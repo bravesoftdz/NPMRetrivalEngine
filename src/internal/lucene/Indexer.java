@@ -1,4 +1,4 @@
-package lucene;
+package internal.lucene;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;

@@ -1,4 +1,4 @@
-package lucene;
+package internal.lucene;
 import java.io.Reader;
 import java.util.Set;
 

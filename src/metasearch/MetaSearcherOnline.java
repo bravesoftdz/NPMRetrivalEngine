@@ -1,59 +1,45 @@
-package lucene;
+package metasearch;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
 
-public class LuceneTester {
+import aggregators.Aggregator;
+
+public class MetaSearcherOnline implements MetaSearcher{
 	
-//   String indexDir = "C:/npm_data/index";
-//   String dataDir = "C:/npm_data/documents";
-   String indexDir = "C:/npm_data/indexcriptions";
-   String dataDir = "C:/npm_data/descriptions";
-   Indexer indexer;
-   Searcher searcher;
+	List<Searcher> searchers;
+	Aggregator aggregator;
+	
+	public MetaSearcherOnline(List<Searcher> searchers, Aggregator aggregator) {
+		super();
+		this.searchers = searchers;
+		this.aggregator = aggregator;
+	}
 
-   public static void main(String[] args) {
-      LuceneTester tester;
-      try {
-         tester = new LuceneTester();
-        // tester.createIndex();
-         tester.search("extract barcode from image file");
-      } catch (IOException e) {
-         e.printStackTrace();
-      } catch (ParseException e) {
-         e.printStackTrace();
-      }
-   }
+	public List<String> search(String query, List<Searcher> searchers, Aggregator aggregator)
+			throws IOException, ParseException {
 
-   private void createIndex() throws IOException{
-      indexer = new Indexer(indexDir);
-      int numIndexed;
-      long startTime = System.currentTimeMillis();	
-      numIndexed = indexer.createIndex(dataDir, new TextFileFilter());
-      long endTime = System.currentTimeMillis();
-      indexer.close();
-      System.out.println(numIndexed+" File indexed, time taken: "
-         +(endTime-startTime)+" ms");		
-   }
+		List<List<String>> rankings = new ArrayList<List<String>>();
+		
+		for (Searcher searcher : searchers) {
+			rankings.add(searcher.search(query));
+		}
 
-   private void search(String searchQuery) throws IOException, ParseException{
-      searcher = new Searcher(indexDir);
-      long startTime = System.currentTimeMillis();
-      TopDocs hits = searcher.search(searchQuery);
-      long endTime = System.currentTimeMillis();
-   
-      System.out.println(hits.totalHits +
-         " documents found. Time :" + (endTime - startTime));
-      for(ScoreDoc scoreDoc : hits.scoreDocs) {
-         Document doc = searcher.getDocument(scoreDoc);
-         String[] path = doc.get(LuceneConstants.FILE_PATH).split("\\\\");
-         String nameDoc = path[path.length-1];
-         nameDoc = nameDoc.replaceAll(".txt", "");
-            System.out.println(nameDoc + " "+ scoreDoc.score);
-      }
-      searcher.close();
-   }
+		return aggregator.aggregate(rankings);
+	}
+	
+	public List<String> search(String query)
+			throws IOException, ParseException {
+
+		List<List<String>> rankings = new ArrayList<List<String>>();
+		
+		for (Searcher searcher : searchers) {
+			rankings.add(searcher.search(query));
+		}
+
+		return aggregator.aggregate(rankings);
+	}
 }
