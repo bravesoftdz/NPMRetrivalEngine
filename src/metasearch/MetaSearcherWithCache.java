@@ -1,6 +1,7 @@
 package metasearch;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class MetaSearcherWithCache implements MetaSearcher{
 		this.aggregator = aggregator;
 	}
 
-	public List<String> search(String query, List<Searcher> searchers, Aggregator aggregator)
+	public List<String> search(String query, Proxy proxy, List<Searcher> searchers, Aggregator aggregator)
 			throws IOException, ParseException {
 
 		List<List<String>> rankings = new ArrayList<List<String>>();
@@ -31,9 +32,9 @@ public class MetaSearcherWithCache implements MetaSearcher{
 			if(cache.isCached(searcher, query)){
 				rankings.add(cache.getCached(searcher, query));
 			}else{
-				List<String> ranking = searcher.search(query);
+				List<String> ranking = searcher.search(query, proxy);
 				rankings.add(ranking);
-				cache.save(searcher,query, null);
+				cache.save(searcher,query, ranking);
 			}
 		}
 		
@@ -42,7 +43,7 @@ public class MetaSearcherWithCache implements MetaSearcher{
 		return aggregator.aggregate(rankings);
 	}
 	
-	public List<String> search(String query)
+	public List<String> search(String query, Proxy proxy)
 			throws IOException, ParseException {
 
 		List<List<String>> rankings = new ArrayList<List<String>>();
@@ -50,12 +51,14 @@ public class MetaSearcherWithCache implements MetaSearcher{
 		CacheManager cache = CacheManager.getInstance();
 		
 		for (Searcher searcher : searchers) {
-			if(!searcher.getName().equals("yarn.com") && cache.isCached(searcher, query)){
+			if(cache.isCached(searcher, query)){
 				rankings.add(cache.getCached(searcher, query));
 			}else{
-				List<String> ranking = searcher.search(query);
+				List<String> ranking = searcher.search(query, proxy);
 				rankings.add(ranking);
-				cache.save(searcher,query, ranking);
+				if(ranking.size()!=0){
+					cache.save(searcher,query, ranking);
+				}
 			}
 		}
 		

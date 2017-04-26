@@ -1,6 +1,8 @@
 package test;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,13 +38,20 @@ public class TestSingleQuery {
 
 	public static void main(String[] args) {
 		
-		LuceneSearch tester = new LuceneSearch();	
-		GoogleWrapper scraper = new GoogleWrapper();
-		NPMWrapper npm1 = new NPMWrapper(11, NPMWrapper.OPTIMAL);
-		NPMWrapper npm2 = new NPMWrapper(11, NPMWrapper.POPULARITY);
-		NPMWrapper npm3 = new NPMWrapper(11, NPMWrapper.QUALITY);
-		NPMWrapper npm4 = new NPMWrapper(11, NPMWrapper.MAINTENANCE);
-		BingWrapper bing = new BingWrapper();
+		Proxy proxy = new Proxy(                                      //
+			    Proxy.Type.HTTP,                                      //
+			    InetSocketAddress.createUnresolved("proxy.exa.unicen.edu.ar", 8080) //
+			);
+		
+		LuceneSearch tester = new LuceneSearch(200);	
+
+		NPMWrapper npm1 = new NPMWrapper(200, NPMWrapper.OPTIMAL);
+		NPMWrapper npm2 = new NPMWrapper(200, NPMWrapper.POPULARITY);
+		NPMWrapper npm3 = new NPMWrapper(200, NPMWrapper.QUALITY);
+		NPMWrapper npm4 = new NPMWrapper(200, NPMWrapper.MAINTENANCE);
+		
+		GoogleWrapper scraper = new GoogleWrapper(50);
+		BingWrapper bing = new BingWrapper(50);
 		//YARNWrapper yarn = new YARNWrapper();
 		//DuckWrapper duck = new DuckWrapper();
 		ArrayList<Searcher> searchers = new ArrayList<Searcher>();
@@ -60,7 +69,7 @@ public class TestSingleQuery {
 		MetaSearcher meta = new MetaSearcherWithCache(searchers, aggregator);
 		List<String> results = new ArrayList<String>();
 		try {
-			results = meta.search("user login");
+			results = meta.search("create web animations", proxy);
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}

@@ -1,6 +1,7 @@
 package metasearch;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,25 +20,25 @@ public class MetaSearcherOnline implements MetaSearcher{
 		this.aggregator = aggregator;
 	}
 
-	public List<String> search(String query, List<Searcher> searchers, Aggregator aggregator)
+	public List<String> search(String query, Proxy proxy, List<Searcher> searchers, Aggregator aggregator)
 			throws IOException, ParseException {
 
 		List<List<String>> rankings = new ArrayList<List<String>>();
 		
 		for (Searcher searcher : searchers) {
-			rankings.add(searcher.search(query));
+			rankings.add(searcher.search(query, proxy));
 		}
 
 		return aggregator.aggregate(rankings);
 	}
 	
-	public List<String> search(String query)
+	public List<String> search(String query, Proxy proxy)
 			throws IOException, ParseException {
 
 		List<List<String>> rankings = new ArrayList<List<String>>();
 		
 		for (Searcher searcher : searchers) {
-			rankings.add(searcher.search(query));
+			rankings.add(searcher.search(query, proxy));
 		}
 
 		return aggregator.aggregate(rankings);

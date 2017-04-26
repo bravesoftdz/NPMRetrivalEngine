@@ -1,6 +1,7 @@
 package external.wrappers;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,33 +14,42 @@ import org.jsoup.safety.Whitelist;
 import metasearch.Searcher;
 import util.PackageManager;
 import util.StopWordManager;
-import util.TFIDFCalculator;
 
 public class GoogleWrapper implements Searcher
 {
     //We need a real browser user agent or Google will block our request with a 403 - Forbidden
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
-
+	public int RESULTS = 20;
+    
     public static void main(String[] args) throws Exception {
     	
     	
                
     }
     
-    public List<String> search(String query){
+    public GoogleWrapper(int results) {
+    	RESULTS = results;
+    }
+    
+    public List<String> search(String query, Proxy proxy){
     	
     	HashMap<String, Integer> wordCount = new HashMap<String,Integer>();
     	
     	List<String> ranking = new ArrayList<String>();
     	
-    	query = "javascript library " + query;
+    	query = "javascript package " + query;
     	
     	int rank = 1;
         //Fetch the page
         Document doc;
 		try {
 			System.out.println("Starting connection with google...");
-			doc = Jsoup.connect("https://google.com/search?q="+query+"&num=10").userAgent(USER_AGENT).timeout(0).get();
+			
+			if(proxy!=null){
+				doc = Jsoup.connect("https://google.com/search?q="+query+"&num=" + RESULTS).proxy(proxy).userAgent(USER_AGENT).timeout(0).get();
+			}else{
+				doc = Jsoup.connect("https://google.com/search?q="+query+"&num=" + RESULTS).userAgent(USER_AGENT).timeout(0).get();
+			}
 
 	        PackageManager pkgm = PackageManager.getInstance();
 	        StopWordManager swm = StopWordManager.getInstance();
@@ -53,12 +63,16 @@ public class GoogleWrapper implements Searcher
 	
 	            //Now do something with the results (maybe something more useful than just printing to console)
 	
-	            //System.out.println(title + " -> " + url);
+	            System.out.println(url);
 	            
 	            String text = "";
 	            Document tech = null;
 	            try{
-	            	tech = Jsoup.connect(url).userAgent(USER_AGENT).timeout(0).get();
+					if (proxy != null) {
+						tech = Jsoup.connect(url).proxy(proxy).userAgent(USER_AGENT).timeout(0).get();
+					} else {
+						tech = Jsoup.connect(url).userAgent(USER_AGENT).timeout(0).get();
+					}
 	            	tech.outputSettings(new Document.OutputSettings()
 	                        .prettyPrint(false));// makes html() preserve linebreaks and
 	                                                    // spacing
@@ -97,7 +111,7 @@ public class GoogleWrapper implements Searcher
 		}    
 
         for(String key:ranking){
-        	System.out.println(key+": "+wordCount.get(key));
+//        	System.out.println(key+": "+wordCount.get(key));
         }
 		
 		return ranking;

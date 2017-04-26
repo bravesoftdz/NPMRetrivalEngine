@@ -1,6 +1,8 @@
 package test;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,19 +38,24 @@ public class TestCompareLuceneNPM {
 
 	public static void main(String[] args) {
 		
+		Proxy proxy = new Proxy(                                      //
+			    Proxy.Type.HTTP,                                      //
+			    InetSocketAddress.createUnresolved("proxy.exa.unicen.edu.ar", 8080) //
+			);
 		
-		NPMWrapper npm1 = new NPMWrapper(22, NPMWrapper.OPTIMAL);
+		
+		NPMWrapper npm1 = new NPMWrapper(200, NPMWrapper.OPTIMAL);
 		//NPMWrapper npm2 = new NPMWrapper(11, NPMWrapper.POPULARITY);
 		//NPMWrapper npm3 = new NPMWrapper(11, NPMWrapper.QUALITY);
 		//NPMWrapper npm4 = new NPMWrapper(11, NPMWrapper.MAINTENANCE);
 		
 		System.out.println();
-		String query = "user login";
+		String query = "create web animations";
 		System.out.println("Executing Query: " + query);
 		
-		LuceneSearch tester = new LuceneSearch();
-		List<String> resultRetrival = tester.search(query);
-		List<String> resultNPM = npm1.search(query);
+		LuceneSearch tester = new LuceneSearch(200);
+		List<String> resultRetrival = tester.search(query, proxy);
+		List<String> resultNPM = npm1.search(query, proxy);
 		
 		System.out.println("Resultados");
 		System.out.println("Solo Lucene");

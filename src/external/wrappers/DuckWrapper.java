@@ -1,6 +1,7 @@
 package external.wrappers;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,20 +15,19 @@ import org.jsoup.select.Elements;
 import metasearch.Searcher;
 import util.PackageManager;
 import util.StopWordManager;
-import util.TFIDFCalculator;
 
 public class DuckWrapper implements Searcher
 {
     //We need a real browser user agent or Google will block our request with a 403 - Forbidden
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
-
+    public static final String USER_AGENT2 = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36";
     public static void main(String[] args) throws Exception {
     	
-    	search2("user");
+    	//search2("user",null);
                
     }
     
-    public static List<String> search2(String query){
+    public  List<String> search(String query, Proxy proxy){
     	
     	HashMap<String, Integer> wordCount = new HashMap<String,Integer>();
     	
@@ -39,8 +39,14 @@ public class DuckWrapper implements Searcher
         //Fetch the page
         Document doc;
 		try {
-			System.out.println("Starting connection with bing...");
-			doc = Jsoup.connect("https://duckduckgo.com/?q="+query+"&ia=web").userAgent(USER_AGENT).timeout(0).get();
+			
+			System.out.println("Starting connection with dockdock...");
+			
+			if(proxy!=null){
+				doc = Jsoup.connect("https://duckduckgo.com/?q="+query+"&ia=web").proxy(proxy).userAgent(USER_AGENT2).timeout(1000).get();
+			}else{
+				doc = Jsoup.connect("https://duckduckgo.com/?q="+query+"&ia=web").userAgent(USER_AGENT2).timeout(1000).get();
+			}
 
 	        PackageManager pkgm = PackageManager.getInstance();
 	        StopWordManager swm = StopWordManager.getInstance();
@@ -61,7 +67,11 @@ public class DuckWrapper implements Searcher
 	            String text = "";
 	            Document tech = null;
 	            try{
-	            	tech = Jsoup.connect(url).userAgent(USER_AGENT).timeout(0).get();
+					if (proxy != null) {
+						tech = Jsoup.connect(url).proxy(proxy).userAgent(USER_AGENT).timeout(0).get();
+					} else {
+						tech = Jsoup.connect(url).userAgent(USER_AGENT).timeout(0).get();
+					}
 	            	tech.outputSettings(new Document.OutputSettings()
 	                        .prettyPrint(false));// makes html() preserve linebreaks and
 	                                                    // spacing
@@ -96,7 +106,7 @@ public class DuckWrapper implements Searcher
 	        }*/
         
 		} catch (IOException e1) {
-			System.out.println("Error estableciendo conexion con google.");;
+			System.out.println("Error estableciendo conexion con dockdock.");;
 		}    
 
         for(String key:ranking){
@@ -112,10 +122,5 @@ public class DuckWrapper implements Searcher
 		return "duckduckgo.com";
 	}
 
-	@Override
-	public List<String> search(String searchQuery) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

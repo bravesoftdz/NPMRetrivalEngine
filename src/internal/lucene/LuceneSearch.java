@@ -1,5 +1,7 @@
 package internal.lucene;
+
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,32 +12,38 @@ import org.apache.lucene.search.TopDocs;
 
 import metasearch.Searcher;
 
-public class LuceneSearch implements Searcher{
-	
-   String indexDir = "C:/Users/Usuarioç/npm_data/index";
-   String dataDir = "C:/Users/Usuarioç/documents";
-//   String indexDir = "C:/npm_data/indexcriptions";
-//   String dataDir = "C:/npm_data/descriptions";
-   Indexer indexer;
-   LuceneSearcher searcher;
+public class LuceneSearch implements Searcher {
 
-   private void createIndex() throws IOException{
-      indexer = new Indexer(indexDir);
-      int numIndexed;
-      long startTime = System.currentTimeMillis();	
-      numIndexed = indexer.createIndex(dataDir, new TextFileFilter());
-      long endTime = System.currentTimeMillis();
-      indexer.close();
-      System.out.println(numIndexed+" File indexed, time taken: "
-         +(endTime-startTime)+" ms");		
-   }
+	String indexDir = "C:/Users/Usuarioç/npm_data/index";
+	String dataDir = "C:/Users/Usuarioç/documents";
+	// String indexDir = "C:/npm_data/indexcriptions";
+	// String dataDir = "C:/npm_data/descriptions";
+	Indexer indexer;
+	LuceneSearcher searcher;
 
-	public List<String> search(String searchQuery) {
+	int max_results = 200;
+
+	public LuceneSearch(int max_results) {
+		this.max_results = max_results;
+	}
+
+	private void createIndex() throws IOException {
+		indexer = new Indexer(indexDir);
+		int numIndexed;
+		long startTime = System.currentTimeMillis();
+		numIndexed = indexer.createIndex(dataDir, new TextFileFilter());
+		long endTime = System.currentTimeMillis();
+		indexer.close();
+		System.out.println(numIndexed + " File indexed, time taken: " + (endTime - startTime) + " ms");
+	}
+
+	public List<String> search(String searchQuery, Proxy proxy) {
 		List<String> results = new ArrayList<String>();
 		try {
+			//createIndex();
 			searcher = new LuceneSearcher(indexDir);
 			long startTime = System.currentTimeMillis();
-			TopDocs hits = searcher.search(searchQuery);
+			TopDocs hits = searcher.search(searchQuery, max_results);
 			long endTime = System.currentTimeMillis();
 
 			System.out.println(hits.totalHits + " documents found. Time :" + (endTime - startTime));

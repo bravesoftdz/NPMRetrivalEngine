@@ -1,8 +1,10 @@
 package external.wrappers;
 
 import java.io.IOException;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.lang.Math;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,35 +19,44 @@ public class NPMWrapper implements Searcher {
 
 	public int MAX_PAGE = 10;
 	public String RANK = OPTIMAL;
-	
+
 	public static final String OPTIMAL = "optimal";
 	public static final String QUALITY = "quality";
 	public static final String POPULARITY = "popularity";
 	public static final String MAINTENANCE = "maintenance";
-	
-	
-	public NPMWrapper(int pages, String ranktype) {
-		MAX_PAGE=pages;
-		RANK=ranktype;
+
+	public NPMWrapper(int results, String ranktype) {
+		MAX_PAGE = (int) Math.ceil(results/10);
+		RANK = ranktype;
 	}
-	
-	public List<String> search(String query) {
+
+	public List<String> search(String query, Proxy proxy) {
 
 		List<String> results = new ArrayList<String>();
 
 		Document doc;
+		
+		System.out.println("Starting connection with NPM...");
+		System.out.println("Analizing Results...");
 
 		for (int page = 1; page < MAX_PAGE; page++) {
 			try {
-				System.out.println("Starting connection with NPM...");
 
-				doc = Jsoup
-						.connect(
-								"https://www.npmjs.com/search?q=" + query + "&page=" + page + "&ranking=" + RANK)
-						.userAgent(USER_AGENT).timeout(0).get();
+				if (proxy != null) {
+					doc = Jsoup
+							.connect("https://www.npmjs.com/search?q=" + query + "&page=" + page + "&ranking=" + RANK)
+							.proxy(proxy).userAgent(USER_AGENT).timeout(0).get();
+				} else {
+					doc = Jsoup
+							.connect("https://www.npmjs.com/search?q=" + query + "&page=" + page + "&ranking=" + RANK)
+							.userAgent(USER_AGENT).timeout(0).get();
+				}
 				// System.out.println("Connection with NPM finished...");
 
-				System.out.println("Analizing Results...");
+
+				if (doc.select("h3 a").size() == 0) {
+					break;
+				}
 				for (Element result : doc.select("h3 a")) {
 
 					if (result.className().startsWith("packageName")) {
@@ -64,7 +75,7 @@ public class NPMWrapper implements Searcher {
 				}
 
 			} catch (IOException e1) {
-				System.out.println("Error estableciendo conexion con NPM.");				
+				System.out.println("Error estableciendo conexion con NPM.");
 			}
 		}
 
@@ -74,7 +85,7 @@ public class NPMWrapper implements Searcher {
 
 	@Override
 	public String getName() {
-		return "npmjs.com"+RANK+MAX_PAGE;
+		return "npmjs.com" + RANK + MAX_PAGE;
 	}
 
 }

@@ -31,10 +31,10 @@ public class LuceneSearcher {
          new StandardAnalyzer(Version.LUCENE_36));
    }
    
-   public TopDocs search( String searchQuery) 
+   public TopDocs search( String searchQuery, int results) 
       throws IOException, ParseException{
       query = queryParser.parse(searchQuery);
-      return indexSearcher.search(query, LuceneConstants.MAX_SEARCH);
+      return indexSearcher.search(query, results);
    }
 
    public Document getDocument(ScoreDoc scoreDoc) 
