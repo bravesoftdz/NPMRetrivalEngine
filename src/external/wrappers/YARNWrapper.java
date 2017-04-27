@@ -10,6 +10,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import metasearch.Searcher;
+import ranking.RankedItem;
+import ranking.Ranking;
 
 @Deprecated
 public class YARNWrapper implements Searcher
@@ -17,9 +19,9 @@ public class YARNWrapper implements Searcher
     //We need a real browser user agent or Google will block our request with a 403 - Forbidden
     public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
     
-    public List<String> search(String query, Proxy proxy){
+    public Ranking search(String query, Proxy proxy){
     	
-    	List<String> results = new ArrayList<String>();
+    	List<RankedItem> results = new ArrayList<RankedItem>();
     	
         Document doc;
 		try {
@@ -47,7 +49,7 @@ public class YARNWrapper implements Searcher
 		
 		            System.out.println(title + " -> " + url); 
 		            
-		            results.add(title);
+		            results.add(new RankedItem(title, 0.0));
 		            
 	        	}
 	        }
@@ -57,7 +59,7 @@ public class YARNWrapper implements Searcher
 			System.out.println("Error estableciendo conexion con YARN.");;
 		}
         
-		return results;
+		return new Ranking(results);
 
     }
 

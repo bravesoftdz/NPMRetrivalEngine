@@ -2,6 +2,10 @@ package aggregators;
 
 import java.util.List;
 
+import ranking.Ranking;
+
 public interface Aggregator {
-	public List<String> aggregate(List<List<String>> rankings);
+	public Ranking aggregate(List<Ranking> rankings);
+	public String getName();
+	public void setName(String name);
 }

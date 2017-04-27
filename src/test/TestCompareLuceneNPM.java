@@ -1,24 +1,12 @@
 package test;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.lucene.queryParser.ParseException;
-
-import aggregators.Aggregator;
-import aggregators.SimpleAgregator;
-import external.wrappers.BingWrapper;
-import external.wrappers.DuckWrapper;
-import external.wrappers.GoogleWrapper;
 import external.wrappers.NPMWrapper;
-import external.wrappers.YARNWrapper;
 import internal.lucene.LuceneSearch;
-import metasearch.MetaSearcher;
-import metasearch.MetaSearcherWithCache;
-import metasearch.Searcher;
+import ranking.RankedItem;
+import ranking.Ranking;
 
 /*
 Q1 bounded buffer 5
@@ -54,26 +42,28 @@ public class TestCompareLuceneNPM {
 		System.out.println("Executing Query: " + query);
 		
 		LuceneSearch tester = new LuceneSearch(200);
-		List<String> resultRetrival = tester.search(query, proxy);
-		List<String> resultNPM = npm1.search(query, proxy);
+		Ranking resultRetrival = tester.search(query, proxy);
+		Ranking resultNPM = npm1.search(query, proxy);
+		resultRetrival.sort();
+		resultNPM.sort();
 		
 		System.out.println("Resultados");
 		System.out.println("Solo Lucene");
-		for(String tech:resultRetrival){
+		for(RankedItem tech:resultRetrival.getRankingList()){
 			if(!resultNPM.contains(tech)){
-				System.out.println(tech);
+				System.out.println(tech.getName()+":"+tech.getScore());
 			}
 		}
 		System.out.println("Solo NPM");
-		for(String tech:resultNPM){
+		for(RankedItem tech:resultNPM.getRankingList()){
 			if(!resultRetrival.contains(tech)){
-				System.out.println(tech);
+				System.out.println(tech.getName()+":"+tech.getScore());
 			}
 		}
 		System.out.println("Compartidos");
-		for(String tech:resultRetrival){
+		for(RankedItem tech:resultRetrival.getRankingList()){
 			if(resultNPM.contains(tech)){
-				System.out.println(tech);
+				System.out.println(tech.getName()+":"+tech.getScore());
 			}
 		}
 		System.out.println();

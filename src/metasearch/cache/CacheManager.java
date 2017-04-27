@@ -5,19 +5,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import metasearch.Searcher;
+import ranking.Ranking;
 
 public class CacheManager {
 
 	private static CacheManager instance = null;
-	private HashMap<String, List<String>> cache = null;
+	private HashMap<String, Ranking> cache = null;
 
 	protected CacheManager() {
-		cache = new HashMap<String, List<String>>();
+		cache = new HashMap<String, Ranking>();
 		loadCache();
 	}
 
@@ -32,7 +32,7 @@ public class CacheManager {
 		ObjectInputStream entrada;
 		try {
 			entrada = new ObjectInputStream(new FileInputStream("cache.dat"));
-			cache = (HashMap<String, List<String>>) entrada.readObject();
+			cache = (HashMap<String, Ranking>) entrada.readObject();
 			entrada.close();
 		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -55,12 +55,12 @@ public class CacheManager {
 		return cache.containsKey(getKey(searcher,query));
 	}
 
-	public List<String> getCached(Searcher searcher, String query) {
+	public Ranking getCached(Searcher searcher, String query) {
 		return cache.get(getKey(searcher,query));
 	}
 
-	public void save(Searcher searcher, String query, List<String> ranking) {
-		cache.put(getKey(searcher,query), ranking);
+	public void save(Searcher searcher, String query, Ranking ranking) {
+		cache.put(getKey(searcher,query), (Ranking) ranking);
 	}
 	
 	private String getKey(Searcher searcher, String query){

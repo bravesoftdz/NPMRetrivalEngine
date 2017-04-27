@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.lucene.queryParser.ParseException;
 
 import aggregators.Aggregator;
+import ranking.Ranking;
 
 public class MetaSearcherOnline implements MetaSearcher{
 	
@@ -20,10 +21,10 @@ public class MetaSearcherOnline implements MetaSearcher{
 		this.aggregator = aggregator;
 	}
 
-	public List<String> search(String query, Proxy proxy, List<Searcher> searchers, Aggregator aggregator)
+	public Ranking search(String query, Proxy proxy, List<Searcher> searchers, Aggregator aggregator)
 			throws IOException, ParseException {
 
-		List<List<String>> rankings = new ArrayList<List<String>>();
+		List<Ranking> rankings = new ArrayList<Ranking>();
 		
 		for (Searcher searcher : searchers) {
 			rankings.add(searcher.search(query, proxy));
@@ -32,10 +33,10 @@ public class MetaSearcherOnline implements MetaSearcher{
 		return aggregator.aggregate(rankings);
 	}
 	
-	public List<String> search(String query, Proxy proxy)
+	public Ranking search(String query, Proxy proxy)
 			throws IOException, ParseException {
 
-		List<List<String>> rankings = new ArrayList<List<String>>();
+		List<Ranking> rankings = new ArrayList<Ranking>();
 		
 		for (Searcher searcher : searchers) {
 			rankings.add(searcher.search(query, proxy));

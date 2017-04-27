@@ -1,9 +1,10 @@
 package metasearch;
 
 import java.net.Proxy;
-import java.util.List;
+
+import ranking.Ranking;
 
 public interface Searcher {
 	public String getName();
-	public List<String> search(String searchQuery,Proxy proxy);
+	public Ranking search(String searchQuery,Proxy proxy);
 }

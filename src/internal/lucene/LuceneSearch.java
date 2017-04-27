@@ -11,6 +11,8 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
 import metasearch.Searcher;
+import ranking.RankedItem;
+import ranking.Ranking;
 
 public class LuceneSearch implements Searcher {
 
@@ -37,8 +39,8 @@ public class LuceneSearch implements Searcher {
 		System.out.println(numIndexed + " File indexed, time taken: " + (endTime - startTime) + " ms");
 	}
 
-	public List<String> search(String searchQuery, Proxy proxy) {
-		List<String> results = new ArrayList<String>();
+	public Ranking search(String searchQuery, Proxy proxy) {
+		List<RankedItem> results = new ArrayList<RankedItem>();
 		try {
 			//createIndex();
 			searcher = new LuceneSearcher(indexDir);
@@ -47,13 +49,14 @@ public class LuceneSearch implements Searcher {
 			long endTime = System.currentTimeMillis();
 
 			System.out.println(hits.totalHits + " documents found. Time :" + (endTime - startTime));
-			for (ScoreDoc scoreDoc : hits.scoreDocs) {
+			for (int i=0;i<hits.scoreDocs.length;i++){
+				ScoreDoc scoreDoc = hits.scoreDocs[i];
 				Document doc = searcher.getDocument(scoreDoc);
 				String[] path = doc.get(LuceneConstants.FILE_PATH).split("\\\\");
 				String nameDoc = path[path.length - 1];
 				nameDoc = nameDoc.replaceAll(".txt", "");
 				// System.out.println(nameDoc + " "+ scoreDoc.score);
-				results.add(nameDoc);
+				results.add(new RankedItem(nameDoc, (double) (max_results-i)));
 			}
 			searcher.close();
 		} catch (IOException e) {
@@ -63,7 +66,7 @@ public class LuceneSearch implements Searcher {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return results;
+		return new Ranking(results);
 	}
 
 	@Override

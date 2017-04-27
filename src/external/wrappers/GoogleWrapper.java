@@ -12,6 +12,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.safety.Whitelist;
 
 import metasearch.Searcher;
+import ranking.RankedItem;
+import ranking.Ranking;
 import util.PackageManager;
 import util.StopWordManager;
 
@@ -31,11 +33,11 @@ public class GoogleWrapper implements Searcher
     	RESULTS = results;
     }
     
-    public List<String> search(String query, Proxy proxy){
+    public Ranking search(String query, Proxy proxy){
     	
     	HashMap<String, Integer> wordCount = new HashMap<String,Integer>();
     	
-    	List<String> ranking = new ArrayList<String>();
+		List<RankedItem> ranking = new ArrayList<RankedItem>();
     	
     	query = "javascript package " + query;
     	
@@ -88,7 +90,7 @@ public class GoogleWrapper implements Searcher
 	                	word=word.trim().toLowerCase();
 	                	if(!"".equals(word) && !swm.isStopWord(word) && pkgm.isPkgName(word)){
 	                		if(!ranking.contains(word)){
-	                			ranking.add(word);
+	                			ranking.add(new RankedItem(word, (double)(RESULTS-(rank-1))));
 	                			wordCount.put(word, rank);
 	                		}
 	                	}
@@ -110,11 +112,11 @@ public class GoogleWrapper implements Searcher
 			System.out.println("Error estableciendo conexion con google.");;
 		}    
 
-        for(String key:ranking){
+        /*for(RankedItem key:ranking){
 //        	System.out.println(key+": "+wordCount.get(key));
-        }
+        }*/
 		
-		return ranking;
+		return new Ranking(ranking);
 
     }
 

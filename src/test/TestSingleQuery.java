@@ -4,21 +4,21 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import org.apache.lucene.queryParser.ParseException;
 
 import aggregators.Aggregator;
-import aggregators.SimpleAgregator;
+import aggregators.WeightedFirstRankingAgregator;
 import external.wrappers.BingWrapper;
-import external.wrappers.DuckWrapper;
 import external.wrappers.GoogleWrapper;
 import external.wrappers.NPMWrapper;
-import external.wrappers.YARNWrapper;
 import internal.lucene.LuceneSearch;
 import metasearch.MetaSearcher;
 import metasearch.MetaSearcherWithCache;
 import metasearch.Searcher;
+import ranking.RankedItem;
+import ranking.Ranking;
 
 /*
 Q1 bounded buffer 5
@@ -58,27 +58,33 @@ public class TestSingleQuery {
 		searchers.add(tester);
 		searchers.add(scraper);
 		searchers.add(npm1);
-		searchers.add(npm2);
-		searchers.add(npm3);
-		searchers.add(npm4);
+		//searchers.add(npm2);
+		//searchers.add(npm3);
+		//searchers.add(npm4);
 		searchers.add(bing);
 		//searchers.add(duck);
 		
-		Aggregator aggregator = new SimpleAgregator();
+		Double[] weights = {0.25,0.25,0.25,0.25};
+		Aggregator aggregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
+		
+		
+		String query = "create web animations";
 		
 		MetaSearcher meta = new MetaSearcherWithCache(searchers, aggregator);
-		List<String> results = new ArrayList<String>();
+		Ranking results = null;
 		try {
-			results = meta.search("create web animations", proxy);
+			results = meta.search(query, proxy);
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
 		
 		System.out.println();
 		System.out.println("RESULTADOS");
-		for(String tech:results){
-				System.out.println(tech);
+		for(RankedItem tech:results.getRankingList()){
+				System.out.println(tech.getName()+":"+tech.getScore());
 		}
+		
+		results.saveRankingInFile("results/"+query+".txt");
 		
 		/*executeQuery("bounded buffer");
 		executeQuery("quick sort");

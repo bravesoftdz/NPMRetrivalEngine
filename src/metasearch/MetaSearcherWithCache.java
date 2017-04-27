@@ -9,6 +9,7 @@ import org.apache.lucene.queryParser.ParseException;
 
 import aggregators.Aggregator;
 import metasearch.cache.CacheManager;
+import ranking.Ranking;
 
 public class MetaSearcherWithCache implements MetaSearcher{
 	
@@ -21,10 +22,10 @@ public class MetaSearcherWithCache implements MetaSearcher{
 		this.aggregator = aggregator;
 	}
 
-	public List<String> search(String query, Proxy proxy, List<Searcher> searchers, Aggregator aggregator)
+	public Ranking search(String query, Proxy proxy, List<Searcher> searchers, Aggregator aggregator)
 			throws IOException, ParseException {
 
-		List<List<String>> rankings = new ArrayList<List<String>>();
+		List<Ranking> rankings = new ArrayList<Ranking>();
 		
 		CacheManager cache = CacheManager.getInstance();
 		
@@ -32,7 +33,7 @@ public class MetaSearcherWithCache implements MetaSearcher{
 			if(cache.isCached(searcher, query)){
 				rankings.add(cache.getCached(searcher, query));
 			}else{
-				List<String> ranking = searcher.search(query, proxy);
+				Ranking ranking = searcher.search(query, proxy);
 				rankings.add(ranking);
 				cache.save(searcher,query, ranking);
 			}
@@ -43,10 +44,10 @@ public class MetaSearcherWithCache implements MetaSearcher{
 		return aggregator.aggregate(rankings);
 	}
 	
-	public List<String> search(String query, Proxy proxy)
+	public Ranking search(String query, Proxy proxy)
 			throws IOException, ParseException {
 
-		List<List<String>> rankings = new ArrayList<List<String>>();
+		List<Ranking> rankings = new ArrayList<Ranking>();
 		
 		CacheManager cache = CacheManager.getInstance();
 		
@@ -54,7 +55,7 @@ public class MetaSearcherWithCache implements MetaSearcher{
 			if(cache.isCached(searcher, query)){
 				rankings.add(cache.getCached(searcher, query));
 			}else{
-				List<String> ranking = searcher.search(query, proxy);
+				Ranking ranking = searcher.search(query, proxy);
 				rankings.add(ranking);
 				if(ranking.size()!=0){
 					cache.save(searcher,query, ranking);

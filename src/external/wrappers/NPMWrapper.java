@@ -9,8 +9,11 @@ import java.lang.Math;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import metasearch.Searcher;
+import ranking.RankedItem;
+import ranking.Ranking;
 
 public class NPMWrapper implements Searcher {
 	// We need a real browser user agent or Google will block our request with a
@@ -30,9 +33,9 @@ public class NPMWrapper implements Searcher {
 		RANK = ranktype;
 	}
 
-	public List<String> search(String query, Proxy proxy) {
-
-		List<String> results = new ArrayList<String>();
+	public Ranking search(String query, Proxy proxy) {
+		
+		List<RankedItem> results = new ArrayList<RankedItem>();
 
 		Document doc;
 		
@@ -57,7 +60,10 @@ public class NPMWrapper implements Searcher {
 				if (doc.select("h3 a").size() == 0) {
 					break;
 				}
-				for (Element result : doc.select("h3 a")) {
+				
+				Elements elements = doc.select("h3 a");
+				for (int e=0; e< elements.size(); e++) {
+					Element result = elements.get(e);
 
 					if (result.className().startsWith("packageName")) {
 
@@ -69,7 +75,7 @@ public class NPMWrapper implements Searcher {
 
 						System.out.println(title + " -> " + url);
 
-						results.add(title);
+						results.add(new RankedItem(title, (double)(((page-1)*10)+e)));
 
 					}
 				}
@@ -79,7 +85,7 @@ public class NPMWrapper implements Searcher {
 			}
 		}
 
-		return results;
+		return new Ranking(results);
 
 	}
 
