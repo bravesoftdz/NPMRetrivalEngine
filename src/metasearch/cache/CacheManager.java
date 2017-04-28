@@ -31,7 +31,7 @@ public class CacheManager {
 	protected void loadCache() {
 		ObjectInputStream entrada;
 		try {
-			entrada = new ObjectInputStream(new FileInputStream("cache.dat"));
+			entrada = new ObjectInputStream(new FileInputStream("cache2.dat"));
 			cache = (HashMap<String, Ranking>) entrada.readObject();
 			entrada.close();
 		} catch (IOException | ClassNotFoundException e) {
@@ -42,7 +42,7 @@ public class CacheManager {
 	public void saveCache() {
 		ObjectOutputStream salida;
 		try {
-			salida = new ObjectOutputStream(new FileOutputStream("cache.dat"));
+			salida = new ObjectOutputStream(new FileOutputStream("cache2.dat"));
 			salida.writeObject(cache);
 			salida.close();
 		} catch (IOException e) {

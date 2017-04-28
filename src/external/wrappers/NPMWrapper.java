@@ -20,7 +20,7 @@ public class NPMWrapper implements Searcher {
 	// 403 - Forbidden
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
 
-	public int MAX_PAGE = 10;
+	public int MAX_PAGE = 20;
 	public String RANK = OPTIMAL;
 
 	public static final String OPTIMAL = "optimal";
