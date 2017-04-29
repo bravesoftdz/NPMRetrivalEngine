@@ -2,6 +2,8 @@ package util;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,9 +14,11 @@ public class HitManager {
 
 	private static HitManager instance = null;
 	private HashMap<String, List<String>> queriesXhits = null;
+	private HashMap<String, List<String>> queriesXNOhits = null;
 
 	protected HitManager() {
 		queriesXhits = new HashMap<String, List<String>>();
+		queriesXNOhits = new HashMap<String, List<String>>();
 		loadQueriesXhits();
 	}
 
@@ -27,39 +31,112 @@ public class HitManager {
 
 	protected void loadQueriesXhits() {
 		String fichero = "examples/queriesXhits";
+		FileReader fr = null;
+		BufferedReader br = null;
 		try {
-			FileReader fr = new FileReader(fichero);
-			BufferedReader br = new BufferedReader(fr);
+			fr = new FileReader(fichero);
+			br = new BufferedReader(fr);
 			String linea;
 			while ((linea = br.readLine()) != null) {
 				String[] queriesXhits = linea.split(":=:");
 				String q = queriesXhits[0];
-				List<String> hits = "".equals(queriesXhits[1])?new ArrayList<String>():Arrays.asList(queriesXhits[1].split(","));
+
+				List<String> hits = new ArrayList<String>();
+				if (queriesXhits.length > 1) {
+					hits.addAll(Arrays.asList(queriesXhits[1].split(",")));
+				}
 				this.queriesXhits.put(q, hits);
+
+				List<String> nohits = new ArrayList<String>();
+				if (queriesXhits.length > 2) {
+					nohits.addAll(Arrays.asList(queriesXhits[2].split(",")));
+				}
+				this.queriesXNOhits.put(q, nohits);
+
 			}
-			fr.close();
 		} catch (Exception e) {
 			System.out.println("Excepcion leyendo fichero " + fichero + ": " + e);
+		} finally {
+			try {
+				if (null != fr)
+					fr.close();
+			} catch (Exception e2) {
+				System.out.println("Excepcion cerrando fichero " + fichero + ": " + e2);
+			}
 		}
 	}
-	
-	public Set<String> getQueries(){
+
+	public void saveQueriesXhits() {
+		String fichero = "examples/queriesXhits";
+		FileWriter fw = null;
+		PrintWriter pw = null;
+		try {
+			fw = new FileWriter(fichero);
+			pw = new PrintWriter(fw);
+			for (String query : queriesXhits.keySet()) {
+				String linea = query + ":=:";
+				for (int i = 0; i < queriesXhits.get(query).size(); i++) {
+					linea = linea + queriesXhits.get(query).get(i);
+					if (i < queriesXhits.get(query).size() - 1) {
+						linea = linea + ",";
+					}
+				}
+				linea = linea + ":=:";
+				for (int i = 0; i < queriesXNOhits.get(query).size(); i++) {
+					linea = linea + queriesXNOhits.get(query).get(i);
+					if (i < queriesXNOhits.get(query).size() - 1) {
+						linea = linea + ",";
+					}
+				}
+				pw.println(linea);
+			}
+		} catch (Exception e) {
+			System.out.println("Excepcion leyendo fichero " + fichero + ": " + e.getMessage());
+		} finally {
+			try {
+				if (null != fw)
+					fw.close();
+			} catch (Exception e2) {
+				System.out.println("Excepcion cerrando fichero " + fichero + ": " + e2.getMessage());
+			}
+		}
+	}
+
+	public Set<String> getQueries() {
 		return queriesXhits.keySet();
 	}
-	
-	public void addHit(String query, String hit){
-		if(queriesXhits.get(query)!=null){
-			if(!queriesXhits.get(query).contains(hit)){
+
+	public void addHit(String query, String hit) {
+		if (queriesXhits.get(query) != null) {
+			if (!queriesXhits.get(query).contains(hit)) {
 				queriesXhits.get(query).add(hit);
 			}
-		}else{
+		} else {
 			queriesXhits.put(query, new ArrayList<String>());
 			queriesXhits.get(query).add(hit);
 		}
 	}
 
+	public void addNOHit(String query, String hit) {
+		if (queriesXNOhits.get(query) != null) {
+			if (!queriesXNOhits.get(query).contains(hit)) {
+				queriesXNOhits.get(query).add(hit);
+			}
+		} else {
+			queriesXNOhits.put(query, new ArrayList<String>());
+			queriesXNOhits.get(query).add(hit);
+		}
+	}
+
 	public boolean isAHit(String q, String pkg) {
 		if (queriesXhits.get(q) != null && queriesXhits.get(q).contains(pkg)) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isNotAHit(String q, String pkg) {
+		if (queriesXNOhits.get(q) != null && queriesXNOhits.get(q).contains(pkg)) {
 			return true;
 		}
 		return false;
