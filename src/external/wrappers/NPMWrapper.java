@@ -12,6 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import metasearch.Searcher;
+import metasearch.cache.CacheRankingManager;
 import ranking.RankedItem;
 import ranking.Ranking;
 
@@ -29,63 +30,73 @@ public class NPMWrapper implements Searcher {
 	public static final String MAINTENANCE = "maintenance";
 
 	public NPMWrapper(int results, String ranktype) {
-		MAX_PAGE = (int) Math.ceil(results/10);
+		MAX_PAGE = (int) Math.ceil(results / 10);
 		RANK = ranktype;
 	}
 
 	public Ranking search(String query, Proxy proxy) {
-		
-		List<RankedItem> results = new ArrayList<RankedItem>();
 
-		Document doc;
-		
-		System.out.println("Starting connection with NPM...");
-		System.out.println("Analizing Results...");
+		Ranking r = CacheRankingManager.getInstance().loadRankingFromCache(this, query);
 
-		for (int page = 1; page < MAX_PAGE; page++) {
-			try {
+		if (r != null) {
+			return r;
+		} else {
 
-				if (proxy != null) {
-					doc = Jsoup
-							.connect("https://www.npmjs.com/search?q=" + query + "&page=" + page + "&ranking=" + RANK)
-							.proxy(proxy).userAgent(USER_AGENT).timeout(0).get();
-				} else {
-					doc = Jsoup
-							.connect("https://www.npmjs.com/search?q=" + query + "&page=" + page + "&ranking=" + RANK)
-							.userAgent(USER_AGENT).timeout(0).get();
-				}
-				// System.out.println("Connection with NPM finished...");
+			List<RankedItem> results = new ArrayList<RankedItem>();
 
+			Document doc;
 
-				if (doc.select("h3 a").size() == 0) {
-					break;
-				}
-				
-				Elements elements = doc.select("h3 a");
-				for (int e=0; e< elements.size(); e++) {
-					Element result = elements.get(e);
+			System.out.println("Starting connection with NPM...");
+			System.out.println("Analizing Results...");
 
-					if (result.className().startsWith("packageName")) {
+			for (int page = 1; page < MAX_PAGE; page++) {
+				try {
 
-						final String title = result.text();
-						final String url = result.attr("href");
-
-						// Now do something with the results (maybe something
-						// more useful than just printing to console)
-
-						System.out.println(title + " -> " + url);
-
-						results.add(new RankedItem(title, (double)(((page-1)*10)+e)));
-
+					if (proxy != null) {
+						doc = Jsoup.connect(
+								"https://www.npmjs.com/search?q=" + query + "&page=" + page + "&ranking=" + RANK)
+								.proxy(proxy).userAgent(USER_AGENT).timeout(0).get();
+					} else {
+						doc = Jsoup.connect(
+								"https://www.npmjs.com/search?q=" + query + "&page=" + page + "&ranking=" + RANK)
+								.userAgent(USER_AGENT).timeout(0).get();
 					}
-				}
+					// System.out.println("Connection with NPM finished...");
 
-			} catch (IOException e1) {
-				System.out.println("Error estableciendo conexion con NPM.");
+					if (doc.select("h3 a").size() == 0) {
+						r = new Ranking(results);
+						break;
+					}
+
+					Elements elements = doc.select("h3 a");
+					for (int e = 0; e < elements.size(); e++) {
+						Element result = elements.get(e);
+
+						if (result.className().startsWith("packageName")) {
+
+							final String title = result.text();
+							final String url = result.attr("href");
+
+							// Now do something with the results (maybe
+							// something
+							// more useful than just printing to console)
+
+							System.out.println(title + " -> " + url);
+
+							results.add(new RankedItem(title, (double) (((page - 1) * 10) + e)));
+
+						}
+					}
+					
+					r = new Ranking(results);
+					CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
+				} catch (IOException e1) {
+					System.out.println("Error estableciendo conexion con NPM.");
+				}
 			}
 		}
 
-		return new Ranking(results);
+		return r;
 
 	}
 

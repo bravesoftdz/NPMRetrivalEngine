@@ -11,6 +11,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 
 import metasearch.Searcher;
+import metasearch.cache.CacheRankingManager;
 import ranking.RankedItem;
 import ranking.Ranking;
 
@@ -39,34 +40,43 @@ public class LuceneSearch implements Searcher {
 		System.out.println(numIndexed + " File indexed, time taken: " + (endTime - startTime) + " ms");
 	}
 
-	public Ranking search(String searchQuery, Proxy proxy) {
-		List<RankedItem> results = new ArrayList<RankedItem>();
-		try {
-			//createIndex();
-			searcher = new LuceneSearcher(indexDir);
-			long startTime = System.currentTimeMillis();
-			TopDocs hits = searcher.search(searchQuery, max_results);
-			long endTime = System.currentTimeMillis();
+	public Ranking search(String query, Proxy proxy) {
 
-			System.out.println(hits.totalHits + " documents found. Time :" + (endTime - startTime));
-			for (int i=0;i<hits.scoreDocs.length;i++){
-				ScoreDoc scoreDoc = hits.scoreDocs[i];
-				Document doc = searcher.getDocument(scoreDoc);
-				String[] path = doc.get(LuceneConstants.FILE_PATH).split("\\\\");
-				String nameDoc = path[path.length - 1];
-				nameDoc = nameDoc.replaceAll(".txt", "");
-				// System.out.println(nameDoc + " "+ scoreDoc.score);
-				results.add(new RankedItem(nameDoc, (double) (max_results-i)));
+		Ranking r = CacheRankingManager.getInstance().loadRankingFromCache(this, query);
+
+		if (r != null) {
+			return r;
+		} else {
+			List<RankedItem> results = new ArrayList<RankedItem>();
+			try {
+				// createIndex();
+				searcher = new LuceneSearcher(indexDir);
+				long startTime = System.currentTimeMillis();
+				TopDocs hits = searcher.search(query, max_results);
+				long endTime = System.currentTimeMillis();
+
+				System.out.println(hits.totalHits + " documents found. Time :" + (endTime - startTime));
+				for (int i = 0; i < hits.scoreDocs.length; i++) {
+					ScoreDoc scoreDoc = hits.scoreDocs[i];
+					Document doc = searcher.getDocument(scoreDoc);
+					String[] path = doc.get(LuceneConstants.FILE_PATH).split("\\\\");
+					String nameDoc = path[path.length - 1];
+					nameDoc = nameDoc.replaceAll(".txt", "");
+					// System.out.println(nameDoc + " "+ scoreDoc.score);
+					results.add(new RankedItem(nameDoc, (double) (max_results - i)));
+				}
+				searcher.close();
+				r = new Ranking(results);
+				CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			searcher.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-		return new Ranking(results);
+		return r;
 	}
 
 	@Override

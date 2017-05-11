@@ -3,6 +3,7 @@ package test;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 
+import external.wrappers.NPMSearchWrapper;
 import external.wrappers.NPMWrapper;
 import internal.lucene.LuceneSearch;
 import ranking.RankedItem;
@@ -32,7 +33,7 @@ public class TestCompareLuceneNPM {
 			);
 		
 		
-		NPMWrapper npm1 = new NPMWrapper(200, NPMWrapper.OPTIMAL);
+		NPMSearchWrapper npm1 = new NPMSearchWrapper(200/*, NPMWrapper.OPTIMAL*/);
 		//NPMWrapper npm2 = new NPMWrapper(11, NPMWrapper.POPULARITY);
 		//NPMWrapper npm3 = new NPMWrapper(11, NPMWrapper.QUALITY);
 		//NPMWrapper npm4 = new NPMWrapper(11, NPMWrapper.MAINTENANCE);

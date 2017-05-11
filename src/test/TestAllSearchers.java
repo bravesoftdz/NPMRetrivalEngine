@@ -4,21 +4,19 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.lucene.queryParser.ParseException;
 
 import aggregators.Aggregator;
 import aggregators.OnlyTheFirst;
-import aggregators.WeightedFirstRankingAgregator;
-import aggregators.WeightedRankingAgregator;
 import external.wrappers.BingWrapper;
 import external.wrappers.GoogleWrapper;
+import external.wrappers.NPMSearchWrapper;
 import external.wrappers.NPMWrapper;
 import internal.lucene.LuceneSearch;
 import metasearch.MetaSearcher;
-import metasearch.MetaSearcherWithCache;
+import metasearch.MetaSearcherOnline;
 import metasearch.Searcher;
 import ranking.RankedItem;
 import ranking.Ranking;
@@ -50,6 +48,7 @@ public class TestAllSearchers {
 		NPMWrapper npm1 = new NPMWrapper(200, NPMWrapper.OPTIMAL);
 		GoogleWrapper scraper = new GoogleWrapper(50);
 		BingWrapper bing = new BingWrapper(50);
+		NPMSearchWrapper npmsearch = new NPMSearchWrapper(200);
 
 		
 		ArrayList<Searcher> lucene = new ArrayList<Searcher>();
@@ -60,12 +59,15 @@ public class TestAllSearchers {
 		npm.add(npm1);
 		ArrayList<Searcher> bings = new ArrayList<Searcher>();
 		bings.add(bing);
+		ArrayList<Searcher> npmsearchers = new ArrayList<Searcher>();
+		npmsearchers.add(npmsearch);
 		
 		List<List<Searcher>> searchers = new ArrayList<List<Searcher>>();
 		searchers.add(lucene);
 		searchers.add(google);
 		searchers.add(npm);
 		searchers.add(bings);
+		searchers.add(npmsearchers);
 
 
 		for (List<Searcher> searcher : searchers) {
@@ -76,7 +78,7 @@ public class TestAllSearchers {
 
 				Aggregator aggregator = new OnlyTheFirst();
 				aggregator.setName(searcher.get(0).getName());
-				MetaSearcher meta = new MetaSearcherWithCache(searcher, aggregator);
+				MetaSearcher meta = new MetaSearcherOnline(searcher, aggregator);
 				Ranking results = null;
 
 				System.out.println("Query "+ query);
@@ -86,10 +88,10 @@ public class TestAllSearchers {
 					e.printStackTrace();
 				}
 
-				System.out.println("Resultados: ");
+				/*System.out.println("Resultados: ");
 				for (RankedItem tech : results.getRankingList()) {
 					System.out.println(tech.getName() + ":" + tech.getScore());
-				}
+				}*/
 
 				results.saveRankingInFile("results/" + aggregator.getName() +"/"+ query + ".txt");
 				
