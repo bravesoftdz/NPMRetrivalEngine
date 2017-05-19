@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,10 +14,12 @@ import java.util.Set;
 public class HitManager {
 
 	private static HitManager instance = null;
+	private List<String> queries = null;
 	private HashMap<String, List<String>> queriesXhits = null;
 	private HashMap<String, List<String>> queriesXNOhits = null;
 
 	protected HitManager() {
+		queries = new ArrayList<String>();
 		queriesXhits = new HashMap<String, List<String>>();
 		queriesXNOhits = new HashMap<String, List<String>>();
 		loadQueriesXhits();
@@ -40,6 +43,7 @@ public class HitManager {
 			while ((linea = br.readLine()) != null) {
 				String[] queriesXhits = linea.split(":=:");
 				String q = queriesXhits[0];
+				queries.add(q);
 
 				List<String> hits = new ArrayList<String>();
 				if (queriesXhits.length > 1) {
@@ -73,7 +77,7 @@ public class HitManager {
 		try {
 			fw = new FileWriter(fichero);
 			pw = new PrintWriter(fw);
-			for (String query : queriesXhits.keySet()) {
+			for (String query : queries) {
 				String linea = query + ":=:";
 				for (int i = 0; i < queriesXhits.get(query).size(); i++) {
 					linea = linea + queriesXhits.get(query).get(i);
@@ -102,8 +106,8 @@ public class HitManager {
 		}
 	}
 
-	public Set<String> getQueries() {
-		return queriesXhits.keySet();
+	public List<String> getQueries() {
+		return queries;
 	}
 
 	public void addHit(String query, String hit) {

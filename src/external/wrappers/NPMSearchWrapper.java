@@ -22,12 +22,24 @@ public class NPMSearchWrapper implements Searcher {
 	// 403 - Forbidden
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
 	public int MAX_RESULTS = 20;
+	public String RANK_TYPE = "";
+	public static final String KEYWORDS = "keywords";
 
 	public NPMSearchWrapper(int results) {
 		this.MAX_RESULTS = results;
 	}
+	
+	public NPMSearchWrapper(int results, String type) {
+		this.MAX_RESULTS = results;
+		RANK_TYPE = type;
+	}
 
 	public Ranking search(String query, Proxy proxy) {
+		
+		if(RANK_TYPE.equals(KEYWORDS)){
+			String[] keywords = query.split(" ");
+			query= "keywords:"+keywords[0]+","+keywords[1];
+		}
 
 		Ranking r = CacheRankingManager.getInstance().loadRankingFromCache(this, query);
 
@@ -43,10 +55,10 @@ public class NPMSearchWrapper implements Searcher {
 			try {
 
 				if (proxy != null) {
-					json = Jsoup.connect("http://npmsearch.com/query?fields=name&sort=rating:desc&q=" + query + "&rows="
+					json = Jsoup.connect("http://npmsearch.com/query?fields=name&sort=rating:desc&q=\"" + query + "\"&rows="
 							+ MAX_RESULTS).proxy(proxy).ignoreContentType(true).execute().body();
 				} else {
-					json = Jsoup.connect("http://npmsearch.com/query?fields=name&sort=rating:desc&q=" + query + "&rows="
+					json = Jsoup.connect("http://npmsearch.com/query?fields=name&sort=rating:desc&q=\"" + query + "\"&rows="
 							+ MAX_RESULTS).ignoreContentType(true).execute().body();
 				}
 				// System.out.println("Connection with NPM finished...");
@@ -75,7 +87,7 @@ public class NPMSearchWrapper implements Searcher {
 
 	@Override
 	public String getName() {
-		return "npmsearch.com";
+		return "npmsearch.com"+RANK_TYPE;
 	}
 
 }
