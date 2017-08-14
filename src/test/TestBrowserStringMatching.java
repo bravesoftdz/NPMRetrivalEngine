@@ -31,7 +31,7 @@ public class TestBrowserStringMatching {
 		List<String> results = new ArrayList<String>();
 		
 		for(String tech:technologies){
-				System.out.println(tech);
+				//System.out.println(tech);
 					if(!"aux".equals(tech)){
 					String fichero = dataDir + tech + ".txt";
 					FileReader fr = null;
@@ -45,19 +45,27 @@ public class TestBrowserStringMatching {
 						while ((linea = br.readLine()) != null) {
 							System.out.print(".");
 							if(linea.contains(query)){
-								results.add(tech);						
+								String[] array = linea.split("https://coveralls.io/");
+								for(String s:array){
+									if(s.contains(query)){
+										System.out.println(s.split("\\)")[0]);
+										//results.add(s.split(")")[0]);
+										break;
+									}
+								}
+								//results.add(tech);						
 								break;
 							}
 						}
 	
 					} catch (Exception e) {
-						System.out.println("Excepcion leyendo fichero " + fichero + ": " + e);
+						//System.out.println("Excepcion leyendo fichero " + fichero + ": " + e);
 					} finally {
 						try {
 							if (null != fr)
 								fr.close();
 						} catch (Exception e2) {
-							System.out.println("Excepcion cerrando fichero " + fichero + ": " + e2);
+							//System.out.println("Excepcion cerrando fichero " + fichero + ": " + e2);
 						}
 					}
 				}
