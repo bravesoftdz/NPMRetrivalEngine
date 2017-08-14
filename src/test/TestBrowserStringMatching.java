@@ -98,11 +98,8 @@ public class TestBrowserStringMatching {
 		List<String> results = new ArrayList<String>();
 		
 		for(String tech:technologies){
-<<<<<<< HEAD
-				//System.out.println(tech);
-=======
+
 //				System.out.println(tech);
->>>>>>> branch 'master' of https://github.com/hcvazquez/NPMRetrivalEngine.git
 					if(!"aux".equals(tech)){
 					String fichero = dataDir + tech + ".txt";
 					FileReader fr = null;
@@ -118,15 +115,9 @@ public class TestBrowserStringMatching {
 							if(linea.contains(query)){
 								String[] array = linea.split("https://coveralls.io/");
 								for(String s:array){
-<<<<<<< HEAD
-									if(s.contains(query)){
-										System.out.println(s.split("\\)")[0]);
-										//results.add(s.split(")")[0]);
-=======
 									if(!s.contains("badge")&&s.contains("branch")){
 										System.out.println("https://coveralls.io/"+s.split("\\)")[0]);
 										results.add("https://coveralls.io/"+s.split("\\)")[0]);
->>>>>>> branch 'master' of https://github.com/hcvazquez/NPMRetrivalEngine.git
 										break;
 									}
 								}
