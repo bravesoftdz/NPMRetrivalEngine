@@ -38,6 +38,8 @@ public class CacheContentManager {
 
 	public void saveContentInCache(List results, Searcher searcher, String query) {
 		String path = "content_cache/" + searcher.getName() +"/"+ query;
+		File directory = new File(path);
+		directory.mkdirs();
 		for(int i=0;i<results.size();i++){
 			String filename = String.valueOf(i)+ ".txt";
 			saveFileContent(results.get(i),path,filename);
@@ -47,7 +49,8 @@ public class CacheContentManager {
 	public void saveFileContent(Object content, String path, String filename){
 		ObjectOutputStream salida = null;
 		try {
-			salida = new ObjectOutputStream(new FileOutputStream(path+"/"+filename));
+			File outputFile = new File(path+"/"+filename);
+			salida = new ObjectOutputStream(new FileOutputStream(outputFile));
 			salida.writeObject(content);
 		} catch (IOException e) {
 			e.printStackTrace();

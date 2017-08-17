@@ -46,10 +46,10 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 				json = Jsoup.connect("http://npmsearch.com/query?fields=name&sort=rating:desc&q=\"" + query + "\"&rows="
 						+ MAX_RESULTS).ignoreContentType(true).execute().body();
 			}
+			result.add(json);
 		} catch (IOException e1) {
 			System.out.println("Error estableciendo conexion con NPM.");
 		}
-		result.add(json);
 		return result;
 	}
 
@@ -74,19 +74,24 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 				List content = getResultContent(query, proxy,this);
 
 				// System.out.println("Connection with NPM finished...");
-				JsonObject obj = new JsonParser().parse(((String)content.get(0))).getAsJsonObject();
-				JsonArray names = obj.getAsJsonArray("results");
-				int rank = 1;
-				for (JsonElement entry : names) {
-					if (entry != null && entry.isJsonObject()) {
-						results.add(new RankedItem(((JsonObject) entry).get("name").getAsString(),
-								(double) (MAX_RESULTS - (rank - 1))));
-						System.out.println();
+				if(content.size()>0){
+					JsonObject obj = new JsonParser().parse(((String)content.get(0))).getAsJsonObject();
+					JsonArray names = obj.getAsJsonArray("results");
+					int rank = 1;
+					for (JsonElement entry : names) {
+						if (entry != null && entry.isJsonObject()) {
+							results.add(new RankedItem(((JsonObject) entry).get("name").getAsString(),
+									(double) (MAX_RESULTS - (rank - 1))));
+							System.out.println();
+						}
+						rank++;
 					}
-					rank++;
+
 				}
+	
 				r = new Ranking(results);
 				CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
+				
 		}
 
 		return r;

@@ -214,11 +214,13 @@ public class Ranking implements Serializable {
 				}
 			}
 
-		} catch (NumberFormatException | IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
-				fr.close();
+				if(fr!=null){
+					fr.close();	
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}	

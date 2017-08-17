@@ -12,10 +12,11 @@ import aggregators.Aggregator;
 import aggregators.WeightedFirstRankingAgregator;
 import external.wrappers.BingWrapper;
 import external.wrappers.GoogleWrapper;
+import external.wrappers.NPMSearchWrapper;
 import external.wrappers.NPMWrapper;
 import internal.lucene.LuceneSearch;
 import metasearch.MetaSearcher;
-import metasearch.MetaSearcherWithCache;
+import metasearch.MetaSearcherOnline;
 import metasearch.Searcher;
 import ranking.RankedItem;
 import ranking.Ranking;
@@ -43,34 +44,36 @@ public class TestSingleQuery {
 			    InetSocketAddress.createUnresolved("proxy.exa.unicen.edu.ar", 8080) //
 			);
 		
-		LuceneSearch tester = new LuceneSearch(200);	
+		LuceneSearch lucene = new LuceneSearch(200);	
 
 		NPMWrapper npm1 = new NPMWrapper(200, NPMWrapper.OPTIMAL);
 		NPMWrapper npm2 = new NPMWrapper(200, NPMWrapper.POPULARITY);
 		NPMWrapper npm3 = new NPMWrapper(200, NPMWrapper.QUALITY);
 		NPMWrapper npm4 = new NPMWrapper(200, NPMWrapper.MAINTENANCE);
 		
-		GoogleWrapper scraper = new GoogleWrapper(50);
+		GoogleWrapper goo = new GoogleWrapper(50);
 		BingWrapper bing = new BingWrapper(50);
 		//YARNWrapper yarn = new YARNWrapper();
 		//DuckWrapper duck = new DuckWrapper();
+		NPMSearchWrapper npms = new NPMSearchWrapper(50);
 		ArrayList<Searcher> searchers = new ArrayList<Searcher>();
-		searchers.add(tester);
-		searchers.add(scraper);
+		searchers.add(lucene);
+		searchers.add(goo);
 		searchers.add(npm1);
+		searchers.add(npms);
 		//searchers.add(npm2);
 		//searchers.add(npm3);
 		//searchers.add(npm4);
 		searchers.add(bing);
 		//searchers.add(duck);
 		
-		Double[] weights = {0.25,0.25,0.25,0.25};
+		Double[] weights = {0.20,0.20,0.20,0.20,0.20};
 		Aggregator aggregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
 		
 		
-		String query = "create web animations";
+		String query = "react animation";
 		
-		MetaSearcher meta = new MetaSearcherWithCache(searchers, aggregator);
+		MetaSearcher meta = new MetaSearcherOnline(searchers, aggregator);
 		Ranking results = null;
 		try {
 			results = meta.search(query, proxy);
