@@ -98,6 +98,7 @@ public class TestBrowserStringMatching {
 		List<String> results = new ArrayList<String>();
 		
 		for(String tech:technologies){
+
 //				System.out.println(tech);
 					if(!"aux".equals(tech)){
 					String fichero = dataDir + tech + ".txt";
