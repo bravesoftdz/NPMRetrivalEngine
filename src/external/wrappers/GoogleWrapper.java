@@ -13,6 +13,8 @@ import org.jsoup.safety.Whitelist;
 
 import metasearch.Searcher;
 import metasearch.cache.CacheRankingManager;
+import ner.EntityExtractor;
+import ner.StringMatching;
 import ranking.RankedItem;
 import ranking.Ranking;
 import util.PackageManager;
@@ -23,6 +25,8 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 	// 403 - Forbidden
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
 	public int RESULTS = 20;
+	
+	private EntityExtractor ent_extractor; //Named Entity Recognition
 
 	public static void main(String[] args) throws Exception {
 
@@ -30,6 +34,7 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 
 	public GoogleWrapper(int results) {
 		RESULTS = results;
+		ent_extractor = new StringMatching();
 	}
 
 	@Override
@@ -74,9 +79,6 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 			List content = getResultContent(query2, proxy,this);
 			doc = (Document) content.get(0);
 
-			PackageManager pkgm = PackageManager.getInstance();
-			StopWordManager swm = StopWordManager.getInstance();
-
 			System.out.println("Analizing Results...");
 			
 			if(doc != null){
@@ -106,18 +108,17 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 						text = tech.html().replaceAll("\\\\n", "\n");
 						text = Jsoup.clean(text, "", Whitelist.none(),
 								new Document.OutputSettings().prettyPrint(false));
-	
-						String[] words = text.split(" ");
-	
-						for (String word : words) {
-							word = word.trim().toLowerCase();
-							if (!"".equals(word) && !swm.isStopWord(word) && pkgm.isPkgName(word)) {
-								if (!ranking.contains(word)) {
-									ranking.add(new RankedItem(word, (double) (RESULTS - (rank - 1))));
-									wordCount.put(word, rank);
-								}
+						
+						List<String> entities = ent_extractor.getNamedEntities(text);
+
+						for (String entity : entities) {
+							if (!ranking.contains(entity)) {
+								ranking.add(new RankedItem(entity, (double) (RESULTS - (rank - 1))));
+								wordCount.put(entity, rank);
 							}
 						}
+						
+
 					} catch (Exception e) {
 						System.out.println("Error en: " + url);
 					}

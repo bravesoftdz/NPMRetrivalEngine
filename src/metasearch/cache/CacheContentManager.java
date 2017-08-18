@@ -53,7 +53,7 @@ public class CacheContentManager {
 			salida = new ObjectOutputStream(new FileOutputStream(outputFile));
 			salida.writeObject(content);
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		} finally {
 			try {
 				if (null != salida)

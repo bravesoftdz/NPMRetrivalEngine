@@ -14,6 +14,8 @@ import org.jsoup.select.Elements;
 
 import metasearch.Searcher;
 import metasearch.cache.CacheRankingManager;
+import ner.EntityExtractor;
+import ner.StringMatching;
 import ranking.RankedItem;
 import ranking.Ranking;
 import util.PackageManager;
@@ -24,6 +26,8 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 	// 403 - Forbidden
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
 	public int MAX_PAGE = 2;
+	
+	private EntityExtractor ent_extractor; //Named Entity Recognition
 
 	public static void main(String[] args) throws Exception {
 
@@ -31,6 +35,7 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 
 	public BingWrapper(int results) {
 		MAX_PAGE = (int) Math.ceil(results / 10);
+		ent_extractor = new StringMatching();
 	}
 
 	@Override
@@ -91,8 +96,16 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 						// Now do something with the results (maybe something						// more						// useful than just printing to console)
 						System.out.println(url);
 						String text = "";						Document tech = null;						try {							if (proxy != null) {								tech = Jsoup.connect(url).proxy(proxy).userAgent(USER_AGENT).timeout(0).get();							} else {								tech = Jsoup.connect(url).userAgent(USER_AGENT).timeout(0).get();							}							tech.outputSettings(new Document.OutputSettings().prettyPrint(false));							tech.select("br").append("\\n");							tech.select("p").prepend("\\n\\n");							text = tech.html().replaceAll("\\\\n", "\n");							text = Jsoup.clean(text, "", Whitelist.none(),									new Document.OutputSettings().prettyPrint(false));
-							String[] words = text.split(" ");
-							for (String word : words) {								word = word.trim().toLowerCase();								if (!"".equals(word) && !swm.isStopWord(word) && pkgm.isPkgName(word)) {									if (!ranking.contains(word)) {										ranking.add(new RankedItem(word, (double) (((page - 1) * 10) + i)));										wordCount.put(word, rank);									}								}							}						} catch (Exception e) {							System.out.println("Error en: " + url);						}						rank++;					}
+							
+							List<String> entities = ent_extractor.getNamedEntities(text);
+
+							for (String entity : entities) {
+								if (!ranking.contains(entity)) {
+									ranking.add(new RankedItem(entity, (double) (((page - 1) * 10) + i)));
+									wordCount.put(entity, rank);
+								}
+							}
+													} catch (Exception e) {							System.out.println("Error en: " + url);						}						rank++;					}
 					// TFIDFCalculator calculator = new TFIDFCalculator();					/*					 * for(String key:wordCount.keySet()){ double tfidf =					 * calculator.tfIdf(wdocs.get(2), wdocs, key);					 * results.add(key); // System.out.println(key + " " +					 * tfidf); }					 */										r =  new Ranking(ranking);					CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
 
 			}

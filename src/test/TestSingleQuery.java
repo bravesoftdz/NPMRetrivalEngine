@@ -71,14 +71,14 @@ public class TestSingleQuery {
 		Aggregator aggregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
 		
 		
-		String query = "react animation";
+		String query = "rpg game 2d";
 		
 		MetaSearcher meta = new MetaSearcherOnline(searchers, aggregator);
 		Ranking results = null;
 		try {
 			results = meta.search(query, proxy);
 		} catch (IOException | ParseException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
 		
 		System.out.println();
