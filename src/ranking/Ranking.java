@@ -19,9 +19,19 @@ public class Ranking implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	protected List<RankedItem> rankingList;
-	protected List<Double> precisionAcum;
-	protected List<Double> recallAcum;
-	protected List<Double> fMeasureAcum;
+	protected List<Double> k_precision;
+	protected List<Double> k_recall;
+	protected List<Double> k_fMeasure;
+	
+	protected String id;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public Ranking(List<RankedItem> results) {
 		super();
@@ -29,9 +39,10 @@ public class Ranking implements Serializable {
 		sort();
 	}
 
-	public Ranking(String filename) {
+	public Ranking(String id,String filename) {
 		super();
 		this.rankingList = loadRankingFromFile(filename);
+		this.id = id;
 		sort();
 	}
 
@@ -65,13 +76,13 @@ public class Ranking implements Serializable {
 	 * 
 	 * @return
 	 */
-	public ArrayList<Double> getPrecisionAcumList() {
+	public ArrayList<Double> getKPrecisionList(int k) {
 
 		ArrayList<Double> precisionList = new ArrayList<Double>();
 
 		int sumVerified = 0;
-		for (int i = 0; i < rankingList.size(); i++) {
-			if (rankingList.get(i).isHit()) {
+		for (int i = 0; i < k; i++) {
+			if (i<rankingList.size() && rankingList.get(i).isHit()) {
 				sumVerified++;
 			}
 			if (sumVerified != 0) {
@@ -82,17 +93,39 @@ public class Ranking implements Serializable {
 
 		}
 
-		this.precisionAcum = precisionList;
+		this.k_precision = precisionList;
 
 		return precisionList;
 	}
+	
+	public ArrayList<Double> getKHitList(int k) {
 
-	public Double getMaxPrecision() {
-		if (precisionAcum == null) {
-			precisionAcum = getPrecisionAcumList();
+		ArrayList<Double> hitList = new ArrayList<Double>();
+
+		int sumVerified = 0;
+		for (int i = 0; i < k; i++) {
+			if (i<rankingList.size() && rankingList.get(i).isHit()) {
+				sumVerified++;
+			}
+			if (sumVerified != 0) {
+				hitList.add((double)sumVerified);
+			} else {
+				hitList.add(0.0);
+			}
+
+		}
+
+		//this.k_hits = hitList;  TODO
+
+		return hitList;
+	}
+
+	public Double getKMaxPrecision(int k) {
+		if (k_precision == null) {
+			k_precision = getKPrecisionList(k);
 		}
 		Double max = 0.0;
-		for (Double d : precisionAcum) {
+		for (Double d : k_precision) {
 			if (d > max) {
 				max = d;
 			}
@@ -100,30 +133,30 @@ public class Ranking implements Serializable {
 		return max;
 	}
 
-	public ArrayList<Double> getRecallAcumList(int goldenSize) {
+	public ArrayList<Double> getKRecallList(int k, int goldenSize) {
 
 		ArrayList<Double> recallList = new ArrayList<Double>();
 
 		int sumVerified = 0;
-		for (int i = 0; i < rankingList.size(); i++) {
-			if (rankingList.get(i).isHit()) {
+		for (int i = 0; i < k; i++) {
+			if (i<rankingList.size() && rankingList.get(i).isHit()) {
 				sumVerified++;
 			}
 			recallList.add((double) sumVerified / (double) goldenSize);
 
 		}
 
-		this.recallAcum = recallList;
+		this.k_recall = recallList;
 
 		return recallList;
 	}
 
-	public Double getMaxRecall(int goldenSize) {
-		if (recallAcum == null) {
-			recallAcum = getRecallAcumList(goldenSize);
+	public Double getKMaxRecall(int k, int goldenSize) {
+		if (k_recall == null) {
+			k_recall = getKRecallList(k, goldenSize);
 		}
 		Double max = 0.0;
-		for (Double d : recallAcum) {
+		for (Double d : k_recall) {
 			if (d > max) {
 				max = d;
 			}
@@ -132,40 +165,40 @@ public class Ranking implements Serializable {
 	}
 
 	// =2*((J4*K4)/(J4+K4))
-	public ArrayList<Double> getFMeasureAcumList(int goldenSize) {
+	public ArrayList<Double> getKFMeasureList(int k, int goldenSize) {
 
-		if (precisionAcum == null) {
-			precisionAcum = getPrecisionAcumList();
+		if (k_precision == null) {
+			k_precision = getKPrecisionList(k);
 		}
 
-		if (recallAcum == null) {
-			recallAcum = getRecallAcumList(goldenSize);
+		if (k_recall == null) {
+			k_recall = getKRecallList(k,goldenSize);
 		}
 
 		ArrayList<Double> fMeasureList = new ArrayList<Double>();
 
-		for (int i = 0; i < rankingList.size(); i++) {
-			if (precisionAcum.get(i).doubleValue() + recallAcum.get(i).doubleValue() != 0) {
+		for (int i = 0; i < k; i++) {
+			if (k_precision.get(i).doubleValue() + k_recall.get(i).doubleValue() != 0) {
 				fMeasureList.add(
-						(double) ((double) 2 * ((precisionAcum.get(i).doubleValue() * recallAcum.get(i).doubleValue())
-								/ (precisionAcum.get(i).doubleValue() + recallAcum.get(i).doubleValue()))));
+						(double) ((double) 2 * ((k_precision.get(i).doubleValue() * k_recall.get(i).doubleValue())
+								/ (k_precision.get(i).doubleValue() + k_recall.get(i).doubleValue()))));
 			} else {
 				fMeasureList.add(0.0);
 			}
 
 		}
 
-		this.fMeasureAcum = fMeasureList;
+		this.k_fMeasure = fMeasureList;
 
 		return fMeasureList;
 	}
 
-	public Double getMaxFMeasure(int goldenSize) {
-		if (fMeasureAcum == null) {
-			fMeasureAcum = getFMeasureAcumList(goldenSize);
+	public Double getKMaxFMeasure(int k, int goldenSize) {
+		if (k_fMeasure == null) {
+			k_fMeasure = getKFMeasureList(k,goldenSize);
 		}
 		Double max = 0.0;
-		for (Double d : fMeasureAcum) {
+		for (Double d : k_fMeasure) {
 			if (d > max) {
 				max = d;
 			}
@@ -228,11 +261,11 @@ public class Ranking implements Serializable {
 		return results;
 	}
 
-	public Double calculateSpearmanCorrelation() {
-		double[] rank = new double[rankingList.size()];
-		double[] golden = new double[rankingList.size()];
+	public Double calculateKSpearmanCorrelation(int k) {
+		double[] rank = new double[k];
+		double[] golden = new double[k];
 		this.fixRank(golden, rank);
-		for (int i = 0; i < rankingList.size(); i++) {
+		for (int i = 0; i < k; i++) {
 			RankedItem item = rankingList.get(i);
 			rank[i] = item.getScore();
 			golden[i] = (item.isHit()) ? 1 : 0;
@@ -242,12 +275,12 @@ public class Ranking implements Serializable {
 		return spearman;
 	}
 
-	public Double calculatePearsonsCorrelation() {
-		double[] rank = new double[rankingList.size()];
-		double[] golden = new double[rankingList.size()];
+	public Double calculateKPearsonsCorrelation(int k) {
+		double[] rank = new double[k];
+		double[] golden = new double[k];
 		this.fixRank(golden, rank);
 
-		for (int i = 0; i < rankingList.size(); i++) {
+		for (int i = 0; i < k; i++) {
 			RankedItem item = rankingList.get(i);
 			rank[i] = item.getScore();
 			golden[i] = (item.isHit()) ? 1 : 0;
@@ -258,12 +291,12 @@ public class Ranking implements Serializable {
 		return pearsons.correlation(golden, rank);
 	}
 
-	public Double calculateKendallsCorrelation() {
-		double[] rank = new double[rankingList.size()];
-		double[] golden = new double[rankingList.size()];
+	public Double calculateKKendallsCorrelation(int k) {
+		double[] rank = new double[k];
+		double[] golden = new double[k];
 		this.fixRank(golden, rank);
 
-		for (int i = 0; i < rankingList.size(); i++) {
+		for (int i = 0; i < k; i++) {
 			RankedItem item = rankingList.get(i);
 			rank[i] = item.getScore();
 			golden[i] = (item.isHit()) ? 1 : 0;

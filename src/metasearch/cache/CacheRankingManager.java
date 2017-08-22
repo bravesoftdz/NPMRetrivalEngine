@@ -22,7 +22,7 @@ public class CacheRankingManager {
 	}
 
 	public Ranking loadRankingFromCache(Searcher searcher, String query) {
-		Ranking ranking = new Ranking("web_cache/" + searcher.getName() +"/"+ query + ".txt");
+		Ranking ranking = new Ranking(searcher.getName() +"_"+ query,"web_cache/" + searcher.getName() +"/"+ query + ".txt");
 		if(ranking.size()>0){
 			return ranking;
 		}
