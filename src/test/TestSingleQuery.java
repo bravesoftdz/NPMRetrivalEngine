@@ -18,6 +18,7 @@ import internal.lucene.LuceneSearch;
 import metasearch.MetaSearcher;
 import metasearch.MetaSearcherOnline;
 import metasearch.Searcher;
+import ner.StringMatching;
 import ranking.RankedItem;
 import ranking.Ranking;
 
@@ -51,8 +52,8 @@ public class TestSingleQuery {
 		NPMWrapper npm3 = new NPMWrapper(200, NPMWrapper.QUALITY);
 		NPMWrapper npm4 = new NPMWrapper(200, NPMWrapper.MAINTENANCE);
 		
-		GoogleWrapper goo = new GoogleWrapper(50);
-		BingWrapper bing = new BingWrapper(50);
+		GoogleWrapper goo = new GoogleWrapper(50,new StringMatching());
+		BingWrapper bing = new BingWrapper(50,new StringMatching());
 		//YARNWrapper yarn = new YARNWrapper();
 		//DuckWrapper duck = new DuckWrapper();
 		NPMSearchWrapper npms = new NPMSearchWrapper(50);

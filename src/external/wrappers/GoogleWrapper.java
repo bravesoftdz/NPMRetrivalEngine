@@ -12,15 +12,17 @@ import org.jsoup.nodes.Element;
 import org.jsoup.safety.Whitelist;
 
 import metasearch.Searcher;
+import metasearch.cache.CacheContentManager;
 import metasearch.cache.CacheRankingManager;
 import ner.EntityExtractor;
 import ner.StringMatching;
 import ranking.RankedItem;
 import ranking.Ranking;
-import util.PackageManager;
-import util.StopWordManager;
 
 public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
+	
+	public static final String GOOGLE = "google.com";
+	
 	// We need a real browser user agent or Google will block our request with a
 	// 403 - Forbidden
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
@@ -32,9 +34,9 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 
 	}
 
-	public GoogleWrapper(int results) {
+	public GoogleWrapper(int results, EntityExtractor ent_ext) {
 		RESULTS = results;
-		ent_extractor = new StringMatching();
+		ent_extractor = ent_ext;
 	}
 
 	@Override
@@ -52,7 +54,7 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 			} catch (IOException e1) {
 				System.out.println("Error estableciendo conexion con NPM.");
 			}
-			result.add(doc);
+			result.add(doc.toString());
 
 		return result;
 	}
@@ -77,7 +79,7 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 			System.out.println("Starting connection with google...");
 
 			List content = getResultContent(query2, proxy,this);
-			doc = (Document) content.get(0);
+			doc = (Document) Jsoup.parse((String)content.get(0));
 
 			System.out.println("Analizing Results...");
 			
@@ -149,7 +151,7 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 
 	@Override
 	public String getName() {
-		return "google.com";
+		return GOOGLE+"_"+ent_extractor.getTechniqueName();
 	}
 
 }

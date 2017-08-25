@@ -1,5 +1,6 @@
 package metasearch.cache;
 
+import java.io.File;
 import java.util.HashMap;
 
 import metasearch.Searcher;
@@ -30,7 +31,10 @@ public class CacheRankingManager {
 	}
 
 	public void saveRankingInCache(Ranking ranking, Searcher searcher, String query) {
-		ranking.saveRankingInFile("web_cache/" + searcher.getName() +"/"+ query + ".txt");
+		String path = "web_cache/" + searcher.getName();
+		File directory = new File(path);
+		directory.mkdirs();
+		ranking.saveRankingInFile(path +"/"+ query + ".txt");
 	}
 
 }

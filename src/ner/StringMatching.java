@@ -8,7 +8,9 @@ import util.PackageManager;
 import util.StopWordManager;
 
 public class StringMatching implements EntityExtractor{
-
+	
+	public static final String STRING_MATCHING = "str_match";
+	
 	@Override
 	public List<String> getNamedEntities(String text) {
 		
@@ -27,6 +29,11 @@ public class StringMatching implements EntityExtractor{
 		
 		return entities;
 		
+	}
+
+	@Override
+	public String getTechniqueName() {
+		return STRING_MATCHING;
 	}
 
 	

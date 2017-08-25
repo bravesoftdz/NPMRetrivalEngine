@@ -1,27 +1,25 @@
 package test;
 
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-import javax.print.attribute.HashAttributeSet;
-
 import ranking.RankedItem;
 import ranking.Ranking;
 import util.HitManager;
-import util.ResultsManager;
 
 public class PutHitOrNotQueries {
 
 	public static void main(String[] args) {
 
-		int max = 20;
+		int max_position = 20;
+		int max_queries = 10;
+		
 		String[] folders = { "WeightedFirstRankingAgregator", "WeightedRankingAgregator",
-				"WeightedRankingAgregator701010", "lucene", "bing.com", "google.com", "npmjs.comoptimal20", "npmsearch.com" };
+				"WeightedRankingAgregator701010", "lucene", "bing.com", "google.com_str_match", "npmjs.comoptimal20", "npmsearch.com" };
 		boolean end = false;
 		HashMap<String, Integer> hits4Search = new HashMap<String, Integer>();
 		
@@ -29,7 +27,8 @@ public class PutHitOrNotQueries {
 		HashMap<String,List<String>> hitsXqueries = new HashMap<String,List<String>>();
 
 		int q = 0;
-		for (String query : HitManager.getInstance().getQueries()) {
+		for (int qnum = 0; qnum < max_queries ; qnum++) {
+			String query =  HitManager.getInstance().getQueries().get(qnum);
 			List<Ranking> rankings = new ArrayList<Ranking>();
 			List<String> pkghits = new ArrayList<String>();
 			for (int e = 0; e < folders.length; e++) {		
@@ -40,7 +39,7 @@ public class PutHitOrNotQueries {
 				System.out.println(
 						"Hits for " + folders[e] + " q:" + q + " \"" + query + "\"" + " input y=yes, n=no, e=end");
 				int hits = 0;
-				for (int i = 0; i < (ranking.getRankingList().size()<max?ranking.getRankingList().size():max); i++) {
+				for (int i = 0; i < (ranking.getRankingList().size()<max_position?ranking.getRankingList().size():max_position); i++) {
 					RankedItem item = ranking.getRankingList().get(i);
 					String pkg = item.getName();
 
@@ -78,7 +77,7 @@ public class PutHitOrNotQueries {
 						item.setHit(false);
 					}
 				}
-				System.out.println("Hits " + hits + "/" + max);
+				System.out.println("Hits " + hits + "/" + max_position);
 				hits4Search.put(folders[e] + query, hits);
 				if (end) {
 					break;
@@ -236,8 +235,8 @@ public class PutHitOrNotQueries {
 				List<Double> kfmeasure = ranking.getKFMeasureList(k, goldenSize);
 				List<Double> khits = ranking.getKHitList(k);
 					
-				for(int i = 1; i<k ;i++){
-					pw.print(i+","+khits.get(i)+","+kprecision.get(i)+","+krecall.get(i)+","+kfmeasure.get(i));
+				for(int i = 0; i<k ;i++){
+					pw.print((i+1)+","+khits.get(i)+","+kprecision.get(i)+","+krecall.get(i)+","+kfmeasure.get(i));
 					pw.println();
 				}
 			}

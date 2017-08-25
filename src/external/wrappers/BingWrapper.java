@@ -33,9 +33,9 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 
 	}
 
-	public BingWrapper(int results) {
+	public BingWrapper(int results, EntityExtractor ent_ext) {
 		MAX_PAGE = (int) Math.ceil(results / 10);
-		ent_extractor = new StringMatching();
+		ent_extractor = ent_ext;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 									+ (param_first != 1 ? ("&first=" + param_first) : ""))
 							.userAgent(USER_AGENT).timeout(0).get();
 				}
-				result.add(doc);
+				result.add(doc.toString());
 			}catch (IOException e1) {
 				System.out.println("Error estableciendo conexion con NPM.");
 			}
@@ -89,7 +89,7 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 			
 			for (int page = 0; page < contents.size(); page++) {
 				
-				doc = (Document)contents.get(page);
+				doc = Jsoup.parse((String)contents.get(page));
 					PackageManager pkgm = PackageManager.getInstance();					StopWordManager swm = StopWordManager.getInstance();
 					Elements elements = doc.select("h2 a");
 					for (int i = 1; i < elements.size() - 1; i++) {						Element result = elements.get(i);						// final String title = result.text();						final String url = result.attr("href");

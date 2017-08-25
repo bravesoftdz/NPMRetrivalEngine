@@ -220,7 +220,9 @@ public class Ranking implements Serializable {
 			e.printStackTrace();
 		} finally {
 			try {
+				if(fichero!=null){
 					fichero.close();
+				}
 			} catch (Exception e2) {
 				e2.printStackTrace();
 			}
