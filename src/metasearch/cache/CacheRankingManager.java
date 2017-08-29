@@ -1,15 +1,17 @@
 package metasearch.cache;
 
 import java.io.File;
-import java.util.HashMap;
 
 import metasearch.Searcher;
 import ranking.Ranking;
+import util.ConfigManager;
 
 public class CacheRankingManager {
 
 	private static CacheRankingManager instance = null;
-	private HashMap<String, Ranking> cache = null;
+	
+	private String cache_folder = ConfigManager.getInstance().getProperty("ranking_folder");
+	private static final String EXT = ".txt";
 
 	protected CacheRankingManager() {
 		//cache = new HashMap<String, Ranking>();
@@ -23,7 +25,7 @@ public class CacheRankingManager {
 	}
 
 	public Ranking loadRankingFromCache(Searcher searcher, String query) {
-		Ranking ranking = new Ranking(searcher.getName() +"_"+ query,"web_cache/" + searcher.getName() +"/"+ query + ".txt");
+		Ranking ranking = new Ranking(searcher.getName() +"_"+ query, cache_folder +"/"+ searcher.getName() +"/"+ query + EXT);
 		if(ranking.size()>0){
 			return ranking;
 		}
@@ -31,10 +33,10 @@ public class CacheRankingManager {
 	}
 
 	public void saveRankingInCache(Ranking ranking, Searcher searcher, String query) {
-		String path = "web_cache/" + searcher.getName();
+		String path = cache_folder +"/"+ searcher.getName();
 		File directory = new File(path);
 		directory.mkdirs();
-		ranking.saveRankingInFile(path +"/"+ query + ".txt");
+		ranking.saveRankingInFile(path +"/"+ query + EXT);
 	}
 
 }

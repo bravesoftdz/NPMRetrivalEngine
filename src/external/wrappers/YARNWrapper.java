@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import metasearch.Searcher;
+import ner.EntityExtractor;
 import ranking.RankedItem;
 import ranking.Ranking;
 
@@ -66,6 +67,18 @@ public class YARNWrapper implements Searcher
 	@Override
 	public String getName() {
 		return "yarn.com";
+	}
+
+	@Override
+	public List acquireData(String query, Proxy proxy) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

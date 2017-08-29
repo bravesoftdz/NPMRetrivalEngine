@@ -13,11 +13,13 @@ import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 import metasearch.Searcher;
+import ner.EntityExtractor;
 import ranking.RankedItem;
 import ranking.Ranking;
 import util.PackageManager;
 import util.StopWordManager;
 
+@Deprecated
 public class DuckWrapper implements Searcher
 {
     //We need a real browser user agent or Google will block our request with a 403 - Forbidden
@@ -122,6 +124,18 @@ public class DuckWrapper implements Searcher
 	@Override
 	public String getName() {
 		return "duckduckgo.com";
+	}
+
+	@Override
+	public List acquireData(String query, Proxy proxy) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -1,14 +1,22 @@
 package metasearch.cache;
 
-import metasearch.Searcher;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+
+import metasearch.Searcher;
+import util.ConfigManager;
 
 public class CacheContentManager {
 
 	private static CacheContentManager instance = null;
+	
+	private String cache_folder = ConfigManager.getInstance().getProperty("content_folder");
+	
+	private static final String EXT = ".txt";
 
 	protected CacheContentManager() {
 		//cache = new HashMap<String, Ranking>();
@@ -21,9 +29,9 @@ public class CacheContentManager {
 		return instance;
 	}
 
-	public List loadContentFromCache(Searcher searcher, String query) {
-		List contents = new ArrayList();
-		String path = "content_cache/" + searcher.getName() +"/"+ query;
+	public List<String> loadContentFromCache(Searcher searcher, String query) {
+		List<String> contents = new ArrayList<String>();
+		String path = cache_folder +"/"+ searcher.getName() +"/"+ query;
 		File f = new File(path);
 		if (f.exists()){
 			File[] ficheros = f.listFiles();
@@ -36,49 +44,35 @@ public class CacheContentManager {
 		}
 	}
 
-	public void saveContentInCache(List results, Searcher searcher, String query) {
-		String path = "content_cache/" + searcher.getName() +"/"+ query;
+	public void saveContentInCache(List<String> results, Searcher searcher, String query) {
+		String path = cache_folder +"/"+ searcher.getName() +"/"+ query;
 		File directory = new File(path);
 		directory.mkdirs();
 		for(int i=0;i<results.size();i++){
-			String filename = String.valueOf(i)+ ".txt";
+			String filename = String.valueOf(i)+ EXT;
 			saveFileContent(results.get(i),path,filename);
 		}
 	}
 
-	public void saveFileContent(Object content, String path, String filename){
-		ObjectOutputStream salida = null;
+	public void saveFileContent(String content, String path, String filename){
 		try {
 			File outputFile = new File(path+"/"+filename);
-			salida = new ObjectOutputStream(new FileOutputStream(outputFile));
-			salida.writeObject(content);
+			FileWriter fileWriter = new FileWriter(outputFile, false); // true to append // false to overwrite.
+			fileWriter.write(content);
+			fileWriter.close();
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-		} finally {
-			try {
-				if (null != salida)
-					salida.close();
-			} catch (Exception e2) {
-				System.out.println("Excepcion cerrando fichero " +filename+": " + e2);
-			}
 		}
 	}
 
-	protected Object loadFileContent(File file) {
-		Object content = null;
-		ObjectInputStream entrada = null;
+	protected String loadFileContent(File file) {
+		String content = null;
 		try {
-			entrada = new ObjectInputStream(new FileInputStream(file));
-			content = entrada.readObject();
-		} catch (IOException | ClassNotFoundException e) {
+			Scanner scanner = new Scanner(file);
+			content = scanner.useDelimiter("\\Z").next();
+			scanner.close();
+		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (null != entrada)
-					entrada.close();
-			} catch (Exception e2) {
-				System.out.println("Excepcion cerrando fichero " +file+": " + e2);
-			}
 		}
 		return content;
 	}

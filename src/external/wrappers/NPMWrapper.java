@@ -13,6 +13,7 @@ import org.jsoup.select.Elements;
 
 import metasearch.Searcher;
 import metasearch.cache.CacheRankingManager;
+import ner.EntityExtractor;
 import ranking.RankedItem;
 import ranking.Ranking;
 
@@ -23,6 +24,7 @@ public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 
 	public int MAX_PAGE = 20;
 	public String RANK = OPTIMAL;
+	public int RESULTS = 20;
 
 	public static final String OPTIMAL = "optimal";
 	public static final String QUALITY = "quality";
@@ -30,14 +32,15 @@ public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 	public static final String MAINTENANCE = "maintenance";
 
 	public NPMWrapper(int results, String ranktype) {
+		RESULTS = results;
 		MAX_PAGE = (int) Math.ceil(results / 10);
 		RANK = ranktype;
 	}
 	
 	@Override
-	public List downloadResultContent(String query, Proxy proxy){
-		List result = new ArrayList();
-		for (int page = 1; page < MAX_PAGE; page++) {
+	public List<String> downloadResultContent(String query, Proxy proxy){
+		List<String> result = new ArrayList<String>();
+		for (int page = 1; page <= MAX_PAGE; page++) {
 			Document doc = null;
 			try {
 				if (proxy != null) {
@@ -49,7 +52,7 @@ public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 							"https://www.npmjs.com/search?q=" + query + "&page=" + page + "&ranking=" + RANK)
 							.userAgent(USER_AGENT).timeout(0).get();
 				}
-				result.add(doc);
+				result.add(doc.toString());
 			} catch (IOException e1) {
 				System.out.println("Error estableciendo conexion con NPM.");
 			}
@@ -65,58 +68,67 @@ public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 			return r;
 		} else {
 
-			List<RankedItem> results = new ArrayList<RankedItem>();
-
-			Document doc;
-
-			System.out.println("Starting connection with NPM...");
-			System.out.println("Analizing Results...");
-
-			List contents = downloadResultContent(query, proxy);
+			List<String> contents = acquireData(query, proxy);
 			
-			for (int page = 0; page < contents.size(); page++) {
-				
-				doc = (Document)contents.get(page);
-				// System.out.println("Connection with NPM finished...");
+			r = processData(contents,null);
+			
+			CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
 
-				if (doc.select("h3 a").size() == 0) {
-					r = new Ranking(results);
-					break;
-				}
+		}
+		return r;
+	}
+	
+	@Override
+	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
+		
+		List<RankedItem> results = new ArrayList<RankedItem>();
+		
+		System.out.println("Analizing Results...");
+		
+		for (int page = 0; page < contents.size() && results.size() < RESULTS; page++) {
+			
+			Document doc = (Document) Jsoup.parse((String)contents.get(page));
 
-				Elements elements = doc.select("h3 a");
-				for (int e = 0; e < elements.size(); e++) {
-					Element result = elements.get(e);
-
-					if (result.className().startsWith("packageName")) {
-
-						final String title = result.text();
-						final String url = result.attr("href");
-
-						// Now do something with the results (maybe
-						// something
-						// more useful than just printing to console)
-
-						System.out.println(title + " -> " + url);
-
-						results.add(new RankedItem(title, (double) (((page - 1) * 10) + e)));
-
-					}
-				}
-				
-				r = new Ranking(results);
-				CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
-
+			if (doc.select("h3 a").size() == 0) {
+				break;
 			}
+
+			Elements elements = doc.select("h3 a");
+			for (int e = 0; e < elements.size(); e++) {
+				Element result = elements.get(e);
+
+				if (result.className().startsWith("packageName")) {
+
+					final String title = result.text();
+					final String url = result.attr("href");
+
+					System.out.println(title + " -> " + url);
+
+					results.add(new RankedItem(title, (double) (((page - 1) * 10) + e)));
+
+				}
+			}
+
 		}
 
-		return r;
+		return new Ranking(results);
 
+	}
+	
+	public List<String> acquireData(String query, Proxy proxy){
+		
+		System.out.println("Acquiring data from NPM...");
+
+		List<String> content = getResultContent(query, proxy,this);
+		
+		System.out.print(" ...connection SUCCESSFUL...");
+		
+		return content;
 	}
 
 	@Override
 	public String getName() {
-		return "npmjs.com" + RANK + MAX_PAGE;
+		return "npmjs.com" + RANK;
 	}
 
 }

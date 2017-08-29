@@ -91,11 +91,7 @@ public class ExecuteAllQueries {
 				
 				MetaSearcher meta = new MetaSearcherWithCache(searchers, aggregator);
 				Ranking results = null;
-				try {
-					results = meta.search(query, proxy);
-				} catch (IOException | ParseException e) {
-					e.printStackTrace();
-				}
+				results = meta.search(query, proxy);
 
 				System.out.println();
 				//System.out.println("RESULTADOS");

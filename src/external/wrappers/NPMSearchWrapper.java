@@ -14,6 +14,7 @@ import com.google.gson.JsonParser;
 
 import metasearch.Searcher;
 import metasearch.cache.CacheRankingManager;
+import ner.EntityExtractor;
 import ranking.RankedItem;
 import ranking.Ranking;
 
@@ -35,8 +36,8 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 	}
 
 	@Override
-	public List downloadResultContent(String query, Proxy proxy){
-		List result = new ArrayList();
+	public List<String> downloadResultContent(String query, Proxy proxy){
+		List<String> result = new ArrayList<String>();
 		String json = null;
 		try {
 			if (proxy != null) {
@@ -67,40 +68,59 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 			return r;
 		} else {
 
-			List<RankedItem> results = new ArrayList<RankedItem>();
-			System.out.println("Starting connection with NPMSearch...");
-			System.out.println("Analizing Results...");
+			List<String> contents = acquireData(query, proxy);
+			
+			r = processData(contents,null);
+			
+			CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
 
-				List content = getResultContent(query, proxy,this);
+		}
+		return r;
+		
+	}
+			
+	@Override
+	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
 
-				// System.out.println("Connection with NPM finished...");
-				if(content.size()>0){
-					JsonObject obj = new JsonParser().parse(((String)content.get(0))).getAsJsonObject();
-					JsonArray names = obj.getAsJsonArray("results");
-					int rank = 1;
-					for (JsonElement entry : names) {
-						if (entry != null && entry.isJsonObject()) {
-							results.add(new RankedItem(((JsonObject) entry).get("name").getAsString(),
-									(double) (MAX_RESULTS - (rank - 1))));
-							System.out.println();
-						}
-						rank++;
-					}
-
-				}
+		List<RankedItem> results = new ArrayList<RankedItem>();
 	
-				r = new Ranking(results);
-				CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
-				
+		System.out.println("Analizing Results...");
+
+		// System.out.println("Connection with NPM finished...");
+		if(contents.size()>0){
+			JsonObject obj = new JsonParser().parse(((String)contents.get(0))).getAsJsonObject();
+			JsonArray names = obj.getAsJsonArray("results");
+			int rank = 1;
+			for (int i = 0; i < names.size() && results.size() < MAX_RESULTS ; i++) {
+				JsonElement entry = names.get(i);
+				if (entry != null && entry.isJsonObject()) {
+					results.add(new RankedItem(((JsonObject) entry).get("name").getAsString(),
+							(double) (MAX_RESULTS - (rank - 1))));
+					System.out.println();
+				}
+				rank++;
+			}
+
 		}
 
-		return r;
+		return 	new Ranking(results);
+	}
+	
+	public List<String> acquireData(String query, Proxy proxy){
+		
+		System.out.println("Acquiring data from npmsearch.com...");
 
+		List<String> content = getResultContent(query, proxy,this);
+		
+		System.out.print(" ...connection SUCCESSFUL...");
+		
+		return content;
 	}
 
 	@Override
 	public String getName() {
 		return "npmsearch.com"+RANK_TYPE;
 	}
+
 
 }

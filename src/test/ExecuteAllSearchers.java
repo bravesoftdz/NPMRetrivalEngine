@@ -17,7 +17,7 @@ import external.wrappers.NPMSearchWrapper;
 import external.wrappers.NPMWrapper;
 import internal.lucene.LuceneSearch;
 import metasearch.MetaSearcher;
-import metasearch.MetaSearcherOnline;
+import metasearch.MetaSearcherImp;
 import metasearch.Searcher;
 import ner.StringMatching;
 import ranking.RankedItem;
@@ -84,15 +84,11 @@ public class ExecuteAllSearchers {
 
 				Aggregator aggregator = new OnlyTheFirst();
 				aggregator.setName(searcher.get(0).getName());
-				MetaSearcher meta = new MetaSearcherOnline(searcher, aggregator);
+				MetaSearcher meta = new MetaSearcherImp(searcher, aggregator);
 				Ranking results = null;
 
 				System.out.println("Query "+ query);
-				try {
-					results = meta.search(query, proxy);
-				} catch (IOException | ParseException e) {
-					e.printStackTrace();
-				}
+				results = meta.search(query, proxy);
 
 
 				String path = "results/" + aggregator.getName();

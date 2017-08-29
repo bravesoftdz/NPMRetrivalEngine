@@ -12,7 +12,7 @@ import aggregators.Aggregator;
 import aggregators.WeightedFirstRankingAgregator;
 import internal.lucene.LuceneSearch;
 import metasearch.MetaSearcher;
-import metasearch.MetaSearcherOnline;
+import metasearch.MetaSearcherImp;
 import metasearch.Searcher;
 import ranking.RankedItem;
 import ranking.Ranking;
@@ -40,13 +40,9 @@ public class TestLucene {
 		String query = "coveralls.io/repos/github";
 		//String query = "img.shields.io/badge/coverage";
 		
-		MetaSearcher meta = new MetaSearcherOnline(searchers, aggregator);
+		MetaSearcher meta = new MetaSearcherImp(searchers, aggregator);
 		Ranking results = null;
-		try {
-			results = meta.search(query, proxy);
-		} catch (IOException | ParseException e) {
-			e.printStackTrace();
-		}
+		results = meta.search(query, proxy);
 		
 		System.out.println();
 		System.out.println("RESULTADOS");

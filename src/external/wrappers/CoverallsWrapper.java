@@ -18,6 +18,7 @@ import ranking.Ranking;
 import util.PackageManager;
 import util.StopWordManager;
 
+@Deprecated
 public class CoverallsWrapper{
 	// We need a real browser user agent or Google will block our request with a
 	// 403 - Forbidden

@@ -1,14 +1,12 @@
 package metasearch;
 
-import java.io.IOException;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.lucene.queryParser.ParseException;
-
 import aggregators.Aggregator;
 import metasearch.cache.CacheManager;
+import ner.EntityExtractor;
 import ranking.Ranking;
 
 public class MetaSearcherWithCache implements MetaSearcher{
@@ -22,8 +20,7 @@ public class MetaSearcherWithCache implements MetaSearcher{
 		this.aggregator = aggregator;
 	}
 
-	public Ranking search(String query, Proxy proxy, List<Searcher> searchers, Aggregator aggregator)
-			throws IOException, ParseException {
+	public Ranking search(String query, Proxy proxy, List<Searcher> searchers, Aggregator aggregator){
 
 		List<Ranking> rankings = new ArrayList<Ranking>();
 		
@@ -44,8 +41,7 @@ public class MetaSearcherWithCache implements MetaSearcher{
 		return aggregator.aggregate(rankings);
 	}
 	
-	public Ranking search(String query, Proxy proxy)
-			throws IOException, ParseException {
+	public Ranking search(String query, Proxy proxy){
 
 		List<Ranking> rankings = new ArrayList<Ranking>();
 		
@@ -66,5 +62,23 @@ public class MetaSearcherWithCache implements MetaSearcher{
 		cache.saveCache();
 
 		return aggregator.aggregate(rankings);
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> acquireData(String query, Proxy proxy) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

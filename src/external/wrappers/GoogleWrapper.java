@@ -12,10 +12,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.safety.Whitelist;
 
 import metasearch.Searcher;
-import metasearch.cache.CacheContentManager;
 import metasearch.cache.CacheRankingManager;
 import ner.EntityExtractor;
-import ner.StringMatching;
 import ranking.RankedItem;
 import ranking.Ranking;
 
@@ -40,8 +38,8 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 	}
 
 	@Override
-	public List downloadResultContent(String query, Proxy proxy){
-		List result = new ArrayList();
+	public List<String> downloadResultContent(String query, Proxy proxy){
+		List<String> results = new ArrayList<String>();
 			Document doc = null;
 			try {
 				if (proxy != null) {
@@ -54,9 +52,27 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 			} catch (IOException e1) {
 				System.out.println("Error estableciendo conexion con NPM.");
 			}
-			result.add(doc.toString());
+			if(doc != null){		
+				for (Element result : doc.select("h3.r a")) {
+	
+					final String url = result.attr("href");
+					System.out.println(url);
+	
+					Document tech = null;
+					try {
+						if (proxy != null) {
+							tech = Jsoup.connect(url).proxy(proxy).userAgent(USER_AGENT).timeout(0).get();
+						} else {
+							tech = Jsoup.connect(url).userAgent(USER_AGENT).timeout(0).get();
+						}
+						results.add(tech.toString());
+					} catch (Exception e) {
+						System.out.println("Error en: " + url);
+					}
+				}
+			}
 
-		return result;
+		return results;
 	}
 	
 	public Ranking search(String query, Proxy proxy) {
@@ -67,86 +83,65 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 			return r;
 		} else {
 
-			String query2 = "javascript package " + query;
+			List<String> contents = acquireData(query, proxy);
 			
-			HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
-			List<RankedItem> ranking = new ArrayList<RankedItem>();
-
-			int rank = 1;
-			// Fetch the page
-			Document doc;
-
-			System.out.println("Starting connection with google...");
-
-			List content = getResultContent(query2, proxy,this);
-			doc = (Document) Jsoup.parse((String)content.get(0));
-
-			System.out.println("Analizing Results...");
+			r = processData(contents,ent_extractor);
 			
-			if(doc != null){
-				
-				for (Element result : doc.select("h3.r a")) {
-	
-					// final String title = result.text();
-					final String url = result.attr("href");
-	
-					// Now do something with the results (maybe something more
-					// useful than just printing to console)
-	
-					System.out.println(url);
-	
-					String text = "";
-					Document tech = null;
-					try {
-						if (proxy != null) {
-							tech = Jsoup.connect(url).proxy(proxy).userAgent(USER_AGENT).timeout(0).get();
-						} else {
-							tech = Jsoup.connect(url).userAgent(USER_AGENT).timeout(0).get();
-						}
-						tech.outputSettings(new Document.OutputSettings().prettyPrint(false));
-	
-						tech.select("br").append("\\n");
-						tech.select("p").prepend("\\n\\n");
-						text = tech.html().replaceAll("\\\\n", "\n");
-						text = Jsoup.clean(text, "", Whitelist.none(),
-								new Document.OutputSettings().prettyPrint(false));
-						
-						List<String> entities = ent_extractor.getNamedEntities(text);
-
-						for (String entity : entities) {
-							if (!ranking.contains(entity)) {
-								ranking.add(new RankedItem(entity, (double) (RESULTS - (rank - 1))));
-								wordCount.put(entity, rank);
-							}
-						}
-						
-
-					} catch (Exception e) {
-						System.out.println("Error en: " + url);
-					}
-					rank++;
-				}
-			}
-
-			// TFIDFCalculator calculator = new TFIDFCalculator();
-			/*
-			 * for(String key:wordCount.keySet()){ double tfidf =
-			 * calculator.tfIdf(wdocs.get(2), wdocs, key); results.add(key);
-			 * // System.out.println(key + " " + tfidf); }
-			 */
-
-			r = new Ranking(ranking);
 			CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
 
 		}
 
-		/*
-		 * for(RankedItem key:ranking){ //
-		 * System.out.println(key+": "+wordCount.get(key)); }
-		 */
-
 		return r;
 
+	}
+	
+	public Ranking processData(List<String> contents, EntityExtractor ent_extractor2) {
+		
+		HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
+		
+		List<RankedItem> ranking = new ArrayList<RankedItem>();
+
+		int rank = 1;
+			
+		for (int i = 0; i <contents.size() && ranking.size() < RESULTS; i++) {
+			
+			String content = contents.get(i);
+			
+			Document tech = (Document) Jsoup.parse((String)content);
+			tech.outputSettings(new Document.OutputSettings().prettyPrint(false));
+
+			tech.select("br").append("\\n");
+			tech.select("p").prepend("\\n\\n");
+			String text = "";
+			text = tech.html().replaceAll("\\\\n", "\n");
+			text = Jsoup.clean(text, "", Whitelist.none(),
+					new Document.OutputSettings().prettyPrint(false));
+			
+			List<String> entities = ent_extractor.getNamedEntities(text);
+
+			for (String entity : entities) {
+				if (!ranking.contains(entity)) {
+					ranking.add(new RankedItem(entity, (double) (RESULTS - (rank - 1))));
+					wordCount.put(entity, rank);
+				}
+			}
+			rank++;
+		}
+		
+		return new Ranking(ranking);
+	}
+
+	public List<String> acquireData(String query, Proxy proxy){
+		
+		String query2 = "javascript package " + query;
+		
+		System.out.println("Acquiring data from google...");
+
+		List<String> content = getResultContent(query2, proxy,this);
+		
+		System.out.print(" ...connection SUCCESSFUL...");
+		
+		return content;
 	}
 
 	@Override

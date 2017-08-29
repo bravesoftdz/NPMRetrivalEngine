@@ -1,12 +1,9 @@
 package test;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import org.apache.lucene.queryParser.ParseException;
 
 import aggregators.Aggregator;
 import aggregators.WeightedFirstRankingAgregator;
@@ -16,7 +13,7 @@ import external.wrappers.NPMSearchWrapper;
 import external.wrappers.NPMWrapper;
 import internal.lucene.LuceneSearch;
 import metasearch.MetaSearcher;
-import metasearch.MetaSearcherOnline;
+import metasearch.MetaSearcherImp;
 import metasearch.Searcher;
 import ner.StringMatching;
 import ranking.RankedItem;
@@ -74,13 +71,9 @@ public class TestSingleQuery {
 		
 		String query = "rpg game 2d";
 		
-		MetaSearcher meta = new MetaSearcherOnline(searchers, aggregator);
+		MetaSearcher meta = new MetaSearcherImp(searchers, aggregator);
 		Ranking results = null;
-		try {
-			results = meta.search(query, proxy);
-		} catch (IOException | ParseException e) {
-			System.out.println(e.getMessage());
-		}
+		results = meta.search(query, proxy);
 		
 		System.out.println();
 		System.out.println("RESULTADOS");
