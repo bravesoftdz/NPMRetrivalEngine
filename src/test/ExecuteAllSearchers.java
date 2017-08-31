@@ -1,13 +1,10 @@
 package test;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.lucene.queryParser.ParseException;
 
 import aggregators.Aggregator;
 import aggregators.OnlyTheFirst;

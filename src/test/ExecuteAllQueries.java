@@ -1,14 +1,11 @@
 package test;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import org.apache.lucene.queryParser.ParseException;
 
 import aggregators.Aggregator;
 import aggregators.WeightedFirstRankingAgregator;
@@ -21,7 +18,6 @@ import metasearch.MetaSearcher;
 import metasearch.MetaSearcherWithCache;
 import metasearch.Searcher;
 import ner.StringMatching;
-import ranking.RankedItem;
 import ranking.Ranking;
 import util.QueryManager;
 

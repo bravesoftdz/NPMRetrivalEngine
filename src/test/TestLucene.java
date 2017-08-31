@@ -1,12 +1,9 @@
 package test;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import org.apache.lucene.queryParser.ParseException;
 
 import aggregators.Aggregator;
 import aggregators.WeightedFirstRankingAgregator;

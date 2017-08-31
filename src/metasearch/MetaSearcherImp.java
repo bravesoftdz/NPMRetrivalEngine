@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.lucene.queryParser.ParseException;
-
 import aggregators.Aggregator;
 import metasearch.cache.CacheContentManager;
 import metasearch.cache.CacheRankingManager;
@@ -28,7 +26,7 @@ public class MetaSearcherImp implements MetaSearcher{
 	}
 
 	public Ranking search(String query, Proxy proxy, List<Searcher> searchers, Aggregator aggregator)
-			throws IOException, ParseException {
+			throws IOException {
 
 		List<Ranking> rankings = new ArrayList<Ranking>();
 		

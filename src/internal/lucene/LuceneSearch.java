@@ -1,23 +1,18 @@
 package internal.lucene;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.jsoup.Jsoup;
 
 import metasearch.Searcher;
+import metasearch.cache.CacheContentManager;
 import metasearch.cache.CacheRankingManager;
 import ner.EntityExtractor;
 import ranking.RankedItem;
@@ -28,11 +23,10 @@ public class LuceneSearch implements Searcher {
 	
 	private static final String datasetURL = ConfigManager.getInstance().getProperty("dataset_url");
 	private static final String download_path = ConfigManager.getInstance().getProperty("download_path");
+	
+	private static final String indexDir = ConfigManager.getInstance().getProperty("index_dir");
+	public static final String jsonFilePath = ConfigManager.getInstance().getProperty("json_file_path");
 
-	String indexDir = "C:/Users/Usuarioç/npm_data/index";
-	String dataDir = "C:/Users/Usuarioç/documents";
-	// String indexDir = "C:/npm_data/indexcriptions";
-	// String dataDir = "C:/npm_data/descriptions";
 	Indexer indexer;
 	LuceneSearcher searcher;
 
@@ -42,11 +36,11 @@ public class LuceneSearch implements Searcher {
 		this.max_results = max_results;
 	}
 
-	private void createIndex() throws IOException {
+	public void createIndex() throws IOException {
 		indexer = new Indexer(indexDir);
 		int numIndexed;
 		long startTime = System.currentTimeMillis();
-		numIndexed = indexer.createIndex(dataDir, new TextFileFilter());
+		numIndexed = indexer.createIndex(jsonFilePath);
 		long endTime = System.currentTimeMillis();
 		indexer.close();
 		System.out.println(numIndexed + " File indexed, time taken: " + (endTime - startTime) + " ms");
@@ -60,9 +54,14 @@ public class LuceneSearch implements Searcher {
 			return r;
 		} else {
 			
-			//acquireData(query, proxy);
+			/*List<String> filepath = acquireData(query, proxy);
 			
-			// createIndex();
+			try {
+				createIndex();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
 			
 			List<String> queries= new ArrayList<String>();
 			queries.add(query);
@@ -93,13 +92,10 @@ public class LuceneSearch implements Searcher {
 			for (int i = 0; i < hits.scoreDocs.length; i++) {
 				ScoreDoc scoreDoc = hits.scoreDocs[i];
 				Document doc = searcher.getDocument(scoreDoc);
-				String[] path = doc.get(LuceneConstants.FILE_PATH).split("\\\\");
-				String nameDoc = path[path.length - 1];
-				nameDoc = nameDoc.replaceAll(".txt", "");
-				// System.out.println(nameDoc + " "+ scoreDoc.score);
+				String nameDoc = doc.get(LuceneConstants.ID);
 				results.add(new RankedItem(nameDoc, (double) (max_results - i)));
 			}
-			searcher.close();
+
 		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 		}
@@ -108,55 +104,28 @@ public class LuceneSearch implements Searcher {
 
 	@Override
 	public List<String> acquireData(String query, Proxy proxy) {
-
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
-		
+		List<String> path = new ArrayList<String>();
+		String json = null;
 		try {
-			URL url = new URL(datasetURL);
-			// read this file into InputStream
-			inputStream = url.openConnection(proxy).getInputStream();
-
-			// write the inputStream to a FileOutputStream
+			int maxBodySize = 0;
 			if (proxy != null) {
-				inputStream = url.openConnection(proxy).getInputStream();
+				json = Jsoup.connect(datasetURL).maxBodySize(maxBodySize).proxy(proxy).ignoreContentType(true).execute().body();
 			} else {
-				inputStream = url.openStream();
-			}
-			
-			outputStream = 
-	                    new FileOutputStream(new File(download_path));
-
-			int read = 0;
-			byte[] bytes = new byte[1024];
-
-			while ((read = inputStream.read(bytes)) != -1) {
-				outputStream.write(bytes, 0, read);
+				json = Jsoup.connect(datasetURL).maxBodySize(maxBodySize).ignoreContentType(true).execute().body();
 			}
 
-			System.out.println("Done!");
+			if(json!=null){
+				String filename = "npm_dataset.json";
+				CacheContentManager.getInstance().saveFileContent(json, download_path, filename);
+				path.add(download_path+"/"+filename);
+				System.out.println("Done!");
+			}
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (outputStream != null) {
-				try {
-					outputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-			}
 		}
 		
-		return null;
+		return path;
 		 
 	}
 }

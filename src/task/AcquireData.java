@@ -1,5 +1,6 @@
 package task;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.ArrayList;
@@ -9,9 +10,11 @@ import external.wrappers.BingWrapper;
 import external.wrappers.GoogleWrapper;
 import external.wrappers.NPMSearchWrapper;
 import external.wrappers.NPMWrapper;
+import internal.lucene.LuceneSearch;
 import metasearch.Searcher;
 import metasearch.cache.CacheContentManager;
 import ner.StringMatching;
+import ranking.Ranking;
 import util.ConfigManager;
 import util.QueryManager;
 
@@ -42,27 +45,30 @@ public class AcquireData {
 
 		Proxy proxy = new Proxy( //
 				Proxy.Type.HTTP, //
-				InetSocketAddress.createUnresolved("proxy.exa.unicen.edu.ar", 8080) //
+				InetSocketAddress.createUnresolved("192.168.2.12", 3128) //
 		);
 		
 		int max_queries = Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
 		int max_results = Integer.valueOf(ConfigManager.getInstance().getProperty("max_results"));
 
-		//LuceneSearch lucene = new LuceneSearch(200);
+		
+		/**
+		 * External Searchers
+		 * 
+		 */
 		NPMWrapper npm = new NPMWrapper(max_results, NPMWrapper.OPTIMAL);
 		GoogleWrapper google = new GoogleWrapper(max_results,new StringMatching());
 		BingWrapper bing = new BingWrapper(max_results,new StringMatching());
 		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);
 		
 		List<Searcher> searchers = new ArrayList<Searcher>();
-		//searchers.add(lucene);
 		searchers.add(google);
 		searchers.add(npm);
 		searchers.add(bing);
 		searchers.add(npmsearch);
 
 
-		for (Searcher searcher : searchers) {
+		/*for (Searcher searcher : searchers) {
 			
 			System.out.println("Analizando "+ searcher.getName());
 			
@@ -81,7 +87,28 @@ public class AcquireData {
 
 				System.out.println();
 			}
+		}*/
+		
+		
+		
+		/**
+		 * Internal Searchers
+		 * 
+		 */
+		
+		LuceneSearch lucene = new LuceneSearch(200);
+		//lucene.acquireData(null, proxy);
+		try {
+			//lucene.createIndex();
+			List<String> list = new ArrayList<String>();
+			list.add("write the news system");
+			Ranking r = lucene.processData(list, null);
+			System.out.println(r.getRankingList().toString());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		
+		
 		
 
 	}
