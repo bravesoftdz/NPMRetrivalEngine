@@ -30,7 +30,7 @@ public class LuceneSearcher {
 	  indexSearcher = new IndexSearcher(reader);
 	    
 
-      queryParser = new MultiFieldQueryParser(new String[]{LuceneConstants.ID, LuceneConstants.DESCR, LuceneConstants.README},
+      queryParser = new MultiFieldQueryParser(new String[]{LuceneConstants.ID, LuceneConstants.DESCR, LuceneConstants.KEYS, LuceneConstants.README},
     		  new StandardAnalyzer());
    }
    

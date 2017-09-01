@@ -45,7 +45,7 @@ public class ExecuteAllSearchers {
 		
 		int max_queries = 10;
 
-		LuceneSearch tester = new LuceneSearch(200);
+		LuceneSearch tester = new LuceneSearch(200,proxy);
 		NPMWrapper npm1 = new NPMWrapper(20, NPMWrapper.OPTIMAL);
 		GoogleWrapper scraper = new GoogleWrapper(20,new StringMatching());
 		BingWrapper bing = new BingWrapper(20,new StringMatching());

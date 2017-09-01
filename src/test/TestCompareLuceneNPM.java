@@ -42,7 +42,7 @@ public class TestCompareLuceneNPM {
 		String query = "create web animations";
 		System.out.println("Executing Query: " + query);
 		
-		LuceneSearch tester = new LuceneSearch(200);
+		LuceneSearch tester = new LuceneSearch(200,proxy);
 		Ranking resultRetrival = tester.search(query, proxy);
 		Ranking resultNPM = npm1.search(query, proxy);
 		resultRetrival.sort();

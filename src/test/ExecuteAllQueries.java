@@ -45,7 +45,7 @@ public class ExecuteAllQueries {
 		
 		int max_queries = 10;
 
-		LuceneSearch tester = new LuceneSearch(200);
+		LuceneSearch tester = new LuceneSearch(200,proxy);
 
 		NPMWrapper npm1 = new NPMWrapper(20, NPMWrapper.OPTIMAL);
 		NPMWrapper npm2 = new NPMWrapper(20, NPMWrapper.POPULARITY);

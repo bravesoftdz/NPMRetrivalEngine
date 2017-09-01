@@ -42,7 +42,7 @@ public class TestSingleQuery {
 			    InetSocketAddress.createUnresolved("proxy.exa.unicen.edu.ar", 8080) //
 			);
 		
-		LuceneSearch lucene = new LuceneSearch(200);	
+		LuceneSearch lucene = new LuceneSearch(200,proxy);	
 
 		NPMWrapper npm1 = new NPMWrapper(200, NPMWrapper.OPTIMAL);
 		NPMWrapper npm2 = new NPMWrapper(200, NPMWrapper.POPULARITY);

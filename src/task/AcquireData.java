@@ -14,6 +14,7 @@ import internal.lucene.LuceneSearch;
 import metasearch.Searcher;
 import metasearch.cache.CacheContentManager;
 import ner.StringMatching;
+import ranking.RankedItem;
 import ranking.Ranking;
 import util.ConfigManager;
 import util.QueryManager;
@@ -96,14 +97,16 @@ public class AcquireData {
 		 * 
 		 */
 		
-		LuceneSearch lucene = new LuceneSearch(200);
+		LuceneSearch lucene = new LuceneSearch(200,proxy);
 		//lucene.acquireData(null, proxy);
 		try {
-			//lucene.createIndex();
+			lucene.createIndex();
 			List<String> list = new ArrayList<String>();
-			list.add("write the news system");
+			list.add("swiper angular");
 			Ranking r = lucene.processData(list, null);
-			System.out.println(r.getRankingList().toString());
+			for(RankedItem tech:r.getRankingList()){
+				System.out.println(tech.getName()+":"+tech.getScore());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -26,7 +26,7 @@ public class TestLucene {
 			    InetSocketAddress.createUnresolved("proxy.exa.unicen.edu.ar", 8080) //
 			);
 		
-		LuceneSearch tester = new LuceneSearch(3000);
+		LuceneSearch tester = new LuceneSearch(3000,proxy);
 		ArrayList<Searcher> searchers = new ArrayList<Searcher>();
 		searchers.add(tester);
 		

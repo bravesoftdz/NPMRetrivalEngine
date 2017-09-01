@@ -31,13 +31,15 @@ public class LuceneSearch implements Searcher {
 	LuceneSearcher searcher;
 
 	int max_results = 200;
+	private Proxy proxy;
 
-	public LuceneSearch(int max_results) {
+	public LuceneSearch(int max_results, Proxy proxy) {
 		this.max_results = max_results;
+		this.proxy = proxy;
 	}
 
 	public void createIndex() throws IOException {
-		indexer = new Indexer(indexDir);
+		indexer = new Indexer(indexDir,proxy);
 		int numIndexed;
 		long startTime = System.currentTimeMillis();
 		numIndexed = indexer.createIndex(jsonFilePath);
@@ -104,6 +106,7 @@ public class LuceneSearch implements Searcher {
 
 	@Override
 	public List<String> acquireData(String query, Proxy proxy) {
+		this.proxy = proxy;
 		List<String> path = new ArrayList<String>();
 		String json = null;
 		try {

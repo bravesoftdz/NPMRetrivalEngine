@@ -102,7 +102,7 @@ public class ProcessData {
 		 * 
 		 */
 		
-		LuceneSearch lucene = new LuceneSearch(200);
+		LuceneSearch lucene = new LuceneSearch(200,proxy);
 		List<Searcher> internal_searchers = new ArrayList<Searcher>();
 		internal_searchers.add(lucene);
 		for (Searcher searcher : internal_searchers) {
