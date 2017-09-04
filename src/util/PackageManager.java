@@ -22,7 +22,7 @@ public class PackageManager {
 	}
 
 	protected void loadPackageNames() {
-		String fichero = "resources/pkgNames.txt";
+		String fichero = ConfigManager.getInstance().getProperty("pkg_name_file");
 		try {
 			FileReader fr = new FileReader(fichero);
 			BufferedReader br = new BufferedReader(fr);

@@ -43,6 +43,18 @@ public class CacheContentManager {
 			return null;
 		}
 	}
+	
+	public String loadFileContent(File file) {
+		String content = null;
+		try {
+			Scanner scanner = new Scanner(file);
+			content = scanner.useDelimiter("\\Z").next();
+			scanner.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return content;
+	}
 
 	public void saveContentInCache(List<String> results, Searcher searcher, String query) {
 		String path = cache_folder +"/"+ searcher.getName() +"/"+ query;
@@ -63,18 +75,6 @@ public class CacheContentManager {
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}
-	}
-
-	protected String loadFileContent(File file) {
-		String content = null;
-		try {
-			Scanner scanner = new Scanner(file);
-			content = scanner.useDelimiter("\\Z").next();
-			scanner.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return content;
 	}
 
 }

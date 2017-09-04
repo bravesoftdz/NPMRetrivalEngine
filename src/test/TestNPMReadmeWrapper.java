@@ -3,7 +3,7 @@ package test;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 
-import external.wrappers.NPMReadmeWrapper;
+import external.wrappers.NPMUtilWrapper;
 
     
 
@@ -16,7 +16,7 @@ public class TestNPMReadmeWrapper {
 			    InetSocketAddress.createUnresolved("192.168.2.12", 3128) //
 			);
 		
-		NPMReadmeWrapper rw = new NPMReadmeWrapper();
+		NPMUtilWrapper rw = new NPMUtilWrapper();
 		String result = rw.downloadReadmeContent("lodash", proxy);
 		System.out.println(result);
 		

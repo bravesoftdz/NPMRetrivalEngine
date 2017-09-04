@@ -11,6 +11,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.jsoup.Jsoup;
 
+import external.wrappers.NPMUtilWrapper;
 import metasearch.Searcher;
 import metasearch.cache.CacheContentManager;
 import metasearch.cache.CacheRankingManager;
@@ -26,6 +27,7 @@ public class LuceneSearch implements Searcher {
 	
 	private static final String indexDir = ConfigManager.getInstance().getProperty("index_dir");
 	public static final String jsonFilePath = ConfigManager.getInstance().getProperty("json_file_path");
+	public static final String npm_filename = ConfigManager.getInstance().getProperty("npm_filename");
 
 	Indexer indexer;
 	LuceneSearcher searcher;
@@ -118,11 +120,13 @@ public class LuceneSearch implements Searcher {
 			}
 
 			if(json!=null){
-				String filename = "npm_dataset.json";
-				CacheContentManager.getInstance().saveFileContent(json, download_path, filename);
-				path.add(download_path+"/"+filename);
+				CacheContentManager.getInstance().saveFileContent(json, download_path, npm_filename);
+				path.add(download_path+"/"+npm_filename);
 				System.out.println("Done!");
 			}
+			
+			acquireExtraData(proxy);
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -130,5 +134,12 @@ public class LuceneSearch implements Searcher {
 		
 		return path;
 		 
+	}
+	
+	public void acquireExtraData(Proxy proxy){
+		System.out.println("Create packege name file");
+		NPMUtilWrapper.createPackageNameFile(download_path+"/"+npm_filename);
+		System.out.println("Downloading Readme Content");
+		NPMUtilWrapper.downloadAllReadmeContent(proxy);
 	}
 }

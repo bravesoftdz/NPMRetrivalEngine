@@ -44,10 +44,10 @@ public class AcquireData {
 
 	public static void main(String[] args) {
 
-		Proxy proxy = new Proxy( //
+		Proxy proxy = /*new Proxy( //
 				Proxy.Type.HTTP, //
 				InetSocketAddress.createUnresolved("192.168.2.12", 3128) //
-		);
+		)*/null;
 		
 		int max_queries = Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
 		int max_results = Integer.valueOf(ConfigManager.getInstance().getProperty("max_results"));
@@ -99,7 +99,8 @@ public class AcquireData {
 		
 		LuceneSearch lucene = new LuceneSearch(200,proxy);
 		//lucene.acquireData(null, proxy);
-		try {
+		lucene.acquireExtraData(proxy);
+		/*try {
 			lucene.createIndex();
 			List<String> list = new ArrayList<String>();
 			list.add("swiper angular");
@@ -109,7 +110,7 @@ public class AcquireData {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		
 		
 		

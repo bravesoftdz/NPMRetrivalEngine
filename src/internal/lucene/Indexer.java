@@ -1,5 +1,6 @@
 package internal.lucene;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.Proxy;
@@ -20,20 +21,22 @@ import org.apache.lucene.store.FSDirectory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import external.wrappers.NPMReadmeWrapper;
+import external.wrappers.NPMUtilWrapper;
+import metasearch.cache.CacheContentManager;
+import util.ConfigManager;
 
 public class Indexer {
 
    private IndexWriter writer;
    private Proxy proxy;
-   private NPMReadmeWrapper nrw;
+   private NPMUtilWrapper nrw;
 
 
    public Indexer(String indexDirectoryPath, Proxy proxy) throws IOException{
 	   
 	  this.proxy = proxy;
 	  
-	  nrw = new NPMReadmeWrapper();
+	  nrw = new NPMUtilWrapper();
       //this directory will contain the indexes
       Directory indexDirectory = 
          FSDirectory.open(Paths.get(indexDirectoryPath));
@@ -116,7 +119,7 @@ public class Indexer {
    private String getReadmeString(String id){
 	   String readme = "";
 	   try{
-		   readme = nrw.downloadReadmeContent(id, proxy);
+		   readme = CacheContentManager.getInstance().loadFileContent(new File(ConfigManager.getInstance().getProperty("readme_dir")+"/"+id));
 	   }catch(Exception e){
 		   
 	   }

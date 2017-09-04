@@ -1,31 +1,23 @@
 package util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import java.io.File;
+
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 
 public class ConfigManager {
 
 	private static ConfigManager instance = null;
 	
-	Properties prop = new Properties();
+	Configuration config;
 
 	protected ConfigManager() {
-		InputStream input = null;
+		Configurations configs = new Configurations();
 		try {
-			input = new FileInputStream("config.properties");
-			prop.load(input);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			config = configs.properties(new File("config.properties"));
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -37,7 +29,7 @@ public class ConfigManager {
 	}
 
 	public String getProperty(String property) {
-		return prop.getProperty(property);
+		return config.getString(property);
 	}
 
 }
