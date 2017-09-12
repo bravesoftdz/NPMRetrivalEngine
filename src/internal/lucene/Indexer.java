@@ -119,7 +119,7 @@ public class Indexer {
    private String getReadmeString(String id){
 	   String readme = "";
 	   try{
-		   readme = CacheContentManager.getInstance().loadFileContent(new File(ConfigManager.getInstance().getProperty("readme_dir")+"/"+id));
+		   readme = CacheContentManager.getInstance().loadFileContent(new File(ConfigManager.getInstance().getProperty("readme_dir")+"/"+id+".txt"));
 	   }catch(Exception e){
 		   
 	   }

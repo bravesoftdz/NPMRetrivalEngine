@@ -19,6 +19,7 @@ import metasearch.MetaSearcherImp;
 import metasearch.Searcher;
 import metasearch.cache.CacheContentManager;
 import metasearch.cache.CacheRankingManager;
+import ner.HiperlinkMatching;
 import ner.StringMatching;
 import ranking.Ranking;
 import util.ConfigManager;
@@ -62,8 +63,8 @@ public class ProcessData {
 		 */
 
 		NPMWrapper npm = new NPMWrapper(max_results, NPMWrapper.OPTIMAL);
-		GoogleWrapper google = new GoogleWrapper(max_results,new StringMatching());
-		BingWrapper bing = new BingWrapper(max_results,new StringMatching());
+		GoogleWrapper google = new GoogleWrapper(max_results,new HiperlinkMatching());
+		BingWrapper bing = new BingWrapper(max_results,new HiperlinkMatching());
 		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);
 		
 		List<Searcher> searchers = new ArrayList<Searcher>();

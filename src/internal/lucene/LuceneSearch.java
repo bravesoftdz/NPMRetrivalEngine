@@ -139,6 +139,8 @@ public class LuceneSearch implements Searcher {
 	public void acquireExtraData(Proxy proxy){
 		System.out.println("Create packege name file");
 		NPMUtilWrapper.createPackageNameFile(download_path+"/"+npm_filename);
+		System.out.println("Create packege name file");
+		NPMUtilWrapper.createHomePagesFile(download_path+"/"+npm_filename);
 		System.out.println("Downloading Readme Content");
 		NPMUtilWrapper.downloadAllReadmeContent(proxy);
 	}

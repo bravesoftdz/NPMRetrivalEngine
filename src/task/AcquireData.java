@@ -13,6 +13,7 @@ import external.wrappers.NPMWrapper;
 import internal.lucene.LuceneSearch;
 import metasearch.Searcher;
 import metasearch.cache.CacheContentManager;
+import ner.HiperlinkMatching;
 import ner.StringMatching;
 import ranking.RankedItem;
 import ranking.Ranking;
@@ -58,18 +59,18 @@ public class AcquireData {
 		 * 
 		 */
 		NPMWrapper npm = new NPMWrapper(max_results, NPMWrapper.OPTIMAL);
-		GoogleWrapper google = new GoogleWrapper(max_results,new StringMatching());
-		BingWrapper bing = new BingWrapper(max_results,new StringMatching());
+		GoogleWrapper google = new GoogleWrapper(max_results,new HiperlinkMatching());
+		BingWrapper bing = new BingWrapper(max_results,new HiperlinkMatching());
 		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);
 		
 		List<Searcher> searchers = new ArrayList<Searcher>();
 		searchers.add(google);
-		searchers.add(npm);
+		//searchers.add(npm);
 		searchers.add(bing);
-		searchers.add(npmsearch);
+		//searchers.add(npmsearch);
 
 
-		/*for (Searcher searcher : searchers) {
+		for (Searcher searcher : searchers) {
 			
 			System.out.println("Analizando "+ searcher.getName());
 			
@@ -88,7 +89,7 @@ public class AcquireData {
 
 				System.out.println();
 			}
-		}*/
+		}
 		
 		
 		
@@ -97,11 +98,11 @@ public class AcquireData {
 		 * 
 		 */
 		
-		LuceneSearch lucene = new LuceneSearch(200,proxy);
+		/*LuceneSearch lucene = new LuceneSearch(200,proxy);
 		//lucene.acquireData(null, proxy);
-		lucene.acquireExtraData(proxy);
-		/*try {
-			lucene.createIndex();
+		//lucene.acquireExtraData(proxy);
+		try {
+			//lucene.createIndex();
 			List<String> list = new ArrayList<String>();
 			list.add("swiper angular");
 			Ranking r = lucene.processData(list, null);
