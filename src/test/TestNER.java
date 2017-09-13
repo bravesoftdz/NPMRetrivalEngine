@@ -34,13 +34,8 @@ public class TestNER {
 			System.out.println(i.getName()+":"+i.getScore());			
 		}*/
 		
-		String html = CacheContentManager.getInstance().loadFileContent(new File("content_cache/google.com_str_match/extract barcode from image/4.txt"));
+		String html = CacheContentManager.getInstance().loadFileContent(new File("content_cache/bing.com_hyp_match/extract barcode from image/0.txt"));
 
-		String cleaned = //Jsoup.clean(html, "http://base.uri", Whitelist.relaxed().preserveRelativeLinks(true));
-		
-		Jsoup.clean(html, "", Whitelist.basic(),
-				new Document.OutputSettings().prettyPrint(false));
-		
 		//System.out.println(cleaned);
 		
 		HiperlinkMatching hm = new HiperlinkMatching();

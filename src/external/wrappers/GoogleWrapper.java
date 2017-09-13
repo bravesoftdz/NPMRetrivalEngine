@@ -85,7 +85,7 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 
 			List<String> contents = acquireData(query, proxy);
 			
-			r = processData(contents,ent_extractor);
+			r = processData(contents);
 			
 			CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
 
@@ -95,7 +95,7 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 
 	}
 	
-	public Ranking processData(List<String> contents, EntityExtractor ent_extractor2) {
+	public Ranking processData(List<String> contents) {
 		
 		HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
 		
@@ -108,16 +108,8 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 			String content = contents.get(i);
 			
 			Document tech = (Document) Jsoup.parse((String)content);
-			tech.outputSettings(new Document.OutputSettings().prettyPrint(false));
-
-			tech.select("br").append("\\n");
-			tech.select("p").prepend("\\n\\n");
-			String text = "";
-			text = tech.html().replaceAll("\\\\n", "\n");
-			text = Jsoup.clean(text, "", Whitelist.none(),
-					new Document.OutputSettings().prettyPrint(false));
 			
-			List<String> entities = ent_extractor.getNamedEntities(text);
+			List<String> entities = ent_extractor.getNamedEntities(tech);
 
 			for (String entity : entities) {
 				if (!ranking.contains(entity)) {

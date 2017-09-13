@@ -12,6 +12,6 @@ public interface Searcher {
 	public Ranking search(String searchQuery,Proxy proxy);
 	
 	public List<String> acquireData(String query, Proxy proxy);
-	public Ranking processData(List<String> contents, EntityExtractor ent_extractor);
+	public Ranking processData(List<String> contents);
 	
 }

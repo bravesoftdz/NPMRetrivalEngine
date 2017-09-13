@@ -86,7 +86,7 @@ public class ProcessData {
 				Ranking ranking = CacheRankingManager.getInstance().loadRankingFromCache(searcher, query);
 				if (ranking == null) {
 					List<String> data = CacheContentManager.getInstance().loadContentFromCache(searcher,query);
-					ranking = searcher.processData(data,new StringMatching());//TODO data null
+					ranking = searcher.processData(data);//TODO data null
 					CacheRankingManager.getInstance().saveRankingInCache(ranking, searcher, query);
 				}
 				
@@ -120,7 +120,7 @@ public class ProcessData {
 				if (ranking == null) {
 					List<String> data = new ArrayList<String>();
 					data.add(query);
-					ranking = searcher.processData(data,null);//TODO data null
+					ranking = searcher.processData(data);//TODO data null
 					CacheRankingManager.getInstance().saveRankingInCache(ranking, searcher, query);
 				}
 				
@@ -156,7 +156,7 @@ public class ProcessData {
 				Ranking ranking = CacheRankingManager.getInstance().loadRankingFromCache(meta, query);
 				if (ranking == null) {
 					meta.acquireData(query, proxy);
-					ranking = meta.processData(null,new StringMatching());//TODO data null
+					ranking = meta.processData(null);//TODO data null
 					CacheRankingManager.getInstance().saveRankingInCache(ranking, meta, query);
 				}
 				

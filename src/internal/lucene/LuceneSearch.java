@@ -70,7 +70,7 @@ public class LuceneSearch implements Searcher {
 			List<String> queries= new ArrayList<String>();
 			queries.add(query);
 			
-			r = processData(queries,null);
+			r = processData(queries);
 			
 			CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
 		}
@@ -83,7 +83,7 @@ public class LuceneSearch implements Searcher {
 	}
 	
 	@Override
-	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
+	public Ranking processData(List<String> contents) {
 		List<RankedItem> results = new ArrayList<RankedItem>();
 		try {
 			

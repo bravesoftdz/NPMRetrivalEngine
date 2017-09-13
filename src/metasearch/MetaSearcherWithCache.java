@@ -77,7 +77,7 @@ public class MetaSearcherWithCache implements MetaSearcher{
 	}
 
 	@Override
-	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
+	public Ranking processData(List<String> contents) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -70,11 +70,11 @@ public class MetaSearcherImp implements MetaSearcher{
 	}
 
 	@Override
-	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
+	public Ranking processData(List<String> contents) {
 		List<Ranking> rs = new ArrayList<Ranking>();
 		
 		for (Searcher searcher : searchers) {
-			rs.add(searcher.processData(rankings.get(searcher.getName()), ent_extractor));
+			rs.add(searcher.processData(rankings.get(searcher.getName())));
 		}
 
 		return aggregator.aggregate(rs);
@@ -86,7 +86,7 @@ public class MetaSearcherImp implements MetaSearcher{
 		for (Searcher searcher : searchers) {
 			Ranking ranking = CacheRankingManager.getInstance().loadRankingFromCache(searcher, query);
 			if (ranking == null) {
-				ranking = searcher.processData(rankings.get(searcher.getName()), ent_extractor);
+				ranking = searcher.processData(rankings.get(searcher.getName()));
 			}
 			rs.add(ranking);
 		}

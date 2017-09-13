@@ -25,7 +25,7 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 	// We need a real browser user agent or Google will block our request with a
 	// 403 - Forbidden
 	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36";
-	private static final String BING = "bing.com";
+	public static final String BING = "bing.com";
 	public int MAX_PAGE = 2;
 	public int RESULTS = 20;
 	
@@ -69,7 +69,6 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 
 					System.out.println(url);
 
-					String text = "";
 					Document tech = null;
 					try {
 						if (proxy != null) {
@@ -99,7 +98,7 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 
 			List<String> contents = acquireData(query, proxy);
 			
-			r = processData(contents,ent_extractor);
+			r = processData(contents);
 			
 			CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
 
@@ -110,7 +109,7 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 	
 	
 	@Override
-	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
+	public Ranking processData(List<String> contents) {
 		
 		HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
 
@@ -118,14 +117,12 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 
 		int rank = 1;
 
-		System.out.println("Analizing Results...");
 
 		for (int i = 0; ranking.size() < RESULTS && i <contents.size(); i++) {		
 			String content = contents.get(i);
-			Document tech = (Document) Jsoup.parse((String)content);			tech.outputSettings(new Document.OutputSettings().prettyPrint(false));			tech.select("br").append("\\n");			tech.select("p").prepend("\\n\\n");
-			String text="";			text = tech.html().replaceAll("\\\\n", "\n");			text = Jsoup.clean(text, "", Whitelist.none(),					new Document.OutputSettings().prettyPrint(false));
+			Document tech = (Document) Jsoup.parse((String)content);
 			
-			List<String> entities = ent_extractor.getNamedEntities(text);
+			List<String> entities = ent_extractor.getNamedEntities(tech);
 
 			for (String entity : entities) {
 				if (!ranking.contains(entity)) {

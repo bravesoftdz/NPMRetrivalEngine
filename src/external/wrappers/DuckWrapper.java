@@ -133,7 +133,7 @@ public class DuckWrapper implements Searcher
 	}
 
 	@Override
-	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
+	public Ranking processData(List<String> contents) {
 		// TODO Auto-generated method stub
 		return null;
 	}

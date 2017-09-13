@@ -70,7 +70,7 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 
 			List<String> contents = acquireData(query, proxy);
 			
-			r = processData(contents,null);
+			r = processData(contents);
 			
 			CacheRankingManager.getInstance().saveRankingInCache(r, this, query);
 
@@ -80,7 +80,7 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 	}
 			
 	@Override
-	public Ranking processData(List<String> contents, EntityExtractor ent_extractor) {
+	public Ranking processData(List<String> contents) {
 
 		List<RankedItem> results = new ArrayList<RankedItem>();
 	
