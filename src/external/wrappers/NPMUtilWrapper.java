@@ -14,6 +14,7 @@ import org.jsoup.nodes.Document;
 import internal.lucene.LuceneConstants;
 import metasearch.cache.CacheContentManager;
 import util.ConfigManager;
+import util.HomeManager;
 import util.PackageManager;
 
 public class NPMUtilWrapper{
@@ -111,14 +112,7 @@ public class NPMUtilWrapper{
 	    		JSONObject json = new JSONObject(linea);
 	    		String id = (String)json.get(LuceneConstants.ID);
 	    		String home = getHomePage(json);
-	    		if(!"".equals(home)&&!"*".equals(home)&& home.indexOf("http")>-1 &&
-	    				!"https://".equals(home)&&!"https:".equals(home)&&
-	    				!"https:/".equals(home)&&!"https".equals(home)&&
-	    				!"http://".equals(home)&&!"http:".equals(home)&&
-	    				!"http:/".equals(home)&&!"http".equals(home)&&
-	    				!"https://github.com".equals(home)&&!"https://github.com/".equals(home)&&
-	    				!"http://github.com".equals(home)&&!"http://github.com/".equals(home)
-	    				){
+	    		if(!HomeManager.getInstance().isMalformed(home)){
 	    			ficheroNombres.write(id + "," + home + "\r\n");
 	    		}	
 	    	  }catch(Exception e) {

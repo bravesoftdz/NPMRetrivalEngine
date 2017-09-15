@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="pingback" href="http://www.codepool.biz/xmlrpc.php"> 
+  <script type="text/javascript" src="http://www.codepool.biz/wp-content/themes/codepool/js/jquery.min.js"></script> 
+  <script type="text/javascript" src="http://www.codepool.biz/wp-content/themes/codepool/js/base.js"></script> 
+  <title>Node.js Barcode Reader for Raspberry Pi</title> 
+  <!-- This site is optimized with the Yoast SEO plugin v3.2.5 - https://yoast.com/wordpress/plugins/seo/ --> 
+  <meta name="description" content="The post demonstrates how to quickly create an online barcode reader using Node.js and Dynamsoft Barcode Reader SDK on Raspberry Pi."> 
+  <meta name="robots" content="noodp"> 
+  <link rel="canonical" href="http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="Node.js Barcode Reader for Raspberry Pi"> 
+  <meta property="og:description" content="The post demonstrates how to quickly create an online barcode reader using Node.js and Dynamsoft Barcode Reader SDK on Raspberry Pi."> 
+  <meta property="og:url" content="http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html"> 
+  <meta property="og:site_name" content="Code Pool"> 
+  <meta property="article:tag" content="Barcode"> 
+  <meta property="article:tag" content="Node.js"> 
+  <meta property="article:tag" content="raspberrypi"> 
+  <meta property="article:section" content="RaspberryPi"> 
+  <meta property="article:published_time" content="2016-04-18T10:00:18+00:00"> 
+  <meta property="article:modified_time" content="2016-04-07T21:34:23+00:00"> 
+  <meta property="og:updated_time" content="2016-04-07T21:34:23+00:00"> 
+  <meta property="og:image" content="http://www.codepool.biz/wp-content/uploads/2016/03/rpi_node_barcode-1-1024x576.png"> 
+  <meta name="twitter:card" content="summary_large_image"> 
+  <meta name="twitter:description" content="The post demonstrates how to quickly create an online barcode reader using Node.js and Dynamsoft Barcode Reader SDK on Raspberry Pi."> 
+  <meta name="twitter:title" content="Node.js Barcode Reader for Raspberry Pi"> 
+  <meta name="twitter:image" content="http://www.codepool.biz/wp-content/uploads/2016/03/rpi_node_barcode-1-1024x576.png"> 
+  <!-- / Yoast SEO plugin. --> 
+  <link rel="alternate" type="application/rss+xml" title="Code Pool » Feed" href="http://www.codepool.biz/feed"> 
+  <link rel="alternate" type="application/rss+xml" title="Code Pool » Comments Feed" href="http://www.codepool.biz/comments/feed"> 
+  <link rel="alternate" type="application/rss+xml" title="Code Pool » How to Build Node.js Barcode Reader on Raspberry Pi Comments Feed" href="http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html/feed"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/www.codepool.biz\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.4.2"}};
+			!function(a,b,c){function d(a){var c,d=b.createElement("canvas"),e=d.getContext&&d.getContext("2d"),f=String.fromCharCode;return e&&e.fillText?(e.textBaseline="top",e.font="600 32px Arial","flag"===a?(e.fillText(f(55356,56806,55356,56826),0,0),d.toDataURL().length>3e3):"diversity"===a?(e.fillText(f(55356,57221),0,0),c=e.getImageData(16,16,1,1).data.toString(),e.fillText(f(55356,57221,55356,57343),0,0),c!==e.getImageData(16,16,1,1).data.toString()):("simple"===a?e.fillText(f(55357,56835),0,0):e.fillText(f(55356,57135),0,0),0!==e.getImageData(16,16,1,1).data[0])):!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g;c.supports={simple:d("simple"),flag:d("flag"),unicode8:d("unicode8"),diversity:d("diversity")},c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.simple&&c.supports.flag&&c.supports.unicode8&&c.supports.diversity||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <link rel="stylesheet" id="cp-style-css" href="http://www.codepool.biz/wp-content/themes/codepool/style.css?ver=4.4.2" type="text/css" media="all"> 
+  <link rel="https://api.w.org/" href="http://www.codepool.biz/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.codepool.biz/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.codepool.biz/wp-includes/wlwmanifest.xml"> 
+  <meta name="generator" content="WordPress 4.4.2"> 
+  <link rel="shortlink" href="http://www.codepool.biz/?p=4448"> 
+  <link rel="alternate" type="application/json+oembed" href="http://www.codepool.biz/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.codepool.biz%2Fraspberry-pi-nodejs-barcode-reader.html"> 
+  <link rel="alternate" type="text/xml+oembed" href="http://www.codepool.biz/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.codepool.biz%2Fraspberry-pi-nodejs-barcode-reader.html&amp;format=xml"> 
+ </head> 
+ <body class="single single-post postid-4448 single-format-standard group-blog"> 
+  <div id="page" class="hfeed site"> 
+   <a class="skip-link screen-reader-text" href="#content">Skip to content</a> 
+   <header id="masthead" class="site-header" role="banner"> 
+    <div class="site-branding"> 
+     <a href="http://www.dynamsoft.com" target="_blank" title="Dynamsoft | 11 Years of Experience in TWAIN SDKs and Version Control Solutions"><img class="company-logo fl" src="http://www.codepool.biz/wp-content/themes/codepool/images/logo-dynamsoft-159x39.png" width="159" height="39" alt="Dynamsoft LOGO"></a> 
+     <div class="site-intro fl"> 
+      <h1 class="site-title"><a href="http://www.codepool.biz/" rel="home">Code Pool</a></h1> 
+      <h2 class="site-description">Dynamsoft Coders' Minds</h2> 
+     </div> 
+     <div id="social-follow" class="fr"> 
+      <ul> 
+       <li><a href="http://www.linkedin.com/company/dynamsoft" target="_blank" title="Follow via Linkedin"> 
+         <div class="sf-icn sf-lin transition" alt="Linked icon"> 
+         </div></a></li> 
+       <li><a href="https://www.facebook.com/Dynamsoft" target="_blank" title="Follow via Facebook"> 
+         <div class="sf-icn sf-fb transition" alt="Facebook icon"> 
+         </div></a></li> 
+       <li><a href="https://twitter.com/dynamsoft" target="_blank" title="Follow via Twitter"> 
+         <div class="sf-icn sf-tt transition" alt="Twitter icon"> 
+         </div></a></li> 
+       <li><a href="https://www.google.com/+Dynamsoft" target="_blank" title="Follow via Google+"> 
+         <div class="sf-icn sf-gp transition" alt="Google+ icon"> 
+         </div></a></li> 
+       <li><a href="http://www.codepool.biz/feed" target="_blank" title="Follow via RSS"> 
+         <div class="sf-icn sf-rss transition" alt="RSS icon"> 
+         </div></a></li> 
+       <div class="clear"></div> 
+      </ul> 
+     </div>
+     <!-- social follow --> 
+    </div>
+    <!-- .site-branding --> 
+   </header>
+   <!-- #masthead --> 
+   <div id="wrapper"> 
+    <div id="content" class="site-content"> 
+     <div id="primary" class="content-area"> 
+      <main id="main" class="site-main" role="main"> 
+       <article id="post-4448" class="post-4448 post type-post status-publish format-standard hentry category-raspberrypi-2 tag-barcode tag-node-js tag-raspberrypi"> 
+        <header class="entry-header"> 
+         <h1 class="entry-title">How to Build Node.js Barcode Reader on Raspberry Pi</h1> 
+         <div class="entry-meta"> 
+          <!-- author and date--> 
+          <span class="byline"><span class="author vcard"><a class="url fn n" href="http://www.codepool.biz/author/xiao-ling">Xiao Ling</a></span></span>&nbsp;/&nbsp;
+          <span class="posted-on"><a href="http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html" rel="bookmark"><time class="entry-date published" datetime="2016-04-18T10:00:18+00:00">April 18, 2016</time><time class="updated" datetime="2016-04-07T21:34:23+00:00">April 7, 2016</time></a></span> 
+          <!-- category and tags--> 
+          <span class="cat-links"> /&nbsp;<a href="http://www.codepool.biz/category/raspberrypi-2" rel="category tag">RaspberryPi</a> </span> 
+          <span class="tags-links"> /&nbsp;<a href="http://www.codepool.biz/tag/barcode" rel="tag">Barcode</a>, <a href="http://www.codepool.biz/tag/node-js" rel="tag">Node.js</a>, <a href="http://www.codepool.biz/tag/raspberrypi" rel="tag">raspberrypi</a> </span> 
+          <!-- comments --> 
+          <span class="comments-link"><a href="http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html#respond"><span class="dsq-postid" rel="4448 http://www.codepool.biz/?p=4448">Leave comment</span></a></span> 
+          <!-- edit link --> 
+         </div>
+         <!-- .entry-meta --> 
+        </header>
+        <!-- .entry-header --> 
+        <div class="entry-content"> 
+         <p>Node.js is available for all platforms including IoT devices like Raspberry Pi. In this post, I will demonstrate how to quickly create an online barcode reader on Raspberry Pi using Node.js and Dynamsoft Barcode Reader SDK.</p> 
+         <p><span id="more-4448"></span></p> 
+         <h2>Node.js for Raspberry Pi</h2> 
+         <p>If you flashed Rasbian Jessie, the latest Linux ROM for Raspberry Pi, you might have noticed that Node.js is pre-installed by default. Nevertheless, the Node version is out of date. To get new features of Node.js, download the latest version.</p> 
+         <p>Here are the steps to install Node.js for Raspberry Pi:</p> 
+         <ol> 
+          <li>Remove the pre-installed Node.js: <pre class="brush:shell">sudo apt-get remove node</pre> </li> 
+          <li>Check Pi hardware information: <pre class="brush:shell">uname –m
+armv7l</pre> </li> 
+          <li>Download the matched <a href="https://nodejs.org/en/download/" target="_blank">Node version for ARM</a>.</li> 
+          <li>Extract the package: <pre class="brush:shell">tar –xf node-v4.4.1-linux-armv7l.tar.xz</pre> </li> 
+          <li>Add the bin path to ~/.bashrc: <pre class="brush:shell">vim ~/.bashrc
+export PATH=$PATH:/home/pi/node-v4.4.0-linux-armv7l/bin
+source ~/.bashrc</pre> </li> 
+          <li>Check whether Node can work: <pre class="brush:shell">node –v
+v4.4.0</pre> </li> 
+         </ol> 
+         <h2>Building Online Barcode Reader</h2> 
+         <p>Get barcode SDK. The Dynamsoft Barcode Reader SDK for Raspberry Pi is not publicly available yet. To get a trial version, contact <a href="mailto:support@dynamsoft.com">support@dynamsoft.com</a>.</p> 
+         <p>Extract the package and generate a symbolic link:</p> 
+         <pre class="brush:shell">sudo ln -s &lt;DynamsoftBarcodeReader&gt;/lib/libDynamsoftBarcodeReader.so /usr/lib/libDynamsoftBarcodeReader.so</pre> 
+         <p>Install <strong>node-gyp</strong> for building Node C/C++ addons:</p> 
+         <pre class="brush:shell">npm install -g node-gyp</pre> 
+         <p>Create <strong>dbr.cc</strong> and <strong>binding.gyp</strong>:</p> 
+         <pre class="brush:shell">        
+    // dbr.cc
+    Isolate* isolate = Isolate::GetCurrent();
+	HandleScope scope(isolate);
+
+	// convert v8 string to char *
+	String::Utf8Value license(args[0]-&gt;ToString());
+	String::Utf8Value fileName(args[1]-&gt;ToString());
+	char *pFileName = *fileName;
+	char *pszLicense = *license;
+	// Dynamsoft Barcode Reader: init
+	__int64 llFormat = args[2]-&gt;IntegerValue();
+	int iMaxCount = 0x7FFFFFFF;
+	ReaderOptions ro = {0};
+	pBarcodeResultArray pResults = NULL;
+
+	// Initialize license
+	if (pszLicense &amp;&amp; (strcmp(pszLicense, "null") !=0) )
+	{
+		printf("license: %s\n", pszLicense);
+		DBR_InitLicense(pszLicense);
+	}
+	else {
+		#ifdef LINUX_DBR
+				printf("Linux dbr license\n");
+				DBR_InitLicense("&lt;license&gt;");
+		#endif
+	}
+
+	ro.llBarcodeFormat = llFormat;
+	ro.iMaxBarcodesNumPerPage = iMaxCount;
+
+	// Decode barcode image
+	int ret = DBR_DecodeFile(pFileName, &amp;ro, &amp;pResults);</pre> 
+         <pre class="brush:shell">// binding.gyp
+{
+  "targets": [
+    {
+      'target_name': "dbr",
+      'sources': [ "dbr.cc" ],
+      'conditions': [
+          ['OS=="linux"', {
+            'defines': [
+              'LINUX_DBR',
+            ],
+            'include_dirs': [
+                "/home/pi/Desktop/dbr/include"
+            ],
+            'libraries': [
+                "-lDynamsoftBarcodeReader", "-L/home/pi/Desktop/dbr/lib"
+            ]
+          }]
+      ]
+    }
+  ]
+}</pre> 
+         <p>Build <strong>dbr.so</strong>:</p> 
+         <pre class="brush:shell">node-gyp build</pre> 
+         <p>Install Node modules <strong>express</strong> and <strong>formidable</strong> for rapidly making a Web project:</p> 
+         <pre class="brush:shell">npm install express formidable</pre> 
+         <p>Use the barcode module in <strong>server.js</strong>:</p> 
+         <pre class="brush:shell">var dbr = require('./build/Release/dbr');
+
+dbr.decodeFile(
+
+    license, fileName, barcodeType,
+
+    function(msg) {
+
+        var response = 'Totol count: ' + msg.length;
+
+        var result = null;
+
+        for (index in msg) {
+
+            result = msg[index]
+
+            response += '&lt;p&gt;' + result['format'] + ': ';
+
+            response += result['value'] + '&lt;p&gt;';
+
+        }
+
+        res.send(response);
+
+    }
+
+);</pre> 
+         <p>Start the server:</p> 
+         <pre class="brush:shell">node server.js</pre> 
+         <p>Visit&nbsp;<strong>http://localhost:2016/index.htm</strong>:</p> 
+         <p><img class="alignnone size-large wp-image-4449" src="http://www.codepool.biz/wp-content/uploads/2016/03/rpi_node_barcode-1-1024x576.png" alt="raspberry pi node.js barcode reader" width="640" height="360" srcset="http://www.codepool.biz/wp-content/uploads/2016/03/rpi_node_barcode-1-300x169.png 300w, http://www.codepool.biz/wp-content/uploads/2016/03/rpi_node_barcode-1-768x432.png 768w, http://www.codepool.biz/wp-content/uploads/2016/03/rpi_node_barcode-1-1024x576.png 1024w, http://www.codepool.biz/wp-content/uploads/2016/03/rpi_node_barcode-1.png 1600w" sizes="(max-width: 640px) 100vw, 640px"></p> 
+         <h2>Source Code</h2> 
+         <p><a href="https://github.com/dynamsoftlabs/raspberry-pi-nodejs-barcode-reader-">https://github.com/dynamsoftlabs/raspberry-pi-nodejs-barcode-reader-</a></p> 
+         <p>&nbsp;</p> 
+        </div>
+        <!-- .entry-content --> 
+       </article>
+       <!-- #post-## --> 
+       <div id="social-share"> 
+        <div class="split-line"></div> 
+        <ul> 
+         <li><a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html&amp;title=How to Build Node.js Barcode Reader on Raspberry Pi&amp;source=http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html" target="_blank" title="Share to Linkedin"> 
+           <div class="ss-icn ss-lin transition" alt="Linked icon"> 
+           </div></a></li> 
+         <li><a href="http://www.facebook.com/sharer.php?u=http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html&amp;t=How to Build Node.js Barcode Reader on Raspberry Pi" target="_blank" title="Share to Facebook"> 
+           <div class="ss-icn ss-fb transition" alt="Facebook icon"> 
+           </div></a></li> 
+         <li><a href="https://twitter.com/share?text=How to Build Node.js Barcode Reader on Raspberry Pi&amp;url=http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html&amp;lang=en" target="_blank" title="Share to Twitter"> 
+           <div class="ss-icn ss-tt transition" alt="Twitter icon"> 
+           </div></a></li> 
+         <li><a href="https://plus.google.com/share?url=http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html" target="_blank" title="Share to Google+"> 
+           <div class="ss-icn ss-gp transition" alt="Google+ icon"> 
+           </div></a></li> 
+         <li><a href="http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html/feed" target="_blank" title="Subscribe to this blog"> 
+           <div class="ss-icn ss-rss transition" alt="RSS icon"> 
+           </div></a></li> 
+         <div class="clear"></div> 
+        </ul> 
+       </div>
+       <!-- begin social share --> 
+       <!-- Xiao Ling --> 
+       <div id="author-xiao-ling" class="author-info" style="display: none;"> 
+        <img class="author-info-avatar author-info-avatar-ext" width="62" height="62" alt="Xiao Ling avatar" " src="http://www.codepool.biz/wp-content/themes/codepool/images/xiao_62.png"> 
+        <p id="author-name" class="author-info-name">Xiao Ling</p> 
+        <div id="social-follow-ext" class="fl"> 
+         <ul> 
+          <li><a href="https://ca.linkedin.com/in/yushulx" target="_blank" title="Follow via Linkedin"> 
+            <div class="sf-icn sf-lin-ext transition" alt="Linked icon"> 
+            </div></a></li> 
+          <li><a href="https://www.facebook.com/lingxiao1002" target="_blank" title="Follow via Facebook"> 
+            <div class="sf-icn sf-fb-ext transition" alt="Facebook icon"> 
+            </div></a></li> 
+          <li><a href="https://twitter.com/yushulx" target="_blank" title="Share to Twitter"> 
+            <div class="sf-icn sf-tt-ext transition" alt="Twitter icon"> 
+            </div></a></li> 
+          <li><a href="https://plus.google.com/+XiaoLingyushulx" target="_blank" title="Follow via Google+"> 
+            <div class="sf-icn sf-gp-ext transition" alt="Google+ icon"> 
+            </div></a></li> 
+          <div class="clear"></div> 
+         </ul> 
+        </div> 
+        <div class="cl"></div> 
+       </div> 
+       <!-- E .author-info --> 
+       <!--
+			<div class="prev-next">
+				<span class="prev"><a href="http://www.codepool.biz/raspberry-pi-visual-c-linux.html" rel="prev">&laquo; Previous post</a></span>
+				<span class="next"><a href="http://www.codepool.biz/build-so-aar-android-studio.html" rel="next">Next Post &raquo;</a></span>
+			</div>
+			.newer-older--> 
+       <div id="disqus_thread"> 
+       </div> 
+       <script type="text/javascript">
+/* <![CDATA[ */
+    var disqus_url = 'http://www.codepool.biz/raspberry-pi-nodejs-barcode-reader.html';
+    var disqus_identifier = '4448 http://www.codepool.biz/?p=4448';
+    var disqus_container_id = 'disqus_thread';
+    var disqus_domain = 'disqus.com';
+    var disqus_shortname = 'kevingao';
+    var disqus_title = "How to Build Node.js Barcode Reader on Raspberry Pi";
+        var disqus_config = function () {
+        var config = this; // Access to the config object
+        config.language = '';
+
+        /*
+           All currently supported events:
+            * preData — fires just before we request for initial data
+            * preInit - fires after we get initial data but before we load any dependencies
+            * onInit  - fires when all dependencies are resolved but before dtpl template is rendered
+            * afterRender - fires when template is rendered but before we show it
+            * onReady - everything is done
+         */
+
+        config.callbacks.preData.push(function() {
+            // clear out the container (its filled for SEO/legacy purposes)
+            document.getElementById(disqus_container_id).innerHTML = '';
+        });
+                config.callbacks.onReady.push(function() {
+            // sync comments in the background so we don't block the page
+            var script = document.createElement('script');
+            script.async = true;
+            script.src = '?cf_action=sync_comments&post_id=4448';
+
+            var firstScript = document.getElementsByTagName( "script" )[0];
+            firstScript.parentNode.insertBefore(script, firstScript);
+        });
+                    };
+/* ]]> */
+</script> 
+       <script type="text/javascript">
+/* <![CDATA[ */
+    var DsqLocal = {
+        'trackbacks': [
+        ],
+        'trackback_url': "http:\/\/www.codepool.biz\/raspberry-pi-nodejs-barcode-reader.html\/trackback"    };
+/* ]]> */
+</script> 
+       <script type="text/javascript">
+/* <![CDATA[ */
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.' + 'disqus.com' + '/embed.js?pname=wordpress&pver=2.74';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+/* ]]> */
+</script> 
+      </main>
+      <!-- #main --> 
+     </div>
+     <!-- #primary --> 
+     <div id="secondary" class="widget-area" role="complementary"> 
+      <div id="siteSubscribe"> 
+       <h2 class="widget-title">Subscribe Newsletter</h2> 
+       <p class="desc">Subscribe to our mailing list to get the monthly update.</p> 
+       <div id="subscribeForm" class="clearfix"> 
+        <input id="subscribeEmail" type="text"> 
+        <a class="d-btn bgOrange" href="javascript:void(0)" id="btnSubscribe">Subscribe</a>
+        <span class="placeHolder">name@email.com</span> 
+       </div> 
+       <div id="subscribeError" class="alertMsg" style="display: none;"> 
+        <p><img src="http://www.codepool.biz/wp-content/themes/codepool/images/icon-submit-error-13x14.png" alt="submit error"> Invalid e-mail address. Please use a format similar to: name@mail.com</p> 
+       </div> 
+       <div id="subscribeSuccess" class="alertMsg" style="display: none;"> 
+        <p><img src="http://www.codepool.biz/wp-content/themes/codepool/images/icon-submit-success-13x14.png" alt="submit success"> You have successfully subscribed to Email Newsletter of Dynamsoft Products. Thank You!</p> 
+       </div> 
+      </div> 
+      <aside id="search-2" class="widget widget_search">
+       <form role="search" method="get" class="search-form" action="http://www.codepool.biz/"> 
+        <label> <span class="screen-reader-text">Search for:</span> <input type="search" class="search-field" placeholder="Search …" value="" name="s" title="Search for:"> </label> 
+        <input type="submit" class="search-submit" value="Search"> 
+       </form>
+      </aside>
+      <aside id="text-395981663" class="widget widget_text">
+       <h2 class="widget-title">Tutorials</h2> 
+       <div class="textwidget">
+        <p><a href="http://www.codepool.biz/barcode-reader-sdk-programming">Barcode Programming</a><br> <a href="http://www.codepool.biz/dwt-web-frameworks-programming">DWT with Web Frameworks</a><br> <a href="http://www.codepool.biz/websocket-how-to">WebSocket Programming</a><br> <a href="http://www.codepool.biz/android-programming">Android Programming</a><br> <a href="http://www.codepool.biz/opencv-programming">OpenCV Programming</a><br> <a href="http://www.codepool.biz/sourcesafe-vss-how-to">Visual SourceSafe</a><br> <a href="http://www.codepool.biz/tfs-team-foundation-server-tutorial">Team Foundation Server</a><br> <a href="http://www.codepool.biz/wcf-java-interop">WCF &amp; Java</a></p> 
+       </div> 
+      </aside>
+      <aside id="tag_cloud-2" class="widget widget_tag_cloud">
+       <h2 class="widget-title">Tags</h2>
+       <div class="tagcloud">
+        <a href="http://www.codepool.biz/tag/net-twain" class="tag-link-94" title="3 topics" style="font-size: 8pt;">.NET TWAIN</a> 
+        <a href="http://www.codepool.biz/tag/android" class="tag-link-269" title="22 topics" style="font-size: 16.793388429752pt;">Android</a> 
+        <a href="http://www.codepool.biz/tag/android-studio" class="tag-link-206" title="4 topics" style="font-size: 9.1570247933884pt;">Android Studio</a> 
+        <a href="http://www.codepool.biz/tag/barcode" class="tag-link-266" title="64 topics" style="font-size: 22pt;">Barcode</a> 
+        <a href="http://www.codepool.biz/tag/c" class="tag-link-261" title="12 topics" style="font-size: 13.900826446281pt;">C#</a> 
+        <a href="http://www.codepool.biz/tag/cc" class="tag-link-110" title="3 topics" style="font-size: 8pt;">C/C++</a> 
+        <a href="http://www.codepool.biz/tag/camera" class="tag-link-120" title="10 topics" style="font-size: 13.090909090909pt;">camera</a> 
+        <a href="http://www.codepool.biz/tag/django" class="tag-link-277" title="3 topics" style="font-size: 8pt;">Django</a> 
+        <a href="http://www.codepool.biz/tag/document" class="tag-link-316" title="6 topics" style="font-size: 10.892561983471pt;">document</a> 
+        <a href="http://www.codepool.biz/tag/dwt" class="tag-link-187" title="5 topics" style="font-size: 10.082644628099pt;">dwt</a> 
+        <a href="http://www.codepool.biz/tag/dynamic-web-twain" class="tag-link-36" title="6 topics" style="font-size: 10.892561983471pt;">Dynamic Web TWAIN</a> 
+        <a href="http://www.codepool.biz/tag/extension" class="tag-link-205" title="6 topics" style="font-size: 10.892561983471pt;">Extension</a> 
+        <a href="http://www.codepool.biz/tag/go" class="tag-link-127" title="3 topics" style="font-size: 8pt;">Go</a> 
+        <a href="http://www.codepool.biz/tag/html5" class="tag-link-262" title="14 topics" style="font-size: 14.710743801653pt;">HTML5</a> 
+        <a href="http://www.codepool.biz/tag/ios" class="tag-link-263" title="4 topics" style="font-size: 9.1570247933884pt;">iOS</a> 
+        <a href="http://www.codepool.biz/tag/java" class="tag-link-101" title="13 topics" style="font-size: 14.363636363636pt;">java</a> 
+        <a href="http://www.codepool.biz/tag/javascript" class="tag-link-268" title="23 topics" style="font-size: 17.02479338843pt;">JavaScript</a> 
+        <a href="http://www.codepool.biz/tag/linux" class="tag-link-238" title="14 topics" style="font-size: 14.710743801653pt;">linux</a> 
+        <a href="http://www.codepool.biz/tag/mac" class="tag-link-264" title="7 topics" style="font-size: 11.471074380165pt;">Mac</a> 
+        <a href="http://www.codepool.biz/tag/mobile" class="tag-link-121" title="4 topics" style="font-size: 9.1570247933884pt;">mobile</a> 
+        <a href="http://www.codepool.biz/tag/nginx" class="tag-link-122" title="4 topics" style="font-size: 9.1570247933884pt;">nginx</a> 
+        <a href="http://www.codepool.biz/tag/node-js" class="tag-link-161" title="6 topics" style="font-size: 10.892561983471pt;">Node.js</a> 
+        <a href="http://www.codepool.biz/tag/nodejs-2" class="tag-link-182" title="6 topics" style="font-size: 10.892561983471pt;">nodejs</a> 
+        <a href="http://www.codepool.biz/tag/ocr" class="tag-link-259" title="8 topics" style="font-size: 12.04958677686pt;">OCR</a> 
+        <a href="http://www.codepool.biz/tag/opencv" class="tag-link-285" title="13 topics" style="font-size: 14.363636363636pt;">OpenCV</a> 
+        <a href="http://www.codepool.biz/tag/openssl" class="tag-link-271" title="3 topics" style="font-size: 8pt;">OpenSSL</a> 
+        <a href="http://www.codepool.biz/tag/pagerank" class="tag-link-113" title="3 topics" style="font-size: 8pt;">pagerank</a> 
+        <a href="http://www.codepool.biz/tag/php" class="tag-link-273" title="10 topics" style="font-size: 13.090909090909pt;">PHP</a> 
+        <a href="http://www.codepool.biz/tag/python" class="tag-link-278" title="16 topics" style="font-size: 15.289256198347pt;">Python</a> 
+        <a href="http://www.codepool.biz/tag/qr-code" class="tag-link-124" title="3 topics" style="font-size: 8pt;">qr code</a> 
+        <a href="http://www.codepool.biz/tag/raspberrypi" class="tag-link-249" title="8 topics" style="font-size: 12.04958677686pt;">raspberrypi</a> 
+        <a href="http://www.codepool.biz/tag/raspberry-pi" class="tag-link-292" title="7 topics" style="font-size: 11.471074380165pt;">Raspberry Pi</a> 
+        <a href="http://www.codepool.biz/tag/scanning" class="tag-link-195" title="4 topics" style="font-size: 9.1570247933884pt;">Scanning</a> 
+        <a href="http://www.codepool.biz/tag/sdk" class="tag-link-225" title="5 topics" style="font-size: 10.082644628099pt;">SDK</a> 
+        <a href="http://www.codepool.biz/tag/seo" class="tag-link-272" title="3 topics" style="font-size: 8pt;">SEO</a> 
+        <a href="http://www.codepool.biz/tag/source-control" class="tag-link-17" title="7 topics" style="font-size: 11.471074380165pt;">source control</a> 
+        <a href="http://www.codepool.biz/tag/tfs-hosting" class="tag-link-26" title="6 topics" style="font-size: 10.892561983471pt;">TFS Hosting</a> 
+        <a href="http://www.codepool.biz/tag/twain" class="tag-link-267" title="10 topics" style="font-size: 13.090909090909pt;">TWAIN</a> 
+        <a href="http://www.codepool.biz/tag/twain-scanning-sdk" class="tag-link-22" title="4 topics" style="font-size: 9.1570247933884pt;">TWAIN scanning SDK</a> 
+        <a href="http://www.codepool.biz/tag/version-control" class="tag-link-255" title="8 topics" style="font-size: 12.04958677686pt;">Version Control</a> 
+        <a href="http://www.codepool.biz/tag/visual-studio" class="tag-link-13" title="3 topics" style="font-size: 8pt;">visual studio</a> 
+        <a href="http://www.codepool.biz/tag/webcam" class="tag-link-72" title="14 topics" style="font-size: 14.710743801653pt;">Webcam</a> 
+        <a href="http://www.codepool.biz/tag/websocket" class="tag-link-274" title="7 topics" style="font-size: 11.471074380165pt;">WebSocket</a> 
+        <a href="http://www.codepool.biz/tag/wpf" class="tag-link-265" title="3 topics" style="font-size: 8pt;">WPF</a> 
+        <a href="http://www.codepool.biz/tag/zxing" class="tag-link-126" title="3 topics" style="font-size: 8pt;">ZXing</a>
+       </div> 
+      </aside>
+     </div> 
+     <!-- #secondary --> 
+     <script language="javascript">
+    //Subscribe Dynamsoft
+	$(".placeHolder").click(function() {
+		$(this).hide();
+		$("#subscribeEmail").focus();
+	});
+	$("#subscribeEmail").focus(function() {
+		$(".placeHolder").hide();
+	});
+	$("#subscribeEmail").blur(function() {
+		if ($(this).val() == '') {
+			$(".placeHolder").show();
+			$("#subscribeError").hide();
+		}
+	});
+	$('#subscribeEmail').keydown(function(e) {
+		if (e.keyCode == 13) {
+			$("#btnSubscribe").click();
+		}
+	});
+	$("#btnSubscribe").click(function() {
+		$("#subscribeError").hide();
+		var strEmail = $("#subscribeEmail").val();
+		if (strEmail != "") {
+			var strEmailRegExp = /^([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]*)$/;
+			if (strEmailRegExp.test(strEmail)) {
+				var formData = {
+					Email: strEmail
+				};
+				$.ajax
+			({
+				type: 'POST',
+				url: '//www.dynamsoft.com/SubscribeNewsletter.ashx',
+				data: formData,
+				dataType: "text/plain"
+			})
+				if (formData.Email != "") {
+					$("#subscribeEmail").val("");
+					$("#subscribeForm").hide();
+					$("#subscribeSuccess").fadeIn();
+				}
+			}
+			else {
+				// error email
+				$("#subscribeError").show();
+			}
+		}
+	})
+	//Clear the attribute value of the input form
+	$("#secondary input.search-submit, body.search .search-form .search-submit").val('');
+</script> 
+    </div>
+    <!-- #content --> 
+   </div>
+   <!-- #wrapper --> 
+   <footer id="colophon" class="site-footer" role="contentinfo"> 
+    <div class="site-info">
+      © 2017 Dynamsoft Corporation 
+    </div>
+    <!-- .site-info --> 
+   </footer>
+   <!-- #colophon --> 
+  </div>
+  <!-- #page --> 
+  <script type="text/javascript">
+    // <![CDATA[
+        var disqus_shortname = 'kevingao';
+        (function () {
+            var nodes = document.getElementsByTagName('span');
+            for (var i = 0, url; i < nodes.length; i++) {
+                if (nodes[i].className.indexOf('dsq-postid') != -1) {
+                    nodes[i].parentNode.setAttribute('data-disqus-identifier', nodes[i].getAttribute('rel'));
+                    url = nodes[i].parentNode.href.split('#', 1);
+                    if (url.length == 1) url = url[0];
+                    else url = url[1]
+                    nodes[i].parentNode.href = url + '#disqus_thread';
+                }
+            }
+            var s = document.createElement('script'); s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + 'disqus.com/forums/' + disqus_shortname + '/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    //]]>
+    </script> 
+  <!-- Auto SyntaxHighlighter --> 
+  <script type="text/javascript" src="http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/core-min.js?ver=3.0.83"></script> 
+  <link rel="stylesheet" id="ash_core-css" href="http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/styles/shCore-min.css?ver=3.0.83" type="text/css" media="all"> 
+  <link rel="stylesheet" id="ash_theme_default-css" href="http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/styles/shThemeDefault-min.css?ver=3.0.83" type="text/css" media="all"> 
+  <script type="text/javascript">
+SyntaxHighlighter.autoloader(
+	'applescript	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushAppleScript-min.js',
+	'actionscript3 as3	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushAS3-min.js',
+	'bash shell	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushBash-min.js',
+	'coldfusion cf	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushColdFusion-min.js',
+	'c# c-sharp csharp	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushCSharp-min.js',
+	'cpp c	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushCpp-min.js',
+	'css	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushCss-min.js',
+	'delphi pas pascal	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushDelphi-min.js',
+	'diff patch	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushDiff-min.js',
+	'erl erlang	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushErlang-min.js',
+	'groovy	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushGroovy-min.js',
+	'js jscript javascript	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushJScript-min.js',
+	'java	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushJava-min.js',
+	'jfx javafx	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushJavaFX-min.js',
+	'objective-c objc cocoa	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushObjC-min.js',
+	'perl pl	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushPerl-min.js',
+	'php	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushPhp-min.js',
+	'text plain	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushPlain-min.js',
+	'ps powershell	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushPowerShell-min.js',
+	'py python	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushPython-min.js',
+	'rails ror ruby	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushRuby-min.js',
+	'scala	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushScala-min.js',
+	'sql	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushSql-min.js',
+	'vb vbnet	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushVb-min.js',
+	'xml xhtml xslt html	http://www.codepool.biz/wp-content/plugins/auto-syntaxhighlighter/SyntaxHighlighter/build/scripts/shBrushXml-min.js'
+
+);
+SyntaxHighlighter.defaults['auto-links'] = false;
+SyntaxHighlighter.defaults['toolbar'] = false;
+SyntaxHighlighter.all();
+</script> 
+  <!-- /Auto SyntaxHighlighter --> 
+  <script type="text/javascript" src="//assets.pinterest.com/js/pinit.js" async data-pin-hover="true" data-pin-height="32" data-pin-shape="round"></script> 
+  <script type="text/javascript" src="http://www.codepool.biz/wp-content/themes/codepool/js/navigation.js?ver=20120206"></script> 
+  <script type="text/javascript" src="http://www.codepool.biz/wp-content/themes/codepool/js/skip-link-focus-fix.js?ver=20130115"></script> 
+  <script type="text/javascript" src="http://www.codepool.biz/wp-includes/js/wp-embed.min.js?ver=4.4.2"></script> 
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-19660825-15', 'auto');
+  ga('send', 'pageview');
+
+</script>   
+ </body>
+</html>

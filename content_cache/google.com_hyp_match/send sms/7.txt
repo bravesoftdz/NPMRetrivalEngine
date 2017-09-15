@@ -1,0 +1,1010 @@
+<!doctype html>
+<html class="no-js">
+ <head> 
+  <script>
+  var twilio = twilio || {};
+  twilio.environment = "prod";
+  twilio.SWIFTYPE_ENGINE_KEY = "T68bXEBf7NaKzyRpvbnG";
+</script> 
+  <script>
+  twilio.account = twilio.account || {};
+  
+
+  twilio.user = twilio.user || {};
+  
+  
+    twilio.user.visitorSid = "VI95a14ff44d2d28ee18b08bbf3bceff3d";
+  
+  
+
+</script> 
+  <script>
+  
+  window.userBetaFeatures = ["marketplace.otters", "clear-large-cookies", "devtools.enigma.preview", "twilio.quest", "api.video.recordings", "api.messaging.next-gen", "api.fax.v1", "debugger-webhook", "enable-video-rooms", "api.wireless", "marketplace"];
+</script> 
+  <!-- Optimizely --> 
+  <script type="text/javascript" class="sl_notranslate">
+    function __cleanup_cookies() {
+      var toClear = ['optimizelySegments', 'optimizelyEndUserId', 'optimizelyPendingLogEvents', 'optimizelyBuckets'];
+      var exp = (new Date()).toUTCString();
+      toClear.forEach(function (key) {
+        document.cookie = key + '=z; path=/; domain=.twilio.com; expires=' + exp;
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", __cleanup_cookies);
+    window['optimizely'] = window['optimizely'] || [];
+    window['optimizely'].push(['setCookieDomain', 'www.twilio.com']);
+  </script> 
+  <script src="https://cdn.optimizely.com/js/6082066.js"></script> 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"> 
+  <meta http-equiv="X-UA-Compatible" content="chrome=1"> 
+  <meta name="viewport" content="width=device-width"> 
+  <meta name="description" content="We build a Node.js and Express web application which automatically messages your administrators when exceptions occur."> 
+  <title>
+      SMS and MMS Notifications with Node.js and Express - Twilio
+    </title> 
+  <link rel="canonical" href="https://www.twilio.com/docs/tutorials/server-notifications-node-express"> 
+  <link rel="shortcut icon" href="/docs/static/img/favicons/favicon.819.ico"> 
+  <link rel="apple-touch-icon" href="/docs/static/img/favicons/favicon_57.819.png"> 
+  <link rel="apple-touch-icon" sizes="72x72" href="/docs/static/img/favicons/favicon_72.819.png"> 
+  <link rel="apple-touch-icon" sizes="114x114" href="/docs/static/img/favicons/favicon_114.819.png"> 
+  <link rel="stylesheet" type="text/css" href="//cloud.typography.com/6230892/752864/css/fonts.css"> 
+  <link rel="stylesheet" href="/docs/static/css/font-awesome.min.819.css"> 
+  <link rel="stylesheet" href="/docs/static/css/devicon.min.819.css"> 
+  <link rel="stylesheet" href="/docs/static/css/twilio-icons.819.css"> 
+  <link rel="stylesheet" href="/docs/static/css/font-mfizz.819.css"> 
+  <meta property="og:title" content="SMS and MMS Notifications with Node.js and Express"> 
+  <meta property="og:description" content="We build a Node.js and Express web application which automatically messages your administrators when exceptions occur."> 
+  <meta property="og:url" content="https://www.twilio.com/docs/tutorials/server-notifications-node-express?utm_source=docs&amp;utm_medium=social&amp;utm_campaign=guides_tags"> 
+  <meta name="twitter:title" content="SMS and MMS Notifications with Node.js and Express"> 
+  <meta name="twitter:description" content="We build a Node.js and Express web application which automatically messages your administrators when exceptions occur."> 
+  <link rel="stylesheet" href="/docs/static/css/docs.min.819.css"> 
+ </head> 
+ <body class="
+    
+      tutorials
+    
+    
+    
+  "> 
+  <!-- Google Tag Manager --> 
+  <noscript>
+   <iframe src="//www.googletagmanager.com/ns.html?id=GTM-MWRD6S" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript> 
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+	'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+	})(window, document, 'script', 'dataLayer', 'GTM-MWRD6S');</script> 
+  <!-- End Google Tag Manager --> 
+  <div role="drawer" class="nav__drawer"> 
+   <div role="drawer__wrapper" class="nav__drawer-wrapper"> 
+    <div role="drawer__nav" class="nav__drawer-nav"> 
+     <span class="nav__drawer-auth"> <a href="/login" class="nav__drawer-auth-link">Log In</a> <a href="/try-twilio" class="nav__drawer-auth-link">Sign Up</a> </span> 
+     <a href="#close" role="drawer__close" class="nav__drawer-close">Close</a> 
+    </div> 
+    <div class="nav__drawer-menu"> 
+     <div class="nav__drawer-container"> 
+      <div class="nav__drawer-grid"> 
+       <div class="nav__drawer-section"> 
+        <div role="drawer__header" class="nav__drawer-header">
+         Products
+        </div> 
+        <div role="drawer__dropdown" class="nav__drawer-dropdown"> 
+         <div class="nav__drawer-column"> 
+          <ul> 
+           <li> 
+            <div class="nav__drawer-link nav__drawer-link--category">
+             Communications Cloud
+            </div> </li> 
+           <li> <a href="/sms" class="nav__drawer-link">Programmable SMS</a> </li> 
+           <li> <a href="/voice" class="nav__drawer-link">Programmable Voice</a> </li> 
+           <li> <a href="/video" class="nav__drawer-link">Programmable Video</a> </li> 
+           <li> <a href="/chat" class="nav__drawer-link">Programmable Chat</a> </li> 
+           <li> <a href="/fax" class="nav__drawer-link">Programmable Fax</a> </li> 
+          </ul> 
+          <ul> 
+           <li> 
+            <div class="nav__drawer-link nav__drawer-link--category">
+             Super Network
+            </div> </li> 
+           <li> <a href="/phone-numbers" class="nav__drawer-link">Phone Numbers</a> </li> 
+           <li> <a href="/sms/short-codes" class="nav__drawer-link">Short Codes</a> </li> 
+           <li> <a href="/sip-trunking" class="nav__drawer-link">Elastic SIP Trunking</a> </li> 
+           <li> <a href="/wireless" class="nav__drawer-link">Programmable Wireless</a> </li> 
+           <li> <a href="/interconnect" class="nav__drawer-link">Interconnect</a> </li> 
+           <li> <a href="/lookup" class="nav__drawer-link">Lookup</a> </li> 
+          </ul> 
+         </div> 
+         <div class="nav__drawer-column"> 
+          <ul> 
+           <li> <a href="/engagement-cloud" class="nav__drawer-link nav__drawer-link--category">Engagement Cloud</a> </li> 
+           <li> <a href="/notify" class="nav__drawer-link">Notify</a> </li> 
+           <li> <a href="/taskrouter" class="nav__drawer-link">TaskRouter</a> </li> 
+           <li> <a href="/two-factor-authentication" class="nav__drawer-link">Two-factor Authentication</a> </li> 
+           <li> <a href="/verification" class="nav__drawer-link">Verification</a> </li> 
+           <li> <a href="/proxy" class="nav__drawer-link">Proxy</a> </li> 
+           <li> <a href="/understand" class="nav__drawer-link">Understand</a> </li> 
+          </ul> 
+          <ul> 
+           <li> 
+            <div class="nav__drawer-link nav__drawer-link--category">
+             Runtime
+            </div> </li> 
+           <li> <a href="/sync" class="nav__drawer-link">Sync</a> </li> 
+          </ul> 
+          <ul> 
+           <li> 
+            <div class="nav__drawer-link nav__drawer-link--category">
+             Marketplace
+            </div> </li> 
+           <li> <a href="/marketplace/add-ons" class="nav__drawer-link">Add-ons</a> </li> 
+           <li> <a href="/marketplace/channels" class="nav__drawer-link">Channels</a> </li> 
+          </ul> 
+         </div> 
+        </div> 
+       </div> 
+       <div class="nav__drawer-section"> 
+        <div role="drawer__header" class="nav__drawer-header">
+         Use Cases
+        </div> 
+        <div role="drawer__dropdown" class="nav__drawer-dropdown"> 
+         <ul> 
+          <li> <a href="/use-cases/access-security" class="nav__drawer-link nav__drawer-link--category">Access Security</a> </li> 
+          <li> <a href="/use-cases/call-and-text-marketing" class="nav__drawer-link nav__drawer-link--category">Call &amp; Text Marketing</a> </li> 
+          <li> <a href="/use-cases/collaboration" class="nav__drawer-link nav__drawer-link--category">Collaboration</a> </li> 
+          <li> <a href="/use-cases/contact-center" class="nav__drawer-link nav__drawer-link--category">Contact Center</a> </li> 
+          <li> <a href="/use-cases/commerce-communications" class="nav__drawer-link nav__drawer-link--category">Commerce Communications</a> </li> 
+         </ul> 
+         <hr> 
+        </div> 
+        <div> 
+         <div class="nav__drawer-column"> 
+          <ul> 
+           <li> <a href="https://customers.twilio.com" class="nav__drawer-link nav__drawer-link--small">Customer Stories</a> </li> 
+           <li> <a href="/learn" class="nav__drawer-link nav__drawer-link--small">Learn</a> </li> 
+           <li> <a href="/showcase" class="nav__drawer-link nav__drawer-link--small">Partner Showcase</a> </li> 
+           <li> <a href="/what-is-cloud-communications?" class="nav__drawer-link nav__drawer-link--small">Why Twilio?</a> </li> 
+           <li> <a href="/support-plans" class="nav__drawer-link nav__drawer-link--small">Support Plans</a> </li> 
+           <li> <a href="/enterprise" class="nav__drawer-link nav__drawer-link--small">Enterprise Plan</a> </li> 
+          </ul> 
+         </div> 
+         <div class="nav__drawer-column"> 
+          <ul> 
+           <li> <a href="/docs" class="nav__drawer-link nav__drawer-link--small">API &amp; Docs</a> </li> 
+           <li> <a href="/blog" class="nav__drawer-link nav__drawer-link--small">Blog</a> </li> 
+           <li> <a href="/help" class="nav__drawer-link nav__drawer-link--small">Help</a> </li> 
+           <li> <a href="/security" class="nav__drawer-link nav__drawer-link--small">Security</a> </li> 
+           <li> <a href="/company/jobs" class="nav__drawer-link nav__drawer-link--small">Jobs at Twilio</a> </li> 
+           <li> <a href="http://status.twilio.com" class="nav__drawer-link nav__drawer-link--small">Status</a> </li> 
+          </ul> 
+         </div> 
+        </div> 
+        <div class="nav__sales"> 
+         <a href="/help/sales" class="nav__sales-button">Talk to Sales</a> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <div role="nav" class="nav nav--subnav nav--inverted nav--transparent " data-subnav-length="40"> 
+   <div role="nav__menu" class="nav__header"> 
+    <div class="nav__title">
+     <a href="/" class="nav__logo">Twilio</a>
+    </div> 
+    <nav class="nav__menu"> 
+     <ul class="nav__menu-items"> 
+      <li class="nav__menu-item"> <a href="/help" class="nav__menu-link"> 
+        <svg xmlns="http://www.w3.org/2000/svg" width="5.9" height="13.5" viewbox="-130.2 48.3 5.9 13.5">
+         <path fill="none" stroke="#F22F46" stroke-miterlimit="10" d="M-127.5 60.8c0 .3-.2.5-.5.5s-.5-.2-.5-.5.2-.5.5-.5.5.2.5.5zm-2.2-9.6c0-1.4 1.1-2.5 2.5-2.5s2.5 1.1 2.5 2.5c0 1-.5 1.5-1.3 2.2-.9.9-1.9 1.9-1.9 4.2m-.7-9.3"></path> 
+        </svg> Help </a> </li> 
+      <li class="nav__menu-item"> <a href="/login" class="nav__menu-link"> 
+        <svg xmlns="http://www.w3.org/2000/svg" width="10.2" height="13.5" viewbox="0 0 10.2 13.5"> 
+         <circle fill="none" stroke="#F22F46" stroke-miterlimit="10" cx="5.1" cy="3" r="2.5"></circle> 
+         <path fill="none" stroke="#F22F46" stroke-miterlimit="10" d="M.5 13.5c0-2.5 2.1-4.6 4.6-4.6s4.6 2.1 4.6 4.6"></path> 
+        </svg> Log In </a> </li> 
+      <li class="nav__menu-item"> <a href="/try-twilio" class="nav__menu-link"> 
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewbox="0 0 13 13"> 
+         <path d="M0 6.5h13M6.5 0v13" fill="none" stroke="#F22F46" stroke-miterlimit="10"></path> 
+        </svg> Sign Up </a> </li> 
+      <li class="nav__menu-item"><a href="#menu" role="nav__activate" class="nav__menu-link nav__menu-activate"><span></span>Menu &amp; Products</a></li> 
+     </ul> 
+    </nav> 
+    <nav role="subnav" class="nav__subnav"> 
+     <header class="nav__subnav-header"> 
+      <a href="/docs" class="nav__subnav-header-link">Docs</a> 
+      <a href="/docs/tutorials" role="subnav__dropdown" class="nav__subnav-link nav__subnav-current">Tutorials</a> 
+     </header> 
+     <ul role="subnav__items" class="nav__subnav-items"> 
+      <li role="subnav__item" class="nav__subnav-item "> <a href="/docs/quickstart" class="nav__subnav-link">Quickstart</a> </li> 
+      <li role="subnav__item" class="nav__subnav-item "> <a href="/docs/guides" class="nav__subnav-link">Guides</a> </li> 
+      <li role="subnav__item" class="nav__subnav-item "> <a href="/docs/tutorials" class="nav__subnav-link">Tutorials</a> </li> 
+      <li role="subnav__item" class="nav__subnav-item "> <a href="/docs/api" class="nav__subnav-link">API Reference</a> </li> 
+      <li role="subnav__item" class="nav__subnav-item "> <a href="/docs/libraries" class="nav__subnav-link">SDKs</a> </li> 
+     </ul> 
+    </nav> 
+   </div> 
+  </div> 
+  <div class="docs__pagenav"> 
+   <div class="uk-container uk-container-center"> 
+    <div class="uk-grid"> 
+     <div class="uk-width-3-4 uk-hidden-small"> 
+      <div class="breadcrumbs"> 
+       <a href="/docs">Twilio Docs</a> &gt; 
+       <a href="/docs/tutorials">Tutorials</a> &gt; 
+       <span>SMS and MMS Notifications with Node.js and Express</span> 
+      </div> 
+     </div> 
+     <div class="uk-width-1-1 uk-width-medium-1-4"> 
+      <div class="search"> 
+       <form action="/docs/search" method="GET"> 
+        <div class="wrapper"> 
+         <input id="search-box" name="q" type="text" value=""> 
+        </div> 
+        <button type="submit"> <i class="fa fa-fw fa-search"></i> </button> 
+       </form> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="docs-container"> 
+   <div class="uk-container"> 
+    <div class="coderail-container "> 
+     <div class="sidenav-column" id="sidenav-column"> 
+      <div class="sidenav-sticky-content" data-uk-sticky="{boundary: true}"> 
+       <div class="collapsible-content"> 
+        <div class="theme-switcher uk-hidden-small"> 
+         <div class="theme-wrapper"> 
+          <a data-theme="light" class="selected"> <i class="fa fa-fw fa-sun-o"></i> </a> 
+          <a data-theme="dark"> <i class="fa fa-fw fa-moon-o"></i> </a> 
+         </div> 
+        </div> 
+        <div class="sidenav"> 
+         <ul id="doc_menu" class="sidenav__section" data-swiftype-index="false"> 
+          <!-- Page entries --> 
+          <li id="dynamic-menu"> 
+           <ul> 
+            <li class="menu-title expanded" role="menu-title" id="doc-navigation-parent"> SMS and MMS Notifications with Node.js and Express </li> 
+            <ul class="menu-accordion expanded" role="menu-accordion" id="doc-navigation"></ul> 
+            <li class="menu-title expanded" role="menu-title"> <span class="heading">Related Tutorials</span> </li> 
+            <ul class="menu-accordion expanded" role="menu-accordion"> 
+             <li> <a href="https://www.twilio.com/docs/tutorials/two-factor-authentication-node-express"> Two-Factor Authentication </a> </li> 
+             <li> <a href="https://www.twilio.com/docs/tutorials/marketing-notifications-node-express"> SMS and MMS Notifications </a> </li> 
+            </ul> 
+           </ul> </li> 
+         </ul> 
+         <div id="test-element"></div> 
+        </div> 
+       </div> 
+       <div class="nav-collapser"> 
+        <div class="nav-collapser-fixed"> 
+         <a data-collapser-action="collapse" class="collapse"> <i class="fa fa-chevron-left" aria-hidden="true"></i> </a> 
+         <a data-collapser-action="expand" class="expand hidden"> <i class="fa fa-chevron-right" aria-hidden="true"></i> </a> 
+        </div> 
+        <div class="nav-collapser-absolute hidden"> 
+         <a data-collapser-action="collapse" class="collapse"> <i class="fa fa-chevron-left" aria-hidden="true"></i> </a> 
+         <a data-collapser-action="expand" class="expand hidden"> <i class="fa fa-chevron-right" aria-hidden="true"></i> </a> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="primary-column
+        "> 
+      <div class="docs-prose"> 
+       <h1 class="page-title "> SMS and MMS Notifications with Node.js and Express </h1> 
+       <div class="by-line"> 
+        <div class="authors-body"> 
+         <div class="author"> 
+          <img src="https://www.gravatar.com/avatar/4786cf28e0f5886c4b006f7487333845?d=mm&amp;s=50" title="Kevin Whinnery" alt="Kevin Whinnery"> Kevin Whinnery 
+         </div> 
+        </div> 
+        <div class="publication-date">
+          Published on June 7, 2017 
+        </div> 
+       </div> 
+       <div class="tutorial-code-cta" align="center"> 
+        <a class="button rounded outline blue" href="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip"> Download the Code </a> 
+       </div> 
+       <div class="block-rich_text "> 
+        <div class="rich-text">
+         <p>Today we're going to get your server to automatically sound the (textual) alarm when something goes wrong. &nbsp;Using <a href="https://nodejs.org/en/">Node.js</a> and the <a href="https://expressjs.com/">Express</a> framework, we'll light up the phones of all of your server administrators when there's an exception.</p> 
+         <p>Clone the sample application <a href="https://github.com/TwilioDevEd/server-notifications-node">from Github, here</a>. &nbsp;Then head to the <a href="https://github.com/TwilioDevEd/server-notifications-node">application's README.md</a> to see how to run it locally.</p> 
+         <p><em><a href="https://customers.twilio.com/178/emc/?utm_source=docs&amp;utm_campaign=docs_to_stories">See how EMC uses Twilio SMS to send IT alerts to 68,000 employees</a>.</em></p> 
+         <p>Let's get started!</p>
+        </div> 
+       </div> 
+       <div class="block-next_step "> 
+        <a href="#"> Onward and Upward <i class="fa fa-fw fa-chevron-down"></i> </a> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <h2 id="configure-a-twilio-rest-client"><a class="toclink" href="#configure-a-twilio-rest-client">Configure a Twilio REST client</a></h2> 
+         <p>In order to send messages we'll need to create a <a href="http://twilio.github.io/twilio-node/#quickstart">Twilio REST client</a>, which requires first reading a&nbsp;<code>TWILIO_ACCOUNT_SID</code>, <code>TWILIO_NUMBER,</code>&nbsp;and&nbsp;<code>TWILIO_AUTH_TOKEN</code> from <a href="https://www.twilio.com/blog/2017/01/how-to-set-environment-variables.html">environmental variables</a>.</p> 
+         <p>We also make the variables available through the <code>config</code> module.</p> 
+         <p>The values for your account SID and Auth Token come from <a href="https://twilio.com/console">the Twilio console</a>:</p> 
+         <p><img alt="Twilio Account Summary section of the console" class="richtext-image full-width" height="147" src="https://s3.amazonaws.com/com.twilio.prod.twilio-docs/images/twilio_account_summary_snap.width-800.png" width="344"></p> 
+         <p>Click the eyeball icon to expose your Auth Token to copy/paste.</p> 
+         <p>You will have to use a purchased number for the <code>TWILIO_NUMBER</code> variable. &nbsp;Phone numbers will be in the hash ('#') phone number pane.</p> 
+         <p>The link above will explain how to set environmental variables on Mac OSX, Windows, and *NIX (although may vary based on choice of shell). &nbsp;On other platforms it might be in a console or set in some other way. &nbsp;You probably&nbsp;have to read platform specific documentation to see where to set these. &nbsp;Read it, though - best practice dictates you keep them out of the code itself.</p>
+        </div> 
+       </div> 
+       <div class="block-code_sample uk-hidden"> 
+        <div class="md-code-sample" id="code-server-configuration-values-read-at-runtime" data-title="Server configuration values read at runtime" data-pref="server"> 
+         <div class="inline-mode"> 
+          <div id="coderail" class="code-rail code-rail-inline"> 
+           <div class="rail-placeholder"></div> 
+           <div class="rail-header uk-hidden"> 
+            <div class="rail-header-wrapper"> 
+             <div class="rail-title"> 
+              <div class="title-content inner"> 
+               <span>Loading Code Samples...</span> 
+              </div> 
+             </div> 
+             <div class="rail-current-language"> 
+              <div class="inner"> 
+               <span>Language</span> 
+               <i class="fa fa-fw fa-chevron-down"></i> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <div class="rail-toolbar uk-hidden"> 
+            <div class="toolbar"> 
+             <a href="#code" class="uk-hidden tab" data-code>Code</a> 
+             <a href="#output" class="uk-hidden inactive" data-output>Output</a> 
+             <span class="separator"></span> 
+             <a id="download" class="uk-hidden"> <i class="fa fa-fw fa-download"></i> <span>Download Project</span> </a> 
+             <a id="github" class="uk-hidden" target="_blank"> <i class="fa fa-fw fa-github-square"></i> <span>View on GitHub</span> </a> 
+             <a id="defrosty" class="fr-on" href="#defrosty"> <i class="fa fa-fw fa-eye"></i> <span class="wider-tooltip">Toggle Highlighted Lines</span> </a> 
+             <a id="clippy" href="#copy"> <i class="fa fa-fw fa-copy"></i> <span>Copy to Clipboard</span> </a> 
+             <a id="linkcode" href="#linkcode"> <i class="fa fa-fw fa-link"></i> <span>Link to this Code</span> </a> 
+             <a href="#expand" data-expand> <i class="fa fa-fw fa-arrows-alt"></i> <span>Full Screen</span> </a> 
+             <a href="#collapse" class="uk-hidden" data-collapse> <i class="fa fa-fw fa-compress"></i> <span>Normal Size</span> </a> 
+            </div> 
+           </div> 
+           <div class="rail-samples"> 
+            <ul> 
+             <li> <a href="#code-server-configuration-values-read-at-runtime"> Server configuration values read at runtime </a> </li> 
+            </ul> 
+           </div> 
+           <div class="rail-languages"></div> 
+           <div class="rail-content"> 
+            <div class="rail-content-inner"> 
+             <div data-sample-title="Server configuration values read at runtime" data-sample="code-server-configuration-values-read-at-runtime" data-pref="server" data-download-url="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip" data-github-url="https://github.com/TwilioDevEd/server-notifications-node/blob/master/config.js" data-sample-id="1451" class="code-sample"> 
+              <div class="sample-language-data" style="display:none;"> 
+               <select> <option value="js">Node.js</option> </select> 
+              </div> 
+              <div class="snippet-container"> 
+               <pre data-ext="js" data-version="default" data-filename="" class="codehilite"><code><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">dotenv</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'dotenv'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">cfg</span> <span class="o">=</span> <span class="p">{};</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">'production'</span> <span class="o">&amp;&amp;</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">'test'</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">dotenv</span><span class="p">.</span><span class="nx">config</span><span class="p">({</span><span class="nx">path</span><span class="o">:</span> <span class="s1">'.env'</span><span class="p">});</span> </span><span class="code-line fr fr-on"><span class="p">}</span> <span class="k">else</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">dotenv</span><span class="p">.</span><span class="nx">config</span><span class="p">({</span><span class="nx">path</span><span class="o">:</span> <span class="s1">'.env.example'</span><span class="p">,</span> <span class="nx">silent</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span> </span><span class="code-line fr fr-on"><span class="p">}</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// HTTP Port to run our web application</span> </span><span class="code-line fr fr-on"><span class="nx">cfg</span><span class="p">.</span><span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">;</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// A random string that will help generate secure one-time passwords and</span> </span><span class="code-line fr fr-on"><span class="c1">// HTTP sessions</span> </span><span class="code-line fr fr-on"><span class="nx">cfg</span><span class="p">.</span><span class="nx">secret</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">APP_SECRET</span> <span class="o">||</span> <span class="s1">'keyboard cat'</span><span class="p">;</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Your Twilio account SID and auth token, both found at:</span> </span><span class="code-line fr fr-on"><span class="c1">// https://www.twilio.com/user/account</span> </span><span class="code-line fr fr-on"><span class="c1">//</span> </span><span class="code-line fr fr-on"><span class="c1">// A good practice is to store these string values as system environment</span> </span><span class="code-line fr fr-on"><span class="c1">// variables, and load them from there as we are doing below. Alternately,</span> </span><span class="code-line fr fr-on"><span class="c1">// you could hard code these values here as strings.</span> </span><span class="code-line hll fr-on"><span class="nx">cfg</span><span class="p">.</span><span class="nx">accountSid</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">TWILIO_ACCOUNT_SID</span><span class="p">;</span> </span><span class="code-line hll fr-on"><span class="nx">cfg</span><span class="p">.</span><span class="nx">authToken</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">TWILIO_AUTH_TOKEN</span><span class="p">;</span> </span><span class="code-line hll fr-on"><span class="nx">cfg</span><span class="p">.</span><span class="nx">sendingNumber</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">TWILIO_NUMBER</span><span class="p">;</span> </span><span class="code-line hll fr-on"> </span><span class="code-line hll fr-on"><span class="kd">var</span> <span class="nx">requiredConfig</span> <span class="o">=</span> <span class="p">[</span><span class="nx">cfg</span><span class="p">.</span><span class="nx">accountSid</span><span class="p">,</span> <span class="nx">cfg</span><span class="p">.</span><span class="nx">authToken</span><span class="p">,</span> <span class="nx">cfg</span><span class="p">.</span><span class="nx">sendingNumber</span><span class="p">];</span> </span><span class="code-line hll fr-on"><span class="kd">var</span> <span class="nx">isConfigured</span> <span class="o">=</span> <span class="nx">requiredConfig</span><span class="p">.</span><span class="nx">every</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">configValue</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line hll fr-on"> <span class="k">return</span> <span class="nx">configValue</span> <span class="o">||</span> <span class="kc">false</span><span class="p">;</span> </span><span class="code-line hll fr-on"><span class="p">});</span> </span><span class="code-line hll fr-on"> </span><span class="code-line hll fr-on"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isConfigured</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line hll fr-on"> <span class="kd">var</span> <span class="nx">errorMessage</span> <span class="o">=</span> </span><span class="code-line hll fr-on"> <span class="s1">'TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_NUMBER must be set.'</span><span class="p">;</span> </span><span class="code-line hll fr-on"> </span><span class="code-line hll fr-on"> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">errorMessage</span><span class="p">);</span> </span><span class="code-line hll fr-on"><span class="p">}</span> </span><span class="code-line hll fr-on"> </span><span class="code-line hll fr-on"><span class="c1">// Export configuration object</span> </span><span class="code-line hll fr-on"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">cfg</span><span class="p">;</span> </span></code></pre> 
+              </div> 
+              <div class="output-snippet-container"> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+          </div> 
+          <div class="rail-caption">
+            config.js 
+          </div> 
+         </div> 
+         <div class="button-mode"> 
+          <h5 class="title"> <i class="fa fa-fw fa-code"></i> Server configuration values read at runtime </h5> 
+          <p>config.js</p> 
+          <div class="active-tail"></div> 
+         </div> 
+        </div> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <p>You found what you needed from the console - next, let's get your server administrators in a list.</p>
+        </div> 
+       </div> 
+       <div class="block-next_step uk-hidden"> 
+        <a href="#"> Who Ya Gonna SMS? <i class="fa fa-fw fa-chevron-down"></i> </a> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <h2 id="list-your-server-admins-and-well-wishers"><a class="toclink" href="#list-your-server-admins-and-well-wishers">List Your Server Admins and Well-Wishers</a></h2> 
+         <p>Here we create a JSON formatted list of administrators who should be notified if a server error occurs. The only essential piece of data we'll need is a <code>phoneNumber</code> for each administrator.</p>
+        </div> 
+       </div> 
+       <div class="block-code_sample uk-hidden"> 
+        <div class="md-code-sample" id="code-json-administrator-list" data-title="JSON Administrator list" data-pref="server"> 
+         <div class="inline-mode"> 
+          <div id="coderail" class="code-rail code-rail-inline"> 
+           <div class="rail-placeholder"></div> 
+           <div class="rail-header uk-hidden"> 
+            <div class="rail-header-wrapper"> 
+             <div class="rail-title"> 
+              <div class="title-content inner"> 
+               <span>Loading Code Samples...</span> 
+              </div> 
+             </div> 
+             <div class="rail-current-language"> 
+              <div class="inner"> 
+               <span>Language</span> 
+               <i class="fa fa-fw fa-chevron-down"></i> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <div class="rail-toolbar uk-hidden"> 
+            <div class="toolbar"> 
+             <a href="#code" class="uk-hidden tab" data-code>Code</a> 
+             <a href="#output" class="uk-hidden inactive" data-output>Output</a> 
+             <span class="separator"></span> 
+             <a id="download" class="uk-hidden"> <i class="fa fa-fw fa-download"></i> <span>Download Project</span> </a> 
+             <a id="github" class="uk-hidden" target="_blank"> <i class="fa fa-fw fa-github-square"></i> <span>View on GitHub</span> </a> 
+             <a id="defrosty" class="fr-on" href="#defrosty"> <i class="fa fa-fw fa-eye"></i> <span class="wider-tooltip">Toggle Highlighted Lines</span> </a> 
+             <a id="clippy" href="#copy"> <i class="fa fa-fw fa-copy"></i> <span>Copy to Clipboard</span> </a> 
+             <a id="linkcode" href="#linkcode"> <i class="fa fa-fw fa-link"></i> <span>Link to this Code</span> </a> 
+             <a href="#expand" data-expand> <i class="fa fa-fw fa-arrows-alt"></i> <span>Full Screen</span> </a> 
+             <a href="#collapse" class="uk-hidden" data-collapse> <i class="fa fa-fw fa-compress"></i> <span>Normal Size</span> </a> 
+            </div> 
+           </div> 
+           <div class="rail-samples"> 
+            <ul> 
+             <li> <a href="#code-json-administrator-list"> JSON Administrator list </a> </li> 
+            </ul> 
+           </div> 
+           <div class="rail-languages"></div> 
+           <div class="rail-content"> 
+            <div class="rail-content-inner"> 
+             <div data-sample-title="JSON Administrator list" data-sample="code-json-administrator-list" data-pref="server" data-download-url="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip" data-github-url="https://github.com/TwilioDevEd/server-notifications-node/blob/master/config/administrators.json" data-sample-id="1450" class="code-sample"> 
+              <div class="sample-language-data" style="display:none;"> 
+               <select> <option value="json">JSON</option> </select> 
+              </div> 
+              <div class="snippet-container"> 
+               <pre data-ext="json" data-version="default" data-filename="" class="codehilite"><code><span class="code-line"><span class="p">[</span> </span><span class="code-line"> <span class="p">{</span> </span><span class="code-line"> <span class="nt">"phoneNumber"</span><span class="p">:</span> <span class="s2">"+15557778888"</span><span class="p">,</span> </span><span class="code-line"> <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"Doraj"</span> </span><span class="code-line"> <span class="p">},</span> </span><span class="code-line"> <span class="p">{</span> </span><span class="code-line"> <span class="nt">"phoneNumber"</span><span class="p">:</span> <span class="s2">"+14447778888"</span><span class="p">,</span> </span><span class="code-line"> <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"Nivek"</span> </span><span class="code-line"> <span class="p">}</span> </span><span class="code-line"><span class="p">]</span> </span></code></pre> 
+              </div> 
+              <div class="output-snippet-container"> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+          </div> 
+          <div class="rail-caption">
+            config/administrators.json 
+          </div> 
+         </div> 
+         <div class="button-mode"> 
+          <h5 class="title"> <i class="fa fa-fw fa-code"></i> JSON Administrator list </h5> 
+          <p>config/administrators.json</p> 
+          <div class="active-tail"></div> 
+         </div> 
+        </div> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <p>Next, let's have a look at how we're going to capture application exceptions.</p>
+        </div> 
+       </div> 
+       <div class="block-next_step uk-hidden"> 
+        <a href="#"> All Your Exceptions Are Belong to Us <i class="fa fa-fw fa-chevron-down"></i> </a> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <h2 id="handle-all-the-unexpected-application-exceptions"><a class="toclink" href="#handle-all-the-unexpected-application-exceptions">Handle&nbsp;All The&nbsp;Unexpected Application Exceptions</a></h2> 
+         <p>We will implement error handling and message delivery as a piece of <a href="http://expressjs.com/guide/using-middleware.html">Express.js middleware</a>.</p> 
+         <p>We'll make all our&nbsp;Twilio API calls from inside our custom middleware.</p>
+        </div> 
+       </div> 
+       <div class="block-code_sample uk-hidden"> 
+        <div class="md-code-sample" id="code-main-application-file-to-load-your-routes-and-router-configuration" data-title="Main application file to load your routes and router configuration" data-pref="server"> 
+         <div class="inline-mode"> 
+          <div id="coderail" class="code-rail code-rail-inline"> 
+           <div class="rail-placeholder"></div> 
+           <div class="rail-header uk-hidden"> 
+            <div class="rail-header-wrapper"> 
+             <div class="rail-title"> 
+              <div class="title-content inner"> 
+               <span>Loading Code Samples...</span> 
+              </div> 
+             </div> 
+             <div class="rail-current-language"> 
+              <div class="inner"> 
+               <span>Language</span> 
+               <i class="fa fa-fw fa-chevron-down"></i> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <div class="rail-toolbar uk-hidden"> 
+            <div class="toolbar"> 
+             <a href="#code" class="uk-hidden tab" data-code>Code</a> 
+             <a href="#output" class="uk-hidden inactive" data-output>Output</a> 
+             <span class="separator"></span> 
+             <a id="download" class="uk-hidden"> <i class="fa fa-fw fa-download"></i> <span>Download Project</span> </a> 
+             <a id="github" class="uk-hidden" target="_blank"> <i class="fa fa-fw fa-github-square"></i> <span>View on GitHub</span> </a> 
+             <a id="defrosty" class="fr-on" href="#defrosty"> <i class="fa fa-fw fa-eye"></i> <span class="wider-tooltip">Toggle Highlighted Lines</span> </a> 
+             <a id="clippy" href="#copy"> <i class="fa fa-fw fa-copy"></i> <span>Copy to Clipboard</span> </a> 
+             <a id="linkcode" href="#linkcode"> <i class="fa fa-fw fa-link"></i> <span>Link to this Code</span> </a> 
+             <a href="#expand" data-expand> <i class="fa fa-fw fa-arrows-alt"></i> <span>Full Screen</span> </a> 
+             <a href="#collapse" class="uk-hidden" data-collapse> <i class="fa fa-fw fa-compress"></i> <span>Normal Size</span> </a> 
+            </div> 
+           </div> 
+           <div class="rail-samples"> 
+            <ul> 
+             <li> <a href="#code-main-application-file-to-load-your-routes-and-router-configuration"> Main application file to load your routes and router configuration </a> </li> 
+            </ul> 
+           </div> 
+           <div class="rail-languages"></div> 
+           <div class="rail-content"> 
+            <div class="rail-content-inner"> 
+             <div data-sample-title="Main application file to load your routes and router configuration" data-sample="code-main-application-file-to-load-your-routes-and-router-configuration" data-pref="server" data-download-url="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip" data-github-url="https://github.com/TwilioDevEd/server-notifications-node/blob/master/webapp.js" data-sample-id="1452" class="code-sample"> 
+              <div class="sample-language-data" style="display:none;"> 
+               <select> <option value="js">Node.js</option> </select> 
+              </div> 
+              <div class="snippet-container"> 
+               <pre data-ext="js" data-version="default" data-filename="" class="codehilite"><code><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'path'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'express'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">bodyParser</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'body-parser'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">session</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'express-session'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">flash</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'connect-flash'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">morgan</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'morgan'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">csurf</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'csurf'</span><span class="p">);</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">twilioNotifications</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./middleware/twilioNotifications'</span><span class="p">);</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Create Express web app</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Use morgan for HTTP request logging in dev and prod</span> </span><span class="code-line fr fr-on"><span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">'test'</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">morgan</span><span class="p">(</span><span class="s1">'combined'</span><span class="p">));</span> </span><span class="code-line fr fr-on"><span class="p">}</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Serve static assets</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">'public'</span><span class="p">)));</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Parse incoming form-encoded HTTP bodies</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">bodyParser</span><span class="p">.</span><span class="nx">urlencoded</span><span class="p">({</span> </span><span class="code-line fr fr-on"> <span class="nx">extended</span><span class="o">:</span> <span class="kc">true</span> </span><span class="code-line fr fr-on"><span class="p">}));</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Create and manage HTTP sessions for all requests</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">session</span><span class="p">({</span> </span><span class="code-line fr fr-on"> <span class="nx">secret</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">secret</span><span class="p">,</span> </span><span class="code-line fr fr-on"> <span class="nx">resave</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> </span><span class="code-line fr fr-on"> <span class="nx">saveUninitialized</span><span class="o">:</span> <span class="kc">true</span> </span><span class="code-line fr fr-on"><span class="p">}));</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Use connect-flash to persist informational messages across redirects</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">flash</span><span class="p">());</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Configure application routes</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">routes</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./controllers/router'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">router</span> <span class="o">=</span> <span class="nx">express</span><span class="p">.</span><span class="nx">Router</span><span class="p">();</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Add CSRF protection for web routes</span> </span><span class="code-line fr fr-on"><span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">'test'</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">csurf</span><span class="p">());</span> </span><span class="code-line fr fr-on"> <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">response</span><span class="p">.</span><span class="nx">locals</span><span class="p">.</span><span class="nx">csrftoken</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">csrfToken</span><span class="p">();</span> </span><span class="code-line fr fr-on"> <span class="nx">next</span><span class="p">();</span> </span><span class="code-line fr fr-on"> <span class="p">});</span> </span><span class="code-line fr fr-on"><span class="p">}</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="nx">routes</span><span class="p">(</span><span class="nx">router</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">router</span><span class="p">);</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Handle 404</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">404</span><span class="p">);</span> </span><span class="code-line fr fr-on"> <span class="nx">response</span><span class="p">.</span><span class="nx">sendFile</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">'public'</span><span class="p">,</span> <span class="s1">'404.html'</span><span class="p">));</span> </span><span class="code-line fr fr-on"><span class="p">});</span> </span><span class="code-line fr fr-on"> </span><span class="code-line hll fr-on"><span class="c1">// Mount middleware to notify Twilio of errors</span> </span><span class="code-line hll fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">twilioNotifications</span><span class="p">.</span><span class="nx">notifyOnError</span><span class="p">);</span> </span><span class="code-line hll fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Handle Errors</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">'An application error has occurred:'</span><span class="p">);</span> </span><span class="code-line fr fr-on"> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">stack</span><span class="p">);</span> </span><span class="code-line fr fr-on"> <span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span> </span><span class="code-line fr fr-on"> <span class="nx">response</span><span class="p">.</span><span class="nx">sendFile</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">'public'</span><span class="p">,</span> <span class="s1">'500.html'</span><span class="p">));</span> </span><span class="code-line fr fr-on"><span class="p">});</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Export Express app</span> </span><span class="code-line fr fr-on"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">app</span><span class="p">;</span> </span></code></pre> 
+              </div> 
+              <div class="output-snippet-container"> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+          </div> 
+          <div class="rail-caption">
+            webapp.js 
+          </div> 
+         </div> 
+         <div class="button-mode"> 
+          <h5 class="title"> <i class="fa fa-fw fa-code"></i> Main application file to load your routes and router configuration </h5> 
+          <p>webapp.js</p> 
+          <div class="active-tail"></div> 
+         </div> 
+        </div> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <p>Now you've seen the main server application - let's look in detail at how we'll send SMS notifications to the administrators in case of emergency.</p>
+        </div> 
+       </div> 
+       <div class="block-next_step uk-hidden"> 
+        <a href="#"> Urgent, Urgent... Emergency <i class="fa fa-fw fa-chevron-down"></i> </a> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <h2 id="trigger-notifications-for-everyone-on-the-administrator-list"><a class="toclink" href="#trigger-notifications-for-everyone-on-the-administrator-list">Trigger Notifications for Everyone on the Administrator List</a></h2> 
+         <p>In our <a href="https://expressjs.com/en/guide/using-middleware.html">Express middleware module</a>, we read all the soon-to-be-awoken administrators from our JSON file and send alert messages to each of them. &nbsp;We do that using the <code>sendSms</code> method in <code>twilioClient</code>. We also call <code>next</code> with the error object, which will allow other configured middleware to execute after us.</p>
+        </div> 
+       </div> 
+       <div class="block-code_sample uk-hidden"> 
+        <div class="md-code-sample" id="code-wrapper-around-twilio-rest-client-to-easily-send-messages" data-title="Wrapper around Twilio REST Client to easily send messages" data-pref="server"> 
+         <div class="inline-mode"> 
+          <div id="coderail" class="code-rail code-rail-inline"> 
+           <div class="rail-placeholder"></div> 
+           <div class="rail-header uk-hidden"> 
+            <div class="rail-header-wrapper"> 
+             <div class="rail-title"> 
+              <div class="title-content inner"> 
+               <span>Loading Code Samples...</span> 
+              </div> 
+             </div> 
+             <div class="rail-current-language"> 
+              <div class="inner"> 
+               <span>Language</span> 
+               <i class="fa fa-fw fa-chevron-down"></i> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <div class="rail-toolbar uk-hidden"> 
+            <div class="toolbar"> 
+             <a href="#code" class="uk-hidden tab" data-code>Code</a> 
+             <a href="#output" class="uk-hidden inactive" data-output>Output</a> 
+             <span class="separator"></span> 
+             <a id="download" class="uk-hidden"> <i class="fa fa-fw fa-download"></i> <span>Download Project</span> </a> 
+             <a id="github" class="uk-hidden" target="_blank"> <i class="fa fa-fw fa-github-square"></i> <span>View on GitHub</span> </a> 
+             <a id="defrosty" class="fr-on" href="#defrosty"> <i class="fa fa-fw fa-eye"></i> <span class="wider-tooltip">Toggle Highlighted Lines</span> </a> 
+             <a id="clippy" href="#copy"> <i class="fa fa-fw fa-copy"></i> <span>Copy to Clipboard</span> </a> 
+             <a id="linkcode" href="#linkcode"> <i class="fa fa-fw fa-link"></i> <span>Link to this Code</span> </a> 
+             <a href="#expand" data-expand> <i class="fa fa-fw fa-arrows-alt"></i> <span>Full Screen</span> </a> 
+             <a href="#collapse" class="uk-hidden" data-collapse> <i class="fa fa-fw fa-compress"></i> <span>Normal Size</span> </a> 
+            </div> 
+           </div> 
+           <div class="rail-samples"> 
+            <ul> 
+             <li> <a href="#code-wrapper-around-twilio-rest-client-to-easily-send-messages"> Wrapper around Twilio REST Client to easily send messages </a> </li> 
+            </ul> 
+           </div> 
+           <div class="rail-languages"></div> 
+           <div class="rail-content"> 
+            <div class="rail-content-inner"> 
+             <div data-sample-title="Wrapper around Twilio REST Client to easily send messages" data-sample="code-wrapper-around-twilio-rest-client-to-easily-send-messages" data-pref="server" data-download-url="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip" data-github-url="https://github.com/TwilioDevEd/server-notifications-node/blob/master/middleware/twilioNotifications.js" data-sample-id="1453" class="code-sample"> 
+              <div class="sample-language-data" style="display:none;"> 
+               <select> <option value="js">Node.js</option> </select> 
+              </div> 
+              <div class="snippet-container"> 
+               <pre data-ext="js" data-version="default" data-filename="" class="codehilite"><code><span class="code-line"><span class="kd">var</span> <span class="nx">twilioClient</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'../twilioClient'</span><span class="p">);</span> </span><span class="code-line"><span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'fs'</span><span class="p">);</span> </span><span class="code-line"><span class="kd">var</span> <span class="nx">admins</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'../config/administrators.json'</span><span class="p">);</span> </span><span class="code-line"> </span><span class="code-line"><span class="kd">function</span> <span class="nx">formatMessage</span><span class="p">(</span><span class="nx">errorToReport</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="k">return</span> <span class="s1">'[This is a test] ALERT! It appears the server is'</span> <span class="o">+</span> </span><span class="code-line"> <span class="s1">'having issues. Exception: '</span> <span class="o">+</span> <span class="nx">errorToReport</span> <span class="o">+</span> </span><span class="code-line"> <span class="s1">'. Go to: http://newrelic.com '</span> <span class="o">+</span> </span><span class="code-line"> <span class="s1">'for more details.'</span><span class="p">;</span> </span><span class="code-line"><span class="p">};</span> </span><span class="code-line"> </span><span class="code-line"><span class="nx">exports</span><span class="p">.</span><span class="nx">notifyOnError</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">appError</span><span class="p">,</span> <span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="nx">admins</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">admin</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="kd">var</span> <span class="nx">messageToSend</span> <span class="o">=</span> <span class="nx">formatMessage</span><span class="p">(</span><span class="nx">appError</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span> </span><span class="code-line"> <span class="nx">twilioClient</span><span class="p">.</span><span class="nx">sendSms</span><span class="p">(</span><span class="nx">admin</span><span class="p">.</span><span class="nx">phoneNumber</span><span class="p">,</span> <span class="nx">messageToSend</span><span class="p">);</span> </span><span class="code-line"> <span class="p">});</span> </span><span class="code-line"> <span class="nx">next</span><span class="p">(</span><span class="nx">appError</span><span class="p">);</span> </span><span class="code-line"><span class="p">};</span> </span></code></pre> 
+              </div> 
+              <div class="output-snippet-container"> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+          </div> 
+          <div class="rail-caption">
+            middleware/twilioNotifications.js 
+          </div> 
+         </div> 
+         <div class="button-mode"> 
+          <h5 class="title"> <i class="fa fa-fw fa-code"></i> Wrapper around Twilio REST Client to easily send messages </h5> 
+          <p>middleware/twilioNotifications.js</p> 
+          <div class="active-tail"></div> 
+         </div> 
+        </div> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <p>And that's how our&nbsp;notifications will be prepared&nbsp;- let's take a look now at how the server will send the message(s).</p>
+        </div> 
+       </div> 
+       <div class="block-next_step uk-hidden"> 
+        <a href="#"> Next <i class="fa fa-fw fa-chevron-down"></i> </a> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <h2 id="send-sms-or-mms-messages-from-the-server"><a class="toclink" href="#send-sms-or-mms-messages-from-the-server">Send&nbsp;SMS or MMS Messages from the Server</a></h2> 
+         <p>There are three parameters needed to <a href="http://twilio.github.io/twilio-node/#moreexamples">send an SMS</a> using the <a href="../../../../api/rest">Twilio REST API</a>: <code>from</code>, <code>to</code>, and <code>body</code>. <a href="../../../../../help/faq/sms/is-mms-supported-for-all-carriers-in-us-and-canada">US and Canadian phone numbers</a> can also send an image with the message (other countries will have an automatic shortened URL). &nbsp;Just uncomment&nbsp;<code>mediaUrl</code> and insert your choice of image, serious or funny.</p>
+        </div> 
+       </div> 
+       <div class="block-code_sample uk-hidden"> 
+        <div class="md-code-sample" id="code-send-a-text-message" data-title="Send a text message" data-pref="server"> 
+         <div class="inline-mode"> 
+          <div id="coderail" class="code-rail code-rail-inline"> 
+           <div class="rail-placeholder"></div> 
+           <div class="rail-header uk-hidden"> 
+            <div class="rail-header-wrapper"> 
+             <div class="rail-title"> 
+              <div class="title-content inner"> 
+               <span>Loading Code Samples...</span> 
+              </div> 
+             </div> 
+             <div class="rail-current-language"> 
+              <div class="inner"> 
+               <span>Language</span> 
+               <i class="fa fa-fw fa-chevron-down"></i> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <div class="rail-toolbar uk-hidden"> 
+            <div class="toolbar"> 
+             <a href="#code" class="uk-hidden tab" data-code>Code</a> 
+             <a href="#output" class="uk-hidden inactive" data-output>Output</a> 
+             <span class="separator"></span> 
+             <a id="download" class="uk-hidden"> <i class="fa fa-fw fa-download"></i> <span>Download Project</span> </a> 
+             <a id="github" class="uk-hidden" target="_blank"> <i class="fa fa-fw fa-github-square"></i> <span>View on GitHub</span> </a> 
+             <a id="defrosty" class="fr-on" href="#defrosty"> <i class="fa fa-fw fa-eye"></i> <span class="wider-tooltip">Toggle Highlighted Lines</span> </a> 
+             <a id="clippy" href="#copy"> <i class="fa fa-fw fa-copy"></i> <span>Copy to Clipboard</span> </a> 
+             <a id="linkcode" href="#linkcode"> <i class="fa fa-fw fa-link"></i> <span>Link to this Code</span> </a> 
+             <a href="#expand" data-expand> <i class="fa fa-fw fa-arrows-alt"></i> <span>Full Screen</span> </a> 
+             <a href="#collapse" class="uk-hidden" data-collapse> <i class="fa fa-fw fa-compress"></i> <span>Normal Size</span> </a> 
+            </div> 
+           </div> 
+           <div class="rail-samples"> 
+            <ul> 
+             <li> <a href="#code-send-a-text-message"> Send a text message </a> </li> 
+            </ul> 
+           </div> 
+           <div class="rail-languages"></div> 
+           <div class="rail-content"> 
+            <div class="rail-content-inner"> 
+             <div data-sample-title="Send a text message" data-sample="code-send-a-text-message" data-pref="server" data-download-url="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip" data-github-url="https://github.com/TwilioDevEd/server-notifications-node/blob/master/twilioClient.js" data-sample-id="1454" class="code-sample"> 
+              <div class="sample-language-data" style="display:none;"> 
+               <select> <option value="js">Node.js</option> </select> 
+              </div> 
+              <div class="snippet-container"> 
+               <pre data-ext="js" data-version="default" data-filename="" class="codehilite"><code><span class="code-line"><span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config'</span><span class="p">);</span> </span><span class="code-line"> </span><span class="code-line"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nx">sendSms</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">to</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="kd">var</span> <span class="nx">client</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'twilio'</span><span class="p">)(</span><span class="nx">config</span><span class="p">.</span><span class="nx">accountSid</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">authToken</span><span class="p">);</span> </span><span class="code-line"> <span class="c1">// console.log(client.api.messages.create())</span> </span><span class="code-line"> <span class="k">return</span> <span class="nx">client</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">messages</span> </span><span class="code-line"> <span class="p">.</span><span class="nx">create</span><span class="p">({</span> </span><span class="code-line"> <span class="nx">body</span><span class="o">:</span> <span class="nx">message</span><span class="p">,</span> </span><span class="code-line"> <span class="nx">to</span><span class="o">:</span> <span class="nx">to</span><span class="p">,</span> </span><span class="code-line"> <span class="nx">from</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">sendingNumber</span><span class="p">,</span> </span><span class="code-line"> <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Administrator notified'</span><span class="p">);</span> </span><span class="code-line"> <span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">'Could not notify administrator'</span><span class="p">);</span> </span><span class="code-line"> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span> </span><span class="code-line"> <span class="p">});</span> </span><span class="code-line"><span class="p">};</span> </span></code></pre> 
+              </div> 
+              <div class="output-snippet-container"> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+          </div> 
+          <div class="rail-caption">
+            twilioClient.js 
+          </div> 
+         </div> 
+         <div class="button-mode"> 
+          <h5 class="title"> <i class="fa fa-fw fa-code"></i> Send a text message </h5> 
+          <p>twilioClient.js</p> 
+          <div class="active-tail"></div> 
+         </div> 
+        </div> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <p>And with that, you've seen how easy it is to add powerful administrative features with Twilio! &nbsp;Let's explore&nbsp;where you might want to look next...</p>
+        </div> 
+       </div> 
+       <div class="block-next_step uk-hidden"> 
+        <a href="#"> Nice Feature! What Else Can I Build? <i class="fa fa-fw fa-chevron-down"></i> </a> 
+       </div> 
+       <div class="block-rich_text uk-hidden"> 
+        <div class="rich-text">
+         <h2 id="where-to-next"><a class="toclink" href="#where-to-next">Where to Next?&nbsp;</a></h2> 
+         <p>At Twilio, we <em>love</em> Node.js - and we have plenty of Node content for you to keep those browser tabs full.</p> 
+         <p><strong><a href="/docs/tutorials/two-factor-authentication-node-express">Two-Factor Authentication&nbsp;with Authy and Node.js</a></strong></p> 
+         <p>Increase the security of your login system by verifying a user's&nbsp;identity using Twilio's Authy.</p> 
+         <p><a href="/docs/tutorials/marketing-notifications-node-express"><strong>SMS and MMS Marketing Notifications</strong></a></p> 
+         <p>SMS and MMS messages are a personal way to engage with users. There are many benefits of marketing directly to phones, but perhaps most of all - SMSes and MMSes are opened at a rate far greater than email.</p> 
+         <h4 id="did-this-help"><a class="toclink" href="#did-this-help">Did this help?</a></h4> 
+         <p>What are you going to build next? &nbsp;Hit up the <a href="https://twitter.com/twilio">Twilio account on Twitter</a> and let us know!</p>
+        </div> 
+       </div> 
+       <div class="contributors"> 
+        <div class="contributors-body"> 
+         <div class="contributor"> 
+          <label>Contributors:</label> 
+          <img src="https://www.gravatar.com/avatar/4786cf28e0f5886c4b006f7487333845?d=mm&amp;s=50" title="Kevin Whinnery" alt="Kevin Whinnery"> 
+         </div> 
+         <div class="contributor"> 
+          <img src="https://www.gravatar.com/avatar/cf08ba1a8f7fdb137914ed30be8b41ab?d=mm&amp;s=50" title="Samuel Mendes" alt="Samuel Mendes"> 
+         </div> 
+         <div class="contributor"> 
+          <img src="https://www.gravatar.com/avatar/8eaa238864b16952faee3a57bbb03e21?d=mm&amp;s=50" title="Paul Kamp" alt="Paul Kamp"> 
+         </div> 
+         <div class="contributor"> 
+          <img src="https://www.gravatar.com/avatar/4fea4ab92cf1693ee648527ff7b4b099?d=mm&amp;s=50" title="Jose Oliveros" alt="Jose Oliveros"> 
+         </div> 
+         <div class="contributor"> 
+          <img src="https://www.gravatar.com/avatar/7ff74e11de7b63c4ec66966b9cb75f63?d=mm&amp;s=50" title="Andrew Baker" alt="Andrew Baker"> 
+         </div> 
+         <div class="contributor"> 
+          <img src="https://www.gravatar.com/avatar/bbf0ef8570078f3b334e386c4f9dd8bf?d=mm&amp;s=50" title="Agustin Camino" alt="Agustin Camino"> 
+         </div> 
+        </div> 
+        <div class="contributors-footer"></div> 
+       </div> 
+       <div class="help-box"> 
+        <h4> <i class="fa fa-fw fa-life-ring"></i> Need some help? </h4> 
+        <p> We all do sometimes; code is hard. Get help now from our <a href="https://support.twilio.com">support team</a>, or lean on the wisdom of the crowd browsing the <a href="http://stackoverflow.com/questions/tagged/twilio"> Twilio tag</a> on Stack Overflow. </p> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="code-column"> 
+      <div id="coderail" class="code-rail code-rail-column" data-uk-sticky="{boundary: true}"> 
+       <div class="rail-placeholder"></div> 
+       <div class="rail-header uk-hidden"> 
+        <div class="rail-header-wrapper"> 
+         <div class="rail-navigation"> 
+          <div class="inner"> 
+           <a href="#previous" class="inactive" data-previous> <i class="fa fa-fw fa-arrow-left left"></i> </a> 
+          </div> 
+          <div class="inner"> 
+           <span> <span class="current-index">1</span> <span>/</span> <span class="snippet-total">1</span> </span> 
+          </div> 
+          <div class="inner"> 
+           <a href="#next" data-next> <i class="fa fa-fw fa-arrow-right"></i> </a> 
+          </div> 
+         </div> 
+         <div class="rail-title"> 
+          <div class="title-content inner"> 
+           <span>Loading Code Samples...</span> 
+           <i class="fa fa-fw fa-chevron-down"></i> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+       <div class="rail-toolbar uk-hidden"> 
+        <div class="rail-current-language"> 
+         <div class="inner"> 
+          <span>Language</span> 
+          <i class="fa fa-fw fa-chevron-down"></i> 
+         </div> 
+        </div> 
+        <div class="toolbar"> 
+         <a href="#code" class="uk-hidden tab" data-code>Code</a> 
+         <a href="#output" class="uk-hidden inactive" data-output>Output</a> 
+         <span class="separator"></span> 
+         <a id="download" class="uk-hidden"> <i class="fa fa-fw fa-download"></i> <span>Download Project</span> </a> 
+         <a id="github" class="uk-hidden" target="_blank"> <i class="fa fa-fw fa-github-square"></i> <span>View on GitHub</span> </a> 
+         <a id="defrosty" class="fr-on" href="#defrosty"> <i class="fa fa-fw fa-eye"></i> <span class="wider-tooltip">Toggle Highlighted Lines</span> </a> 
+         <a id="clippy" href="#copy"> <i class="fa fa-fw fa-copy"></i> <span>Copy to Clipboard</span> </a> 
+         <a id="linkcode" href="#linkcode"> <i class="fa fa-fw fa-link"></i> <span>Link to this Code</span> </a> 
+         <a href="#expand" data-expand> <i class="fa fa-fw fa-arrows-alt"></i> <span>Full Screen</span> </a> 
+         <a href="#collapse" class="uk-hidden" data-collapse> <i class="fa fa-fw fa-compress"></i> <span>Normal Size</span> </a> 
+        </div> 
+       </div> 
+       <div class="rail-samples"> 
+        <ul> 
+         <li> <a href="#code-server-configuration-values-read-at-runtime"> Server configuration values read at runtime </a> </li> 
+         <li> <a href="#code-json-administrator-list"> JSON Administrator list </a> </li> 
+         <li> <a href="#code-main-application-file-to-load-your-routes-and-router-configuration"> Main application file to load your routes and router configuration </a> </li> 
+         <li> <a href="#code-wrapper-around-twilio-rest-client-to-easily-send-messages"> Wrapper around Twilio REST Client to easily send messages </a> </li> 
+         <li> <a href="#code-send-a-text-message"> Send a text message </a> </li> 
+        </ul> 
+       </div> 
+       <div class="rail-languages"></div> 
+       <div class="rail-content"> 
+        <div class="rail-content-inner"> 
+         <div data-sample-title="Server configuration values read at runtime" data-sample="code-server-configuration-values-read-at-runtime" data-pref="server" data-download-url="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip" data-github-url="https://github.com/TwilioDevEd/server-notifications-node/blob/master/config.js" data-sample-id="1451" class="code-sample"> 
+          <div class="sample-language-data" style="display:none;"> 
+           <select> <option value="js">Node.js</option> </select> 
+          </div> 
+          <div class="snippet-container"> 
+           <pre data-ext="js" data-version="default" data-filename="" class="codehilite"><code><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">dotenv</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'dotenv'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">cfg</span> <span class="o">=</span> <span class="p">{};</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">'production'</span> <span class="o">&amp;&amp;</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">'test'</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">dotenv</span><span class="p">.</span><span class="nx">config</span><span class="p">({</span><span class="nx">path</span><span class="o">:</span> <span class="s1">'.env'</span><span class="p">});</span> </span><span class="code-line fr fr-on"><span class="p">}</span> <span class="k">else</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">dotenv</span><span class="p">.</span><span class="nx">config</span><span class="p">({</span><span class="nx">path</span><span class="o">:</span> <span class="s1">'.env.example'</span><span class="p">,</span> <span class="nx">silent</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span> </span><span class="code-line fr fr-on"><span class="p">}</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// HTTP Port to run our web application</span> </span><span class="code-line fr fr-on"><span class="nx">cfg</span><span class="p">.</span><span class="nx">port</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span> <span class="o">||</span> <span class="mi">3000</span><span class="p">;</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// A random string that will help generate secure one-time passwords and</span> </span><span class="code-line fr fr-on"><span class="c1">// HTTP sessions</span> </span><span class="code-line fr fr-on"><span class="nx">cfg</span><span class="p">.</span><span class="nx">secret</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">APP_SECRET</span> <span class="o">||</span> <span class="s1">'keyboard cat'</span><span class="p">;</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Your Twilio account SID and auth token, both found at:</span> </span><span class="code-line fr fr-on"><span class="c1">// https://www.twilio.com/user/account</span> </span><span class="code-line fr fr-on"><span class="c1">//</span> </span><span class="code-line fr fr-on"><span class="c1">// A good practice is to store these string values as system environment</span> </span><span class="code-line fr fr-on"><span class="c1">// variables, and load them from there as we are doing below. Alternately,</span> </span><span class="code-line fr fr-on"><span class="c1">// you could hard code these values here as strings.</span> </span><span class="code-line hll fr-on"><span class="nx">cfg</span><span class="p">.</span><span class="nx">accountSid</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">TWILIO_ACCOUNT_SID</span><span class="p">;</span> </span><span class="code-line hll fr-on"><span class="nx">cfg</span><span class="p">.</span><span class="nx">authToken</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">TWILIO_AUTH_TOKEN</span><span class="p">;</span> </span><span class="code-line hll fr-on"><span class="nx">cfg</span><span class="p">.</span><span class="nx">sendingNumber</span> <span class="o">=</span> <span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">TWILIO_NUMBER</span><span class="p">;</span> </span><span class="code-line hll fr-on"> </span><span class="code-line hll fr-on"><span class="kd">var</span> <span class="nx">requiredConfig</span> <span class="o">=</span> <span class="p">[</span><span class="nx">cfg</span><span class="p">.</span><span class="nx">accountSid</span><span class="p">,</span> <span class="nx">cfg</span><span class="p">.</span><span class="nx">authToken</span><span class="p">,</span> <span class="nx">cfg</span><span class="p">.</span><span class="nx">sendingNumber</span><span class="p">];</span> </span><span class="code-line hll fr-on"><span class="kd">var</span> <span class="nx">isConfigured</span> <span class="o">=</span> <span class="nx">requiredConfig</span><span class="p">.</span><span class="nx">every</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">configValue</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line hll fr-on"> <span class="k">return</span> <span class="nx">configValue</span> <span class="o">||</span> <span class="kc">false</span><span class="p">;</span> </span><span class="code-line hll fr-on"><span class="p">});</span> </span><span class="code-line hll fr-on"> </span><span class="code-line hll fr-on"><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">isConfigured</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line hll fr-on"> <span class="kd">var</span> <span class="nx">errorMessage</span> <span class="o">=</span> </span><span class="code-line hll fr-on"> <span class="s1">'TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_NUMBER must be set.'</span><span class="p">;</span> </span><span class="code-line hll fr-on"> </span><span class="code-line hll fr-on"> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="nx">errorMessage</span><span class="p">);</span> </span><span class="code-line hll fr-on"><span class="p">}</span> </span><span class="code-line hll fr-on"> </span><span class="code-line hll fr-on"><span class="c1">// Export configuration object</span> </span><span class="code-line hll fr-on"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">cfg</span><span class="p">;</span> </span></code></pre> 
+          </div> 
+          <div class="output-snippet-container"> 
+          </div> 
+         </div> 
+         <div data-sample-title="JSON Administrator list" data-sample="code-json-administrator-list" data-pref="server" data-download-url="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip" data-github-url="https://github.com/TwilioDevEd/server-notifications-node/blob/master/config/administrators.json" data-sample-id="1450" class="code-sample"> 
+          <div class="sample-language-data" style="display:none;"> 
+           <select> <option value="json">JSON</option> </select> 
+          </div> 
+          <div class="snippet-container"> 
+           <pre data-ext="json" data-version="default" data-filename="" class="codehilite"><code><span class="code-line"><span class="p">[</span> </span><span class="code-line"> <span class="p">{</span> </span><span class="code-line"> <span class="nt">"phoneNumber"</span><span class="p">:</span> <span class="s2">"+15557778888"</span><span class="p">,</span> </span><span class="code-line"> <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"Doraj"</span> </span><span class="code-line"> <span class="p">},</span> </span><span class="code-line"> <span class="p">{</span> </span><span class="code-line"> <span class="nt">"phoneNumber"</span><span class="p">:</span> <span class="s2">"+14447778888"</span><span class="p">,</span> </span><span class="code-line"> <span class="nt">"name"</span><span class="p">:</span> <span class="s2">"Nivek"</span> </span><span class="code-line"> <span class="p">}</span> </span><span class="code-line"><span class="p">]</span> </span></code></pre> 
+          </div> 
+          <div class="output-snippet-container"> 
+          </div> 
+         </div> 
+         <div data-sample-title="Main application file to load your routes and router configuration" data-sample="code-main-application-file-to-load-your-routes-and-router-configuration" data-pref="server" data-download-url="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip" data-github-url="https://github.com/TwilioDevEd/server-notifications-node/blob/master/webapp.js" data-sample-id="1452" class="code-sample"> 
+          <div class="sample-language-data" style="display:none;"> 
+           <select> <option value="js">Node.js</option> </select> 
+          </div> 
+          <div class="snippet-container"> 
+           <pre data-ext="js" data-version="default" data-filename="" class="codehilite"><code><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'path'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'express'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">bodyParser</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'body-parser'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">session</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'express-session'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">flash</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'connect-flash'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">morgan</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'morgan'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">csurf</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'csurf'</span><span class="p">);</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">twilioNotifications</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./middleware/twilioNotifications'</span><span class="p">);</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Create Express web app</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Use morgan for HTTP request logging in dev and prod</span> </span><span class="code-line fr fr-on"><span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">'test'</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">morgan</span><span class="p">(</span><span class="s1">'combined'</span><span class="p">));</span> </span><span class="code-line fr fr-on"><span class="p">}</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Serve static assets</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="kr">static</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">'public'</span><span class="p">)));</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Parse incoming form-encoded HTTP bodies</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">bodyParser</span><span class="p">.</span><span class="nx">urlencoded</span><span class="p">({</span> </span><span class="code-line fr fr-on"> <span class="nx">extended</span><span class="o">:</span> <span class="kc">true</span> </span><span class="code-line fr fr-on"><span class="p">}));</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Create and manage HTTP sessions for all requests</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">session</span><span class="p">({</span> </span><span class="code-line fr fr-on"> <span class="nx">secret</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">secret</span><span class="p">,</span> </span><span class="code-line fr fr-on"> <span class="nx">resave</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> </span><span class="code-line fr fr-on"> <span class="nx">saveUninitialized</span><span class="o">:</span> <span class="kc">true</span> </span><span class="code-line fr fr-on"><span class="p">}));</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Use connect-flash to persist informational messages across redirects</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">flash</span><span class="p">());</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Configure application routes</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">routes</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./controllers/router'</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="kd">var</span> <span class="nx">router</span> <span class="o">=</span> <span class="nx">express</span><span class="p">.</span><span class="nx">Router</span><span class="p">();</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Add CSRF protection for web routes</span> </span><span class="code-line fr fr-on"><span class="k">if</span> <span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">NODE_ENV</span> <span class="o">!==</span> <span class="s1">'test'</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">csurf</span><span class="p">());</span> </span><span class="code-line fr fr-on"> <span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">response</span><span class="p">.</span><span class="nx">locals</span><span class="p">.</span><span class="nx">csrftoken</span> <span class="o">=</span> <span class="nx">request</span><span class="p">.</span><span class="nx">csrfToken</span><span class="p">();</span> </span><span class="code-line fr fr-on"> <span class="nx">next</span><span class="p">();</span> </span><span class="code-line fr fr-on"> <span class="p">});</span> </span><span class="code-line fr fr-on"><span class="p">}</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="nx">routes</span><span class="p">(</span><span class="nx">router</span><span class="p">);</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">router</span><span class="p">);</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Handle 404</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">404</span><span class="p">);</span> </span><span class="code-line fr fr-on"> <span class="nx">response</span><span class="p">.</span><span class="nx">sendFile</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">'public'</span><span class="p">,</span> <span class="s1">'404.html'</span><span class="p">));</span> </span><span class="code-line fr fr-on"><span class="p">});</span> </span><span class="code-line fr fr-on"> </span><span class="code-line hll fr-on"><span class="c1">// Mount middleware to notify Twilio of errors</span> </span><span class="code-line hll fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">twilioNotifications</span><span class="p">.</span><span class="nx">notifyOnError</span><span class="p">);</span> </span><span class="code-line hll fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Handle Errors</span> </span><span class="code-line fr fr-on"><span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line fr fr-on"> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">'An application error has occurred:'</span><span class="p">);</span> </span><span class="code-line fr fr-on"> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">stack</span><span class="p">);</span> </span><span class="code-line fr fr-on"> <span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">(</span><span class="mi">500</span><span class="p">);</span> </span><span class="code-line fr fr-on"> <span class="nx">response</span><span class="p">.</span><span class="nx">sendFile</span><span class="p">(</span><span class="nx">path</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="nx">__dirname</span><span class="p">,</span> <span class="s1">'public'</span><span class="p">,</span> <span class="s1">'500.html'</span><span class="p">));</span> </span><span class="code-line fr fr-on"><span class="p">});</span> </span><span class="code-line fr fr-on"> </span><span class="code-line fr fr-on"><span class="c1">// Export Express app</span> </span><span class="code-line fr fr-on"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">app</span><span class="p">;</span> </span></code></pre> 
+          </div> 
+          <div class="output-snippet-container"> 
+          </div> 
+         </div> 
+         <div data-sample-title="Wrapper around Twilio REST Client to easily send messages" data-sample="code-wrapper-around-twilio-rest-client-to-easily-send-messages" data-pref="server" data-download-url="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip" data-github-url="https://github.com/TwilioDevEd/server-notifications-node/blob/master/middleware/twilioNotifications.js" data-sample-id="1453" class="code-sample"> 
+          <div class="sample-language-data" style="display:none;"> 
+           <select> <option value="js">Node.js</option> </select> 
+          </div> 
+          <div class="snippet-container"> 
+           <pre data-ext="js" data-version="default" data-filename="" class="codehilite"><code><span class="code-line"><span class="kd">var</span> <span class="nx">twilioClient</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'../twilioClient'</span><span class="p">);</span> </span><span class="code-line"><span class="kd">var</span> <span class="nx">fs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'fs'</span><span class="p">);</span> </span><span class="code-line"><span class="kd">var</span> <span class="nx">admins</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'../config/administrators.json'</span><span class="p">);</span> </span><span class="code-line"> </span><span class="code-line"><span class="kd">function</span> <span class="nx">formatMessage</span><span class="p">(</span><span class="nx">errorToReport</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="k">return</span> <span class="s1">'[This is a test] ALERT! It appears the server is'</span> <span class="o">+</span> </span><span class="code-line"> <span class="s1">'having issues. Exception: '</span> <span class="o">+</span> <span class="nx">errorToReport</span> <span class="o">+</span> </span><span class="code-line"> <span class="s1">'. Go to: http://newrelic.com '</span> <span class="o">+</span> </span><span class="code-line"> <span class="s1">'for more details.'</span><span class="p">;</span> </span><span class="code-line"><span class="p">};</span> </span><span class="code-line"> </span><span class="code-line"><span class="nx">exports</span><span class="p">.</span><span class="nx">notifyOnError</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">appError</span><span class="p">,</span> <span class="nx">request</span><span class="p">,</span> <span class="nx">response</span><span class="p">,</span> <span class="nx">next</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="nx">admins</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">admin</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="kd">var</span> <span class="nx">messageToSend</span> <span class="o">=</span> <span class="nx">formatMessage</span><span class="p">(</span><span class="nx">appError</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span> </span><span class="code-line"> <span class="nx">twilioClient</span><span class="p">.</span><span class="nx">sendSms</span><span class="p">(</span><span class="nx">admin</span><span class="p">.</span><span class="nx">phoneNumber</span><span class="p">,</span> <span class="nx">messageToSend</span><span class="p">);</span> </span><span class="code-line"> <span class="p">});</span> </span><span class="code-line"> <span class="nx">next</span><span class="p">(</span><span class="nx">appError</span><span class="p">);</span> </span><span class="code-line"><span class="p">};</span> </span></code></pre> 
+          </div> 
+          <div class="output-snippet-container"> 
+          </div> 
+         </div> 
+         <div data-sample-title="Send a text message" data-sample="code-send-a-text-message" data-pref="server" data-download-url="https://github.com/TwilioDevEd/server-notifications-node/archive/master.zip" data-github-url="https://github.com/TwilioDevEd/server-notifications-node/blob/master/twilioClient.js" data-sample-id="1454" class="code-sample"> 
+          <div class="sample-language-data" style="display:none;"> 
+           <select> <option value="js">Node.js</option> </select> 
+          </div> 
+          <div class="snippet-container"> 
+           <pre data-ext="js" data-version="default" data-filename="" class="codehilite"><code><span class="code-line"><span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./config'</span><span class="p">);</span> </span><span class="code-line"> </span><span class="code-line"><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span><span class="p">.</span><span class="nx">sendSms</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">to</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="kd">var</span> <span class="nx">client</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'twilio'</span><span class="p">)(</span><span class="nx">config</span><span class="p">.</span><span class="nx">accountSid</span><span class="p">,</span> <span class="nx">config</span><span class="p">.</span><span class="nx">authToken</span><span class="p">);</span> </span><span class="code-line"> <span class="c1">// console.log(client.api.messages.create())</span> </span><span class="code-line"> <span class="k">return</span> <span class="nx">client</span><span class="p">.</span><span class="nx">api</span><span class="p">.</span><span class="nx">messages</span> </span><span class="code-line"> <span class="p">.</span><span class="nx">create</span><span class="p">({</span> </span><span class="code-line"> <span class="nx">body</span><span class="o">:</span> <span class="nx">message</span><span class="p">,</span> </span><span class="code-line"> <span class="nx">to</span><span class="o">:</span> <span class="nx">to</span><span class="p">,</span> </span><span class="code-line"> <span class="nx">from</span><span class="o">:</span> <span class="nx">config</span><span class="p">.</span><span class="nx">sendingNumber</span><span class="p">,</span> </span><span class="code-line"> <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Administrator notified'</span><span class="p">);</span> </span><span class="code-line"> <span class="p">}).</span><span class="k">catch</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span> </span><span class="code-line"> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">'Could not notify administrator'</span><span class="p">);</span> </span><span class="code-line"> <span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span> </span><span class="code-line"> <span class="p">});</span> </span><span class="code-line"><span class="p">};</span> </span></code></pre> 
+          </div> 
+          <div class="output-snippet-container"> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="footer" data-swiftype-index="false"> 
+   <div class="uk-container uk-container-center"> 
+    <div class="footer__statement">
+     We can’t wait to see what you build.
+    </div> 
+    <div class="uk-grid"> 
+     <div class="uk-width-1-1 uk-width-small-1-3 uk-width-medium-1-5"> 
+      <section class="footer__section"> 
+       <header class="footer__header">
+        Products
+       </header> 
+       <ul class="footer__list"> 
+        <li class="footer__list-item"> <a href="/voice-video" class="footer__link">Voice &amp; Video</a> </li> 
+        <li class="footer__list-item"> <a href="/messaging" class="footer__link">Messaging</a> </li> 
+        <li class="footer__list-item"> <a href="/authy" class="footer__link">Authentication</a> </li> 
+        <li class="footer__list-item"> <a href="/wireless" class="footer__link">Connected Devices</a> </li> 
+       </ul> 
+      </section> 
+     </div> 
+     <div class="uk-width-1-1 uk-width-small-1-3 uk-width-medium-1-5"> 
+      <section class="footer__section"> 
+       <header class="footer__header">
+        Use Cases
+       </header> 
+       <ul class="footer__list"> 
+        <li class="footer__list-item"> <a href="/use-cases/access-security" class="footer__link">Access Security</a> </li> 
+        <li class="footer__list-item"> <a href="/use-cases/contextual-call-center" class="footer__link">Contextual Call Center</a> </li> 
+        <li class="footer__list-item"> <a href="/use-cases/marketplace-communications" class="footer__link">Marketplace Communications</a> </li> 
+        <li class="footer__list-item"> <a href="/use-cases/mobile-messaging" class="footer__link">Mobile Messaging</a> </li> 
+       </ul> 
+      </section> 
+     </div> 
+     <div class="uk-width-1-1 uk-width-small-1-3 uk-width-medium-1-5"> 
+      <section class="footer__section"> 
+       <header class="footer__header">
+        About
+       </header> 
+       <ul class="footer__list"> 
+        <li class="footer__list-item"> <a href="/what-is-cloud-communications?" class="footer__link">What is Twilio?</a> </li> 
+        <li class="footer__list-item"> <a href="https://customers.twilio.com" class="footer__link">Customers</a> </li> 
+        <li class="footer__list-item"> <a href="/help" class="footer__link">Get Help</a> </li> 
+        <li class="footer__list-item"> <a href="/help/sales" class="footer__link">Talk to Sales</a> </li> 
+        <li class="footer__list-item"> <a href="/docs/glossary" class="footer__link">Glossary</a> </li> 
+       </ul> 
+      </section> 
+     </div> 
+     <div class="uk-width-1-1 uk-width-medium-2-5"> 
+      <section class="footer__section"> 
+       <header class="footer__header">
+        Hits From The Blog
+       </header> 
+       <ul class="footer__list footer__list"> 
+        <li class="footer__list-item"> <a href="https://www.twilio.com/blog/2017/09/fax-machine-adafruit-tessel-javascript-twilio.html" class="footer__link">How to Build Your Own Fax Machine with Tessel, JavaScript and Twilio</a> </li> 
+        <li class="footer__list-item"> <a href="https://www.twilio.com/blog/2017/09/21552.html" class="footer__link">Now Offering Numbers in 100 Countries: Unrivaled Choice for Your Communications</a> </li> 
+        <li class="footer__list-item"> <a href="https://www.twilio.com/blog/2017/09/myzindagi-fights-fake-doctors-brings-real-doctors-and-real-care-to-the-masses-with-twilio-video.html" class="footer__link">MyZindagi Fights Fake Doctors, Brings Real Doctors and Real Care To The Masses With Twilio Video</a> </li> 
+        <li class="footer__list-item"> <a href="https://www.twilio.com/blog/2017/09/request-signature-authentication-ivr-python-pyramid.html" class="footer__link">Request Signature Authentication for IVRs Built with Python</a> </li> 
+        <li class="footer__list-item"> <a href="https://www.twilio.com/blog/2017/09/relay-sms-platform.html" class="footer__link">From 0 to 15 Million In A Few Months: Relay Scales Their Texting Platform For Organizers</a> </li> 
+       </ul> 
+      </section> 
+     </div> 
+    </div> 
+    <footer class="footer__footer"> 
+     <div class="footer__logo" title="Twilio"> 
+      <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewbox="0 0 30 30"> 
+       <path d="M15 0C6.7 0 0 6.7 0 15s6.7 15 15 15 15-6.7 15-15S23.3 0 15 0zm0 26C8.9 26 4 21.1 4 15S8.9 4 15 4s11 4.9 11 11-4.9 11-11 11z" /> 
+       <circle cx="18.7" cy="11.3" r="3.1" /> 
+       <circle cx="18.7" cy="18.7" r="3.1" /> 
+       <circle cx="11.3" cy="18.7" r="3.1" /> 
+       <circle cx="11.3" cy="11.3" r="3.1" /> 
+      </svg> 
+     </div> 
+     <ul class="legal__list"> 
+      <li class="legal__list-item"> <a href="/company" class="legal__link">About Twilio</a> </li> 
+      <li class="legal__list-item"> <a href="/legal" class="legal__link">Legal</a> </li> 
+      <li class="legal__list-item">Copyright © 2017 Twilio, Inc. <br class="uk-visible-small">All Rights Reserved. </li> 
+     </ul> 
+    </footer> 
+   </div> 
+  </div> 
+  <script src="/docs/static/js/vendor.min.819.js"></script> 
+  <!-- Mixpanel --> 
+  <script type="text/javascript">(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f);b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==
+  typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,
+    e,d])};b.__SV=1.2}})(document,window.mixpanel||[]);
+    mixpanel.init("f71c19735fa6ecc5225ff563285e1794");
+    </script> 
+  <!-- Heap --> 
+  <script type="text/javascript">
+    window.heap=window.heap||[],heap.load=function(e,t){window.heap.appid=e,window.heap.config=t=t||{};var n=t.forceSSL||"https:"===document.location.protocol,a=document.createElement("script");a.type="text/javascript",a.async=!0,a.src=(n?"https:":"http:")+"//cdn.heapanalytics.com/js/heap-"+e+".js";var o=document.getElementsByTagName("script")[0];o.parentNode.insertBefore(a,o);for(var r=function(e){return function(){heap.push([e].concat(Array.prototype.slice.call(arguments,0)))}},p=["clearEventProperties","identify","setEventProperties","track","unsetEventProperty"],c=0;c<p.length;c++)heap[p[c]]=r(p[c])};
+    heap.load('1541905715');
+
+    
+
+    
+
+    </script> 
+  <!-- Eloqua --> 
+  <script type="text/javascript">
+    var _elqQ = _elqQ || [];
+    _elqQ.push(['elqSetSiteId', '815114181']);
+    _elqQ.push(['elqTrackPageView']);
+    _elqQ.push(['elqUseFirstPartyCookie', 'www.twilio.com']);
+
+    (function () {
+      function async_load() {
+        var s = document.createElement('script'); s.type = 'text/javascript'; s.async = true;
+        s.src = '//img03.en25.com/i/elqCfg.min.js';
+        var x = document.getElementsByTagName('script')[0]; x.parentNode.insertBefore(s, x);
+      }
+      if (window.addEventListener) window.addEventListener('DOMContentLoaded', async_load, false);
+      else if (window.attachEvent) window.attachEvent('onload', async_load);
+    })();
+    </script> 
+  <!-- Transifex --> 
+  <script type="text/javascript">
+    window.liveSettings = {
+      api_key: '4c06c1c5a6b341e591d969476fe2675f'
+    };
+    </script> 
+  <script type="text/javascript" src="//cdn.transifex.com/live.js"></script> 
+  <style>
+    .txlive-langselector { display: none; }
+    </style> 
+  <script src="/docs/static/js/docs.min.819.js"></script>   
+ </body>
+</html>
