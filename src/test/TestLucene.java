@@ -37,7 +37,7 @@ public class TestLucene {
 		String query = "coveralls.io/repos/github";
 		//String query = "img.shields.io/badge/coverage";
 		
-		MetaSearcher meta = new MetaSearcherImp(searchers, aggregator);
+		MetaSearcher meta = new MetaSearcherImp(searchers, aggregator, 200/*max_result*/);
 		Ranking results = null;
 		results = meta.search(query, proxy);
 		
@@ -47,7 +47,7 @@ public class TestLucene {
 				System.out.println("<a href=\""+"https://www.npmjs.com/package/"+tech.getName()+"\">"+tech.getName()+"</a>");
 		}
 		
-		//results.saveRankingInFile("results/"+query+".txt");		
+		//results.saveRankingInFile("results/"+query+".txt");
 		
 
 	}

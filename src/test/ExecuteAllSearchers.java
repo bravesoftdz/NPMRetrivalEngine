@@ -81,7 +81,7 @@ public class ExecuteAllSearchers {
 
 				Aggregator aggregator = new OnlyTheFirst();
 				aggregator.setName(searcher.get(0).getId());
-				MetaSearcher meta = new MetaSearcherImp(searcher, aggregator);
+				MetaSearcher meta = new MetaSearcherImp(searcher, aggregator, /*max_results*/20);
 				Ranking results = null;
 
 				System.out.println("Query "+ query);

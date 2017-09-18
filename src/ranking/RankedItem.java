@@ -61,9 +61,9 @@ public class RankedItem implements Comparable<RankedItem>, Serializable {
 	
 	
 	
-   /* @Override
+    @Override
     public int hashCode() {
-        return getName().length();
-    }*/
+        return getName().hashCode();
+    }
 	
 }

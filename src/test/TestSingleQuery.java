@@ -71,7 +71,7 @@ public class TestSingleQuery {
 		
 		String query = "rpg game 2d";
 		
-		MetaSearcher meta = new MetaSearcherImp(searchers, aggregator);
+		MetaSearcher meta = new MetaSearcherImp(searchers, aggregator, 200/*max_result*/);
 		Ranking results = null;
 		results = meta.search(query, proxy);
 		

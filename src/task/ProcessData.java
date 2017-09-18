@@ -3,19 +3,13 @@ package task;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import aggregators.Aggregator;
-import aggregators.WeightedFirstRankingAgregator;
-import aggregators.WeightedRankingAgregator;
 import external.wrappers.BingWrapper;
 import external.wrappers.GoogleWrapper;
 import external.wrappers.NPMSearchWrapper;
 import external.wrappers.NPMWrapper;
 import internal.lucene.LuceneSearch;
-import metasearch.MetaSearcher;
-import metasearch.MetaSearcherImp;
 import metasearch.Searcher;
 import metasearch.cache.CacheContentManager;
 import metasearch.cache.CacheRankingManager;
@@ -135,42 +129,6 @@ public class ProcessData {
 				
 				System.out.println();
 				
-			}
-		}
-		
-		
-		
-		
-		/**
-		 * Aggregators
-		 */
-		List<Aggregator> aggregators = new ArrayList<Aggregator>();
-
-		Double[] weights = { 0.25, 0.25, 0.25, 0.25 };
-		Aggregator weightedFirstRankingAgregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
-		aggregators.add(weightedFirstRankingAgregator);
-
-		Aggregator weightedRankingAgregator = new WeightedRankingAgregator(Arrays.asList(weights));
-		aggregators.add(weightedRankingAgregator);
-
-		for (Aggregator aggregator : aggregators) {
-			for (int i = 0 ; i < max_queries ; i++) {
-
-				String query = QueryManager.getInstance().getQueries().get(i);
-
-				System.out.println("Query "+ query);
-				
-				MetaSearcher meta = new MetaSearcherImp(searchers, aggregator);
-				
-				Ranking ranking = CacheRankingManager.getInstance().loadRankingFromCache(meta, query);
-				if (ranking == null) {
-					meta.acquireData(query, proxy);
-					ranking = meta.processData(null);//TODO data null
-					CacheRankingManager.getInstance().saveRankingInCache(ranking, meta, query);
-				}
-				
-				System.out.println();
-
 			}
 		}
 		
