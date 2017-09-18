@@ -1,0 +1,157 @@
+<html>
+ <head> 
+  <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1"> 
+  <meta NAME="GENERATOR" CONTENT="Mozilla/4.04 [en] (Win95; U) [Netscape]"> 
+  <meta NAME="Author" CONTENT="Jun Yang"> 
+  <title>Oracle Dates and Times</title> 
+ </head> 
+ <body text="#000000" bgcolor="#E0F7F0" link="#0000EE" vlink="#551A8B" alink="#FF0000"> 
+  <h3>Resources</h3> 
+  <ul> 
+   <li> <a href="http://www.amazon.com/Database-Systems-Complete-Hector-Garcia-Molina/dp/0130319953/sr=1-3/qid=1158032088/ref=sr_1_3/103-1834795-5993454?ie=UTF8&amp;s=books">Database Systems: The Complete Book</a> by Hector Garcia, Jeff Ullman, and Jennifer Widom. <p> </p></li>
+   <li> <a href="http://www.amazon.com/First-Course-Database-Systems-2nd/dp/0130353000/sr=1-1/qid=1158032316/ref=pd_bbs_1/103-1834795-5993454?ie=UTF8&amp;s=books">A First Course in Database Systems</a> by Jeff Ullman and Jennifer Widom. <p> </p></li>
+   <li> Gradiance <a href="http://www.gradiance.com/STwelcome.html">SQL Tutorial</a>. </li>
+  </ul> 
+  <h1> <font size="+3">Oracle Dates and Times</font>&nbsp; 
+   <hr WIDTH="100%"></h1> 
+  <ul> 
+   <li> <a href="#overview">Overview</a></li> 
+   <li> <a href="#date format">DATE Format</a></li> 
+   <li> <a href="#the current time">The Current Time</a></li> 
+   <li> <a href="#operations on date">Operations on DATE</a></li> 
+   <li> <a href="#further information">Further Information</a></li> 
+  </ul> 
+  <h3> 
+   <hr WIDTH="100%"><a name="overview"></a>Overview</h3> Oracle supports both date and time, albeit differently from the SQL2 standard. Rather than using two separate entities, date and time, Oracle only uses one, 
+  <tt>DATE</tt>. The 
+  <tt>DATE</tt> type is stored in a special internal format that includes not just the month, day, and year, but also 
+  <br>the hour, minute, and second. 
+  <p>The <tt>DATE</tt> type is used in the same way as other built-in types such as <tt>INT</tt>. For example, the following SQL statement creates a relation with an attribute of type <tt>DATE</tt>: </p>
+  <pre>create table x(a int, b date);</pre> 
+  <h3> 
+   <hr WIDTH="100%"><a name="date format"></a><tt>DATE</tt> Format</h3> When a 
+  <tt>DATE</tt> value is displayed, Oracle must first convert that value from the special internal format to a printable string. The conversion is done by a function 
+  <tt>TO_CHAR</tt>, according to a 
+  <tt>DATE</tt> 
+  <i>format</i>. Oracle's default format for 
+  <tt>DATE</tt> is "
+  <tt>DD-MON-YY</tt>". Therefore, when you issue the query 
+  <pre>select b from x;</pre> you will see something like: 
+  <pre>B
+---------
+01-APR-98</pre> Whenever a 
+  <tt>DATE</tt> value is displayed, Oracle will call 
+  <tt>TO_CHAR</tt> automatically with the default 
+  <tt>DATE</tt> format. However, you may override the default behavior by calling 
+  <tt>TO_CHAR</tt> explicitly with your own 
+  <tt>DATE</tt> format. For example, 
+  <pre>SELECT TO_CHAR(b, 'YYYY/MM/DD') AS b
+FROM x;</pre> returns the result: 
+  <pre>B
+---------------------------------------------------------------------------
+1998/04/01</pre> The general usage of 
+  <tt>TO_CHAR</tt> is: 
+  <pre>TO_CHAR(&lt;date&gt;, '&lt;format&gt;')</pre> where the 
+  <tt>&lt;format&gt;</tt> string can be formed from over 40 options. Some of the more popular ones include: 
+  <br>&nbsp; 
+  <table border width="100%"> 
+   <tbody>
+    <tr> 
+     <td><tt>MM</tt></td> 
+     <td>Numeric month (<i>e.g.</i>, <tt>07</tt>)</td> 
+    </tr> 
+    <tr> 
+     <td><tt>MON</tt></td> 
+     <td>Abbreviated month name (<i>e.g.</i>, <tt>JUL</tt>)</td> 
+    </tr> 
+    <tr> 
+     <td><tt>MONTH</tt></td> 
+     <td>Full month name (<i>e.g.</i>, <tt>JULY</tt>)</td> 
+    </tr> 
+    <tr> 
+     <td><tt>DD</tt></td> 
+     <td>Day of month (<i>e.g.</i>, <tt>24</tt>)</td> 
+    </tr> 
+    <tr> 
+     <td><tt>DY</tt></td> 
+     <td>Abbreviated name of day (<i>e.g.</i>, <tt>FRI</tt>)</td> 
+    </tr> 
+    <tr> 
+     <td><tt>YYYY</tt></td> 
+     <td>4-digit year (<i>e.g.</i>, <tt>1998</tt>)</td> 
+    </tr> 
+    <tr> 
+     <td><tt>YY</tt></td> 
+     <td>Last 2 digits of the year (<i>e.g.</i>, <tt>98</tt>)</td> 
+    </tr> 
+    <tr> 
+     <td><tt>RR</tt></td> 
+     <td>Like <tt>YY</tt>, but the two digits are ``rounded'' to a year in the range 1950 to 2049. Thus, <tt>06</tt> is considered <tt>2006</tt> instead of <tt>1906</tt></td>, for example. 
+    </tr> 
+    <tr> 
+     <td><tt>AM</tt> (or <tt>PM</tt>)</td> 
+     <td>Meridian indicator</td> 
+    </tr> 
+    <tr> 
+     <td><tt>HH</tt></td> 
+     <td>Hour of day (<tt>1</tt>-<tt>12</tt>)</td> 
+    </tr> 
+    <tr> 
+     <td><tt>HH24</tt></td> 
+     <td>Hour of day (<tt>0</tt>-<tt>23</tt>)</td> 
+    </tr> 
+    <tr> 
+     <td><tt>MI</tt></td> 
+     <td>Minute (<tt>0</tt>-<tt>59</tt>)</td> 
+    </tr> 
+    <tr> 
+     <td><tt>SS</tt></td> 
+     <td>Second (<tt>0</tt>-<tt>59</tt>)</td> 
+    </tr> 
+   </tbody>
+  </table> 
+  <p>You have just learned how to output a <tt>DATE</tt> value using <tt>TO_CHAR</tt>. Now what about inputting a <tt>DATE</tt> value? This is done through a function called <tt>TO_DATE</tt>, which converts a string to a <tt>DATE</tt> value, again according to the <tt>DATE</tt> format. Normally, you do not have to call <tt>TO_DATE</tt> explicitly: Whenever Oracle expects a <tt>DATE</tt> value, it will automatically convert your input string using <tt>TO_DATE</tt> according to the default <tt>DATE</tt> format "<tt>DD-MON-YY</tt>". For example, to insert a tuple with a <tt>DATE</tt> attribute, you can simply type: </p>
+  <pre>insert into x values(99, '31-may-98');</pre> Alternatively, you may use 
+  <tt>TO_DATE</tt> explicitly: 
+  <pre>insert into x
+values(99, to_date('1998/05/31:12:00:00AM', 'yyyy/mm/dd:hh:mi:ssam'));</pre> The general usage of 
+  <tt>TO_DATE</tt> is: 
+  <pre>TO_DATE(&lt;string&gt;, '&lt;format&gt;')</pre> where the 
+  <tt>&lt;format&gt;</tt> string has the same options as in 
+  <tt>TO_CHAR</tt>. 
+  <p>Finally, you can change the default <tt>DATE</tt> format of Oracle from "<tt>DD-MON-YY</tt>" to something you like by issuing the following command in <tt>sqlplus</tt>: </p>
+  <pre>alter session set NLS_DATE_FORMAT='&lt;my_format&gt;';</pre> The change is only valid for the current 
+  <tt>sqlplus</tt> session. 
+  <h3> 
+   <hr WIDTH="100%"><a name="the current time"></a>The Current Time</h3> The built-in function 
+  <tt>SYSDATE</tt> returns a 
+  <tt>DATE</tt> value containing the current date and time on your system. For example, 
+  <pre>select to_char(sysdate, 'Dy DD-Mon-YYYY HH24:MI:SS') as "Current Time"
+from dual;</pre> returns 
+  <pre>Current Time
+---------------------------------------------------------------------------
+Tue 21-Apr-1998 21:18:27</pre> which is the time when I was preparing this document 
+  <tt>:-)</tt> Two interesting things to note here: 
+  <ul> 
+   <li> You can use double quotes to make names case sensitive (by default, SQL is case insensitive), or to force spaces into names. Oracle will treat everything inside the double quotes literally as a single name. In this example, if <tt>"Current Time"</tt> is not quoted, it would have been interpreted as <i>two</i> case insensitive names <tt>CURRENT</tt> and <tt>TIME</tt>, which would actually cause a syntax error.</li> 
+   <li> <tt>DUAL</tt> is built-in relation in Oracle which serves as a dummy relation to put in the <tt>FROM</tt> clause when nothing else is appropriate. For example, try "<tt>select 1+2 from dual;</tt>".</li> 
+  </ul> Another name for the built-in function 
+  <tt>SYSDATE</tt> is 
+  <tt>CURRENT_DATE</tt>. Be aware of these special names to avoid name conflicts. 
+  <h3> 
+   <hr WIDTH="100%"><a name="operations on date"></a>Operations on <tt>DATE</tt></h3> You can compare 
+  <tt>DATE</tt> values using the standard comparison operators such as 
+  <tt>=</tt>, 
+  <tt>!=</tt>, 
+  <tt>&gt;</tt>, 
+  <i>etc.</i> 
+  <p>You can subtract two <tt>DATE</tt> values, and the result is a <tt>FLOAT</tt> which is the number of days between the two <tt>DATE</tt> values. In general, the result may contain a fraction because <tt>DATE</tt> also has a time component. For obvious reasons, adding, multiplying, and dividing two <tt>DATE</tt> values are not allowed. </p>
+  <p>You can add and subtract constants to and from a <tt>DATE</tt> value, and these numbers will be interpreted as numbers of days. For example, <tt>SYSDATE+1</tt> will be tomorrow. You cannot multiply or divide <tt>DATE</tt> values. </p>
+  <p>With the help of <tt>TO_CHAR</tt>, string operations can be used on <tt>DATE</tt> values as well. For example, <tt>to_char(&lt;date&gt;, 'DD-MON-YY') like '%JUN%'</tt> evaluates to true if <tt>&lt;date&gt;</tt> is in June. </p>
+  <hr WIDTH="100%">
+  <font size="-2">This document was written originally by Kristian Widjaja for Prof. Jeff Ullman's CS145 class in Autumn, 1997; revised by Jun Yang for Prof. Jennifer Widom's CS145 class in Spring, 1998; further revisions by Prof. Ullman in Autumn, 1998.</font> 
+  <!-- --> 
+  <script src="http://tags.stanford.edu/tags.js" type="text/javascript"></script> 
+  <!-- -->  
+ </body>
+</html>

@@ -49,7 +49,12 @@ public class MetaSearcherImp implements MetaSearcher{
 	}
 
 	@Override
-	public String getName() {
+	public String getId() {
+		return aggregator.getName();
+	}
+	
+	@Override
+	public String getContentId() {
 		return aggregator.getName();
 	}
 
@@ -63,7 +68,7 @@ public class MetaSearcherImp implements MetaSearcher{
 	        if(data==null){
 	        	data = searcher.acquireData(query,proxy);
 	        }
-			rankings.put(searcher.getName(),data);
+			rankings.put(searcher.getId(),data);
 		}
 
 		return null;
@@ -74,7 +79,7 @@ public class MetaSearcherImp implements MetaSearcher{
 		List<Ranking> rs = new ArrayList<Ranking>();
 		
 		for (Searcher searcher : searchers) {
-			rs.add(searcher.processData(rankings.get(searcher.getName())));
+			rs.add(searcher.processData(rankings.get(searcher.getId())));
 		}
 
 		return aggregator.aggregate(rs);
@@ -86,7 +91,7 @@ public class MetaSearcherImp implements MetaSearcher{
 		for (Searcher searcher : searchers) {
 			Ranking ranking = CacheRankingManager.getInstance().loadRankingFromCache(searcher, query);
 			if (ranking == null) {
-				ranking = searcher.processData(rankings.get(searcher.getName()));
+				ranking = searcher.processData(rankings.get(searcher.getId()));
 			}
 			rs.add(ranking);
 		}

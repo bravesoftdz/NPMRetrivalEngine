@@ -14,6 +14,7 @@ import util.StopWordManager;
 public class HiperlinkMatching implements EntityExtractor{
 	
 	public static final String HYPER_MATCHING = "hyp_match";
+	public static final String NPM_SUFFIX = "https://www.npmjs.com/package/";
 	
 	@Override
 	public List<String> getNamedEntities(Document tech) {
@@ -28,17 +29,7 @@ public class HiperlinkMatching implements EntityExtractor{
 		text = Jsoup.clean(text, "", Whitelist.basic(),
 				new Document.OutputSettings().prettyPrint(false));
 		
-		List<String> entities = new ArrayList<String>();
-
-		PackageManager pkgm = PackageManager.getInstance();
-
-		for (String home : pkgm.getHomePages()) {
-			if (text.contains(home)){
-				entities.add(pkgm.getPkgName(home));
-			}
-		}
-		
-		return entities;
+		return getNamedEntities(text);
 		
 	}
 
@@ -57,6 +48,12 @@ public class HiperlinkMatching implements EntityExtractor{
 		for (String home : pkgm.getHomePages()) {
 			if (text.contains(home)){
 				entities.add(pkgm.getPkgName(home));
+			}
+		}
+		
+		for (String pkg : pkgm.getPkgNames()){
+			if(text.contains(NPM_SUFFIX+pkg)){
+				entities.add(pkg);
 			}
 		}
 		

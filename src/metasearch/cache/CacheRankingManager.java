@@ -25,7 +25,7 @@ public class CacheRankingManager {
 	}
 
 	public Ranking loadRankingFromCache(Searcher searcher, String query) {
-		Ranking ranking = new Ranking(searcher.getName() +"_"+ query, cache_folder +"/"+ searcher.getName() +"/"+ query + EXT);
+		Ranking ranking = new Ranking(searcher.getId() +"_"+ query, cache_folder +"/"+ searcher.getId() +"/"+ query + EXT);
 		if(ranking.size()>0){
 			return ranking;
 		}
@@ -33,7 +33,7 @@ public class CacheRankingManager {
 	}
 
 	public void saveRankingInCache(Ranking ranking, Searcher searcher, String query) {
-		String path = cache_folder +"/"+ searcher.getName();
+		String path = cache_folder +"/"+ searcher.getId();
 		File directory = new File(path);
 		directory.mkdirs();
 		ranking.saveRankingInFile(path +"/"+ query + EXT);

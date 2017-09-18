@@ -77,6 +77,6 @@ public class CacheManager {
 	}
 
 	private String getKey(Searcher searcher, String query) {
-		return searcher.getName() + "::::" + query;
+		return searcher.getId() + "::::" + query;
 	}
 }

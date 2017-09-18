@@ -20,6 +20,7 @@ import metasearch.Searcher;
 import metasearch.cache.CacheContentManager;
 import metasearch.cache.CacheRankingManager;
 import ner.HiperlinkMatching;
+import ner.Stanford_CRF;
 import ner.StringMatching;
 import ranking.Ranking;
 import util.ConfigManager;
@@ -65,17 +66,25 @@ public class ProcessData {
 		NPMWrapper npm = new NPMWrapper(max_results, NPMWrapper.OPTIMAL);
 		GoogleWrapper google = new GoogleWrapper(max_results,new HiperlinkMatching());
 		BingWrapper bing = new BingWrapper(max_results,new HiperlinkMatching());
+		GoogleWrapper google2 = new GoogleWrapper(max_results,new StringMatching());
+		BingWrapper bing2 = new BingWrapper(max_results,new StringMatching());
+		GoogleWrapper google3 = new GoogleWrapper(max_results,new Stanford_CRF());
+		BingWrapper bing3 = new BingWrapper(max_results,new Stanford_CRF());
 		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);
 		
 		List<Searcher> searchers = new ArrayList<Searcher>();
 		searchers.add(google);
 		searchers.add(npm);
 		searchers.add(bing);
+		searchers.add(google2);
+		searchers.add(bing2);
+		searchers.add(google3);
+		searchers.add(bing3);
 		searchers.add(npmsearch);
 
 		for (Searcher searcher : searchers) {
 			
-			System.out.println("Analizando "+ searcher.getName());
+			System.out.println("Analizando "+ searcher.getId());
 			
 			for (int i = 0 ; i < max_queries ; i++) {
 
@@ -108,7 +117,7 @@ public class ProcessData {
 		internal_searchers.add(lucene);
 		for (Searcher searcher : internal_searchers) {
 			
-			System.out.println("Analizando "+ searcher.getName());
+			System.out.println("Analizando "+ searcher.getId());
 			
 			for (int i = 0 ; i < max_queries ; i++) {
 

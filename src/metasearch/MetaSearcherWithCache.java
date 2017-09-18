@@ -65,11 +65,17 @@ public class MetaSearcherWithCache implements MetaSearcher{
 	}
 
 	@Override
-	public String getName() {
+	public String getId() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	
+	@Override
+	public String getContentId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	@Override
 	public List<String> acquireData(String query, Proxy proxy) {
 		// TODO Auto-generated method stub

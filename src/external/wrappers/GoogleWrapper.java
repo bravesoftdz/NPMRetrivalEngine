@@ -127,18 +127,23 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 		
 		String query2 = "javascript package " + query;
 		
-		System.out.println("Acquiring data from google...");
+		//System.out.println("Acquiring data from google...");
 
 		List<String> content = getResultContent(query2, proxy,this);
 		
-		System.out.print(" ...connection SUCCESSFUL...");
+		//System.out.print(" ...connection SUCCESSFUL...");
 		
 		return content;
 	}
 
 	@Override
-	public String getName() {
+	public String getId() {
 		return GOOGLE+"_"+ent_extractor.getTechniqueName();
+	}
+	
+	@Override
+	public String getContentId() {
+		return GOOGLE+"_"+RESULTS;
 	}
 
 }

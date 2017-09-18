@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+ <head> 
+  <title>audio - Audio Interface for R - RForge.net</title> 
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+  <link rel="stylesheet" href="/main.css" type="text/css"> 
+ </head> 
+ <body bgcolor="#d0d0d0" text="#000000" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0"> 
+  <div style="background-color: #e0e0ff; border: 2px solid #a0a0ff; padding: 10px; margin: 7px; font-size: 16pt"> 
+   <b>audio - Audio Interface for R</b> 
+  </div> 
+  <div style="background-color: #a0a0a0; border: 2px solid #808080; padding: 3px 10px 1px; margin: 7px; text-align: left; font-size: 9pt; color: #ffffff"> 
+   <a href="/" style="color: #ffffff"><i>RForge.net</i></a> 
+  </div> 
+  <div style="background-color: #ffffff; border: 2px solid #a0a0a0; padding: 10px; margin: 7px; text-align: justify;"> 
+   <table width="100%">
+    <tbody>
+     <tr valign="top">
+      <td width="120"> <h2>audio</h2> <p> <a href="/audio/index.html">About audio</a><br><a href="/audio/git.html">GIT&nbsp;access</a><br><a href="/audio/files/">Download/Files</a><br><a href="/audio/news.html">News</a><br><a href="/audio/check/">Check results</a><br><a href="/doc/packages/audio/00Index.html">Package R docs</a><br> </p><p> </p></td>
+      <td> 
+       <!-- project="audio", file="index.html" --> 
+       <center>
+        <h2>About&nbsp;<i>audio</i></h2>
+       </center> <style type="text/css"> tt {color: #000080} #RC {background-color: #e0e0ff; border: 2px solid #c0c0ff; padding: 10px; margin: 7px}</style> 
+       <table> 
+        <tbody>
+         <tr>
+          <td colspan="2"><b>What is audio</b></td>
+         </tr> 
+         <tr>
+          <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+          <td> <p><b>audio</b> is an R package that adds the capability to play and record audio to R. It adds a flexible driver infrastructure such that arbitrary audio drivers can be used. Currently audio in form of PCM samples is supported for recording and playback. Also WAVE (aka .WAV) audio file format is supported. </p><p> Release versions of <b>audio</b> can be obtained from <a href="http://cran.r-project.org">CRAN</a> - usually <tt>install.packages("audio")</tt> in R will do the trick. The current development version can be downloaded from the <a href="/audio/files">files section</a>. </p><p> 
+            <!-- Please report any bugs or wishes related to <b>audio</b> using the <a href="https://www.rforge.net/cgi-bin/bugzilla/enter_bug.cgi?product=audio">Bugzilla for audio</a>. --> </p></td>
+         </tr> 
+         <tr>
+          <td colspan="2"><b>What's new?</b></td>
+         </tr> 
+         <tr>
+          <td></td>
+          <td> 
+           <div style="background: #ffffd0; padding: 10px 5px 10px 0px"> 
+            <b>2011/01/14 - audio 0.1-4</b> released. It provides fixes for the WMM driver ensuring better compatibility with Windows 7. 
+           </div> <p> <b>2008/09/23 - audio 0.1-0</b> released. It is the first public release. It has built-in audio drivers for Mac OS X and Windows. Those have been successfully tested. It also includes an experimental PortAudio driver that was originally meant to be the only driver since it purportedly supports all architectures, but it never worked properly so we decided to write our own native drivers. (We are looking for volunteers to provide a better PortAudio driver.) </p><p> </p></td>
+         </tr> 
+         <tr>
+          <td colspan="2"><b>Installation</b></td>
+         </tr> 
+         <tr>
+          <td></td>
+          <td> Use <tt>install.packages("audio")</tt> in R to install. There are no special needs on Mac OS X and Windows, but users of other unix systems may want to install PortAudio library. </td>
+         </tr> 
+         <tr>
+          <td colspan="2"><b>Documentation</b></td>
+         </tr> 
+         <tr>
+          <td></td>
+          <td> See <a href="/doc/packages/audio/00Index.html">audio package documentation</a> for details. The most simple use is to play back sound or record audio. 
+           <div id="RC" class="RC"> 
+            <tt>library(audio)</tt>
+            <br> 
+            <tt>play(sin(1:10000/20))</tt> 
+            <i># play a short sound of a fixed frequency</i>
+            <br> 
+           </div> The sound is played asynchronously, so you're back on the R console while the sound is being played. You can use the <tt>audioInstance</tt> objects that is returned by <tt>play</tt> and <tt>record</tt> to control the audio operation. 
+           <div id="RC" class="RC"> 
+            <tt>a &lt;- play(sin(1:100000/20))</tt>
+            <br> 
+            <tt>a</tt>
+            <br> 
+            <tt><font color="#808080"># Audio player instance 63b770 of AudioUnits (Mac OS X) driver (macosx).</font></tt>
+            <br> 
+            <tt>wait(a)</tt> 
+            <i># wait for the playback to finish</i>
+            <br> 
+            <tt>rewind(a)</tt>
+            <br> 
+            <tt>resume(a)</tt> 
+            <i># play again</i>
+            <br> 
+           </div> Analogously, it's possible to record audio: 
+           <div id="RC" class="RC"> 
+            <i># record 8000 samples at 8000Hz (1 sec), mono (1 channel)</i>
+            <br> 
+            <tt>a &lt;- record(8000, 8000, 1)</tt>
+            <br> 
+            <tt>wait(a)</tt> 
+            <i># wait for the recording to finish</i>
+            <br> 
+            <tt>x &lt;- a$data</tt> 
+            <i># get the result</i>
+            <br> 
+            <tt>x[1:10]</tt> 
+            <i># show first ten samples</i>
+            <br> 
+            <tt><font color="#808080">#sample rate: 8000Hz, mono, 16-bits<br> # [1] 0.018100981 0.017364085 0.016479610 0.013326526 0.010764275 0.011048204<br> # [7] 0.010541249 0.010892886 0.007960078 0.006703259</font></tt>
+            <br> 
+            <tt>close(a); rm(a)</tt> 
+            <i># you can close the instance at this point</i>
+            <br> 
+            <tt>play(x)</tt> 
+            <i># play back the result</i>
+            <br> 
+            <i># amplify and crop the signal</i>
+            <br> 
+            <tt>y &lt;- x * 2</tt>
+            <br> 
+            <tt>y[y &lt; -1] &lt;- -1</tt>
+            <br> 
+            <tt>y[y &gt; 1] &lt;- 1</tt>
+            <br> 
+            <i># play the amplified signal</i>
+            <br> 
+            <tt>play(y)</tt>
+            <br> 
+           </div> The objects returned by <tt>record</tt> are of class <tt>audioSample</tt> which is essentially a numeric vector (for mono) or numeric matrix with two rows (for stereo). Valid values are between -1 and 1. Regular numeric operations can be performed on such objects as seen in the previous example. Audio samples have additional attributes <tt>rate</tt> (sample rate in Hz) and <tt>bits</tt> (resolution in bits). The latter is optional and used only for storage. </td>
+         </tr> 
+         <tr>
+          <td colspan="2"><b>Writing audio drivers</b></td>
+         </tr> 
+         <tr>
+          <td></td>
+          <td> <b>audio</b> provides an infrastrcture for arbitrary audio drivers. Although the built-in drivers should be sufficient for the majority of users, additional audio drivers can be loaded. An audio driver is simply a shared object (<tt>.so</tt>, <tt>.dylib</tt> or <tt>.dll</tt> depending on the paltform) that implements and exports at least one function <tt>create_audio_driver</tt> which returns a pointer to the <tt>audio_driver_t</tt> type (a structure) as defined in <tt>driver.h</tt>. It is currently defined as follows: 
+           <div id="RC" class="RC"> 
+            <tt><font color="#808080">typedef struct audio_driver {</font><br> &nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">unsigned int</font> length;</tt> 
+            <i>/* length of the driver structure, i.e., sizeof(audio_driver_t) */</i>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">const char *</font>name;</tt> 
+            <i>/* short identifier */</i>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">const char *</font>descr;</tt> 
+            <i>/* description */</i>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">const char *</font>copyright;</tt> 
+            <i>/* copyright (optional) */</i>
+            <br> 
+            <tt><br> &nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">struct audio_instance *</font>(*create_player)(<font color="#206040">SEXP</font> source, <font color="#206040">float</font> rate, <font color="#206040">int</font> flags);</tt>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">struct audio_instance *</font>(*create_recorder)(<font color="#206040">SEXP target</font>, <font color="#206040">float</font> rate, <font color="#206040">int</font> channels, <font color="#206040">int</font> flags);</tt> 
+            <i>/* (optional) */</i>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">int</font> (*start)(<font color="#206040">struct audio_instance *</font>);</tt> 
+            <i>/* start recording/playback */</i>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">int</font> (*pause)(<font color="#206040">struct audio_instance *</font>);</tt> 
+            <i>/* pause recording/playback */</i>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">int</font> (*resume)(<font color="#206040">struct audio_instance *</font>);</tt> 
+            <i>/* resume previously paused recording/playback */</i>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">int</font> (*rewind)(<font color="#206040">struct audio_instance *</font>);</tt> 
+            <i>/* move the pointer in the source/target to the beginning */</i>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">int</font> (*wait)(<font color="#206040">struct audio_instance *</font>, <font color="#206040">double</font> timeout);</tt>
+            <i>/* Note: the instance may be NULL for global wait */</i>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">int</font> (*close)(<font color="#206040">struct audio_instance *</font>);</tt> 
+            <i>/* close the instance, may release underlying audio objects */</i>
+            <br> 
+            <tt>&nbsp;&nbsp;&nbsp;&nbsp;<font color="#206040">void</font> (*dispose)(<font color="#206040">struct audio_instance *</font>);</tt> 
+            <i>/* must free the instance pointer and all internally allocated memory/objects */</i>
+            <br> 
+            <tt><font color="#808080">} audio_driver_t;</font></tt> 
+           </div> The pivotal entries are <tt>create_player</tt> and <tt>create_recorder</tt> which create an audio instance, i.e. an object that can be used to influence the recording or playback. Each audio instance must conform at least to the audio_instance structure, but it can have additional elements (see built-in drivers for examples). The structure is allocated (usually from the heap) in <tt>create_player</tt> or <tt>create_recorder</tt> and must be freed by <tt>dispose</tt>. The recording/playback may not start until <tt>start</tt> is called. Drivers should be able to recover from reaching the end of input, i.e. <tt>rewind</tt> followed by <tt>resume</tt> should result in repeated playback/recording. Playback loop is supported via <tt>APFLAG_LOOP</tt> and should be implemented even though the R interface doesn't expose that feature (yet). </td>
+         </tr> 
+        </tbody>
+       </table> </td>
+     </tr>
+    </tbody>
+   </table> 
+  </div>   
+ </body>
+</html>

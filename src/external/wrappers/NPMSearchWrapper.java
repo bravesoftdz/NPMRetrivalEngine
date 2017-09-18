@@ -17,6 +17,7 @@ import metasearch.cache.CacheRankingManager;
 import ner.EntityExtractor;
 import ranking.RankedItem;
 import ranking.Ranking;
+import util.PackageManager;
 
 public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 	// We need a real browser user agent or Google will block our request with a
@@ -25,6 +26,8 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 	public int MAX_RESULTS = 20;
 	public String RANK_TYPE = "";
 	public static final String KEYWORDS = "keywords";
+	
+	public static final String NPMSEARCH =  "npmsearch.com";
 
 	public NPMSearchWrapper(int results) {
 		this.MAX_RESULTS = results;
@@ -85,7 +88,7 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 		List<RankedItem> results = new ArrayList<RankedItem>();
 	
 		System.out.println("Analizing Results...");
-
+		PackageManager pm = PackageManager.getInstance();
 		// System.out.println("Connection with NPM finished...");
 		if(contents.size()>0){
 			JsonObject obj = new JsonParser().parse(((String)contents.get(0))).getAsJsonObject();
@@ -94,9 +97,10 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 			for (int i = 0; i < names.size() && results.size() < MAX_RESULTS ; i++) {
 				JsonElement entry = names.get(i);
 				if (entry != null && entry.isJsonObject()) {
-					results.add(new RankedItem(((JsonObject) entry).get("name").getAsString(),
-							(double) (MAX_RESULTS - (rank - 1))));
-					System.out.println();
+					String pkg = ((JsonObject) entry).get("name").getAsString();
+					if(pm.isPkgName(pkg)){
+						results.add(new RankedItem(pkg,(double) (MAX_RESULTS - (rank - 1))));
+					}
 				}
 				rank++;
 			}
@@ -108,18 +112,23 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 	
 	public List<String> acquireData(String query, Proxy proxy){
 		
-		System.out.println("Acquiring data from npmsearch.com...");
+		//System.out.println("Acquiring data from npmsearch.com...");
 
 		List<String> content = getResultContent(query, proxy,this);
 		
-		System.out.print(" ...connection SUCCESSFUL...");
+		//System.out.print(" ...connection SUCCESSFUL...");
 		
 		return content;
 	}
 
 	@Override
-	public String getName() {
-		return "npmsearch.com"+RANK_TYPE;
+	public String getId() {
+		return NPMSEARCH + RANK_TYPE;
+	}
+	
+	@Override
+	public String getContentId() {
+		return NPMSEARCH+"_"+MAX_RESULTS;
 	}
 
 

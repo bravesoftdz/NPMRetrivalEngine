@@ -73,14 +73,14 @@ public class ExecuteAllSearchers {
 
 		for (List<Searcher> searcher : searchers) {
 			
-			System.out.println("Analizando "+ searcher.get(0).getName());
+			System.out.println("Analizando "+ searcher.get(0).getId());
 			
 			for (int i = 0 ; i < max_queries ; i++) {
 
 				String query = QueryManager.getInstance().getQueries().get(i);
 
 				Aggregator aggregator = new OnlyTheFirst();
-				aggregator.setName(searcher.get(0).getName());
+				aggregator.setName(searcher.get(0).getId());
 				MetaSearcher meta = new MetaSearcherImp(searcher, aggregator);
 				Ranking results = null;
 

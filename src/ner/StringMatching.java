@@ -27,20 +27,7 @@ public class StringMatching implements EntityExtractor{
 		text = Jsoup.clean(text, "", Whitelist.none(),
 				new Document.OutputSettings().prettyPrint(false));
 		
-		List<String> entities = new ArrayList<String>();
-		
-		String[] words = text.split(" ");
-		PackageManager pkgm = PackageManager.getInstance();
-		StopWordManager swm = StopWordManager.getInstance();
-
-		for (String word : words) {
-			word = word.trim().toLowerCase();
-			if (!"".equals(word) && !swm.isStopWord(word) && pkgm.isPkgName(word)) {
-				entities.add(word);
-			}
-		}
-		
-		return entities;
+		return getNamedEntities(text);
 		
 	}
 

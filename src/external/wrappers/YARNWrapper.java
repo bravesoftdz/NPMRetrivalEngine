@@ -65,7 +65,12 @@ public class YARNWrapper implements Searcher
     }
 
 	@Override
-	public String getName() {
+	public String getId() {
+		return "yarn.com";
+	}
+	
+	@Override
+	public String getContentId() {
 		return "yarn.com";
 	}
 

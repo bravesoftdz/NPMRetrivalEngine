@@ -65,14 +65,14 @@ public class AcquireData {
 		
 		List<Searcher> searchers = new ArrayList<Searcher>();
 		searchers.add(google);
-		//searchers.add(npm);
+		searchers.add(npm);
 		searchers.add(bing);
-		//searchers.add(npmsearch);
+		searchers.add(npmsearch);
 
 
 		for (Searcher searcher : searchers) {
 			
-			System.out.println("Analizando "+ searcher.getName());
+			System.out.println("Analizando "+ searcher.getContentId());
 			
 			for (int i = 0 ; i < max_queries ; i++) {
 

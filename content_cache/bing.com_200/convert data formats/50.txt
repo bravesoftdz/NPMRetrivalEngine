@@ -1,0 +1,1182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html class="no-js" lang="en">
+ <head> 
+  <meta http-equiv="Content-Language" content="en-us"> 
+  <meta http-equiv="Content-Type" content="text/html; charset=windows-1252"> 
+  <!-- <meta http-equiv="X-UA-Compatible" content="IE=9" /> --> 
+  <link rel="SHORTCUT ICON" href="/favicon.ico"> 
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"> 
+  <title>Date and Time Conversions Using SQL Server</title> 
+  <meta name="description" content="There are many instances when dates and times don't show up at your doorstep in the format you'd like it to be, nor does the output of a query fit the needs of the people viewing it. One option is to format the data in the application itself. Another opti"> 
+  <link rel="canonical" href="https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/"> 
+  <link href="https://www.mssqltips.com/css/foundation2.css" rel="stylesheet"> 
+  <link href="https://www.mssqltips.com/css/app.css" rel="stylesheet"> 
+  <meta property="og:url" content="https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/"> 
+  <meta property="og:type" content="website"> 
+  <meta property="og:title" content="Date and Time Conversions Using SQL Server"> 
+  <meta property="og:description" content="There are many instances when dates and times don't show up at your doorstep in the format you'd like it to be, nor does the output of a query fit the needs of the people viewing it. One option is to format the data in the application itself. Another opti"> 
+  <meta property="og:image" content="https://www.mssqltips.com/images_newsletter/1145_NewsletterImage.png"> 
+  <meta name="twitter:card" content="summary_large_image"> 
+  <meta name="twitter:site" content="@mssqltips"> 
+  <meta name="twitter:creator" content="@mssqltips"> 
+  <meta name="twitter:title" content="Date and Time Conversions Using SQL Server"> 
+  <meta name="twitter:description" content="There are many instances when dates and times don't show up at your doorstep in the format you'd like it to be, nor does the output of a query fit the needs of the people viewing it. One option is to format the data in the application itself. Another opti"> 
+  <meta name="twitter:image" content="https://www.mssqltips.com/images_newsletter/1145_NewsletterImage.png"> 
+  <script async src="https://www.googletagservices.com/tag/js/gpt.js"></script> 
+  <script>
+  var googletag = googletag || {};
+  googletag.cmd = googletag.cmd || [];
+</script> 
+  <script type="text/javascript">
+var gptAdSlots = [];
+googletag.cmd.push(function() {
+
+var mapping = googletag.sizeMapping().
+
+addSize([100, 100], []).
+addSize([320, 400], []).
+addSize([320, 700], []).
+addSize([750, 200], [728, 90]).
+addSize([1050, 200], [728, 90]).build();
+
+ googletag.defineSlot('/53998264/160x600-Primary', [160, 600], 'div-gpt-ad-1388505177750-0').addService(googletag.pubads());  googletag.defineSlot('/53998264/160x600-Secondary', [160, 600], 'div-gpt-ad-1388505177750-1').addService(googletag.pubads());  googletag.defineSlot('/53998264/300x250-Primary', [300, 250], 'div-gpt-ad-1388505177750-2').addService(googletag.pubads());  googletag.defineSlot('/53998264/300x250-Secondary', [300, 250], 'div-gpt-ad-1388505177750-3').addService(googletag.pubads());  
+	gptAdSlots[0] = googletag.defineSlot('/53998264/728x90-Primary', [728, 90], 'ad-slot-leader').
+	defineSizeMapping(mapping).
+	addService(googletag.pubads());
+
+	googletag.defineSlot('/53998264/170x90-pos1', [170, 90], 'div-gpt-ad-1481919244109-0').addService(googletag.pubads());
+	googletag.defineSlot('/53998264/170x90-pos2', [170, 90], 'div-gpt-ad-1481919244109-1').addService(googletag.pubads());
+	googletag.defineSlot('/53998264/170x90-pos3', [170, 90], 'div-gpt-ad-1481919244109-2').addService(googletag.pubads());
+	googletag.defineSlot('/53998264/170x90-pos4', [170, 90], 'div-gpt-ad-1481919244109-3').addService(googletag.pubads());
+
+
+
+googletag.pubads().enableSingleRequest();
+googletag.pubads().collapseEmptyDivs();
+googletag.enableServices();
+});
+</script> 
+ </head> 
+ <body onload="PR.prettyPrint()"> 
+  <a name="top"></a> 
+  <div class="row"> 
+   <div class="large-12 columns text-center"> 
+    <br> 
+    <a onclick="_gaq.push(['_trackEvent', '990x30', 'Click', 'Top']);" target="_blank" href="/ss.asp?id=3529&amp;link=https://www.mssqltips.com/mssqltips-giveaway-vslive-orlando/?src=ss20170917"><img src="https://www.mssqltips.com/absolutebm/banners/MSSQLTips_VSLive201711_20170906_990x30.png" border="0" height="30" width="990" alt="Learn more about SQL Server tools"></a> 
+    <br>
+    <br> 
+   </div> 
+  </div> 
+  <div class="row"> 
+   <div class="large-2 columns text-center"> 
+    <a href="https://www.mssqltips.com/"><img alt="mssqltips logo" src="https://www.mssqltips.com/images/mslogo_113x60.png"></a> 
+   </div> 
+   <div class="large-8 hide-for-print columns"> 
+    <div style="padding:10px; background-color:#DADADA"> 
+     <div style="padding: 5px; background-color:#FFFFFF"> 
+      <script>
+			  (function() {
+			    var cx = '004111219998430415686:pjndvj5e2n4';
+			    var gcse = document.createElement('script');
+			    gcse.type = 'text/javascript';
+			    gcse.async = true;
+			    gcse.src = 'https://cse.google.com/cse.js?cx=' + cx;
+			    var s = document.getElementsByTagName('script')[0];
+			    s.parentNode.insertBefore(gcse, s);
+			  })();
+			</script> 
+      <gcse:searchbox-only resultsurl="/search/" newwindow="false" queryparametername="q"></gcse:searchbox-only> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="large-2 columns hide-for-small hide-for-print text-center"> 
+    <a href="https://www.mssqltips.com/mssqltips-giveaway-vslive-orlando/?src=header" target="_blank"><img alt="giveaway" src="https://www.mssqltips.com/images/mssqltips_giveaway-FV4_20170425.png"></a> 
+   </div> 
+  </div> 
+  <div class="row"> 
+   <div class="large-12 columns text-center">
+     &nbsp; 
+   </div> 
+  </div> 
+  <div class="row" style="background-color:#3B6D93;"> 
+   <div class="large-12 columns text-center hide-for-medium hide-for-small hide-for-print"> 
+    <h3 style="text-align:center; color:white; padding:5px 0 0 0;"> <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Tutorials_l']);" href="https://www.mssqltips.com/sql-server-tutorials/" style="text-decoration:none;color:white">Tutorials</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'DBA_l']);" href="https://www.mssqltips.com/sql-server-dba-resources/" style="text-decoration:none;color:white">DBA</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Dev_l']);" href="https://www.mssqltips.com/sql-server-developer-resources/" style="text-decoration:none;color:white">Dev</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'BI_l']);" href="https://www.mssqltips.com/sql-server-business-intelligence-resources/" style="text-decoration:none;color:white">BI</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Career_l']);" href="https://www.mssqltips.com/sql-server-professional-development-resources/" style="text-decoration:none;color:white">Career</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Categories_l']);" href="https://www.mssqltips.com/sql-server-categories/" style="text-decoration:none;color:white">Categories</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Webcasts_l']);" href="https://www.mssqltips.com/sql-server-webcasts/" style="text-decoration:none;color:white">Webcasts</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Whitepapers_l']);" href="https://www.mssqltips.com/sql-server-whitepapers/" style="text-decoration:none;color:white">Whitepapers</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'TodaysTip_l']);" href="https://www.mssqltips.com/todays-sql-server-tip/" style="text-decoration:none;color:white">Today's&nbsp;Tip</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Join_l']);" href="https://www.mssqltips.com/get-free-sql-server-tips/?ref=JoinHeaderMenu" style="text-decoration:none;color:white">Join</a> </h3> 
+   </div> 
+  </div> 
+  <div class="row" style="background-color:#3B6D93;"> 
+   <div class="large-12 columns text-center hide-for-large hide-for-small hide-for-print"> 
+    <h3 style="text-align:center; color:white; padding:5px 0 0 0;"> <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Tutorials_m']);" href="https://www.mssqltips.com/sql-server-tutorials/" style="text-decoration:none;color:white">Tutorials</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'DBA_m']);" href="https://www.mssqltips.com/sql-server-dba-resources/" style="text-decoration:none;color:white">DBA</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Dev_m']);" href="https://www.mssqltips.com/sql-server-developer-resources/" style="text-decoration:none;color:white">Dev</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'BI_m']);" href="https://www.mssqltips.com/sql-server-business-intelligence-resources/" style="text-decoration:none;color:white">BI</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Categories_m']);" href="https://www.mssqltips.com/sql-server-categories/" style="text-decoration:none;color:white">Categories</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Webcasts_m']);" href="https://www.mssqltips.com/sql-server-webcasts/" style="text-decoration:none;color:white">Webcasts</a> </h3> 
+   </div> 
+  </div> 
+  <div class="row" style="background-color:#3B6D93;"> 
+   <div class="large-12 columns text-center hide-for-medium hide-for-large hide-for-print"> 
+    <h3 style="text-align:center; color:white; padding:5px 0 0 0;"> <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'DBA_s']);" href="https://www.mssqltips.com/sql-server-dba-resources/" style="text-decoration:none;color:white">DBA</a>&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Dev_s']);" href="https://www.mssqltips.com/sql-server-developer-resources/" style="text-decoration:none;color:white">Dev</a>&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'BI_s']);" href="https://www.mssqltips.com/sql-server-business-intelligence-resources/" style="text-decoration:none;color:white">BI</a>&nbsp;&nbsp;&nbsp; <a onclick="_gaq.push(['_trackEvent', 'Menu_20160204', 'Click', 'Categories_s']);" href="https://www.mssqltips.com/sql-server-categories/" style="text-decoration:none;color:white">Categories</a> </h3> 
+   </div> 
+  </div> 
+  <div class="row">
+    &nbsp; 
+  </div> 
+  <div class="row"> 
+   <div class="large-9 columns" role="content"> 
+    <h1>Date and Time Conversions Using SQL Server</h1> 
+    <div align="center" class="hide-for-print"> 
+     <br> 
+     <div id="ad-slot-leader" style="height:150px;"> 
+      <script>
+					 googletag.cmd.push(function() {googletag.display('ad-slot-leader'); });
+				   </script> 
+     </div> 
+    </div> 
+    <div id="fb-root"></div> 
+    <script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script> 
+    <article> 
+     <span class="hide-for-small"><h6>By: <a href="/sqlserverauthor/11/edgewood-solutions/" rel="author" title="author profile for Edgewood Solutions"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Edgewood Solutions</span></span></a> &nbsp;&nbsp;|&nbsp;&nbsp; <a href="#comments" title="read and post comments">Read Comments (25)</a> &nbsp;&nbsp;|&nbsp;&nbsp; Related Tips: <a href="/sqlservertip/1145/date-and-time-conversions-using-sql-server/">1</a> | <a href="/sqlservertip/1616/sql-server-2008-date-and-time-data-types/">2</a> | <a href="/sqlservertip/1712/sql-server-function-to-convert-integer-date-to-datetime-format/">3</a> | <a href="/sqlservertip/2509/add-and-subtract-dates-using-dateadd-in-sql-server/">4</a> | <a href="/sqlservertip/2508/sql-server-datediff-example/">5</a> | <a href="/sqlservertip/2507/determine-sql-server-date-and-time-with-datepart-and-datename-functions/">6</a> | <a href="/sqlservertip/2688/work-around-for-calculating-age-using-the-sql-server-datediff-function/">7</a> | <a href="/sql-server-developer-resources/">More</a> &gt; <a href="/sql-server-tip-category/121/dates/">Dates</a></h6></span> 
+     <br> 
+     <div align="center"> 
+      <div style="width: 100%; padding: 4px; background-color: #CC0000; text-align: center; line-height: 25px;"> 
+       <a onclick="_gaq.push(['_trackEvent', 'Giveaway', 'Click', 'VSLive']);" href="https://www.mssqltips.com/mssqltips-giveaway-vslive-orlando/?src=rb" style="color: #FFFFFF; text-decoration: none; font-size: 20px;" target="_blank">Attend a SQL Server Conference for FREE &gt;&gt; click to learn more</a> 
+      </div>
+     </div> 
+     <br>
+     <br> 
+     <h5>Problem</h5> 
+     <p>There are many instances when dates and times don't show up at your doorstep in the format you'd like it to be, nor does the output of a query fit the needs of the people viewing it. One option is to format the data in the application itself. Another option is to use the built-in functions SQL Server provides to format the date string for you.</p> 
+     <h5>Solution</h5> 
+     <p>SQL Server provides a number of options you can use to format a date/time string. One of the first considerations is the actual date/time needed. The most common is the current date/time using <b>getdate()</b>. This provides the current date and time according to the server providing the date and time. If a universal date/time is needed, then <b>getutcdate()</b> should be used. To change the format of the date, you convert the requested date to a string and specify the format number corresponding to the format needed. Below is a list of formats and an example of the output: </p> 
+     <center> 
+      <table width="600" style="font-family: Arial; font-size: small;" border="1" cellspacing="0" cellpadding="3"> 
+       <tbody> 
+        <tr align="left" valign="top"> 
+         <td style="background-color: gray;" colspan="3"><b><font color="#ffffff" size="2">DATE FORMATS</font></b><font size="2"> </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td><b><font size="2">Format #</font></b><font size="2"> </font></td> 
+         <td><b><font size="2">Query</font></b><font size="2"> (current date: 12/30/2006) </font></td> 
+         <td><b><font size="2">Sample</font></b><font size="2"> </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">1 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 1) </font></td> 
+         <td><font size="2">12/30/06 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">2 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 2) </font></td> 
+         <td><font size="2">06.12.30 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">3 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 3) </font></td> 
+         <td><font size="2">30/12/06 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">4 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 4) </font></td> 
+         <td><font size="2">30.12.06 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">5 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 5) </font></td> 
+         <td><font size="2">30-12-06 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">6 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 6) </font></td> 
+         <td><font size="2">30 Dec 06 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">7 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 7) </font></td> 
+         <td><font size="2">Dec 30, 06 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">10 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 10) </font></td> 
+         <td><font size="2">12-30-06 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">11 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 11) </font></td> 
+         <td><font size="2">06/12/30 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">101 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 101) </font></td> 
+         <td><font size="2">12/30/2006 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">102 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 102) </font></td> 
+         <td><font size="2">2006.12.30 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">103 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 103) </font></td> 
+         <td><font size="2">30/12/2006 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">104 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 104) </font></td> 
+         <td><font size="2">30.12.2006 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">105 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 105) </font></td> 
+         <td><font size="2">30-12-2006 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">106 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 106) </font></td> 
+         <td><font size="2">30 Dec 2006 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">107 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 107) </font></td> 
+         <td><font size="2">Dec 30, 2006 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">110 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 110) </font></td> 
+         <td><font size="2">12-30-2006 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">111 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 111) </font></td> 
+         <td><font size="2">2006/12/30 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td></td> 
+         <td></td> 
+         <td></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td style="background-color: gray;" colspan="3"><font color="#ffffff"><b><font size="2">TIME FORMATS</font></b><font size="2"> </font></font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">8 or 108 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 8) </font></td> 
+         <td><font size="2">00:38:54 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">9 or 109 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 9) </font></td> 
+         <td><font size="2">Dec 30 2006 12:38:54:840AM </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td align="center"><font size="2">14 or 114 </font></td> 
+         <td><font size="2">select convert(varchar, getdate(), 14) </font></td> 
+         <td><font size="2">00:38:54:840 </font></td>
+        </tr>
+       </tbody>
+      </table>
+     </center> 
+     <p>You can also format the date or time without dividing characters, as well as concatenate the date and time string: </p> 
+     <center> 
+      <table width="600" style="font-family: Arial; font-size: small;" border="1" cellspacing="0" cellpadding="3"> 
+       <tbody> 
+        <tr align="left" valign="top"> 
+         <td><b><font size="2">Sample statement</font></b><font size="2"> </font></td> 
+         <td><b><font size="2">Output</font></b><font size="2"> </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td><font size="2">select replace(convert(varchar, getdate(),101),'/','') </font></td> 
+         <td><font size="2">12302006 </font></td>
+        </tr> 
+        <tr align="left" valign="top"> 
+         <td><font size="2">select replace(convert(varchar, getdate(),101),'/','') + replace(convert(varchar, getdate(),108),':','') </font></td> 
+         <td><font size="2">12302006004426 </font></td>
+        </tr>
+       </tbody>
+      </table>
+     </center> 
+     <h5>Next Steps</h5> 
+     <ul> 
+      <li>The formats listed above are not inclusive of all formats provided. Experiment with the different format numbers to see what others are available </li>
+      <li>These formats can be used for all date/time functions, as well as data being served to clients, so experiment with these data format conversions to see if they can provide data more efficiently </li>
+      <li><a href="/categorylist.asp">Check out all of the SQL Server tip categories on the site</a></li>
+     </ul> 
+     <br>
+     <br> Last Update: 
+     <span itemprop="datePublished" content="2017-01-03">2017-01-03</span> 
+     <br>
+     <br>
+     <br> 
+     <div class="row"> 
+      <div class="large-6 columns"> 
+       <div align="center" class="hide-for-print">
+        <a href="https://www.mssqltips.com/get-free-sql-server-tips/?ref=yellow" onclick="_gaq.push(['_trackEvent', 'Join', 'Click', 'YellowButton']);"><img border="0" src="/images/getfreesqltips_red_20160929.png" alt="signup button" width="300" height="150"></a>
+       </div> 
+       <br> 
+      </div> 
+      <div class="large-6 columns"> 
+       <div align="center" class="hide-for-print">
+        <a href="/sqlservertip/1616/sql-server-2008-date-and-time-data-types/" onclick="_gaq.push(['_trackEvent', 'NextTip', 'Click', 'YellowArrow']);"><img border="0" src="/images/nav_nexttip_clickhere_rev1.png" alt="next tip button" width="300" height="150"></a>
+       </div> 
+       <br> 
+      </div> 
+     </div> 
+     <br>
+     <br> 
+     <h5>About the author</h5> 
+     <div class="row"> 
+      <div class="large-6 columns"> 
+       <a href="/sqlserverauthor/11/edgewood-solutions/"><img itemprop="image" style="float: left; padding: 0px 3px 0px 0px;" alt="MSSQLTips author Edgewood Solutions" height="90" src="/images/edgewood_100x150.png" width="60"></a> Edgewood Solutions is a technology company focused on Microsoft SQL Server and founder of MSSQLTips.com. 
+       <br>
+       <br>
+       <b><a href="/sqlserverauthor/11/edgewood-solutions/">View all my tips</a></b> 
+      </div> 
+      <div class="large-6 columns"> 
+       <b>Related Resources</b>
+       <br> 
+       <ul> 
+        <li><a href="/sqlservertip/1145/date-and-time-conversions-using-sql-server/" title="Date and Time Conversions Using SQL Server">Date and Time Conversions Using SQL Server...</a></li>
+        <li><a href="/sqlservertip/1616/sql-server-2008-date-and-time-data-types/" title="SQL Server 2008 Date and Time Data Types">SQL Server 2008 Date and Time Data Types...</a></li>
+        <li><a href="/sqlservertip/1712/sql-server-function-to-convert-integer-date-to-datetime-format/" title="SQL Server function to convert integer date to datetime format">SQL Server function to convert integer date to dat...</a></li>
+        <li><a href="/sqlservertip/2509/add-and-subtract-dates-using-dateadd-in-sql-server/" title="Add and Subtract Dates using DATEADD in SQL Server">Add and Subtract Dates using DATEADD in SQL Server...</a></li>
+        <li><a href="/sqlservertip/2508/sql-server-datediff-example/" title="SQL Server DateDiff Example">SQL Server DateDiff Example...</a></li>
+        <li><a href="/sqlservertip/2507/determine-sql-server-date-and-time-with-datepart-and-datename-functions/" title="Determine SQL Server Date and Time with DATEPART and DATENAME Functions">Determine SQL Server Date and Time with DATEPART a...</a></li>
+        <li><a href="/sqlservertip/2688/work-around-for-calculating-age-using-the-sql-server-datediff-function/" title="Work around for calculating age using the SQL Server DateDiff function">Work around for calculating age using the SQL Serv...</a></li>
+        <li><a href="/sql-server-developer-resources/">More Database Developer Tips...</a></li> 
+       </ul> 
+      </div> 
+     </div> 
+     <br>
+     <br> 
+     <a name="comments"></a> 
+     <div class="row hide-for-small hide-for-print"> 
+      <div class="large-2 columns"> 
+       <script src="//platform.linkedin.com/in.js" type="text/javascript"></script>
+       <script type="IN/Share" data-counter="right"></script> 
+      </div> 
+      <div class="large-2 columns"> 
+       <div class="fb-like" data-href="https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/" data-layout="button_count" data-width="50" data-action="like" data-show-faces="false"></div> 
+      </div> 
+      <div class="large-2 columns"> 
+       <a href="https://twitter.com/share" class="twitter-share-button" data-show-count="false">Tweet</a>
+       <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script> 
+      </div> 
+      <div class="large-2 columns"> 
+       <!-- Place this tag where you want the +1 button to render --> 
+       <g:plusone size="medium" annotation="inline" width="120"></g:plusone> 
+       <!-- Place this render call where appropriate --> 
+       <script type="text/javascript">
+				  (function() {
+				    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+				    po.src = 'https://apis.google.com/js/plusone.js';
+				    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+				  })();
+				</script> 
+      </div> 
+      <div class="large-4 columns"> 
+       <a href="/contribute/">Become a paid author</a> 
+      </div> 
+      <hr> 
+     </div> 
+     <br>
+     <br> 
+    </article> 
+    <div class="row"> 
+    </div> 
+    <div class="hide-for-print"> 
+     <a name="commentnew"></a> 
+     <a name="comments2"></a> 
+     <script language="javascript">
+function RefreshImage(valImageId) {
+	var objImage = document.images[valImageId];
+	if (objImage == undefined) {
+		return;
+	}
+	var now = new Date();
+	objImage.src = objImage.src.split('?')[0] + '?x=' + now.toUTCString();
+}
+</script> 
+     <script language="Javascript">
+/**
+ * DHTML email validation script. Courtesy of SmartWebby.com (http://www.smartwebby.com/dhtml/)
+ */
+
+function echeck(str) {
+
+		var at="@"
+		var dot="."
+		var lat=str.indexOf(at)
+		var lstr=str.length
+		var ldot=str.indexOf(dot)
+		if (str.indexOf(at)==-1){
+		   alert("Invalid E-mail")
+		   return false
+		}
+
+		if (str.indexOf(at)==-1 || str.indexOf(at)==0 || str.indexOf(at)==lstr){
+		   alert("Invalid E-mail")
+		   return false
+		}
+
+		if (str.indexOf(dot)==-1 || str.indexOf(dot)==0 || str.indexOf(dot)==lstr){
+		    alert("Invalid E-mail")
+		    return false
+		}
+
+		 if (str.indexOf(at,(lat+1))!=-1){
+		    alert("Invalid E-mail")
+		    return false
+		 }
+
+		 if (str.substring(lat-1,lat)==dot || str.substring(lat+1,lat+2)==dot){
+		    alert("Invalid E-mail")
+		    return false
+		 }
+
+		 if (str.indexOf(dot,(lat+2))==-1){
+		    alert("Invalid E-mail")
+		    return false
+		 }
+		
+		 if (str.indexOf(" ")!=-1){
+		    alert("Invalid E-mail")
+		    return false
+		 }
+
+ 		 return true					
+	}
+
+function ValidateForm(){
+	var emailID=document.comment.email
+	var name=document.comment.name
+	var captchacode=document.comment.captchacode
+
+
+	if ((name.value==null)||(name.value=="")){
+		alert("Please Enter your Name")
+		name.focus()
+		return false
+	}	
+	if ((emailID.value==null)||(emailID.value=="")){
+		alert("Please Enter your Email")
+		emailID.focus()
+		return false
+	}
+	if (echeck(emailID.value)==false){
+		emailID.focus()
+		return false
+	}
+	if ((captchacode.value==null)||(captchacode.value=="")){
+		alert("Please Enter Code")
+		captchacode.focus()
+		return false
+	}
+	return true
+ }
+</script> 
+     <!-- TinyMCE --> 
+     <script type="text/javascript" src="/tinymce2/js/tinymce/tinymce.min.js"></script> 
+     <script type="text/javascript">
+tinymce.init({
+    selector: "textarea",
+    menubar: false,
+    plugins: "preview",
+    toolbar: "undo redo | bold italic | bullist numlist outdent indent | link | preview"
+});
+</script> 
+     <!-- /TinyMCE --> 
+     <form name="comment" action="https://www.mssqltips.com/sqlservertip/1145/date-and-time-conversions-using-sql-server/#comments2" method="post" onSubmit="return ValidateForm()"> 
+      <input type="hidden" name="tipid" value="1145"> 
+      <input type="hidden" name="CanonicalComment" value=""> 
+      <div> 
+       <!-- Gets replaced with TinyMCE, remember HTML in a textarea should be encoded --> 
+       <div style="background-color:#E2E2E2; padding:10px;"> 
+        <h5><span style="color:#000080">Post a comment or let the author know this tip helped.</span></h5> 
+        <p>All comments are reviewed, so stay on subject or we may delete your comment. Note: your email address is not published. Required fields are marked with an asterisk (*).</p> *Name&nbsp;
+        <input type="text" name="name" size="30" value="">&nbsp;&nbsp; *Email&nbsp;
+        <input type="text" name="email" size="30" value="">&nbsp;&nbsp; Notify for updates&nbsp;
+        <input type="checkbox" checked name="notifyflag" value="-1">
+        <br>
+        <br> 
+        <textarea id="elm1" name="elm1" rows="10" style="width: 100%">&lt;p&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;*** NOTE *** - If you want to include code from SQL Server Management Studio (SSMS) in your post, please copy the code from SSMS and paste the code into a text editor like NotePad before copying the code below to remove the SSMS formatting.</textarea> 
+        <br>SQL tips: 
+        <input type="checkbox" name="emailflag" value="1">
+        <br> 
+        <br> 
+        <table> 
+         <tbody>
+          <tr> 
+           <td> *Enter Code <input name="captchacode" type="text" id="captchacode" size="10"> <img id="imgCaptcha" src="/captcha.asp"> <a href="javascript:void(0)" onclick="RefreshImage('imgCaptcha')"><img border="0" alt="refresh code" src="/images/refresh.png"></a> </td> 
+           <td> &nbsp;&nbsp;&nbsp;&nbsp;<input TYPE="submit" Value="Save Comment" name="go" class="submit" style="background-color: #000080; color: #FFFFFF; font-size: 18px; font-weight: bold;"> </td> 
+          </tr> 
+         </tbody>
+        </table> 
+       </div> 
+      </div> 
+     </form> 
+    </div> 
+    <div class="hide-for-print"> 
+     <style type="text/css">
+.ForumPostBodyArea
+{
+	width: 100%;
+	vertical-align: top;
+	overflow: auto;
+}
+</style> 
+     <br>
+     <br>
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Tuesday, May 09, 2017 - 11:26:34 AM - Julie </b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>&nbsp;I would add that <strong>cast(date_expression as date)</strong> is sometimes a useful&nbsp;solution. It keeps the date characteristics for sorting, comparing, etc. but drops the time portion. This is great for items going to excel.</p> <p>&nbsp;</p> <p></p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Thursday, April 06, 2017 - 2:11:44 PM - Greg Robidoux</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>Hi Koduru,</p> <p>Take a look at this tip: https://www.mssqltips.com/sqlservertip/2507/determine-sql-server-date-and-time-with-datepart-and-datename-functions/</p> <p>&nbsp;</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Thursday, April 06, 2017 - 1:01:01 PM - koduru jaladakshi</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>&nbsp;</p> <p>&nbsp;hi how to get result in sql server like</p> <p>year:2017</p> <p>date:06</p> <p>month:04</p> <p>please help me</p> <p>thank u.</p> <p>&nbsp;</p> <p></p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Thursday, December 10, 2015 - 2:16:54 AM - Adarsh v nair</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>01/01/0100 10:00:00 how &nbsp;to convert time 10:00:0</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Saturday, October 03, 2015 - 5:22:09 AM - senya</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>hello,i just want to create a date from the table in sql server 2008.But there one error was araised whatever change the datatype(varchar,int,char).such as that error is,</p> <p>"Arithmetic overflow error converting expression to data type int.<br>The statement has been terminated".</p> <p>how ll clear this error.</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Monday, August 31, 2015 - 10:25:38 AM - Umit</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>Hi there,</p> <p>I am retrieving data with SQL from a Oracle database where I encounter different date formats in the same data group.</p> <p>I run the SQL query in VBA and the query results are pasted in an excel tab. So in the same data column I have data with multiple date formats in excel.</p> <p>Only one date format recognized as date, according to pc's regional settings. I need to convert all data into same format before I retrieve them to excel.</p> <p>right now I use this:&nbsp;TO_CHAR(v.BASLANGICTARIHI, 'DD/MM/YYYY') but it does not help.</p> <p>Can someone help me here?</p> <p>Thanks.</p> <p>&nbsp;</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Monday, January 05, 2015 - 3:20:07 PM - Sharim</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>--Output as char with space like 3 1 1 0 2 0 1 4.<br>declare @dt varchar(120)<br>declare @hold1 varchar(2)<br>declare @hold2 varchar(15)<br>declare @i int</p> <p>set @dt = CONVERT(varchar(26),getdate(),103)<br>set @dt = REPLACE(@dt,'/','')<br>set @i=1<br>set @hold2=''</p> <p>WHILE (@i &lt; len(@dt)+1)<br>BEGIN<br>&nbsp; set @hold1 = substring(@dt,@i, 1)+' '<br>&nbsp; set @hold2 += @hold1<br>&nbsp; set @i += 1<br>END<br>select @hold2</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Wednesday, November 05, 2014 - 1:40:28 AM - San</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>Hi&nbsp;<strong style="font-size: 13px;">Greg Robidoux,</strong></p> <p><strong style="font-size: 13px;"><br></strong></p> <p><strong style="font-size: 13px;">Thanks a lot.</strong></p> <p><strong style="font-size: 13px;"><br></strong></p> <p><strong style="font-size: 13px;">Your suggestion were working well... Really you have given me a great thing.</strong></p> <p><strong style="font-size: 13px;"><br></strong></p> <p><strong style="font-size: 13px;">Once again thanks....</strong></p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Saturday, November 01, 2014 - 6:54:03 AM - Greg Robidoux</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>Hi San,</p> <p>use this select replace(convert(varchar, getdate(),103),'/','')&nbsp; to get the output you need and then use one of these functions to add the space between each number</p> <p><a target="_blank" href="http://dbamentalist.wordpress.com/2013/06/17/t-sql-function-add-a-space-between-all-characters/comment-page-1/">http://dbamentalist.wordpress.com/2013/06/17/t-sql-function-add-a-space-between-all-characters/comment-page-1/</a></p> <p><a target="_blank" href="http://www.codeproject.com/Tips/426728/T-SQL-Function-Add-a-space-between-all-characters">http://www.codeproject.com/Tips/426728/T-SQL-Function-Add-a-space-between-all-characters</a></p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Saturday, November 01, 2014 - 6:42:45 AM - San</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>Input date (31/10/2014)</p> <p>Output as char with space like 3 1 1 0 2 0 1 4.</p> <p>&nbsp;</p> <p>Can anyone help me?</p> <p>&nbsp;</p> <p>This is for cheque date printing...</p> <p>&nbsp;</p> <p>&nbsp;</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Monday, February 18, 2013 - 11:32:21 PM - giam</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> thank you very much. </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Friday, November 30, 2012 - 9:42:22 AM - Jeremy Kadlec</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>satheeshkumar,</p> <p>Have you checked out Tim Ford's tip - <a target="_blank" href="/sqlservertip/1712/sql-server-function-to-convert-integer-date-to-datetime-format/">http://www.mssqltips.com/sqlservertip/1712/sql-server-function-to-convert-integer-date-to-datetime-format/</a>?</p> <p>I believe he has a function to take care of the date logic, but I think you will have to modify it to include the time logic you need.</p> <p>HTH.</p> <p>Thank you,<br>Jeremy Kadlec</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Friday, November 30, 2012 - 2:40:01 AM - satheeshkumar</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>hI</p> <p>BELOW MY REQUORMENT</p> <p>Input - 20121130121020 = output 2012/11/30 12:10:20</p> <p>&nbsp;</p> <p>Can any one help me out this</p> <p>&nbsp;</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Monday, November 19, 2012 - 9:37:04 AM - Jeremy Kadlec</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>Dev,</p> <p>Can you post the date format you are seeing in SSMS and the final format you would like?</p> <p>Thank you,<br>Jeremy Kadlec</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Monday, November 19, 2012 - 5:59:40 AM - Dev</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>How to convert datetime format stored data to 24hr time format in SSMS 2008?<br>Any idea on this?</p> <p>&nbsp;</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Wednesday, September 19, 2012 - 1:06:03 AM - e</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p></p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Monday, September 17, 2012 - 6:10:13 PM - Mike</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>Don't forget 23: &nbsp; 2006-12-30</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Friday, August 17, 2012 - 12:57:12 AM - tintu</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>i want extracting date from sql server,using php how to get this?? i used</p> <p><span style="font-size: 13px;">$d=convert(varchar,getdate(),101);</span></p> <p><span style="font-size: 13px;">echo $d;</span></p> <p><span style="font-size: 13px;">&nbsp;this is not working</span></p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Tuesday, July 24, 2012 - 5:47:14 AM - Gayatri Tiwari</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>its very very helpful...</p> <p>still i need few more details... for few more formulaes....</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Wednesday, May 16, 2012 - 9:23:58 AM - Jeremy Kadlec</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>Tessa,</p> <p>Would this work for you?</p> <p>convert(varchar,getdate(),105) + ' ' + convert(varchar,getdate(),108)</p> <p>Is there any reason you would not use this format:</p> 
+         <table style="font-family: Arial; font-size: small;" width="600" border="1" cellspacing="0" cellpadding="3"> 
+          <tbody> 
+           <tr align="left" valign="top"> 
+            <td align="center"><span style="font-size: x-small;">9 or 109 </span></td> 
+            <td><span style="font-size: x-small;">select convert(varchar, getdate(), 9) </span></td> 
+            <td><span style="font-size: x-small;">Dec 30 2006 12:38:54:840AM </span></td> 
+           </tr> 
+          </tbody> 
+         </table> <p>&nbsp;</p> <p>Have you also seen these tips:</p> <p><a target="_blank" href="/sqlservertip/2588/new-date-and-time-functions-in-sql-server-2012/">http://www.mssqltips.com/sqlservertip/2588/new-date-and-time-functions-in-sql-server-2012/</a></p> <p><a target="_blank" href="/sqlservertip/1616/sql-server-2008-date-and-time-data-types/">http://www.mssqltips.com/sqlservertip/1616/sql-server-2008-date-and-time-data-types/</a></p> <p>HTH.</p> <p>Thank you,<br>Jeremy Kadlec</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Wednesday, May 16, 2012 - 7:42:46 AM - Tessa</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>I would like to see the complete date and time a DD-MM-YYYY HH:MM:SS</p> <p>I use:&nbsp;convert(varchar,getdate(),105) + convert(varchar,getdate(),108)</p> <p>I get: 16-05-201213:42:18</p> <p>&nbsp;</p> <p>How would I get the extra space between the Date and Time to get 16-05-2012 13:42:18</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Thursday, May 12, 2011 - 11:15:21 AM - Vijay Prakash Vyas</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>It's very helpful info thanks for help!!!!!</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Thursday, January 08, 2009 - 6:46:58 AM - tosscrosby</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>Actually, I was simply complimenting the "tip" as it provided exactly what I needed for ANY date:</p> <p>&nbsp;select replace(convert(varchar, getdate(),101),'/','') + replace(convert(varchar, getdate(),108),':','')</p> <p>This converts any MSSQL datetime to MMDDYYYYHHMMSS - exactly what the Oracle folks wanted!</p> <p>&nbsp;</p> <p>Thanks anyway :-)</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Thursday, January 08, 2009 - 6:27:17 AM - Senthilkumar.S</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>Select the particular year,month, day,pls do following query</p> <p>&nbsp;---------------------------------------------------------------------------------------</p> <p>select * from barrowBooks where year(barrow_date)='2008' and month(barrow_date)='11' and day(barrow_date)='12'&nbsp; order by barrow_date desc</p> <p>&nbsp;</p> <p>convert the date and time&nbsp; using this query </p> <p>----------------------------------------------------------------</p> <p>select convert(char(11),getdate(),108) --&gt;Result of time&nbsp; 11:18:18</p> <p>select convert(char(10),getdate(),101) --&gt;Result of Date&nbsp; 11/06/2008</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+     <table border="0" width="100%" cellspacing="0" cellpadding="4" style="border: 1px solid #CBDCED; table-layout: fixed;"> 
+      <tbody>
+       <tr> 
+        <td width="80%" bgcolor="#E8F3FF"> <b>Wednesday, January 07, 2009 - 12:50:38 PM - tosscrosby</b> </td> 
+        <td style="text-align: right;" bgcolor="#E8F3FF"> <a title="read the tip" href="#top">Back To Top</a> </td> 
+       </tr> 
+       <tr> 
+        <td colspan="2" class="ForumPostBodyArea"> <p>I just had a request from our Oracle team to see if I could supply them with dates in a MMDDYYYYHHMMSS format. Came here and found what I need in all of about 30 seconds. Thanks.</p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
+     <br> 
+    </div> 
+   </div> 
+   <aside class="large-3 hide-for-print columns"> 
+    <script language="Javascript">
+	function ValidateEmail(){
+		var emailID=document.optin.ea
+
+		if ((emailID.value==null)||(emailID.value=="")||(emailID.value=="enter email address")){
+			alert("Please Enter your Email")
+			emailID.focus()
+			return false
+		}
+		if (echeck2(emailID.value)==false){
+			emailID.focus()
+			return false
+		}
+		return true
+	 }
+
+	</script> 
+    <div id="sticky" align="center"> 
+     <div id="search-div" style="height:300px;"> 
+      <div id="signup-div"> 
+       <div style="text-align: center;">
+        <a href="/get-free-sql-server-tips/?ref=LeftGFSTSlant"><img border="0" src="/images/GetFreeSQLTips.png"></a>
+       </div> 
+       <form action="/get-free-sql-server-tips/" method="post" name="optin" onsubmit="return ValidateEmail()"> 
+        <div style="text-align: center;"> 
+         <input name="URL" type="hidden" value="leftform"> 
+         <input name="ReferralURL" type="hidden" value=""> 
+         <input size="25" type="text" onblur="if (this.value=='') this.value=this.defaultValue" onclick="if (this.defaultValue==this.value) this.value=''" value="enter email address" name="ea"> 
+         <input type="submit" name="Button1" value="Join"> 
+        </div> 
+       </form> 
+      </div> 
+     </div> 
+    </div> 
+    <!-- 160x600-Primary --> 
+    <div align="center"> 
+     <div id="div-gpt-ad-1388505177750-0" style="width:160px; height:800px;"> 
+      <script type="text/javascript">
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-1388505177750-0'); });
+	</script> 
+     </div> 
+    </div>
+    <!-- 300x250-Primary --> 
+    <div align="center"> 
+     <div id="div-gpt-ad-1388505177750-2" style="width:300px; height:450px;"> 
+      <script type="text/javascript">
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-1388505177750-2'); });
+	</script> 
+     </div> 
+    </div>
+    <div align="center"> 
+     <br> 
+     <!-- /53998264/170x90-pos1 --> 
+     <div id="div-gpt-ad-1481919244109-0" style="height:90px; width:170px;"> 
+      <script>
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-1481919244109-0'); });
+	</script> 
+     </div> 
+     <br> 
+     <br> 
+     <br> 
+     <br> 
+     <!-- /53998264/170x90-pos2 --> 
+     <div id="div-gpt-ad-1481919244109-1" style="height:90px; width:170px;"> 
+      <script>
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-1481919244109-1'); });
+	</script> 
+     </div> 
+     <br> 
+     <br> 
+     <br> 
+     <br> 
+     <!-- /53998264/170x90-pos3 --> 
+     <div id="div-gpt-ad-1481919244109-2" style="height:90px; width:170px;"> 
+      <script>
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-1481919244109-2'); });
+	</script> 
+     </div> 
+     <br> 
+     <br> 
+     <br> 
+     <br> 
+     <!-- /53998264/170x90-pos4 --> 
+     <div id="div-gpt-ad-1481919244109-3" style="height:90px; width:170px;"> 
+      <script>
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-1481919244109-3'); });
+	</script> 
+     </div> 
+     <br> 
+    </div> 
+    <br> 
+    <br> 
+    <br> 
+    <br> 
+    <br> 
+    <br>
+    <!-- 160x600-Secondary --> 
+    <div align="center"> 
+     <div id="div-gpt-ad-1388505177750-1" style="width:160px; height:800px;"> 
+      <script type="text/javascript">
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-1388505177750-1'); });
+	</script> 
+     </div> 
+    </div> 
+    <!-- 300x250-Secondary --> 
+    <div align="center"> 
+     <div id="div-gpt-ad-1388505177750-3" style="width:300px; height:250px;"> 
+      <script type="text/javascript">
+	googletag.cmd.push(function() { googletag.display('div-gpt-ad-1388505177750-3'); });
+	</script> 
+     </div> 
+    </div> 
+    <br>
+    <br>
+    <br> 
+    <div id="sticky-anchor"></div> 
+   </aside> 
+  </div> 
+  <footer class="row"> 
+   <div class="large-12 columns"> 
+    <hr> 
+    <div class="row hide-for-print"> 
+     <div class="large-2 medium-3 columns hide-for-small"> 
+      <h3><span style="color:#3B6D93">Follow</span></h3> 
+      <a href="/get-free-sql-server-tips/?ref=GetFooterMenu">Get Free SQL Tips</a>
+      <br>
+      <br> 
+      <a href="https://twitter.com/mssqltips" target="_blank">Twitter</a>
+      <br>
+      <br> 
+      <a href="https://www.linkedin.com/grp/home?gid=2320891" target="_blank">LinkedIn</a>
+      <br>
+      <br> 
+      <a href="https://plus.google.com/+Mssqltips_est_2006/posts" target="_blank">Google+</a>
+      <br>
+      <br> 
+      <a href="https://www.facebook.com/pages/MSSQLTips/155636491141708" target="_blank">Facebook</a>
+      <br>
+      <br> 
+      <a href="https://www.pinterest.com/mssqltips/" target="_blank">Pinterest</a>
+      <br>
+      <br> 
+      <a href="https://feeds.feedburner.com/MSSQLTips-LatestSqlServerTips" target="_blank">RSS</a>
+      <br> 
+     </div> 
+     <div class="large-2 medium-3 small-6 columns"> 
+      <h3><span style="color:#3B6D93">Learning</span></h3> 
+      <a href="/sql-server-dba-resources/">DBAs</a>
+      <br>
+      <br> 
+      <a href="/sql-server-developer-resources/">Developers</a>
+      <br>
+      <br> 
+      <a href="/sql-server-business-intelligence-resources/">BI Professionals</a>
+      <br>
+      <br> 
+      <a href="/sql-server-professional-development-resources/">Careers</a>
+      <br>
+      <br> 
+      <a href="http://sqlserverquestions.mssqltips.com/questionlist.asp">Q and A</a>
+      <br>
+      <br> 
+      <a href="/todays-sql-server-tip/">Today's Tip</a>
+      <br> 
+     </div> 
+     <div class="large-2 medium-3 small-6 columns"> 
+      <h3><span style="color:#3B6D93">Resources</span></h3> 
+      <a href="/sql-server-tutorials/">Tutorials</a>
+      <br>
+      <br> 
+      <a href="/sql-server-webcasts/">Webcasts</a>
+      <br>
+      <br> 
+      <a href="/sql-server-whitepapers/">Whitepapers</a>
+      <br>
+      <br> 
+      <a href="/sql-server-tools/">Tools</a>
+      <br>
+      <br> 
+     </div> 
+     <div class="large-2 medium-3 columns hide-for-small"> 
+      <h3><span style="color:#3B6D93">Search</span></h3> 
+      <a href="/sql-server-categories/">Tip Categories</a>
+      <br>
+      <br> 
+      <a href="/search-tip-id/">Search By TipID</a>
+      <br>
+      <br> 
+      <a href="/sql-server-mssqltips-authors/">Authors</a>
+      <br> 
+     </div> 
+     <div class="large-2 hide-for-medium columns hide-for-small"> 
+      <h3><span style="color:#3B6D93">Community</span></h3> 
+      <a href="/learn-more-about-mssqltips/">First Timer?</a>
+      <br>
+      <br> 
+      <a href="/mssqltips-community/1/">Pictures</a>
+      <br>
+      <br> 
+      <a href="/contribute/">Contribute</a>
+      <br>
+      <br> 
+      <a href="/sql-server-event-list/">Event Calendar</a>
+      <br>
+      <br> 
+      <a href="/sql-server-user-groups/">User Groups</a>
+      <br>
+      <br> 
+      <a href="/mssqltips-author-of-year/">Author of the Year</a>
+      <br>
+      <br> 
+     </div> 
+     <div class="large-2 hide-for-medium columns hide-for-small"> 
+      <h3><span style="color:#3B6D93">More Info</span></h3> 
+      <a href="/get-free-sql-server-tips/?ref=JoinFooterMenu">Join</a>
+      <br>
+      <br> 
+      <a href="/about/">About</a>
+      <br>
+      <br> 
+      <a href="/copyright/">Copyright</a>
+      <br>
+      <br> 
+      <a href="/privacy/">Privacy</a>
+      <br>
+      <br> 
+      <a href="/disclaimer/">Disclaimer</a>
+      <br>
+      <br> 
+      <a href="/feedback/">Feedback</a>
+      <br>
+      <br> 
+      <a href="/advertise/">Advertise</a>
+      <br> 
+     </div> 
+    </div> 
+    <hr> 
+    <div class="row"> 
+     <div class="large-12 columns text-center"> 
+      <p>Copyright (c) 2006-2017 <a href="https://www.edgewoodsolutions.com">Edgewood Solutions, LLC</a> All rights reserved<br> <small>Some names and products listed are the registered trademarks of their respective owners.</small></p> 
+     </div> 
+    </div> 
+   </div> 
+  </footer> 
+  <!-- dropdown 990x30 --> 
+  <style type="text/css">
+#slideboxtop{
+    width:100%;
+    height:50px;
+    padding:10px;
+    background-color:#FFFFFF;
+    border-bottom:1px solid #000000;
+    position:fixed;
+    top: -250px;
+	-moz-box-shadow:-2px 0px 5px #aaa;
+	-webkit-box-shadow:-2px 0px 5px #aaa;
+/* 	box-shadow:-2px 0px 5px #aaa;    */
+}
+</style> 
+  <div class="hide-for-small hide-for-medium hide-for-print"> 
+   <div id="slideboxtop" style="z-index:99;"> 
+    <div style="text-align:center"> 
+     <a onclick="_gaq.push(['_trackEvent', '990x30', 'Click', 'Dropdown']);" target="_blank" href="/ss.asp?id=3529&amp;link=https://www.mssqltips.com/mssqltips-giveaway-vslive-orlando/?src=ss20170917"><img src="https://www.mssqltips.com/absolutebm/banners/MSSQLTips_VSLive201711_20170906_990x30.png" border="0" height="30" width="990" alt="Learn more about SQL Server tools"></a> 
+    </div> 
+   </div> 
+  </div> 
+  <script src="https://www.mssqltips.com/js/vendor/modernizr.js"></script> 
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script> 
+  <link type="text/css" href="/css/prettify.css" rel="stylesheet"> 
+  <script type="text/javascript" src="/css/prettify.js"></script> 
+  <script type="text/javascript" src="/css/lang-sql.js"></script> 
+  <script type="text/javascript">
+$(function() {
+	$(window).scroll(function(){
+		if  ($(window).scrollTop() > 250)
+			$('#slideboxtop').animate({'top':'0px'});
+		else
+			$('#slideboxtop').stop(true).animate({'top':'-250px'});
+	});
+});
+</script> 
+  <!-- sticky 300x250 --> 
+  <style type="text/css">
+#sticky {
+    padding: 0ex;
+    width: 300px;
+    background-color: #fff;
+}
+
+#sticky.stick {
+    margin-top: 75px !important;
+    position: fixed;
+    top: 0;
+    z-index: 10000;
+}
+</style> 
+  <script type="text/javascript">
+function sticky_relocate() {
+    var window_top = $(window).scrollTop();
+    var div_top = $('#sticky-anchor').offset().top;
+    var window_width = $(window).width();
+    var window_height = $(window).height();
+    if (window_top > div_top && window_width > 1100 && window_height > 400 ) {
+        $('#sticky').addClass('stick');
+        $('#sticky-anchor').height($('#sticky').outerHeight());
+    } else {
+        $('#sticky').removeClass('stick');
+        $('#sticky-anchor').height(0);
+    }
+}
+
+$(function() {
+    $(window).scroll(sticky_relocate);
+    sticky_relocate();
+});
+
+</script> 
+  <!-- Start Alexa Certify Javascript --> 
+  <script type="text/javascript">
+_atrk_opts = { atrk_acct:"oydse1a8gR00wM", domain:"mssqltips.com",dynamic: true};
+(function() { var as = document.createElement('script'); as.type = 'text/javascript'; as.async = true; as.src = "https://d31qbv1cthcecs.cloudfront.net/atrk.js"; var s = document.getElementsByTagName('script')[0];s.parentNode.insertBefore(as, s); })();
+</script> 
+  <noscript>
+   <img src="https://d5nxst8fruw4z.cloudfront.net/atrk.gif?account=oydse1a8gR00wM" style="display:none" height="1" width="1" alt="">
+  </noscript> 
+  <!-- End Alexa Certify Javascript --> 
+  <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-910745-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>   
+ </body>
+</html>

@@ -8,7 +8,9 @@ import ranking.Ranking;
 
 public interface Searcher {
 	
-	public String getName();
+	public String getId();
+	public String getContentId();
+	
 	public Ranking search(String searchQuery,Proxy proxy);
 	
 	public List<String> acquireData(String query, Proxy proxy);

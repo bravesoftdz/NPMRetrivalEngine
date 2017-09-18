@@ -1,0 +1,459 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head> 
+  <title>Date and time in Java</title> 
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"> 
+  <meta name="author" content="Ortwin Glück"> 
+  <meta name="keywords" content="Date, Calendar, DateFormat, SimpleDateFormat, GregorianCalendar, TimeZone, Java"> 
+  <meta name="description" content="Date, time, calendars and time zones in Java"> 
+  <meta name="og:type" content="article"> 
+  <meta name="date" content="2010-12-26Z"> 
+  <meta name="generator" content="Odi's CSS Skin-O-Matic"> 
+  <meta name="copyright" content="Ortwin Glück"> 
+  <meta name="og:title" content="odi.ch"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <link rel="stylesheet" type="text/css" media="screen,print" href="../../design/rounded_all.css"> 
+  <link rel="stylesheet" type="text/css" media="print" href="../../design/rounded_print.css"> 
+  <!--[if IE]><link rel="stylesheet" type="text/css" media="screen,print" href="../../design/rounded_ie.css"><![endif]--> 
+  <link rel="start" href="../../" title="Home"> 
+  <link rel="author" href="../../contact.php" title="Contact"> 
+  <link rel="copyright" href="http://creativecommons.org/licenses/by-sa/3.0/" tile="Creative Commons Attribution-ShareAlike (CC BY-SA)"> 
+  <link rel="search" href="https://www.google.com/search?domains=odi.ch&amp;sitesearch=odi.ch" title="Search"> 
+  <script type="text/javascript" src="../../js/google.js"></script> 
+ </head> 
+ <body> 
+  <div id="servicebar" title="Site services"> 
+   <script type="text/javascript">
+      function parseRfcDate(s) {
+        var rfcDate = /(\d{4})-(\d{1,2})-(\d{1,2})(T((\d{1,2}):(\d{1,2}):(\d{1,2})))?(Z|([\+-])(\d\d):(\d\d))/;
+        var m = rfcDate.exec(s);
+        if (!m) return null; // no match
+        var d;
+        if (m[4]) {
+          // has time
+          d = new Date(m[1], m[2]-1, m[3], m[6], m[7], m[8]);
+        } else {
+          // only date
+          d = new Date(m[1], m[2]-1, m[3]);
+        }
+        var tzofs;
+        if (m[9] == "Z") {
+          tzofs = 0;
+        } else {
+          tzofs = parseInt(m[11]) * 60 + parseInt(m[12]);
+          if (m[10] == "-") tzofs = -tzofs;
+        }
+        var myofs = tzofs + d.getTimezoneOffset();
+        d.setTime(d.getTime() - myofs * 60 * 1000);
+        return d;
+      }
+      
+      
+      var head = document.getElementsByTagName("head")[0];
+      var metas = head.getElementsByTagName("meta");
+      for (var i=0; i<metas.length; i++) {
+        if (metas[i].getAttribute("name") != "date") continue;
+        var date = parseRfcDate(metas[i].getAttribute("content"));
+        if (!date) continue;
+        document.write("<p>[edited: ");
+        document.write(date.getFullYear() +"-"+ (date.getMonth()+1) +"-"+ date.getDate());
+        document.write("]</p>");
+        break;
+      }
+    </script> 
+   <p>[176802 views] </p> 
+   <!-- SiteSearch Google --> 
+   <form id="googlesearch" title="Search this site" method="GET" action="https://www.google.com/search"> 
+    <input type="hidden" name="ie" value="UTF-8"> 
+    <input type="hidden" name="oe" value="UTF-8"> 
+    <input type="hidden" name="domains" value="odi.ch"> 
+    <input type="hidden" name="sitesearch" value="odi.ch"> [
+    <input type="text" name="q" title="Search keywords" accesskey="f" value="Search" size="5" maxlength="255" onfocus="document.forms['googlesearch'].elements['q'].value=''">] 
+   </form> 
+   <!-- SiteSearch Google --> 
+   <p>[<a href="../../toggle_ads.php" rel="nofollow" title="toggles ads on and off">toggle ads</a>]</p> 
+  </div> 
+  <div id="navigation"> 
+   <span class="skiplink"><a href="#contentanchor" accesskey="1">Skip navigation</a></span> 
+   <ul class="navigation" id="navigationid">
+    <li class="node closed"><a href="../../weblog/index.php">Blog</a>
+     <ul>
+      <li class="leaf"><a href="../../weblog/browse.php">All</a></li>
+      <li class="leaf"><a href="../../weblog/bycat.php?cat=2">Code</a></li>
+      <li class="leaf"><a href="../../weblog/bycat.php?cat=6">Food</a></li>
+      <li class="leaf"><a href="../../weblog/bycat.php?cat=1">General</a></li>
+      <li class="leaf"><a href="../../weblog/bycat.php?cat=5">Reviews</a></li>
+      <li class="leaf"><a href="../../weblog/bycat.php?cat=3">Social</a></li>
+      <li class="leaf"><a href="../../weblog/bycat.php?cat=4">Updates</a></li>
+     </ul></li>
+    <li class="node open"><a href="../../prog/design/newbies.php">Articles</a>
+     <ul>
+      <li class="leaf"><a href="../../prog/design/newbies.php">Java Anti-Patterns</a></li>
+      <li class="leaf active"><a href="../../prog/design/datetime.php">Date and time</a></li>
+      <li class="leaf"><a href="../../prog/shell/index.php">Linux shell</a></li>
+      <li class="leaf"><a href="../../prog/git.php">Git</a></li>
+      <li class="leaf"><a href="../../prog/ipv6.php">IPv6</a></li>
+      <li class="leaf"><a href="../../prog/design/php/index.php">On PHP</a></li>
+      <li class="leaf"><a href="../../prog/design/php/guide.php">PHP Best Practice</a></li>
+      <li class="leaf"><a href="../../prog/css/nav/index.php">CSS Navigation</a></li>
+      <li class="leaf"><a href="../../prog/css/ajaxnav/index.php">AJAX Navigation</a></li>
+      <li class="leaf"><a href="../../prog/jms-tx.php">JTA JMS</a></li>
+      <li class="leaf"><a href="../../prog/design/singleton.php">Singleton Applied</a></li>
+     </ul></li>
+    <li class="node closed"><a href="../../prog/zenbook/index.php">Linux</a>
+     <ul>
+      <li class="leaf"><a href="../../prog/zenbook/index.php">Gentoo on Zenbook</a></li>
+      <li class="leaf"><a href="../../prog/macbookpro/index.php">Gentoo on MacBook</a></li>
+      <li class="leaf"><a href="../../prog/imac/index.php">Gentoo on iMac</a></li>
+      <li class="leaf"><a href="../../prog/tm630/index.php">Acer TM630</a></li>
+      <li class="leaf"><a href="../../prog/tm630/gentoo.php">Gentoo on TM630</a></li>
+      <li class="leaf"><a href="../../prog/tm630/suse.php">SuSE on TM630</a></li>
+     </ul></li>
+    <li class="node closed"><a href="../../prog/prog.php">Software Projects</a>
+     <ul>
+      <li class="leaf"><a href="../../prog/httpclient.php">Apache HTTP Client</a></li>
+      <li class="leaf"><a href="../../prog/jaas-pam.php">JAAS-PAM</a></li>
+      <li class="node closed"><a href="../../prog/java/index.php">Tiny Java stuff</a>
+       <ul>
+        <li class="leaf"><a href="../../prog/java/lib_odi.php">lib_odi</a></li>
+        <li class="leaf"><a href="../../prog/java/portscanner.php">Portscanner</a></li>
+        <li class="leaf"><a href="../../prog/java/qvadis.php">Quo Vadis</a></li>
+       </ul></li>
+      <li class="node closed"><a href="../../prog/lfn/index.php">Utilities</a>
+       <ul>
+        <li class="leaf"><a href="../../prog/lfn/index.php">LFN Tools</a></li>
+        <li class="leaf"><a href="../../prog/timeout.php">Timeout kill</a></li>
+        <li class="leaf"><a href="../../prog/thumbnail.php">Thumbnail</a></li>
+        <li class="leaf"><a href="../../prog/stripatt.php">Stripatt</a></li>
+        <li class="leaf"><a href="../../prog/povtools.php">POV Tools</a></li>
+       </ul></li>
+     </ul></li>
+    <li class="leaf"><a href="../../guestbook/index.php">Guestbook</a></li>
+    <li class="leaf"><a href="../../contact.php">Contact</a></li>
+   </ul> 
+  </div> 
+  <a name="contentanchor" title="Page content follows"></a> 
+  <div id="content"> 
+   <h1>Date and time in Java</h1> 
+   <p>During the course of my career I have met (too) many developers who are not familiar enough with issues revolving around time and date. I am pointing all developers with knowledge deficiency in that area to this page. This absence of knowledge can manifest in different statements:</p> 
+   <ul> 
+    <li>You want a time zone in the date format? No problem, I'll just always append +01:00 to the string.</li> 
+    <li>We don't need time zone information because we don't have overseas customers.</li> 
+    <li>We don't need time zone information because Switzerland doesn't stretch across time zones.</li> 
+    <li>No, there can't be a time zone issue: Webserver and DB are in the same room.</li> 
+    <li>Why is there a 'Z' at the end of this XML datetime string?</li> 
+   </ul> 
+   <p>As with so many things everything said here is only true to some precision. The precision here ends with leap seconds. I am not taking these into account as in normal IT systems they are not relevant and our clocks are not as accurate. If you work in astronomy, or rocket science this may not be precise enough for you.</p> 
+   <h3>What is time?</h3> 
+   <p>Time is a physical property. For Physicists it is a dimension tightly coupled with space (spacetime). Time as a physical property (or dimension) passes uniformly. As far as we know. And to any precision that is relevant to us. Even if it did not we were probably unable to tell because we lack something to compare it to. We simply can't define how fast time passes - we live inside of it. Just like a piece of driftwood in a river is unable to change its speed relative to the current we can not change our speed within time. Because to measure speed you compare the difference of what you measure to a difference of time. That sort of measurement is absurd for time itself of course. So we can safely assume that physical time passes uniformly. For physical time there is no notion of "date" or "clock" or "second". These are notions defined by humans.</p> 
+   <h3>Measuring time</h3> 
+   <p>We don't live inside a particle accelerator. We live on earth. We know day and night. We can see time passing with every day, month, year. These are marked by periodic events: sunrise, full moon, the longest day. That's the way we have been measuring time forever: we use natural periodic events. Even the most scientific definition of today's "second" bases on that: <cite>The duration of 9,192,631,770 periods of the radiation corresponding to the transition between the two hyperfine levels of the ground state of the Caesium-133 atom (Wikipedia).</cite> Here the periodic events are the waves of (a very precise) electromagnetic radiation. Note that, lacking any other option, our definition of the second is completely arbitrary.</p> 
+   <p>We live on Earth, which spins around its axis. This is an accelerated motion by the terms of General Relativity, which means that we measure (slightly) shorter seconds than someone with a different acceleration e.g. in a space ship. But as stated above our definition of the second is arbitrary anyway. So as long as you don't work for NASA and as long as SETI hasn't found anything out there, don't worry.</p> 
+   <h3>Measuring duration</h3> 
+   <p>So we employ the definition of the duration of a second to measure the passing of time. We can notably use seconds (and its fractions) to measure durations: how long it takes us to go shopping, how long it takes to boil an egg. A <em>duration</em> is the answer to the question "how long". You measure durations with a stop watch. Specifically a duration does <em>not</em> answer the question "when".</p> 
+   <h3>UTC</h3> 
+   <p>If we want an answer to the question "when" other than "in 27 seconds from now" we must have a means to reference any point in time. We can do this simply by laying out a time scale much like a ruler. A ruler has a zero mark and a positive (and maybe negative) part on its scale. We can do the same in time. We define some arbitrary point in time as 0. From that we can make a reference to any point in the future or in the past by telling how many seconds it is away from point 0. That is what the Coordinated Universal Time (UTC) does. It gives every second on that scale a name: "2007-12-31 23:59:59.000 UTC" for example. UTC always increases. It never goes backwards. Some minutes however may not have exactly 60 seconds. Some may have 59 (that has not happened so far), some may have 61 (happens a couple of times a year). They are called leap seconds and are used for corrections.</p> 
+   <h3>Computer clocks</h3> 
+   <p>Computers contain clocks (also referred to as timers). Several of them usually. With different precisions and capabilities. The operating system gives us access to the "system clock", which in practice uses one of these timers. On a "good" operation system this clock always advances, and never appears to go backwards. That means for consecutive readings a and b we can rely on: a &lt;= b, but not necessarily a &lt; b. Because these timers have limited precision, consecutive readings may return the same value, even though the numerical precision would allow to represent a difference. On modern Linux systems <code>System.currentTime()</code> normally achieves millisecond precision, but <code>System.nanoTime()</code> does not achieve nanosecond precision. Different restrictions are valid for <code>Object.wait()</code>. This method uses interrupts to get a timeout notification. The precision of this timing may vary widely. Please note that these clocks and interrupts may exhibit a lot of jitter: the clock appears to jump wildly even when read in precise intervals. </p>
+   <h3>NTP</h3> 
+   <p>Computer clocks tend to be very bad clocks compared to your watch. Their speed varies constantly. They need to be adjusted all the time to avoid going either too fast or too slow. NTP does just that. With some millisecond precision. Don't be scared that NTP would set your clock backwards and you could observe a &gt; b. The operating system will only advance the clock or delay it (slew), but never reset it. That is, only to really adjust a wrong clock for more than 2 seconds. </p>
+   <p>Time synchronise your servers. Servers whose time is not in sync with the global time cause problems. The UNIX <a href="http://www.ntp.org/">NTP</a> daemon can keep time in sync with millisecond precision. This minimal <code>/etc/ntp.conf</code> is enough to keep your server synced (needs UDP port 123 in your firewall open): </p>
+   <pre>
+server     pool.ntp.org    iburst
+driftfile  /var/lib/ntp/ntp.drift
+restrict   default nomodify nopeer noquery
+restrict   127.0.0.1
+disable    monitor
+</pre> 
+   <h3>Local time</h3> 
+   <p>When you look at your watch, most of you do not read UTC. You read <em>local</em> time. Also known as <em>wall clock time</em>. It is a representation of UTC in a certain calendar and time zone. More on this later.</p> 
+   <h3>Ambiguous Day</h3> 
+   <p>This may seem obvious, but it is not. A day is defined as 86400 seconds (24 hours). This is the time the earth takes for a single rotation. Exactly it is the time until the sun appears in the same place in the sky again. This is different from the time it takes to see distant stars in the same place which is called a <em>sideral</em> day (the earth advances on its orbit around the sun). As you will see in the paragraph about Daylight Saving Time a day in your local time is not always 24 hours. In many countries there is one day a year with 23 and one with 25 hours. Applications should never assume that a local day has 24 hours. The notion of a "day" is not well-defined without a calendar!</p> 
+   <p>This ambiguity easily manifests in Java Timers. The method <code>java.util.Timer.schedule(TimerTask task, Date firstTime, long period)</code> is unsuitable for executing daily tasks. If you pass 86400000 milliseconds (24 hours) as the period, the timer will fire every 24 hours, but after a DST change the timer appears to be firing one hour off schedule. While the timer sticks exactly to its 24 hour interval, people usually expect timers to fire at the same local time every day.</p> 
+   <h3>Representing points in time by UNIX time</h3> 
+   <p>In IT systems we sometimes need to refer to precise points in time. Examples are:</p> 
+   <ul> 
+    <li>When was a file last modified</li> 
+    <li>Start of an appointment</li> 
+    <li>When an email was sent</li> 
+   </ul> 
+   <p>These points in time have the characteristics of an event. If two events have the same time stamp they occurred in the very same moment. It doesn't matter if one occurs in Shanghai and the other in London: they still occur in the very same moment. Independent of any time zone. We usually use UNIX time to represent points in time.</p> 
+   <p>UNIX time stamps are the number of seconds that have elapsed since midnight 1.1.1970 UTC. Uh... here appears a "date". Never mind, we'll get to that in a minute. Java's <code>java.util.Date</code> class effectively encapsulates a UNIX time stamp. It represents a point in time by a millisecond counter in a 64 bit <code>long</code> variable. While 32 bit representation on UNIX will overflow in 2038 the 64 bit signed long will last for roughly another 18 billion years. Please note that none of the deprecated methods and constructors of the Date class should ever be used. They are from a time when the Sun people were confused about time themselves. <a href="http://java.sun.com/j2se/1.5.0/docs/api/javax/management/timer/Timer.html#field_summary"><code>javax.management.timer.Timer</code></a> has some convenient constants for the most used millisecond values.</p> 
+   <pre>
+// these are equivalent
+long now = System.currentTimeMillis();
+Date now = new Date();
+
+// long and Date are mutually exchangeable
+// Date is actually just a long wrapper.
+long ts = (new Date()).getTime();
+Date d = new Date(1095379201L);
+
+// simple arithmetics. Be careful of int overflows!
+Date now = new Date();
+Date in8Hours = new Date(now.getTime() + 8L * Timer.ONE_HOUR);
+
+    <strike>
+     Date in7Days = new Date(now.getTime() + 7L * Timer.ONE_DAY);
+    </strike> // assumes 24h day!
+
+// this is overkill
+
+    <strike>
+     Date now = new Date(System.currentTimeMillis());
+    </strike>
+</pre> 
+   <h3>Calendars</h3> 
+   <p>Referring to a point in time by its UNIX time stamp may be quite exact. But it is far from usable. If I tell you "let's meet at 1,095,379,201" it'll probably take you a while until you noticed that this point in time already passed several years ago. That's why we use calendars. Not only in the western world today we use the Gregorian Calendar. It defines twelve months a year of different length and inserts a leap day every four years (rule is a little more complex) at the end of February. It is a very exact calendar which means that in some hundred years time it will be snowing in July in Switzerland not because of an aberrant calendar but much more likely because of a change in climate.</p> 
+   <h3>Calendar and time zone</h3> 
+   <p>Calendar define dates. Without a calendar "31 December 2001" has no meaning. A calendar is tightly coupled to the notion of a "day". Our notion of "day" is also strongly coupled to sunrise and sunset. Sunrise and sunset depend on where on earth you are, don't they. Hence, it is apparent that a Calendar is only well-defined together with a geographical position. This is especially visible on New Year's eve when around the globe people launch fireworks to celebrate the beginning of a new year. The toasting and launching of fireworks happens roughly 24 times (some time zones are not much inhabited, there are "odd" time zones) during a whole day!</p> 
+   <p>Each one of these partying people of course claims the hour 24:00 for them - be they in Australia or Western Europe. It is also apparent that at any given moment there is not just one date around the globe but two. While people in Europe are already drunk and celebrating January 1st, people in New York are just starting to cook dinner on December 31st in the same moment. The two date "halves" of the Earth are separated by the time zone where midnight is and the international date boundary in the Pacific.</p> 
+   <p>This leads to the shocking fact that "31 December 2001" is not well defined. Because there are two dates around the globe at any given moment this date can refer to anything within 48 hours. Not even "31 December 2001 24:00:00" is well defined at all without specifying a time zone. It can refer to any point in time within 24 hours.</p> 
+   <p>All of the following expressions are useless without a time zone!</p> 
+   <ul> 
+    <li>1.1.2007</li> 
+    <li>14:30:00</li> 
+    <li>1.1.2007 14:30:00</li> 
+    <li>29.10.2006 02:30 Swiss local time (see Daylight Saving Time paragraph)</li> 
+    <li>Monday</li> 
+    <li>2 days (see Ambiguous Day paragraph)</li> 
+   </ul> 
+   <h3>Time zones</h3> 
+   <p>You have certainly heard of time zones. But do you really know exactly what they are? Think of them as a unit of measure for the thing called "time". Comparable with the unit of measure for "length". A stick of 1 meter length is 1000 millimetres, or 3.28 feet. The length of the stick doesn't change whether I say it's 1000 millimetres long or 3.28 feet. Same goes for time. The point in time doesn't change whether I express it in one time zone or another.</p> 
+   <p>The mother of all time zones is <a href="http://maps.google.ch/maps?f=q&amp;hl=en&amp;geocode=&amp;q=greenwich&amp;ie=UTF8&amp;z=12&amp;iwloc=addr">Greenwich</a> Mean Time (GMT). This is the time zone used by UTC. Offsets of all other time zones are specified in offsets from GMT. Zones to the east have positive offsets, zones to the west have negative ones. Again this nicely compares to length: the "meter" is the mother of all SI length units of measure (the original prototype is a <a href="http://en.wikipedia.org/wiki/Metre#Prototype_metre_bar">platinum bar</a> kept in France). Other units are expressed as multiples of the meter: 1 millimeter = 1/1000 meter, 1 kilometer = 1000 meters. </p> 
+   <p>Converting between time zones is easy: <code>18:00 GMT = 18:00+00:00 = 19:00+01:00 = 17:00-01:00</code></p> 
+   <p>The suffix is the <em>offset</em> from GMT that <em>has been added</em> to the GMT time.</p> 
+   <p>The Java <code>java.util.TimeZone</code> can represent two things depending on how it is used (and this may surprise and confuse most people):</p> 
+   <ul> 
+    <li>A time zone</li> 
+    <li>A time zone database of a location</li> 
+   </ul> 
+   <p>Time zones are not assigned to locations by astronomers but by politicians. That's why that time is called <em>legal time</em>. These assignments <a href="http://news.gmane.org/gmane.comp.time.tz/">change</a>. That's why TimeZone keeps a database of historical time zone assignments of many cities. Also (and this may again surprise many people) many countries in the world change their time zone twice a year: <em>daylight savings time is nothing else but a time zone</em>. More on DST below. NB: Also England uses DST. So their time zone is not always GMT!</p> 
+   <p>Most of the time applications use a location database like <code>TimeZone.getTimeZone("Europe/Zurich")</code>. This frees the application from most DST issues. See below. Of course an application can also use a simple exact time zone if required: <code>TimeZone.getTimeZone("GMT+04:30")</code></p> 
+   <p>Using the correct time zone for <code>java.util.Calendar</code> and <code>java.text.DateFormat</code> is crucial to make your application time zone safe. If you don't specify the time zone, Java will use the system default time zone. In a server environment that is hardly the one that's right.</p> 
+   <p>Localizing an application doesn't just mean to support different <code>Locale</code>s, but also different <code>TimeZone</code>s. So classes in your codebase that are Locale dependent, are probably also TimeZone dependent.</p> 
+   <p>It should be noted that <code>TimeZone.getTimeZone()</code> does not throw an exception when passed an unknown time zone name. Instead it returns GMT. If the name of the time zone comes from an untrusted source, such as a GUI, you need to validate it. Otherwise your application code will behave unexpectedly.</p> Read on for a lot more 
+   <a href="http://cs.ucla.edu/~eggert/tz/tz-link.htm">detailed information</a>. 
+   <h3>Representing a point in time in a Calendar</h3> 
+   <p>As we have seen above, in IT systems, points in time do not have to be represented in a calendar. It is enough to use a UNIX time stamp. Representing a point in time in different calendars and time zones has no influence on the point in time that is being referred to (the length of the stick doesn't change). The only time a representation in a calendar is desirable, is for user interfaces and calendar arithmetics (finding the begin/end of a day, adding days, weeks, etc.). When a human needs to read a point in time she expects it in a human readable form in her local time zone.</p> 
+   <p>In Java we use the <code>java.text.DateFormat</code> and it's most used implementation <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/text/DateFormat.html"><code>java.text.SimpleDateFormat</code></a> to convert <code>Date</code> instances to and from user readable time representation. Important here is not to forget to specify the time zone. Otherwise the system default time zone will be used which is only meaningful for Desktop applications. Also note that SimpleDateFormat instances are not thread-safe. You should thus avoid static instances.</p> 
+   <pre>
+// not thread-safe
+public 
+    <strike>
+     static
+    </strike> SimpleDateFormat dfm = new SimpleDateFormat("yyyy-MM-dd");
+
+// This is how to initialise a well-known Date (often used in unit test fixtures)
+DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+dfm.setTimeZone(TimeZone.getTimeZone("Europe/Zurich"));
+Date a = dfm.parse("2007-02-26 20:15:00");
+Date b = dfm.parse("2007-02-27 08:00:00");
+
+// Don't use the deprecated constructors
+
+    <strike>
+     Date badhabit = new Date(106, 1, 26, 20, 15, 00);
+    </strike>
+
+// output is likewise simple
+System.out.println("Result: "+ dfm.format(a));
+
+// if you don't initialise the DateFormat with a TimeZone, include it in the format!
+DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+Date a = dfm.parse("2007-02-26 20:15:00 +0200");
+</pre> 
+   <p>Be careful with the symbols of SimpleDateFormat. "hh" corresponds to Calendar.HOUR which is the hour on the 12-hour clock. It is ambiguous without AM/PM. Furthermore the Calendar class doesn't throw an exception when you do <code>calendar.set(Calendar.HOUR, 20)</code>, but it will do something completely wrong! Use "HH" and Calendar.HOUR_OF_DAY for the 24-hour clock.</p> 
+   <p>Java also offers the <code>java.util.Calendar</code> and <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/util/GregorianCalendar.html"><code>java.util.GregorianCalendar</code></a> pair. It allows to convert to and from <code>Date</code> with the <code>setTime</code> and <code>getTime</code> methods. It also allows modification of individual fields. This is the class to use when one must determine the start and end of a day. Also here, set the right time zone or what you are doing is undefined.</p> 
+   <pre>
+// simple way to get a specific point in time
+GregorianCalendar cal = new GregorianCalendar(tz);
+cal.set(2009, Calendar.DECEMBER, 31, 20, 15, 00);
+cal.set(Calendar.MILLISECONDS, 0);
+Date d = cal.getTime();
+
+/**
+ * Calculates midnight of the day in which date lies with respect
+ * to a time zone.
+ **/
+public Date midnight(Date date, TimeZone tz) {
+  Calendar cal = new GregorianCalendar(tz);
+  cal.setTime(date);
+  cal.set(Calendar.HOUR_OF_DAY, 0);
+  cal.set(Calendar.MINUTE, 0);
+  cal.set(Calendar.SECOND, 0);
+  cal.set(Calendar.MILLISECOND, 0);
+  return cal.getTime();
+}
+
+/**
+ * Adds a number of days to a date. DST change dates are handled
+ * according to the time zone. That's necessary as these days don't
+ * have 24 hours.
+ */
+public Date addDays(Date date, int days, TimeZone tz) {
+  Calendar cal = new GregorianCalendar(tz);
+  cal.setTime(date);
+  cal.add(Calendar.DATE, days);
+  return cal.getTime();
+}
+</pre> 
+   <h3>AM/PM</h3> 
+   <p>Some nations are very comfortable using the 12-hour clock and using AM or PM to clarify which half of the day they mean. But for most of the people the 24-hour clock is far more familiar. Be very careful when using the 12-hour clock. Some people (especially in central Europe) are extremely unfamiliar with it. Imagine you hand out plane tickets with a boarding time like "10. January 12:30 AM". You can be sure that half the passengers will show up half past midnight (which is correct), and the others half past noon (having missed their flight).</p> 
+   <p>As a rule of thumb: There is no zero hour on the 12-hour clock, and a day starts with AM. So 12:00 AM is equal to 0:00 on the 24-hour clock, and 12:00 PM is equal to 12:00 on the 24-hour clock.</p> 
+   <p>I strongly suggest you use the 24-hour clock in applications, and never the AM/PM notion. Or at least let the user choose his preference. On printed documents, such as tickets, you should never use the 12-hour clock. In Java this means to avoid Calendar.HOUR, Calendar.AM_PM and the "hh" symbol of SimpleDateFormat. Instead use Calendar.HOUR_OF_DAY and the "HH" symbol.</p> 
+   <h3>Conversion between time zones</h3> 
+   <p>As a rule you can not convert a <code>java.util.Date</code> to a different time zone. This is semantically impossible as a Date is always in UTC. Only a <code>Calendar</code> or a textual representation of a date can be converted into a different time zone. In practice time zone conversions are only necessary when dates are read from or written to text. Typically on a GUI. Or in data exchange interfaces. In these cases a <code>java.text.DateFormat</code> should be used with the right time zone set.</p> 
+   <pre>
+DateFormat indfm = new SimpleDateFormat("MM/dd/yyyy HH'h'mm");
+indfm.setTimeZone(TimeZone.getTimeZone("Australia/Sydney"));
+Date purchaseDate = dfm.parse("12/31/2007 20h15");
+
+DateFormat outdfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+outdfm.setTimeZone(TimeZone.getTimeZone("GMT"));
+csvfile.println(outdfm.format(purchaseDate) +" GMT");
+</pre> 
+   <p>Please avoid coding the following method. It has no effect and demonstrates a lack of understanding of Date and Calendar.</p> 
+   <pre title="stupid">
+// BULLSHIT CODE! This method does nothing.
+public static Date convertTz(Date date, TimeZone tz) {
+  Calendar cal = Calendar.getInstance();
+  cal.setTimeZone(TimeZone.getTimeZone("UTC"));
+  cal.setTime(date);
+  cal.setTimeZone(tz);
+  return cal.getTime();
+}
+</pre> 
+   <p>When changing the time zone of a Calendar object there is a <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4827490">small catch</a>: you need to call Calendar.get(int) immediately after, or your Calendar object may not be updated correctly!</p> 
+   <pre>
+GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+c.set(2012, Calendar.APRIL, 19, 22, 0, 0);  // 20.04 00:00
+c.set(Calendar.MILLISECOND, 0);
+c.getTime(); // calculates other fields and ms value after calls to set()
+c.setTimeZone(TimeZone.getTimeZone("Europe/Zurich")); // invalidates all fields
+c.get(Calendar.DATE); // calculates fields from ms value
+</pre> 
+   <h3>Periods of time (intervals)</h3> 
+   <p>Imagine the following examples that refer to a period of time:</p> 
+   <ul> 
+    <li>Begin and end of a Java method call (bench mark)</li> 
+    <li>The meeting is from 8h30 to 10h00</li> 
+    <li>The date a piece of hardware was repaired</li> 
+    <li>My mother's birthday</li> 
+    <li>During my vacation</li> 
+    <li>When I was young</li> 
+   </ul> 
+   <p>Each of these are not as precise as a UNIX time stamp. They refer to more than a certain second in time. Some of these designate the duration of a single day. Others several days.</p> 
+   <h3>Representing a period</h3> 
+   <p>Periods of time can have very different semantics. They may require different representations:</p> 
+   <ul> 
+    <li>Begin and end of a Java method call: Two UNIX time stamps </li> 
+    <li>The meeting is from 8h30 to 10h00: UNIX time, duration in minutes</li> 
+    <li>During my vacation: Two Calendar objects with time zone</li> 
+    <li>The date a piece of hardware was repaired: Calendar object with time zone</li> 
+    <li>My mother's birthday: Calendar object with time zone</li> 
+    <li>When I was young: fuzzy correlation between "young" and an age</li> 
+   </ul> 
+   <p>When two UNIX time stamps are used for a period, their general contract should be that the beginning time stamp is considered inside the interval, while the end time stamp is considered outside the interval. This way it is possible to represent consecutive intervals without gaps. For representation to a user it may be necessary to specially handle boundary cases: "Monday 00:00 until 24:00" reads easier than "Monday 00:00 until Tuesday 00:00".</p> 
+   <h3>Representing days of the week</h3> 
+   <p>In very special occasions it is even necessary to think carefully of how to represent a day of the week in a database. Consider the following situation: A calendaring web application stores recurring calendar entries in the DB. Example: "Monday March 12 2007 01h00 GMT+02:00, recurring every Monday". So the next occurrence is "Monday March 19 2007 01h00 GMT+02:00".</p> 
+   <p>The application chooses to store the start date in GMT without explicitly storing the time zone. Because the user may travel around the globe and wants to see date and time of his calendar entries in the local time zone of his current location. So it makes no sense to store the date in that random time zone that he was in at the time when the calendar entry was created. Thus the start date becomes "2007-03-11 23h00 GMT" which in GMT belongs to a Sunday. If the webapp now stores "recurring every Monday" it will calculate the next occurrence as "2007-03-19 23h00" in GMT (19. is the Monday) which in the user's local time zone is "Tuesday March 20 2007 01h00 GMT+02:00" — one day too late! This happens of course due to the fact that the notion "Monday" has a different meaning in each time zone.</p> 
+   <p>It is apparent that the application also needs to convert the day of the week to GMT. It does that by choosing 0h00 of a nearby Monday in the user's time zone, converting that point in time to GMT and evaluating the day of the week again — resulting in Sunday of course.</p> 
+   <h3>Exchanging date and time information</h3> 
+   <p>Care must be taken when transferring date and time information between IT systems. As outlined above the time zone information may be an important part of a date which must not be lost or changed. In other situations the data is independent of a time zone.</p> 
+   <p>In text formats like CSV, XML, HTTP or SMTP headers dates are usually formatted in a human readable way (not as UNIX times). Generally such date formats should always incorporate a time zone to avoid any ambiguities. XML schema for instance uses the ISO 8601 standard where the time zone is optional, where SMTP uses RFC 2822 with a mandatory time zone. The time zone for a given point in time must be given as an absolute offset (not a geographical location). Otherwise interpretation of a such a time may be ambiguous with respect to DST (see below).</p> 
+   <pre>
+ISO 8601 date and time: "2007-02-26T21:23:14.250+01:00"
+RFC 2822 date and time: "Mon, 26 Feb 2007 21:23:14 +0100" 
+</pre> 
+   <p>Rules of thumb:</p> 
+   <ul> 
+    <li>UNIX times may be transferred in any time zone. You can safely choose GMT.</li> 
+    <li>The time zone information of periods must not be modified.</li> 
+   </ul> 
+   <p>For persistence (databases) the same rules apply. A store / load cycle of a UNIX time stamp must not modify the data even when in between any of the following has happened: DST has changed, client has changed time zone, database has changed time zone.</p> 
+   <h3>Daylight savings time</h3> 
+   <p>During daylight savings time one hour is added to normal time. It usually starts on a Sunday night in spring at 02h00 when the clock jumps to 03h00, skipping one hour. And in autumn the clock jumps back from 03h00 to 02h00, repeating one hour.</p> 
+   <p>As already noted above, DST is nothing else than a time zone. It is important to understand that countries that use DST thus change time zone twice a year. Also Great Britain. Thus just because a guy can see the Greenwich observatory from his window doesn't mean his time zone is GMT (but could be GMT+1 in summer).</p>
+   <p> </p>
+   <p>For instance in Switzerland normal time is GMT+01:00 and DST is GMT+02:00. DST start and end are a matter of the most absurd political decisionmaking (Australia postponed its DST start in 2006 because of a sports event...). Also some countries like India once used to have DST and now haven't anymore. All this history is recorded in the Java TimeZone database (and also the UNIX time zone databases). Because of the ever changing nature of this data it is important that you keep this DB uptodate. As of 2007 for example the USA will greatly expand the duration of DST (due to some Energy Conservation Act or something).</p> 
+   <p>Please note that while the DST change no such "clock jumping" is observed in GMT: In spring: <code>02:00+01:00 = 03:00+02:00 = 01:00 GMT</code> and in autumn: <code>03:00+02:00 = 02:00+01:00 = 01:00 GMT</code>. It is really just a change of the time zone. Our clocks just measure the time in a different zone. But UTC keeps ticking on.</p> 
+   <p>DST causes a bit of a pain for calendaring applications: two days in the year do not have 24 hours in local time. The day in spring has 23 and the one in autumn 25 hours. I don't know of any calendaring application that supports that in its week view...</p> 
+   <p>Sometimes DST is called "summer time" because it is employed during the summer months. But careful, when it's summer on the northern hemisphere, it's winter on the southern hemisphere. Obviously the difference in time zones can vary greatly because of that. Let's compare Zurich, Switzerland and Auckland, New Zealand. During July Zurich is in the GMT+2 and Auckland in the GMT+12 zone, resulting in a clock difference of 10 hours. During December however, Zurich is in the GMT+1 and Auckland in the GMT+13 zone, creating a difference of 12 hours. So better check before skyping with your Kiwi friends!</p> 
+   <p>DST also causes a tiny ambiguity on the end day when users have to enter a time. Not a GUI that I know asks the user for the time zone that he is entering a date and time in. Most GUIs just take the location of the terminal the user is <em>currently</em> on as a reference. Consider the user entering "29.10.2006 02:30" in Zurich. This is the night when Europe switches from DST to normal time. So the hour between 02 and 03 in the morning shows up twice on local clocks. The time entered by the user is therefore not well-defined. It's not clear whether she means 02:30+02:00 or 02:30+01:00 one hour later. Note that the ambiguity is not present in spring. In that night 01:30 is always GMT+01:00, 02:30 does not exist and 03:30 is always GMT+02:00. If this case is important for your application you should check for it. Unfortunately in Java there is no API call that directly tells you the DST end date. But you can test like so (checks if a day has 23 hours):</p> 
+   <pre>
+public boolean isDSTend(Calendar cal) {
+  int year = cal.get(Calendar.YEAR);
+  int month = cal.get(Calendar.MONTH);
+  int date = cal.get(Calendar.DATE);
+  TimeZone tz = cal.getTimeZone();
+  return isDSTend(year, month, date, tz);
+}
+
+public boolean isDSTend(int year, int month, int date, TimeZone tz) {
+  java.util.Calendar cal = new java.util.GregorianCalendar(tz);
+  cal.set(java.util.Calendar.MILLISECOND, 0);
+  cal.set(year, month, date, 00, 30, 00);
+  cal.add(java.util.Calendar.HOUR_OF_DAY, 24);
+  return (23 == cal.get(java.util.Calendar.HOUR_OF_DAY));
+}
+</pre> 
+   <h3>Week numbers</h3> 
+   <p>Week numbers are popular among managers: "can we arrange a meeting in week 34?". By week numbers they usually mean the number displayed in MS Outlook. What they don't know: <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO-8601</a> defines the week numbers, Outlook's implementation is not (necessarily) compatible with that. And week numbers have a small ambiguity. Java's Calendar class can be made ISO compatible with <code>setMinimalDaysInFirstWeek(4)</code>.</p> 
+   <p>The thing is: 30 December 2002 is in week 1 of the year 2003. But Java's Calendar class only has one YEAR field. This year field has different meanings depending on how the Calendar object is used:</p> 
+   <ul> 
+    <li>When setting the WEEK_OF_YEAR and YEAR field, YEAR is interpreted as the year of the week.</li> 
+    <li>When setting the DATE and YEAR field, YEAR is interpreted as the year of the date.</li> 
+    <li>When getting the YEAR field, always the year of the date is returned.</li> 
+    <li>There is no direct way to determine the year for the week field.</li> 
+   </ul> 
+   <p>Sun <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6218127">refuses</a> to fix the bug. Use the following method to determine the correct year for the week field:</p> 
+   <pre>
+public int getYearForWeek(GregorianCalendar cal) {
+   int year = cal.get(Calendar.YEAR); 
+   int week = cal.get(Calendar.WEEK_OF_YEAR);
+   int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+
+   if (week == 1 &amp;&amp; dayOfMonth &gt; 20)
+      return year + 1;
+
+   if (week &gt;= 52 &amp;&amp; dayOfMonth &lt; 10)
+      return year - 1;
+
+   return year;
+}
+</pre> 
+  </div> 
+  <div id="ads"> 
+   <script type="text/javascript">
+	google_ad_client = "pub-0465253261570008";
+	google_ad_width = 160;
+	google_ad_height = 600;
+	google_ad_format = "160x600_as";
+	google_ad_channel ="";
+	google_ad_type = "text_image";
+	google_color_border = "5354BF";
+	google_color_bg = "FFFFFF";
+	google_color_link = "3E3F8F";
+	google_color_url = "3E3F8F";
+	google_color_text = "000000";
+  </script> 
+   <script type="text/javascript" src="https://pagead2.googlesyndication.com/pagead/show_ads.js">
+  </script> 
+   <script type="text/javascript">
+     function showAds(oldhandler) {
+         if (oldhandler) oldhandler(); // append to event handler chain
+		 // we patch the CSS to position the ads to the right place
+		 var content = document.getElementById("content");
+	     var ads = document.getElementById("ads");
+		 ads.style.left = (content.offsetLeft + content.offsetWidth + 10) + "px";
+		 ads.style.display = "block"; // now show them
+     }
+     // when window is resized our content moves
+     window.onresize = showAds(window.onresize);
+     // show as soon as rendering is done and offsetWidth calculated
+     window.onload = showAds(window.onload);
+  </script> 
+  </div>   
+ </body>
+</html>

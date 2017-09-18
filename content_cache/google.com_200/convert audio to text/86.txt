@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+ <head> 
+  <meta charset="utf-8"> 
+  <link rel="shortcut icon" href="http://www.smartjava.org/sites/all/themes/touch/favicon.ico" type="image/png"> 
+  <link rel="shortlink" href="/node/77"> 
+  <link rel="canonical" href="/content/record-audio-using-webrtc-chrome-and-speech-recognition-websockets"> 
+  <meta name="Generator" content="Drupal 7 (http://drupal.org)"> 
+  <title>Record audio using webrtc in chrome and speech recognition with websockets | Smartjava.org</title> 
+  <link type="text/css" rel="stylesheet" href="http://www.smartjava.org/sites/www.smartjava.org/files/css/css_xE-rWrJf-fncB6ztZfd2huxqgxu4WO-qwma6Xer30m4.css" media="all"> 
+  <link type="text/css" rel="stylesheet" href="http://www.smartjava.org/sites/www.smartjava.org/files/css/css_xLKejvFHysXp-l3laViVkLJ1ayzcTAFQJbq6WjkyPLA.css" media="all"> 
+  <link type="text/css" rel="stylesheet" href="http://www.smartjava.org/sites/www.smartjava.org/files/css/css_ggwmJjnSHIyQGr6BcS46i7z-SeJR7vFJ2H8b7fsUJ1o.css" media="all"> 
+  <link type="text/css" rel="stylesheet" href="http://www.smartjava.org/sites/www.smartjava.org/files/css/css_a8THpTafnD7EtAWXgGzRCTYapAlF3nSgOco54D39oUU.css" media="all"> 
+  <script type="text/javascript" src="http://www.smartjava.org/sites/www.smartjava.org/files/js/js_xAPl0qIk9eowy_iS9tNkCWXLUVoat94SQT48UBCFkyQ.js"></script> 
+  <script type="text/javascript" src="http://static.ak.fbcdn.net/connect.php/js/FB.Share"></script> 
+  <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script> 
+  <script type="text/javascript" src="https://apis.google.com/js/plusone.js"></script> 
+  <script type="text/javascript" src="http://platform.linkedin.com/in.js"></script> 
+  <script type="text/javascript" src="http://www.smartjava.org/sites/www.smartjava.org/files/js/js_tHHX3IJWNuwVfwLdZ34PwSROT-LdEbqvweMIOBFwX4I.js"></script> 
+  <script type="text/javascript">
+<!--//--><![CDATA[//><!--
+var _gaq = _gaq || [];_gaq.push(["_setAccount", "UA-19067049-1"]);_gaq.push(["_trackPageview"]);(function() {var ga = document.createElement("script");ga.type = "text/javascript";ga.async = true;ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";var s = document.getElementsByTagName("script")[0];s.parentNode.insertBefore(ga, s);})();
+//--><!]]>
+</script> 
+  <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/gist-embed/2.2/gist-embed.min.js"></script> 
+  <script type="text/javascript" src="http://www.smartjava.org/sites/www.smartjava.org/files/js/js_ix99IaKNwg4XQrjVLFsrlxH0Czfb_Wvr8_P-vBK2zQU.js"></script> 
+  <script type="text/javascript" src="http://www.smartjava.org/sites/www.smartjava.org/files/js/js_a71sZMkRrWcH09jEeUmXCgmUNz1GN5hCiuKt3qRffwg.js"></script> 
+  <script type="text/javascript">
+<!--//--><![CDATA[//><!--
+jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"","ajaxPageState":{"theme":"touch","theme_token":"yFCGWhSgJXewiCsqSG5PrjBLphJyaJQM1XAAGLgWf7g","js":{"misc\/jquery.js":1,"misc\/jquery.once.js":1,"misc\/drupal.js":1,"http:\/\/static.ak.fbcdn.net\/connect.php\/js\/FB.Share":1,"http:\/\/platform.twitter.com\/widgets.js":1,"https:\/\/apis.google.com\/js\/plusone.js":1,"http:\/\/platform.linkedin.com\/in.js":1,"sites\/all\/modules\/google_analytics\/googleanalytics.js":1,"sites\/all\/modules\/service_links\/js\/linkedin_share_button.js":1,"sites\/all\/modules\/service_links\/js\/facebook_like.js":1,"sites\/all\/modules\/service_links\/js\/facebook_share.js":1,"sites\/all\/modules\/service_links\/js\/google_plus_one.js":1,"0":1,"http:\/\/cdnjs.cloudflare.com\/ajax\/libs\/gist-embed\/2.2\/gist-embed.min.js":1,"sites\/all\/modules\/disqus\/disqus.js":1,"sites\/all\/themes\/touch\/js\/scrolltopcontrol.js":1},"css":{"modules\/system\/system.base.css":1,"modules\/system\/system.menus.css":1,"modules\/system\/system.messages.css":1,"modules\/system\/system.theme.css":1,"modules\/book\/book.css":1,"modules\/field\/theme\/field.css":1,"modules\/node\/node.css":1,"modules\/search\/search.css":1,"modules\/user\/user.css":1,"sites\/all\/modules\/views\/css\/views.css":1,"sites\/all\/modules\/ctools\/css\/ctools.css":1,"sites\/all\/modules\/geshifilter\/geshifilter.css":1,"sites\/all\/themes\/touch\/style.css":1}},"ws_fs":{"type":"button_count","fix_count":true},"ws_fl":{"width":80,"height":"21"},"ws_gpo":{"type":"","counter":true},"ws_lsb":{"countmode":"right"},"googleanalytics":{"trackOutbound":1,"trackMailto":1,"trackDownload":1,"trackDownloadExtensions":"7z|aac|arc|arj|asf|asx|avi|bin|csv|doc|exe|flv|gif|gz|gzip|hqx|jar|jpe?g|js|mp(2|3|4|e?g)|mov(ie)?|msi|msp|pdf|phps|png|ppt|qtm?|ra(m|r)?|sea|sit|tar|tgz|torrent|txt|wav|wma|wmv|wpd|xls|xml|z|zip"},"disqus":{"domain":"testforum-smartjava","url":"http:\/\/www.smartjava.org\/content\/record-audio-using-webrtc-chrome-and-speech-recognition-websockets","title":"Record audio using webrtc in chrome and speech recognition with websockets","identifier":"node\/77"}});
+//--><!]]>
+</script> 
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]--> 
+ </head> 
+ <body class="html not-front not-logged-in one-sidebar sidebar-second page-node page-node- page-node-77 node-type-article"> 
+  <div id="wrapper" class="clearfix"> 
+   <div id="header-top" class="clearfix"> 
+    <div id="logo">
+     <!--start logo--> 
+     <div id="site-slogan"></div>
+     <!--site slogan--> 
+    </div>
+    <!--end logo--> 
+    <!-- / start search box region --> 
+    <div class="search-box"> 
+     <div class="region region-search-box"> 
+      <div id="block-search-form" class="block block-search"> 
+       <div class="content"> 
+        <form action="/content/record-audio-using-webrtc-chrome-and-speech-recognition-websockets" method="post" id="search-block-form" accept-charset="UTF-8">
+         <div>
+          <div class="container-inline"> 
+           <h2 class="element-invisible">Search form</h2> 
+           <div class="form-item form-type-textfield form-item-search-block-form"> 
+            <label class="element-invisible" for="edit-search-block-form--2">Search </label> 
+            <input title="Enter the terms you wish to search for." type="text" id="edit-search-block-form--2" name="search_block_form" value="" size="15" maxlength="128" class="form-text"> 
+           </div> 
+           <div class="form-actions form-wrapper" id="edit-actions">
+            <input type="submit" id="edit-submit" name="op" value="Search" class="form-submit">
+           </div>
+           <input type="hidden" name="form_build_id" value="form-WiSu520jR4wS7RZh0YVW9uXxOgjqaM5_lPgqKTktyAw"> 
+           <input type="hidden" name="form_id" value="search_block_form"> 
+          </div> 
+         </div>
+        </form> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+     </div> 
+     <!-- /.region --> 
+    </div> 
+    <!-- / end search box region --> 
+    <ul id="header-social"> 
+     <li><a href="http://www.twitter.com/josdirksen" target="_blank" rel="me"><img src="http://www.smartjava.org/sites/all/themes/touch//images/twitter.png" alt="twitter"></a></li> 
+     <li><a href="/rss.xml"><img src="http://www.smartjava.org/sites/all/themes/touch//images/rss.png" alt="RSS"></a></li> 
+    </ul>
+    <!--end header-social--> 
+   </div>
+   <!--end header-top--> 
+   <div id="header" class="clearfix">
+    <!--start header--> 
+    <div id="main-menu"> 
+     <div id="main-menu-links"> 
+      <ul class="menu">
+       <li class="first leaf"><a href="/">Home</a></li> 
+       <li class="leaf"><a href="/articles">Articles</a></li> 
+       <li class="leaf"><a href="/content/bamos">Bamos</a></li> 
+       <li class="last leaf"><a href="/content/my-books">My Books</a></li> 
+      </ul> 
+     </div>
+     <!-- end main-menu-links --> 
+    </div>
+    <!-- end main-menu --> 
+   </div> 
+   <!-- /#header --> 
+   <div id="content-body"> 
+    <div class="breadcrumb">
+     <h2 class="element-invisible">You are here</h2>
+     <nav class="breadcrumb">
+      <a href="/">Home</a> » Record audio using webrtc in chrome and speech recognition with websockets
+     </nav>
+    </div> 
+    <section id="main" role="main" class="clear"> 
+     <a id="main-content"></a> 
+     <h1 class="title" id="page-title">Record audio using webrtc in chrome and speech recognition with websockets</h1> 
+     <div class="region region-content"> 
+      <div id="block-system-main" class="block block-system"> 
+       <div class="content"> 
+        <span class="submitted">By <span class="username">jos.dirksen</span> on Sun, 09/23/2012 - 19:39</span> 
+        <div class="content"> 
+         <div class="field field-name-body field-type-text-with-summary field-label-hidden">
+          <div class="field-items">
+           <div class="field-item even">
+            <p> There are many different web api standards that are turning the web browser into a complete application platform. With websockets we get nice asynchronous communication, various standards allow us access to sensors in laptops and mobile devices and we can even determine how full the battery is. One of the standards I'm really interested in is webrtc. With webrtc we can get real-time audio and video communication between browsers without needing plugins or additional tools. A couple of months ago I wrote about how you can use webrtc to access the webcam and<a href="http://www.smartjava.org/content/face-detection-using-html5-javascript-webrtc-websockets-jetty-and-javacvopencv"> use it for face recognition</a>. At that time, none of the browser allowed you to access the microphone. A couple of months later though, and both the developer version of firefox and developer version of chrome, allow you to access the microphone!</p> 
+            <p>So let's see what we can do with this. Most of the examples I've seen so far focus on processing the input directly, within the browser, using the <a href="http://www.w3.org/TR/webaudio/">Web Audio API</a>. You get synthesizers, audio visualizations, spectrometers etc. What was missing, however, was a means of recording the audio data and storing it for further processing at the server side. In this article I'll show you just that. I'm going to show you how you can create the following (you might need to enlarge it to read the response from the server):</p> 
+            <iframe width="700" height="525" src="http://www.youtube.com/embed/PVUhHAMH7tw" frameborder="0" allowfullscreen></iframe>
+            <p> In this screencast you can see the following:</p> 
+            <ol> 
+             <li>A simple HTML page that access your microphone</li> 
+             <li>The speech is recorded and using websockets is sent to a backend</li> 
+             <li>The backend combines the audio data</li> 
+             <li>And sends it to google's speech to text API</li> 
+             <li>The result from this API call is returned to the browser</li> 
+            </ol> 
+            <p>And all this is done without any plugins in the browser! So what's involved to accomplish all this.</p> 
+            <h2>Allowing access to your microphone</h2> 
+            <p>The first thing you need to do is make sure you've got an up to date version of chrome. I use the dev build, and am currently on this version:</p> 
+            <p><img src="/sites/default/files/Help.png" width="673" height="531" alt="Help.png"></p> 
+            <p>Since this is still an experimental feature we need to enable this using the chrome flags. </p> 
+            <p><img src="/sites/default/files/chrome___flags.png" width="673" height="531" alt="chrome___flags.png"></p> 
+            <p>Make sure the "Web Audio Input" flag is enabled. With this configuration out of the way we can start to access our microphone. </p> 
+            <h2>Access the audio stream from the microphone</h2> 
+            <p>This is actually very easy:</p> 
+            <div class="geshifilter"> 
+             <pre class="text geshifilter-text" style="font-family:monospace;">          function callback(stream) {
+               var context = new webkitAudioContext();
+               var mediaStreamSource = context.createMediaStreamSource(stream);
+               ...
+           }
+&nbsp;
+           $(document).ready(function() {
+               navigator.webkitGetUserMedia({audio:true}, callback);
+               ...
+           }</pre>
+            </div> 
+            <p>As you can see I use the webkit prefix functions directly, you could, of course, also use a shim so it is browser independent. What happens in the code above is rather straightforward. We ask, using getUserMedia, for access to the microphone. If this is successful our callback gets called with the audio stream as its parameter. In this callback we use the Web Audio specification to create a mediaStreamSource from our microphone. With this mediaStreamSource we can do all the nice Web Audio tricks you can see <a href="http://chromium.googlecode.com/svn/trunk/samples/audio/visualizer-gl.html">here</a>.</p> 
+            <p>But we don't want that, we want to record the stream and send it to a backend server for further processing. In future versions this will probably be possible directly from the webrtc API, at this time, however, this isn't possible yet. Luckily, though, we can use a feature from the Web Audio API to get access to the raw data. With the <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#JavaScriptAudioNode" title="JavaScriptAudioNode">JavaScriptAudioNode</a> we can create a custom node, which we can use to access the raw data (which is PCM encoded). Before I started my own work on this I searched around a bit and came across the recoder.js project from here: <a href="https://github.com/mattdiamond/Recorderjs">https://github.com/mattdiamond/Recorderjs</a>. Matt created a recorder that can record the output from Web Audio nodes, and that's exactly what I needed.</p> 
+            <p>All I needed to do now was connect the stream we just created to the recorder library:</p> 
+            <div class="geshifilter"> 
+             <pre class="text geshifilter-text" style="font-family:monospace;">           function callback(stream) {
+               var context = new webkitAudioContext();
+               var mediaStreamSource = context.createMediaStreamSource(stream);
+               rec = new Recorder(mediaStreamSource);
+           }</pre>
+            </div> 
+            <p>With this code, we create a recorder from our stream. This recorder provides the following functions:</p> 
+            <ul> 
+             <li>record: Start recording from the input</li> 
+             <li>stop: Stop recording</li> 
+             <li>clear: Clear the current recording</li> 
+             <li>exportWav: Export the data as a wav file</li> 
+            </ul> 
+            <h2>Connect the recorder to the buttons</h2> 
+            <p>I've created a simple webpage with an output for the text and two buttons to control the recording:</p> 
+            <p><img src="/sites/default/files/Speech%20recognition%20with%20Javascript%2C%20Websockets%20and%20Google%20Speech%20API.png" width="667" height="487" alt="Speech recognition with Javascript, Websockets and Google Speech API.png"></p> 
+            <p>The 'record' button starts the recording, and once you hit the 'Export' button the recording stops, and is sent to the backend for processing.</p> 
+            <p>Record button:</p> 
+            <div class="geshifilter"> 
+             <pre class="text geshifilter-text" style="font-family:monospace;">           $('#record').click(function() {
+                   rec.record();
+                   ws.send("start");
+                   $("#message").text("Click export to stop recording and analyze the input");
+&nbsp;
+                   // export a wav every second, so we can send it using websockets
+                   intervalKey = setInterval(function() {
+                       rec.exportWAV(function(blob) {
+                           rec.clear();
+                           ws.send(blob);
+                       });
+                   }, 1000);
+               });</pre>
+            </div> 
+            <p>This function (using jQuery to connect it to the button) when clicked starts the recording. It also uses a websocket (ws), see further down on how to setup the websocket, to indicate to the backend server to expect a new recording (more on this later). Finally when the button is clicked an interval is created that passes the data to the backend, encoded as wav file, every second. We do this to avoid sending too large chunks of data to the backend and improve performance.</p> 
+            <p>Export button:</p> 
+            <div class="geshifilter"> 
+             <pre class="text geshifilter-text" style="font-family:monospace;">               $('#export').click(function() {
+                   // first send the stop command
+                   rec.stop();
+                   ws.send("stop");
+                   clearInterval(intervalKey);
+                   ws.send("analyze");
+                   $("#message").text("");
+               });</pre>
+            </div> 
+            <p>The export button, bad naming I think when I'm writing this, stops the recording, the interval and informs the backend server that it can send the received data to the google api for further processing.</p> 
+            <h2>Connecting the frontend to the backend</h2> 
+            <p>To connect the webapplication to the backend server we use websockets. In the previous code fragments you've already seen how they are used. We create them with the following:</p> 
+            <div class="geshifilter"> 
+             <pre class="text geshifilter-text" style="font-family:monospace;">               var ws = new WebSocket("ws://127.0.0.1:9999");
+               ws.onopen = function () {
+                   console.log("Openened connection to websocket");
+               };
+&nbsp;
+               ws.onmessage = function(e) {
+                   var jsonResponse = jQuery.parseJSON(e.data );
+                   console.log(jsonResponse);
+                   if (jsonResponse.hypotheses.length &gt; 0) {
+                      var bestMatch = jsonResponse.hypotheses[0].utterance;
+                       $("#outputText").text(bestMatch);
+                   }
+               }</pre>
+            </div> 
+            <p>We create a connection, and when we receive a message from the backend we just assume it contains the response to our speech analysis. And that's it for the complete front end of the application. We use getUserMedia to access the microphone, use the Web Audio API to get access to the raw data and communicate with websockets with the backend server.</p> 
+            <h2>The backend server</h2> 
+            <p>Our backend server needs to do a couple of things. It first needs to combine the incoming chunks to a single audio file, next it needs to convert this to a format google APIs expect, which is flac. Finally we make a call to the google api and return the response. </p> 
+            <p>I've used Jetty as the websocket server for this example. If you want to know the details about setting this up, look at the <a href="http://www.smartjava.org/content/face-detection-using-html5-javascript-webrtc-websockets-jetty-and-javacvopencv">facedetection</a> example. In this article I'll only show the code to process the incoming messages.</p> 
+            <h3>First step, combine the incoming data</h3> 
+            <p>The data we receive is encoded as wav (thanks to the recorder.js library we don't have to do this ourselves). In our backend we thus receive sound fragments with a length of one second. We can't just concatenate these together, since wav files have a header that tells how long the fragment is (amongst other things), so we have to combine them, and rewrite the header. Lets first look at the code (ugly code, but works good enough for now :)</p> 
+            <div class="geshifilter"> 
+             <pre class="java geshifilter-java" style="font-family:monospace;"><span style="color: #000000; font-weight: bold;">public</span> <span style="color: #000066; font-weight: bold;">void</span> onMessage<span style="color: #009900;">(</span><span style="color: #000066; font-weight: bold;">byte</span><span style="color: #009900;">[</span><span style="color: #009900;">]</span> data, <span style="color: #000066; font-weight: bold;">int</span> offset, <span style="color: #000066; font-weight: bold;">int</span> length<span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+&nbsp;
+			<span style="color: #000000; font-weight: bold;">if</span> <span style="color: #009900;">(</span>currentCommand.<span style="color: #006633;">equals</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"start"</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+				<span style="color: #000000; font-weight: bold;">try</span> <span style="color: #009900;">{</span>
+					<span style="color: #666666; font-style: italic;">// The temporary file that contains our captured audio stream</span>
+					<a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a> f <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a><span style="color: #009900;">(</span><span style="color: #0000ff;">"out.wav"</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+					<span style="color: #666666; font-style: italic;">// if the file already exists we append it.</span>
+					<span style="color: #000000; font-weight: bold;">if</span> <span style="color: #009900;">(</span>f.<span style="color: #006633;">exists</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+						LOG.<span style="color: #006633;">info</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"Adding received block to existing file."</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+						<span style="color: #666666; font-style: italic;">// two clips are used to concat the data</span>
+						 <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Aaudioinputstream+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">AudioInputStream</span></a> clip1 <span style="color: #339933;">=</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Aaudiosystem+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">AudioSystem</span></a>.<span style="color: #006633;">getAudioInputStream</span><span style="color: #009900;">(</span>f<span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+						 <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Aaudioinputstream+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">AudioInputStream</span></a> clip2 <span style="color: #339933;">=</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Aaudiosystem+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">AudioSystem</span></a>.<span style="color: #006633;">getAudioInputStream</span><span style="color: #009900;">(</span><span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Abytearrayinputstream+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">ByteArrayInputStream</span></a><span style="color: #009900;">(</span>data<span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+						 <span style="color: #666666; font-style: italic;">// use a sequenceinput to cat them together</span>
+						 <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Aaudioinputstream+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">AudioInputStream</span></a> appendedFiles <span style="color: #339933;">=</span> 
+		                            <span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Aaudioinputstream+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">AudioInputStream</span></a><span style="color: #009900;">(</span>
+		                                <span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Asequenceinputstream+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">SequenceInputStream</span></a><span style="color: #009900;">(</span>clip1, clip2<span style="color: #009900;">)</span>,     
+		                                clip1.<span style="color: #006633;">getFormat</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span>, 
+		                                clip1.<span style="color: #006633;">getFrameLength</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span> <span style="color: #339933;">+</span> clip2.<span style="color: #006633;">getFrameLength</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+						 <span style="color: #666666; font-style: italic;">// write out the output to a temporary file</span>
+		                    <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Aaudiosystem+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">AudioSystem</span></a>.<span style="color: #006633;">write</span><span style="color: #009900;">(</span>appendedFiles, 
+		                            <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Aaudiofileformat.type+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">AudioFileFormat.<span style="color: #006633;">Type</span></span></a>.<span style="color: #006633;">WAVE</span>,
+		                            <span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a><span style="color: #009900;">(</span><span style="color: #0000ff;">"out2.wav"</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+		                    <span style="color: #666666; font-style: italic;">// rename the files and delete the old one</span>
+		                    <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a> f1 <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a><span style="color: #009900;">(</span><span style="color: #0000ff;">"out.wav"</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+		                    <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a> f2 <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a><span style="color: #009900;">(</span><span style="color: #0000ff;">"out2.wav"</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+		                    f1.<span style="color: #006633;">delete</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+		                    f2.<span style="color: #006633;">renameTo</span><span style="color: #009900;">(</span><span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a><span style="color: #009900;">(</span><span style="color: #0000ff;">"out.wav"</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+					<span style="color: #009900;">}</span> <span style="color: #000000; font-weight: bold;">else</span> <span style="color: #009900;">{</span>
+						LOG.<span style="color: #006633;">info</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"Starting new recording."</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+						<a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afileoutputstream+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">FileOutputStream</span></a> fOut <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afileoutputstream+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">FileOutputStream</span></a><span style="color: #009900;">(</span><span style="color: #0000ff;">"out.wav"</span>,<span style="color: #000066; font-weight: bold;">true</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+						fOut.<span style="color: #006633;">write</span><span style="color: #009900;">(</span>data<span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+						fOut.<span style="color: #006633;">close</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+					<span style="color: #009900;">}</span>			
+				<span style="color: #009900;">}</span> <span style="color: #000000; font-weight: bold;">catch</span> <span style="color: #009900;">(</span><a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Aexception+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">Exception</span></a> e<span style="color: #009900;">)</span> <span style="color: #009900;">{</span>	...<span style="color: #009900;">}</span>
+			<span style="color: #009900;">}</span>
+		<span style="color: #009900;">}</span></pre>
+            </div> 
+            <p>This method gets called for each chunk of audio we receive from the browser. What we do here is the following:</p> 
+            <ul> 
+             <li>First, we check whether we have a temp audio file, if not we create it</li> 
+             <li>If the file exists we use Java's AudioSystem to create an audio sequence</li> 
+             <li>This sequence is then written to another file</li> 
+             <li>The original is deleted and the new one is renamed.</li> 
+             <li>We repeat this for each chunk</li> 
+            </ul> 
+            <p>So at this point we have a wav file that keeps on growing for each added chunk. Now before we convert this, lets look at the code we use to control the backend.</p> 
+            <div class="geshifilter"> 
+             <pre class="java geshifilter-java" style="font-family:monospace;"><span style="color: #000000; font-weight: bold;">public</span> <span style="color: #000066; font-weight: bold;">void</span> onMessage<span style="color: #009900;">(</span><a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Astring+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">String</span></a> data<span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+			<span style="color: #000000; font-weight: bold;">if</span> <span style="color: #009900;">(</span>data.<span style="color: #006633;">startsWith</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"start"</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+				<span style="color: #666666; font-style: italic;">// before we start we cleanup anything left over</span>
+				cleanup<span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+				currentCommand <span style="color: #339933;">=</span> <span style="color: #0000ff;">"start"</span><span style="color: #339933;">;</span>
+			<span style="color: #009900;">}</span> <span style="color: #000000; font-weight: bold;">else</span> <span style="color: #000000; font-weight: bold;">if</span> <span style="color: #009900;">(</span>data.<span style="color: #006633;">startsWith</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"stop"</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+				currentCommand <span style="color: #339933;">=</span> <span style="color: #0000ff;">"stop"</span><span style="color: #339933;">;</span>
+			<span style="color: #009900;">}</span> <span style="color: #000000; font-weight: bold;">else</span> <span style="color: #000000; font-weight: bold;">if</span> <span style="color: #009900;">(</span>data.<span style="color: #006633;">startsWith</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"clear"</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+				<span style="color: #666666; font-style: italic;">// just remove the current recording</span>
+				cleanup<span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+			<span style="color: #009900;">}</span> <span style="color: #000000; font-weight: bold;">else</span> <span style="color: #000000; font-weight: bold;">if</span> <span style="color: #009900;">(</span>data.<span style="color: #006633;">startsWith</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"analyze"</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+                        <span style="color: #666666; font-style: italic;">// convert to flac</span>
+	               ...
+	                <span style="color: #666666; font-style: italic;">// send the request to the google speech to text service</span>
+	                ...
+                       <span style="color: #009900;">}</span>
+           <span style="color: #009900;">}</span></pre>
+            </div> 
+            <p>The previous method responded to binary websockets messages. The one shown above responds to string messages. We use this to control, from the browser, what the backend should do. Let's look at the analyze command, since that is the interesting one. When this command is issued from the frontend the backend needs to convert the wav file to flac and send it to the google service.</p> 
+            <h3>convert to flac</h3> 
+            <p>For the conversion to flac we need an external library since Java standard has no support for this. I used the <a href="http://javaflacencoder.sourceforge.net/">javaflacencoder from here</a> for this.</p> 
+            <div class="geshifilter"> 
+             <pre class="java geshifilter-java" style="font-family:monospace;"><span style="color: #666666; font-style: italic;">// get an encoder</span>
+FLAC_FileEncoder flacEncoder <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> FLAC_FileEncoder<span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+<span style="color: #666666; font-style: italic;">// point to the input file</span>
+<a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a> inputFile <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a><span style="color: #009900;">(</span><span style="color: #0000ff;">"out.wav"</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+<a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a> outputFile <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Afile+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">File</span></a><span style="color: #009900;">(</span><span style="color: #0000ff;">"out2.flac"</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+<span style="color: #666666; font-style: italic;">// encode the file</span>
+LOG.<span style="color: #006633;">info</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"Start encoding wav file to flac."</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+flacEncoder.<span style="color: #006633;">encode</span><span style="color: #009900;">(</span>inputFile, outputFile<span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+LOG.<span style="color: #006633;">info</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"Finished encoding wav file to flac."</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span></pre>
+            </div> 
+            <p>Easy as that. Now we got a flac file that we can send to google for analysis.</p> 
+            <h3>Send to google for analysis</h3> 
+            <p>A couple of weeks ago I ran across an article that explained how someone analyzed <a href="http://mikepultz.com/2011/03/accessing-google-speech-api-chrome-11/">chrome and found out about an undocumented google API</a> you can use for speech to text. If you post a flac file to this url: <a href="https://www.google.com/speech-api/v1/recognize?xjerr=1&amp;client=chromium&amp;lang=en-US">https://www.google.com/speech-api/v1/recognize?xjerr=1&amp;client=chromium&amp;l...</a> you receive a response like this:</p> 
+            <div class="geshifilter"> 
+             <pre class="text geshifilter-text" style="font-family:monospace;">{
+    "status": 0,
+    "id": "ae466ffa24a1213f5611f32a17d5a42b-1",
+    "hypotheses": [
+    {
+        "utterance": "the quick brown fox",
+        "confidence": 0.857393
+    }]
+}</pre>
+            </div> 
+            <p>To do this from java code, using HTTPClient, you do the following:</p> 
+            <div class="geshifilter"> 
+             <pre class="java geshifilter-java" style="font-family:monospace;"> <span style="color: #666666; font-style: italic;">// send the request to the google speech to text service</span>
+LOG.<span style="color: #006633;">info</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"Sending file to google for speech2text"</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+HttpClient client <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> DefaultHttpClient<span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+HttpPost p <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> HttpPost<span style="color: #009900;">(</span><a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Aurl+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">URL</span></a><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+p.<span style="color: #006633;">addHeader</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"Content-Type"</span>, <span style="color: #0000ff;">"audio/x-flac; rate=44100"</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+ p.<span style="color: #006633;">setEntity</span><span style="color: #009900;">(</span><span style="color: #000000; font-weight: bold;">new</span> FileEntity<span style="color: #009900;">(</span>outputFile, <span style="color: #0000ff;">"audio/x-flac; rate=44100"</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+HttpResponse response <span style="color: #339933;">=</span> client.<span style="color: #006633;">execute</span><span style="color: #009900;">(</span>p<span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+f <span style="color: #009900;">(</span>response.<span style="color: #006633;">getStatusLine</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span>.<span style="color: #006633;">getStatusCode</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span> <span style="color: #339933;">==</span> <span style="color: #cc66cc;">200</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+	LOG.<span style="color: #006633;">info</span><span style="color: #009900;">(</span><span style="color: #0000ff;">"Received valid response, sending back to browser."</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Astring+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">String</span></a> result <span style="color: #339933;">=</span> <span style="color: #000000; font-weight: bold;">new</span> <a href="http://www.google.com/search?hl=en&amp;q=allinurl%3Astring+java.sun.com&amp;btnI=I%27m%20Feeling%20Lucky"><span style="color: #003399;">String</span></a><span style="color: #009900;">(</span>IOUtils.<span style="color: #006633;">toByteArray</span><span style="color: #009900;">(</span>response.<span style="color: #006633;">getEntity</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span>.<span style="color: #006633;">getContent</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+	<span style="color: #000000; font-weight: bold;">this</span>.<span style="color: #006633;">connection</span>.<span style="color: #006633;">sendMessage</span><span style="color: #009900;">(</span>result<span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">}</span></pre>
+            </div> 
+            <p>And that are all the steps that are needed. </p> 
+            <p><img src="/sites/default/files/Speech%20recognition%20with%20Javascript%2C%20Websockets%20and%20Google%20Speech%20API-1.png" width="659" height="449" alt="Speech recognition with Javascript, Websockets and Google Speech API-1.png"></p> 
+           </div>
+          </div>
+         </div>
+         <div id="disqus_thread">
+          <noscript>
+           <p><a href="http://testforum-smartjava.disqus.com/?url=http%3A%2F%2Fwww.smartjava.org%2Fcontent%2Frecord-audio-using-webrtc-chrome-and-speech-recognition-websockets">View the discussion thread.</a></p>
+          </noscript>
+         </div> 
+        </div> 
+        <footer> 
+        </footer> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+     </div> 
+     <!-- /.region --> 
+    </section> 
+    <!-- /#main --> 
+    <aside id="sidebar-second" role="complementary" class="sidebar clearfix"> 
+     <div class="region region-sidebar-second"> 
+      <div id="block-service-links-service-links" class="block block-service-links"> 
+       <h2>Share this page</h2> 
+       <div class="content"> 
+        <div class="service-links">
+         <div class="item-list">
+          <ul>
+           <li class="first"><a href="http://twitter.com/share?url=http%3A//www.smartjava.org/content/record-audio-using-webrtc-chrome-and-speech-recognition-websockets&amp;count=horizontal&amp;via=josdirksen&amp;text=Record%20audio%20using%20webrtc%20in%20chrome%20and%20speech%20recognition%20with%20websockets&amp;counturl=http%3A//www.smartjava.org/content/record-audio-using-webrtc-chrome-and-speech-recognition-websockets" class="twitter-share-button service-links-twitter-widget" title="Tweet This" rel="nofollow"><span class="element-invisible">Tweet Widget</span></a></li> 
+           <li><a href="http://www.facebook.com/sharer.php" title="Share this post on Facebook" class="service-links-facebook-widget" rel="http://www.smartjava.org/content/record-audio-using-webrtc-chrome-and-speech-recognition-websockets">Share on Facebook</a></li> 
+           <li><a href="http://www.smartjava.org/content/record-audio-using-webrtc-chrome-and-speech-recognition-websockets" title="Plus it" class="service-links-google-plus-one" rel="nofollow"><span class="element-invisible">Google Plus One</span></a></li> 
+           <li><a href="http://www.facebook.com/plugins/like.php?href=http%3A//www.smartjava.org/content/record-audio-using-webrtc-chrome-and-speech-recognition-websockets&amp;layout=button_count&amp;show_faces=true&amp;action=like&amp;colorscheme=light&amp;width=80&amp;height=21&amp;font=&amp;locale=" title="I Like it" class="service-links-facebook-like" rel="nofollow"><span class="element-invisible">Facebook Like</span></a></li> 
+           <li class="last"><a href="http://www.smartjava.org/content/record-audio-using-webrtc-chrome-and-speech-recognition-websockets" title="Share on Linkedin" class="service-links-linkedin-share-button" rel="nofollow"><span class="element-invisible">Linkedin Share Button</span></a></li> 
+          </ul>
+         </div>
+        </div> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+      <div id="block-block-7" class="block block-block"> 
+       <h2>My Books</h2> 
+       <div class="content"> 
+        <p> Click to buy:</p> 
+        <p><a href="http://www.amazon.com/RESTful-Web-Services-Scala-Dirksen-ebook/dp/B016MWRF1Q"><br> <img src="https://d255esdrn735hr.cloudfront.net/sites/default/files/imagecache/ppv4_main_book_cover/B04843_RESTful%20Web%20Services%20with%20Scala_.jpg" width="180"></a><br> -<a href="https://www.packtpub.com/web-development/restful-web-services-scala">buy @ packt-</a></p> 
+        <p><a href="http://www.amazon.com/Three-js-Cookbook-Jos-Dirksen/dp/1783981180"><br> <img src="/sites/www.smartjava.org/files/threejscookbook.jpeg" width="180"></a><br> -<a href="https://www.packtpub.com/web-development/threejs-cookbook">buy @ packt-</a></p> 
+        <p><a href="http://www.amazon.com/Three-js-Essentials-Jos-Dirksen/dp/1783980869/ref=tmm_pap_title_0"><br> <img src="/sites/www.smartjava.org/files/tjes.jpeg" width="180"></a><br> -<a href="https://www.packtpub.com/web-development/threejs-essentials">buy @ packt-</a></p> 
+        <p><a href="http://www.amazon.com/gp/product/1782166289/ref=s9_psimh_gw_p14_d0_i1?pf_rd_m=ATVPDKIKX0DER&amp;pf_rd_s=center-2&amp;pf_rd_r=04MAKR25VCGVPSF3JTQ8&amp;pf_rd_t=101&amp;pf_rd_p=1630083502&amp;pf_rd_i=507846"><br> <img src="http://www.smartjava.org/sites/default/files/41wIE5b%2BugL._SX258_PJlook-inside-v2%2CTopRight%2C1%2C0_SH20_BO1%2C204%2C203%2C200_.jpg" width="180"></a><br> -<a href="http://www.packtpub.com/learning-three-js-javascript-3d-library-for-webgl/book">buy @ packt-</a></p> 
+        <p><a href="http://www.amazon.com/SOA-Governance-Action-REST-Architectures/dp/1617290270/ref=sr_1_1?s=books&amp;ie=UTF8&amp;qid=1327414681&amp;sr=1-1"><br> <img src="http://www.smartjava.org/sites/default/files/os-esbs.jpg" width="180"></a></p> 
+        <p><a href="http://www.amazon.com/Open-Source-ESBs-Action-Implementations-ServiceMix/dp/1933988215/ref=sr_1_1?s=books&amp;ie=UTF8&amp;qid=1327414178&amp;sr=1-1"><br> <img align="center" src="http://www.smartjava.org/sites/default/files/cover-soa-governance.jpg" width="180"></a></p> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+      <div id="block-block-6" class="block block-block"> 
+       <h2>My Twitter timeline</h2> 
+       <div class="content"> 
+        <p> <a class="twitter-timeline" width="200" href="https://twitter.com/josdirksen" data-widget-id="302354570443628544">Tweets by @josdirksen</a></p> 
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+      <div id="block-views-related-block" class="block block-views"> 
+       <h2>Related articles</h2> 
+       <div class="content"> 
+        <div class="view view-related view-id-related view-display-id-block view-dom-id-ecf47095f5f79bf9952ecd74434e42f9"> 
+         <div class="view-content"> 
+          <div class="item-list"> 
+           <ul> 
+            <li class="views-row views-row-1 views-row-odd views-row-first"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/exploring-html5-web-audio-api-filters">Exploring the HTML5 Web Audio API: Filters</a></span> 
+             </div></li> 
+            <li class="views-row views-row-2 views-row-even"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/motion-controlled-space-invaders-using-webrtc-and-canvas">Motion controlled space invaders using webrtc and canvas</a></span> 
+             </div></li> 
+            <li class="views-row views-row-3 views-row-odd views-row-last"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/adjust-colors-your-page-based-lighting-room-html5-webrtc-and-webcam">Adjust colors of your page based on the lighting of the room with HTML5, webrtc and a webcam</a></span> 
+             </div></li> 
+           </ul>
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+      <div id="block-views-latest-articles-block" class="block block-views"> 
+       <h2>Latest articles</h2> 
+       <div class="content"> 
+        <div class="view view-latest-articles view-id-latest_articles view-display-id-block view-dom-id-22382553578bc9627c529498bfc430fb"> 
+         <div class="view-content"> 
+          <div class="item-list"> 
+           <ul> 
+            <li class="views-row views-row-1 views-row-odd views-row-first"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/voronoi-fractal-d3js">Voronoi Fractal with D3.js</a></span> 
+             </div></li> 
+            <li class="views-row views-row-2 views-row-even"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/dynamic-component-loading-angular2-replace-compile">Dynamic component loading with Angular2: replace $compile</a></span> 
+             </div></li> 
+            <li class="views-row views-row-3 views-row-odd"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/analyzing-swearing-movies-part-1-swears-minute">Analyzing swearing in movies Part 1: Swears per minute</a></span> 
+             </div></li> 
+            <li class="views-row views-row-4 views-row-even"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/first-steps-angular-2-8-cool-features">First steps with Angular 2: 8 cool features</a></span> 
+             </div></li> 
+            <li class="views-row views-row-5 views-row-odd"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/scalaz-features-everyday-usage-part-3-state-monad-writer-monad-and-lenses">Scalaz features for everyday usage part 3: State Monad, Writer Monad and lenses</a></span> 
+             </div></li> 
+            <li class="views-row views-row-6 views-row-even"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/getting-started-scala-native">Getting started with scala-native</a></span> 
+             </div></li> 
+            <li class="views-row views-row-7 views-row-odd"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/render-3d-star-wars-force-awakens-models-blender-and-threejs">Render 3D Star Wars: The Force Awakens models in Blender and Three.js</a></span> 
+             </div></li> 
+            <li class="views-row views-row-8 views-row-even"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/service-discovery-docker-and-consul-part-2">Service Discovery with Docker and Consul: part 2</a></span> 
+             </div></li> 
+            <li class="views-row views-row-9 views-row-odd"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/scalaz-features-everyday-usage-part-2-monad-transformers-and-reader-monad"> Scalaz features for everyday usage part 2: Monad Transformers and the Reader Monad</a></span> 
+             </div></li> 
+            <li class="views-row views-row-10 views-row-even views-row-last"> 
+             <div class="views-field views-field-title"> 
+              <span class="field-content"><a href="/content/scalaz-features-everyday-usage-part-1-typeclasses-and-scala-extensions">Scalaz features for everyday usage part 1: Typeclasses and Scala extensions</a></span> 
+             </div></li> 
+           </ul>
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+     </div> 
+     <!-- /.region --> 
+    </aside> 
+    <!-- /#sidebar-second --> 
+   </div> 
+   <!-- end content-body --> 
+   <div class="clear"></div> 
+   <div id="footer" class="clearfix"> 
+    <!-- / start first footer block --> 
+    <div class="first-footer"> 
+     <div class="region region-footer-first"> 
+      <div id="block-block-1" class="block block-block"> 
+       <h2>About me</h2> 
+       <div class="content"> 
+        <p>My name is Jos Dirksen. I'm an independent consultant, currently working at ING. My focus areas are Scala, Java, HTML5, SOA, governance, ESBs, integration, REST and quality. I've also written a couple of books. Two for Manning and four for Packt. I frequently talk about my interests on conferences and workshops, and you can read my articles on this website.</p> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+     </div> 
+     <!-- /.region --> 
+    </div> 
+    <!-- / end first footer --> 
+    <!-- / start second footer block --> 
+    <div class="second-footer"> 
+     <div class="region region-footer-second"> 
+      <div id="block-block-2" class="block block-block"> 
+       <h2>Contact me</h2> 
+       <div class="content"> 
+        <li>Twitter: @josdirksen </li> 
+        <li>Email: <a href="mailto:jos.dirksen@gmail.com">jos.dirksen@gmail.com</a></li> 
+        <li>Website: <a href="http://www.smartjava.org">www.smartjava.org</a></li> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+     </div> 
+     <!-- /.region --> 
+    </div> 
+    <!-- / end second footer --> 
+    <!-- / start third footer block --> 
+    <div class="second-footer"> 
+     <div class="region region-footer-third"> 
+      <div id="block-block-3" class="block block-block"> 
+       <h2>Interesting links</h2> 
+       <div class="content"> 
+        <ul>
+         <li><a href="http://www.html5rocks.com">html5rocks.com</a></li> 
+         <li><a href="http://www.manning.com">manning.com</a></li> 
+         <li><a href="http://www.packtpub.com">manning.com</a></li> 
+         <li><a href="http://www.arstechnica.com">arstechnica.com</a></li> 
+        </ul> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+     </div> 
+     <!-- /.region --> 
+    </div> 
+    <!-- / end third footer --> 
+    <!-- / start fourth footer block --> 
+    <div class="second-footer"> 
+     <div class="region region-footer-fourth"> 
+      <div id="block-block-8" class="block block-block"> 
+       <h2>Terms and Conditions</h2> 
+       <div class="content"> 
+        <p> <a href="http://www.smartjava.org/other/FENIT_AV-2003_ENG.pdf">Terms and conditions (ENG)</a><br> <a href="http://www.smartjava.org/other/FENIT_AV-2003_NL.pdf">Terms and conditions (NL)</a> </p> 
+       </div> 
+      </div> 
+      <!-- /.block --> 
+     </div> 
+     <!-- /.region --> 
+    </div> 
+    <!-- / end fourth footer --> 
+    <div class="clear"></div> 
+    <div class="clear"></div> 
+    <div id="copyright">
+     Copyright © 2017, Smartjava.org
+    </div> 
+   </div> 
+   <!-- /#footer --> 
+  </div> 
+  <!-- /#wrapper -->  
+ </body>
+</html>

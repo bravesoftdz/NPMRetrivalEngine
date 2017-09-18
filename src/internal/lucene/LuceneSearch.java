@@ -78,7 +78,12 @@ public class LuceneSearch implements Searcher {
 	}
 
 	@Override
-	public String getName() {
+	public String getId() {
+		return "lucene";
+	}
+	
+	@Override
+	public String getContentId() {
 		return "lucene";
 	}
 	

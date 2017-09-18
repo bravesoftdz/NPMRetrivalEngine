@@ -122,10 +122,16 @@ public class DuckWrapper implements Searcher
     }
 
 	@Override
-	public String getName() {
+	public String getId() {
 		return "duckduckgo.com";
 	}
 
+	
+	@Override
+	public String getContentId() {
+		return "duckduckgo.com";
+	}
+	
 	@Override
 	public List acquireData(String query, Proxy proxy) {
 		// TODO Auto-generated method stub

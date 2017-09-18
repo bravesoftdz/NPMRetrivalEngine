@@ -31,7 +31,7 @@ public class CacheContentManager {
 
 	public List<String> loadContentFromCache(Searcher searcher, String query) {
 		List<String> contents = new ArrayList<String>();
-		String path = cache_folder +"/"+ searcher.getName() +"/"+ query;
+		String path = cache_folder +"/"+ searcher.getContentId() +"/"+ query;
 		File f = new File(path);
 		if (f.exists()){
 			File[] ficheros = f.listFiles();
@@ -57,7 +57,7 @@ public class CacheContentManager {
 	}
 
 	public void saveContentInCache(List<String> results, Searcher searcher, String query) {
-		String path = cache_folder +"/"+ searcher.getName() +"/"+ query;
+		String path = cache_folder +"/"+ searcher.getContentId() +"/"+ query;
 		File directory = new File(path);
 		directory.mkdirs();
 		for(int i=0;i<results.size();i++){

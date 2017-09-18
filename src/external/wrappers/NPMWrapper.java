@@ -16,6 +16,7 @@ import metasearch.cache.CacheRankingManager;
 import ner.EntityExtractor;
 import ranking.RankedItem;
 import ranking.Ranking;
+import util.PackageManager;
 
 public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 	// We need a real browser user agent or Google will block our request with a
@@ -30,6 +31,8 @@ public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 	public static final String QUALITY = "quality";
 	public static final String POPULARITY = "popularity";
 	public static final String MAINTENANCE = "maintenance";
+	
+	public static final String NPMJS = "npmjs.com";
 
 	public NPMWrapper(int results, String ranktype) {
 		RESULTS = results;
@@ -85,6 +88,8 @@ public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 		
 		System.out.println("Analizing Results...");
 		
+		PackageManager pm = PackageManager.getInstance();
+		
 		for (int page = 0; page < contents.size() && results.size() < RESULTS; page++) {
 			
 			Document doc = (Document) Jsoup.parse((String)contents.get(page));
@@ -101,10 +106,11 @@ public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 
 					final String title = result.text();
 					final String url = result.attr("href");
-
-					System.out.println(title + " -> " + url);
-
-					results.add(new RankedItem(title, (double) (((page - 1) * 10) + e)));
+					
+					if(pm.isPkgName(title)){
+						System.out.println(title + " -> " + url);
+						results.add(new RankedItem(title, (double) (((page - 1) * 10) + e)));
+					}
 
 				}
 			}
@@ -117,18 +123,23 @@ public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 	
 	public List<String> acquireData(String query, Proxy proxy){
 		
-		System.out.println("Acquiring data from NPM...");
+		//System.out.println("Acquiring data from NPM...");
 
 		List<String> content = getResultContent(query, proxy,this);
 		
-		System.out.print(" ...connection SUCCESSFUL...");
+		//System.out.print(" ...connection SUCCESSFUL...");
 		
 		return content;
 	}
 
 	@Override
-	public String getName() {
-		return "npmjs.com" + RANK;
+	public String getId() {
+		return NPMJS +"_"+ RANK;
+	}
+	
+	@Override
+	public String getContentId() {
+		return NPMJS +"_"+ RANK + "_" + RESULTS;
 	}
 
 }
