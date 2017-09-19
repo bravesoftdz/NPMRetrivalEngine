@@ -11,6 +11,53 @@ import Jama.EigenvalueDecomposition;
 
 public abstract class MarkovChainAggregator implements Aggregator{
 	
+	@Override
+	public Ranking aggregate(List<Ranking> rankings) {
+		List<RankedItem> uniqueItems = getUniqueItems(rankings);
+	    int N = uniqueItems.size();
+	    double[][] transition = getTransitionMatrix(uniqueItems,rankings);
+	    checkTransitionMatrix(transition, N);
+		Matrix stationaryMatrix = computeMatrix(N, transition);	
+		return getRankingFromMatrix(uniqueItems, stationaryMatrix);
+	}
+	
+	private Matrix computeMatrix(int N, double[][] transition) {
+	    Matrix stationaryMatrix = null;
+	    if(stationaryMatrix == null){
+		    try{
+		    	stationaryMatrix = computeByFindingEigenvector(N, transition);
+		    }catch(Exception e){
+		    	
+		    }finally{
+			    if(stationaryMatrix == null){
+			    	System.out.println("Error computing matrix with Eigenvector");
+			    	try{
+			    		stationaryMatrix = computeBySolvingLinearSystemEquations(N, transition);	
+			    	}catch(Exception e){
+			    		
+			    	}finally{
+			    		System.out.println("Error computing matrix with LinearSystemEquations");
+			    	    if(stationaryMatrix == null){
+			    	    	try{
+			    	    		stationaryMatrix = computeUsingXIterations(N, transition,50);	
+			    	    	}catch(Exception e){
+			    	    		
+			    	    	}finally{
+			    	    		if(stationaryMatrix == null){
+			    	    			System.out.println("Error computing matrix with  XIterations");
+			    	    		}
+			    	    		
+			    	    	}
+			    	    }
+			    		
+			    	}
+			 
+			    }
+		    }
+	    }
+	    return stationaryMatrix;
+	}
+	
     public Matrix computeUsingXIterations(int N, double[][] transition, int iter){
         // compute using x number iterations of power method
         Matrix A = new Matrix(transition);
@@ -56,15 +103,25 @@ public abstract class MarkovChainAggregator implements Aggregator{
 	    return x;
     }
 
-	@Override
-	public Ranking aggregate(List<Ranking> rankings) {
-		List<RankedItem> uniqueItems = getUniqueItems(rankings);
-	    int N = uniqueItems.size();
-	    double[][] transition = getTransitionMatrix(uniqueItems,rankings);
-		Matrix stationaryMatrix = computeBySolvingLinearSystemEquations(N, transition);	
-		return getRankingFromMatrix(uniqueItems, stationaryMatrix);
+
+	private boolean checkTransitionMatrix(double[][] transition,int N) {
+		for(int i=0;i<N;i++){
+			double check = 0.0;
+			for(int e=0;e<N;e++){
+				check += transition[i][e];
+			}
+			if(check!=1.0){
+				System.out.println("ERRoR: chaeck="+check);
+			}else{
+				System.out.println("GOOD!");
+			}
+			
+		}
+		
+		return false;
+		
 	}
-	
+
 	private Ranking getRankingFromMatrix(List<RankedItem> uniqueItems, Matrix stationaryMatrix) {
         if(stationaryMatrix.getRowDimension()==uniqueItems.size()){
         	List<RankedItem> items = new ArrayList<RankedItem>();

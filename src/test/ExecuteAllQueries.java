@@ -9,7 +9,7 @@ import java.util.List;
 
 import aggregators.Aggregator;
 import aggregators.WeightedFirstRankingAgregator;
-import aggregators.WeightedRankingAgregator;
+import aggregators.WeightedBordaFuse;
 import external.wrappers.BingWrapper;
 import external.wrappers.GoogleWrapper;
 import external.wrappers.NPMWrapper;
@@ -72,11 +72,11 @@ public class ExecuteAllQueries {
 		Aggregator weightedFirstRankingAgregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
 		aggregators.add(weightedFirstRankingAgregator);
 
-		Aggregator weightedRankingAgregator = new WeightedRankingAgregator(Arrays.asList(weights));
+		Aggregator weightedRankingAgregator = new WeightedBordaFuse(Arrays.asList(weights));
 		aggregators.add(weightedRankingAgregator);
 		
 		Double[] weights2 = { 0.70, 0.10, 0.10, 0.10 };
-		Aggregator weightedRankingAgregator2 = new WeightedRankingAgregator(Arrays.asList(weights2));
+		Aggregator weightedRankingAgregator2 = new WeightedBordaFuse(Arrays.asList(weights2));
 		weightedRankingAgregator2.setName(weightedRankingAgregator2.getName()+"701010");
 		aggregators.add(weightedRankingAgregator2);
 

@@ -7,12 +7,18 @@ import java.util.Arrays;
 import java.util.List;
 
 import aggregators.Aggregator;
+import aggregators.BordaFuse;
 import aggregators.M1;
+import aggregators.M2;
+import aggregators.M3;
+import aggregators.M4;
+import aggregators.WeightedBordaFuse;
 import aggregators.WeightedFirstRankingAgregator;
 import external.wrappers.BingWrapper;
 import external.wrappers.GoogleWrapper;
 import external.wrappers.NPMSearchWrapper;
 import external.wrappers.NPMWrapper;
+import internal.lucene.LuceneSearch;
 import metasearch.MetaSearcher;
 import metasearch.MetaSearcherImp;
 import metasearch.Searcher;
@@ -64,26 +70,48 @@ public class AggregateData {
 		BingWrapper bing = new BingWrapper(max_results,new HiperlinkMatching());
 		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);
 		
+		/**
+		 * Internal Searchers
+		 * 
+		 */
+		
+		LuceneSearch lucene = new LuceneSearch(max_results,proxy);
+		
 		List<Searcher> searchers = new ArrayList<Searcher>();
+		searchers.add(lucene);
 		searchers.add(google);
 		searchers.add(npm);
 		searchers.add(bing);
-		searchers.add(npmsearch);		
+		searchers.add(npmsearch);	
+		
 		
 		/**
 		 * Aggregators
 		 */
 		List<Aggregator> aggregators = new ArrayList<Aggregator>();
 
-		Double[] weights = { 0.25, 0.25, 0.25, 0.25 };
+		Double[] weights = {0.20, 0.20, 0.20, 0.20, 0.20};
+		/*
 		Aggregator weightedFirstRankingAgregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
-		aggregators.add(weightedFirstRankingAgregator);
+		aggregators.add(weightedFirstRankingAgregator);*/
 
 		/*Aggregator weightedRankingAgregator = new WeightedRankingAgregator(Arrays.asList(weights));
 		aggregators.add(weightedRankingAgregator);*/
-		
-		Aggregator m1 = new M1();
+
+		/*Aggregator m1 = new M1();
 		aggregators.add(m1);
+		
+		Aggregator m2 = new M2();
+		aggregators.add(m2);
+		
+		Aggregator m3 = new M3();
+		aggregators.add(m3);
+		
+		Aggregator m4 = new M4();
+		aggregators.add(m4);*/
+		
+		Aggregator borda = new WeightedBordaFuse(Arrays.asList(weights));
+		aggregators.add(borda);
 
 		for (Aggregator aggregator : aggregators) {
 			for (int i = 0 ; i < max_queries ; i++) {
@@ -94,7 +122,7 @@ public class AggregateData {
 				
 				MetaSearcher meta = new MetaSearcherImp(searchers, aggregator, max_results);
 				
-				Ranking ranking = CacheRankingManager.getInstance().loadRankingFromCache(meta, query);
+				Ranking ranking = null/*CacheRankingManager.getInstance().loadRankingFromCache(meta, query)*/;
 				if (ranking == null) {
 					meta.acquireData(query, proxy);
 					ranking = meta.processData(null);//TODO data null

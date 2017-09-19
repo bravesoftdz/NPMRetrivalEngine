@@ -112,8 +112,9 @@ public class GoogleWrapper extends SearchWrapperAbs implements Searcher {
 			List<String> entities = ent_extractor.getNamedEntities(tech);
 
 			for (String entity : entities) {
-				if (!ranking.contains(entity)) {
-					ranking.add(new RankedItem(entity, (double) (RESULTS - (rank - 1))));
+				RankedItem ri = new RankedItem(entity, (double) (RESULTS - (rank - 1)));
+				if (!ranking.contains(ri)) {
+					ranking.add(ri);
 					wordCount.put(entity, rank);
 				}
 			}

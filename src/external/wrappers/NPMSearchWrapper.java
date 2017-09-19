@@ -99,7 +99,10 @@ public class NPMSearchWrapper extends SearchWrapperAbs implements Searcher {
 				if (entry != null && entry.isJsonObject()) {
 					String pkg = ((JsonObject) entry).get("name").getAsString();
 					if(pm.isPkgName(pkg)){
-						results.add(new RankedItem(pkg,(double) (MAX_RESULTS - (rank - 1))));
+						RankedItem ri = new RankedItem(pkg,(double) (MAX_RESULTS - (rank - 1)));
+						if (!results.contains(ri)) {
+							results.add(ri);
+						}
 					}
 				}
 				rank++;

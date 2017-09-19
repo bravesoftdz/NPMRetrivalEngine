@@ -44,7 +44,11 @@ public class MetaSearcherImp implements MetaSearcher{
 	        if(ranking == null){
 	        	System.out.println("Warning: Ranking " + searcher.getId() + "no se puede cargar");
 	        }else{
-				rankings.add(ranking);
+	        	if(ranking.size()>ranking_size){
+	        		rankings.add(ranking.getRankingAtK(ranking_size));
+	        	}else{
+	        		rankings.add(ranking);
+	        	}
 	        }
 		}
 
@@ -53,7 +57,11 @@ public class MetaSearcherImp implements MetaSearcher{
 
 	@Override
 	public Ranking processData(List<String> contents) {
-		return aggregator.aggregate(rankings);
+		Ranking result = aggregator.aggregate(rankings);
+		if(result.size()>ranking_size){
+    		rankings.add(result.getRankingAtK(ranking_size));
+    	}		
+		return result;
 	}
 	
 	public Ranking search(String query, Proxy proxy, List<Searcher> searchers, Aggregator aggregator)

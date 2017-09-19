@@ -42,6 +42,19 @@ public class MarkovChain {
                                 };
 
 
+        for(int i=0;i<N;i++){
+			double check = 0.0;
+			for(int e=0;e<N;e++){
+				check += transition[i][e];
+			}
+			if(check!=1.0){
+				System.out.println("ERRoR: chaeck="+check);
+			}else{
+				System.out.println("GOOD!");
+			}
+			
+		}
+        
         // compute using 50 iterations of power method
         Matrix A = new Matrix(transition);
         A = A.transpose();

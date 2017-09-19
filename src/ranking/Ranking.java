@@ -44,6 +44,11 @@ public class Ranking implements Serializable {
 		this.id = id;
 		sort();
 	}
+	
+	public Ranking getRankingAtK(int k){
+		sort();
+		return new Ranking(rankingList.subList(0, k));
+	}
 
 	public List<RankedItem> getRankingList() {
 		return rankingList;

@@ -108,8 +108,11 @@ public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 					final String url = result.attr("href");
 					
 					if(pm.isPkgName(title)){
-						System.out.println(title + " -> " + url);
-						results.add(new RankedItem(title, (double) (((page - 1) * 10) + e)));
+						RankedItem ri = new RankedItem(title, (double) (((page - 1) * 10) + e));
+						if (!results.contains(ri)) {
+							System.out.println(title + " -> " + url);
+							results.add(ri);
+						}
 					}
 
 				}

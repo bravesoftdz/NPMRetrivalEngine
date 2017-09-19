@@ -1,6 +1,5 @@
 package aggregators;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,19 +26,22 @@ public class M1 extends MarkovChainAggregator {
 			HashMap<String,Double> higherRanked = new HashMap<String, Double>();
 			double countTransitions = 0.0;
 			for(Ranking r:rankings){
-				for(RankedItem it:r.getRankingList()){
-					if(it.getScore()>ri.getScore()){
-						if(higherRanked.get(it.getName())==null){
-							higherRanked.put(it.getName(),1.0);
-						}else{
-							higherRanked.put(it.getName(),higherRanked.get(it.getName())+1.0);
+				if(r.contains(ri)){
+					RankedItem P = r.getRankingList().get(r.getRankingList().indexOf(ri));
+					for(RankedItem Q:r.getRankingList()){
+						if(P.getScore()<=Q.getScore()){
+							if(higherRanked.get(Q.getName())==null){
+								higherRanked.put(Q.getName(),1.0);
+							}else{
+								higherRanked.put(Q.getName(),higherRanked.get(Q.getName())+1.0);
+							}
+							countTransitions ++;
 						}
-						countTransitions ++;
-					}
+					}				
 				}
 			}
 			for(int i=0;i<uniqueItems.size();i++){
-				transitionMatrix[i][e] = higherRanked.get(uniqueItems.get(i).getName())!=null ? higherRanked.get(uniqueItems.get(i).getName()) /countTransitions : 0.0;
+				transitionMatrix[e][i] = higherRanked.get(uniqueItems.get(i).getName())!=null ? higherRanked.get(uniqueItems.get(i).getName()) /countTransitions : 0.0;
 			}
 			
 		}
