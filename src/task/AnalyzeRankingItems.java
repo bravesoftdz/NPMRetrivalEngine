@@ -9,6 +9,7 @@ import ranking.RankedItem;
 import ranking.Ranking;
 import util.ConfigManager;
 import util.HitManager;
+import util.PackageManager;
 
 /**
  * Tarea de analizar si un elemento del ranking es un hit o no
@@ -25,10 +26,10 @@ public class AnalyzeRankingItems {
 	public static void main(String[] args) {
 		
 		int max_queries = Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
-		int max_position = Integer.valueOf(ConfigManager.getInstance().getProperty("max_results"));
+		int max_position = Integer.valueOf(ConfigManager.getInstance().getProperty("top_results"));
 		
-		String[] folders = { "WeightedFirstRankingAgregator", "WeightedRankingAgregator",
-				"lucene", "bing.com", "google.com_str_match", "npmjs.comoptimal", "npmsearch.com" };
+		String[] folders = { "lucene", "bing.com_stanford_CRF", "google.com_stanford_CRF", "bing.com_str_match", "google.com_str_match", "bing.com_hyp_match", "google.com_hyp_match", "npmjs.com_optimal", "npmsearch.com", 
+								"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse"};
 		boolean end = false;
 		HashMap<String, Integer> hits4Search = new HashMap<String, Integer>();
 		
@@ -57,7 +58,8 @@ public class AnalyzeRankingItems {
 
 						String inChar = "";
 						try {
-							System.out.print(i + " - " + pkg);
+							System.out.println(i + " - " + pkg + " -> " + PackageManager.getInstance().getDesc(pkg));
+							System.out.print("https://www.npmjs.com/package/" + pkg + " ");
 							Scanner sc = new Scanner(System.in);
 							inChar = sc.nextLine();
 							if (inChar.equals("y")) {

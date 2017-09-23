@@ -1,6 +1,7 @@
 package internal.lucene;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -9,6 +10,7 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser.Operator;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
@@ -28,10 +30,20 @@ public class LuceneSearcher {
 	  Directory dir = FSDirectory.open(Paths.get(indexDirectoryPath));
 	  IndexReader reader = DirectoryReader.open(dir);
 	  indexSearcher = new IndexSearcher(reader);
-	    
 
-      queryParser = new MultiFieldQueryParser(new String[]{LuceneConstants.ID, LuceneConstants.DESCR, LuceneConstants.KEYS, LuceneConstants.README},
-    		  new StandardAnalyzer());
+	  String[] fields = new String[]{/*LuceneConstants.ID,*/ LuceneConstants.KEYS, LuceneConstants.DESCR, LuceneConstants.README};
+
+	  //Boosting
+	  HashMap<String,Float> boosts = new HashMap<String,Float>();
+	  boosts.put(fields[0], 1.0F);
+	  boosts.put(fields[1], 1.0F);
+	  boosts.put(fields[2], 1.0F);/*
+	  boosts.put(fields[3], 1.0F);*/
+	  
+	  queryParser = new MultiFieldQueryParser(fields,
+    		  new StandardAnalyzer()
+    		  ,boosts);
+      //queryParser.setDefaultOperator(Operator.AND);
    }
    
    public TopDocs search( String searchQuery, int results) 

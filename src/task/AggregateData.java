@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import aggregators.Aggregator;
+import aggregators.BoostedBordaFuse;
 import aggregators.BordaFuse;
+import aggregators.CordorcetAggregator;
 import aggregators.M1;
 import aggregators.M2;
 import aggregators.M3;
@@ -67,7 +69,7 @@ public class AggregateData {
 
 		NPMWrapper npm = new NPMWrapper(max_results, NPMWrapper.OPTIMAL);
 		GoogleWrapper google = new GoogleWrapper(max_results,new HiperlinkMatching());
-		BingWrapper bing = new BingWrapper(max_results,new HiperlinkMatching());
+		//BingWrapper bing = new BingWrapper(max_results,new HiperlinkMatching());
 		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);
 		
 		/**
@@ -81,7 +83,7 @@ public class AggregateData {
 		searchers.add(lucene);
 		searchers.add(google);
 		searchers.add(npm);
-		searchers.add(bing);
+//		searchers.add(bing);
 		searchers.add(npmsearch);	
 		
 		
@@ -91,14 +93,8 @@ public class AggregateData {
 		List<Aggregator> aggregators = new ArrayList<Aggregator>();
 
 		Double[] weights = {0.20, 0.20, 0.20, 0.20, 0.20};
-		/*
-		Aggregator weightedFirstRankingAgregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
-		aggregators.add(weightedFirstRankingAgregator);*/
 
-		/*Aggregator weightedRankingAgregator = new WeightedRankingAgregator(Arrays.asList(weights));
-		aggregators.add(weightedRankingAgregator);*/
-
-		/*Aggregator m1 = new M1();
+		Aggregator m1 = new M1();
 		aggregators.add(m1);
 		
 		Aggregator m2 = new M2();
@@ -108,10 +104,19 @@ public class AggregateData {
 		aggregators.add(m3);
 		
 		Aggregator m4 = new M4();
-		aggregators.add(m4);*/
+		aggregators.add(m4);
 		
-		Aggregator borda = new WeightedBordaFuse(Arrays.asList(weights));
+		/*Aggregator w_borda = new WeightedBordaFuse(Arrays.asList(weights));
+		aggregators.add(w_borda);*/
+		
+		Aggregator borda = new BordaFuse();
 		aggregators.add(borda);
+		
+		Aggregator boosted_borda = new BoostedBordaFuse();
+		aggregators.add(boosted_borda);
+		
+		Aggregator cordorcet = new CordorcetAggregator();
+		aggregators.add(cordorcet);
 
 		for (Aggregator aggregator : aggregators) {
 			for (int i = 0 ; i < max_queries ; i++) {

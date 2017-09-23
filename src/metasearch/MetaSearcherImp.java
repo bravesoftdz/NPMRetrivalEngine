@@ -44,11 +44,11 @@ public class MetaSearcherImp implements MetaSearcher{
 	        if(ranking == null){
 	        	System.out.println("Warning: Ranking " + searcher.getId() + "no se puede cargar");
 	        }else{
-	        	if(ranking.size()>ranking_size){
+	        	/*if(ranking.size()>ranking_size){
 	        		rankings.add(ranking.getRankingAtK(ranking_size));
-	        	}else{
+	        	}else{*/
 	        		rankings.add(ranking);
-	        	}
+	        	//}
 	        }
 		}
 

@@ -5,6 +5,7 @@ import java.net.Proxy;
 
 import external.wrappers.NPMUtilWrapper;
 import util.ConfigManager;
+import util.PackageManager;
 
     
 
@@ -22,9 +23,10 @@ public class TestNPMReadmeWrapper {
 			);
 		
 		//NPMUtilWrapper rw = new NPMUtilWrapper();
-		NPMUtilWrapper.createHomePagesFile(download_path+"/"+npm_filename);
+		NPMUtilWrapper.createDescFile(download_path+"/"+npm_filename);
 		//String result = rw.downloadReadmeContent("lodash", proxy);
 		//System.out.println(result);
+		System.out.println(PackageManager.getInstance().getDesc("quagga"));
 		
 		
 

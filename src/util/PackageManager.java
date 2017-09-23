@@ -12,11 +12,14 @@ public class PackageManager {
 	private ArrayList<String> pkgNames = null;
 	private HashMap<String,String> pkgHomePages = null;
 	private HashMap<String,String> pkgHomePagesByPkgs = null;
+	private HashMap<String,String> pkgDescs = null;
 
 	protected PackageManager() {
 		pkgNames = new ArrayList<String>();
 		pkgHomePages = new HashMap<String,String>();
 		pkgHomePagesByPkgs = new HashMap<String,String>();
+		pkgDescs = new HashMap<String,String>();
+		loadPkgDesc();
 		loadPackageNames();
 		loadHomePages();
 	}
@@ -38,6 +41,22 @@ public class PackageManager {
 				String[] arr = linea.split(",");
 				pkgHomePages.put(arr[1],arr[0]);
 				pkgHomePagesByPkgs.put(arr[0],arr[1]);
+			}
+			fr.close();
+		} catch (Exception e) {
+			System.out.println("Excepcion leyendo fichero " + fichero + ": " + e);
+		}
+	}
+	
+	protected void loadPkgDesc() {
+		String fichero = ConfigManager.getInstance().getProperty("pkg_description_file");
+		try {
+			FileReader fr = new FileReader(fichero);
+			BufferedReader br = new BufferedReader(fr);
+			String linea;
+			while ((linea = br.readLine()) != null) {
+				String[] arr = linea.split(",");
+				pkgDescs.put(arr[0],arr[1]);
 			}
 			fr.close();
 		} catch (Exception e) {
@@ -83,6 +102,10 @@ public class PackageManager {
 
 	public String getHomePage(String entity) {
 		return pkgHomePagesByPkgs.get(entity);
+	}
+	
+	public String getDesc(String pkg) {
+		return pkgDescs.get(pkg);
 	}
 
 }

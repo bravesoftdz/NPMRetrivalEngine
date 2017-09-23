@@ -76,7 +76,7 @@ public class ProcessData {
 		searchers.add(bing3);
 		searchers.add(npmsearch);
 
-		for (Searcher searcher : searchers) {
+		/*for (Searcher searcher : searchers) {
 			
 			System.out.println("Analizando "+ searcher.getId());
 			
@@ -96,7 +96,7 @@ public class ProcessData {
 				System.out.println();
 				
 			}
-		}
+		}*/
 		
 		
 		
@@ -119,7 +119,7 @@ public class ProcessData {
 
 				System.out.println("Query "+ query);
 				
-				Ranking ranking = CacheRankingManager.getInstance().loadRankingFromCache(searcher, query);
+				Ranking ranking = null;//CacheRankingManager.getInstance().loadRankingFromCache(searcher, query);
 				if (ranking == null) {
 					List<String> data = new ArrayList<String>();
 					data.add(query);

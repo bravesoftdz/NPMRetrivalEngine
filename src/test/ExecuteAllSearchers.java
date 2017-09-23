@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import aggregators.Aggregator;
-import aggregators.OnlyTheFirst;
+import aggregators.BoostedBordaFuse;
 import external.wrappers.BingWrapper;
 import external.wrappers.GoogleWrapper;
 import external.wrappers.NPMSearchWrapper;
@@ -79,7 +79,7 @@ public class ExecuteAllSearchers {
 
 				String query = QueryManager.getInstance().getQueries().get(i);
 
-				Aggregator aggregator = new OnlyTheFirst();
+				Aggregator aggregator = new BoostedBordaFuse();
 				aggregator.setName(searcher.get(0).getId());
 				MetaSearcher meta = new MetaSearcherImp(searcher, aggregator, /*max_results*/20);
 				Ranking results = null;

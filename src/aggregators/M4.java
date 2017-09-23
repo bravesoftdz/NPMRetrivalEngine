@@ -25,23 +25,31 @@ public class M4 extends MarkovChainAggregator {
 			HashMap<String,Double> higherRanked = new HashMap<String, Double>();
 			double countTransitions = 0.0;
 			for(int Q=0;Q<uniqueItems.size();Q++){
-				boolean flag = true;
+				int mayor = 0;
+				int minor = 0;
 				for(Ranking r:rankings){
-					if(!(r.contains(uniqueItems.get(P)) && r.contains(uniqueItems.get(Q)))){
-						flag=false;
-					}
-					if(!(uniqueItems.get(P).getScore()<uniqueItems.get(Q).getScore())){
-						flag=false;
+					if(!uniqueItems.get(P).equals(uniqueItems.get(Q))&&r.contains(uniqueItems.get(P)) && r.contains(uniqueItems.get(Q))){
+						if(uniqueItems.get(P).getScore()<uniqueItems.get(Q).getScore()){
+							mayor++;
+						}else{
+							minor++;
+						}
 					}
 				}
-				if(flag || P==Q){
+				if(mayor<minor){
 					if(higherRanked.get(uniqueItems.get(Q).getName())==null){
 						higherRanked.put(uniqueItems.get(Q).getName(),1.0);
 					}else{
 						higherRanked.put(uniqueItems.get(Q).getName(),higherRanked.get(uniqueItems.get(Q).getName())+1.0);
 					}
-					countTransitions ++;
+				}else{
+					if(higherRanked.get(uniqueItems.get(P).getName())==null){
+						higherRanked.put(uniqueItems.get(P).getName(),1.0);
+					}else{
+						higherRanked.put(uniqueItems.get(P).getName(),higherRanked.get(uniqueItems.get(P).getName())+1.0);
+					}
 				}
+				countTransitions ++;
 			}
 			for(int i=0;i<uniqueItems.size();i++){
 				transitionMatrix[P][i] = higherRanked.get(uniqueItems.get(i).getName())!=null ? higherRanked.get(uniqueItems.get(i).getName()) /countTransitions : 0.0;

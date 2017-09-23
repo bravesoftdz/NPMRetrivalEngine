@@ -23,6 +23,17 @@ public class Ranking implements Serializable {
 	protected List<Double> k_fMeasure;
 	
 	protected String id;
+	
+	protected Comparator<RankedItem> comparator = new Comparator<RankedItem>() {
+		@Override
+		public int compare(RankedItem r1, RankedItem r2) {
+			return r1.compareTo(r2) * -1;
+		}
+	};
+
+	public void setComparator(Comparator<RankedItem> comparator) {
+		this.comparator = comparator;
+	}
 
 	public String getId() {
 		return id;
@@ -67,12 +78,7 @@ public class Ranking implements Serializable {
 	}
 
 	public void sort() {
-		rankingList.sort(new Comparator<RankedItem>() {
-			@Override
-			public int compare(RankedItem r1, RankedItem r2) {
-				return r1.compareTo(r2) * -1;
-			}
-		});
+		rankingList.sort(comparator);
 	}
 
 	/**

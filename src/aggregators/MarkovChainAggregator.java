@@ -16,8 +16,11 @@ public abstract class MarkovChainAggregator implements Aggregator{
 		List<RankedItem> uniqueItems = getUniqueItems(rankings);
 	    int N = uniqueItems.size();
 	    double[][] transition = getTransitionMatrix(uniqueItems,rankings);
-	    checkTransitionMatrix(transition, N);
-		Matrix stationaryMatrix = computeMatrix(N, transition);	
+	    //checkTransitionMatrix(transition, N);
+		Matrix stationaryMatrix = computeUsingXIterations(N, transition, 50);	
+        for(int i = 0; i<stationaryMatrix.getRowDimension(); i++){
+        	System.out.println(stationaryMatrix.get(i, 0));	
+        }
 		return getRankingFromMatrix(uniqueItems, stationaryMatrix);
 	}
 	
@@ -101,6 +104,23 @@ public abstract class MarkovChainAggregator implements Aggregator{
 	    b.set(0, 0, 1.0);
 	    Matrix x = B.solve(b);
 	    return x;
+    }
+    
+    public Matrix computeUsingAggregateOrdering(int N, double[][] transition){   
+	    // If ergordic, stationary distribution = unique solution to Ax = x
+	    // up to scaling factor.
+	    // We solve (A - I) x = 0, but replace row 0 with constraint that
+	    // says the sum of x coordinates equals one
+         double[][] result = new double[N][1];
+		for(int e=0;e<N;e++){
+			double agg = 0.0;
+			for(int i=0;i<N;i++){
+				agg += transition[i][e];
+			}
+			result[e][0]=agg;	
+		}
+		
+		return new Matrix(result);
     }
 
 
