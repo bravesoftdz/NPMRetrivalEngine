@@ -92,9 +92,9 @@ public class AggregateData {
 		 */
 		List<Aggregator> aggregators = new ArrayList<Aggregator>();
 
-		Double[] weights = {0.20, 0.20, 0.20, 0.20, 0.20};
+		//Double[] weights = {0.20, 0.20, 0.20, 0.20, 0.20};
 
-		Aggregator m1 = new M1();
+		/*Aggregator m1 = new M1();
 		aggregators.add(m1);
 		
 		Aggregator m2 = new M2();
@@ -109,15 +109,19 @@ public class AggregateData {
 		/*Aggregator w_borda = new WeightedBordaFuse(Arrays.asList(weights));
 		aggregators.add(w_borda);*/
 		
-		Aggregator borda = new BordaFuse();
+		/*Aggregator borda = new BordaFuse();
 		aggregators.add(borda);
 		
 		Aggregator boosted_borda = new BoostedBordaFuse();
 		aggregators.add(boosted_borda);
 		
 		Aggregator cordorcet = new CordorcetAggregator();
-		aggregators.add(cordorcet);
-
+		aggregators.add(cordorcet);*/
+		
+		Double[] weights = { 0.25, 0.25, 0.25, 0.25 };
+		Aggregator weightedFirstRankingAgregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
+		aggregators.add(weightedFirstRankingAgregator);
+		
 		for (Aggregator aggregator : aggregators) {
 			for (int i = 0 ; i < max_queries ; i++) {
 

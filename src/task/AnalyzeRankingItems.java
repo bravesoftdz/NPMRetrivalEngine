@@ -29,7 +29,7 @@ public class AnalyzeRankingItems {
 		int max_position = Integer.valueOf(ConfigManager.getInstance().getProperty("top_results"));
 		
 		String[] folders = { "lucene", "bing.com_stanford_CRF", "google.com_stanford_CRF", "bing.com_str_match", "google.com_str_match", "bing.com_hyp_match", "google.com_hyp_match", "npmjs.com_optimal", "npmsearch.com", 
-								"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse"};
+								"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedFirstRankingAgregator"};
 		boolean end = false;
 		HashMap<String, Integer> hits4Search = new HashMap<String, Integer>();
 		
