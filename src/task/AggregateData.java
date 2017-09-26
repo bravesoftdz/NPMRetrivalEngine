@@ -79,22 +79,50 @@ public class AggregateData {
 		
 		LuceneSearch lucene = new LuceneSearch(max_results,proxy);
 		
-		List<Searcher> searchers = new ArrayList<Searcher>();
-		searchers.add(lucene);
-		searchers.add(google);
-		searchers.add(npm);
-//		searchers.add(bing);
-		searchers.add(npmsearch);	
 		
+		/**
+		 * Artificial Searcher
+		 */
+		Double[] weights = { 0.25, 0.25, 0.25, 0.25 };
+		WeightedFirstRankingAgregator weightedFirstRankingAgregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
+		List<Searcher> silver = new ArrayList<Searcher>();
+		silver.add(lucene);
+		silver.add(google);
+		for (int i = 0 ; i < max_queries ; i++) {
+
+			String query = QueryManager.getInstance().getQueries().get(i);
+
+			System.out.println("Query "+ query);
+			
+			MetaSearcher meta = new MetaSearcherImp(silver, weightedFirstRankingAgregator, max_results);
+			
+			Ranking ranking = null/*CacheRankingManager.getInstance().loadRankingFromCache(meta, query)*/;
+			if (ranking == null) {
+				meta.acquireData(query, proxy);
+				ranking = meta.processData(null);//TODO data null
+				CacheRankingManager.getInstance().saveRankingInCache(ranking, meta, query);
+			}
+			
+			System.out.println();
+
+		}
 		
 		/**
 		 * Aggregators
 		 */
+		
+		List<Searcher> searchers = new ArrayList<Searcher>();
+		///searchers.add(lucene);
+		//searchers.add(google);
+		searchers.add(npm);
+		//searchers.add(npmsearch);
+		searchers.add(new MetaSearcherImp(silver, weightedFirstRankingAgregator, max_results));
+		
 		List<Aggregator> aggregators = new ArrayList<Aggregator>();
 
-		//Double[] weights = {0.20, 0.20, 0.20, 0.20, 0.20};
+		
 
-		/*Aggregator m1 = new M1();
+		Aggregator m1 = new M1();
 		aggregators.add(m1);
 		
 		Aggregator m2 = new M2();
@@ -106,21 +134,18 @@ public class AggregateData {
 		Aggregator m4 = new M4();
 		aggregators.add(m4);
 		
-		/*Aggregator w_borda = new WeightedBordaFuse(Arrays.asList(weights));
+		/*Double[] weights_borda = {0.20, 0.20, 0.40, 0.20};
+		Aggregator w_borda = new WeightedBordaFuse(Arrays.asList(weights_borda));
 		aggregators.add(w_borda);*/
 		
-		/*Aggregator borda = new BordaFuse();
+		Aggregator borda = new BordaFuse();
 		aggregators.add(borda);
 		
 		Aggregator boosted_borda = new BoostedBordaFuse();
 		aggregators.add(boosted_borda);
 		
 		Aggregator cordorcet = new CordorcetAggregator();
-		aggregators.add(cordorcet);*/
-		
-		Double[] weights = { 0.25, 0.25, 0.25, 0.25 };
-		Aggregator weightedFirstRankingAgregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
-		aggregators.add(weightedFirstRankingAgregator);
+		aggregators.add(cordorcet);
 		
 		for (Aggregator aggregator : aggregators) {
 			for (int i = 0 ; i < max_queries ; i++) {
@@ -142,7 +167,6 @@ public class AggregateData {
 
 			}
 		}
-		
 
 	}
 

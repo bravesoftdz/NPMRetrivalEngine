@@ -20,10 +20,13 @@ public class EvaluateRankings {
 	public static void main(String[] args) {
 
 		int max_queries = Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
-		int max_position = Integer.valueOf(ConfigManager.getInstance().getProperty("max_results"));
+		int max_position = Integer.valueOf(ConfigManager.getInstance().getProperty("top_results"));
 		
-		String[] folders = { "lucene", "bing.com_stanford_CRF", "google.com_stanford_CRF", "bing.com_str_match", "google.com_str_match", "bing.com_hyp_match", "google.com_hyp_match", "npmjs.com_optimal", "npmsearch.com", 
+		/*String[] folders = { "lucene", "bing.com_stanford_CRF", "google.com_stanford_CRF", "bing.com_str_match", "google.com_str_match", "bing.com_hyp_match", "google.com_hyp_match", "npmjs.com_optimal", "npmsearch.com", 
+				"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedFirstRankingAgregator"};*/
+		String[] folders = { "npmjs.com_optimal", "npmsearch.com", 
 				"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedFirstRankingAgregator"};
+
 		boolean end = false;
 		HashMap<String, Integer> hits4Search = new HashMap<String, Integer>();
 		
@@ -137,7 +140,7 @@ public class EvaluateRankings {
 			if(ranking.getId()!=null){
 				fw = new FileWriter(fichero);
 				pw = new PrintWriter(fw);
-				pw.print("k,hits,precision,recall,fmeasure");
+				pw.print("k,#hits,precision,recall,fmeasure,hit");
 				pw.println();
 				
 				List<Double> kprecision = ranking.getKPrecisionList(k);
@@ -146,7 +149,11 @@ public class EvaluateRankings {
 				List<Double> khits = ranking.getKHitList(k);
 					
 				for(int i = 0; i<k ;i++){
-					pw.print((i+1)+","+khits.get(i)+","+kprecision.get(i)+","+krecall.get(i)+","+kfmeasure.get(i));
+					int hit = 0;
+					if(i<ranking.getRankingList().size()){
+						hit = ranking.getRankingList().get(i).isHit()?1:0;
+					}
+					pw.print((i+1)+","+khits.get(i)+","+kprecision.get(i)+","+krecall.get(i)+","+kfmeasure.get(i)+","+hit);
 					pw.println();
 				}
 			}

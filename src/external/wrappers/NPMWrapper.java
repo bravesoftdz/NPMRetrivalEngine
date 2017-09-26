@@ -108,9 +108,10 @@ public class NPMWrapper extends SearchWrapperAbs implements Searcher {
 					final String url = result.attr("href");
 					
 					if(pm.isPkgName(title)){
-						RankedItem ri = new RankedItem(title, (double) (((page - 1) * 10) + e));
+						RankedItem ri = new RankedItem(title, (double) (((page - 1) * 10) + e));//este score esta mal
 						if (!results.contains(ri)) {
 							System.out.println(title + " -> " + url);
+							ri.setScore((double) (RESULTS-results.size())); // aca se corrige el score de arriba
 							results.add(ri);
 						}
 					}

@@ -152,7 +152,11 @@ public class Ranking implements Serializable {
 			if (i<rankingList.size() && rankingList.get(i).isHit()) {
 				sumVerified++;
 			}
-			recallList.add((double) sumVerified / (double) goldenSize);
+			if (sumVerified != 0) {
+				recallList.add((double) sumVerified / (double) goldenSize);
+			} else {
+				recallList.add(0.0);
+			}
 
 		}
 
