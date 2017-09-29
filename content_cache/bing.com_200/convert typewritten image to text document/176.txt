@@ -1,0 +1,532 @@
+<!doctype html>
+<html>
+ <head> 
+  <meta charset="utf-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <link rel="stylesheet" type="text/css" href="../jkincludes/articlesv2.css"> 
+  <script type="text/javascript" src="../jkincludes/syntaxhighlight/syntax3/scripts/shCore.js"></script> 
+  <script type="text/javascript" src="../jkincludes/syntaxhighlight/syntax3/scripts/shBrushJScript.js"></script> 
+  <link href="../jkincludes/syntaxhighlight/syntax3/styles/shCoreDefault.css" rel="stylesheet" type="text/css"> 
+  <script type="text/javascript">
+     SyntaxHighlighter.all()
+</script> 
+  <script type="text/javascript">
+
+function ajaxRequest(){
+ var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"] //activeX versions to check for in IE
+ if (window.ActiveXObject){ //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
+  for (var i=0; i<activexmodes.length; i++){
+   try{
+    return new ActiveXObject(activexmodes[i])
+   }
+   catch(e){
+    //suppress error
+   }
+  }
+ }
+ else if (window.XMLHttpRequest) // if Mozilla, Safari etc
+  return new XMLHttpRequest()
+ else
+  return false
+}
+
+</script> 
+  <title>Retrieving an XML document using Ajax</title> 
+ </head> 
+ <body> 
+  <div id="maincontainer"> 
+   <div id="topsection"> 
+    <div id="pathlinks">
+     <a href="http://www.javascriptkit.com">Home</a> 
+     <img border="0" src="../jkincludes/arrow.gif" width="15" height="18"> 
+     <a href="http://www.javascriptkit.com/dhtmltutors/">DHTML &amp; DOM</a> 
+     <img border="0" src="../jkincludes/arrow.gif" width="15" height="18"> P
+     <a href="ajaxgetpost.shtml">erforming GET and POST requests using Ajax</a> 
+     <img border="0" src="../jkincludes/arrow.gif" width="15" height="18"> Here
+    </div> 
+    <!-- BuySellAds Ad Code --> 
+    <script type="text/javascript">
+(function(){
+  var bsa = document.createElement('script');
+     bsa.type = 'text/javascript';
+     bsa.async = true;
+     bsa.src = 'http://s3.buysellads.com/ac/bsa.js';
+  (document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(bsa);
+})();
+</script> 
+    <!-- End BuySellAds Ad Code --> 
+    <script type="text/javascript" src="http://www.javascriptkit.com/jkincludes/syntaxhighlight/shCore.js"></script> 
+    <script type="text/javascript" src="http://www.javascriptkit.com/jkincludes/syntaxhighlight/shBrushJScript.js"></script> 
+    <link href="http://www.javascriptkit.com/jkincludes/syntaxhighlight/shCore.css" rel="stylesheet" type="text/css"> 
+    <link href="http://www.javascriptkit.com/jkincludes/syntaxhighlight/shThemeDefault.css" rel="stylesheet" type="text/css"> 
+    <script type="text/javascript">
+     SyntaxHighlighter.all()
+</script> 
+    <form id="jksitesearch" method="get" action="http://www.javascriptkit.com/search/search.php" class="zoom_searchform" style="text-align:right" onSubmit="if (this.zoom_query.value=='' || this.zoom_query.value=='Search JavaScript Kit'){alert('Please enter a search term first!'); return false}"> 
+     <input type="text" name="zoom_query" id="zoom_query" size="20" value="Search JavaScript Kit" class="zoom_searchbox"> 
+     <input class="zoom_button" type="image" src="http://www.javascriptkit.com/jkincludes/search.gif" title="Search JK"> 
+     <input name="zoom_per_page" id="zoom_per_page" type="hidden" value="10"> 
+     <input name="zoom_and" id="zoom_and" type="hidden" value="1"> 
+     <input type="hidden" name="zoom_sort" value="0"> 
+     <div id="jksitesearch_cat"> 
+      <b>Categories:</b> 
+      <input type="checkbox" name="zoom_cat[]" value="-1" id="searchall" style="margin-left: 5px">
+      <label for="searchall">All</label> 
+      <input type="checkbox" name="zoom_cat[]" id="javascriptssearch" value="0">
+      <label for="javascriptssearch">Free JS/ Applets</label> 
+      <input type="checkbox" name="zoom_cat[]" id="tutorialsearch" value="1" checked>
+      <label for="tutorialsearch">Tutorials</label> 
+      <input type="checkbox" name="zoom_cat[]" id="referencesearch" value="2">
+      <label for="referencesearch">References</label> 
+     </div> 
+    </form> 
+    <div id="bannerarea"> 
+     <script type="text/javascript" src="http://www.javascriptkit.com/adbanner.js"></script> 
+    </div> 
+   </div> 
+   <div id="contentwrapper"> 
+    <div id="contentcolumn"> 
+     <h4> <img border="0" src="../jkincludes/arrow2.gif" width="17" height="17"> Retrieving an XML document using Ajax</h4> 
+     <p> When making a server request in Ajax, the data returned can be in either plain text/html, or an XML document instead. The later is technically just a text file as well, but with some special instructions, Ajax can retrieve that well formed XML text file and return it back to you as a XML object. This enables the XML data to be easily parsed using standard <a href="http://www.javascriptkit.com/domref/index.shtml">DOM methods</a>.</p> 
+     <p> Here's a simple XML document in RSS format I'll be using for illustration (lets name it "<b><a href="javascriptkit.xml">javascriptkit.xml</a></b>"):</p> 
+     <p class="examplecode">&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;<br> <br> &lt;rss version="0.91"&gt;<br> &lt;channel&gt;<br> &lt;title&gt;JavaScriptKit.com&lt;/title&gt;<br> &lt;link&gt;http://www.javascriptkit.com&lt;/link&gt;<br> &lt;description&gt;JavaScript tutorials and over 400+ free scripts!&lt;/description&gt;<br> &lt;language&gt;en&lt;/language&gt;<br> <br> &lt;item&gt;<br> &lt;title&gt;Document Text Resizer&lt;/title&gt;<br> &lt;link&gt;http://www.javascriptkit.com/script/script2/doctextresizer.shtml&lt;/link&gt;<br> &lt;description&gt;This script adds the ability for your users to toggle your webpage's font size, with persistent cookies then used to remember the setting&lt;/description&gt;<br> &lt;/item&gt;<br> <br> &lt;item&gt;<br> &lt;title&gt;JavaScript Reference- Keyboard/ Mouse Buttons Events&lt;/title&gt;<br> &lt;link&gt;http://www.javascriptkit.com/jsref/eventkeyboardmouse.shtml&lt;/link&gt;<br> &lt;description&gt;The latest update to our JS Reference takes a hard look at keyboard and mouse button events in JavaScript, including the unicode value of each key.&lt;/description&gt;<br> &lt;/item&gt;<br> <br> &lt;item&gt;<br> &lt;title&gt;Dynamically loading an external JavaScript or CSS file&lt;/title&gt;<br> &lt;link&gt;http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml&lt;/link&gt;<br> &lt;description&gt;External JavaScript or CSS files do not always have to be synchronously loaded as part of the page, but dynamically as well. In this tutorial, see how.&lt;/description&gt;<br> &lt;/item&gt;<br> <br> &lt;/channel&gt;<br> &lt;/rss&gt;</p> 
+     <p> The below shows retrieving this XML document and outputing the headlines ("<code>title</code>" elements) of each entry:</p> 
+     <p class="examplecode">&lt;div id="result"&gt; &lt;/div&gt;<br> <br> &lt;script type="text/javascript"&gt;<font color="#626262"><br> <br> function ajaxRequest(){<br> &nbsp;var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"] //activeX versions to check for in IE<br> &nbsp;if (window.ActiveXObject){ //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)<br> &nbsp; for (var i=0; i&lt;activexmodes.length; i++){<br> &nbsp;&nbsp; try{<br> &nbsp;&nbsp;&nbsp; return new ActiveXObject(activexmodes[i])<br> &nbsp;&nbsp; }<br> &nbsp;&nbsp; catch(e){<br> &nbsp;&nbsp;&nbsp; //suppress error<br> &nbsp;&nbsp; }<br> &nbsp; }<br> &nbsp;}<br> &nbsp;else if (window.XMLHttpRequest) // if Mozilla, Safari etc<br> &nbsp; return new XMLHttpRequest()<br> &nbsp;else<br> &nbsp; return false<br> }</font><br> <br> var mygetrequest=new ajaxRequest()<br> <font color="#FF0000">if (mygetrequest.overrideMimeType)<br> &nbsp;mygetrequest.overrideMimeType('text/xml')</font><br> mygetrequest.onreadystatechange=function(){<br> &nbsp;if (mygetrequest.readyState==4){<br> &nbsp; if (mygetrequest.status==200 || window.location.href.indexOf("http")==-1){<br> <font color="#FF0000">&nbsp;&nbsp; var xmldata=mygetrequest.responseXML //retrieve result as an XML object</font><br> &nbsp;&nbsp; var rssentries=xmldata.getElementsByTagName("item")<br> &nbsp;&nbsp; var output='&lt;ul&gt;'<br> &nbsp;&nbsp; for (var i=0; i&lt;rssentries.length; i++){<br> &nbsp;&nbsp;&nbsp; output+='&lt;li&gt;'<br> &nbsp;&nbsp;&nbsp; output+='&lt;a href="'+rssentries[i].getElementsByTagName('link')[0].firstChild.nodeValue+'"&gt;'<br> &nbsp;&nbsp;&nbsp; output+=rssentries[i].getElementsByTagName('title')[0].firstChild.nodeValue+'&lt;/a&gt;'<br> &nbsp;&nbsp;&nbsp; output+='&lt;/li&gt;'<br> &nbsp;&nbsp; }<br> &nbsp;&nbsp; output+='&lt;/ul&gt;'<br> &nbsp;&nbsp; document.getElementById("result").innerHTML=output<br> &nbsp; }<br> &nbsp; else{<br> &nbsp;&nbsp; alert("An error has occured making the request")<br> &nbsp; }<br> &nbsp;}<br> }<br> <br> mygetrequest.open("GET", "javascriptkit.xml", true)<br> mygetrequest.send(null)<br> <br> &lt;/script&gt;</p> 
+     <p><b>Demo:</b></p> 
+     <p>
+      <!--webbot bot="HTMLMarkup" startspan --></p>
+     <div id="result"> 
+     </div> 
+     <script type="text/javascript">
+
+var mygetrequest=new ajaxRequest()
+if (mygetrequest.overrideMimeType)
+mygetrequest.overrideMimeType('text/xml')
+mygetrequest.onreadystatechange=function(){
+if (mygetrequest.readyState==4){
+if (mygetrequest.status==200 || window.location.href.indexOf("http")==-1){
+var xmldata=mygetrequest.responseXML //retrieve result as an XML object
+var rssentries=xmldata.getElementsByTagName("item")
+var output='<ul>'
+for (var i=0; i<rssentries.length; i++){
+output+='<li>'
+output+='<a href="'+rssentries[i].getElementsByTagName('link')[0].firstChild.nodeValue+'">'
+output+=rssentries[i].getElementsByTagName('title')[0].firstChild.nodeValue+'</a>'
+output+='</li>'
+}
+output+='</ul>'
+document.getElementById("result").innerHTML=output
+}
+else{
+alert("An error has occured making the request")
+}
+}
+}
+
+mygetrequest.open("GET", "javascriptkit.xml", true)
+mygetrequest.send(null)
+
+</script>
+     <!--webbot bot="HTMLMarkup" endspan i-checksum="63596" -->
+     <p></p> 
+     <p>The key points to remember when getting a XML document using Ajax are:</p> 
+     <ul> 
+      <li>Detect for and call the method <code> request.overrideMimeType('text/xml')</code> before sending the request. This is a necessary step to address an issue in certain versions of Firefox. IE has much bigger problems- see next section below.</li> 
+      <li>When accessing the returned data, call <code>request.responseXML</code> instead of <code>responseText</code> to get the data as an XML object (assuming the data is a valid XML file).</li> 
+     </ul> 
+     <p>The data returned by <code>request.responseXML</code> is an XML object that can be parsed using standard <a href="http://www.javascriptkit.com/domref/index.shtml">DOM methods and properties</a>. Notice that to access the actual contents of an element, you need to drill down all the way to the element's "<code>firstChild</code>" object before looking up its "<code>nodeValue</code>".</p> 
+     <h4> <img border="0" src="../jkincludes/arrow2.gif" width="17" height="17"> XML documents and the "Content-type" pitfall in IE</h4> 
+     <p> There is a major pitfall to be aware of when getting XML documents via Ajax in IE (as of IE7). Not knowing this will have you pulling your hair out wondering why you can't work on the returned data as an XML object. So what's this giant hole in the ground? Well, in IE, XML documents must return an explicit <code>"content-type</code>" header corresponding to XML (ie: "<code>Content-type: text/xml</code>") in order for the browser to know that this is an XML document. Without this header, the file will be retrieved as a regular text file instead of turning its contents into an XML object. Firefox has this requirement as well actually, though instead of solely relying on the server to hopefully generate the correct "<code>content-type</code>" header for a given file, it supports the client side method "<code>request.overrideMimeType()</code>" that you can use to just tell the browser manually and unequivocally what the type of the target file is. That's why we call the lines:</p> 
+     <p class="examplecode">if (mygetrequest.overrideMimeType)<br> &nbsp;mygetrequest.overrideMimeType('text/xml')</p> 
+     <p> in the code earlier in Firefox, so FF is told manually that the target file is an XML one. Any question, either coming from the server end or the browser's with regards to what the heck the type of the target file is instantly silenced by calling this method, no problem. However, IE the rebel doesn't support "<code>request.overrideMimeType()</code>", which means you must rely fully on your server- and tweak it if necessary- to properly generate the correct "<code>content-type</code>" headers for XML documents. No proper header, and the file will be returned as plain text, instead of an XML object that you access using "<code>request.responseXML</code>".</p> 
+     <p> Typically a server is already set up to generate the proper "<code>content-type</code>" headers for the well known file extensions, such as "<code>text/xml</code>" for all files with an "<code>.xml</code>" extension. Assuming this is the case on your server and the file you're retrieving via Ajax is called "sample.xml", then you won't run into any problems in IE, as the correct XML header has been added. But consider all the other possible situations in which you would:</p> 
+     <ol> 
+      <li>Your server isn't set up to recognize ".xml" files as XML documents.</li> 
+      <li>You named the XML file with a custom extension such as "sample.rss"</li> 
+      <li>Your XML file is dynamically generated via a server side script, so its extension may be "sample.php"</li> 
+     </ol> 
+     <p> For 1) and 2), the solution is to modify your server's configuration to output a correct XML content mimetype based on the file extensions that should be recognized as XML documents. On Unix/Linux servers for example, this can usually be done in one of two ways:</p> 
+     <p> <b>1)</b> Add to the "<code>.htaccess</code>" file that exists in the HTML root directory of your site the line (<a href="http://www.javascriptkit.com/howto/htaccess9.shtml">more info</a>):</p> 
+     <p class="examplecode">AddType application/xml .xml .rss</p> 
+     <p> <b>2)</b> OR, at an even lower level, add the above line to the "<code>httpd.config</code>" file of your server instead (look under the "<code>mimetypes</code>" section). Alternatively, if your server uses a graphical control panel such as <a href="http://www.cpanel.net/">cPanel</a>, you can just click on the "<b>Mime Types</b>" button on the admin frontpage to make the changes.</p> 
+     <p> For 3), the solution is simpler. If your XML file is dynamically generated by a server side script, simply ensure that the script outputs an XML header before the actual XML contents. Using a PHP script for example, you'd do:</p> 
+     <p class="examplecode">&lt;?<br> <font color="#FF0000"><code>header('Content-type: text/xml');</code></font><br> <br> echo "Actual XML contents...";<br> <br> ?&gt;</p> 
+     <p>Yes, curse the day IE was born!</p> 
+     <ul id="toc"> 
+      <li><a href="ajaxgetpost.shtml">Performing GET requests using Ajax (Ajax introduction)</a></li> 
+      <li><a href="ajaxgetpost2.shtml">Performing POST requests using Ajax</a></li> 
+      <li>Retrieving an XML document using Ajax</li> 
+      <li><a href="ajaxgetpost4.shtml">Retrieving a JSON file using Ajax</a></li> 
+     </ul> 
+     <div align="right" id="nextpage">
+      <a href="ajaxgetpost4.shtml">Retrieving a JSON file using Ajax <img border="0" src="../jkincludes/forward.gif" width="15" height="17"></a>
+     </div> 
+    </div> 
+   </div> 
+   <div id="leftcolumn"> 
+    <div class="sidemenucomponent"> 
+     <div>
+      <a href="http://www.javascriptkit.com"> <img src="http://www.javascriptkit.com/jkincludes/jklogosmall.gif" border="0" title="JavaScript Kit" width="163" height="51" style="margin-top: 2px"></a> 
+     </div> 
+     <ul id="mainmenulinks" class="categorylinks"> 
+      <li><a href="http://www.javascriptkit.com/">JavaScript Kit</a></li> 
+      <li><a href="http://www.javascriptkit.com/cutpastejava.shtml">Free JavaScripts</a></li> 
+      <li><a href="http://www.javascriptkit.com/javatutors/">JavaScript tutorials</a></li> 
+      <li><a href="http://www.javascriptkit.com/jsref/">JavaScript Reference</a></li> 
+      <li><a href="http://www.javascriptkit.com/domref/">DOM Reference</a></li> 
+      <li><a href="http://www.javascriptkit.com/dhtmltutors/">Developer &amp; CSS</a></li> 
+      <li><a href="http://www.javascriptkit.com/howto/">Web Design</a></li> 
+      <li><a href="http://www.javascriptkit.com/java/">Free Java Applets</a></li> 
+      <li><a href="http://www.javascriptkit.com/dhtmltutors/cssreference.shtml">CSS Quick Reference</a></li> 
+      <li><a href="http://www.dynamicdrive.com/forums/forumdisplay.php?7-JavaScript">JavaScript Forums</a></li> 
+     </ul> 
+     <div class="headers">
+      Partners
+     </div> 
+     <ul class="linkslist"> 
+      <li><a href="http://www.cssdrive.com">CSS Drive</a></li> 
+      <li><a href="http://www.dynamicdrive.com/dynamicindex1/">JavaScript Menus</a></li> 
+      <li><a href="http://www.dynamicdrive.com/style/">CSS codes &amp; examples</a></li> 
+     </ul> 
+     <script type="text/javascript">
+var sectionmatch=["cutpastejava", "javatutors", "jsref", "dhtmltutors", "howto", "java", "cssref"]
+var docurl=window.location.toString()
+var menulinksobj=document.getElementById("mainmenulinks")
+if (menulinksobj && menulinksobj.getElementsByTagName("a")){
+for (i=0; i<sectionmatch.length; i++){
+if (docurl.indexOf(sectionmatch[i])!=-1 && menulinksobj.getElementsByTagName("a")[i+1].style){
+menulinksobj.getElementsByTagName("a")[i+1].style.color="#3A6200"
+menulinksobj.getElementsByTagName("a")[i+1].style.backgroundColor="#EAEAEA"
+break;
+}
+}
+}
+
+</script> 
+    </div> 
+    <div id="stickyarea"> 
+     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+     <!-- JK RA horizontal --> 
+     <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7051847089736268" data-ad-slot="9662634634" data-ad-format="auto"></ins> 
+     <script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script> 
+     <!-- BuySellAds Zone Code --> 
+     <div class="bsacontainer nomargin"> 
+      <div id="bsap_1299814" class="bsarocks bsap_dd6e9fbb78d92ec298f6119b05509777"></div> 
+     </div> 
+     <!-- End BuySellAds Zone Code --> 
+     <div class="sidemenucomponent"> 
+      <div style="font-size: 12px; margin-top: 1em; padding-left: 5px;"> 
+       <script type="text/javascript">
+bookmarkit()
+</script> 
+      </div> 
+     </div> 
+     <!-- Go to www.addthis.com/dashboard to customize your tools --> 
+     <div class="addthis_sharing_toolbox" style="margin-left:10px"></div> 
+     <!-- Go to www.addthis.com/dashboard to customize your tools --> 
+     <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=georgeuser"></script> 
+     <div id="sharearea" style="font-size: 12px; margin: 1em auto; padding-left: 5px; text-align:center"> 
+      <a href="https://twitter.com/share" class="twitter-share-button" data-size="large" data-show-count="false">Tweet</a>
+      <script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+     </div> 
+     <!-- end sticky area --> 
+    </div> 
+    <script>
+
+;(function(){
+
+	var rightcolumnad = document.getElementById('stickyarea')
+	var standardbody = (document.compatMode=="CSS1Compat")? document.documentElement : document.body
+
+	function getoffset(what, offsettype){
+		return (what.offsetParent)? what[offsettype]+getoffset(what.offsetParent, offsettype) : what[offsettype]
+	}
+	
+	function getoffsetof(el){
+		el._offsets={left:getoffset(el, "offsetLeft"), top:getoffset(el, "offsetTop"), h: el.offsetHeight}
+	}
+
+	var jkmakesticky = {
+		target: null,
+		docheight: null,
+		docscrollHeight: null,
+		contentcolumnheight: null,
+		rightcolumnheight: null,
+		resizeTimer: null,
+		refreshCoords: function(){
+			this.docheight = window.innerHeight || standardbody.clientHeight-15
+			this.docscrollHeight = standardbody.scrollHeight-20
+			this.contentcolumnheight = document.getElementById("contentcolumn").offsetHeight
+			this.rightcolumnheight = document.getElementById("leftcolumn").offsetHeight
+			getoffsetof( this.target )
+		},
+		stickit: function(){
+			var target = this.target
+			var offsettop = target._offsets.top
+			if (offsettop == 0 || ( this.rightcolumnheight >= this.contentcolumnheight)){ // if offsettop of banner container is 0, it means it's hidden, or if right column is longer than content column
+				return
+			}
+			var docscrolly = window.pageYOffset || standardbody.scrollTop
+			if ( docscrolly > offsettop){
+				if (!/sticky/i.test(target.className)){
+					target.className = target.className + 'sticky'
+				}
+			}
+			else{
+				if (/sticky/i.test(target.className)){
+					target.className = target.className.replace(/\s*sticky\s*/i, '')
+				}
+			}
+		},
+		init:function(target){
+			this.target = target
+			this.refreshCoords()
+			window.addEventListener('scroll', function(){
+				requestAnimationFrame(function(){
+					jkmakesticky.stickit()
+				})
+			}, false)
+		}
+	}
+
+	if (rightcolumnad){
+		jkmakesticky.init( rightcolumnad )
+		jkmakesticky.stickit()
+		window.addEventListener('load', function(e){
+			rightcolumnad.className = rightcolumnad.className.replace(/\s*sticky\s*/i, '')
+			jkmakesticky.refreshCoords()
+			jkmakesticky.stickit()
+		}, false)
+		window.addEventListener('resize', function(e){
+			clearTimeout(jkmakesticky.resizeTimer)
+			jkmakesticky.resizeTimer = setTimeout(function(){
+				rightcolumnad.className = rightcolumnad.className.replace(/\s*sticky\s*/i, '')
+				jkmakesticky.refreshCoords()
+				jkmakesticky.stickit()
+			}, 100)
+		}, false)
+	}
+
+})();
+
+</script> 
+   </div> 
+   <div id="footer"> 
+    <!--ZOOMSTOP--> 
+    <p align="center"> </p>
+    <div style="max-width: 730px; margin-left: 185px;" id="footerad"> 
+     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+     <!-- JK RA horizontal --> 
+     <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7051847089736268" data-ad-slot="9662634634" data-ad-format="horizontal, rectangle"></ins> 
+     <script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script> 
+    </div> 
+    <script>
+
+var showdiscussarea = (function(){
+	var multipagetutorial = !!document.getElementById('toc') // Bool to detect whether this page is part of multi pages tutorial
+	var showdiscussarea = !multipagetutorial
+	if (multipagetutorial){
+		var toc = document.getElementById('toc')
+		var toclis = toc.getElementsByTagName('li')
+		var lastli = toclis[ toclis.length -1 ]
+		if (lastli.firstChild.tagName !='A' ) // if this is last page in tutorial
+			showdiscussarea = true
+	}
+	return showdiscussarea
+})()
+
+/*
+	disqusLoader.js v1.0
+	A JavaScript plugin for lazy-loading Disqus comments widget.
+	-
+	By Osvaldas Valutis, www.osvaldas.info
+	Available for use under the MIT License
+*/
+
+;( function( window, document, index )
+{
+	'use strict';
+
+	var extendObj = function( defaults, options )
+		{
+			var prop, extended = {};
+			for( prop in defaults )
+				if( Object.prototype.hasOwnProperty.call( defaults, prop ))
+					extended[ prop ] = defaults[ prop ];
+
+			for( prop in options )
+				if( Object.prototype.hasOwnProperty.call( options, prop ))
+					extended[ prop ] = options[ prop ];
+
+			return extended;
+		},
+		getOffset = function( el )
+		{
+			var rect = el.getBoundingClientRect();
+			return { top: rect.top + document.body.scrollTop, left: rect.left + document.body.scrollLeft };
+		},
+		loadScript = function( url, callback )
+		{
+			var script	 = document.createElement( 'script' );
+			script.src	 = url;
+			script.async = true;
+			script.setAttribute( 'data-timestamp', +new Date());
+			script.addEventListener( 'load', function()
+			{
+				if( typeof callback === 'function' )
+					callback();
+			});
+			( document.head || document.body ).appendChild( script );
+		},
+		throttle		= function(a,b){var c,d;return function(){var e=this,f=arguments,g=+new Date;c&&g<c+a?(clearTimeout(d),d=setTimeout(function(){c=g,b.apply(e,f)},a)):(c=g,b.apply(e,f))}},
+
+		throttleTO		= false,
+		laziness		= false,
+		disqusConfig	= false,
+		scriptUrl		= false,
+
+		scriptStatus	= 'unloaded',
+		instance		= false,
+
+		init = function()
+		{
+			if( !instance || !document.body.contains( instance ) || instance.disqusLoaderStatus == 'loaded' )
+				return true;
+
+			var winST	= window.pageYOffset,
+				offset	= getOffset( instance ).top;
+
+			// if the element is too far below || too far above
+			if( offset - winST > window.innerHeight * laziness || winST - offset - instance.offsetHeight - ( window.innerHeight * laziness ) > 0 )
+				return true;
+
+			var tmp = document.getElementById( 'disqus_thread' );
+			if( tmp ) tmp.removeAttribute( 'id' );
+			instance.setAttribute( 'id', 'disqus_thread' );
+			instance.disqusLoaderStatus = 'loaded';
+
+			if( scriptStatus == 'loaded' )
+			{
+				DISQUS.reset({ reload: true, config: disqusConfig });
+			}
+			else // unloaded | loading
+			{
+				window.disqus_config = disqusConfig;
+				if( scriptStatus == 'unloaded' )
+				{
+					scriptStatus = 'loading';
+					loadScript( scriptUrl, function()
+					{
+						scriptStatus = 'loaded';
+					});
+				}
+			}
+		};
+
+	window.addEventListener( 'scroll', throttle( throttleTO, init ));
+	window.addEventListener( 'resize', throttle( throttleTO, init ));
+
+	window.disqusLoader = function( element, options )
+	{
+		options = extendObj(
+		{
+			laziness:		1,
+			throttle:		250,
+			scriptUrl:		false,
+			disqusConfig:	false,
+
+		}, options );
+
+		laziness		= options.laziness + 1;
+		throttleTO		= options.throttle;
+		disqusConfig	= options.disqusConfig;
+		scriptUrl		= scriptUrl === false ? options.scriptUrl : scriptUrl; // set it only once
+
+		if( typeof element === 'string' )				instance = document.querySelector( element );
+		else if( typeof element.length === 'number' )	instance = element[ 0 ];
+		else											instance = element;
+
+		instance.disqusLoaderStatus = 'unloaded';
+
+		init();
+	};
+
+}( window, document, 0 ));
+
+</script> 
+    <div id="discussarea"> 
+     <h3 id="discusscommentheader" style="display:none">Comments- Your Turn!</h3> 
+     <div id="disqus_thread" class="discussclass"></div> 
+    </div> 
+    <script>
+
+var disqusoptions ={
+  scriptUrl: '//javascriptkit.disqus.com/embed.js',
+  /*
+    @type: string (url)
+    @default: none
+    @required
+    URL of Disqus' executive JS file. The value is memorized on the first function call
+    and ignored otherwise because Disqus allows only one instance per page at the time.
+  */
+
+  laziness: 1,
+  /*
+    @type: int (>=0)
+    @default: 1
+    Sets the laziness of loading the widget: (viewport height) * laziness . For example:
+    0 - widget load starts when at the least a tiny part of it gets in the viewport;
+    1 - widget load starts when the distance between the widget zone and the viewport is no more than the height of the viewport;
+    2 - 2x viewports, etc.
+  */
+
+  throttle: 250,
+  /*
+    @type: int (milliseconds)
+    @default: 250
+    Defines how often the plugin should make calculations during the
+    processes such as resize of a browser's window or viewport scroll.
+    250 = 4 times in a second.
+  */
+
+  /*
+    @type: function
+    @default: none
+    Disqus-native options. Check Disqus' manual for more information.
+  */
+  disqusConfig: function()
+  {
+    this.page.title       = document.title;
+    this.page.url         = window.location.href;
+    this.page.identifier  = window.location.pathname;
+  }
+};
+
+// vanilla
+if (showdiscussarea){
+	disqusLoader( '.discussclass', disqusoptions );
+	document.getElementById('discusscommentheader').style.display = 'block';
+}
+</script> 
+    <div style="margin-left:195px; margin-top:6px" id="copyright">
+     Copyright (c) 2016 
+     <a href="http://www.javascriptkit.com">JavaScript Kit</a>. NO PART may be reproduced without author's permission.
+    </div> 
+    <p></p> 
+    <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script> 
+    <script type="text/javascript">
+_uacct = "UA-55377-1";
+urchinTracker();
+</script> 
+    <!-- MailMunch for JavaScript Kit --> 
+    <!-- Paste this code right before the </head> tag on every page of your site. --> 
+    <script src="//a.mailmunch.co/app/v1/site.js" id="mailmunch-script" data-mailmunch-site-id="283097" async></script> 
+   </div> 
+  </div>   
+ </body>
+</html>

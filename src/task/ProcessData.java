@@ -58,31 +58,31 @@ public class ProcessData {
 		 */
 
 		NPMWrapper npm = new NPMWrapper(max_results, NPMWrapper.OPTIMAL);
-		/*GoogleWrapper google = new GoogleWrapper(max_results,new HiperlinkMatching());
+		GoogleWrapper google = new GoogleWrapper(max_results,new HiperlinkMatching());
 		BingWrapper bing = new BingWrapper(max_results,new HiperlinkMatching());
 		GoogleWrapper google2 = new GoogleWrapper(max_results,new StringMatching());
 		BingWrapper bing2 = new BingWrapper(max_results,new StringMatching());
 		GoogleWrapper google3 = new GoogleWrapper(max_results,new Stanford_CRF());
 		BingWrapper bing3 = new BingWrapper(max_results,new Stanford_CRF());
-		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);*/
+		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);
 		
 		List<Searcher> searchers = new ArrayList<Searcher>();
 		searchers.add(npm);
-		/*searchers.add(google);
+		searchers.add(google);
 		searchers.add(bing);
 		searchers.add(google2);
 		searchers.add(bing2);
 		searchers.add(google3);
 		searchers.add(bing3);
-		searchers.add(npmsearch);*/
+		searchers.add(npmsearch);
 
 		for (Searcher searcher : searchers) {
 			
 			System.out.println("Analizando "+ searcher.getId());
 			
-			for (int i = 0 ; i < max_queries ; i++) {
+			//for (int i = 0 ; i < max_queries ; i++) {
 
-				String query = QueryManager.getInstance().getQueries().get(i);
+				String query = "convert typewritten image to text document";//QueryManager.getInstance().getQueries().get(i);
 
 				System.out.println("Query "+ query);
 				
@@ -95,7 +95,7 @@ public class ProcessData {
 				
 				System.out.println();
 				
-			}
+			//}
 		}
 		
 		
@@ -106,16 +106,16 @@ public class ProcessData {
 		 * 
 		 */
 		
-		/*LuceneSearch lucene = new LuceneSearch(200,proxy);
+		LuceneSearch lucene = new LuceneSearch(200,proxy);
 		List<Searcher> internal_searchers = new ArrayList<Searcher>();
 		internal_searchers.add(lucene);
 		for (Searcher searcher : internal_searchers) {
 			
 			System.out.println("Analizando "+ searcher.getId());
 			
-			for (int i = 0 ; i < max_queries ; i++) {
+			//for (int i = 0 ; i < max_queries ; i++) {
 
-				String query = QueryManager.getInstance().getQueries().get(i);
+				String query = "convert typewritten image to text document";//QueryManager.getInstance().getQueries().get(i);
 
 				System.out.println("Query "+ query);
 				
@@ -129,8 +129,8 @@ public class ProcessData {
 				
 				System.out.println();
 				
-			}
-		}*/
+			//}
+		}
 		
 
 	}

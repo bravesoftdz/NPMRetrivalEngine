@@ -74,9 +74,9 @@ public class AcquireData {
 			
 			System.out.println("Analizando "+ searcher.getContentId());
 			
-			for (int i = 0 ; i < max_queries ; i++) {
+			//for (int i = 0 ; i < max_queries ; i++) {
 
-				String query = QueryManager.getInstance().getQueries().get(i);
+				String query = "convert typewritten image to text document";//QueryManager.getInstance().getQueries().get(i);
 
 				System.out.println("Query "+ query);
 				
@@ -88,7 +88,7 @@ public class AcquireData {
 				CacheContentManager.getInstance().saveContentInCache(data,searcher,query);
 
 				System.out.println();
-			}
+			//}
 		}
 		
 		

@@ -1,0 +1,700 @@
+<!doctype html>
+<html>
+ <head> 
+  <meta charset="utf-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <title>
+    Typed Arrays in ECMAScript 6
+  </title> 
+  <link rel="icon" type="image/png" href="../../img/2ality_logo_32.png" sizes="32x32"> 
+  <link rel="stylesheet" href="../../site.css"> 
+  <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.8.0/styles/default.min.css"> 
+  <link href="https://fonts.googleapis.com/css?family=Lato:700|Open+Sans|Source+Code+Pro|Libre+Baskerville:700" rel="stylesheet"> 
+  <link rel="alternate" type="application/atom+xml" href="http://feeds.feedburner.com/2ality" title="2ality feed"> 
+  <!--  Metadata for Google, Facebook, Twitter --> 
+  <meta name="description" content="Typed Arrays are an ECMAScript 6 API for handling binary data. This blog post explains how they work."> 
+  <meta property="og:site_name" content="2ality"> 
+  <meta name="twitter:site" content="@2ality"> 
+ </head> 
+ <body> 
+  <div id="reactHtml">
+   <div data-reactroot="" data-reactid="1" data-react-checksum="-1810693566">
+    <div id="top_row" class="no-link" data-reactid="2">
+     <div class="no-link" style="color:white;background:darkblue;width:100%;text-align:center;padding-top:0.4em;padding-bottom:0.4em;margin-bottom:0.6em;" data-reactid="3">
+      <a href="http://exploringjs.com/" data-reactid="4">JS&nbsp;books (free&nbsp;online)</a>
+      <span class="separator" data-reactid="5"> | </span>
+      <a href="http://esnextnews.com/" data-reactid="6">Newsletter</a>
+      <span class="separator" data-reactid="7"> | </span>
+      <a href="http://dr-axel.de/contact.html" data-reactid="8">Training</a>
+     </div>
+     <div id="blog_name" data-reactid="9">
+      <a href="../../index.html" data-reactid="10">2ality – JavaScript and more</a>
+     </div>
+     <div id="lower-link-bar" class="no-link" data-reactid="11">
+      <a href="../../p/about.html" data-reactid="12">About</a>
+      <span class="separator" data-reactid="13"> | </span>
+      <a href="../../p/donate.html" data-reactid="14">Donate</a>
+      <span class="separator" data-reactid="15"> | </span>
+      <a href="../../p/subscribe.html" data-reactid="16">Subscribe</a>
+      <span class="separator" data-reactid="17"> | </span>
+      <a href="../../archive.html" data-reactid="18">Archive</a>
+      <span class="separator" data-reactid="19"> | </span>
+      <a href="https://cse.google.com/cse/publicurl?cx=005653361008053745020:pdru5pmwmgi" data-reactid="20">Search</a>
+      <span class="separator" data-reactid="21"> | </span>
+      <a href="http://exploringjs.com/es2016-es2017/" data-reactid="22">ES2016+ES2017</a>
+      <span class="separator" data-reactid="23"> | </span>
+      <a href="../../2017/02/ecmascript-2018.html" data-reactid="24">ES2018</a>
+     </div>
+    </div>
+    <div id="bottom_row" data-reactid="25">
+     <div class="number-headings" id="page-core" data-reactid="26">
+      <h1 data-reactid="27">Typed Arrays in ECMAScript 6</h1>
+      <div class="date-and-tags" data-reactid="28">
+       <!-- react-text: 29 -->[
+       <!-- /react-text -->
+       <!-- react-text: 30 -->2015-09-05
+       <!-- /react-text -->
+       <!-- react-text: 31 -->] 
+       <!-- /react-text -->
+       <a href="" data-reactid="32">esnext</a>
+       <!-- react-text: 33 -->, 
+       <!-- /react-text -->
+       <a href="" data-reactid="34">dev</a>
+       <!-- react-text: 35 -->, 
+       <!-- /react-text -->
+       <a href="" data-reactid="36">javascript</a>
+      </div>
+      <div id="adbox" data-reactid="37">
+       <div id="adbox-explain" data-reactid="38">
+        (Ad, please don’t block)
+       </div>
+       <script async type="text/javascript" src="https://cdn.carbonads.com/carbon.js?zoneid=1673&amp;serve=C6AILKT&amp;placement=2alitycom" id="_carbonads_js" data-reactid="39"></script>
+      </div>
+      <div data-reactid="40">
+       <p>Typed Arrays are an ECMAScript 6 API for handling binary data. This blog post explains how they work.</p> 
+       <!--more--> 
+       <h2 id="overview">Overview&nbsp;&nbsp;<a class="header-anchor" href="#overview" aria-hidden="true">#</a></h2> 
+       <p>Code example:</p> 
+       <pre><code class="language-js"><span class="hljs-keyword">let</span> typedArray = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>([<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>]);
+<span class="hljs-built_in">console</span>.log(typedArray.length); <span class="hljs-comment">// 3</span>
+typedArray[<span class="hljs-number">0</span>] = <span class="hljs-number">5</span>;
+<span class="hljs-keyword">let</span> normalArray = [...typedArray]; <span class="hljs-comment">// [5,1,2]</span>
+
+<span class="hljs-comment">// The elements are stored in typedArray.buffer.</span>
+<span class="hljs-comment">// Get a different view on the same data:</span>
+<span class="hljs-keyword">let</span> dataView = <span class="hljs-keyword">new</span> <span class="hljs-built_in">DataView</span>(typedArray.buffer);
+<span class="hljs-built_in">console</span>.log(dataView.getUint8(<span class="hljs-number">0</span>)); <span class="hljs-comment">// 5</span>
+</code></pre> 
+       <p>Instances of <code>ArrayBuffer</code> store the binary data to be processed. Two kinds of <em>views</em> are used to access the data:</p> 
+       <ul> 
+        <li>Typed Arrays (<code>Uint8Array</code>, <code>Int16Array</code>, <code>Float32Array</code>, etc.) interpret the ArrayBuffer as an indexed sequence of elements of a single type.</li> 
+        <li>Instances of <code>DataView</code> let you access data as elements of several types (<code>Uint8</code>, <code>Int16</code>, <code>Float32</code>, etc.), at any byte offset inside an ArrayBuffer.</li> 
+       </ul> 
+       <p>The following browser APIs support Typed Arrays (<a href="#sec_browser-apis-supporting-typed-arrays">details are mentioned later</a>):</p> 
+       <ul> 
+        <li>File API</li> 
+        <li>XMLHttpRequest</li> 
+        <li>Fetch API</li> 
+        <li>Canvas</li> 
+        <li>WebSockets</li> 
+        <li>And more</li> 
+       </ul> 
+       <h2 id="introduction">Introduction&nbsp;&nbsp;<a class="header-anchor" href="#introduction" aria-hidden="true">#</a></h2> 
+       <p>For a long time, JavaScript was not very good at handling binary data. This changed with the introduction of the Typed Array API, whose main use cases are:</p> 
+       <ul> 
+        <li>Processing binary data: manipulating image data in HTML Canvas elements, parsing binary files, handling binary network protocols, etc.</li> 
+        <li>Interacting with native APIs: Native APIs often receive and return data in a binary format, which you could neither store nor manipulate well in traditional JavaScript. That meant that whenever you were communicating with such an API, data had to be converted from JavaScript to binary and back, for every call. Typed Arrays eliminate this bottleneck. One example of communicating with native APIs is WebGL, for which Typed Arrays were initially created. Section “<a href="http://www.html5rocks.com/en/tutorials/webgl/typed_arrays/#toc-history">History of Typed Arrays</a>” of the article “<a href="http://www.html5rocks.com/en/tutorials/webgl/typed_arrays/#toc-history">Typed Arrays: Binary Data in the Browser</a>” (by Ilmari Heikkinen for HTML5 Rocks) has more information.</li> 
+       </ul> 
+       <p>Two kinds of objects work together in the Typed Array API:</p> 
+       <ul> 
+        <li>Buffers: Instances of <code>ArrayBuffer</code> hold the binary data.</li> 
+        <li>Views: provide the methods for accessing the binary data. There are two kinds of views: 
+         <ul> 
+          <li>An instance of a Typed Array constructor (<code>Uint8Array</code>, <code>Float64Array</code>, etc.) works much like a normal Array, but only allows a single type for its elements and doesn’t have holes.</li> 
+          <li>An instance of <code>DataView</code> lets you access data at any byte offset in the buffer, and interprets that data as one of several types (<code>Uint8</code>, <code>Float64</code>, etc.).</li> 
+         </ul> </li> 
+       </ul> 
+       <p>This is a diagram of the structure of the Typed Array API (notable: all Typed Arrays have a common superclass):</p> 
+       <p><img src="typed-arrays/typed_arrays_class_diagram.jpg" alt=""></p> 
+       <p>Typed Arrays were a separate specification before they became part of the ECMAScript 6 standard.</p> 
+       <h3 id="element-types">Element types&nbsp;&nbsp;<a class="header-anchor" href="#element-types" aria-hidden="true">#</a></h3> 
+       <p>The following element types are supported by the API:</p> 
+       <table class="framed"> 
+        <thead> 
+         <tr> 
+          <th>Element type</th> 
+          <th>Bytes</th> 
+          <th>Description</th> 
+          <th>C type</th> 
+         </tr> 
+        </thead> 
+        <tbody> 
+         <tr> 
+          <td>Int8</td> 
+          <td>1</td> 
+          <td>8-bit signed integer</td> 
+          <td>signed char</td> 
+         </tr> 
+         <tr> 
+          <td>Uint8</td> 
+          <td>1</td> 
+          <td>8-bit unsigned integer</td> 
+          <td>unsigned char</td> 
+         </tr> 
+         <tr> 
+          <td>Uint8C</td> 
+          <td>1</td> 
+          <td>8-bit unsigned integer (clamped conversion)</td> 
+          <td>unsigned char</td> 
+         </tr> 
+         <tr> 
+          <td>Int16</td> 
+          <td>2</td> 
+          <td>16-bit signed integer</td> 
+          <td>short</td> 
+         </tr> 
+         <tr> 
+          <td>Uint16</td> 
+          <td>2</td> 
+          <td>16-bit unsigned integer</td> 
+          <td>unsigned short</td> 
+         </tr> 
+         <tr> 
+          <td>Int32</td> 
+          <td>4</td> 
+          <td>32-bit signed integer</td> 
+          <td>int</td> 
+         </tr> 
+         <tr> 
+          <td>Uint32</td> 
+          <td>4</td> 
+          <td>32-bit unsigned integer</td> 
+          <td>unsigned int</td> 
+         </tr> 
+         <tr> 
+          <td>Float32</td> 
+          <td>4</td> 
+          <td>32-bit floating point</td> 
+          <td>float</td> 
+         </tr> 
+         <tr> 
+          <td>Float64</td> 
+          <td>8</td> 
+          <td>64-bit floating point</td> 
+          <td>double</td> 
+         </tr> 
+        </tbody> 
+       </table> 
+       <p>The element type <code>Uint8C</code> is special: it is not supported by <code>DataView</code> and only exists to enable <code>Uint8ClampedArray</code>. This Typed Array is used by the <code>canvas</code> element (where it replaces <code>CanvasPixelArray</code>). The only difference between <code>Uint8C</code> and <code>Uint8</code> is how overflow and underflow are handled (as explained in the next section). It is recommended to avoid the former – <a href="https://mail.mozilla.org/pipermail/es-discuss/2015-August/043902.html">quoting Brendan Eich</a>:</p> 
+       <blockquote> 
+        <p>Just to be super-clear (and I was around when it was born), <code>Uint8ClampedArray</code> is <em>totally</em> a historical artifact (of the HTML5 canvas element). Avoid unless you really are doing canvas-y things.</p> 
+       </blockquote> 
+       <h3 id="handling-overflow-and-underflow">Handling overflow and underflow&nbsp;&nbsp;<a class="header-anchor" href="#handling-overflow-and-underflow" aria-hidden="true">#</a></h3> 
+       <p>Normally, when a value is out of the range of the element type, modulo arithmetic is used to convert it to a value within range. For signed and unsigned integers that means that:</p> 
+       <ul> 
+        <li>The highest value plus one is converted to the lowest value (0 for unsigned integers).</li> 
+        <li>The lowest value minus one is converted to the highest value.</li> 
+       </ul> 
+       <p>Modulo conversion for unsigned 8-bit integers:</p> 
+       <pre><code class="language-repl">&gt; let uint8 = new Uint8Array(1);
+&gt; uint8[0] = 255; uint8[0] // highest value within range
+255
+&gt; uint8[0] = 256; uint8[0] // overflow
+0
+&gt; uint8[0] = 0; uint8[0] // lowest value within range
+0
+&gt; uint8[0] = -1; uint8[0] // underflow
+255
+</code></pre> 
+       <p>Modulo conversion for signed 8-bit integers:</p> 
+       <pre><code class="language-repl">&gt; let int8 = new Int8Array(1);
+&gt; int8[0] = 127; int8[0] // highest value within range
+127
+&gt; int8[0] = 128; int8[0] // overflow
+-128
+&gt; int8[0] = -128; int8[0] // lowest value within range
+-128
+&gt; int8[0] = -129; int8[0] // underflow
+127
+</code></pre> 
+       <p>Clamped conversion is different:</p> 
+       <ul> 
+        <li>All underflowing values are converted to the lowest value.</li> 
+        <li>All overflowing values are converted to the highest value.</li> 
+       </ul> 
+       <pre><code class="language-repl">&gt; let uint8c = new Uint8ClampedArray(1);
+&gt; uint8c[0] = 255; uint8c[0] // highest value within range
+255
+&gt; uint8c[0] = 256; uint8c[0] // overflow
+255
+&gt; uint8c[0] = 0; uint8c[0] // lowest value within range
+0
+&gt; uint8c[0] = -1; uint8c[0] // underflow
+0
+</code></pre> 
+       <h3 id="endianness">Endianness&nbsp;&nbsp;<a class="header-anchor" href="#endianness" aria-hidden="true">#</a></h3> 
+       <p>Whenever a type (such as <code>Uint16</code>) is stored as multiple bytes, <em>endianness</em> matters:</p> 
+       <ul> 
+        <li>Big endian: the most significant byte comes first. For example, the <code>Uint16</code> value 0xABCD is stored as two bytes – first 0xAB, then 0xCD.</li> 
+        <li>Little endian: the least significant byte comes first. For example, the <code>Uint16</code> value 0xABCD is stored as two bytes – first 0xCD, then 0xAB.</li> 
+       </ul> 
+       <p>Endianness tends to be fixed per CPU architecture and consistent across native APIs. Typed Arrays are used to communicate with those APIs, which is why their endianness follows the endianness of the platform and can’t be changed.</p> 
+       <p>On the other hand, the endianness of protocols and binary files varies and is fixed across platforms. Therefore, we must be able to access data with either endianness. DataViews serve this use case and let you specify endianness when you get or set a value.</p> 
+       <p><a href="https://en.wikipedia.org/wiki/Endianness">Quoting Wikipedia on Endianness</a>:</p> 
+       <ul> 
+        <li>Big-endian representation is the most common convention in data networking; fields in the protocols of the Internet protocol suite, such as IPv4, IPv6, TCP, and UDP, are transmitted in big-endian order. For this reason, big-endian byte order is also referred to as network byte order.</li> 
+        <li>Little-endian storage is popular for microprocessors in part due to significant historical influence on microprocessor designs by Intel Corporation.</li> 
+       </ul> 
+       <p>You can use the following function to determine the endianness of a platform.</p> 
+       <pre><code class="language-js"><span class="hljs-keyword">const</span> BIG_ENDIAN = <span class="hljs-built_in">Symbol</span>(<span class="hljs-string">'BIG_ENDIAN'</span>);
+<span class="hljs-keyword">const</span> LITTLE_ENDIAN = <span class="hljs-built_in">Symbol</span>(<span class="hljs-string">'LITTLE_ENDIAN'</span>);
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getPlatformEndianness</span>(<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">let</span> arr32 = <span class="hljs-built_in">Uint32Array</span>.of(<span class="hljs-number">0x12345678</span>);
+    <span class="hljs-keyword">let</span> arr8 = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>(arr32.buffer);
+    <span class="hljs-keyword">switch</span> ((arr8[<span class="hljs-number">0</span>]*<span class="hljs-number">0x1000000</span>) + (arr8[<span class="hljs-number">1</span>]*<span class="hljs-number">0x10000</span>) + (arr8[<span class="hljs-number">2</span>]*<span class="hljs-number">0x100</span>) + (arr8[<span class="hljs-number">3</span>])) {
+        <span class="hljs-keyword">case</span> <span class="hljs-number">0x12345678</span>:
+            <span class="hljs-keyword">return</span> BIG_ENDIAN;
+        <span class="hljs-keyword">case</span> <span class="hljs-number">0x78563412</span>:
+            <span class="hljs-keyword">return</span> LITTLE_ENDIAN;
+        <span class="hljs-keyword">default</span>:
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Unknown endianness'</span>);
+    }
+}
+</code></pre> 
+       <p>There are also platforms that arrange <em>words</em> (pairs of bytes) with a different endianness than bytes inside words. That is called mixed endianness. Should you want to support such a platform then it is easy to extend the previous code.</p> 
+       <h3 id="sec_negative-typed-array-indices">Negative indices&nbsp;&nbsp;<a class="header-anchor" href="#sec_negative-typed-array-indices" aria-hidden="true">#</a></h3> 
+       <p>With the bracket operator <code>[ ]</code>, you can only use non-negative indices (starting at 0). The methods of ArrayBuffers, Typed Arrays and DataViews work differently: every index can be negative. If it is, it counts backwards from the length. In other words, it is added to the length to produce a normal index. Therefore <code>-1</code> refers to the last element, <code>-2</code> to the second-last, etc. Methods of normal Arrays work the same way.</p> 
+       <pre><code class="language-repl">&gt; let ui8 = Uint8Array.of(0, 1, 2);
+&gt; ui8.slice(-1)
+Uint8Array [ 2 ]
+</code></pre> 
+       <p>Offsets, on the other hand, must be non-negative. If, for example, you pass <code>-1</code> to:</p> 
+       <pre><code class="language-js"><span class="hljs-built_in">DataView</span>.prototype.getInt8(byteOffset)
+</code></pre> 
+       <p>then you get a <code>RangeError</code>.</p> 
+       <h2 id="arraybuffers">ArrayBuffers&nbsp;&nbsp;<a class="header-anchor" href="#arraybuffers" aria-hidden="true">#</a></h2> 
+       <p>ArrayBuffers store the data, <em>views</em> (Typed Arrays and DataViews) let you read and change it. In order to create a DataView, you need to provide its constructor with an ArrayBuffer. Typed Array constructors can optionally create an ArrayBuffer for you.</p> 
+       <h3 id="arraybuffer-constructor"><code>ArrayBuffer</code> constructor&nbsp;&nbsp;<a class="header-anchor" href="#arraybuffer-constructor" aria-hidden="true">#</a></h3> 
+       <p>The signature of the constructor is:</p> 
+       <pre><code class="language-js"><span class="hljs-built_in">ArrayBuffer</span>(length : number)
+</code></pre> 
+       <p>Invoking this constructor via <code>new</code> creates an instance whose capacity is <code>length</code> bytes. Each of those bytes is initially 0.</p> 
+       <h3 id="static-arraybuffer-methods">Static <code>ArrayBuffer</code> methods&nbsp;&nbsp;<a class="header-anchor" href="#static-arraybuffer-methods" aria-hidden="true">#</a></h3> 
+       <ul> 
+        <li><code>ArrayBuffer.isView(arg)</code><br> Returns <code>true</code> if <code>arg</code> is an object and a view for an ArrayBuffer. Only Typed Arrays and DataViews have the required internal property <code>[[ViewedArrayBuffer]]</code>. That means that this check is roughly equivalent to checking whether <code>arg</code> is an instance of a Typed Array or of <code>DataView</code>.</li> 
+       </ul> 
+       <h3 id="arraybufferprototype-properties"><code>ArrayBuffer.prototype</code> properties&nbsp;&nbsp;<a class="header-anchor" href="#arraybufferprototype-properties" aria-hidden="true">#</a></h3> 
+       <ul> 
+        <li> <p><code>get ArrayBuffer.prototype.byteLength</code><br> Returns the capacity of this ArrayBuffer in bytes.</p> </li> 
+        <li> <p><code>ArrayBuffer.prototype.slice(start, end)</code><br> Creates a new ArrayBuffer that contains the bytes of this ArrayBuffer whose indices are greater than or equal to <code>start</code> and less than <code>end</code>. <code>start</code> and <code>end</code> can be negative (see Sect. “<a href="#sec_negative-typed-array-indices">Negative indices</a>”).</p> </li> 
+       </ul> 
+       <h2 id="typed-arrays">Typed Arrays&nbsp;&nbsp;<a class="header-anchor" href="#typed-arrays" aria-hidden="true">#</a></h2> 
+       <p>The various kinds of Typed Array are only different w.r.t. to the type of their elements:</p> 
+       <ul> 
+        <li>Typed Arrays whose elements are integers: <code>Int8Array</code>, <code>Uint8Array</code>, <code>Uint8ClampedArray</code>, <code>Int16Array</code>, <code>Uint16Array</code>, <code>Int32Array</code>, <code>Uint32Array</code></li> 
+        <li>Typed Arrays whose elements are floats: <code>Float32Array</code>, <code>Float64Array</code></li> 
+       </ul> 
+       <h3 id="typed-arrays-versus-normal-arrays">Typed Arrays versus normal Arrays&nbsp;&nbsp;<a class="header-anchor" href="#typed-arrays-versus-normal-arrays" aria-hidden="true">#</a></h3> 
+       <p>Typed Arrays are much like normal Arrays: they have a <code>length</code>, elements can be accessed via the bracket operator <code>[ ]</code> and they have all of the standard Array methods. They differ from Arrays in the following ways:</p> 
+       <ul> 
+        <li>All of their elements have the same type, setting elements converts values to that type.</li> 
+        <li>They are contiguous. Normal Arrays can have <em>holes</em> (indices in the range [0, <code>arr.length</code>) that have no associated element), Typed Arrays can’t.</li> 
+        <li>Initialized with zeros. This is a consequence of the previous item: 
+         <ul> 
+          <li><code>new Array(10)</code> creates a normal Array without any elements (it only has holes).</li> 
+          <li><code>new Uint8Array(10)</code> creates a Typed Array whose 10 elements are all 0.</li> 
+         </ul> </li> 
+        <li>An associated buffer. The elements of a Typed Array <code>ta</code> are not stored in <code>ta</code>, they are stored in an associated ArrayBuffer that can be accessed via <code>ta.buffer</code>.</li> 
+       </ul> 
+       <h3 id="typed-arrays-are-iterable">Typed Arrays are iterable&nbsp;&nbsp;<a class="header-anchor" href="#typed-arrays-are-iterable" aria-hidden="true">#</a></h3> 
+       <p>Typed Arrays implement a method whose key is <code>Symbol.iterator</code> and are therefore iterable (consult chapter “<a href="http://exploringjs.com/es6/ch_iteration.html">Iterables and iterators</a>” in “Exploring ES6” for more information). That means that you can use the <code>for-of</code> loop and similar mechanisms in ES6:</p> 
+       <pre><code class="language-js"><span class="hljs-keyword">let</span> ui8 = <span class="hljs-built_in">Uint8Array</span>.of(<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">2</span>);
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> byte <span class="hljs-keyword">of</span> ui8) {
+    <span class="hljs-built_in">console</span>.log(byte);
+}
+<span class="hljs-comment">// Output:</span>
+<span class="hljs-comment">// 0</span>
+<span class="hljs-comment">// 1</span>
+<span class="hljs-comment">// 2</span>
+</code></pre> 
+       <p>ArrayBuffers and DataViews are not iterable.</p> 
+       <h3 id="converting-typed-arrays-to-and-from-normal-arrays">Converting Typed Arrays to and from normal Arrays&nbsp;&nbsp;<a class="header-anchor" href="#converting-typed-arrays-to-and-from-normal-arrays" aria-hidden="true">#</a></h3> 
+       <p>To convert a normal Array to a Typed Array, you make it the parameter of a Typed Array constructor. For example:</p> 
+       <pre><code class="language-repl">&gt; let tarr = new Uint8Array([0,1,2]);
+</code></pre> 
+       <p>The classic way to convert a Typed Array to an Array is to invoke <code>Array.prototype.slice</code> on it. This trick works for all Array-like objects (such as <code>arguments</code>) and Typed Arrays are Array-like.</p> 
+       <pre><code class="language-repl">&gt; Array.prototype.slice.call(tarr)
+[ 0, 1, 2 ]
+</code></pre> 
+       <p>In ES6, you can use the spread operator (<code>...</code>), because Typed Arrays are iterable:</p> 
+       <pre><code class="language-repl">&gt; [...tarr]
+[ 0, 1, 2 ]
+</code></pre> 
+       <p>Another ES6 alternative is <code>Array.from()</code>, which works with either iterables or Array-like objects:</p> 
+       <pre><code class="language-repl">&gt; Array.from(tarr)
+[ 0, 1, 2 ]
+</code></pre> 
+       <h3 id="the-species-pattern">The Species pattern&nbsp;&nbsp;<a class="header-anchor" href="#the-species-pattern" aria-hidden="true">#</a></h3> 
+       <p>Some methods create new instances that are similar to <code>this</code>. The species pattern lets you configure what constructor should be used to do so. For example, if you create a subclass <code>MyArray</code> of <code>Array</code> then the default is that <code>map()</code> creates instances of <code>MyArray</code>. If you want it to create instances of <code>Array</code>, you can use the species pattern to make that happen. Details are explained in Sect “<a href="http://exploringjs.com/es6/ch_classes.html#sec_species-pattern">The species pattern</a>” in “Exploring ES6”.</p> 
+       <p>ArrayBuffers use the species pattern in the following locations:</p> 
+       <ul> 
+        <li><code>ArrayBuffer.prototype.slice()</code></li> 
+        <li>Whenever an ArrayBuffer is cloned inside a Typed Array or DataView.</li> 
+       </ul> 
+       <p>Typed Arrays use the species pattern in the following locations:</p> 
+       <ul> 
+        <li><code>TypedArray&lt;T&gt;.prototype.filter()</code></li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.map()</code></li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.slice()</code></li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.subarray()</code></li> 
+       </ul> 
+       <p>DataViews don’t use the species pattern.</p> 
+       <h3 id="the-inheritance-hierarchy-of-typed-arrays">The inheritance hierarchy of Typed Arrays&nbsp;&nbsp;<a class="header-anchor" href="#the-inheritance-hierarchy-of-typed-arrays" aria-hidden="true">#</a></h3> 
+       <p>As you could see in the diagram at the beginning of this post, all Typed Array classes (<code>Uint8Array</code> etc.) have a common superclass. I’m calling that superclass <code>TypedArray</code>, but it is not directly accessible from JavaScript (the ES6 specification calls it <em>the intrinsic object <code>%TypedArray%</code></em>). <code>TypedArray.prototype</code> houses all methods of Typed Arrays.</p> 
+       <h3 id="static-typedarray-methods">Static <code>TypedArray</code> methods&nbsp;&nbsp;<a class="header-anchor" href="#static-typedarray-methods" aria-hidden="true">#</a></h3> 
+       <p>Both static <code>TypedArray</code> methods are inherited by its subclasses (<code>Uint8Array</code> etc.).</p> 
+       <h4 id="typedarrayof"><code>TypedArray.of()</code>&nbsp;&nbsp;<a class="header-anchor" href="#typedarrayof" aria-hidden="true">#</a></h4> 
+       <p>This method has the signature:</p> 
+       <pre><code class="language-js">TypedArray.of(...items)
+</code></pre> 
+       <p>It creates a new Typed Array that is an instance of <code>this</code> (the class on which <code>of()</code> was invoked). The elements of that instance are the parameters of <code>of()</code>.</p> 
+       <p>You can think of <code>of()</code> as a custom literal for Typed Arrays:</p> 
+       <pre><code class="language-repl">&gt; Float32Array.of(0.151, -8, 3.7)
+Float32Array [ 0.151, -8, 3.7 ]
+</code></pre> 
+       <h4 id="typedarrayfrom"><code>TypedArray.from()</code>&nbsp;&nbsp;<a class="header-anchor" href="#typedarrayfrom" aria-hidden="true">#</a></h4> 
+       <p>This method has the signature:</p> 
+       <pre><code class="language-js">TypedArray&lt;U&gt;.from(source : Iterable&lt;T&gt;, mapfn? : <span class="hljs-function"><span class="hljs-params">T</span> =&gt;</span> U, thisArg?)
+</code></pre> 
+       <p>It converts the iterable <code>source</code> into an instance of <code>this</code> (a Typed Array).</p> 
+       <p>For example, normal Arrays are iterable and can be converted with this method:</p> 
+       <pre><code class="language-repl">&gt; Uint16Array.from([0, 1, 2])
+Uint16Array [ 0, 1, 2 ]
+</code></pre> 
+       <p>Typed Arrays are iterable, too:</p> 
+       <pre><code class="language-repl">&gt; let ui16 = Uint16Array.from(Uint8Array.of(0, 1, 2));
+&gt; ui16 instanceof Uint16Array
+true
+</code></pre> 
+       <p>The optional <code>mapfn</code> lets you transform the elements of <code>source</code> before they become elements of the result. Why perform the two steps <em>mapping</em> and <em>conversion</em> in one go? Compared to performing the first step separately, via <code>source.map()</code>, there are two advantages:</p> 
+       <ol> 
+        <li>No intermediate Array or Typed Array is needed.</li> 
+        <li>When converting a Typed Array to a Typed Array whose elements have a higher precision, the mapping step can make use of that higher precision.</li> 
+       </ol> 
+       <p>To illustrate the second advantage, let’s use <code>map()</code> to double the elements of a Typed Array:</p> 
+       <pre><code class="language-repl">&gt; Int8Array.of(127, 126, 125).map(x =&gt; 2 * x)
+Int8Array [ -2, -4, -6 ]
+</code></pre> 
+       <p>As you can see, the values overflow and are coerced into the <code>Int8</code> range of values. If map via <code>from()</code>, you can choose the type of the result so that values don’t overflow:</p> 
+       <pre><code class="language-repl">&gt; Int16Array.from(Int8Array.of(127, 126, 125), x =&gt; 2 * x)
+Int16Array [ 254, 252, 250 ]
+</code></pre> 
+       <p><a href="https://twitter.com/awbjs/status/585199958661472257">According to Allen Wirfs-Brock</a>, mapping between Typed Arrays was what motivated the <code>mapfn</code> parameter of <code>from()</code>.</p> 
+       <h3 id="typedarrayprototype-properties"><code>TypedArray.prototype</code> properties&nbsp;&nbsp;<a class="header-anchor" href="#typedarrayprototype-properties" aria-hidden="true">#</a></h3> 
+       <p>Indices accepted by Typed Array methods can be negative (they work like traditional Array methods that way). Offsets must be non-negative. For details, see Sect. “<a href="#sec_negative-typed-array-indices">Negative indices</a>”.</p> 
+       <h4 id="methods-specific-to-typed-arrays">Methods specific to Typed Arrays&nbsp;&nbsp;<a class="header-anchor" href="#methods-specific-to-typed-arrays" aria-hidden="true">#</a></h4> 
+       <p>The following properties are specific to Typed Arrays, normal Arrays don’t have them:</p> 
+       <ul> 
+        <li><code>get TypedArray&lt;T&gt;.prototype.buffer : ArrayBuffer</code><br> Returns the buffer backing this Typed Array.</li> 
+        <li><code>get TypedArray&lt;T&gt;.prototype.byteLength : number</code><br> Returns the size in bytes of this Typed Array’s buffer.</li> 
+        <li><code>get TypedArray&lt;T&gt;.prototype.byteOffset : number</code><br> Returns the offset where this Typed Array “starts” inside its ArrayBuffer.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.set(arrayOrTypedArray, offset=0)</code><br> Copies all elements of <code>arrayOrTypedArray</code> to this Typed Array. The element at index 0 of <code>arrayOrTypedArray</code> is written to index <code>offset</code> of this Typed Array (etc.). 
+         <ul> 
+          <li>If <code>arrayOrTypedArray</code> is a normal Array, its elements are converted to numbers who are then converted to the element type <code>T</code> of this Typed Array.</li> 
+          <li>If <code>arrayOrTypedArray</code> is a Typed Array then each of its elements is converted directly to the appropriate type for this Typed Array. If both Typed Arrays have the same element type then faster, byte-wise copying is used.</li> 
+         </ul> </li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.subarray(begin=0, end=this.length) : TypedArray&lt;T&gt;</code><br> Returns a new Typed Array that has the same buffer as this Typed Array, but a (generally) smaller range. If <code>begin</code> is non-negative then the first element of the resulting Typed Array is <code>this[begin]</code>, the second <code>this[begin+1]</code> (etc.). If <code>begin</code> in negative, it is converted appropriately.</li> 
+       </ul> 
+       <h4 id="array-methods">Array methods&nbsp;&nbsp;<a class="header-anchor" href="#array-methods" aria-hidden="true">#</a></h4> 
+       <p>The following methods are basically the same as the methods of normal Arrays:</p> 
+       <ul> 
+        <li><code>TypedArray&lt;T&gt;.prototype.copyWithin(target : number, start : number, end = this.length) : This</code><br> Copies the elements whose indices are between <code>start</code> (including) and <code>end</code> (excluding) to indices starting at <code>target</code>. If the ranges overlap and the former range comes first then elements are copied in reverse order to avoid overwriting source elements before they are copied.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.entries() : Iterable&lt;[number,T]&gt;</code><br> Returns an iterable over [index,element] pairs for this Typed Array.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.every(callbackfn, thisArg?)</code><br> Returns <code>true</code> if <code>callbackfn</code> returns <code>true</code> for every element of this Typed Array. Otherwise, it returns <code>false</code>. <code>every()</code> stops processing the first time <code>callbackfn</code> returns <code>false</code>.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.fill(value, start=0, end=this.length) : void</code><br> Set the elements whose indices range from <code>start</code> to <code>end</code> to <code>value</code>.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.filter(callbackfn, thisArg?) : TypedArray&lt;T&gt;</code><br> Returns a Typed Array that contains every element of this Typed Array for which <code>callbackfn</code> returns <code>true</code>. In general, the result is shorter than this Typed Array.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.find(predicate : T =&gt; boolean, thisArg?) : T</code><br> Returns the first element for which the function <code>predicate</code> returns <code>true</code>.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.findIndex(predicate : T =&gt; boolean, thisArg?) : number</code><br> Returns the index of the first element for which <code>predicate</code> returns <code>true</code>.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.forEach(callbackfn, thisArg?) : void</code><br> Iterates over this Typed Array and invokes <code>callbackfn</code> for each element.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.indexOf(searchElement, fromIndex=0) : number</code><br> Returns the index of the first element that strictly equals <code>searchElement</code>. The search starts at <code>fromIndex</code>.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.join(separator : string = ',') : string</code><br> Converts all elements to strings and concatenates them, separated by <code>separator</code>.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.keys() : Iterable&lt;number&gt;</code><br> Returns an iterable over the indices of this Typed Array.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.lastIndexOf(searchElement, fromIndex?) : number</code><br> Returns the index of the last element that strictly equals <code>searchElement</code>. The search starts at <code>fromIndex</code>, backwards.</li> 
+        <li><code>get TypedArray&lt;T&gt;.prototype.length : number</code><br> Returns the length of this Typed Array.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.map(callbackfn, thisArg?) : TypedArray&lt;T&gt;</code><br> Returns a new Typed Array in which every element is the result of applying <code>callbackfn</code> to the corresponding element of this Typed Array.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.reduce(callbackfn : (previousValue : any, currentElement : T, currentIndex : number, array : TypedArray&lt;T&gt;) =&gt; any, initialValue?) : any</code><br> <code>callbackfn</code> is fed one element at a time, together with the result that was computed so far and computes a new result. Elements are visited from left to right.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.reduceRight(callbackfn : (previousValue : any, currentElement : T, currentIndex : number, array : TypedArray&lt;T&gt;) =&gt; any, initialValue?) : any</code><br> <code>callbackfn</code> is fed one element at a time, together with the result that was computed so far and computes a new result. Elements are visited from right to left.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.reverse() : This</code><br> Reverses the order of the elements of this Typed Array and returns <code>this</code>.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.slice(start=0, end=this.length) : TypedArray&lt;T&gt;</code><br> Create a new Typed Array that only has the elements of this Typed Array whose indices are between <code>start</code> (including) and <code>end</code> (excluding).</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.some(callbackfn, thisArg?)</code><br> Returns <code>true</code> if <code>callbackfn</code> returns <code>true</code> for at least one element of this Typed Array. Otherwise, it returns <code>false</code>. <code>some()</code> stops processing the first time <code>callbackfn</code> returns <code>true</code>.</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.sort(comparefn? : (number, number) =&gt; number)</code><br> Sorts this Typed Array, as specified via <code>comparefn</code>. If <code>comparefn</code> is missing, sorting is done ascendingly, by comparing via the less-than operator (<code>&lt;</code>).</li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.toLocaleString(reserved1?, reserved2?)</code></li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.toString()</code></li> 
+        <li><code>TypedArray&lt;T&gt;.prototype.values() : Iterable&lt;T&gt;</code><br> Returns an iterable over the values of this Typed Array.</li> 
+       </ul> 
+       <p>Due to all of these methods being available for Arrays, you can consult the following two sources to find out more about how they work:</p> 
+       <ul> 
+        <li>The following methods are new in ES6 and explained in chapter “<a href="http://exploringjs.com/es6/ch_arrays.html">New Array features</a>” of “Exploring ES6”: <code>copyWithin</code>, <code>entries</code>, <code>fill</code>, <code>find</code>, <code>findIndex</code>, <code>keys</code>, <code>values</code>.</li> 
+        <li>All other methods are explained in chapter “<a href="http://speakingjs.com/es5/ch18.html">Arrays</a>” of “Speaking JavaScript”.</li> 
+       </ul> 
+       <h3 id="sec_typed-array-constructors"><code>«ElementType»Array</code> constructor&nbsp;&nbsp;<a class="header-anchor" href="#sec_typed-array-constructors" aria-hidden="true">#</a></h3> 
+       <p>Each Typed Array constructor has a name that follows the pattern <code>«ElementType»Array</code>, where <code>«ElementType»</code> is one of the element types in the table at the beginning. That means that there are 9 constructors for Typed Arrays: <code>Int8Array</code>, <code>Uint8Array</code>, <code>Uint8ClampedArray</code> (element type <code>Uint8C</code>), <code>Int16Array</code>, <code>Uint16Array</code>, <code>Int32Array</code>, <code>Uint32Array</code>, <code>Float32Array</code>, <code>Float64Array</code>.</p> 
+       <p>Each constructor has five <em>overloaded</em> versions – it behaves differently depending on how many arguments it receives and what their types are:</p> 
+       <ul> 
+        <li> <p><code>«ElementType»Array(buffer, byteOffset=0, length?)</code><br> Creates a new Typed Array whose buffer is <code>buffer</code>. It starts accessing the buffer at the given <code>byteOffset</code> and will have the given <code>length</code>. Note that <code>length</code> counts elements of the Typed Array (with 1–4 bytes each), not bytes.</p> </li> 
+        <li> <p><code>«ElementType»Array(length)</code><br> Creates a Typed Array with the given <code>length</code> and the appropriate buffer (whose size in bytes is <code>length * «ElementType»Array.BYTES_PER_ELEMENT</code>).</p> </li> 
+        <li> <p><code>«ElementType»Array()</code><br> Creates a Typed Array whose <code>length</code> is 0. It also creates an associated empty ArrayBuffer.</p> </li> 
+        <li> <p><code>«ElementType»Array(typedArray)</code><br> Creates a new Typed Array that has the same length and elements as <code>typedArray</code>. Values that are too large or small are converted appropriately.</p> </li> 
+        <li> <p><code>«ElementType»Array(arrayLikeObject)</code><br> Treats <code>arrayLikeObject</code> like an Array and creates a new TypedArray that has the same length and elements. Values that are too large or small are converted appropriately.</p> </li> 
+       </ul> 
+       <p>The following code shows three different ways of creating the same Typed Array:</p> 
+       <pre><code class="language-js"><span class="hljs-keyword">let</span> tarr = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>]);
+
+<span class="hljs-keyword">let</span> tarr = <span class="hljs-built_in">Uint8Array</span>.of(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>);
+
+<span class="hljs-keyword">let</span> tarr = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>(<span class="hljs-number">3</span>);
+tarr[<span class="hljs-number">0</span>] = <span class="hljs-number">0</span>;
+tarr[<span class="hljs-number">1</span>] = <span class="hljs-number">1</span>;
+tarr[<span class="hljs-number">2</span>] = <span class="hljs-number">2</span>;
+</code></pre> 
+       <h3 id="static-elementtypearray-properties">Static <code>«ElementType»Array</code> properties&nbsp;&nbsp;<a class="header-anchor" href="#static-elementtypearray-properties" aria-hidden="true">#</a></h3> 
+       <ul> 
+        <li> <p><code>«ElementType»Array.BYTES_PER_ELEMENT</code><br> Counts how many bytes are needed to store a single element:</p> <pre><code class="language-repl">&gt; Uint8Array.BYTES_PER_ELEMENT
+1
+&gt; Int16Array.BYTES_PER_ELEMENT
+2
+&gt; Float64Array.BYTES_PER_ELEMENT
+8
+</code></pre> </li> 
+       </ul> 
+       <h3 id="elementtypearrayprototype-properties"><code>«ElementType»Array.prototype</code> properties&nbsp;&nbsp;<a class="header-anchor" href="#elementtypearrayprototype-properties" aria-hidden="true">#</a></h3> 
+       <ul> 
+        <li><code>«ElementType»Array.prototype.BYTES_PER_ELEMENT</code><br> The same as <code>«ElementType»Array.BYTES_PER_ELEMENT</code>.</li> 
+       </ul> 
+       <h2 id="dataviews">DataViews&nbsp;&nbsp;<a class="header-anchor" href="#dataviews" aria-hidden="true">#</a></h2> 
+       <h3 id="dataview-constructor"><code>DataView</code> constructor&nbsp;&nbsp;<a class="header-anchor" href="#dataview-constructor" aria-hidden="true">#</a></h3> 
+       <ul> 
+        <li><code>DataView(buffer, byteOffset=0, byteLength=buffer.byteLength-byteOffset)</code><br> Creates a new DataView whose data is stored in the ArrayBuffer <code>buffer</code>. By default, the new DataView can access all of <code>buffer</code>, the last two parameters allow you to change that.</li> 
+       </ul> 
+       <h3 id="dataviewprototype-properties"><code>DataView.prototype</code> properties&nbsp;&nbsp;<a class="header-anchor" href="#dataviewprototype-properties" aria-hidden="true">#</a></h3> 
+       <ul> 
+        <li> <p><code>get DataView.prototype.buffer</code><br> Returns the ArrayBuffer of this DataView.</p> </li> 
+        <li> <p><code>get DataView.prototype.byteLength</code><br> Returns how many bytes can be accessed by this DataView.</p> </li> 
+        <li> <p><code>get DataView.prototype.byteOffset</code><br> Returns at which offset this DataView starts accessing the bytes in its buffer.</p> </li> 
+        <li> <p><code>DataView.prototype.get«ElementType»(byteOffset, littleEndian=false)</code><br> Reads a value from the buffer of this DataView.</p> 
+         <ul> 
+          <li><code>«ElementType»</code> can be: <code>Float32</code>, <code>Float64</code>, <code>Int8</code>, <code>Int16</code>, <code>Int32</code>, <code>Uint8</code>, <code>Uint16</code>, <code>Uint32</code></li> 
+         </ul> </li> 
+        <li> <p><code>DataView.prototype.set«ElementType»(byteOffset, value, littleEndian=false)</code><br> Writes <code>value</code> to the buffer of this DataView.</p> 
+         <ul> 
+          <li><code>«ElementType»</code> can be: <code>Float32</code>, <code>Float64</code>, <code>Int8</code>, <code>Int16</code>, <code>Int32</code>, <code>Uint8</code>, <code>Uint16</code>, <code>Uint32</code></li> 
+         </ul> </li> 
+       </ul> 
+       <h2 id="sec_browser-apis-supporting-typed-arrays">Browser APIs that support Typed Arrays&nbsp;&nbsp;<a class="header-anchor" href="#sec_browser-apis-supporting-typed-arrays" aria-hidden="true">#</a></h2> 
+       <p>Typed Arrays have been around for a while, so there are quite a few browser APIs that support them.</p> 
+       <h3 id="file-api">File API&nbsp;&nbsp;<a class="header-anchor" href="#file-api" aria-hidden="true">#</a></h3> 
+       <p><a href="http://www.w3.org/TR/FileAPI/">The file API</a> lets you access local files. The following code demonstrates how to get the bytes of a submitted local file in an ArrayBuffer.</p> 
+       <pre><code class="language-js"><span class="hljs-keyword">let</span> fileInput = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'fileInput'</span>);
+<span class="hljs-keyword">let</span> file = fileInput.files[<span class="hljs-number">0</span>];
+<span class="hljs-keyword">let</span> reader = <span class="hljs-keyword">new</span> FileReader();
+reader.readAsArrayBuffer(file);
+reader.onload = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">let</span> arrayBuffer = reader.result;
+    ···
+};
+</code></pre> 
+       <h3 id="xmlhttprequest"><code>XMLHttpRequest</code>&nbsp;&nbsp;<a class="header-anchor" href="#xmlhttprequest" aria-hidden="true">#</a></h3> 
+       <p>In newer versions of <a href="http://www.w3.org/TR/XMLHttpRequest/">the <code>XMLHttpRequest</code> API</a>, you can have the results delivered in an ArrayBuffer:</p> 
+       <pre><code class="language-js"><span class="hljs-keyword">let</span> xhr = <span class="hljs-keyword">new</span> XMLHttpRequest();
+xhr.open(<span class="hljs-string">'GET'</span>, someUrl);
+xhr.responseType = <span class="hljs-string">'arraybuffer'</span>;
+
+xhr.onload = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">let</span> arrayBuffer = xhr.response;
+    ···
+};
+
+xhr.send();
+</code></pre> 
+       <h3 id="fetch-api">Fetch API&nbsp;&nbsp;<a class="header-anchor" href="#fetch-api" aria-hidden="true">#</a></h3> 
+       <p>Similarly to <code>XMLHttpRequest</code>, <a href="https://fetch.spec.whatwg.org/">the Fetch API</a> lets you request resources. But it is based on Promises, which makes it more convenient to use. The following code demonstrates how to download the content pointed to by <code>url</code> as an ArrayBuffer:</p> 
+       <pre><code class="language-js">fetch(url)
+.then(<span class="hljs-function"><span class="hljs-params">request</span> =&gt;</span> request.arrayBuffer())
+.then(<span class="hljs-function"><span class="hljs-params">arrayBuffer</span> =&gt;</span> ···);
+</code></pre> 
+       <h3 id="canvas">Canvas&nbsp;&nbsp;<a class="header-anchor" href="#canvas" aria-hidden="true">#</a></h3> 
+       <p><a href="http://www.w3.org/TR/html5/scripting-1.html#the-canvas-element">Quoting the HTML5 specification</a>:</p> 
+       <blockquote> 
+        <p>The <code>canvas</code> element provides scripts with a resolution-dependent bitmap canvas, which can be used for rendering graphs, game graphics, art, or other visual images on the fly.</p> 
+       </blockquote> 
+       <p><a href="http://www.w3.org/TR/2dcontext/">The 2D Context of <code>canvas</code></a> lets you retrieve the bitmap data as an instance of <code>Uint8ClampedArray</code>:</p> 
+       <pre><code class="language-js"><span class="hljs-keyword">let</span> canvas = <span class="hljs-built_in">document</span>.getElementById(<span class="hljs-string">'my_canvas'</span>);
+<span class="hljs-keyword">let</span> context = canvas.getContext(<span class="hljs-string">'2d'</span>);
+<span class="hljs-keyword">let</span> imageData = context.getImageData(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, canvas.width, canvas.height);
+<span class="hljs-keyword">let</span> uint8ClampedArray = imageData.data;
+</code></pre> 
+       <h3 id="websockets">WebSockets&nbsp;&nbsp;<a class="header-anchor" href="#websockets" aria-hidden="true">#</a></h3> 
+       <p><a href="http://www.w3.org/TR/websockets/">WebSockets</a> let you send and receive binary data via ArrayBuffers:</p> 
+       <pre><code class="language-js"><span class="hljs-keyword">let</span> socket = <span class="hljs-keyword">new</span> WebSocket(<span class="hljs-string">'ws://127.0.0.1:8081'</span>);
+socket.binaryType = <span class="hljs-string">'arraybuffer'</span>;
+
+<span class="hljs-comment">// Wait until socket is open</span>
+socket.addEventListener(<span class="hljs-string">'open'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">event</span>) </span>{
+    <span class="hljs-comment">// Send binary data</span>
+    <span class="hljs-keyword">let</span> typedArray = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Uint8Array</span>(<span class="hljs-number">4</span>);
+    socket.send(typedArray.buffer);
+});
+
+<span class="hljs-comment">// Receive binary data</span>
+socket.addEventListener(<span class="hljs-string">'message'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">event</span>) </span>{
+    <span class="hljs-keyword">let</span> arrayBuffer = event.data;
+    ···
+});
+</code></pre> 
+       <h3 id="other-apis">Other APIs&nbsp;&nbsp;<a class="header-anchor" href="#other-apis" aria-hidden="true">#</a></h3> 
+       <ul> 
+        <li> <p><a href="https://www.khronos.org/registry/webgl/specs/latest/2.0/">WebGL</a> uses the Typed Array API for: accessing buffer data, specifying pixels for texture mapping, reading pixel data, and more.</p> </li> 
+        <li> <p><a href="http://www.w3.org/TR/webaudio/">The Web Audio API</a> lets you <a href="http://www.w3.org/TR/webaudio/#dfn-decodeAudioData">decode audio data</a> submitted via an ArrayBuffer.</p> </li> 
+        <li> <p><a href="http://www.w3.org/TR/media-source/">Media Source Extensions</a>: The HTML media elements are currently <code>&lt;audio&gt;</code> and <code>&lt;video&gt;</code>. The Media Source Extensions API enables you to create streams to be played via those elements. You can add binary data to such streams via ArrayBuffers, Typed Arrays or DataViews.</p> </li> 
+        <li> <p>Communication with <a href="http://www.w3.org/TR/workers/">Web Workers</a>: If you send data to a Worker via <a href="http://www.w3.org/TR/workers/#dom-worker-postmessage"><code>postMessage()</code></a>, either the message (which will be cloned) or the transferable objects can contain ArrayBuffers.</p> </li> 
+        <li> <p><a href="https://html.spec.whatwg.org/multipage/comms.html#crossDocumentMessages">Cross-document communication</a>: works similarly to communication with Web Workers and also uses the method <code>postMessage()</code>.</p> </li> 
+       </ul> 
+       <h2 id="extended-example-jpeg-sof0-decoder">Extended example: JPEG SOF0 decoder&nbsp;&nbsp;<a class="header-anchor" href="#extended-example-jpeg-sof0-decoder" aria-hidden="true">#</a></h2> 
+       <p>The code of the following example is <a href="https://github.com/rauschma/typed-array-demos">on GitHub</a>. And you can <a href="http://rauschma.github.io/typed-array-demos/">run it online</a>.</p> 
+       <p>The example is a web pages that lets you upload a JPEG file and parses its structure to determine the height and the width of the image and more.</p> 
+       <h3 id="the-jpeg-file-format">The JPEG file format&nbsp;&nbsp;<a class="header-anchor" href="#the-jpeg-file-format" aria-hidden="true">#</a></h3> 
+       <p>A JPEG file is a sequence of <em>segments</em> (typed data). Each segment starts with the following four bytes:</p> 
+       <ul> 
+        <li>Marker (two bytes): declares what kind of data is stored in the segment. The first of the two bytes is always 0xFF. Each of the standard markers has a human readable name. For example, the marker 0xFFC0 has the name “Start Of Frame (Baseline DCT)”, short: “SOF0”.</li> 
+        <li>Length of segment (two bytes): how long is this segment (in bytes, including the length itself)?</li> 
+       </ul> 
+       <p>JPEG files are big-endian on all platforms. Therefore, this example demonstrates how important it is that we can specify endianness when using DataViews.</p> 
+       <h3 id="the-javascript-code">The JavaScript code&nbsp;&nbsp;<a class="header-anchor" href="#the-javascript-code" aria-hidden="true">#</a></h3> 
+       <p>The following function <code>processArrayBuffer()</code> is an abridged version of the actual code; I’ve removed a few error checks to reduce clutter. <code>processArrayBuffer()</code> receives an ArrayBuffer with the contents of the submitted JPEG file and iterates over its segments.</p> 
+       <pre><code class="language-js"><span class="hljs-comment">// JPEG is big endian</span>
+<span class="hljs-keyword">var</span> IS_LITTLE_ENDIAN = <span class="hljs-literal">false</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">processArrayBuffer</span>(<span class="hljs-params">arrayBuffer</span>) </span>{
+    <span class="hljs-keyword">try</span> {
+        <span class="hljs-keyword">var</span> dv = <span class="hljs-keyword">new</span> <span class="hljs-built_in">DataView</span>(arrayBuffer);
+        ···
+        <span class="hljs-keyword">var</span> ptr = <span class="hljs-number">2</span>;
+        <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) {
+            ···
+            <span class="hljs-keyword">var</span> lastPtr = ptr;
+            enforceValue(<span class="hljs-number">0xFF</span>, dv.getUint8(ptr),
+                <span class="hljs-string">'Not a marker'</span>);
+            ptr++;
+            <span class="hljs-keyword">var</span> marker = dv.getUint8(ptr);
+            ptr++;
+            <span class="hljs-keyword">var</span> len = dv.getUint16(ptr, IS_LITTLE_ENDIAN);
+            ptr += len;
+            logInfo(<span class="hljs-string">'Marker: '</span>+hex(marker)+<span class="hljs-string">' ('</span>+len+<span class="hljs-string">' byte(s))'</span>);
+            ···
+
+            <span class="hljs-comment">// Did we find what we were looking for?</span>
+            <span class="hljs-keyword">if</span> (marker === <span class="hljs-number">0xC0</span>) { <span class="hljs-comment">// SOF0</span>
+                logInfo(decodeSOF0(dv, lastPtr));
+                <span class="hljs-keyword">break</span>;
+            }
+        }
+    } <span class="hljs-keyword">catch</span> (e) {
+        logError(e.message);
+    }
+}
+</code></pre> 
+       <p>This code uses the following helper functions (that are not shown here):</p> 
+       <ul> 
+        <li><code>enforceValue()</code> throws an error if the expected value (first parameter) doesn’t match the actual value (second parameter).</li> 
+        <li><code>logInfo()</code> and <code>logError()</code> display messages on the page.</li> 
+        <li><code>hex()</code> turns a number into a string with two hexadecimal digits.</li> 
+       </ul> 
+       <p><code>decodeSOF0()</code> parses the segment SOF0:</p> 
+       <pre><code class="language-js"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">decodeSOF0</span>(<span class="hljs-params">dv, start</span>) </span>{
+    <span class="hljs-comment">// Example (16x16):</span>
+    <span class="hljs-comment">// FF C0 00 11 08 00 10 00 10 03 01 22 00 02 11 01 03 11 01</span>
+    <span class="hljs-keyword">var</span> data = {};
+    start += <span class="hljs-number">4</span>; <span class="hljs-comment">// skip marker 0xFFC0 and segment length 0x0011</span>
+    <span class="hljs-keyword">var</span> data = {
+        <span class="hljs-attr">bitsPerColorComponent</span>: dv.getUint8(start), <span class="hljs-comment">// usually 0x08</span>
+        imageHeight: dv.getUint16(start+<span class="hljs-number">1</span>, IS_LITTLE_ENDIAN),
+        <span class="hljs-attr">imageWidth</span>: dv.getUint16(start+<span class="hljs-number">3</span>, IS_LITTLE_ENDIAN),
+        <span class="hljs-attr">numberOfColorComponents</span>: dv.getUint8(start+<span class="hljs-number">5</span>),
+    };
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">JSON</span>.stringify(data, <span class="hljs-literal">null</span>, <span class="hljs-number">4</span>);
+}
+</code></pre> 
+       <p>More information on the structure of JPEG files:</p> 
+       <ul> 
+        <li>“<a href="https://en.wikipedia.org/wiki/JPEG#Syntax_and_structure">JPEG: Syntax and structure</a>” (on Wikipedia)</li> 
+        <li>“<a href="https://en.wikipedia.org/wiki/JPEG_File_Interchange_Format#File_format_structure">JPEG File Interchange Format: File format structure</a>” (on Wikipedia)</li> 
+       </ul> 
+       <h2 id="availability">Availability&nbsp;&nbsp;<a class="header-anchor" href="#availability" aria-hidden="true">#</a></h2> 
+       <p>Much of the Typed Array API is implemented by all modern JavaScript engines, but several features are new to ECMAScript 6:</p> 
+       <ul> 
+        <li>Static methods borrowed from Arrays: <code>TypedArray&lt;T&gt;.from()</code>, <code>TypedArray&lt;T&gt;.of()</code></li> 
+        <li>Prototype methods borrowed from Arrays: <code>TypedArray&lt;T&gt;.prototype.map()</code> etc.</li> 
+        <li>Iterable Typed Arrays</li> 
+        <li>Support for the species pattern</li> 
+        <li>An inheritance hierarchy where <code>TypedArray&lt;T&gt;</code> is the superclass of all Typed Array classes</li> 
+       </ul> 
+       <p>It may take a while until these are available everywhere. As usual, kangax’ “<a href="https://kangax.github.io/compat-table/es6/#typed_arrays">ES6 compatibility table</a>” describes the status quo.</p> 
+      </div>
+      <div style="margin-top:3em;" data-reactid="41"> 
+       <hr> 
+       <div id="disqus_thread"></div> 
+       <script>
+                var disqus_config = function () {
+                    this.page.url = 'http://www.2ality.com/2015/09/typed-arrays.html';
+                    this.page.identifier = 'http://www.2ality.com/2015/09/typed-arrays.html';
+                };
+                (function() {  // DON'T EDIT BELOW THIS LINE
+                    var d = document, s = d.createElement('script');
+
+                    s.src = 'https://2ality.disqus.com/embed.js';
+
+                    s.setAttribute('data-timestamp', +new Date());
+                    (d.head || d.body).appendChild(s);
+                })();
+            </script> 
+       <noscript>
+        Please enable JavaScript to view the 
+        <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+       </noscript> 
+      </div>
+     </div>
+     <div id="right_column" data-reactid="42">
+      <div class="no-link" style="text-align:center;" data-reactid="43">
+       <a href="http://rauschma.de/" data-reactid="44"><img style="margin-left:auto;margin-right:auto;" width="180px" height="180px" src="../../img/axel_head.jpg" data-reactid="45"><br data-reactid="46">
+        <!-- react-text: 47 -->Dr. Axel Rauschmayer
+        <!-- /react-text --></a>
+       <br data-reactid="48">
+       <a href="https://twitter.com/rauschma" data-reactid="49">Twitter</a>
+       <!-- react-text: 50 -->, 
+       <!-- /react-text -->
+       <a href="https://social.tchncs.de/@rauschma" data-reactid="51">Mastodon</a>
+      </div>
+      <div data-reactid="52">
+       <h2 data-reactid="53">Most popular (last 30 days)</h2>
+       <!-- react-text: 54 -->Loading...
+       <!-- /react-text -->
+      </div>
+     </div>
+    </div>
+   </div>
+  </div> 
+  <script defer>
+    var pageData = {"metaDescription":"Typed Arrays are an ECMAScript 6 API for handling binary data. This blog post explains how they work.","relativeWebPath":"2015/09/typed-arrays.html","titleText":"Typed Arrays in ECMAScript 6","titleHtml":"Typed Arrays in ECMAScript 6","date":"2015-09-05","tagsArray":["esnext","dev","javascript"],"postHtml":"<p>Typed Arrays are an ECMAScript 6 API for handling binary data. This blog post explains how they work.</p>\n<!--more-->\n<h2 id=\"overview\">Overview  <a class=\"header-anchor\" href=\"#overview\" aria-hidden=\"true\">#</a></h2>\n<p>Code example:</p>\n<pre><code class=\"language-js\"><span class=\"hljs-keyword\">let</span> typedArray = <span class=\"hljs-keyword\">new</span> <span class=\"hljs-built_in\">Uint8Array</span>([<span class=\"hljs-number\">0</span>,<span class=\"hljs-number\">1</span>,<span class=\"hljs-number\">2</span>]);\n<span class=\"hljs-built_in\">console</span>.log(typedArray.length); <span class=\"hljs-comment\">// 3</span>\ntypedArray[<span class=\"hljs-number\">0</span>] = <span class=\"hljs-number\">5</span>;\n<span class=\"hljs-keyword\">let</span> normalArray = [...typedArray]; <span class=\"hljs-comment\">// [5,1,2]</span>\n\n<span class=\"hljs-comment\">// The elements are stored in typedArray.buffer.</span>\n<span class=\"hljs-comment\">// Get a different view on the same data:</span>\n<span class=\"hljs-keyword\">let</span> dataView = <span class=\"hljs-keyword\">new</span> <span class=\"hljs-built_in\">DataView</span>(typedArray.buffer);\n<span class=\"hljs-built_in\">console</span>.log(dataView.getUint8(<span class=\"hljs-number\">0</span>)); <span class=\"hljs-comment\">// 5</span>\n</code></pre>\n<p>Instances of <code>ArrayBuffer</code> store the binary data to be processed. Two kinds of <em>views</em> are used to access the data:</p>\n<ul>\n<li>Typed Arrays (<code>Uint8Array</code>, <code>Int16Array</code>, <code>Float32Array</code>, etc.) interpret the ArrayBuffer as an indexed sequence of elements of a single type.</li>\n<li>Instances of <code>DataView</code> let you access data as elements of several types (<code>Uint8</code>, <code>Int16</code>, <code>Float32</code>, etc.), at any byte offset inside an ArrayBuffer.</li>\n</ul>\n<p>The following browser APIs support Typed Arrays (<a href=\"#sec_browser-apis-supporting-typed-arrays\">details are mentioned later</a>):</p>\n<ul>\n<li>File API</li>\n<li>XMLHttpRequest</li>\n<li>Fetch API</li>\n<li>Canvas</li>\n<li>WebSockets</li>\n<li>And more</li>\n</ul>\n<h2 id=\"introduction\">Introduction  <a class=\"header-anchor\" href=\"#introduction\" aria-hidden=\"true\">#</a></h2>\n<p>For a long time, JavaScript was not very good at handling binary data. This changed with the introduction of the Typed Array API, whose main use cases are:</p>\n<ul>\n<li>Processing binary data: manipulating image data in HTML Canvas elements, parsing binary files, handling binary network protocols, etc.</li>\n<li>Interacting with native APIs: Native APIs often receive and return data in a binary format, which you could neither store nor manipulate well in traditional JavaScript. That meant that whenever you were communicating with such an API, data had to be converted from JavaScript to binary and back, for every call. Typed Arrays eliminate this bottleneck. One example of communicating with native APIs is WebGL, for which Typed Arrays were initially created. Section “<a href=\"http://www.html5rocks.com/en/tutorials/webgl/typed_arrays/#toc-history\">History of Typed Arrays</a>” of the article “<a href=\"http://www.html5rocks.com/en/tutorials/webgl/typed_arrays/#toc-history\">Typed Arrays: Binary Data in the Browser</a>” (by Ilmari Heikkinen for HTML5 Rocks) has more information.</li>\n</ul>\n<p>Two kinds of objects work together in the Typed Array API:</p>\n<ul>\n<li>Buffers: Instances of <code>ArrayBuffer</code> hold the binary data.</li>\n<li>Views: provide the methods for accessing the binary data. There are two kinds of views:\n<ul>\n<li>An instance of a Typed Array constructor (<code>Uint8Array</code>, <code>Float64Array</code>, etc.) works much like a normal Array, but only allows a single type for its elements and doesn’t have holes.</li>\n<li>An instance of <code>DataView</code> lets you access data at any byte offset in the buffer, and interprets that data as one of several types (<code>Uint8</code>, <code>Float64</code>, etc.).</li>\n</ul>\n</li>\n</ul>\n<p>This is a diagram of the structure of the Typed Array API (notable: all Typed Arrays have a common superclass):</p>\n<p><img src=\"typed-arrays/typed_arrays_class_diagram.jpg\" alt=\"\"></p>\n<p>Typed Arrays were a separate specification before they became part of the ECMAScript 6 standard.</p>\n<h3 id=\"element-types\">Element types  <a class=\"header-anchor\" href=\"#element-types\" aria-hidden=\"true\">#</a></h3>\n<p>The following element types are supported by the API:</p>\n<table class=\"framed\">\n<thead>\n<tr>\n<th>Element type</th>\n<th>Bytes</th>\n<th>Description</th>\n<th>C type</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Int8</td>\n<td>1</td>\n<td>8-bit signed integer</td>\n<td>signed char</td>\n</tr>\n<tr>\n<td>Uint8</td>\n<td>1</td>\n<td>8-bit unsigned integer</td>\n<td>unsigned char</td>\n</tr>\n<tr>\n<td>Uint8C</td>\n<td>1</td>\n<td>8-bit unsigned integer (clamped conversion)</td>\n<td>unsigned char</td>\n</tr>\n<tr>\n<td>Int16</td>\n<td>2</td>\n<td>16-bit signed integer</td>\n<td>short</td>\n</tr>\n<tr>\n<td>Uint16</td>\n<td>2</td>\n<td>16-bit unsigned integer</td>\n<td>unsigned short</td>\n</tr>\n<tr>\n<td>Int32</td>\n<td>4</td>\n<td>32-bit signed integer</td>\n<td>int</td>\n</tr>\n<tr>\n<td>Uint32</td>\n<td>4</td>\n<td>32-bit unsigned integer</td>\n<td>unsigned int</td>\n</tr>\n<tr>\n<td>Float32</td>\n<td>4</td>\n<td>32-bit floating point</td>\n<td>float</td>\n</tr>\n<tr>\n<td>Float64</td>\n<td>8</td>\n<td>64-bit floating point</td>\n<td>double</td>\n</tr>\n</tbody>\n</table>\n<p>The element type <code>Uint8C</code> is special: it is not supported by <code>DataView</code> and only exists to enable <code>Uint8ClampedArray</code>. This Typed Array is used by the <code>canvas</code> element (where it replaces <code>CanvasPixelArray</code>). The only difference between <code>Uint8C</code> and <code>Uint8</code> is how overflow and underflow are handled (as explained in the next section). It is recommended to avoid the former – <a href=\"https://mail.mozilla.org/pipermail/es-discuss/2015-August/043902.html\">quoting Brendan Eich</a>:</p>\n<blockquote>\n<p>Just to be super-clear (and I was around when it was born), <code>Uint8ClampedArray</code> is <em>totally</em> a historical artifact (of the HTML5 canvas element). Avoid unless you really are doing canvas-y things.</p>\n</blockquote>\n<h3 id=\"handling-overflow-and-underflow\">Handling overflow and underflow  <a class=\"header-anchor\" href=\"#handling-overflow-and-underflow\" aria-hidden=\"true\">#</a></h3>\n<p>Normally, when a value is out of the range of the element type, modulo arithmetic is used to convert it to a value within range. For signed and unsigned integers that means that:</p>\n<ul>\n<li>The highest value plus one is converted to the lowest value (0 for unsigned integers).</li>\n<li>The lowest value minus one is converted to the highest value.</li>\n</ul>\n<p>Modulo conversion for unsigned 8-bit integers:</p>\n<pre><code class=\"language-repl\">&gt; let uint8 = new Uint8Array(1);\n&gt; uint8[0] = 255; uint8[0] // highest value within range\n255\n&gt; uint8[0] = 256; uint8[0] // overflow\n0\n&gt; uint8[0] = 0; uint8[0] // lowest value within range\n0\n&gt; uint8[0] = -1; uint8[0] // underflow\n255\n</code></pre>\n<p>Modulo conversion for signed 8-bit integers:</p>\n<pre><code class=\"language-repl\">&gt; let int8 = new Int8Array(1);\n&gt; int8[0] = 127; int8[0] // highest value within range\n127\n&gt; int8[0] = 128; int8[0] // overflow\n-128\n&gt; int8[0] = -128; int8[0] // lowest value within range\n-128\n&gt; int8[0] = -129; int8[0] // underflow\n127\n</code></pre>\n<p>Clamped conversion is different:</p>\n<ul>\n<li>All underflowing values are converted to the lowest value.</li>\n<li>All overflowing values are converted to the highest value.</li>\n</ul>\n<pre><code class=\"language-repl\">&gt; let uint8c = new Uint8ClampedArray(1);\n&gt; uint8c[0] = 255; uint8c[0] // highest value within range\n255\n&gt; uint8c[0] = 256; uint8c[0] // overflow\n255\n&gt; uint8c[0] = 0; uint8c[0] // lowest value within range\n0\n&gt; uint8c[0] = -1; uint8c[0] // underflow\n0\n</code></pre>\n<h3 id=\"endianness\">Endianness  <a class=\"header-anchor\" href=\"#endianness\" aria-hidden=\"true\">#</a></h3>\n<p>Whenever a type (such as <code>Uint16</code>) is stored as multiple bytes, <em>endianness</em> matters:</p>\n<ul>\n<li>Big endian: the most significant byte comes first. For example, the <code>Uint16</code> value 0xABCD is stored as two bytes – first 0xAB, then 0xCD.</li>\n<li>Little endian: the least significant byte comes first. For example, the <code>Uint16</code> value 0xABCD is stored as two bytes – first 0xCD, then 0xAB.</li>\n</ul>\n<p>Endianness tends to be fixed per CPU architecture and consistent across native APIs. Typed Arrays are used to communicate with those APIs, which is why their endianness follows the endianness of the platform and can’t be changed.</p>\n<p>On the other hand, the endianness of protocols and binary files varies and is fixed across platforms. Therefore, we must be able to access data with either endianness. DataViews serve this use case and let you specify endianness when you get or set a value.</p>\n<p><a href=\"https://en.wikipedia.org/wiki/Endianness\">Quoting Wikipedia on Endianness</a>:</p>\n<ul>\n<li>Big-endian representation is the most common convention in data networking; fields in the protocols of the Internet protocol suite, such as IPv4, IPv6, TCP, and UDP, are transmitted in big-endian order. For this reason, big-endian byte order is also referred to as network byte order.</li>\n<li>Little-endian storage is popular for microprocessors in part due to significant historical influence on microprocessor designs by Intel Corporation.</li>\n</ul>\n<p>You can use the following function to determine the endianness of a platform.</p>\n<pre><code class=\"language-js\"><span class=\"hljs-keyword\">const</span> BIG_ENDIAN = <span class=\"hljs-built_in\">Symbol</span>(<span class=\"hljs-string\">'BIG_ENDIAN'</span>);\n<span class=\"hljs-keyword\">const</span> LITTLE_ENDIAN = <span class=\"hljs-built_in\">Symbol</span>(<span class=\"hljs-string\">'LITTLE_ENDIAN'</span>);\n<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> <span class=\"hljs-title\">getPlatformEndianness</span>(<span class=\"hljs-params\"></span>) </span>{\n    <span class=\"hljs-keyword\">let</span> arr32 = <span class=\"hljs-built_in\">Uint32Array</span>.of(<span class=\"hljs-number\">0x12345678</span>);\n    <span class=\"hljs-keyword\">let</span> arr8 = <span class=\"hljs-keyword\">new</span> <span class=\"hljs-built_in\">Uint8Array</span>(arr32.buffer);\n    <span class=\"hljs-keyword\">switch</span> ((arr8[<span class=\"hljs-number\">0</span>]*<span class=\"hljs-number\">0x1000000</span>) + (arr8[<span class=\"hljs-number\">1</span>]*<span class=\"hljs-number\">0x10000</span>) + (arr8[<span class=\"hljs-number\">2</span>]*<span class=\"hljs-number\">0x100</span>) + (arr8[<span class=\"hljs-number\">3</span>])) {\n        <span class=\"hljs-keyword\">case</span> <span class=\"hljs-number\">0x12345678</span>:\n            <span class=\"hljs-keyword\">return</span> BIG_ENDIAN;\n        <span class=\"hljs-keyword\">case</span> <span class=\"hljs-number\">0x78563412</span>:\n            <span class=\"hljs-keyword\">return</span> LITTLE_ENDIAN;\n        <span class=\"hljs-keyword\">default</span>:\n            <span class=\"hljs-keyword\">throw</span> <span class=\"hljs-keyword\">new</span> <span class=\"hljs-built_in\">Error</span>(<span class=\"hljs-string\">'Unknown endianness'</span>);\n    }\n}\n</code></pre>\n<p>There are also platforms that arrange <em>words</em> (pairs of bytes) with a different endianness than bytes inside words. That is called mixed endianness. Should you want to support such a platform then it is easy to extend the previous code.</p>\n<h3 id=\"sec_negative-typed-array-indices\">Negative indices  <a class=\"header-anchor\" href=\"#sec_negative-typed-array-indices\" aria-hidden=\"true\">#</a></h3>\n<p>With the bracket operator <code>[ ]</code>, you can only use non-negative indices (starting at 0). The methods of ArrayBuffers, Typed Arrays and DataViews work differently: every index can be negative. If it is, it counts backwards from the length. In other words, it is added to the length to produce a normal index. Therefore <code>-1</code> refers to the last element, <code>-2</code> to the second-last, etc. Methods of normal Arrays work the same way.</p>\n<pre><code class=\"language-repl\">&gt; let ui8 = Uint8Array.of(0, 1, 2);\n&gt; ui8.slice(-1)\nUint8Array [ 2 ]\n</code></pre>\n<p>Offsets, on the other hand, must be non-negative. If, for example, you pass <code>-1</code> to:</p>\n<pre><code class=\"language-js\"><span class=\"hljs-built_in\">DataView</span>.prototype.getInt8(byteOffset)\n</code></pre>\n<p>then you get a <code>RangeError</code>.</p>\n<h2 id=\"arraybuffers\">ArrayBuffers  <a class=\"header-anchor\" href=\"#arraybuffers\" aria-hidden=\"true\">#</a></h2>\n<p>ArrayBuffers store the data, <em>views</em> (Typed Arrays and DataViews) let you read and change it. In order to create a DataView, you need to provide its constructor with an ArrayBuffer. Typed Array constructors can optionally create an ArrayBuffer for you.</p>\n<h3 id=\"arraybuffer-constructor\"><code>ArrayBuffer</code> constructor  <a class=\"header-anchor\" href=\"#arraybuffer-constructor\" aria-hidden=\"true\">#</a></h3>\n<p>The signature of the constructor is:</p>\n<pre><code class=\"language-js\"><span class=\"hljs-built_in\">ArrayBuffer</span>(length : number)\n</code></pre>\n<p>Invoking this constructor via <code>new</code> creates an instance whose capacity is <code>length</code> bytes. Each of those bytes is initially 0.</p>\n<h3 id=\"static-arraybuffer-methods\">Static <code>ArrayBuffer</code> methods  <a class=\"header-anchor\" href=\"#static-arraybuffer-methods\" aria-hidden=\"true\">#</a></h3>\n<ul>\n<li><code>ArrayBuffer.isView(arg)</code><br>\nReturns <code>true</code> if <code>arg</code> is an object and a view for an ArrayBuffer. Only Typed Arrays and DataViews have the required internal property <code>[[ViewedArrayBuffer]]</code>. That means that this check is roughly equivalent to checking whether <code>arg</code> is an instance of a Typed Array or of <code>DataView</code>.</li>\n</ul>\n<h3 id=\"arraybufferprototype-properties\"><code>ArrayBuffer.prototype</code> properties  <a class=\"header-anchor\" href=\"#arraybufferprototype-properties\" aria-hidden=\"true\">#</a></h3>\n<ul>\n<li>\n<p><code>get ArrayBuffer.prototype.byteLength</code><br>\nReturns the capacity of this ArrayBuffer in bytes.</p>\n</li>\n<li>\n<p><code>ArrayBuffer.prototype.slice(start, end)</code><br>\nCreates a new ArrayBuffer that contains the bytes of this ArrayBuffer whose indices are greater than or equal to <code>start</code> and less than <code>end</code>. <code>start</code> and <code>end</code> can be negative (see Sect. “<a href=\"#sec_negative-typed-array-indices\">Negative indices</a>”).</p>\n</li>\n</ul>\n<h2 id=\"typed-arrays\">Typed Arrays  <a class=\"header-anchor\" href=\"#typed-arrays\" aria-hidden=\"true\">#</a></h2>\n<p>The various kinds of Typed Array are only different w.r.t. to the type of their elements:</p>\n<ul>\n<li>Typed Arrays whose elements are integers: <code>Int8Array</code>, <code>Uint8Array</code>, <code>Uint8ClampedArray</code>, <code>Int16Array</code>, <code>Uint16Array</code>, <code>Int32Array</code>, <code>Uint32Array</code></li>\n<li>Typed Arrays whose elements are floats: <code>Float32Array</code>, <code>Float64Array</code></li>\n</ul>\n<h3 id=\"typed-arrays-versus-normal-arrays\">Typed Arrays versus normal Arrays  <a class=\"header-anchor\" href=\"#typed-arrays-versus-normal-arrays\" aria-hidden=\"true\">#</a></h3>\n<p>Typed Arrays are much like normal Arrays: they have a <code>length</code>, elements can be accessed via the bracket operator <code>[ ]</code> and they have all of the standard Array methods. They differ from Arrays in the following ways:</p>\n<ul>\n<li>All of their elements have the same type, setting elements converts values to that type.</li>\n<li>They are contiguous. Normal Arrays can have <em>holes</em> (indices in the range [0, <code>arr.length</code>) that have no associated element), Typed Arrays can’t.</li>\n<li>Initialized with zeros. This is a consequence of the previous item:\n<ul>\n<li><code>new Array(10)</code> creates a normal Array without any elements (it only has holes).</li>\n<li><code>new Uint8Array(10)</code> creates a Typed Array whose 10 elements are all 0.</li>\n</ul>\n</li>\n<li>An associated buffer. The elements of a Typed Array <code>ta</code> are not stored in <code>ta</code>, they are stored in an associated ArrayBuffer that can be accessed via <code>ta.buffer</code>.</li>\n</ul>\n<h3 id=\"typed-arrays-are-iterable\">Typed Arrays are iterable  <a class=\"header-anchor\" href=\"#typed-arrays-are-iterable\" aria-hidden=\"true\">#</a></h3>\n<p>Typed Arrays implement a method whose key is <code>Symbol.iterator</code> and are therefore iterable (consult chapter “<a href=\"http://exploringjs.com/es6/ch_iteration.html\">Iterables and iterators</a>” in “Exploring ES6” for more information). That means that you can use the <code>for-of</code> loop and similar mechanisms in ES6:</p>\n<pre><code class=\"language-js\"><span class=\"hljs-keyword\">let</span> ui8 = <span class=\"hljs-built_in\">Uint8Array</span>.of(<span class=\"hljs-number\">0</span>,<span class=\"hljs-number\">1</span>,<span class=\"hljs-number\">2</span>);\n<span class=\"hljs-keyword\">for</span> (<span class=\"hljs-keyword\">let</span> byte <span class=\"hljs-keyword\">of</span> ui8) {\n    <span class=\"hljs-built_in\">console</span>.log(byte);\n}\n<span class=\"hljs-comment\">// Output:</span>\n<span class=\"hljs-comment\">// 0</span>\n<span class=\"hljs-comment\">// 1</span>\n<span class=\"hljs-comment\">// 2</span>\n</code></pre>\n<p>ArrayBuffers and DataViews are not iterable.</p>\n<h3 id=\"converting-typed-arrays-to-and-from-normal-arrays\">Converting Typed Arrays to and from normal Arrays  <a class=\"header-anchor\" href=\"#converting-typed-arrays-to-and-from-normal-arrays\" aria-hidden=\"true\">#</a></h3>\n<p>To convert a normal Array to a Typed Array, you make it the parameter of a Typed Array constructor. For example:</p>\n<pre><code class=\"language-repl\">&gt; let tarr = new Uint8Array([0,1,2]);\n</code></pre>\n<p>The classic way to convert a Typed Array to an Array is to invoke <code>Array.prototype.slice</code> on it. This trick works for all Array-like objects (such as <code>arguments</code>) and Typed Arrays are Array-like.</p>\n<pre><code class=\"language-repl\">&gt; Array.prototype.slice.call(tarr)\n[ 0, 1, 2 ]\n</code></pre>\n<p>In ES6, you can use the spread operator (<code>...</code>), because Typed Arrays are iterable:</p>\n<pre><code class=\"language-repl\">&gt; [...tarr]\n[ 0, 1, 2 ]\n</code></pre>\n<p>Another ES6 alternative is <code>Array.from()</code>, which works with either iterables or Array-like objects:</p>\n<pre><code class=\"language-repl\">&gt; Array.from(tarr)\n[ 0, 1, 2 ]\n</code></pre>\n<h3 id=\"the-species-pattern\">The Species pattern  <a class=\"header-anchor\" href=\"#the-species-pattern\" aria-hidden=\"true\">#</a></h3>\n<p>Some methods create new instances that are similar to <code>this</code>. The species pattern lets you configure what constructor should be used to do so. For example, if you create a subclass <code>MyArray</code> of <code>Array</code> then the default is that <code>map()</code> creates instances of <code>MyArray</code>. If you want it to create instances of <code>Array</code>, you can use the species pattern to make that happen. Details are explained in Sect “<a href=\"http://exploringjs.com/es6/ch_classes.html#sec_species-pattern\">The species pattern</a>” in “Exploring ES6”.</p>\n<p>ArrayBuffers use the species pattern in the following locations:</p>\n<ul>\n<li><code>ArrayBuffer.prototype.slice()</code></li>\n<li>Whenever an ArrayBuffer is cloned inside a Typed Array or DataView.</li>\n</ul>\n<p>Typed Arrays use the species pattern in the following locations:</p>\n<ul>\n<li><code>TypedArray&lt;T&gt;.prototype.filter()</code></li>\n<li><code>TypedArray&lt;T&gt;.prototype.map()</code></li>\n<li><code>TypedArray&lt;T&gt;.prototype.slice()</code></li>\n<li><code>TypedArray&lt;T&gt;.prototype.subarray()</code></li>\n</ul>\n<p>DataViews don’t use the species pattern.</p>\n<h3 id=\"the-inheritance-hierarchy-of-typed-arrays\">The inheritance hierarchy of Typed Arrays  <a class=\"header-anchor\" href=\"#the-inheritance-hierarchy-of-typed-arrays\" aria-hidden=\"true\">#</a></h3>\n<p>As you could see in the diagram at the beginning of this post, all Typed Array classes (<code>Uint8Array</code> etc.) have a common superclass. I’m calling that superclass <code>TypedArray</code>, but it is not directly accessible from JavaScript (the ES6 specification calls it <em>the intrinsic object <code>%TypedArray%</code></em>). <code>TypedArray.prototype</code> houses all methods of Typed Arrays.</p>\n<h3 id=\"static-typedarray-methods\">Static <code>TypedArray</code> methods  <a class=\"header-anchor\" href=\"#static-typedarray-methods\" aria-hidden=\"true\">#</a></h3>\n<p>Both static <code>TypedArray</code> methods are inherited by its subclasses (<code>Uint8Array</code> etc.).</p>\n<h4 id=\"typedarrayof\"><code>TypedArray.of()</code>  <a class=\"header-anchor\" href=\"#typedarrayof\" aria-hidden=\"true\">#</a></h4>\n<p>This method has the signature:</p>\n<pre><code class=\"language-js\">TypedArray.of(...items)\n</code></pre>\n<p>It creates a new Typed Array that is an instance of <code>this</code> (the class on which <code>of()</code> was invoked). The elements of that instance are the parameters of <code>of()</code>.</p>\n<p>You can think of <code>of()</code> as a custom literal for Typed Arrays:</p>\n<pre><code class=\"language-repl\">&gt; Float32Array.of(0.151, -8, 3.7)\nFloat32Array [ 0.151, -8, 3.7 ]\n</code></pre>\n<h4 id=\"typedarrayfrom\"><code>TypedArray.from()</code>  <a class=\"header-anchor\" href=\"#typedarrayfrom\" aria-hidden=\"true\">#</a></h4>\n<p>This method has the signature:</p>\n<pre><code class=\"language-js\">TypedArray&lt;U&gt;.from(source : Iterable&lt;T&gt;, mapfn? : <span class=\"hljs-function\"><span class=\"hljs-params\">T</span> =&gt;</span> U, thisArg?)\n</code></pre>\n<p>It converts the iterable <code>source</code> into an instance of <code>this</code> (a Typed Array).</p>\n<p>For example, normal Arrays are iterable and can be converted with this method:</p>\n<pre><code class=\"language-repl\">&gt; Uint16Array.from([0, 1, 2])\nUint16Array [ 0, 1, 2 ]\n</code></pre>\n<p>Typed Arrays are iterable, too:</p>\n<pre><code class=\"language-repl\">&gt; let ui16 = Uint16Array.from(Uint8Array.of(0, 1, 2));\n&gt; ui16 instanceof Uint16Array\ntrue\n</code></pre>\n<p>The optional <code>mapfn</code> lets you transform the elements of <code>source</code> before they become elements of the result. Why perform the two steps <em>mapping</em> and <em>conversion</em> in one go? Compared to performing the first step separately, via <code>source.map()</code>, there are two advantages:</p>\n<ol>\n<li>No intermediate Array or Typed Array is needed.</li>\n<li>When converting a Typed Array to a Typed Array whose elements have a higher precision, the mapping step can make use of that higher precision.</li>\n</ol>\n<p>To illustrate the second advantage, let’s use <code>map()</code> to double the elements of a Typed Array:</p>\n<pre><code class=\"language-repl\">&gt; Int8Array.of(127, 126, 125).map(x =&gt; 2 * x)\nInt8Array [ -2, -4, -6 ]\n</code></pre>\n<p>As you can see, the values overflow and are coerced into the <code>Int8</code> range of values. If map via <code>from()</code>, you can choose the type of the result so that values don’t overflow:</p>\n<pre><code class=\"language-repl\">&gt; Int16Array.from(Int8Array.of(127, 126, 125), x =&gt; 2 * x)\nInt16Array [ 254, 252, 250 ]\n</code></pre>\n<p><a href=\"https://twitter.com/awbjs/status/585199958661472257\">According to Allen Wirfs-Brock</a>, mapping between Typed Arrays was what motivated the <code>mapfn</code> parameter of <code>from()</code>.</p>\n<h3 id=\"typedarrayprototype-properties\"><code>TypedArray.prototype</code> properties  <a class=\"header-anchor\" href=\"#typedarrayprototype-properties\" aria-hidden=\"true\">#</a></h3>\n<p>Indices accepted by Typed Array methods can be negative (they work like traditional Array methods that way). Offsets must be non-negative. For details, see Sect. “<a href=\"#sec_negative-typed-array-indices\">Negative indices</a>”.</p>\n<h4 id=\"methods-specific-to-typed-arrays\">Methods specific to Typed Arrays  <a class=\"header-anchor\" href=\"#methods-specific-to-typed-arrays\" aria-hidden=\"true\">#</a></h4>\n<p>The following properties are specific to Typed Arrays, normal Arrays don’t have them:</p>\n<ul>\n<li><code>get TypedArray&lt;T&gt;.prototype.buffer : ArrayBuffer</code><br>\nReturns the buffer backing this Typed Array.</li>\n<li><code>get TypedArray&lt;T&gt;.prototype.byteLength : number</code><br>\nReturns the size in bytes of this Typed Array’s buffer.</li>\n<li><code>get TypedArray&lt;T&gt;.prototype.byteOffset : number</code><br>\nReturns the offset where this Typed Array “starts” inside its ArrayBuffer.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.set(arrayOrTypedArray, offset=0)</code><br>\nCopies all elements of <code>arrayOrTypedArray</code> to this Typed Array. The element at index 0 of <code>arrayOrTypedArray</code> is written to index <code>offset</code> of this Typed Array (etc.).\n<ul>\n<li>If <code>arrayOrTypedArray</code> is a normal Array, its elements are converted to numbers who are then converted to the element type <code>T</code> of this Typed Array.</li>\n<li>If <code>arrayOrTypedArray</code> is a Typed Array then each of its elements is converted directly to the appropriate type for this Typed Array. If both Typed Arrays have the same element type then faster, byte-wise copying is used.</li>\n</ul>\n</li>\n<li><code>TypedArray&lt;T&gt;.prototype.subarray(begin=0, end=this.length) : TypedArray&lt;T&gt;</code><br>\nReturns a new Typed Array that has the same buffer as this Typed Array, but a (generally) smaller range. If <code>begin</code> is non-negative then the first element of the resulting Typed Array is <code>this[begin]</code>, the second <code>this[begin+1]</code> (etc.). If <code>begin</code> in negative, it is converted appropriately.</li>\n</ul>\n<h4 id=\"array-methods\">Array methods  <a class=\"header-anchor\" href=\"#array-methods\" aria-hidden=\"true\">#</a></h4>\n<p>The following methods are basically the same as the methods of normal Arrays:</p>\n<ul>\n<li><code>TypedArray&lt;T&gt;.prototype.copyWithin(target : number, start : number, end = this.length) : This</code><br>\nCopies the elements whose indices are between <code>start</code> (including) and <code>end</code> (excluding) to indices starting at <code>target</code>. If the ranges overlap and the former range comes first then elements are copied in reverse order to avoid overwriting source elements before they are copied.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.entries() : Iterable&lt;[number,T]&gt;</code><br>\nReturns an iterable over [index,element] pairs for this Typed Array.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.every(callbackfn, thisArg?)</code><br>\nReturns <code>true</code> if <code>callbackfn</code> returns <code>true</code> for every element of this Typed Array. Otherwise, it returns <code>false</code>. <code>every()</code> stops processing the first time <code>callbackfn</code> returns <code>false</code>.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.fill(value, start=0, end=this.length) : void</code><br>\nSet the elements whose indices range from <code>start</code> to <code>end</code> to <code>value</code>.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.filter(callbackfn, thisArg?) : TypedArray&lt;T&gt;</code><br>\nReturns a Typed Array that contains every element of this Typed Array for which <code>callbackfn</code> returns <code>true</code>. In general, the result is shorter than this Typed Array.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.find(predicate : T =&gt; boolean, thisArg?) : T</code><br>\nReturns the first element for which the function <code>predicate</code> returns <code>true</code>.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.findIndex(predicate : T =&gt; boolean, thisArg?) : number</code><br>\nReturns the index of the first element for which <code>predicate</code> returns <code>true</code>.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.forEach(callbackfn, thisArg?) : void</code><br>\nIterates over this Typed Array and invokes <code>callbackfn</code> for each element.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.indexOf(searchElement, fromIndex=0) : number</code><br>\nReturns the index of the first element that strictly equals <code>searchElement</code>. The search starts at <code>fromIndex</code>.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.join(separator : string = ',') : string</code><br>\nConverts all elements to strings and concatenates them, separated by <code>separator</code>.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.keys() : Iterable&lt;number&gt;</code><br>\nReturns an iterable over the indices of this Typed Array.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.lastIndexOf(searchElement, fromIndex?) : number</code><br>\nReturns the index of the last element that strictly equals <code>searchElement</code>. The search starts at <code>fromIndex</code>, backwards.</li>\n<li><code>get TypedArray&lt;T&gt;.prototype.length : number</code><br>\nReturns the length of this Typed Array.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.map(callbackfn, thisArg?) : TypedArray&lt;T&gt;</code><br>\nReturns a new Typed Array in which every element is the result of applying <code>callbackfn</code> to the corresponding element of this Typed Array.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.reduce(callbackfn : (previousValue : any, currentElement : T, currentIndex : number, array : TypedArray&lt;T&gt;) =&gt; any, initialValue?) : any</code><br>\n<code>callbackfn</code> is fed one element at a time, together with the result that was computed so far and computes a new result. Elements are visited from left to right.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.reduceRight(callbackfn : (previousValue : any, currentElement : T, currentIndex : number, array : TypedArray&lt;T&gt;) =&gt; any, initialValue?) : any</code><br>\n<code>callbackfn</code> is fed one element at a time, together with the result that was computed so far and computes a new result. Elements are visited from right to left.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.reverse() : This</code><br>\nReverses the order of the elements of this Typed Array and returns <code>this</code>.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.slice(start=0, end=this.length) : TypedArray&lt;T&gt;</code><br>\nCreate a new Typed Array that only has the elements of this Typed Array whose indices are between <code>start</code> (including) and <code>end</code> (excluding).</li>\n<li><code>TypedArray&lt;T&gt;.prototype.some(callbackfn, thisArg?)</code><br>\nReturns <code>true</code> if <code>callbackfn</code> returns <code>true</code> for at least one element of this Typed Array. Otherwise, it returns <code>false</code>. <code>some()</code> stops processing the first time <code>callbackfn</code> returns <code>true</code>.</li>\n<li><code>TypedArray&lt;T&gt;.prototype.sort(comparefn? : (number, number) =&gt; number)</code><br>\nSorts this Typed Array, as specified via <code>comparefn</code>. If <code>comparefn</code> is missing, sorting is done ascendingly, by comparing via the less-than operator (<code>&lt;</code>).</li>\n<li><code>TypedArray&lt;T&gt;.prototype.toLocaleString(reserved1?, reserved2?)</code></li>\n<li><code>TypedArray&lt;T&gt;.prototype.toString()</code></li>\n<li><code>TypedArray&lt;T&gt;.prototype.values() : Iterable&lt;T&gt;</code><br>\nReturns an iterable over the values of this Typed Array.</li>\n</ul>\n<p>Due to all of these methods being available for Arrays, you can consult the following two sources to find out more about how they work:</p>\n<ul>\n<li>The following methods are new in ES6 and explained in chapter “<a href=\"http://exploringjs.com/es6/ch_arrays.html\">New Array features</a>” of “Exploring ES6”: <code>copyWithin</code>, <code>entries</code>, <code>fill</code>, <code>find</code>, <code>findIndex</code>, <code>keys</code>, <code>values</code>.</li>\n<li>All other methods are explained in chapter “<a href=\"http://speakingjs.com/es5/ch18.html\">Arrays</a>” of “Speaking JavaScript”.</li>\n</ul>\n<h3 id=\"sec_typed-array-constructors\"><code>«ElementType»Array</code> constructor  <a class=\"header-anchor\" href=\"#sec_typed-array-constructors\" aria-hidden=\"true\">#</a></h3>\n<p>Each Typed Array constructor has a name that follows the pattern <code>«ElementType»Array</code>, where <code>«ElementType»</code> is one of the element types in the table at the beginning. That means that there are 9 constructors for Typed Arrays: <code>Int8Array</code>, <code>Uint8Array</code>, <code>Uint8ClampedArray</code> (element type <code>Uint8C</code>), <code>Int16Array</code>, <code>Uint16Array</code>, <code>Int32Array</code>, <code>Uint32Array</code>, <code>Float32Array</code>, <code>Float64Array</code>.</p>\n<p>Each constructor has five <em>overloaded</em> versions – it behaves differently depending on how many arguments it receives and what their types are:</p>\n<ul>\n<li>\n<p><code>«ElementType»Array(buffer, byteOffset=0, length?)</code><br>\nCreates a new Typed Array whose buffer is <code>buffer</code>. It starts accessing the buffer at the given <code>byteOffset</code> and will have the given <code>length</code>. Note that <code>length</code> counts elements of the Typed Array (with 1–4 bytes each), not bytes.</p>\n</li>\n<li>\n<p><code>«ElementType»Array(length)</code><br>\nCreates a Typed Array with the given <code>length</code> and the appropriate buffer (whose size in bytes is <code>length * «ElementType»Array.BYTES_PER_ELEMENT</code>).</p>\n</li>\n<li>\n<p><code>«ElementType»Array()</code><br>\nCreates a Typed Array whose <code>length</code> is 0. It also creates an associated empty ArrayBuffer.</p>\n</li>\n<li>\n<p><code>«ElementType»Array(typedArray)</code><br>\nCreates a new Typed Array that has the same length and elements as <code>typedArray</code>. Values that are too large or small are converted appropriately.</p>\n</li>\n<li>\n<p><code>«ElementType»Array(arrayLikeObject)</code><br>\nTreats <code>arrayLikeObject</code> like an Array and creates a new TypedArray that has the same length and elements. Values that are too large or small are converted appropriately.</p>\n</li>\n</ul>\n<p>The following code shows three different ways of creating the same Typed Array:</p>\n<pre><code class=\"language-js\"><span class=\"hljs-keyword\">let</span> tarr = <span class=\"hljs-keyword\">new</span> <span class=\"hljs-built_in\">Uint8Array</span>([<span class=\"hljs-number\">1</span>,<span class=\"hljs-number\">2</span>,<span class=\"hljs-number\">3</span>]);\n\n<span class=\"hljs-keyword\">let</span> tarr = <span class=\"hljs-built_in\">Uint8Array</span>.of(<span class=\"hljs-number\">1</span>,<span class=\"hljs-number\">2</span>,<span class=\"hljs-number\">3</span>);\n\n<span class=\"hljs-keyword\">let</span> tarr = <span class=\"hljs-keyword\">new</span> <span class=\"hljs-built_in\">Uint8Array</span>(<span class=\"hljs-number\">3</span>);\ntarr[<span class=\"hljs-number\">0</span>] = <span class=\"hljs-number\">0</span>;\ntarr[<span class=\"hljs-number\">1</span>] = <span class=\"hljs-number\">1</span>;\ntarr[<span class=\"hljs-number\">2</span>] = <span class=\"hljs-number\">2</span>;\n</code></pre>\n<h3 id=\"static-elementtypearray-properties\">Static <code>«ElementType»Array</code> properties  <a class=\"header-anchor\" href=\"#static-elementtypearray-properties\" aria-hidden=\"true\">#</a></h3>\n<ul>\n<li>\n<p><code>«ElementType»Array.BYTES_PER_ELEMENT</code><br>\nCounts how many bytes are needed to store a single element:</p>\n<pre><code class=\"language-repl\">&gt; Uint8Array.BYTES_PER_ELEMENT\n1\n&gt; Int16Array.BYTES_PER_ELEMENT\n2\n&gt; Float64Array.BYTES_PER_ELEMENT\n8\n</code></pre>\n</li>\n</ul>\n<h3 id=\"elementtypearrayprototype-properties\"><code>«ElementType»Array.prototype</code> properties  <a class=\"header-anchor\" href=\"#elementtypearrayprototype-properties\" aria-hidden=\"true\">#</a></h3>\n<ul>\n<li><code>«ElementType»Array.prototype.BYTES_PER_ELEMENT</code><br>\nThe same as <code>«ElementType»Array.BYTES_PER_ELEMENT</code>.</li>\n</ul>\n<h2 id=\"dataviews\">DataViews  <a class=\"header-anchor\" href=\"#dataviews\" aria-hidden=\"true\">#</a></h2>\n<h3 id=\"dataview-constructor\"><code>DataView</code> constructor  <a class=\"header-anchor\" href=\"#dataview-constructor\" aria-hidden=\"true\">#</a></h3>\n<ul>\n<li><code>DataView(buffer, byteOffset=0, byteLength=buffer.byteLength-byteOffset)</code><br>\nCreates a new DataView whose data is stored in the ArrayBuffer <code>buffer</code>. By default, the new DataView can access all of <code>buffer</code>, the last two parameters allow you to change that.</li>\n</ul>\n<h3 id=\"dataviewprototype-properties\"><code>DataView.prototype</code> properties  <a class=\"header-anchor\" href=\"#dataviewprototype-properties\" aria-hidden=\"true\">#</a></h3>\n<ul>\n<li>\n<p><code>get DataView.prototype.buffer</code><br>\nReturns the ArrayBuffer of this DataView.</p>\n</li>\n<li>\n<p><code>get DataView.prototype.byteLength</code><br>\nReturns how many bytes can be accessed by this DataView.</p>\n</li>\n<li>\n<p><code>get DataView.prototype.byteOffset</code><br>\nReturns at which offset this DataView starts accessing the bytes in its buffer.</p>\n</li>\n<li>\n<p><code>DataView.prototype.get«ElementType»(byteOffset, littleEndian=false)</code><br>\nReads a value from the buffer of this DataView.</p>\n<ul>\n<li><code>«ElementType»</code> can be: <code>Float32</code>, <code>Float64</code>, <code>Int8</code>, <code>Int16</code>, <code>Int32</code>, <code>Uint8</code>, <code>Uint16</code>, <code>Uint32</code></li>\n</ul>\n</li>\n<li>\n<p><code>DataView.prototype.set«ElementType»(byteOffset, value, littleEndian=false)</code><br>\nWrites <code>value</code> to the buffer of this DataView.</p>\n<ul>\n<li><code>«ElementType»</code> can be: <code>Float32</code>, <code>Float64</code>, <code>Int8</code>, <code>Int16</code>, <code>Int32</code>, <code>Uint8</code>, <code>Uint16</code>, <code>Uint32</code></li>\n</ul>\n</li>\n</ul>\n<h2 id=\"sec_browser-apis-supporting-typed-arrays\">Browser APIs that support Typed Arrays  <a class=\"header-anchor\" href=\"#sec_browser-apis-supporting-typed-arrays\" aria-hidden=\"true\">#</a></h2>\n<p>Typed Arrays have been around for a while, so there are quite a few browser APIs that support them.</p>\n<h3 id=\"file-api\">File API  <a class=\"header-anchor\" href=\"#file-api\" aria-hidden=\"true\">#</a></h3>\n<p><a href=\"http://www.w3.org/TR/FileAPI/\">The file API</a> lets you access local files. The following code demonstrates how to get the bytes of a submitted local file in an ArrayBuffer.</p>\n<pre><code class=\"language-js\"><span class=\"hljs-keyword\">let</span> fileInput = <span class=\"hljs-built_in\">document</span>.getElementById(<span class=\"hljs-string\">'fileInput'</span>);\n<span class=\"hljs-keyword\">let</span> file = fileInput.files[<span class=\"hljs-number\">0</span>];\n<span class=\"hljs-keyword\">let</span> reader = <span class=\"hljs-keyword\">new</span> FileReader();\nreader.readAsArrayBuffer(file);\nreader.onload = <span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> (<span class=\"hljs-params\"></span>) </span>{\n    <span class=\"hljs-keyword\">let</span> arrayBuffer = reader.result;\n    ···\n};\n</code></pre>\n<h3 id=\"xmlhttprequest\"><code>XMLHttpRequest</code>  <a class=\"header-anchor\" href=\"#xmlhttprequest\" aria-hidden=\"true\">#</a></h3>\n<p>In newer versions of <a href=\"http://www.w3.org/TR/XMLHttpRequest/\">the <code>XMLHttpRequest</code> API</a>, you can have the results delivered in an ArrayBuffer:</p>\n<pre><code class=\"language-js\"><span class=\"hljs-keyword\">let</span> xhr = <span class=\"hljs-keyword\">new</span> XMLHttpRequest();\nxhr.open(<span class=\"hljs-string\">'GET'</span>, someUrl);\nxhr.responseType = <span class=\"hljs-string\">'arraybuffer'</span>;\n\nxhr.onload = <span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> (<span class=\"hljs-params\"></span>) </span>{\n    <span class=\"hljs-keyword\">let</span> arrayBuffer = xhr.response;\n    ···\n};\n\nxhr.send();\n</code></pre>\n<h3 id=\"fetch-api\">Fetch API  <a class=\"header-anchor\" href=\"#fetch-api\" aria-hidden=\"true\">#</a></h3>\n<p>Similarly to <code>XMLHttpRequest</code>, <a href=\"https://fetch.spec.whatwg.org/\">the Fetch API</a> lets you request resources. But it is based on Promises, which makes it more convenient to use. The following code demonstrates how to download the content pointed to by <code>url</code> as an ArrayBuffer:</p>\n<pre><code class=\"language-js\">fetch(url)\n.then(<span class=\"hljs-function\"><span class=\"hljs-params\">request</span> =&gt;</span> request.arrayBuffer())\n.then(<span class=\"hljs-function\"><span class=\"hljs-params\">arrayBuffer</span> =&gt;</span> ···);\n</code></pre>\n<h3 id=\"canvas\">Canvas  <a class=\"header-anchor\" href=\"#canvas\" aria-hidden=\"true\">#</a></h3>\n<p><a href=\"http://www.w3.org/TR/html5/scripting-1.html#the-canvas-element\">Quoting the HTML5 specification</a>:</p>\n<blockquote>\n<p>The <code>canvas</code> element provides scripts with a resolution-dependent bitmap canvas, which can be used for rendering graphs, game graphics, art, or other visual images on the fly.</p>\n</blockquote>\n<p><a href=\"http://www.w3.org/TR/2dcontext/\">The 2D Context of <code>canvas</code></a> lets you retrieve the bitmap data as an instance of <code>Uint8ClampedArray</code>:</p>\n<pre><code class=\"language-js\"><span class=\"hljs-keyword\">let</span> canvas = <span class=\"hljs-built_in\">document</span>.getElementById(<span class=\"hljs-string\">'my_canvas'</span>);\n<span class=\"hljs-keyword\">let</span> context = canvas.getContext(<span class=\"hljs-string\">'2d'</span>);\n<span class=\"hljs-keyword\">let</span> imageData = context.getImageData(<span class=\"hljs-number\">0</span>, <span class=\"hljs-number\">0</span>, canvas.width, canvas.height);\n<span class=\"hljs-keyword\">let</span> uint8ClampedArray = imageData.data;\n</code></pre>\n<h3 id=\"websockets\">WebSockets  <a class=\"header-anchor\" href=\"#websockets\" aria-hidden=\"true\">#</a></h3>\n<p><a href=\"http://www.w3.org/TR/websockets/\">WebSockets</a> let you send and receive binary data via ArrayBuffers:</p>\n<pre><code class=\"language-js\"><span class=\"hljs-keyword\">let</span> socket = <span class=\"hljs-keyword\">new</span> WebSocket(<span class=\"hljs-string\">'ws://127.0.0.1:8081'</span>);\nsocket.binaryType = <span class=\"hljs-string\">'arraybuffer'</span>;\n\n<span class=\"hljs-comment\">// Wait until socket is open</span>\nsocket.addEventListener(<span class=\"hljs-string\">'open'</span>, <span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> (<span class=\"hljs-params\">event</span>) </span>{\n    <span class=\"hljs-comment\">// Send binary data</span>\n    <span class=\"hljs-keyword\">let</span> typedArray = <span class=\"hljs-keyword\">new</span> <span class=\"hljs-built_in\">Uint8Array</span>(<span class=\"hljs-number\">4</span>);\n    socket.send(typedArray.buffer);\n});\n\n<span class=\"hljs-comment\">// Receive binary data</span>\nsocket.addEventListener(<span class=\"hljs-string\">'message'</span>, <span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> (<span class=\"hljs-params\">event</span>) </span>{\n    <span class=\"hljs-keyword\">let</span> arrayBuffer = event.data;\n    ···\n});\n</code></pre>\n<h3 id=\"other-apis\">Other APIs  <a class=\"header-anchor\" href=\"#other-apis\" aria-hidden=\"true\">#</a></h3>\n<ul>\n<li>\n<p><a href=\"https://www.khronos.org/registry/webgl/specs/latest/2.0/\">WebGL</a> uses the Typed Array API for: accessing buffer data, specifying pixels for texture mapping, reading pixel data, and more.</p>\n</li>\n<li>\n<p><a href=\"http://www.w3.org/TR/webaudio/\">The Web Audio API</a> lets you <a href=\"http://www.w3.org/TR/webaudio/#dfn-decodeAudioData\">decode audio data</a> submitted via an ArrayBuffer.</p>\n</li>\n<li>\n<p><a href=\"http://www.w3.org/TR/media-source/\">Media Source Extensions</a>: The HTML media elements are currently <code>&lt;audio&gt;</code> and <code>&lt;video&gt;</code>. The Media Source Extensions API enables you to create streams to be played via those elements. You can add binary data to such streams via ArrayBuffers, Typed Arrays or DataViews.</p>\n</li>\n<li>\n<p>Communication with <a href=\"http://www.w3.org/TR/workers/\">Web Workers</a>: If you send data to a Worker via <a href=\"http://www.w3.org/TR/workers/#dom-worker-postmessage\"><code>postMessage()</code></a>, either the message (which will be cloned) or the transferable objects can contain ArrayBuffers.</p>\n</li>\n<li>\n<p><a href=\"https://html.spec.whatwg.org/multipage/comms.html#crossDocumentMessages\">Cross-document communication</a>: works similarly to communication with Web Workers and also uses the method <code>postMessage()</code>.</p>\n</li>\n</ul>\n<h2 id=\"extended-example-jpeg-sof0-decoder\">Extended example: JPEG SOF0 decoder  <a class=\"header-anchor\" href=\"#extended-example-jpeg-sof0-decoder\" aria-hidden=\"true\">#</a></h2>\n<p>The code of the following example is <a href=\"https://github.com/rauschma/typed-array-demos\">on GitHub</a>. And you can <a href=\"http://rauschma.github.io/typed-array-demos/\">run it online</a>.</p>\n<p>The example is a web pages that lets you upload a JPEG file and parses its structure to determine the height and the width of the image and more.</p>\n<h3 id=\"the-jpeg-file-format\">The JPEG file format  <a class=\"header-anchor\" href=\"#the-jpeg-file-format\" aria-hidden=\"true\">#</a></h3>\n<p>A JPEG file is a sequence of <em>segments</em> (typed data). Each segment starts with the following four bytes:</p>\n<ul>\n<li>Marker (two bytes): declares what kind of data is stored in the segment. The first of the two bytes is always 0xFF. Each of the standard markers has a human readable name. For example, the marker 0xFFC0 has the name “Start Of Frame (Baseline DCT)”, short: “SOF0”.</li>\n<li>Length of segment (two bytes): how long is this segment (in bytes, including the length itself)?</li>\n</ul>\n<p>JPEG files are big-endian on all platforms. Therefore, this example demonstrates how important it is that we can specify endianness when using DataViews.</p>\n<h3 id=\"the-javascript-code\">The JavaScript code  <a class=\"header-anchor\" href=\"#the-javascript-code\" aria-hidden=\"true\">#</a></h3>\n<p>The following function <code>processArrayBuffer()</code> is an abridged version of the actual code; I’ve removed a few error checks to reduce clutter. <code>processArrayBuffer()</code> receives an ArrayBuffer with the contents of the submitted JPEG file and iterates over its segments.</p>\n<pre><code class=\"language-js\"><span class=\"hljs-comment\">// JPEG is big endian</span>\n<span class=\"hljs-keyword\">var</span> IS_LITTLE_ENDIAN = <span class=\"hljs-literal\">false</span>;\n\n<span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> <span class=\"hljs-title\">processArrayBuffer</span>(<span class=\"hljs-params\">arrayBuffer</span>) </span>{\n    <span class=\"hljs-keyword\">try</span> {\n        <span class=\"hljs-keyword\">var</span> dv = <span class=\"hljs-keyword\">new</span> <span class=\"hljs-built_in\">DataView</span>(arrayBuffer);\n        ···\n        <span class=\"hljs-keyword\">var</span> ptr = <span class=\"hljs-number\">2</span>;\n        <span class=\"hljs-keyword\">while</span> (<span class=\"hljs-literal\">true</span>) {\n            ···\n            <span class=\"hljs-keyword\">var</span> lastPtr = ptr;\n            enforceValue(<span class=\"hljs-number\">0xFF</span>, dv.getUint8(ptr),\n                <span class=\"hljs-string\">'Not a marker'</span>);\n            ptr++;\n            <span class=\"hljs-keyword\">var</span> marker = dv.getUint8(ptr);\n            ptr++;\n            <span class=\"hljs-keyword\">var</span> len = dv.getUint16(ptr, IS_LITTLE_ENDIAN);\n            ptr += len;\n            logInfo(<span class=\"hljs-string\">'Marker: '</span>+hex(marker)+<span class=\"hljs-string\">' ('</span>+len+<span class=\"hljs-string\">' byte(s))'</span>);\n            ···\n\n            <span class=\"hljs-comment\">// Did we find what we were looking for?</span>\n            <span class=\"hljs-keyword\">if</span> (marker === <span class=\"hljs-number\">0xC0</span>) { <span class=\"hljs-comment\">// SOF0</span>\n                logInfo(decodeSOF0(dv, lastPtr));\n                <span class=\"hljs-keyword\">break</span>;\n            }\n        }\n    } <span class=\"hljs-keyword\">catch</span> (e) {\n        logError(e.message);\n    }\n}\n</code></pre>\n<p>This code uses the following helper functions (that are not shown here):</p>\n<ul>\n<li><code>enforceValue()</code> throws an error if the expected value (first parameter) doesn’t match the actual value (second parameter).</li>\n<li><code>logInfo()</code> and <code>logError()</code> display messages on the page.</li>\n<li><code>hex()</code> turns a number into a string with two hexadecimal digits.</li>\n</ul>\n<p><code>decodeSOF0()</code>  parses the segment SOF0:</p>\n<pre><code class=\"language-js\"><span class=\"hljs-function\"><span class=\"hljs-keyword\">function</span> <span class=\"hljs-title\">decodeSOF0</span>(<span class=\"hljs-params\">dv, start</span>) </span>{\n    <span class=\"hljs-comment\">// Example (16x16):</span>\n    <span class=\"hljs-comment\">// FF C0 00 11 08 00 10 00 10 03 01 22 00 02 11 01 03 11 01</span>\n    <span class=\"hljs-keyword\">var</span> data = {};\n    start += <span class=\"hljs-number\">4</span>; <span class=\"hljs-comment\">// skip marker 0xFFC0 and segment length 0x0011</span>\n    <span class=\"hljs-keyword\">var</span> data = {\n        <span class=\"hljs-attr\">bitsPerColorComponent</span>: dv.getUint8(start), <span class=\"hljs-comment\">// usually 0x08</span>\n        imageHeight: dv.getUint16(start+<span class=\"hljs-number\">1</span>, IS_LITTLE_ENDIAN),\n        <span class=\"hljs-attr\">imageWidth</span>: dv.getUint16(start+<span class=\"hljs-number\">3</span>, IS_LITTLE_ENDIAN),\n        <span class=\"hljs-attr\">numberOfColorComponents</span>: dv.getUint8(start+<span class=\"hljs-number\">5</span>),\n    };\n    <span class=\"hljs-keyword\">return</span> <span class=\"hljs-built_in\">JSON</span>.stringify(data, <span class=\"hljs-literal\">null</span>, <span class=\"hljs-number\">4</span>);\n}\n</code></pre>\n<p>More information on the structure of JPEG files:</p>\n<ul>\n<li>“<a href=\"https://en.wikipedia.org/wiki/JPEG#Syntax_and_structure\">JPEG: Syntax and structure</a>” (on Wikipedia)</li>\n<li>“<a href=\"https://en.wikipedia.org/wiki/JPEG_File_Interchange_Format#File_format_structure\">JPEG File Interchange Format: File format structure</a>” (on Wikipedia)</li>\n</ul>\n<h2 id=\"availability\">Availability  <a class=\"header-anchor\" href=\"#availability\" aria-hidden=\"true\">#</a></h2>\n<p>Much of the Typed Array API is implemented by all modern JavaScript engines, but several features are new to ECMAScript 6:</p>\n<ul>\n<li>Static methods borrowed from Arrays: <code>TypedArray&lt;T&gt;.from()</code>, <code>TypedArray&lt;T&gt;.of()</code></li>\n<li>Prototype methods borrowed from Arrays: <code>TypedArray&lt;T&gt;.prototype.map()</code> etc.</li>\n<li>Iterable Typed Arrays</li>\n<li>Support for the species pattern</li>\n<li>An inheritance hierarchy where <code>TypedArray&lt;T&gt;</code> is the superclass of all Typed Array classes</li>\n</ul>\n<p>It may take a while until these are available everywhere. As usual, kangax’ “<a href=\"https://kangax.github.io/compat-table/es6/#typed_arrays\">ES6 compatibility table</a>” describes the status quo.</p>\n","webRootPath":"../../","webImagePath":"../../img/","webDataPath":"../../data/","widgetData":{}};
+  </script> 
+  <script defer src="../../script/PostPage.bundle.js"></script> 
+  <script defer>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-46839352-1', 'auto');
+    ga('send', 'pageview');
+  </script>  
+ </body>
+</html>

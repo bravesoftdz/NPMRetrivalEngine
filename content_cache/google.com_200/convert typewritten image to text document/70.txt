@@ -1,0 +1,819 @@
+<!doctype html>
+<html class="route- route-post section-architecture">
+ <head> 
+  <meta charset="utf-8"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+  <title> - Beginning Elm</title> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui"> 
+  <meta property="og:type" content="website"> 
+  <meta property="og:url" content="http://elmprogramming.com"> 
+  <meta property="og:title" content="Beginning Elm"> 
+  <meta property="og:description" content="A gentle introduction to Elm programming language"> 
+  <meta property="og:site_name" content="Elm Programming"> 
+  <link rel="icon" href="/favicon.png"> 
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"> 
+  <link rel="stylesheet" href="/css/main.css"> 
+  <!--[if IE]>
+    <link rel="stylesheet" type="text/css" href="/css/ie.css" />
+  <![endif]--> 
+ </head> 
+ <body> 
+  <div class="page-hero"></div> 
+  <a id="banner" class="banner" href="#newsletter"> <i class="fa fa-book"></i> <strong> New chapters are coming soon! </strong> <em> Sign up for the newsletter to get notified! </em> <i class="fa fa-envelope"></i> </a> 
+  <div class="page-body"> 
+   <header class="page-header"> 
+    <div class="container"> 
+     <a class="logo" href="http://elmprogramming.com/"> Beginning Elm </a> 
+     <p class="page-header-icons"> <a href="https://twitter.com/elm_programming" target="_blank"> <i class="fa fa-twitter"></i> </a> <a href="https://github.com/pawanpoudel" target="_blank"> <i class="fa fa-github"></i> </a> </p> 
+     <div class="share-buttons"> 
+      <div class="share-button--twitter"> 
+       <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://elmprogramming.com" data-text="Beginning Elm: a gentle intro to @elmlang, a delightful language for building robust web apps." data-via="elm_programming">Tweet</a> 
+      </div> 
+     </div> 
+    </div> 
+   </header> 
+   <main class="page-container"> 
+    <section class="heading"> 
+     <div class="container"> 
+      <h1> <em>5.3</em> </h1> 
+      <h2>Virtual DOM</h2> 
+     </div> 
+    </section> 
+    <div class="page-content"> 
+     <div class="container"> 
+      <div class="breadcrumb-holder"> 
+       <header id="breadcrumb" class="breadcrumb"> 
+        <a id="open" class="breadcrumb-toggle"> <span></span> <span></span> <span></span> </a> 
+        <span class="breadcrumb-section"> architecture </span> 
+        <a class="breadcrumb-next" href="/model-view-update-part-2.html"> <i class="fa fa-angle-right"></i> <span>Next article</span> </a> 
+        <a class="breadcrumb-previous" href="/model-view-update-part-1.html"> <i class="fa fa-angle-left"></i> <span>Previous article</span> </a> 
+       </header> 
+      </div> 
+      <nav id="menu" class="menu"> 
+       <ul></ul> 
+      </nav> 
+      <article class="content"> 
+       <p>The <a href="/elm-runtime.html" target="_blank">Elm runtime</a> uses a package called <a href="http://package.elm-lang.org/packages/elm-lang/virtual-dom/latest" target="_blank"><code class="highlighter-rouge">elm-lang/virtual-dom</code></a> to render HTML on a screen. In this section, we’ll learn how this library works. First, let’s understand how browsers render HTML in general.</p> 
+       <h3 id="how-browsers-render-html">How Browsers Render HTML</h3> 
+       <p>When a browser is given some HTML code, it takes that code through a series of transformations before the UI elements are displayed on a screen.</p> 
+       <p><img src="/images/virtual-dom/browser-parse-flow.png" alt=""></p> 
+       <h4 id="1-parse-html">1. Parse HTML</h4> 
+       <p>Let’s look at how the following HTML code we saw earlier in the <a href="/model-view-update-part-1.html" target="_blank">Model View Update - Part 1</a> section gets rendered.</p> 
+       <figure class="highlight">
+        <pre><code class="language-html" data-lang="html"><span class="nt">&lt;html&gt;</span>
+  <span class="nt">&lt;body&gt;</span>
+    <span class="nt">&lt;div&gt;</span>
+      <span class="nt">&lt;button&gt;</span> - <span class="nt">&lt;/button&gt;</span>
+      0
+      <span class="nt">&lt;button&gt;</span> + <span class="nt">&lt;/button&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+  <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre>
+       </figure> 
+       <p>The first thing a browser does when it encounters the above code is create HTML tokens. Tokens are the building blocks of a language. Collectively, they represent the entire vocabulary of that language. For example, the vocabulary of the English language consists of all the words that appear in a dictionary. Browsers use a process called <em>tokenization</em> or <em>lexical analysis</em> to break a chunk of HTML code into individual tokens. The figure below shows how the above code appears to a browser — a series of text characters.</p> 
+       <p><img src="/images/virtual-dom/html-tokenization-1.png" alt=""></p> 
+       <p>To keep things simple, only a portion of the code is shown here. The first thing a browser does is step through the characters one at a time starting from the beginning.</p> 
+       <p><img src="/images/virtual-dom/html-tokenization-2.png" alt=""></p> 
+       <p>The first character it encounters is <code class="highlighter-rouge">&lt;</code>, which means what follows is a <em>start tag token</em>. The browser continues to process the next characters until it encounters <code class="highlighter-rouge">&gt;</code>, which marks the end of a <em>start tag token</em>.</p> 
+       <p><img src="/images/virtual-dom/html-tokenization-3.png" alt=""></p> 
+       <p>The series of characters between <code class="highlighter-rouge">&lt;</code> and <code class="highlighter-rouge">&gt;</code> are converted into the first start tag token called <code class="highlighter-rouge">html</code>.</p> 
+       <p><img src="/images/virtual-dom/html-tokenization-4.png" alt=""></p> 
+       <p>The second token is the <code class="highlighter-rouge">body</code> start tag.</p> 
+       <p><img src="/images/virtual-dom/html-tokenization-5.png" alt=""></p> 
+       <p><img src="/images/virtual-dom/html-tokenization-6.png" alt=""></p> 
+       <p>The browser continues to step through the characters in our code, converting them into more tokens. The figure below shows all the tokens present in our code.</p> 
+       <p><img src="/images/virtual-dom/html-tokenization-7.png" alt=""></p> 
+       <h4 id="2-construct-the-dom-tree">2. Construct the DOM Tree</h4> 
+       <p>During the tokenization phase, the browser processed our code, which started as a stream of text characters, into a series of tokens. The next step is to create the Document Object Model (DOM) tree using these tokens.</p> 
+       <p class="info"><em>“The Document Object Model (DOM) is a programming interface for HTML and XML documents. It provides a structured representation of the document and it defines a way that the structure can be accessed from programs so that they can change the document structure, style and content. The DOM provides a representation of the document as a structured group of nodes and objects that have properties and methods. Essentially, it connects web pages to scripts or programming languages.”</em> - <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction" target="_blank">Mozilla Developer Network</a></p> 
+       <p>After an HTML page is loaded, we often need to make changes to it based on various events generated either by the user or some other source. For example, when the user clicks the <code class="highlighter-rouge">+</code> button in the counter app we built earlier, we need to increment the count. To make this update easier, the browser creates the DOM tree for the page. A tree is a data structure that simulates the hierarchical relationship between objects.</p> 
+       <p>With access to the object representation of each element in the HTML page, we can now add, change, and remove HTML elements and attributes; change the CSS styles; react to existing events; or create new events through JavaScript.</p> 
+       <p>The DOM objects tend to have almost one-to-one mapping to the HTML markup as shown in the figure below.</p> 
+       <p><img src="/images/virtual-dom/html-to-dom-mapping.png" alt=""></p> 
+       <p>The mapping is very close because the browser builds the DOM tree from the tokens extracted from the original HTML code as shown below.</p> 
+       <p><img src="/images/virtual-dom/html-token-to-dom-mapping.png" alt=""></p> 
+       <p>The objects in the DOM tree are often referred to as <code class="highlighter-rouge">nodes</code> in HTML parlance. We can be specific and call each node with a different name based on what type of object it represents. For example, the root node in the DOM tree is known as <code class="highlighter-rouge">document</code>. It is a special type of node that represents the entire HTML document. When the DOM tree creation process begins, the <code class="highlighter-rouge">document</code> node is the first one to be created. The browser then takes a sequence of tokens from the tokenization stage, creates respective DOM objects, and adds them to the tree as the <code class="highlighter-rouge">document</code> node’s children.</p> 
+       <p><img src="/images/virtual-dom/dom-tree-with-document-node.png" alt=""></p> 
+       <p>Nodes that can be used to specify an HTML tag are called <code class="highlighter-rouge">elements</code>. The element attributes such as <code class="highlighter-rouge">id</code> and <code class="highlighter-rouge">class</code> can be represented using the <code class="highlighter-rouge">attribute</code> nodes. Similarly, the comments and plain text can be represented using the <code class="highlighter-rouge">comment</code> and <code class="highlighter-rouge">text</code> nodes respectively. The official <a href="https://www.w3.org/TR/dom/" target="_blank">DOM specification</a> contains many more types of nodes.</p> 
+       <p>We can actually query the node type right from the browser console. Open the browser console from the counter app page located at <a href="http://localhost:8000/elm-examples/Counter.elm" target="_blank"><code class="highlighter-rouge">http://localhost:8000/elm-examples/Counter.elm</code></a> and enter the code after the <code class="highlighter-rouge">&gt;</code> prompt into the console to see the results.</p> 
+       <dl> 
+        <dt>
+         Opening browser console
+        </dt> 
+        <dd>
+         Instructions for opening the browser console depends on which browser you’re using. Please read 
+         <a href="https://www.wickedlysmart.com/hfjsconsole/" target="_blank">this</a> nice tutorial from WickedlySmart that explains how to open the console on various browsers.
+        </dd> 
+       </dl> 
+       <figure class="highlight">
+        <pre><code class="language-javascript" data-lang="javascript"><span class="o">&gt;</span> <span class="nb">document</span><span class="p">.</span><span class="nx">nodeType</span>
+<span class="mi">9</span></code></pre>
+       </figure> 
+       <p>The <a href="https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType" target="_blank"><code class="highlighter-rouge">nodeType</code></a> property returns a number. To find out which node type that number represents, we need to reference the following table.</p> 
+       <p><img src="/images/virtual-dom/node-types-mdn.png" alt=""></p> 
+       <div style="text-align:center"> 
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType" target="_blank"> Source: Mozilla Developer Network </a> 
+       </div> 
+       <p>The number <code class="highlighter-rouge">9</code> means the <code class="highlighter-rouge">DOCUMENT_NODE</code>. Let’s query the node type of a few more DOM objects.</p> 
+       <figure class="highlight">
+        <pre><code class="language-javascript" data-lang="javascript"><span class="o">&gt;</span> <span class="kd">var</span> <span class="nx">div</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s2">"div"</span><span class="p">)</span>
+<span class="kc">undefined</span>
+
+<span class="o">&gt;</span> <span class="nx">div</span><span class="p">.</span><span class="nx">nodeType</span>
+<span class="mi">1</span>      <span class="c1">// --&gt; ELEMENT_NODE</span>
+
+<span class="o">&gt;</span> <span class="kd">var</span> <span class="nx">text</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createTextNode</span><span class="p">(</span><span class="s2">"some text"</span><span class="p">)</span>
+<span class="kc">undefined</span>
+
+<span class="o">&gt;</span> <span class="nx">text</span><span class="p">.</span><span class="nx">nodeType</span>
+<span class="mi">3</span>      <span class="c1">// --&gt; TEXT_NODE</span>
+
+<span class="o">&gt;</span> <span class="kd">var</span> <span class="nx">comment</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createComment</span><span class="p">(</span><span class="s2">"some comment"</span><span class="p">)</span>
+<span class="kc">undefined</span>
+
+<span class="o">&gt;</span> <span class="nx">comment</span><span class="p">.</span><span class="nx">nodeType</span>
+<span class="mi">8</span>      <span class="c1">// --&gt; COMMENT_NODE</span></code></pre>
+       </figure> 
+       <p>Notice how we can create HTML elements using JavaScript functions such as <code class="highlighter-rouge">createElement</code>, <code class="highlighter-rouge">createTextNode</code>, and <code class="highlighter-rouge">createComment</code>. That’s possible due to the existence of the DOM tree. It turns the HTML code we typed into something we can manipulate using JavaScript in memory.</p> 
+       <h4 id="3-construct-the-render-tree">3. Construct the Render Tree</h4> 
+       <p>While the DOM tree is being created, the browser starts the rendering process in parallel by creating yet another tree called the <em>render tree</em>. The render tree contains the style information for each DOM node that dictates how the node should be displayed. Nodes that aren’t meant to be displayed on a screen aren’t included in the render tree. Here are a few examples of nodes that aren’t visible: <code class="highlighter-rouge">head</code>, <code class="highlighter-rouge">script</code>, and <code class="highlighter-rouge">meta</code>. Some nodes might be hidden via CSS through the use of <code class="highlighter-rouge">display: none</code> even though they can actually be displayed on a screen. These nodes are also excluded from the render tree.</p> 
+       <h4 id="4-layout-the-render-tree">4. Layout the Render Tree</h4> 
+       <p>With the render tree in place, the browser proceeds to lay out each node. The render tree contains the information that dictates <em>how</em> the nodes should be displayed, but not <em>where</em> on a screen they should be rendered. The browser computes the position and size of each node from the information stored in the render tree.</p> 
+       <h4 id="5-paint-the-render-tree-on-screen">5. Paint the Render Tree on Screen</h4> 
+       <p>Now that all information required to render the nodes has been computed, the browser begins to convert each node in the render tree to actual pixels on the screen. This process is called <em>painting</em>.</p> 
+       <p>The virtual DOM library in Elm only deals with the DOM tree, not the render tree, but by learning about both you have a complete picture of how a HTML page is rendered in the browser.</p> 
+       <dl> 
+        <dt>
+         Further Reading
+        </dt> 
+        <dd>
+         What we covered so far is a very high-level overview of how browsers parse and render HTML on a screen. If you’d like to learn more about this topic, here are a few resources:
+        </dd> 
+        <dd> 
+         <ul> 
+          <li><a href="https://www.html5rocks.com/en/tutorials/internals/howbrowserswork/" target="_blank">How Browsers Work: Behind the scenes of modern web browsers</a></li> 
+          <li><a href="https://developers.google.com/web/fundamentals/performance/critical-rendering-path/constructing-the-object-model#top_of_page" target="_blank">Web Fundamentals - Constructing the Object Model</a></li> 
+          <li><a href="https://developers.google.com/web/fundamentals/performance/critical-rendering-path/render-tree-construction" target="_blank">Web Fundamentals - Render-tree Construction, Layout, and Paint</a></li> 
+         </ul> 
+        </dd> 
+       </dl> 
+       <h3 id="virtual-dom">Virtual DOM</h3> 
+       <p>Although the DOM tree makes it easy for us to create, update, and delete nodes, the direct manipulation of that tree tends to be really slow when we have large number of nodes. Let’s write some code in JavaScript to find out how long it takes to update a DOM node compared to a simple string. Create a new file called <code class="highlighter-rouge">dom-performance-test.js</code> in the <code class="highlighter-rouge">beginning-elm</code> directory.</p> 
+       <p><img src="/images/virtual-dom/dom-performance-test-file.png" alt=""></p> 
+       <p>Add the following code to <code class="highlighter-rouge">dom-performance-test.js</code>.</p> 
+       <figure class="highlight">
+        <pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Create a simple string</span>
+<span class="kd">var</span> <span class="nx">someString</span> <span class="o">=</span> <span class="s2">"some string"</span><span class="p">;</span>
+
+<span class="c1">// Update string 10,000 times</span>
+<span class="kd">function</span> <span class="nx">updateString</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="mi">10000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">someString</span> <span class="o">=</span> <span class="s2">"updated string"</span>
+    <span class="p">};</span>
+<span class="p">}</span>
+
+<span class="c1">// Find out how long it takes to update a string 10,000 times</span>
+<span class="kd">var</span> <span class="nx">t1</span> <span class="o">=</span> <span class="nx">performance</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
+<span class="nx">updateString</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">t2</span> <span class="o">=</span> <span class="nx">performance</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"It took "</span> <span class="o">+</span> <span class="p">(</span><span class="nx">t2</span> <span class="o">-</span> <span class="nx">t1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">" milliseconds to update a string."</span><span class="p">);</span></code></pre>
+       </figure> 
+       <p>We created a simple string and wrote a function to update that string 10,000 times. We then used the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Performance/now" target="_blank"><code class="highlighter-rouge">performance.now()</code></a> function to capture the timestamp right before and after applying the <code class="highlighter-rouge">updateString</code> function. Finally, we printed how long it took for the <code class="highlighter-rouge">updateString</code> function to execute to the console.</p> 
+       <p>Next, we’ll write a similar test to find out how long it takes to update a DOM node. Add the following code to the bottom of <code class="highlighter-rouge">dom-performance-test.js</code>.</p> 
+       <figure class="highlight">
+        <pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Create new nodes</span>
+<span class="kd">var</span> <span class="nx">newDiv</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s2">"div"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">newText</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createTextNode</span><span class="p">(</span><span class="s2">"some text"</span><span class="p">);</span>
+
+<span class="c1">// Add new nodes to the DOM tree</span>
+<span class="nx">newDiv</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">newText</span><span class="p">);</span>
+<span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">newDiv</span><span class="p">);</span>
+
+<span class="c1">// Update the text node inside div 10,000 times</span>
+<span class="kd">function</span> <span class="nx">updateDOM</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="mi">10000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">newDiv</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s2">"updated text"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Find out how long it takes to update a DOM element</span>
+<span class="kd">var</span> <span class="nx">t3</span> <span class="o">=</span> <span class="nx">performance</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
+<span class="nx">updateDOM</span><span class="p">();</span>
+<span class="kd">var</span> <span class="nx">t4</span> <span class="o">=</span> <span class="nx">performance</span><span class="p">.</span><span class="nx">now</span><span class="p">();</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"It took "</span> <span class="o">+</span> <span class="p">(</span><span class="nx">t4</span> <span class="o">-</span> <span class="nx">t3</span><span class="p">)</span> <span class="o">+</span> <span class="s2">" milliseconds to update a DOM element."</span><span class="p">);</span></code></pre>
+       </figure> 
+       <p>We created a new <code class="highlighter-rouge">div</code> element and added a text node to it. After that, we appended the <code class="highlighter-rouge">div</code> as a child to the <code class="highlighter-rouge">body</code> element. The <code class="highlighter-rouge">updateDOM</code> function simply updates the HTML content inside the <code class="highlighter-rouge">div</code> element 10,000 times by assigning a new value to the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML" target="_blank"><code class="highlighter-rouge">innerHtml</code></a> property.</p> 
+       <p>To run this experiment, we need to load <code class="highlighter-rouge">dom-performance-test.js</code> from the <code class="highlighter-rouge">index.html</code> file located in <code class="highlighter-rouge">beginning-elm</code> directory.</p> 
+       <figure class="highlight">
+        <pre><code class="language-html" data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html&gt;</span>
+  .
+  .
+  <span class="nt">&lt;body&gt;</span>
+    .
+    .
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"elm.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"experiment.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"dom-performance-test.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    .
+    .
+  <span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre>
+       </figure> 
+       <p>Open <code class="highlighter-rouge">index.html</code> in a browser and then open the browser console. You should see the number of milliseconds it took to update a string and a DOM element.</p> 
+       <p><img src="/images/virtual-dom/dom-performance-1.png" alt=""></p> 
+       <p>Those numbers are from Chrome 56 on a MacBook Air with 1.6 GHz Intel Core i5 processor and 8 GB of memory. You might see different results depending on which browser and computer you run the experiment on. No matter which browser or computer you end up using, you’ll realize that it takes significantly longer to update a DOM element compared to a string. Why is that?</p> 
+       <p>Updating a string is quite straightforward. JavaScript knows where the string is stored in memory, so it takes the new value and simply overwrites the bits in memory. But when we update a DOM node, it’s not just JavaScript that’s doing the work. The browser needs to take the new change through the entire process we laid out earlier:</p> 
+       <ul> 
+        <li>Parse HTML</li> 
+        <li>Update the DOM tree</li> 
+        <li>Update the render tree</li> 
+        <li>Layout the render tree</li> 
+        <li>Paint the render tree on screen</li> 
+       </ul> 
+       <p>Depending on how complex the change is, the browser may need to destroy and re-create the existing children nodes of the element we’re trying to update. It may also need to recompute the physical dimensions and style of many nodes that are affected by the change. If there are any browser extensions that control access to the node we want to modify, the browser will have to first ask for their permission and notify them after the change has been made.</p> 
+       <p>The full implications of updating a DOM node could be huge. The update we’re trying to make above wasn’t even that complex and it took about 288 times longer than updating a string. We can only imagine how much longer it will take when we need to update many nodes at once.</p> 
+       <p>Although we can’t fully sidestep this problem, Elm mitigates it by making as few updates as possible to the DOM tree. Elm actually takes over the entire responsibility for updating the DOM tree from us. Earlier when we wrote this code in JavaScript:</p> 
+       <figure class="highlight">
+        <pre><code class="language-javascript" data-lang="javascript"><span class="c1">// Update the text node inside div 10,000 times</span>
+<span class="kd">function</span> <span class="nx">updateDOM</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="mi">10000</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">newDiv</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s2">"updated text"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+       </figure> 
+       <p>We were getting into the dirty details of updating the DOM by ourselves. In Elm, all we need to do is specify how we want to present our model to the user and let Elm take care of updating the DOM. In the <a href="/model-view-update-part-1.html#view" target="_blank">Model View Update - Part 1</a> section, we wrote the following code to display our view.</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">view</span> <span class="o">:</span> <span class="kt">Model</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="kt">Msg</span>
+<span class="n">view</span> <span class="n">model</span> <span class="o">=</span>
+    <span class="n">div</span> <span class="kt">[]</span>
+        <span class="p">[</span> <span class="n">button</span> <span class="p">[</span> <span class="n">onClick</span> <span class="kt">Decrement</span> <span class="p">]</span> <span class="p">[</span> <span class="n">text</span> <span class="s">"-"</span> <span class="p">]</span>
+        <span class="p">,</span> <span class="n">text</span> <span class="p">(</span><span class="n">toString</span> <span class="n">model</span><span class="p">)</span>
+        <span class="p">,</span> <span class="n">button</span> <span class="p">[</span> <span class="n">onClick</span> <span class="kt">Increment</span> <span class="p">]</span> <span class="p">[</span> <span class="n">text</span> <span class="s">"+"</span> <span class="p">]</span>
+        <span class="p">]</span></code></pre>
+       </figure> 
+       <p>We didn’t have to specify which DOM nodes should be updated. All we did was declare what our view should look like by using simple Elm functions. Behind the scenes, Elm used the <a href="http://package.elm-lang.org/packages/elm-lang/virtual-dom/latest" target="_blank"><code class="highlighter-rouge">elm-lang/virtual-dom</code></a> package to convert the code in the <code class="highlighter-rouge">view</code> function to actual DOM nodes.</p> 
+       <p><img src="/images/virtual-dom/elm-runtime-virtual-dom.png" alt=""></p> 
+       <p>Let’s dig a little deeper into the <code class="highlighter-rouge">elm-lang/virtual-dom</code> package to understand how it works. Most functions defined in the <code class="highlighter-rouge">Html</code> module are wrappers for virtual DOM nodes. Take a look at how the <code class="highlighter-rouge">div</code> function is implemented in the <code class="highlighter-rouge">Html</code> module.</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">div</span> <span class="o">:</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Attribute</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Html</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="n">msg</span>
+<span class="n">div</span> <span class="o">=</span>
+    <span class="n">node</span> <span class="s">"div"</span></code></pre>
+       </figure> 
+       <p>All it does is pass a tag name to another function called <code class="highlighter-rouge">node</code> also defined in the <code class="highlighter-rouge">Html</code> module.</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">node</span> <span class="o">:</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Attribute</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Html</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="n">msg</span>
+<span class="n">node</span> <span class="o">=</span>
+    <span class="kt">VirtualDom</span><span class="o">.</span><span class="n">node</span></code></pre>
+       </figure> 
+       <p>The <code class="highlighter-rouge">node</code> function provides a general way to create HTML tags. Most helper functions in the <code class="highlighter-rouge">Html</code> module such as <code class="highlighter-rouge">div</code>, <code class="highlighter-rouge">button</code>, and <code class="highlighter-rouge">label</code> are defined using the <code class="highlighter-rouge">node</code> function.</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">button</span> <span class="o">:</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Attribute</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Html</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="n">msg</span>
+<span class="n">button</span> <span class="o">=</span>
+    <span class="n">node</span> <span class="s">"button"</span></code></pre>
+       </figure> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">label</span> <span class="o">:</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Attribute</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Html</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="n">msg</span>
+<span class="n">label</span> <span class="o">=</span>
+    <span class="n">node</span> <span class="s">"label"</span></code></pre>
+       </figure> 
+       <p>The <code class="highlighter-rouge">Html</code> module provides an impressive list of helper functions for creating almost all of the tags in use today. However, if we need to create some tag that is not covered by those functions, we can simply use the <code class="highlighter-rouge">node</code> function like this:</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">someTag</span> <span class="o">:</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Attribute</span> <span class="kt">Msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Html</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="n">msg</span>
+<span class="n">someTag</span> <span class="n">attributes</span> <span class="n">children</span> <span class="o">=</span>
+    <span class="n">node</span> <span class="s">"sometag"</span> <span class="n">attributes</span> <span class="n">children</span></code></pre>
+       </figure> 
+       <p>If we look at the <code class="highlighter-rouge">node</code> function’s implementation, we’ll find out that it’s a simple wrapper for a virtual DOM node.</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">node</span> <span class="o">:</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Attribute</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Html</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="n">msg</span>
+<span class="n">node</span> <span class="o">=</span>
+    <span class="kt">VirtualDom</span><span class="o">.</span><span class="n">node</span></code></pre>
+       </figure> 
+       <p>If we wanted to, we could have used <code class="highlighter-rouge">VirtualDom.node</code> directly in our <code class="highlighter-rouge">view</code> function. Let’s try that. Modify the <code class="highlighter-rouge">view</code> function in <code class="highlighter-rouge">Counter.elm</code> as shown below and also import the <code class="highlighter-rouge">VirtualDom</code> module.</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="kr">module</span> <span class="nn">Counter</span> <span class="n">exposing</span> <span class="p">(</span><span class="o">..</span><span class="p">)</span>
+
+<span class="kr">import</span> <span class="nn">VirtualDom</span>
+<span class="kr">import</span> <span class="nn">Html.Events</span> <span class="n">exposing</span> <span class="p">(</span><span class="o">..</span><span class="p">)</span>
+<span class="kr">import</span> <span class="nn">Html</span> <span class="n">exposing</span> <span class="p">(</span><span class="o">..</span><span class="p">)</span>
+<span class="o">.</span>
+<span class="o">.</span>
+
+<span class="n">view</span> <span class="o">:</span> <span class="kt">Model</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="kt">Msg</span>
+<span class="n">view</span> <span class="n">model</span> <span class="o">=</span>
+    <span class="kt">VirtualDom</span><span class="o">.</span><span class="n">node</span> <span class="s">"div"</span>
+        <span class="kt">[]</span>
+        <span class="p">[</span> <span class="n">button</span> <span class="p">[</span> <span class="n">onClick</span> <span class="kt">Decrement</span> <span class="p">]</span> <span class="p">[</span> <span class="n">text</span> <span class="s">"-"</span> <span class="p">]</span>
+        <span class="p">,</span> <span class="n">text</span> <span class="p">(</span><span class="n">toString</span> <span class="n">model</span><span class="p">)</span>
+        <span class="p">,</span> <span class="n">button</span> <span class="p">[</span> <span class="n">onClick</span> <span class="kt">Increment</span> <span class="p">]</span> <span class="p">[</span> <span class="n">text</span> <span class="s">"+"</span> <span class="p">]</span>
+        <span class="p">]</span></code></pre>
+       </figure> 
+       <p>Run <code class="highlighter-rouge">elm-reactor</code> from the <code class="highlighter-rouge">beginning-elm</code> directory in terminal if it’s not running already, and go to this URL in your browser: <a href="http://localhost:8000/elm-examples/Counter.elm" target="_blank"><code class="highlighter-rouge">http://localhost:8000/elm-examples/Counter.elm</code></a>. You should see the following error.</p> 
+       <p><img src="/images/virtual-dom/virtual-dom-module-not-found.png" alt=""></p> 
+       <p>Elm is complaining that it can’t find the <code class="highlighter-rouge">VirtualDom</code> module even if the package it belongs to is already installed.</p> 
+       <p><img src="/images/virtual-dom/virtual-dom-package-location.png" alt=""></p> 
+       <p>When we installed the <a href="http://package.elm-lang.org/packages/elm-lang/html/latest" target="_blank"><code class="highlighter-rouge">elm-lang/html</code></a> package in the <a href="/building-a-simple-page-in-elm.html#building-a-simple-page-with-elm" target="_blank">Building a Simple Page with Elm</a> section, the <code class="highlighter-rouge">elm-lang/virtual-dom</code> package also got installed because it’s one of the packages <code class="highlighter-rouge">elm-lang/html</code> depends on.</p> 
+       <p>Elm gave us an error because we can’t access a module in our code unless the associated package is explicitly listed in the <code class="highlighter-rouge">beginning-elm/elm-package.json</code> file. Currently, it isn’t.</p> 
+       <figure class="highlight">
+        <pre><code class="language-code" data-lang="code">{
+    .
+    .
+    "dependencies": {
+        "elm-lang/core": "5.0.0 &lt;= v &lt; 6.0.0",
+        "elm-lang/html": "2.0.0 &lt;= v &lt; 3.0.0",
+        "elm-lang/http": "1.0.0 &lt;= v &lt; 2.0.0"
+    },
+    .
+    .
+}</code></pre>
+       </figure> 
+       <p>We can either add the <code class="highlighter-rouge">elm-lang/virtual-dom</code> package directly to the <code class="highlighter-rouge">elm-package.json</code> file or have <code class="highlighter-rouge">elm-package</code> do that for us. Let’s go with the latter approach. From the <code class="highlighter-rouge">beginning-elm</code> directory in terminal, run the following command.</p> 
+       <figure class="highlight">
+        <pre><code class="language-bash" data-lang="bash">elm-package install elm-lang/virtual-dom</code></pre>
+       </figure> 
+       <p>Answer <code class="highlighter-rouge">y</code> when asked to add <code class="highlighter-rouge">elm-lang/virtual-dom</code> as a dependency to the <code class="highlighter-rouge">elm-package.json</code> file and approve the installation plan. Now if you refresh the <a href="http://localhost:8000/elm-examples/Counter.elm" target="_blank"><code class="highlighter-rouge">http://localhost:8000/elm-examples/Counter.elm</code></a> page, you’ll see another error.</p> 
+       <p><img src="/images/virtual-dom/virtual-dom-delete-build-artifacts-error.png" alt=""></p> 
+       <p>Usually, Elm is pretty good at telling us what exactly went wrong. But in this case, we have no idea what the issue is just by looking at the error message. Since we asked Elm to install a package that was already there, <code class="highlighter-rouge">elm-reactor</code> got confused. Go ahead and delete the <code class="highlighter-rouge">build-artifacts</code> directory located in <code class="highlighter-rouge">beginning-elm/elm-stuff</code>. That will force <code class="highlighter-rouge">elm-reactor</code> to recompile the entire project and it’ll be able to sort out the confusion. Now if you refresh the <a href="http://localhost:8000/elm-examples/Counter.elm" target="_blank"><code class="highlighter-rouge">http://localhost:8000/elm-examples/Counter.elm</code></a> page one more time, you should see our beautiful view.</p> 
+       <p><img src="/images/elm-architecture/counter-app-1.png" alt=""></p> 
+       <p>Next, let’s look at how the <code class="highlighter-rouge">VirtualDom.node</code> function is implemented.</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">node</span> <span class="o">:</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Property</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="p">(</span><span class="kt">Node</span> <span class="n">msg</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Node</span> <span class="n">msg</span>
+<span class="n">node</span> <span class="o">=</span>
+    <span class="kt">Native</span><span class="o">.</span><span class="kt">VirtualDom</span><span class="o">.</span><span class="n">node</span></code></pre>
+       </figure> 
+       <p>As it turns out it’s also a wrapper for yet another <code class="highlighter-rouge">node</code> function defined in the <code class="highlighter-rouge">Native.VirtualDom</code> module. The <code class="highlighter-rouge">Native</code> prefix indicates that this module is not written in Elm. Native modules are generally written in JavaScript, but they can also be written in some other language (e.g., CoffeeScript) that eventually compiles to JavaScript.</p> 
+       <p>A good number of Elm modules are partially implemented in JavaScript behind the scenes. For example, the <code class="highlighter-rouge">List.foldr</code> function we went over in the <a href="/list.html#folding-a-list" target="_blank">Folding a List</a> section is implemented like this:</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">foldr</span> <span class="o">:</span> <span class="p">(</span><span class="n">a</span> <span class="o">-&gt;</span> <span class="n">b</span> <span class="o">-&gt;</span> <span class="n">b</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">b</span> <span class="o">-&gt;</span> <span class="kt">List</span> <span class="n">a</span> <span class="o">-&gt;</span> <span class="n">b</span>
+<span class="n">foldr</span> <span class="o">=</span>
+    <span class="kt">Native</span><span class="o">.</span><span class="kt">List</span><span class="o">.</span><span class="n">foldr</span></code></pre>
+       </figure> 
+       <p><code class="highlighter-rouge">Native.List.foldr</code> is in turn implemented in JavaScript like this:</p> 
+       <figure class="highlight">
+        <pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">foldr</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">xs</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">arr</span> <span class="o">=</span> <span class="nx">toArray</span><span class="p">(</span><span class="nx">xs</span><span class="p">);</span>
+	<span class="kd">var</span> <span class="nx">acc</span> <span class="o">=</span> <span class="nx">b</span><span class="p">;</span>
+	<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">arr</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">--</span><span class="p">;</span> <span class="p">)</span>
+	<span class="p">{</span>
+		<span class="nx">acc</span> <span class="o">=</span> <span class="nx">A2</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">arr</span><span class="p">[</span><span class="nx">i</span><span class="p">],</span> <span class="nx">acc</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">acc</span><span class="p">;</span>
+<span class="p">}</span></code></pre>
+       </figure> 
+       <p>Similarly, the <code class="highlighter-rouge">String.filter</code> function we covered in the <a href="/string.html#filtering-a-string" target="_blank">Filtering a String</a> section also uses a native module behind the scenes.</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">filter</span> <span class="o">:</span> <span class="p">(</span><span class="kt">Char</span> <span class="o">-&gt;</span> <span class="kt">Bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span> <span class="o">-&gt;</span> <span class="kt">String</span>
+<span class="n">filter</span> <span class="o">=</span>
+    <span class="kt">Native</span><span class="o">.</span><span class="kt">String</span><span class="o">.</span><span class="n">filter</span></code></pre>
+       </figure> 
+       <p><code class="highlighter-rouge">Native.String.filter</code> is in turn implemented in JavaScript like this:</p> 
+       <figure class="highlight">
+        <pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">filter</span><span class="p">(</span><span class="nx">pred</span><span class="p">,</span> <span class="nx">str</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">return</span> <span class="nx">str</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">''</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">_elm_lang$core$Native_Utils</span><span class="p">.</span><span class="nx">chr</span><span class="p">).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">pred</span><span class="p">).</span><span class="nx">join</span><span class="p">(</span><span class="s1">''</span><span class="p">);</span>
+<span class="p">}</span></code></pre>
+       </figure> 
+       <p>As of this writing, 24.2% of the entire <a href="https://github.com/elm-lang/core" target="_blank"><code class="highlighter-rouge">elm-lang/core</code></a> package, which includes standard library modules such as <code class="highlighter-rouge">List</code> and <code class="highlighter-rouge">String</code>, is implemented in JavaScript.</p> 
+       <p><img src="/images/virtual-dom/elm-lang-core-javascript-percentage.png" alt=""></p> 
+       <p>Similarly, 39.5% of the <a href="https://github.com/elm-lang/virtual-dom" target="_blank"><code class="highlighter-rouge">elm-lang/virtual-dom</code></a> package is implemented in JavaScript.</p> 
+       <p><img src="/images/virtual-dom/virtual-dom-javascript-percentage.png" alt=""></p> 
+       <p>Now that we know what native modules are, let’s get back to the <code class="highlighter-rouge">Native.VirtualDom</code> module. The <code class="highlighter-rouge">node</code> function in that module is implemented like this in JavaScript:</p> 
+       <figure class="highlight">
+        <pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">node</span><span class="p">(</span><span class="nx">tag</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="k">return</span> <span class="nx">F2</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">factList</span><span class="p">,</span> <span class="nx">kidList</span><span class="p">)</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="nx">nodeHelp</span><span class="p">(</span><span class="nx">tag</span><span class="p">,</span> <span class="nx">factList</span><span class="p">,</span> <span class="nx">kidList</span><span class="p">);</span>
+	<span class="p">});</span>
+<span class="p">}</span></code></pre>
+       </figure> 
+       <p>It uses another function called <code class="highlighter-rouge">nodeHelp</code> to create DOM nodes. <code class="highlighter-rouge">nodeHelp</code> in turn uses another function called <code class="highlighter-rouge">organizeFacts</code>. Going down this rabbit hole to understand how each of these functions work is out of scope for this book. The <code class="highlighter-rouge">Native.VirtualDom</code> module contains some complex code that we’re not equipped to understand without an extensive knowledge of JavaScript and the inner workings of virtual DOM. We’ll just settle for a high-level overview of how <code class="highlighter-rouge">Native.VirtualDom</code> works. The following <a href="https://en.wikipedia.org/wiki/Algorithm" target="_blank">algorithm</a> roughly outlines the process used by this module.</p> 
+       <p><strong>Step 1:</strong> Create a virtual DOM tree. This is not an exact replica of the real DOM tree. It’s just a light-weight version built using <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects" target="_blank">JavaScript objects</a>.</p> 
+       <p><strong>Step 2:</strong> Make a UI change in our app. This change could be anything, for example changing the color of a button, or adding a completely new UI element, or removing an existing one.</p> 
+       <p><strong>Step 3:</strong> Create a new virtual DOM tree that reflects the UI changes we made. This tree is different from the one created in step 1.</p> 
+       <p><strong>Step 4:</strong> Figure out the exact differences between the new and previous virtual DOM trees. This step is where the virtual DOM really shines. If we were to compute the difference between the new and previous UI using the real DOM, we would take a huge performance hit. In contrast, the virtual DOM is highly optimized for operations like these.</p> 
+       <p><strong>Step 5:</strong> Repeat step 2 through step 4 until all UI changes have been identified.</p> 
+       <p><strong>Step 6:</strong> Create instructions for modifying the real DOM tree in one big batch. As mentioned earlier, even a seemingly small change to the real DOM tree is expensive from performance standpoint. So it’s prudent to combine multiple instructions together rather than applying each change individually.</p> 
+       <p><strong>Step 7:</strong> Modify the real DOM tree using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame" target="_blank"><code class="highlighter-rouge">requestAnimationFrame</code></a> function, which figures out the best way to apply multiple changes so that the transition from the previous UI to the new one is smooth.</p> 
+       <p>Although we dug deep into the <code class="highlighter-rouge">elm-lang/virtual-dom</code> package in this section, the good news is we don’t really have to understand how it works at all to be able to build great apps in Elm. The <code class="highlighter-rouge">Html</code> module abstracts all this dirty detail away and lets us use simple functions like <code class="highlighter-rouge">div</code>, <code class="highlighter-rouge">button</code>, and <code class="highlighter-rouge">label</code> that map directly to the HTML tags.</p> 
+       <dl> 
+        <dt>
+         A Brief History of Virtual DOM
+        </dt> 
+        <dd>
+         The concept of virtual DOM was popularized by 
+         <a href="https://facebook.github.io/react/" target="_blank">React</a> — a JavaScript library for building user interfaces — back in 2013. At the time, the virtual DOM implementation was buried deep into React, so other languages and frameworks couldn’t take advantage of this great concept.
+        </dd> 
+        <dd> 
+         <p><a href="https://twitter.com/raynos?lang=en" target="_blank">Jake Verbaten</a> realized that it’s possible to implement a virtual DOM on its own as a set of independent modules and wrote a <a href="https://gist.github.com/Raynos/8414846" target="_blank">nice article</a> that laid out what that implementation would look like. In early 2014, Matt Esch started working on creating a standalone <a href="https://github.com/Matt-Esch/virtual-dom" target="_blank">virtual DOM library</a>.</p> 
+        </dd> 
+        <dd> 
+         <p>Soon after the standalone virtual DOM library was available, <a href="https://twitter.com/czaplic?lang=en" target="_blank">Evan Czaplicki</a> — the creator of Elm — used it as an underlying implementation for the <code class="highlighter-rouge">Native.VirtualDom</code> module. In May of 2016, a new version (0.17) of Elm was released and Evan had to rewrite the entire virtual DOM implementation from scratch to support the API changes made in 0.17. The new implementation is much faster than the versions used before 0.17.</p> 
+        </dd> 
+       </dl> 
+       <h3 id="benefits-of-using-virtual-dom">Benefits of Using Virtual DOM</h3> 
+       <p>From what we have learned so far, it appears that the reason virtual DOM exists is to mitigate the performance bottlenecks caused by manipulating the DOM tree too often. There is also a second benefit that is more relevant to our day-to-day experience with Elm — it allows us to write modular view code using pure functions. The rest of this section is dedicated to exploring these two benefits.</p> 
+       <h4 id="writing-modular-view-code">Writing Modular View Code</h4> 
+       <p>Let’s look at the <code class="highlighter-rouge">view</code> function we wrote in Elm earlier once again.</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">view</span> <span class="o">:</span> <span class="kt">Model</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="kt">Msg</span>
+<span class="n">view</span> <span class="n">model</span> <span class="o">=</span>
+    <span class="n">div</span> <span class="kt">[]</span>
+        <span class="p">[</span> <span class="n">button</span> <span class="p">[</span> <span class="n">onClick</span> <span class="kt">Decrement</span> <span class="p">]</span> <span class="p">[</span> <span class="n">text</span> <span class="s">"-"</span> <span class="p">]</span>
+        <span class="p">,</span> <span class="n">text</span> <span class="p">(</span><span class="n">toString</span> <span class="n">model</span><span class="p">)</span>
+        <span class="p">,</span> <span class="n">button</span> <span class="p">[</span> <span class="n">onClick</span> <span class="kt">Increment</span> <span class="p">]</span> <span class="p">[</span> <span class="n">text</span> <span class="s">"+"</span> <span class="p">]</span>
+        <span class="p">]</span></code></pre>
+       </figure> 
+       <p>The beautiful thing about this function is that it will always return the exact same HTML given the same input. That means we can reliably verify that the <code class="highlighter-rouge">view</code> function behaves as expected with <a href="/easy-to-test.html" target="_blank">simple tests</a>. We can also break it into multiple equally reliable functions if it starts to get more complex. Let’s imagine an app whose home page looks like this:</p> 
+       <p><img src="/images/virtual-dom/amicus-home-page.png" alt=""></p> 
+       <p>The home page is divided into three distinct regions: navigation header, main content region, and footer. The view code for this page will certainly be a lot more complex than the above <code class="highlighter-rouge">view</code> function, but we can break it into multiple functions so that it doesn’t get too overwhelming. Here’s how a hypothetical <code class="highlighter-rouge">view</code> function for that home page would look:</p> 
+       <figure class="highlight">
+        <pre><code class="language-haskell" data-lang="haskell"><span class="n">view</span> <span class="o">:</span> <span class="kt">Model</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="kt">Msg</span>
+<span class="n">view</span> <span class="n">model</span> <span class="o">=</span>
+    <span class="n">div</span> <span class="kt">[]</span>
+        <span class="p">[</span> <span class="n">nav</span> <span class="n">model</span>
+        <span class="p">,</span> <span class="n">mainContent</span> <span class="n">model</span>
+        <span class="p">,</span> <span class="n">footer</span> <span class="n">model</span>
+        <span class="p">]</span>
+
+
+<span class="n">nav</span> <span class="o">:</span> <span class="kt">Model</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="kt">Msg</span>
+<span class="n">nav</span> <span class="n">model</span> <span class="o">=</span>
+    <span class="n">header</span> <span class="p">[</span> <span class="kr">class</span> <span class="s">"navbar navbar-fixed-top navbar-inverse"</span> <span class="p">]</span>
+        <span class="p">[</span> <span class="n">div</span> <span class="p">[</span> <span class="kr">class</span> <span class="s">"container"</span> <span class="p">]</span>
+            <span class="p">[</span> <span class="n">div</span> <span class="p">[</span> <span class="kr">class</span> <span class="s">"navbar-header"</span> <span class="p">]</span>
+                <span class="p">[</span> <span class="n">button</span>
+                    <span class="p">[</span> <span class="kr">class</span> <span class="s">"navbar-toggle"</span>
+                    <span class="p">,</span> <span class="n">attribute</span> <span class="s">"data-target"</span> <span class="s">"#myNavBar"</span>
+                    <span class="p">,</span> <span class="n">attribute</span> <span class="s">"data-toggle"</span> <span class="s">"collapse"</span>
+                    <span class="p">]</span>
+                    <span class="p">[</span> <span class="n">span</span> <span class="p">[</span> <span class="kr">class</span> <span class="s">"icon-bar"</span> <span class="p">]</span> <span class="kt">[]</span>
+                    <span class="p">,</span> <span class="n">span</span> <span class="p">[</span> <span class="kr">class</span> <span class="s">"icon-bar"</span> <span class="p">]</span> <span class="kt">[]</span>
+                    <span class="p">,</span> <span class="n">span</span> <span class="p">[</span> <span class="kr">class</span> <span class="s">"icon-bar"</span> <span class="p">]</span> <span class="kt">[]</span>
+                    <span class="p">]</span>
+                <span class="p">,</span> <span class="n">li</span> <span class="kt">[]</span>
+                    <span class="p">[</span> <span class="n">a</span> <span class="p">[</span> <span class="n">href</span> <span class="s">"#home"</span><span class="p">,</span> <span class="n">id</span> <span class="s">"logo"</span> <span class="p">]</span>
+                        <span class="p">[</span> <span class="n">text</span> <span class="s">"amicus app"</span> <span class="p">]</span>
+                    <span class="p">]</span>
+                <span class="p">]</span>
+            <span class="p">,</span> <span class="kt">Html</span><span class="o">.</span><span class="n">nav</span> <span class="p">[</span> <span class="kr">class</span> <span class="s">"collapse navbar-collapse"</span><span class="p">,</span> <span class="n">id</span> <span class="s">"myNavBar"</span> <span class="p">]</span>
+                <span class="p">[</span> <span class="n">ul</span> <span class="p">[</span> <span class="kr">class</span> <span class="s">"nav navbar-nav navbar-right"</span> <span class="p">]</span>
+                    <span class="p">[</span> <span class="n">li</span> <span class="kt">[]</span>
+                        <span class="p">[</span> <span class="n">a</span> <span class="p">[</span> <span class="n">href</span> <span class="s">"#help"</span> <span class="p">]</span>
+                            <span class="p">[</span> <span class="n">text</span> <span class="s">"Help"</span> <span class="p">]</span>
+                        <span class="p">]</span>
+                    <span class="p">,</span> <span class="n">li</span> <span class="kt">[]</span>
+                        <span class="p">[</span> <span class="n">a</span> <span class="p">[</span> <span class="n">href</span> <span class="s">"#login"</span> <span class="p">]</span>
+                            <span class="p">[</span> <span class="n">text</span> <span class="s">"Login"</span> <span class="p">]</span>
+                        <span class="p">]</span>
+                    <span class="p">]</span>
+                <span class="p">]</span>
+            <span class="p">]</span>
+        <span class="p">]</span>
+
+
+<span class="n">mainContent</span> <span class="o">:</span> <span class="kt">Model</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="kt">Msg</span>
+<span class="n">mainContent</span> <span class="n">model</span> <span class="o">=</span>
+    <span class="kr">case</span> <span class="n">model</span><span class="o">.</span><span class="n">route</span> <span class="kr">of</span>
+        <span class="kt">HomeRoute</span> <span class="o">-&gt;</span>
+            <span class="kt">StaticPages</span><span class="o">.</span><span class="kt">HomeView</span><span class="o">.</span><span class="n">view</span> <span class="nb">()</span>
+
+        <span class="kt">AboutRoute</span> <span class="o">-&gt;</span>
+            <span class="kt">StaticPages</span><span class="o">.</span><span class="kt">AboutView</span><span class="o">.</span><span class="n">view</span> <span class="nb">()</span>
+
+        <span class="kt">ContactRoute</span> <span class="o">-&gt;</span>
+            <span class="kt">StaticPages</span><span class="o">.</span><span class="kt">ContactView</span><span class="o">.</span><span class="n">view</span> <span class="nb">()</span>
+
+        <span class="kt">HelpRoute</span> <span class="o">-&gt;</span>
+            <span class="kt">StaticPages</span><span class="o">.</span><span class="kt">HelpView</span><span class="o">.</span><span class="n">view</span> <span class="nb">()</span>
+
+        <span class="kt">SignupRoute</span> <span class="o">-&gt;</span>
+            <span class="kt">App</span><span class="o">.</span><span class="n">map</span> <span class="kt">SignupMsg</span> <span class="p">(</span><span class="kt">Signup</span><span class="o">.</span><span class="kt">View</span><span class="o">.</span><span class="n">view</span> <span class="n">model</span><span class="o">.</span><span class="n">currentUser</span><span class="p">)</span>
+
+        <span class="kt">ProfileRoute</span> <span class="o">-&gt;</span>
+            <span class="kt">App</span><span class="o">.</span><span class="n">map</span> <span class="kt">ProfileMsg</span> <span class="p">(</span><span class="kt">Profile</span><span class="o">.</span><span class="kt">View</span><span class="o">.</span><span class="n">view</span> <span class="n">model</span><span class="o">.</span><span class="n">currentUser</span><span class="p">)</span>
+
+        <span class="kt">LoginRoute</span> <span class="o">-&gt;</span>
+            <span class="kt">App</span><span class="o">.</span><span class="n">map</span> <span class="kt">LoginMsg</span> <span class="p">(</span><span class="kt">Login</span><span class="o">.</span><span class="kt">View</span><span class="o">.</span><span class="n">view</span> <span class="n">model</span><span class="o">.</span><span class="n">currentUser</span><span class="p">)</span>
+
+        <span class="kt">NotFoundRoute</span> <span class="o">-&gt;</span>
+            <span class="n">notFoundView</span>
+
+
+<span class="n">notFoundView</span> <span class="o">:</span> <span class="kt">Html</span> <span class="kt">Msg</span>
+<span class="n">notFoundView</span> <span class="o">=</span>
+    <span class="n">div</span> <span class="kt">[]</span> <span class="p">[</span> <span class="n">text</span> <span class="s">"Not found"</span> <span class="p">]</span>
+
+
+<span class="n">footer</span> <span class="o">:</span> <span class="kt">Model</span> <span class="o">-&gt;</span> <span class="kt">Html</span> <span class="kt">Msg</span>
+<span class="n">footer</span> <span class="n">model</span> <span class="o">=</span>
+    <span class="kt">Html</span><span class="o">.</span><span class="n">footer</span> <span class="p">[</span> <span class="kr">class</span> <span class="s">"container"</span> <span class="p">]</span>
+        <span class="p">[</span> <span class="n">small</span> <span class="kt">[]</span> <span class="p">[</span> <span class="n">text</span> <span class="s">"Copyright © 2016 Vandelay Industries"</span> <span class="p">]</span>
+        <span class="p">,</span> <span class="kt">Html</span><span class="o">.</span><span class="n">nav</span> <span class="kt">[]</span>
+            <span class="p">[</span> <span class="n">ul</span> <span class="kt">[]</span>
+                <span class="p">[</span> <span class="n">li</span> <span class="kt">[]</span>
+                    <span class="p">[</span> <span class="n">a</span> <span class="p">[</span> <span class="n">href</span> <span class="s">"#about"</span> <span class="p">]</span>
+                        <span class="p">[</span> <span class="n">text</span> <span class="s">"About"</span> <span class="p">]</span>
+                    <span class="p">]</span>
+                <span class="p">,</span> <span class="n">li</span> <span class="kt">[]</span>
+                    <span class="p">[</span> <span class="n">a</span> <span class="p">[</span> <span class="n">href</span> <span class="s">"#contact"</span> <span class="p">]</span>
+                        <span class="p">[</span> <span class="n">text</span> <span class="s">"Contact"</span> <span class="p">]</span>
+                    <span class="p">]</span>
+                <span class="p">]</span>
+            <span class="p">]</span>
+        <span class="p">]</span></code></pre>
+       </figure> 
+       <p>Don’t worry about understanding how each function in the above code listing works. Just focus on the overall structure of the code. Instead of producing all HTML code by itself, the <code class="highlighter-rouge">view</code> function now delegates that task to the <code class="highlighter-rouge">nav</code>, <code class="highlighter-rouge">mainContent</code>, and <code class="highlighter-rouge">footer</code> functions which are responsible for producing HTML for each individual section of the page. By splitting the view code like this, we’ve reduced the cognitive overload quite a bit. We can zoom in on one specific part of the page by locating the respective function and just understand how that code works. This is one of the reasons why Elm is a fantastic tool for building highly interactive web apps that will continue to grow in size and complexity over time.</p> 
+       <p>In most languages and frameworks, it’s not so straightforward to write modular view functions like in Elm. That’s because not only do those languages lack inherent support for pure functions, but the view code also often wants to manipulate the real DOM directly.</p> 
+       <p><img src="/images/virtual-dom/view-code-in-other-languages.png" alt=""></p> 
+       <p>Whereas in Elm, the view code is isolated from the real DOM by the Elm runtime.</p> 
+       <p><img src="/images/virtual-dom/view-code-in-elm.png" alt=""></p> 
+       <h4 id="performance-benefits">Performance Benefits</h4> 
+       <p>Since the Elm runtime abstracts away the dirty details of manipulating the real DOM, it has much more freedom to make clever optimizations behind the scenes resulting in much faster rendering of pages. But, how fast can Elm render pages exactly? The chart below shows how Elm fares against some of the most popular front-end frameworks in use today.</p> 
+       <p><img src="/images/virtual-dom/elm-vs-other-frameworks.png" alt=""></p> 
+       <div style="text-align:center"> 
+        <a href="http://elm-lang.org/blog/blazing-fast-html-round-two" target="_blank"> Source: Blazing Fast HTML by Evan Czaplicki </a> 
+       </div> 
+       <p>The above graph shows that Elm is <em>extremely</em> fast when it comes to rendering pages. If you are interested in learning what optimizations Elm uses to achieve such great performance, you should definitely read <a href="http://elm-lang.org/blog/blazing-fast-html-round-two" target="_blank">this</a> wonderful blog post by Evan.</p> 
+       <h3 id="summary">Summary</h3> 
+       <p>In this section, we learned how modern browsers render HTML by first parsing a stream of characters into HTML tokens and building the DOM tree using those tokens. The DOM tree is then converted into the render tree, which goes through a layout process, before finally being painted on a screen.</p> 
+       <p>We also learned that manipulating the DOM tree is quite slow. This led to the development of the virtual DOM that has enabled the Elm runtime to significantly speed up the rendering process. The virtual DOM has also enabled us to write modular view code using pure Elm functions that are easy to test and maintain in the long run.</p> 
+      </article> 
+      <nav class="pagination"> 
+       <a class="pagination-previous" href="/model-view-update-part-1.html"> <em>? Previous</em> <strong>Model View Update - Part 1</strong> </a> 
+       <a class="pagination-next" href="/model-view-update-part-2.html"> <em>Next ?</em> <strong>Model View Update - Part 2</strong> </a> 
+      </nav> 
+     </div> 
+    </div> 
+   </main> 
+   <a id="top" class="elevator"> <i class="fa fa-angle-up"></i> <span>Back to top</span> </a> 
+  </div> 
+  <section id="newsletter" class="page-newsletter"> 
+   <div class="container"> 
+    <div class="page-newsletter-heading"> 
+     <span class="icons"> <i class="fa fa-book"></i> </span> 
+     <h3> New <strong>chapters</strong> are coming soon! </h3> 
+     <p> <strong>Sign up</strong> for the Elm Programming <strong>newsletter</strong> to get notified! </p> 
+    </div> 
+    <div class="page-newsletter-form"> 
+     <!-- Begin MailChimp Signup Form --> 
+     <link href="//cdn-images.mailchimp.com/embedcode/classic-10_7.css" rel="stylesheet" type="text/css"> 
+     <style type="text/css">
+            #mc_embed_signup {
+                font-family: "Source Sans Pro", "Roboto", "Open Sans", Arial, sans-serif;
+            }
+
+            #mc_embed_signup .mc-field-group label, #mc_embed_signup .asterisk, #mc_embed_signup .indicates-required, #mc_embed_signup div.response, #mc_embed_signup #mce-success-response {
+                color: #f4f1ce;
+            }
+
+            #mc_embed_signup .button {
+                display: block;
+                margin: 0 auto;
+                border: 1px solid #ebeff5;
+                border-radius: 3px;
+                color: #69707a;
+                font-size: 16px;
+                position: relative;
+                vertical-align: top;
+                cursor: pointer;
+                height: auto;
+                line-height: 1;
+                padding: 8px 12px 10px;
+                text-align: left;
+                background: linear-gradient(#365056, #273032);
+                border-color: #111415;
+                color: white;
+                box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.3), 0 1px 2px rgba(0, 0, 0, 0.3);
+                text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+            }
+
+            #mc_embed_signup #mc-embedded-subscribe-form div.mce_inline_error {
+                color: #dc141b;
+            }
+
+            #mc_embed_signup div.response {
+                width: 100%;
+            }
+
+            #mc_embed_signup div#mce-responses {
+                margin: 0;
+                padding: 0;
+            }
+
+            #mc_embed_signup div.response {
+                padding: 0 .5em .5em 0;
+            }
+            /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
+        	   We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
+        </style> 
+     <div id="mc_embed_signup"> 
+      <form action="//elmprogramming.us14.list-manage.com/subscribe/post?u=30270f334d081b35c542f7ecd&amp;id=ff5c3e0f3b" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate> 
+       <div id="mc_embed_signup_scroll"> 
+        <div class="indicates-required">
+         <span class="asterisk">*</span> indicates required
+        </div> 
+        <div class="mc-field-group"> 
+         <label for="mce-EMAIL">Email Address <span class="asterisk">*</span> </label> 
+         <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL"> 
+        </div> 
+        <div class="mc-field-group"> 
+         <label for="mce-FNAME">First Name </label> 
+         <input type="text" value="" name="FNAME" class="" id="mce-FNAME"> 
+        </div> 
+        <div class="mc-field-group"> 
+         <label for="mce-LNAME">Last Name </label> 
+         <input type="text" value="" name="LNAME" class="" id="mce-LNAME"> 
+        </div> 
+        <div id="mce-responses" class="clear"> 
+         <div class="response" id="mce-error-response" style="display:none"></div> 
+         <div class="response" id="mce-success-response" style="display:none"></div> 
+        </div> 
+        <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups--> 
+        <div style="position: absolute; left: -5000px;" aria-hidden="true">
+         <input type="text" name="b_30270f334d081b35c542f7ecd_ff5c3e0f3b" tabindex="-1" value="">
+        </div> 
+        <div class="clear">
+         <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+        </div> 
+       </div> 
+      </form> 
+     </div> 
+     <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"></script> 
+     <script type="text/javascript">
+            (function($) {
+                window.fnames = new Array();
+                window.ftypes = new Array();
+                fnames[0] = 'EMAIL';
+                ftypes[0] = 'email';
+                fnames[1] = 'FNAME';
+                ftypes[1] = 'text';
+                fnames[2] = 'LNAME';
+                ftypes[2] = 'text';
+            }(jQuery));
+            var $mcj = jQuery.noConflict(true);
+        </script> 
+     <!--End mc_embed_signup--> 
+    </div> 
+   </div> 
+  </section> 
+  <section id="newsletter" class="page-disqus"> 
+   <div class="container"> 
+    <div id="disqus_thread"></div> 
+    <script>
+        var disqus_config = function () {
+          this.page.url = page.url;
+          this.page.identifier = page.identifier;
+          this.page.title = page.subtitle;
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = '//elmprogramming.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+      </script> 
+    <noscript>
+      Please enable JavaScript to view the 
+     <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a> 
+    </noscript> 
+   </div> 
+  </section> 
+  <footer id="footer" class="page-footer"> 
+   <footer class="container"> 
+    <p> Copyright © 2016 Pawan Poudel. All Rights Reserved. </p> 
+   </footer> 
+  </footer> 
+  <div id="overlay" class="page-overlay"></div> 
+  <div class="page-menu"> 
+   <section class="toc-component"> 
+    <div class="container"> 
+     <article class="toc-section toc-section--web"> 
+      <div class="toc-heading"> 
+       <i class="fa fa-globe"></i> 
+       <h3>Introduction</h3> 
+       <em> Get your feet wet with <strong>Elm</strong> </em> 
+      </div> 
+      <ol class="toc-content"> 
+       <li class="toc-month"> <a href="/introduction.html"> <em>01</em> Introduction </a> </li> 
+       <li> <a href="/feedback.html"> Feedback </a> </li> 
+       <li> <a href="/why-elm.html"> Why Elm </a> </li> 
+       <li> <a href="/who-this-book-is-for.html"> Who This Book is For </a> </li> 
+       <li> <a href="/conventions-used-in-the-book.html"> Conventions Used in This Book </a> </li> 
+       <li> <a href="/acknowledgements.html"> Acknowledgements </a> </li> 
+       <li> <a href="/about-the-author.html"> About the Author </a> </li> 
+       <li class="toc-month"> <a href="/getting-started-intro.html"> <em>02</em> Getting Started </a> </li> 
+       <li> <a href="/installation.html"> Installation </a> </li> 
+       <li> <a href="/building-a-simple-page-in-elm.html"> Building a Simple Web Page </a> </li> 
+       <li> <a href="/elm-platform.html"> Elm Platform </a> </li> 
+       <li> <a href="/elm-language.html"> Elm Programming Language </a> </li> 
+       <li> <a href="/elm-compiler.html"> Elm Compiler </a> </li> 
+       <li> <a href="/elm-architecture.html"> Elm Architecture </a> </li> 
+       <li> <a href="/elm-runtime.html"> Elm Runtime </a> </li> 
+       <li> <a href="/elm-make.html"> elm-make </a> </li> 
+       <li> <a href="/elm-package.html"> elm-package </a> </li> 
+       <li> <a href="/elm-reactor.html"> elm-reactor </a> </li> 
+       <li> <a href="/elm-repl.html"> elm-repl </a> </li> 
+       <li> <a href="/try-elm-site.html"> Try Elm Site </a> </li> 
+      </ol> 
+     </article> 
+     <article class="toc-section toc-section--web"> 
+      <div class="toc-heading"> 
+       <i class="fa fa-globe"></i> 
+       <h3>Syntax &amp; Semantics</h3> 
+       <em> Learn <strong>Elm</strong> from the <strong>ground up</strong> </em> 
+      </div> 
+      <ol class="toc-content"> 
+       <li class="toc-month"> <a href="/elm-language-basics-intro.html"> <em>03</em> Elm Language Basics </a> </li> 
+       <li> <a href="/simple-arithmetic.html"> Simple Arithmetic </a> </li> 
+       <li> <a href="/boolean.html"> Boolean </a> </li> 
+       <li> <a href="/comparison.html"> Comparison </a> </li> 
+       <li> <a href="/comment.html"> Comments </a> </li> 
+       <li> <a href="/expression.html"> Expression </a> </li> 
+       <li> <a href="/value.html"> Value </a> </li> 
+       <li> <a href="/constant.html"> Constant </a> </li> 
+       <li> <a href="/if-expression.html"> If Expression </a> </li> 
+       <li> <a href="/function.html"> Function </a> </li> 
+       <li> <a href="/let-expression.html"> Let Expression </a> </li> 
+       <li> <a href="/case-expression.html"> Case Expression </a> </li> 
+       <li> <a href="/indentation.html"> Indentation </a> </li> 
+       <li> <a href="/string.html"> String </a> </li> 
+       <li> <a href="/regular-expression.html"> Regular Expression </a> </li> 
+       <li> <a href="/list.html"> List </a> </li> 
+       <li> <a href="/array.html"> Array </a> </li> 
+       <li> <a href="/tuple.html"> Tuple </a> </li> 
+       <li> <a href="/record.html"> Record </a> </li> 
+       <li class="toc-month"> <a href="/benefits-of-elm-intro.html"> <em>04</em> Benefits of Using Elm </a> </li> 
+       <li> <a href="/immutability.html"> Immutability </a> </li> 
+       <li> <a href="/pure-functions.html"> Pure Functions </a> </li> 
+       <li> <a href="/function-composition.html"> Solving Complex Problems with Simple Functions </a> </li> 
+       <li> <a href="/easy-to-test.html"> Easy to Test </a> </li> 
+       <li> <a href="/type-system.html"> Type System </a> </li> 
+       <li> <a href="/easier-code-organization.html"> Easier Code Organization </a> </li> 
+       <li> <a href="/fuzz-testing.html"> Fuzz Testing </a> </li> 
+       <li> <a href="/pattern-matching.html"> Pattern Matching </a> </li> 
+       <li> <a href="/benefits-of-elm-conclusion.html"> Conclusion </a> </li> 
+      </ol> 
+     </article> 
+     <article class="toc-section toc-section--web"> 
+      <div class="toc-heading"> 
+       <i class="fa fa-globe"></i> 
+       <h3>Architecture</h3> 
+       <em> Understand how the <strong>Elm Architecture</strong> helps us build <strong>robust</strong> front-end web applications </em> 
+      </div> 
+      <ol class="toc-content"> 
+       <li class="toc-month"> <a href="/elm-architecture-intro.html"> <em>05</em> Elm Architecture </a> </li> 
+       <li> <a href="/model-view-update-part-1.html"> Model View Update - Part 1 </a> </li> 
+       <li> <a href="/virtual-dom.html" class="active"> Virtual DOM </a> </li> 
+       <li> <a href="/model-view-update-part-2.html"> Model View Update - Part 2 </a> </li> 
+       <li> <a href="/side-effects.html"> Side Effects </a> </li> 
+       <li> <a href="/commands.html"> Commands </a> </li> 
+       <li> <a href="/http-requests.html"> HTTP Requests </a> </li> 
+       <li> <a href="/json-encoding-decoding.html"> JSON Encoding &amp; Decoding </a> </li> 
+       <li> <a href="/tasks.html"> Tasks </a> </li> 
+       <li> <a href="/subscriptions.html"> Subscriptions </a> </li> 
+       <li> <a href="/ports.html"> Ports </a> </li> 
+       <li> <a href="/chapter-5-conclusion.html"> Conclusion </a> </li> 
+      </ol> 
+     </article> 
+    </div> 
+   </section> 
+  </div> 
+  <div id="close" class="page-close"> 
+   <a class="page-close-button"> Close </a> 
+  </div> 
+  <script type="text/javascript" src="/javascript/jquery-1.11.1.min.js"></script> 
+  <script type="text/javascript" src="/javascript/codemirror.js"></script> 
+  <script type="text/javascript" src="/javascript/mode/xml/xml.js"></script> 
+  <script type="text/javascript" src="/javascript/mode/htmlmixed/htmlmixed.js"></script> 
+  <script type="text/javascript" src="/javascript/marksheet.js"></script> 
+  <script type="text/javascript" src="/javascript/affix.js"></script> 
+  <script type="text/javascript" src="/javascript/post.js"></script> 
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-87678552-1', 'auto');
+  ga('send', 'pageview');
+</script> 
+  <script async type="text/javascript">
+  WebFontConfig = {
+    google: { families: [ 'Source+Sans+Pro:400,300,700,400italic,700italic:latin', 'Source+Code+Pro::latin' ] }
+  };
+  (function() {
+    var wf = document.createElement('script');
+    wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
+      '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+    wf.type = 'text/javascript';
+    wf.async = 'true';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(wf, s);
+  })();
+</script>   
+ </body>
+</html>
