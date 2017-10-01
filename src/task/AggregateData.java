@@ -83,7 +83,7 @@ public class AggregateData {
 		/**
 		 * Artificial Searcher
 		 */
-		Double[] weights = { 0.25, 0.25, 0.25, 0.25 };
+		/*Double[] weights = { 0.25, 0.25, 0.25, 0.25 };
 		WeightedFirstRankingAgregator weightedFirstRankingAgregator = new WeightedFirstRankingAgregator(Arrays.asList(weights));
 		List<Searcher> silver = new ArrayList<Searcher>();
 		silver.add(lucene);
@@ -96,7 +96,7 @@ public class AggregateData {
 			
 			MetaSearcher meta = new MetaSearcherImp(silver, weightedFirstRankingAgregator, max_results);
 			
-			Ranking ranking = null/*CacheRankingManager.getInstance().loadRankingFromCache(meta, query)*/;
+			Ranking ranking = null //CacheRankingManager.getInstance().loadRankingFromCache(meta, query);
 			if (ranking == null) {
 				meta.acquireData(query, proxy);
 				ranking = meta.processData(null);//TODO data null
@@ -105,18 +105,18 @@ public class AggregateData {
 			
 			System.out.println();
 
-		}
+		}*/
 		
 		/**
 		 * Aggregators
 		 */
 		
 		List<Searcher> searchers = new ArrayList<Searcher>();
-		///searchers.add(lucene);
-		//searchers.add(google);
+		searchers.add(lucene);
+		searchers.add(google);
 		searchers.add(npm);
-		//searchers.add(npmsearch);
-		searchers.add(new MetaSearcherImp(silver, weightedFirstRankingAgregator, max_results));
+		searchers.add(npmsearch);
+		//searchers.add(new MetaSearcherImp(silver, weightedFirstRankingAgregator, max_results));
 		
 		List<Aggregator> aggregators = new ArrayList<Aggregator>();
 
