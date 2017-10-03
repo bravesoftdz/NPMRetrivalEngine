@@ -45,10 +45,10 @@ public class AcquireData {
 
 	public static void main(String[] args) {
 
-		Proxy proxy = /*new Proxy( //
-				Proxy.Type.HTTP, //
-				InetSocketAddress.createUnresolved("192.168.2.12", 3128) //
-		)*/null;
+		Proxy proxy = new Proxy(
+				Proxy.Type.HTTP, 
+				InetSocketAddress.createUnresolved("192.168.2.12", 3128)
+		);
 		
 		int max_queries = Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
 		int max_results = Integer.valueOf(ConfigManager.getInstance().getProperty("max_results"));
@@ -74,9 +74,9 @@ public class AcquireData {
 			
 			System.out.println("Analizando "+ searcher.getContentId());
 			
-			//for (int i = 0 ; i < max_queries ; i++) {
+			for (int i = 60 ; i < QueryManager.getInstance().getQueries().size()/*max_queries*/ ; i++) {
 
-				String query = "convert typewritten image to text document";//QueryManager.getInstance().getQueries().get(i);
+				String query = QueryManager.getInstance().getQueries().get(i);
 
 				System.out.println("Query "+ query);
 				
@@ -88,7 +88,7 @@ public class AcquireData {
 				CacheContentManager.getInstance().saveContentInCache(data,searcher,query);
 
 				System.out.println();
-			//}
+			}
 		}
 		
 		
@@ -112,8 +112,7 @@ public class AcquireData {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}*/
-		
-		
+	
 		
 
 	}

@@ -16,22 +16,27 @@ public class EvaluateRankings {
 	
 	public static final String RESULTS = ConfigManager.getInstance().getProperty("ranking_folder");
 	public static final String EXT = ".txt";
+	
+	public static String[] folders = { "npmjs.com_optimal","WeightedBordaFuse" , "lucene", "npmsearch.com", 
+			"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedFirstRankingAgregator","Filter_google.com_hyp_match"};
 
+	public static int max_queries = Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
+	public static int max_position = Integer.valueOf(ConfigManager.getInstance().getProperty("top_results"));
+	
 	public static void main(String[] args) {
 
-		int max_queries = Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
-		int max_position = Integer.valueOf(ConfigManager.getInstance().getProperty("top_results"));
 		
 		/*String[] folders = { "lucene", "bing.com_stanford_CRF", "google.com_stanford_CRF", "bing.com_str_match", "google.com_str_match", "bing.com_hyp_match", "google.com_hyp_match", "npmjs.com_optimal", "npmsearch.com", 
 				"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedFirstRankingAgregator"};*/
-		String[] folders = { "lucene","npmjs.com_optimal", "npmsearch.com", 
-				"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedFirstRankingAgregator"};
+		
 
 		boolean end = false;
 		HashMap<String, Integer> hits4Search = new HashMap<String, Integer>();
 		
 		HashMap<String,List<Ranking>> rankingsXqueries = new HashMap<String,List<Ranking>>();
 		HashMap<String,List<String>> hitsXqueries = new HashMap<String,List<String>>();
+		
+		HashMap<String,List<Ranking>> rankingsXFolder = new HashMap<String,List<Ranking>>();
 
 		int q = 0;
 		for (int qnum = 0; qnum < max_queries ; qnum++) {
@@ -43,6 +48,11 @@ public class EvaluateRankings {
 				Ranking ranking = new Ranking(folders[e]+"_"+query,filepath);
 				rankings.add(ranking);
 
+				if(rankingsXFolder.get(folders[e])==null){
+					rankingsXFolder.put(folders[e], new ArrayList<Ranking>());
+				}
+				rankingsXFolder.get(folders[e]).add(ranking);
+				
 				int hits = 0;
 				for (int i = 0; i < (ranking.getRankingList().size()<max_position?ranking.getRankingList().size():max_position); i++) {
 					RankedItem item = ranking.getRankingList().get(i);
@@ -85,7 +95,7 @@ public class EvaluateRankings {
 		try {
 			Scanner sc = new Scanner(System.in);
 			if (sc.nextLine().equals("y")) {
-				saveStatisticsToCSV(folders,rankingsXqueries,hitsXqueries);
+				saveStatisticsToCSV(folders,rankingsXqueries,hitsXqueries,rankingsXFolder);
 			}
 			sc.close();
 
@@ -98,7 +108,7 @@ public class EvaluateRankings {
 	}
 
 	public static void saveStatisticsToCSV(String[] folders, HashMap<String, List<Ranking>> rankingsXqueries, 
-			HashMap<String, List<String>> hitsXqueries) {
+			HashMap<String, List<String>> hitsXqueries, HashMap<String, List<Ranking>> rankingsXFolder) {
 	
 		String fichero = "csv/statistics.csv";
 		FileWriter fw = null;
@@ -115,11 +125,12 @@ public class EvaluateRankings {
 			for(String query:rankingsXqueries.keySet()){
 				pw.print(query);
 				for(Ranking ranking:rankingsXqueries.get(query)){
-					pw.print(","+saveAndGetKStatsFile(ranking,20,hitsXqueries.get(query).size()));
+					pw.print(","+saveAndGetKStatsFile(ranking,hitsXqueries.get(query).size()));
 				}
 				pw.println();
 			}
 			
+			saveMatrixFile(rankingsXFolder);
 		} catch (Exception e) {
 			pw.println("Excepcion leyendo fichero " + fichero + ": " + e.getMessage());
 		} finally {
@@ -132,7 +143,50 @@ public class EvaluateRankings {
 		}
 	}
 	
-	private static String saveAndGetKStatsFile(Ranking ranking, int k, int goldenSize) {
+	private static void saveMatrixFile(HashMap<String, List<Ranking>> rankingsXFolder) {
+		for(String folder:folders){	
+			String fichero = "csv/matrix/"+folder+".csv";
+			FileWriter fw = null;
+			PrintWriter pw = null;
+			try {
+				List<Ranking> rankings = rankingsXFolder.get(folder);
+				
+				fw = new FileWriter(fichero);
+				pw = new PrintWriter(fw);
+					
+				/*pw.print("query");
+				for(int i = 1; i<max_position+1 ;i++){
+					pw.print(","+i);
+				}
+				pw.println();*/
+				
+				for(int e=0;e<max_queries;e++){
+					//pw.print(HitManager.getInstance().getQueries().get(e));
+					for(int i = 0; i<max_position ;i++){
+						int hit = 0;
+						if(i<rankings.get(e).getRankingList().size()){
+							hit = rankings.get(e).getRankingList().get(i).isHit()?1:0;
+						}
+						pw.print(hit+(i+1<max_position?",":""));
+					}
+					pw.println();
+				}
+				
+			} catch (Exception e) {
+				pw.println("Excepcion leyendo fichero " + fichero + ": " + e.getMessage());
+			} finally {
+				try {
+					if (null != fw)
+						fw.close();
+				} catch (Exception e2) {
+					pw.println("Excepcion cerrando fichero " + fichero + ": " + e2.getMessage());
+				}
+			}
+		}
+
+	}
+	
+	private static String saveAndGetKStatsFile(Ranking ranking, int goldenSize) {
 		String fichero = "csv/statistics/"+ranking.getId()+".csv";
 		FileWriter fw = null;
 		PrintWriter pw = null;
@@ -143,12 +197,12 @@ public class EvaluateRankings {
 				pw.print("k,#hits,precision,recall,fmeasure,hit");
 				pw.println();
 				
-				List<Double> kprecision = ranking.getKPrecisionList(k);
-				List<Double> krecall = ranking.getKRecallList(k, goldenSize);
-				List<Double> kfmeasure = ranking.getKFMeasureList(k, goldenSize);
-				List<Double> khits = ranking.getKHitList(k);
+				List<Double> kprecision = ranking.getKPrecisionList(max_position);
+				List<Double> krecall = ranking.getKRecallList(max_position, goldenSize);
+				List<Double> kfmeasure = ranking.getKFMeasureList(max_position, goldenSize);
+				List<Double> khits = ranking.getKHitList(max_position);
 					
-				for(int i = 0; i<k ;i++){
+				for(int i = 0; i<max_position ;i++){
 					int hit = 0;
 					if(i<ranking.getRankingList().size()){
 						hit = ranking.getRankingList().get(i).isHit()?1:0;
@@ -171,12 +225,5 @@ public class EvaluateRankings {
 		return fichero;
 	}
 
-	private static String toCsvList(List<Double> l){
-		String r = "";
-		for(Double i:l){
-			r = r + i.toString() + " ";
-		}
-		return r.substring(0, r.lastIndexOf(" ")-1);
-	}
 
 }

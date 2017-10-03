@@ -10,6 +10,7 @@ import aggregators.Aggregator;
 import aggregators.BoostedBordaFuse;
 import aggregators.BordaFuse;
 import aggregators.CordorcetAggregator;
+import aggregators.FilterExternalRankAgregator;
 import aggregators.M1;
 import aggregators.M2;
 import aggregators.M3;
@@ -26,6 +27,7 @@ import metasearch.MetaSearcherImp;
 import metasearch.Searcher;
 import metasearch.cache.CacheRankingManager;
 import ner.HiperlinkMatching;
+import ranking.RankedItem;
 import ranking.Ranking;
 import util.ConfigManager;
 import util.QueryManager;
@@ -88,6 +90,7 @@ public class AggregateData {
 		List<Searcher> silver = new ArrayList<Searcher>();
 		silver.add(lucene);
 		silver.add(google);
+		silver.add(npm);
 		for (int i = 0 ; i < max_queries ; i++) {
 
 			String query = QueryManager.getInstance().getQueries().get(i);
@@ -96,7 +99,7 @@ public class AggregateData {
 			
 			MetaSearcher meta = new MetaSearcherImp(silver, weightedFirstRankingAgregator, max_results);
 			
-			Ranking ranking = null //CacheRankingManager.getInstance().loadRankingFromCache(meta, query);
+			Ranking ranking = null; //CacheRankingManager.getInstance().loadRankingFromCache(meta, query);
 			if (ranking == null) {
 				meta.acquireData(query, proxy);
 				ranking = meta.processData(null);//TODO data null
@@ -107,6 +110,47 @@ public class AggregateData {
 
 		}*/
 		
+		
+		List<Searcher> filters = new ArrayList<Searcher>();
+		filters.add(lucene);
+		filters.add(npm);	
+		List<Searcher> externalRank = new ArrayList<Searcher>();
+		externalRank.add(google);
+		
+		FilterExternalRankAgregator filterGoogleRankAgregator = new FilterExternalRankAgregator();
+		filterGoogleRankAgregator.setName(filterGoogleRankAgregator.getPrefix()+externalRank.get(0).getId());
+
+		/*for (int i = 0 ; i < max_queries ; i++) {
+
+			String query = QueryManager.getInstance().getQueries().get(i);
+
+			System.out.println("Query "+ query);
+			
+			List<Ranking> rank_filters = new ArrayList<Ranking>();
+			for(Searcher filter:filters){
+				Ranking r = CacheRankingManager.getInstance().loadRankingFromCache(filter, query)!=null?
+						CacheRankingManager.getInstance().loadRankingFromCache(filter, query):
+							new Ranking(new ArrayList<RankedItem>());;
+				rank_filters.add(r);
+			}
+			
+			filterGoogleRankAgregator.setFilters(rank_filters);
+			
+			MetaSearcher meta = new MetaSearcherImp(externalRank, filterGoogleRankAgregator, max_results);
+			
+			Ranking ranking = null; //CacheRankingManager.getInstance().loadRankingFromCache(meta, query);
+			if (ranking == null) {
+				meta.acquireData(query, proxy);
+				ranking = meta.processData(null);//TODO data null
+				CacheRankingManager.getInstance().saveRankingInCache(ranking, meta, query);
+			}
+			
+			System.out.println();
+
+		}
+		*/
+		
+		
 		/**
 		 * Aggregators
 		 */
@@ -116,13 +160,13 @@ public class AggregateData {
 		searchers.add(google);
 		searchers.add(npm);
 		searchers.add(npmsearch);
-		//searchers.add(new MetaSearcherImp(silver, weightedFirstRankingAgregator, max_results));
+		searchers.add(new MetaSearcherImp(externalRank, filterGoogleRankAgregator, max_results));
 		
 		List<Aggregator> aggregators = new ArrayList<Aggregator>();
 
 		
 
-		Aggregator m1 = new M1();
+		/*Aggregator m1 = new M1();
 		aggregators.add(m1);
 		
 		Aggregator m2 = new M2();
@@ -132,20 +176,20 @@ public class AggregateData {
 		aggregators.add(m3);
 		
 		Aggregator m4 = new M4();
-		aggregators.add(m4);
+		aggregators.add(m4);*/
 		
-		/*Double[] weights_borda = {0.20, 0.20, 0.40, 0.20};
+		Double[] weights_borda = {0.005, 0.0025, 0.9925, 0.00, 0.00};
 		Aggregator w_borda = new WeightedBordaFuse(Arrays.asList(weights_borda));
-		aggregators.add(w_borda);*/
+		aggregators.add(w_borda);
 		
-		Aggregator borda = new BordaFuse();
+		/*Aggregator borda = new BordaFuse();
 		aggregators.add(borda);
 		
 		Aggregator boosted_borda = new BoostedBordaFuse();
 		aggregators.add(boosted_borda);
 		
 		Aggregator cordorcet = new CordorcetAggregator();
-		aggregators.add(cordorcet);
+		aggregators.add(cordorcet);*/
 		
 		for (Aggregator aggregator : aggregators) {
 			for (int i = 0 ; i < max_queries ; i++) {

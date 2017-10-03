@@ -72,9 +72,9 @@ public class BingWrapper extends SearchWrapperAbs implements Searcher {
 					Document tech = null;
 					try {
 						if (proxy != null) {
-							tech = Jsoup.connect(url).proxy(proxy).userAgent(USER_AGENT).timeout(0).get();
+							tech = Jsoup.connect(url).proxy(proxy).userAgent(USER_AGENT).timeout(30000).get();
 						} else {
-							tech = Jsoup.connect(url).userAgent(USER_AGENT).timeout(0).get();
+							tech = Jsoup.connect(url).userAgent(USER_AGENT).timeout(30000).get();
 						}		
 						results.add(tech.toString());
 					}catch (Exception e) {
