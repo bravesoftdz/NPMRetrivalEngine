@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <title>#GTMTips: Track JavaScript Errors As Events - Simo Ahava's blog</title> 
+  <link rel="canonical" href="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="#GTMTips: Track JavaScript Errors As Events - Simo Ahava's blog"> 
+  <meta property="og:description" content="Back back to the friggin’ basics. Almost two years ago, I wrote a two-parter on how to have fun with Google Tag Manager: Part 1, and Part 2. The first part had a nice exercise for tracking JavaScript Errors as Google Analytics Events, using the recently published “JavaScript Error Listener” Tag. Well, that was in …"> 
+  <meta property="og:url" content="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/"> 
+  <meta property="og:site_name" content="Simo Ahava's blog"> 
+  <meta property="article:tag" content="errors"> 
+  <meta property="article:tag" content="Google Tag Manager"> 
+  <meta property="article:tag" content="gtmtips"> 
+  <meta property="article:tag" content="JavaScript"> 
+  <meta property="article:section" content="GTM tips"> 
+  <meta property="article:published_time" content="2016-03-24T09:11:53+03:00"> 
+  <meta property="fb:admins" content="564618569"> 
+  <meta property="og:image" content="http://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-tags.png"> 
+  <meta property="og:image" content="http://www.simoahava.com/wp-content/uploads/2016/03/built-in-errors-1024x378.png"> 
+  <meta property="og:image" content="http://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-trigger-300x205.png"> 
+  <meta property="og:image" content="http://www.simoahava.com/wp-content/uploads/2016/03/google-analytics-error-tag-683x1024.png"> 
+  <meta property="og:image" content="http://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-as-goal-300x291.png"> 
+  <meta property="og:image" content="http://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-alert-1024x496.png"> 
+  <meta property="og:image" content="http://www.simoahava.com/wp-content/uploads/2016/03/error-trigger-environment-debug-1024x353.png"> 
+  <meta property="og:image" content="http://www.simoahava.com/wp-content/uploads/2016/03/random-number-sample-javascript-error-1024x307.png"> 
+  <meta property="og:image" content="http://www.simoahava.com/wp-content/uploads/2016/03/script-error-1024x186.png"> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:description" content="Back back to the friggin’ basics. Almost two years ago, I wrote a two-parter on how to have fun with Google Tag Manager: Part 1, and Part 2. The first part had a nice exercise for tracking JavaScript Errors as Google Analytics Events, using the recently published “JavaScript Error Listener” Tag. Well, that was in […]"> 
+  <meta name="twitter:title" content="#GTMTips: Track JavaScript Errors As Events - Simo Ahava's blog"> 
+  <meta name="twitter:site" content="@SimoAhava"> 
+  <meta name="twitter:image" content="http://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-tags.png"> 
+  <meta name="twitter:creator" content="@SimoAhava"> 
+  <script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"WebSite","@id":"#website","url":"https:\/\/www.simoahava.com\/","name":"Simo Ahava&#039;s blog","potentialAction":{"@type":"SearchAction","target":"https:\/\/www.simoahava.com\/?s={search_term_string}","query-input":"required name=search_term_string"}}</script> 
+  <link rel="dns-prefetch" href="//fonts.googleapis.com"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="Simo Ahava's blog » Feed" href="https://www.simoahava.com/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Simo Ahava's blog » Comments Feed" href="https://www.simoahava.com/comments/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Simo Ahava's blog » #GTMTips: Track JavaScript Errors As Events Comments Feed" href="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/feed/"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/www.simoahava.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.8.2"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,56826,8203,55356,56819),0,0),c=j.toDataURL(),b!==c&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55358,56794,8205,9794,65039),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55358,56794,8203,9794,65039),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <link rel="stylesheet" id="yarppWidgetCss-css" href="https://www.simoahava.com/wp-content/plugins/yet-another-related-posts-plugin/style/widget.css?ver=4.8.2" type="text/css" media="all"> 
+  <link rel="stylesheet" id="crayon-css" href="https://www.simoahava.com/wp-content/plugins/crayon-syntax-highlighter/css/min/crayon.min.css?ver=_2.7.2_beta" type="text/css" media="all"> 
+  <link rel="stylesheet" id="genesis-simple-share-plugin-css-css" href="//www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/css/share.css?ver=0.1.0" type="text/css" media="all"> 
+  <link rel="stylesheet" id="genesis-simple-share-genericons-css-css" href="//www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/css/genericons.css?ver=0.1.0" type="text/css" media="all"> 
+  <link rel="stylesheet" id="sixteen-nine-pro-theme-css" href="https://www.simoahava.com/wp-content/themes/sixteen-nine-pro/style.css?ver=1.0.1" type="text/css" media="all"> 
+  <link rel="stylesheet" id="dashicons-css" href="https://www.simoahava.com/wp-includes/css/dashicons.min.css?ver=4.8.2" type="text/css" media="all"> 
+  <link rel="stylesheet" id="google-font-css" href="//fonts.googleapis.com/css?family=Playfair+Display%3A400italic%7CRoboto%3A400%2C700%7CRoboto+Condensed%3A400%2C700%7CRoboto+Slab%3A400&amp;ver=2.5.3" type="text/css" media="all"> 
+  <link rel="stylesheet" id="simple-social-icons-font-css" href="https://www.simoahava.com/wp-content/plugins/simple-social-icons/css/style.css?ver=2.0.1" type="text/css" media="all"> 
+  <link rel="stylesheet" id="genesis-printstyle-plus-css" href="https://www.simoahava.com/wp-content/plugins/genesis-printstyle-plus/css/print-html5.min.css?ver=1421418660" type="text/css" media="print"> 
+  <link rel="stylesheet" id="yarppRelatedCss-css" href="https://www.simoahava.com/wp-content/plugins/yet-another-related-posts-plugin/style/related.css?ver=4.8.2" type="text/css" media="all"> 
+  <script type="text/javascript" src="https://www.simoahava.com/wp-includes/js/jquery/jquery.js?ver=1.12.4"></script> 
+  <script type="text/javascript" src="https://www.simoahava.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var CrayonSyntaxSettings = {"version":"_2.7.2_beta","is_admin":"0","ajaxurl":"https:\/\/www.simoahava.com\/wp-admin\/admin-ajax.php","prefix":"crayon-","setting":"crayon-setting","selected":"crayon-setting-selected","changed":"crayon-setting-changed","special":"crayon-setting-special","orig_value":"data-orig-value","debug":""};
+var CrayonSyntaxStrings = {"copy":"Press %s to Copy, %s to Paste","minimize":"Click To Expand Code"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://www.simoahava.com/wp-content/plugins/crayon-syntax-highlighter/js/min/crayon.min.js?ver=_2.7.2_beta"></script> 
+  <script type="text/javascript" src="//www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/sharrre/jquery.sharrre.min.js?ver=0.1.0"></script> 
+  <!--[if lt IE 9]>
+<script type='text/javascript' src='https://www.simoahava.com/wp-content/themes/genesis/lib/js/html5shiv.js?ver=3.7.3'></script>
+<![endif]--> 
+  <script type="text/javascript" src="https://www.simoahava.com/wp-content/themes/sixteen-nine-pro/js/responsive-menu.js?ver=1.0.0"></script> 
+  <script type="text/javascript" src="https://www.simoahava.com/wp-content/themes/sixteen-nine-pro/js/backstretch.js?ver=1.0.0"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var BackStretchImg = {"src":"\/\/www.simoahava.com\/wp-content\/uploads\/2014\/02\/maisema.jpg"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://www.simoahava.com/wp-content/themes/sixteen-nine-pro/js/backstretch-set.js?ver=1.0.0"></script> 
+  <script type="text/javascript" src="https://www.simoahava.com/wp-content/plugins/simple-social-icons/svgxuse.js?ver=1.1.21"></script> 
+  <link rel="https://api.w.org/" href="https://www.simoahava.com/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://www.simoahava.com/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://www.simoahava.com/wp-includes/wlwmanifest.xml"> 
+  <meta name="generator" content="WordPress 4.8.2"> 
+  <link rel="shortlink" href="https://www.simoahava.com/?p=3285"> 
+  <link rel="alternate" type="application/json+oembed" href="https://www.simoahava.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.simoahava.com%2Fgtm-tips%2Ftrack-javascript-errors-events%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="https://www.simoahava.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.simoahava.com%2Fgtm-tips%2Ftrack-javascript-errors-events%2F&amp;format=xml"> 
+  <script type="text/javascript">
+<!--
+function bb2_addLoadEvent(func) {
+	var oldonload = window.onload;
+	if (typeof window.onload != 'function') {
+		window.onload = func;
+	} else {
+		window.onload = function() {
+			oldonload();
+			func();
+		}
+	}
+}
+
+bb2_addLoadEvent(function() {
+	for ( i=0; i < document.forms.length; i++ ) {
+		if (document.forms[i].method == 'post') {
+			var myElement = document.createElement('input');
+			myElement.setAttribute('type', 'hidden');
+			myElement.name = 'bb2_screener_';
+			myElement.value = '1507035889 152.170.5.222';
+			document.forms[i].appendChild(myElement);
+		}
+	}
+});
+// --></script> 
+  <script data-cfasync="false" type="text/javascript">
+	var gtm4wp_datalayer_name = "dataLayer";
+	var dataLayer = dataLayer || [];
+	dataLayer.push({"pageTitle":"#GTMTips: Track JavaScript Errors As Events - Simo Ahava&#039;s blog","pagePostType":"post","pagePostType2":"single-post","pageCategory":["gtm-tips"],"pageAttributes":["errors","google-tag-manager","gtmtips","javascript"],"postCountOnPage":1,"postCountTotal":1});
+</script> 
+  <script data-cfasync="false">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.'+'js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-W92WQQ');</script> 
+  <link rel="icon" href="https://www.simoahava.com/wp-content/themes/sixteen-nine-pro/images/favicon.ico"> 
+  <style type="text/css" media="screen"> .simple-social-icons ul li a, .simple-social-icons ul li a:hover, .simple-social-icons ul li a:focus { background-color: #000000 !important; border-radius: 3px; color: #aaaaaa !important; border: 0px #ffffff solid !important; font-size: 18px; padding: 9px; }  .simple-social-icons ul li a:hover, .simple-social-icons ul li a:focus { background-color: #000000 !important; border-color: #ffffff !important; color: #ffffff !important; }  .simple-social-icons ul li a:focus { outline: 1px dotted #000000 !important; }</style>
+  <style type="text/css">.site-title a { color: #ffffff; }</style> 
+  <style>body { background-color: #ffffff; }</style> 
+  <link rel="amphtml" href="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/amp/">
+ </head> 
+ <body class="post-template-default single single-post postid-3285 single-format-standard custom-background content-sidebar" itemscope itemtype="https://schema.org/WebPage"> 
+  <noscript>
+   <iframe src="//www.googletagmanager.com/ns.html?id=GTM-W92WQQ" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript> 
+  <div class="site-container">
+   <header class="site-header" itemscope itemtype="https://schema.org/WPHeader">
+    <div class="wrap">
+     <div class="site-avatar">
+      <a href="https://www.simoahava.com/"><img alt="" src="https://secure.gravatar.com/avatar/f274917395e759402d57acf7c4513356?s=224&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/f274917395e759402d57acf7c4513356?s=448&amp;d=mm&amp;r=g 2x" class="avatar avatar-224 photo" height="224" width="224"></a>
+     </div>
+     <div class="title-area">
+      <p class="site-title" itemprop="headline"><a href="https://www.simoahava.com/">Simo Ahava's blog</a></p>
+      <p class="site-description" itemprop="description">What's New In Digital Analytics?</p>
+     </div>
+     <div class="widget-area header-widget-area">
+      <section id="nav_menu-2" class="widget widget_nav_menu">
+       <div class="widget-wrap">
+        <nav class="nav-header" itemscope itemtype="https://schema.org/SiteNavigationElement">
+         <ul id="menu-top" class="menu genesis-nav-menu">
+          <li id="menu-item-119" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-has-children menu-item-119"><a href="https://www.simoahava.com/" itemprop="url"><span itemprop="name">Blog</span></a> 
+           <ul class="sub-menu"> 
+            <li id="menu-item-3306" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3306"><a href="https://www.simoahava.com/blog-statistics/" itemprop="url"><span itemprop="name">Blog Statistics</span></a></li> 
+            <li id="menu-item-1327" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1327"><a href="https://www.simoahava.com/tag/google-tag-manager/" itemprop="url"><span itemprop="name">Google Tag Manager</span></a></li> 
+            <li id="menu-item-938" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-938"><a href="https://www.simoahava.com/category/analytics/" itemprop="url"><span itemprop="name">Analytics</span></a></li> 
+            <li id="menu-item-751" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-751"><a href="https://www.simoahava.com/category/digital-marketing/" itemprop="url"><span itemprop="name">Digital marketing</span></a></li> 
+            <li id="menu-item-157" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-157"><a href="https://www.simoahava.com/category/content-management/" itemprop="url"><span itemprop="name">Content management</span></a></li> 
+            <li id="menu-item-158" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-158"><a href="https://www.simoahava.com/category/seo/" itemprop="url"><span itemprop="name">SEO</span></a></li> 
+            <li id="menu-item-753" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-753"><a href="https://www.simoahava.com/category/web-design/" itemprop="url"><span itemprop="name">Web design</span></a></li> 
+            <li id="menu-item-752" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-752"><a href="https://www.simoahava.com/category/web-development/" itemprop="url"><span itemprop="name">Web development</span></a></li> 
+           </ul> </li> 
+          <li id="menu-item-1765" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-1765"><a href="https://www.simoahava.com/category/gtm-tips/" itemprop="url"><span itemprop="name">GTM tips</span></a></li> 
+          <li id="menu-item-1927" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-1927"><a href="https://www.simoahava.com/tools/" itemprop="url"><span itemprop="name">Tools</span></a> 
+           <ul class="sub-menu"> 
+            <li id="menu-item-4334" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4334"><a href="https://www.simoahava.com/tools/gtm-tools/" itemprop="url"><span itemprop="name">GTM Tools</span></a></li> 
+            <li id="menu-item-4340" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4340"><a href="https://www.simoahava.com/tools/chrome-extensions/" itemprop="url"><span itemprop="name">Chrome Extensions</span></a></li> 
+            <li id="menu-item-4348" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4348"><a href="https://www.simoahava.com/tools/google-analytics-validator/" itemprop="url"><span itemprop="name">Google Analytics Validator</span></a></li> 
+            <li id="menu-item-4347" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4347"><a href="https://www.simoahava.com/tools/google-analytics-custom-dimension-manager/" itemprop="url"><span itemprop="name">Google Analytics Custom Dimension Manager</span></a></li> 
+           </ul> </li> 
+          <li id="menu-item-120" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-120"><a href="https://www.simoahava.com/about-simo-ahava/" itemprop="url"><span itemprop="name">About Simo Ahava</span></a></li> 
+         </ul>
+        </nav>
+       </div>
+      </section> 
+      <section id="simple-social-icons-2" class="widget simple-social-icons">
+       <div class="widget-wrap">
+        <h4 class="widget-title widgettitle">Contact me</h4> 
+        <ul class="aligncenter">
+         <li class="ssi-gplus"><a href="https://plus.google.com/+SimoAhava" target="_blank">
+           <svg role="img" class="social-gplus" aria-labelledby="social-gplus">
+            <use xlink:href="https://www.simoahava.com/wp-content/plugins/simple-social-icons/symbol-defs.svg#social-gplus"></use>
+           </svg></a></li>
+         <li class="ssi-linkedin"><a href="https://fi.linkedin.com/in/simoahava" target="_blank">
+           <svg role="img" class="social-linkedin" aria-labelledby="social-linkedin">
+            <use xlink:href="https://www.simoahava.com/wp-content/plugins/simple-social-icons/symbol-defs.svg#social-linkedin"></use>
+           </svg></a></li>
+         <li class="ssi-rss"><a href="https://www.simoahava.com/feed/" target="_blank">
+           <svg role="img" class="social-rss" aria-labelledby="social-rss">
+            <use xlink:href="https://www.simoahava.com/wp-content/plugins/simple-social-icons/symbol-defs.svg#social-rss"></use>
+           </svg></a></li>
+         <li class="ssi-twitter"><a href="https://www.twitter.com/SimoAhava" target="_blank">
+           <svg role="img" class="social-twitter" aria-labelledby="social-twitter">
+            <use xlink:href="https://www.simoahava.com/wp-content/plugins/simple-social-icons/symbol-defs.svg#social-twitter"></use>
+           </svg></a></li>
+        </ul>
+       </div>
+      </section> 
+      <section id="text-2" class="widget widget_text">
+       <div class="widget-wrap"> 
+        <div class="textwidget">
+         simo (at) simoahava.com
+        </div> 
+       </div>
+      </section> 
+     </div>
+     <footer class="site-footer" itemscope itemtype="https://schema.org/WPFooter">
+      <div class="wrap"></div>
+     </footer>
+    </div>
+   </header>
+   <div class="site-inner">
+    <div class="content-sidebar-wrap">
+     <main class="content">
+      <div class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+       You are here: 
+       <span class="breadcrumb-link-wrap" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="https://www.simoahava.com/" itemprop="item"><span itemprop="name">Home</span></a></span> 
+       <span aria-label="breadcrumb separator">/</span> 
+       <span class="breadcrumb-link-wrap" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"><a href="https://www.simoahava.com/category/gtm-tips/" itemprop="item"><span itemprop="name">GTM tips</span></a></span> 
+       <span aria-label="breadcrumb separator">/</span> #GTMTips: Track JavaScript Errors As Events
+      </div>
+      <article class="post-3285 post type-post status-publish format-standard category-gtm-tips tag-errors tag-google-tag-manager tag-gtmtips tag-javascript entry" itemscope itemtype="https://schema.org/CreativeWork">
+       <header class="entry-header">
+        <h1 class="entry-title" itemprop="headline">#GTMTips: Track JavaScript Errors As Events</h1> 
+        <p class="entry-meta"><time class="entry-time" itemprop="datePublished" datetime="2016-03-24T09:11:53+00:00">24/03/2016</time> by <span class="entry-author" itemprop="author" itemscope itemtype="https://schema.org/Person"><a href="https://www.simoahava.com/author/admin/" class="entry-author-link" itemprop="url" rel="author"><span class="entry-author-name" itemprop="name">Simo Ahava</span></a></span> <span class="entry-comments-link"><a href="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/#comments"><span class="dsq-postid" data-dsqidentifier="3285 http://www.simoahava.com/?p=3285">14 Comments</span></a></span> </p>
+       </header>
+       <div class="entry-content" itemprop="text">
+        <div class="share-before share-filled share-small" id="share-before-3285">
+         <div class="googlePlus" id="googleplus-before-3285" data-url="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/" data-urlalt="https://www.simoahava.com/?p=3285" data-text="#GTMTips: Track JavaScript Errors As Events" data-title="Share"></div>
+         <div class="facebook" id="facebook-before-3285" data-url="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/" data-urlalt="https://www.simoahava.com/?p=3285" data-text="#GTMTips: Track JavaScript Errors As Events" data-title="Share"></div>
+         <div class="twitter" id="twitter-before-3285" data-url="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/" data-urlalt="https://www.simoahava.com/?p=3285" data-text="#GTMTips: Track JavaScript Errors As Events" data-title="Tweet"></div>
+         <div class="linkedin" id="linkedin-before-3285" data-url="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/" data-urlalt="https://www.simoahava.com/?p=3285" data-text="#GTMTips: Track JavaScript Errors As Events" data-title="Share"></div>
+        </div> 
+        <script type="text/javascript">
+				jQuery(document).ready(function($) {
+					$('#googleplus-before-3285').sharrre({
+										  share: {
+										    googlePlus: true
+										  },
+										  urlCurl: 'https://www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/sharrre/sharrre.php',
+										  enableHover: false,
+										  enableTracking: true,
+										  buttons: {  },
+										  click: function(api, options){
+										    api.simulateClick();
+										    api.openPopup('googlePlus');
+										  }
+										});
+$('#facebook-before-3285').sharrre({
+										  share: {
+										    facebook: true
+										  },
+										  urlCurl: 'https://www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/sharrre/sharrre.php',
+										  enableHover: false,
+										  enableTracking: true,
+										  buttons: {  },
+										  click: function(api, options){
+										    api.simulateClick();
+										    api.openPopup('facebook');
+										  }
+										});
+$('#twitter-before-3285').sharrre({
+										  share: {
+										    twitter: true
+										  },
+										  urlCurl: 'https://www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/sharrre/sharrre.php',
+										  enableHover: false,
+										  enableTracking: true,
+										  buttons: {  twitter: { via: 'SimoAhava' } },
+										  click: function(api, options){
+										    api.simulateClick();
+										    api.openPopup('twitter');
+										  }
+										});
+$('#linkedin-before-3285').sharrre({
+										  share: {
+										    linkedin: true
+										  },
+										  urlCurl: 'https://www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/sharrre/sharrre.php',
+										  enableHover: false,
+										  enableTracking: true,
+										  buttons: {  },
+										  click: function(api, options){
+										    api.simulateClick();
+										    api.openPopup('linkedin');
+										  }
+										});
+
+				});
+		</script>
+        <p>Back back to the friggin’ basics. Almost two years ago, I wrote a two-parter on how to have fun with <a href="https://tagmanager.google.com/">Google Tag Manager</a>: <a href="http://www.simoahava.com/analytics/fun-with-google-tag-manager-part-1/">Part 1</a>, and <a href="http://www.simoahava.com/analytics/fun-google-tag-manager-part-2/">Part 2</a>. The first part had a nice exercise for tracking JavaScript Errors as Google Analytics Events, using the recently published “JavaScript Error Listener” Tag. </p> 
+        <p>Well, that was in GTM V1. Now we’ve been smoothly sailing with the wonderful new interface for well over a year, and it’s time to update some of these nifty tricks. In this <a href="http://www.simoahava.com/category/gtm-tips/">#GTMTips</a> post, I’ll show you how to track uncaught JavaScript errors in the new interface, plus give you some tips on the overall process.</p> 
+        <h2>Tip 43: Track JavaScript Errors As Events</h2> 
+        <p><a href="http://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-tags.png" rel="attachment wp-att-3287"><img src="https://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-tags.png" alt="Track JavaScript Errors As Events In Google Tag Manager" width="960" height="540" class="simo"></a><br> The process is actually really simple. Much easier than it was in the previous Google Tag Manager interface.</p> 
+        <p>By the way, <em>uncaught</em> refers to an error which hasn’t been captured and handled by any of the scripts on the page. The most common way to catch an error is to use <code>try...catch</code> blocks around your code, which capture any errors which bubble up to the context where you have the block. If an error makes its way through without having been caught in any way, it will trigger the JavaScript Error Trigger. Thus it’s a good way to audit your current error detection methods, too!</p> 
+        <p>Anyway, you start by making sure the Built-In Variables are activated.<br> <a href="http://www.simoahava.com/wp-content/uploads/2016/03/built-in-errors.png" rel="attachment wp-att-3288"><img src="https://www.simoahava.com/wp-content/uploads/2016/03/built-in-errors-1024x378.png" alt="Built-In Error Variables" width="1024" height="378" class="simo"></a><br> If you’re curious about these Built-In Variables, check the relevant section of my <a href="http://www.simoahava.com/analytics/variable-guide-google-tag-manager/#builtin">Variable Guide For Google Tag Manager</a>.</p> 
+        <p>Next, head on over to <strong>Triggers</strong>, and create a new one:<br> <a href="http://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-trigger.png" rel="attachment wp-att-3289"><img src="https://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-trigger-300x205.png" alt="JavaScript Error Trigger" width="300" height="205" class="simo"></a><br> I’m going to let the Trigger fire on “All JavaScript Errors”, but be sure to read to the end of this post for tips regarding this selection.</p> 
+        <p>Finally, you need a Google Analytics Event Tag, which collects and concatenates all this information. Here’s what I use:<br> <a href="http://www.simoahava.com/wp-content/uploads/2016/03/google-analytics-error-tag.png" rel="attachment wp-att-3290"><img src="https://www.simoahava.com/wp-content/uploads/2016/03/google-analytics-error-tag-683x1024.png" alt="Google Analytics Error Tag" width="683" height="1024" class="simo"></a><br> An example result using these settings would be something like:</p> 
+        <p><strong>Event Category</strong>: JavaScript Error<br> <strong>Event Action</strong>: Uncaught ReferenceError: appear is not defined<br> <strong>Event Label</strong>: 1255: http://www.simoahava.com/scripts/bundle.js</p> 
+        <p>I’m sending the event as <a href="https://support.google.com/analytics/answer/1033068#NonInteractionEvents">Non-Interaction: True</a>, because it’s not a user interaction, and I don’t want it to be counted as such.</p> 
+        <p>And that’s it for the implementation! </p> 
+        <p>Now, there are some things you might want to consider when implementing this on your own website. The next chapter will tackle these issues.</p> 
+        <h2>Tips</h2> 
+        <p>Tracking JavaScript Errors can be quite the bipolar experience. On the one hand, it’s just a good, solid developer attitude to want to know about what’s breaking up or already broken on your site. On the other hand, it can cause a deluge of Events in your Google Analytics profile, leading to sessions reaching their hit limits and severe sampling issues. So here are a couple of tips to manage it all.</p> 
+        <h3>1. Track errors as Google Analytics Goals</h3> 
+        <p>“Track ERRORS as GOALS, what has he been smoking?!” I hear you exclaim. Yeah, it’s not a <em>business</em> goal, but goals can also be <strong>negative</strong> goals. The reason I’m interested in this particular negative goal, is because I want to see a <strong>Conversion Rate</strong> for sessions with JavaScript Errors. This will allow me to do all sorts of cool analyses on how the error rates are fluctuating over time. To set up the goal, you can use the following settings:<br> <a href="http://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-as-goal.png" rel="attachment wp-att-3291"><img src="https://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-as-goal-300x291.png" alt="JavaScript Error As GA Goal" width="300" height="291" class="simo"></a><br> Next, you can create an <strong>Alert</strong>, which sends you an email every time the number of JavaScript Errors has gone up significantly on your site:<br> <a href="http://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-alert.png" rel="attachment wp-att-3292"><img src="https://www.simoahava.com/wp-content/uploads/2016/03/javascript-error-alert-1024x496.png" alt="JavaScript Error Google Analytics Alert" width="1024" height="496" class="simo"></a><br> Now you’ll get an email every time there’s a significant increase in the number of JavaScript Errors recorded on your site.</p> 
+        <h3>2. Use Environments or the Debug Mode</h3> 
+        <p>Tracking <em>every single uncaught JavaScript error</em> can lead to a deluge of hits. The modern website is best known for the number of errors it dispatches, not the fancy UI or the awesome new framework it utilizes. To keep the number of errors down, you might want to delimit them to only fire in a <a href="http://www.simoahava.com/analytics/better-qa-with-google-tag-manager-environments/">specific environment</a>, or when in the Debug Mode. You could, for example, allow the Error Trigger to work only in the staging environment.<br> <a href="http://www.simoahava.com/wp-content/uploads/2016/03/error-trigger-environment-debug.png" rel="attachment wp-att-3293"><img src="https://www.simoahava.com/wp-content/uploads/2016/03/error-trigger-environment-debug-1024x353.png" alt="JavaScript Error in Environments or Debug Mode" width="1024" height="353" class="simo"></a><br> This way only errors triggered by your testers and developers will be recorded. The downside, of course, is that it’s not an authentic setting, and no matter how much you test and debug, you will always miss some things. </p> 
+        <h3>3. Add manual sampling</h3> 
+        <p>Another way to prevent every single error from dispatching is to manually sample the hits that are sent to Google Analytics. You could, for example, only let the Trigger fire for 50% of recorded errors. You can use the Random Number Built-In Variable here:<br> <a href="http://www.simoahava.com/wp-content/uploads/2016/03/random-number-sample-javascript-error.png" rel="attachment wp-att-3294"><img src="https://www.simoahava.com/wp-content/uploads/2016/03/random-number-sample-javascript-error-1024x307.png" alt="Random Number sampling for Error Trigger" width="1024" height="307" class="simo"></a><br> The trick is to only fire the Trigger when the Random Number Variable returns a number that ends in 0, 1, 2, 3 or 4. That’s 50% of the possible numbers it can end in.</p> 
+        <p>Naturally, the downside here is that you might miss some outlier errors, which only pop up every now and then. But you should still catch most of the significant ones.</p> 
+        <h3>4. Script Error</h3> 
+        <p>If your site is using JavaScript files loaded from external content distribution networks, the messages and line numbers of the errors dispatched in these external scripts are not exposed in the browser. This is a reality you’ll have to work with. There’s no way to identify where and what error took place, as the browser will only dispatch the nondescript “Script Error.” message with a line number of 0. The URL of the script is still exposed, though, and you can use that to narrow down the possible errors.<br> <a href="http://www.simoahava.com/wp-content/uploads/2016/03/script-error.png" rel="attachment wp-att-3295"><img src="https://www.simoahava.com/wp-content/uploads/2016/03/script-error-1024x186.png" alt="Script Error " width="1024" height="186" class="simo"></a><br> It’s a good idea to host as many scripts as possible on your own website. Not only will you know more about the errors that are thrown, but also being subservient to an external CDN can introduce security issues, if the third party decides to add some malicious or dangerous code to the library you’re using (or if they’re hacked).</p> 
+        <h2>Summary</h2> 
+        <p>I hope this tip has been useful. Tracking errors is one of the ways to make sure that your website is catering an optimized experience for your visitors. Google Analytics provides a great tool for tracking these errors, because it also lets you create session- and user-scoped segments around error events. With those segments, you can start analyzing the actual business impact of errors thrown on the site. </p> 
+        <p>An error in the eCommerce checkout funnel can be destructive to your business, and using Google Analytics for detection can help you get on top of things before you’ve lost too much money.</p> 
+        <div class="share-after share-filled share-small" id="share-after-3285">
+         <div class="googlePlus" id="googleplus-after-3285" data-url="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/" data-urlalt="https://www.simoahava.com/?p=3285" data-text="#GTMTips: Track JavaScript Errors As Events" data-title="Share"></div>
+         <div class="facebook" id="facebook-after-3285" data-url="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/" data-urlalt="https://www.simoahava.com/?p=3285" data-text="#GTMTips: Track JavaScript Errors As Events" data-title="Share"></div>
+         <div class="twitter" id="twitter-after-3285" data-url="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/" data-urlalt="https://www.simoahava.com/?p=3285" data-text="#GTMTips: Track JavaScript Errors As Events" data-title="Tweet"></div>
+         <div class="linkedin" id="linkedin-after-3285" data-url="https://www.simoahava.com/gtm-tips/track-javascript-errors-events/" data-urlalt="https://www.simoahava.com/?p=3285" data-text="#GTMTips: Track JavaScript Errors As Events" data-title="Share"></div>
+        </div> 
+        <script type="text/javascript">
+				jQuery(document).ready(function($) {
+					$('#googleplus-after-3285').sharrre({
+										  share: {
+										    googlePlus: true
+										  },
+										  urlCurl: 'https://www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/sharrre/sharrre.php',
+										  enableHover: false,
+										  enableTracking: true,
+										  buttons: {  },
+										  click: function(api, options){
+										    api.simulateClick();
+										    api.openPopup('googlePlus');
+										  }
+										});
+$('#facebook-after-3285').sharrre({
+										  share: {
+										    facebook: true
+										  },
+										  urlCurl: 'https://www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/sharrre/sharrre.php',
+										  enableHover: false,
+										  enableTracking: true,
+										  buttons: {  },
+										  click: function(api, options){
+										    api.simulateClick();
+										    api.openPopup('facebook');
+										  }
+										});
+$('#twitter-after-3285').sharrre({
+										  share: {
+										    twitter: true
+										  },
+										  urlCurl: 'https://www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/sharrre/sharrre.php',
+										  enableHover: false,
+										  enableTracking: true,
+										  buttons: {  twitter: { via: 'SimoAhava' } },
+										  click: function(api, options){
+										    api.simulateClick();
+										    api.openPopup('twitter');
+										  }
+										});
+$('#linkedin-after-3285').sharrre({
+										  share: {
+										    linkedin: true
+										  },
+										  urlCurl: 'https://www.simoahava.com/wp-content/plugins/genesis-simple-share/lib/sharrre/sharrre.php',
+										  enableHover: false,
+										  enableTracking: true,
+										  buttons: {  },
+										  click: function(api, options){
+										    api.simulateClick();
+										    api.openPopup('linkedin');
+										  }
+										});
+
+				});
+		</script>
+        <div class="yarpp-related"> 
+         <h3 style="margin-top: 5px;">Related posts:</h3>
+         <ol> 
+          <li><a href="https://www.simoahava.com/gtm-tips/track-outbound-links-in-gtm-v2/" rel="bookmark" title="#GTMtips: Track Outbound Links In GTM V2">#GTMtips: Track Outbound Links In GTM V2 </a></li> 
+          <li><a href="https://www.simoahava.com/gtm-tips/track-file-downloads-in-gtm-v2/" rel="bookmark" title="#GTMtips: Track File Downloads In GTM V2">#GTMtips: Track File Downloads In GTM V2 </a></li> 
+          <li><a href="https://www.simoahava.com/gtm-tips/track-url-fragments-as-pageviews/" rel="bookmark" title="#GTMtips: Track URL Fragments As Pageviews">#GTMtips: Track URL Fragments As Pageviews </a></li> 
+          <li><a href="https://www.simoahava.com/gtm-tips/gtmtips-track-launch-campaigns-in-gtm-for-ios/" rel="bookmark" title="#GTMTips: Track Launch Campaigns In GTM For iOS">#GTMTips: Track Launch Campaigns In GTM For iOS </a></li> 
+         </ol> 
+        </div> 
+       </div>
+       <footer class="entry-footer">
+        <p class="entry-meta"><span class="entry-categories">Filed Under: <a href="https://www.simoahava.com/category/gtm-tips/" rel="category tag">GTM tips</a></span> <span class="entry-tags">Tagged With: <a href="https://www.simoahava.com/tag/errors/" rel="tag">errors</a>, <a href="https://www.simoahava.com/tag/google-tag-manager/" rel="tag">Google Tag Manager</a>, <a href="https://www.simoahava.com/tag/gtmtips/" rel="tag">gtmtips</a>, <a href="https://www.simoahava.com/tag/javascript/" rel="tag">JavaScript</a></span></p>
+       </footer>
+      </article>
+      <div class="widget-area">
+       <section id="user-profile-2" class="widget user-profile">
+        <div class="widget-wrap">
+         <p><span class="alignleft"><img alt="" src="https://secure.gravatar.com/avatar/f274917395e759402d57acf7c4513356?s=45&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/f274917395e759402d57acf7c4513356?s=90&amp;d=mm&amp;r=g 2x" class="avatar avatar-45 photo" height="45" width="45"></span>Simo Ahava is Senior Data Advocate at Reaktor. He is also Google Developer Expert for Google Analytics. He's worked with web development and SEO since 1997, with Google Analytics since urchin.js, and with Google Tag Manager since its release. In his spare time he plays the ukulele. <a class="pagelink" href="https://www.simoahava.com/about-simo-ahava/">Read More…</a></p> 
+        </div>
+       </section> 
+      </div> 
+      <div class="dcl-disqus-thread" id="comments"> 
+       <div id="disqus_thread"> 
+       </div> 
+      </div> 
+      <script type="text/javascript">
+	/* <![CDATA[ */
+		var disqus_url = 'https://www.simoahava.com/gtm-tips/track-javascript-errors-events/';
+		var disqus_identifier = '3285 http://www.simoahava.com/?p=3285';
+		var disqus_container_id = 'disqus_thread';
+		var disqus_domain = 'disqus.com';
+		var disqus_shortname = 'simoahava';
+		var disqus_title = "#GTMTips: Track JavaScript Errors As Events";
+		var disqus_config = function () {
+			var config = this; // Access to the config object
+			config.language = '';
+
+			/* Add the ability to add javascript callbacks */
+			
+			/*
+			   All currently supported events:
+				* preData — fires just before we request for initial data
+				* preInit - fires after we get initial data but before we load any dependencies
+				* onInit  - fires when all dependencies are resolved but before dtpl template is rendered
+				* afterRender - fires when template is rendered but before we show it
+				* onReady - everything is done
+			 */
+
+			config.callbacks.preData.push(function() {
+				// clear out the container (its filled for SEO/legacy purposes)
+				document.getElementById(disqus_container_id).innerHTML = '';
+			});
+						config.callbacks.onReady.push(function() {
+				// sync comments in the background so we don't block the page
+				var script = document.createElement('script');
+				script.async = true;
+				script.src = '?cf_action=sync_comments&post_id=3285';
+
+				var firstScript = document.getElementsByTagName( "script" )[0];
+				firstScript.parentNode.insertBefore(script, firstScript);
+			});
+								};
+	/* ]]> */
+	</script> 
+      <script type="text/javascript">
+	/* <![CDATA[ */
+		var DsqLocal = {
+			'trackbacks': [
+				],
+			'trackback_url': "https:\/\/www.simoahava.com\/gtm-tips\/track-javascript-errors-events\/trackback\/"		};
+	/* ]]> */
+	</script> 
+     </main>
+     <aside class="sidebar sidebar-primary widget-area" role="complementary" aria-label="Primary Sidebar" itemscope itemtype="https://schema.org/WPSideBar">
+      <section id="search-2" class="widget widget_search">
+       <div class="widget-wrap">
+        <h4 class="widget-title widgettitle">Search content</h4> 
+        <form class="search-form" itemprop="potentialAction" itemscope itemtype="https://schema.org/SearchAction" method="get" action="https://www.simoahava.com/" role="search">
+         <meta itemprop="target" content="https://www.simoahava.com/?s={s}">
+         <input itemprop="query-input" type="search" name="s" placeholder="Search this website …">
+         <input type="submit" value="Search">
+        </form>
+       </div>
+      </section> 
+      <section id="custom_html-2" class="widget_text widget widget_custom_html">
+       <div class="widget_text widget-wrap">
+        <h4 class="widget-title widgettitle">Upcoming talks</h4> 
+        <div class="textwidget custom-html-widget">
+         <ul> 
+          <li><strong>23 September 2017</strong> - <a href="http://london.measurecamp.org/">MeasureCamp</a>, London</li> 
+          <li><strong>28 September 2017</strong> - <a href="https://conversionjam.com/stockholm-2017">Conversion Jam</a>, Stockholm</li> 
+          <li><strong>20 March 2018</strong> - <a href="https://smxmuenchen.de/">SMX München</a></li> 
+         </ul>
+        </div>
+       </div>
+      </section> 
+      <section id="dcl_latest_comments-2" class="widget widget_dcl_latest_comments">
+       <div class="widget-wrap">
+        <h4 class="widget-title widgettitle">Recent comments</h4> 
+        <style>
+					.dsq-widget-user{
+					text-decoration:none;
+					display:block;
+					font-family:'Trebuchet MS',Helvetica,sans-serif;
+					}
+					.dsq-widget-comment{
+					font-family:'Trebuchet MS',Helvetica,sans-serif;
+					display:block;
+					}
+					.dsq-widget-meta a{
+					text-decoration:none;
+					font-family:'Trebuchet MS',Helvetica,sans-serif;
+					}
+					.dsq-widget-item{
+					border-left:3px solid #a0a0a0;
+					padding-left:10px;
+					transition-property: background-color, color;
+					transition-duration: 1s;
+					transition-timing-function: ease-out;
+					} 
+					.dsq-widget-item p a{
+					text-decoration:none;
+					}
+					.dsq-widget-item:hover{
+					border-left:3px solid #a0a0a0;
+					border-right:3px solid #a0a0a0;
+					padding-left:10px;
+					background-color:#eaeaea;
+					}
+					.dsq-widget-avatar{
+					border-radius:100px;
+					}
+					h3{
+					font-family:'Trebuchet MS',Helvetica,sans-serif;
+					}
+				</style>
+        <script type="text/javascript" src="https://simoahava.disqus.com/recent_comments_widget.js?num_items=5&amp;hide_avatars=1&amp;avatar_size=35&amp;excerpt_length=25&amp;rand=994687570"></script>
+       </div>
+      </section> 
+     </aside>
+    </div>
+   </div>
+  </div>
+  <script type="text/javascript" src="https://www.simoahava.com/wp-includes/js/comment-reply.min.js?ver=4.8.2"></script> 
+  <script type="text/javascript" src="https://www.simoahava.com/wp-includes/js/wp-embed.min.js?ver=4.8.2"></script> 
+  <script data-cfasync="false" type="text/javascript">
+					/* <![CDATA[ */
+					var hash = window.location.hash;
+                                        var disqus_shortname = 'simoahava';
+					if(hash!==''){
+					var ds_loaded = true;
+					var dcl_loaded = 1;
+					(function() {
+						var dsq = document.createElement('script'); dsq.type = 'text/javascript';
+						dsq.async = true;
+						dsq.src = '//' + disqus_shortname + '.' + 'disqus.com' + '/' + 'embed' + '.js' + '?pname=wordpress&pver=<?php echo DISQUS_VERSION; ?>';
+						(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+					})();}
+					/* ]]> */
+					</script>
+  <script data-cfasync="false" type="text/javascript">
+					var disqus_shortname = "simoahava";
+					if (typeof ds_loaded == "undefined") {
+						var ds_loaded = false; //To track loading only once on a page.
+					}
+					function loadDisqus()
+					{
+						var disqus_div = document.getElementById("disqus_thread"); //The ID of the Disqus DIV tag
+						var top = disqus_div.offsetTop;
+						var disqus_data = disqus_div.dataset;
+						if ( !ds_loaded && ( window.scrollY || window.pageYOffset ) + window.innerHeight > top ) 
+						{
+							ds_loaded = true;
+							for (var key in disqus_data) 
+							{
+								if (key.substr(0,6) == "disqus") 
+								{
+									window["disqus_" + key.replace("disqus","").toLowerCase()] = disqus_data[key];
+								}
+							}
+							var dsq = document.createElement("script");
+							dsq.type = "text/javascript";
+							dsq.async = true;
+							dsq.src = "https://" + window.disqus_shortname + ".disqus.com/embed.js";
+							if(document.getElementById("dcl-hidden-div")) {
+								document.getElementById("dcl-hidden-div").innerHTML = "Loading...";
+							}
+							(document.getElementsByTagName("head")[0] || document.getElementsByTagName("body")[0]).appendChild(dsq);
+						}    
+					}
+					var disqus_div_new = document.getElementById("disqus_thread");
+					var divExists = disqus_div_new != null;
+					if(document.body.scrollHeight < window.innerHeight){
+						loadDisqus();
+					} else if(divExists) {
+						window.onscroll = function() { loadDisqus(); }
+					}
+					</script> 
+ </body>
+</html>
