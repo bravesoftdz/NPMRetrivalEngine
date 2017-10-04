@@ -1,0 +1,690 @@
+<!doctype html>
+<html lang="en" class="no-js">
+ <head>
+  <meta charset="utf-8"> 
+  <title>A phone call from the cloud: Windows Azure, SignalR &amp; Twilio - Maarten Balliauw {blog}</title>
+  <meta property="og:locale" content="en">
+  <meta property="og:site_name" content="Maarten Balliauw {blog}">
+  <meta property="og:title" content="A phone call from the cloud: Windows Azure, SignalR &amp; Twilio">
+  <link rel="canonical" href="https://blog.maartenballiauw.be/post/2012/11/12/a-phone-call-from-the-cloud-windows-azure-signalr-twilio.html">
+  <meta property="og:url" content="https://blog.maartenballiauw.be/post/2012/11/12/a-phone-call-from-the-cloud-windows-azure-signalr-twilio.html">
+  <meta property="og:description" content="Note: this blog post used to be an article for the Windows Azure Roadtrip website. Since that one no longer exists, I decided to post the articles on my blog as well. Find the source code for this post here: 05 ConfirmPhoneNumberDemo.zip (1.32 mb). It has been written earlier this year, some versions of packages used (like jQuery or SignalR) may be outdated in this post. Live with it.In the previous blog post we saw how you can send e-mails from Windows Azure. Why not take communication a step further and make a phone call from Windows Azure? I’ve already mentioned that Windows Azure is a platform which will run your code, topped with some awesomesauce in the form of a large number of components that will speed up development. One of those components is the API provided by Twilio, a third-party service.Twilio is a telephony web-service API that lets you use your existing web languages and skills to build voice and SMS applications. Twilio Voice allows your applications to make and receive phone calls. Twilio SMS allows your applications to make and receive SMS messages. We’ll use Twilio Voice in conjunction with jQuery and SignalR to spice up a sign-up process.The scenarioThe idea is simple: we want users to sign up using a username and password. In addition, they’ll have to provide their phone number. The user will submit the sign-up form and will be displayed a confirmation code. In the background, the user will be called and asked to enter this confirmation code in order to validate his phone number. Once finished, the browser will automatically continue the sign-up process. Here’s a visual:Sounds too good to be true? Get ready, as it’s relatively simple using Windows Azure and Twilio.Let’s start…Before we begin, make sure you have a Twilio account. Twilio offers some free credits, enough to test with. After registering, make sure that you enable international calls and that your phone number is registered as a developer. Twilio takes this step in order to ensure that their service isn’t misused for making abusive phone calls using free developer accounts.Next, create a Windows Azure project containing an ASP.NET MVC 4 web role. Install the following NuGet packages in it (right-click, Library Package Manager, go wild): jQuery jQuery.UI.Combined jQuery.Validation json2 Modernizr SignalR Twilio Twilio.Mvc Twilio.TwiML It may also be useful to develop some familiarity with the concepts behind SignalR.The registration formLet’s create our form. Using a simple model class, SignUpModel, create the following action method:public ActionResult Index(){ return View(new SignUpModel());}This action method is accompanied with a view, a simple form requesting the required information from our user:@using (Html.BeginForm(&quot;SignUp&quot;, &quot;Home&quot;, FormMethod.Post)) { @Html.ValidationSummary(true) <fieldset> <legend>Sign Up for this awesome service</legend> @* etc etc etc *@ <div class=&quot;editor-label&quot;> @Html.LabelFor(model => model.Phone) </div> <div class=&quot;editor-field&quot;> @Html.EditorFor(model => model.Phone) @Html.ValidationMessageFor(model => model.Phone) </div> <p> <input type=&quot;submit&quot; value=&quot;Sign up!&quot; /> </p> </fieldset>}We’ll spice up this form with a dialog first. Using jQuery UI, we can create a simple <div> element which will serve as the dialog’s content. Note the ui-helper-hidden class which is used to make it invisible to view.<div id=&quot;phoneDialog&quot; class=&quot;ui-helper-hidden&quot;> <h1>Keep an eye on your phone...</h1> <p>Pick up the phone and follow the instructions.</p> <p>You will be asked to enter the following code:</p> <h2>1743</h2></div>This is a simple dialog in which we’ll show a hardcoded confirmation code which the user will have to provide when called using Twilio.Next, let’s code our JavaScript logic which will spice up this form. First, add the required JavaScript libraries for SignalR (more on that later):<script src=&quot;@Url.Content(&quot;~/Scripts/jquery.signalR-0.5.0.min.js&quot;)&quot; type=&quot;text/javascript&quot;></script><script src=&quot;@Url.Content(&quot;~/signalr/hubs&quot;)&quot; type=&quot;text/javascript&quot;></script>Next, capture the form’s submit event and, if the phone number has not been validated yet, cancel the submit event and show our dialog instead:$('form:first').submit(function (e) { if ($(this).valid() &amp;&amp; $('#Phone').data('validated') != true) { // Show a dialog $('#phoneDialog').dialog({ title: '', modal: true, width: 400, height: 400, resizable: false, beforeClose: function () { if ($('#Phone').data('validated') != true) { return false; } } }); // Don't submit. Yet. e.preventDefault(); }});Nothing fancy yet. If you now run this code, you’ll see that a dialog opens and remains open for eternity. Let’s craft some SignalR code now. SignalR uses a concept of Hubs to enable client-server communication, but also server-client communication. We’ll need the latter to inform our view whenever the user has confirmed his phone number. In the project, add the following class: [HubName(&quot;phonevalidator&quot;)]public class PhoneValidatorHub : Hub{ public void StartValidation(string phoneNumber) { }} This class defines a service that the client can call. SignalR will also keep the connection with the client open so that this PhoneValidatorHub can later send a message to the client as well. Let’s connect our view to this hub. In the form submit event handler, add the following line of code:// Validate the phone number using Twilio$.connection.phonevalidator.startValidation($('#Phone').val());We’ve created a C# class with a StartValidation method and we’re calling the startValidation message from JavaScript. Coincidence? No. SignalR makes this possible. But we’re not finished yet. We can now call a method on the server side, but how would the server inform the client when the phone number has been validated? I’ll get to that point later. First, let’s make sure our JavaScript code can receive that call from the server. To do so, connect to the PhoneValidator hub and add a callback function to it: var validatorHub = $.connection.phonevalidator;validatorHub.validated = function (phoneNumber) { if (phoneNumber == $('#Phone').val()) { $('#Phone').data('validated', true); $('#phoneDialog').dialog('destroy'); $('form:first').trigger('submit'); }};$.connection.hub.start(); What we’re doing here is adding a client-side function named validated to the SignalR hub. We can call this function, sitting at the client side, from our server-side code later on. The function itself is easy: it checks whether the phone number that was validated matches the one the user entered and, if so, it submits the form and completes the signup.All that’s left is calling the user and, when the confirmation succeeds, we’ll have to inform our client by calling the validated message on the hub.Initiating a phone callThe phone call to our user will be initiated in the PhoneValidatorHub’s StartValidation method. Add the following code there:var twilioClient = new TwilioRestClient(&quot;api user&quot;, &quot;api password&quot;); string url = &quot;http://mas.cloudapp.net/Home/TwilioValidationMessage?passcode=1743&quot; + &quot;&amp;phoneNumber=&quot; + HttpContext.Current.Server.UrlEncode(phoneNumber); // Instantiate the call options that are passed to the outbound callCallOptions options = new CallOptions();options.From = &quot;+14155992671&quot;; // Twilio's developer number options.To = phoneNumber;options.Url = url; // Make the call.twilioClient.InitiateOutboundCall(options);Using the TwilioRestClient class, we create a request to Twilio. We also pass on a URL which points to our application. Twilio uses TwiML, an XML format to instruct their phone services. When calling the InitiateOutboundCall method, Twilio will issue a request to the URL we are hosting (http://.....cloudapp.net/Home/TwilioValidationMessage) to fetch the TwiML which tells Twilio what to say, ask, record, gather, … on the phone.Next up: implementing the TwilioValidationMessage action method.public ActionResult TwilioValidationMessage(string passcode, string phoneNumber){ var response = new TwilioResponse(); response.Say(&quot;Hi there, welcome to Maarten's Awesome Service.&quot;); response.Say(&quot;To validate your phone number, please enter the 4 digit&quot; + &quot; passcode displayed on your screen followed by the pound sign.&quot;); response.BeginGather(new { numDigits = 4, action = &quot;http://mas.cloudapp.net/Home/TwilioValidationCallback?phoneNumber=&quot; + Server.UrlEncode(phoneNumber), method = &quot;GET&quot; }); response.EndGather(); return new TwiMLResult(response);}That’s right. We’re creating some TwiML here. Our ASP.NET MVC action method is telling Twilio to say some text and to gather 4 digits from his phone pad. These 4 digits will be posted to the TwilioValidationCallback action method by the Twilio service. Which is the next method we’ll have to implement.public ActionResult TwilioValidationCallback(string phoneNumber){ var hubContext = GlobalHost.ConnectionManager.GetHubContext<PhoneValidatorHub>(); hubContext.Clients.validated(phoneNumber); var response = new TwilioResponse(); response.Say(&quot;Thank you! Your browser should automatically continue. Bye!&quot;); response.Hangup(); return new TwiMLResult(response);}The TwilioValidationCallback action method does two things. First, it gets a reference to our SignalR hub and calls the validated function on it. As you may recall, we created this method on the hub’s client side, so in fact our ASP.NET MVC server application is calling a method on the client side. Doing this triggers the client to hide the validation dialog and complete the user sign-up process.Another action we’re doing here is generating some more TwiML (it’s fun!). We thank the user for validating his phone number and, after that, we hang up the call.You see? Working with voice (and text messages too, if you want) isn’t that hard. It enables additional scenarios that can make your application stand out from all the many others out there. Enjoy!05 ConfirmPhoneNumberDemo.zip (1.32 mb) This is an imported post. It was imported from my old blog using an automated tool and may contain formatting errors and/or broken images.">
+  <meta name="twitter:site" content="@maartenballiauw">
+  <meta name="twitter:title" content="A phone call from the cloud: Windows Azure, SignalR &amp; Twilio">
+  <meta name="twitter:description" content="Note: this blog post used to be an article for the Windows Azure Roadtrip website. Since that one no longer exists, I decided to post the articles on my blog as well. Find the source code for this post here: 05 ConfirmPhoneNumberDemo.zip (1.32 mb). It has been written earlier this year, some versions of packages used (like jQuery or SignalR) may be outdated in this post. Live with it.In the previous blog post we saw how you can send e-mails from Windows Azure. Why not take communication a step further and make a phone call from Windows Azure? I’ve already mentioned that Windows Azure is a platform which will run your code, topped with some awesomesauce in the form of a large number of components that will speed up development. One of those components is the API provided by Twilio, a third-party service.Twilio is a telephony web-service API that lets you use your existing web languages and skills to build voice and SMS applications. Twilio Voice allows your applications to make and receive phone calls. Twilio SMS allows your applications to make and receive SMS messages. We’ll use Twilio Voice in conjunction with jQuery and SignalR to spice up a sign-up process.The scenarioThe idea is simple: we want users to sign up using a username and password. In addition, they’ll have to provide their phone number. The user will submit the sign-up form and will be displayed a confirmation code. In the background, the user will be called and asked to enter this confirmation code in order to validate his phone number. Once finished, the browser will automatically continue the sign-up process. Here’s a visual:Sounds too good to be true? Get ready, as it’s relatively simple using Windows Azure and Twilio.Let’s start…Before we begin, make sure you have a Twilio account. Twilio offers some free credits, enough to test with. After registering, make sure that you enable international calls and that your phone number is registered as a developer. Twilio takes this step in order to ensure that their service isn’t misused for making abusive phone calls using free developer accounts.Next, create a Windows Azure project containing an ASP.NET MVC 4 web role. Install the following NuGet packages in it (right-click, Library Package Manager, go wild): jQuery jQuery.UI.Combined jQuery.Validation json2 Modernizr SignalR Twilio Twilio.Mvc Twilio.TwiML It may also be useful to develop some familiarity with the concepts behind SignalR.The registration formLet’s create our form. Using a simple model class, SignUpModel, create the following action method:public ActionResult Index(){ return View(new SignUpModel());}This action method is accompanied with a view, a simple form requesting the required information from our user:@using (Html.BeginForm(&quot;SignUp&quot;, &quot;Home&quot;, FormMethod.Post)) { @Html.ValidationSummary(true) <fieldset> <legend>Sign Up for this awesome service</legend> @* etc etc etc *@ <div class=&quot;editor-label&quot;> @Html.LabelFor(model => model.Phone) </div> <div class=&quot;editor-field&quot;> @Html.EditorFor(model => model.Phone) @Html.ValidationMessageFor(model => model.Phone) </div> <p> <input type=&quot;submit&quot; value=&quot;Sign up!&quot; /> </p> </fieldset>}We’ll spice up this form with a dialog first. Using jQuery UI, we can create a simple <div> element which will serve as the dialog’s content. Note the ui-helper-hidden class which is used to make it invisible to view.<div id=&quot;phoneDialog&quot; class=&quot;ui-helper-hidden&quot;> <h1>Keep an eye on your phone...</h1> <p>Pick up the phone and follow the instructions.</p> <p>You will be asked to enter the following code:</p> <h2>1743</h2></div>This is a simple dialog in which we’ll show a hardcoded confirmation code which the user will have to provide when called using Twilio.Next, let’s code our JavaScript logic which will spice up this form. First, add the required JavaScript libraries for SignalR (more on that later):<script src=&quot;@Url.Content(&quot;~/Scripts/jquery.signalR-0.5.0.min.js&quot;)&quot; type=&quot;text/javascript&quot;></script><script src=&quot;@Url.Content(&quot;~/signalr/hubs&quot;)&quot; type=&quot;text/javascript&quot;></script>Next, capture the form’s submit event and, if the phone number has not been validated yet, cancel the submit event and show our dialog instead:$('form:first').submit(function (e) { if ($(this).valid() &amp;&amp; $('#Phone').data('validated') != true) { // Show a dialog $('#phoneDialog').dialog({ title: '', modal: true, width: 400, height: 400, resizable: false, beforeClose: function () { if ($('#Phone').data('validated') != true) { return false; } } }); // Don't submit. Yet. e.preventDefault(); }});Nothing fancy yet. If you now run this code, you’ll see that a dialog opens and remains open for eternity. Let’s craft some SignalR code now. SignalR uses a concept of Hubs to enable client-server communication, but also server-client communication. We’ll need the latter to inform our view whenever the user has confirmed his phone number. In the project, add the following class: [HubName(&quot;phonevalidator&quot;)]public class PhoneValidatorHub : Hub{ public void StartValidation(string phoneNumber) { }} This class defines a service that the client can call. SignalR will also keep the connection with the client open so that this PhoneValidatorHub can later send a message to the client as well. Let’s connect our view to this hub. In the form submit event handler, add the following line of code:// Validate the phone number using Twilio$.connection.phonevalidator.startValidation($('#Phone').val());We’ve created a C# class with a StartValidation method and we’re calling the startValidation message from JavaScript. Coincidence? No. SignalR makes this possible. But we’re not finished yet. We can now call a method on the server side, but how would the server inform the client when the phone number has been validated? I’ll get to that point later. First, let’s make sure our JavaScript code can receive that call from the server. To do so, connect to the PhoneValidator hub and add a callback function to it: var validatorHub = $.connection.phonevalidator;validatorHub.validated = function (phoneNumber) { if (phoneNumber == $('#Phone').val()) { $('#Phone').data('validated', true); $('#phoneDialog').dialog('destroy'); $('form:first').trigger('submit'); }};$.connection.hub.start(); What we’re doing here is adding a client-side function named validated to the SignalR hub. We can call this function, sitting at the client side, from our server-side code later on. The function itself is easy: it checks whether the phone number that was validated matches the one the user entered and, if so, it submits the form and completes the signup.All that’s left is calling the user and, when the confirmation succeeds, we’ll have to inform our client by calling the validated message on the hub.Initiating a phone callThe phone call to our user will be initiated in the PhoneValidatorHub’s StartValidation method. Add the following code there:var twilioClient = new TwilioRestClient(&quot;api user&quot;, &quot;api password&quot;); string url = &quot;http://mas.cloudapp.net/Home/TwilioValidationMessage?passcode=1743&quot; + &quot;&amp;phoneNumber=&quot; + HttpContext.Current.Server.UrlEncode(phoneNumber); // Instantiate the call options that are passed to the outbound callCallOptions options = new CallOptions();options.From = &quot;+14155992671&quot;; // Twilio's developer number options.To = phoneNumber;options.Url = url; // Make the call.twilioClient.InitiateOutboundCall(options);Using the TwilioRestClient class, we create a request to Twilio. We also pass on a URL which points to our application. Twilio uses TwiML, an XML format to instruct their phone services. When calling the InitiateOutboundCall method, Twilio will issue a request to the URL we are hosting (http://.....cloudapp.net/Home/TwilioValidationMessage) to fetch the TwiML which tells Twilio what to say, ask, record, gather, … on the phone.Next up: implementing the TwilioValidationMessage action method.public ActionResult TwilioValidationMessage(string passcode, string phoneNumber){ var response = new TwilioResponse(); response.Say(&quot;Hi there, welcome to Maarten's Awesome Service.&quot;); response.Say(&quot;To validate your phone number, please enter the 4 digit&quot; + &quot; passcode displayed on your screen followed by the pound sign.&quot;); response.BeginGather(new { numDigits = 4, action = &quot;http://mas.cloudapp.net/Home/TwilioValidationCallback?phoneNumber=&quot; + Server.UrlEncode(phoneNumber), method = &quot;GET&quot; }); response.EndGather(); return new TwiMLResult(response);}That’s right. We’re creating some TwiML here. Our ASP.NET MVC action method is telling Twilio to say some text and to gather 4 digits from his phone pad. These 4 digits will be posted to the TwilioValidationCallback action method by the Twilio service. Which is the next method we’ll have to implement.public ActionResult TwilioValidationCallback(string phoneNumber){ var hubContext = GlobalHost.ConnectionManager.GetHubContext<PhoneValidatorHub>(); hubContext.Clients.validated(phoneNumber); var response = new TwilioResponse(); response.Say(&quot;Thank you! Your browser should automatically continue. Bye!&quot;); response.Hangup(); return new TwiMLResult(response);}The TwilioValidationCallback action method does two things. First, it gets a reference to our SignalR hub and calls the validated function on it. As you may recall, we created this method on the hub’s client side, so in fact our ASP.NET MVC server application is calling a method on the client side. Doing this triggers the client to hide the validation dialog and complete the user sign-up process.Another action we’re doing here is generating some more TwiML (it’s fun!). We thank the user for validating his phone number and, after that, we hang up the call.You see? Working with voice (and text messages too, if you want) isn’t that hard. It enables additional scenarios that can make your application stand out from all the many others out there. Enjoy!05 ConfirmPhoneNumberDemo.zip (1.32 mb) This is an imported post. It was imported from my old blog using an automated tool and may contain formatting errors and/or broken images.">
+  <meta name="twitter:url" content="https://blog.maartenballiauw.be/post/2012/11/12/a-phone-call-from-the-cloud-windows-azure-signalr-twilio.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://blog.maartenballiauw.be/images/splash/1.jpg">
+  <meta name="twitter:creator" content="@Maarten Balliauw">
+  <meta property="og:image" content="https://blog.maartenballiauw.be/images/splash/1.jpg">
+  <meta property="og:type" content="article">
+  <meta property="article:published_time" content="2012-11-12T13:52:00+01:00"> 
+  <script type="application/ld+json"> { "@context" : "http://schema.org", "@type" : "Person", "name" : "Maarten Balliauw {blog}", "url" : "https://blog.maartenballiauw.be", "sameAs" : ["https://twitter.com/maartenballiauw","https://www.linkedin.com/in/maartenballiauw","https://about.me/maartenballiauw","http://stackoverflow.com/cv/maartenballiauw"] } </script> 
+  <link href="https://blog.maartenballiauw.be/feed.xml" type="application/atom+xml" rel="alternate" title="Maarten Balliauw {blog} Feed"> 
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <script> document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js '; </script> 
+  <link rel="stylesheet" href="https://blog.maartenballiauw.be/assets/css/main.css">
+  <meta http-equiv="cleartype" content="on"> 
+ </head>
+ <body> 
+  <!--[if lt IE 9]><div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</div><![endif]-->
+  <div class="masthead">
+   <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+     <nav id="site-nav" class="greedy-nav"> 
+      <button>
+       <div class="navicon"></div></button>
+      <ul class="visible-links">
+       <li class="masthead__menu-item masthead__menu-item--lg"><a href="https://blog.maartenballiauw.be/">Maarten Balliauw {blog}</a></li>
+       <li class="masthead__menu-item"><a href="https://blog.maartenballiauw.be/about-me.html">About me</a></li>
+       <li class="masthead__menu-item"><a href="https://blog.maartenballiauw.be/hire-me.html">Hire me</a></li>
+       <li class="masthead__menu-item"><a href="https://blog.maartenballiauw.be/talks-presentations.html">Talks &amp; Presentations</a></li>
+       <li class="masthead__menu-item"><a href="https://blog.maartenballiauw.be/contact-me.html">Contact</a></li>
+       <li class="masthead__menu-item"><a href="https://blog.maartenballiauw.be/archive/posts-by-year.html">Archive</a></li>
+       <li class="masthead__menu-item"><a href="https://blog.maartenballiauw.be/disclaimer.html">Disclaimer</a></li>
+      </ul>
+      <ul class="hidden-links hidden"></ul>
+     </nav>
+    </div>
+   </div>
+  </div>
+  <div class="page__hero" style=" "> 
+   <img src="https://blog.maartenballiauw.be/images/splash/1.jpg" alt="A phone call from the cloud: Windows Azure, SignalR &amp; Twilio" class="page__hero-image">
+  </div>
+  <div id="main" role="main">
+   <div class="sidebar sticky">
+    <div itemscope itemtype="http://schema.org/Person">
+     <div class="author__avatar"> 
+      <img src="https://blog.maartenballiauw.be/images/bio-photo.jpg" class="author__avatar" alt="Maarten Balliauw">
+     </div>
+     <div class="author__content">
+      <h3 class="author__name">Maarten Balliauw</h3>
+      <p class="author__bio">Loves ASP.NET MVC, C#, Microsoft Azure, PHP and application performance. Co-founded <a href="http://www.myget.org">MyGet</a>. Developer Advocate at <a href="http://www.jetbrains.com">JetBrains</a>. Frequent speaker at and organizer of various national and international events. Likes brewing his own beer.</p>
+     </div>
+     <div class="author__urls-wrapper"> 
+      <button class="btn btn--inverse">Follow</button>
+      <ul class="author__urls social-icons">
+       <li><i class="fa fa-fw fa-map-marker" aria-hidden="true"></i> Antwerp, Belgium</li>
+       <li><a href="https://twitter.com/maartenballiauw"><i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+       <li><a href="https://www.linkedin.com/in/maartenballiauw"><i class="fa fa-fw fa-linkedin-square" aria-hidden="true"></i> LinkedIn</a></li>
+       <li><a href="https://github.com/maartenba"><i class="fa fa-fw fa-github" aria-hidden="true"></i> Github</a></li>
+      </ul>
+     </div>
+    </div>
+    <div class="ad ad-left" data-type="ad" data-publisher="lqm.maartenballiauw.site" data-format="160x600" data-zone="side"></div>
+   </div>
+   <article class="page" itemscope itemtype="http://schema.org/CreativeWork">
+    <meta itemprop="headline" content="A phone call from the cloud: Windows Azure, SignalR &amp; Twilio">
+    <meta itemprop="description" content="Note: this blog post used to be an article for the Windows Azure Roadtrip website. Since that one no longer exists, I decided to post the articles on my blog as well. Find the source code for this post here: 05 ConfirmPhoneNumberDemo.zip (1.32 mb). It has been written earlier this year, some versions of packages used (like jQuery or SignalR) may be outdated in this post. Live with it.In the previous blog post we saw how you can send e-mails from Windows Azure. Why not take communication a step further and make a phone call from Windows Azure? I’ve already mentioned that Windows Azure is a platform which will run your code, topped with some awesomesauce in the form of a large number of components that will speed up development. One of those components is the API provided by Twilio, a third-party service.Twilio is a telephony web-service API that lets you use your existing web languages and skills to build voice and SMS applications. Twilio Voice allows your applications to make and receive phone calls. Twilio SMS allows your applications to make and receive SMS messages. We’ll use Twilio Voice in conjunction with jQuery and SignalR to spice up a sign-up process.The scenarioThe idea is simple: we want users to sign up using a username and password. In addition, they’ll have to provide their phone number. The user will submit the sign-up form and will be displayed a confirmation code. In the background, the user will be called and asked to enter this confirmation code in order to validate his phone number. Once finished, the browser will automatically continue the sign-up process. Here’s a visual:Sounds too good to be true? Get ready, as it’s relatively simple using Windows Azure and Twilio.Let’s start…Before we begin, make sure you have a Twilio account. Twilio offers some free credits, enough to test with. After registering, make sure that you enable international calls and that your phone number is registered as a developer. Twilio takes this step in order to ensure that their service isn’t misused for making abusive phone calls using free developer accounts.Next, create a Windows Azure project containing an ASP.NET MVC 4 web role. Install the following NuGet packages in it (right-click, Library Package Manager, go wild): jQuery jQuery.UI.Combined jQuery.Validation json2 Modernizr SignalR Twilio Twilio.Mvc Twilio.TwiML It may also be useful to develop some familiarity with the concepts behind SignalR.The registration formLet’s create our form. Using a simple model class, SignUpModel, create the following action method:public ActionResult Index(){ return View(new SignUpModel());}This action method is accompanied with a view, a simple form requesting the required information from our user:@using (Html.BeginForm(&quot;SignUp&quot;, &quot;Home&quot;, FormMethod.Post)) { @Html.ValidationSummary(true) <fieldset> <legend>Sign Up for this awesome service</legend> @* etc etc etc *@ <div class=&quot;editor-label&quot;> @Html.LabelFor(model => model.Phone) </div> <div class=&quot;editor-field&quot;> @Html.EditorFor(model => model.Phone) @Html.ValidationMessageFor(model => model.Phone) </div> <p> <input type=&quot;submit&quot; value=&quot;Sign up!&quot; /> </p> </fieldset>}We’ll spice up this form with a dialog first. Using jQuery UI, we can create a simple <div> element which will serve as the dialog’s content. Note the ui-helper-hidden class which is used to make it invisible to view.<div id=&quot;phoneDialog&quot; class=&quot;ui-helper-hidden&quot;> <h1>Keep an eye on your phone...</h1> <p>Pick up the phone and follow the instructions.</p> <p>You will be asked to enter the following code:</p> <h2>1743</h2></div>This is a simple dialog in which we’ll show a hardcoded confirmation code which the user will have to provide when called using Twilio.Next, let’s code our JavaScript logic which will spice up this form. First, add the required JavaScript libraries for SignalR (more on that later):<script src=&quot;@Url.Content(&quot;~/Scripts/jquery.signalR-0.5.0.min.js&quot;)&quot; type=&quot;text/javascript&quot;></script><script src=&quot;@Url.Content(&quot;~/signalr/hubs&quot;)&quot; type=&quot;text/javascript&quot;></script>Next, capture the form’s submit event and, if the phone number has not been validated yet, cancel the submit event and show our dialog instead:$('form:first').submit(function (e) { if ($(this).valid() &amp;&amp; $('#Phone').data('validated') != true) { // Show a dialog $('#phoneDialog').dialog({ title: '', modal: true, width: 400, height: 400, resizable: false, beforeClose: function () { if ($('#Phone').data('validated') != true) { return false; } } }); // Don't submit. Yet. e.preventDefault(); }});Nothing fancy yet. If you now run this code, you’ll see that a dialog opens and remains open for eternity. Let’s craft some SignalR code now. SignalR uses a concept of Hubs to enable client-server communication, but also server-client communication. We’ll need the latter to inform our view whenever the user has confirmed his phone number. In the project, add the following class: [HubName(&quot;phonevalidator&quot;)]public class PhoneValidatorHub : Hub{ public void StartValidation(string phoneNumber) { }} This class defines a service that the client can call. SignalR will also keep the connection with the client open so that this PhoneValidatorHub can later send a message to the client as well. Let’s connect our view to this hub. In the form submit event handler, add the following line of code:// Validate the phone number using Twilio$.connection.phonevalidator.startValidation($('#Phone').val());We’ve created a C# class with a StartValidation method and we’re calling the startValidation message from JavaScript. Coincidence? No. SignalR makes this possible. But we’re not finished yet. We can now call a method on the server side, but how would the server inform the client when the phone number has been validated? I’ll get to that point later. First, let’s make sure our JavaScript code can receive that call from the server. To do so, connect to the PhoneValidator hub and add a callback function to it: var validatorHub = $.connection.phonevalidator;validatorHub.validated = function (phoneNumber) { if (phoneNumber == $('#Phone').val()) { $('#Phone').data('validated', true); $('#phoneDialog').dialog('destroy'); $('form:first').trigger('submit'); }};$.connection.hub.start(); What we’re doing here is adding a client-side function named validated to the SignalR hub. We can call this function, sitting at the client side, from our server-side code later on. The function itself is easy: it checks whether the phone number that was validated matches the one the user entered and, if so, it submits the form and completes the signup.All that’s left is calling the user and, when the confirmation succeeds, we’ll have to inform our client by calling the validated message on the hub.Initiating a phone callThe phone call to our user will be initiated in the PhoneValidatorHub’s StartValidation method. Add the following code there:var twilioClient = new TwilioRestClient(&quot;api user&quot;, &quot;api password&quot;); string url = &quot;http://mas.cloudapp.net/Home/TwilioValidationMessage?passcode=1743&quot; + &quot;&amp;phoneNumber=&quot; + HttpContext.Current.Server.UrlEncode(phoneNumber); // Instantiate the call options that are passed to the outbound callCallOptions options = new CallOptions();options.From = &quot;+14155992671&quot;; // Twilio's developer number options.To = phoneNumber;options.Url = url; // Make the call.twilioClient.InitiateOutboundCall(options);Using the TwilioRestClient class, we create a request to Twilio. We also pass on a URL which points to our application. Twilio uses TwiML, an XML format to instruct their phone services. When calling the InitiateOutboundCall method, Twilio will issue a request to the URL we are hosting (http://.....cloudapp.net/Home/TwilioValidationMessage) to fetch the TwiML which tells Twilio what to say, ask, record, gather, … on the phone.Next up: implementing the TwilioValidationMessage action method.public ActionResult TwilioValidationMessage(string passcode, string phoneNumber){ var response = new TwilioResponse(); response.Say(&quot;Hi there, welcome to Maarten's Awesome Service.&quot;); response.Say(&quot;To validate your phone number, please enter the 4 digit&quot; + &quot; passcode displayed on your screen followed by the pound sign.&quot;); response.BeginGather(new { numDigits = 4, action = &quot;http://mas.cloudapp.net/Home/TwilioValidationCallback?phoneNumber=&quot; + Server.UrlEncode(phoneNumber), method = &quot;GET&quot; }); response.EndGather(); return new TwiMLResult(response);}That’s right. We’re creating some TwiML here. Our ASP.NET MVC action method is telling Twilio to say some text and to gather 4 digits from his phone pad. These 4 digits will be posted to the TwilioValidationCallback action method by the Twilio service. Which is the next method we’ll have to implement.public ActionResult TwilioValidationCallback(string phoneNumber){ var hubContext = GlobalHost.ConnectionManager.GetHubContext<PhoneValidatorHub>(); hubContext.Clients.validated(phoneNumber); var response = new TwilioResponse(); response.Say(&quot;Thank you! Your browser should automatically continue. Bye!&quot;); response.Hangup(); return new TwiMLResult(response);}The TwilioValidationCallback action method does two things. First, it gets a reference to our SignalR hub and calls the validated function on it. As you may recall, we created this method on the hub’s client side, so in fact our ASP.NET MVC server application is calling a method on the client side. Doing this triggers the client to hide the validation dialog and complete the user sign-up process.Another action we’re doing here is generating some more TwiML (it’s fun!). We thank the user for validating his phone number and, after that, we hang up the call.You see? Working with voice (and text messages too, if you want) isn’t that hard. It enables additional scenarios that can make your application stand out from all the many others out there. Enjoy!05 ConfirmPhoneNumberDemo.zip (1.32 mb) This is an imported post. It was imported from my old blog using an automated tool and may contain formatting errors and/or broken images.">
+    <meta itemprop="datePublished" content="November 12, 2012">
+    <div class="page__inner-wrap">
+     <div class="ad" data-type="ad" data-publisher="lqm.maartenballiauw.site" data-format="728x90" data-zone="top"></div>
+     <header>
+      <h1 class="page__title" itemprop="headline">A phone call from the cloud: Windows Azure, SignalR &amp; Twilio</h1>
+     </header>
+     <section class="page__content" itemprop="text">
+      <p><i>Note: this blog post used to be an article for the Windows Azure Roadtrip website. Since that one no longer exists, I decided to post the articles on my blog as well. Find the source code for this post here: <a href="/files/2012/11/05+ConfirmPhoneNumberDemo.zip">05 ConfirmPhoneNumberDemo.zip (1.32 mb)</a>. <br>It has been written earlier this year, some versions of packages used (like jQuery or SignalR) may be outdated in this post. Live with it.</i></p>
+      <p>In the <a href="/post/2012/11/12/Sending-e-mail-from-Windows-Azure.aspx">previous blog post</a> we saw how you can send e-mails from Windows Azure. Why not take communication a step further and make a phone call from Windows Azure? I’ve already mentioned that Windows Azure is a platform which will run your code, topped with some awesomesauce in the form of a large number of components that will speed up development. One of those components is the API provided by <a href="http://ahoy.twilio.com/azure">Twilio</a>, a third-party service.</p>
+      <p>Twilio is a telephony web-service API that lets you use your existing web languages and skills to build voice and SMS applications. Twilio Voice allows your applications to make and receive phone calls. Twilio SMS allows your applications to make and receive SMS messages. We’ll use Twilio Voice in conjunction with <a href="http://www.jquery.com">jQuery</a> and <a href="http://www.github.com/signalr/signalr">SignalR</a> to spice up a sign-up process.</p>
+      <h3>The scenario</h3>
+      <p>The idea is simple: we want users to sign up using a username and password. In addition, they’ll have to provide their phone number. The user will submit the sign-up form and will be displayed a confirmation code. In the background, the user will be called and asked to enter this confirmation code in order to validate his phone number. Once finished, the browser will automatically continue the sign-up process. Here’s a visual:</p>
+      <p><a href="/images/clip_image002_2.jpg"><img title="clip_image002" style="border-top: 0px; border-right: 0px; background-image: none; border-bottom: 0px; float: none; padding-top: 0px; padding-left: 0px; margin-left: auto; border-left: 0px; display: block; padding-right: 0px; margin-right: auto" border="0" alt="clip_image002" src="/images/clip_image002_thumb_1.jpg" width="484" height="363"></a></p>
+      <p>Sounds too good to be true? Get ready, as it’s relatively simple using Windows Azure and Twilio.</p>
+      <h3>Let’s start…</h3>
+      <p>Before we begin, make sure you have a <a href="http://ahoy.twilio.com/azure">Twilio</a> account. Twilio offers some free credits, enough to test with. After registering, make sure that you <a href="https://www.twilio.com/user/account/international">enable international calls</a> and that your <a href="https://www.twilio.com/user/account/phone-numbers/verified">phone number is registered</a> as a developer. Twilio takes this step in order to ensure that their service isn’t misused for making abusive phone calls using free developer accounts.</p>
+      <p>Next, create a Windows Azure project containing an ASP.NET MVC 4 web role. Install the following NuGet packages in it (right-click, Library Package Manager, go wild):</p>
+      <ul>
+       <li>jQuery</li>
+       <li>jQuery.UI.Combined</li>
+       <li>jQuery.Validation</li>
+       <li>json2</li>
+       <li>Modernizr</li>
+       <li>SignalR</li>
+       <li>Twilio</li>
+       <li>Twilio.Mvc</li>
+       <li>Twilio.TwiML</li>
+      </ul>
+      <p>It may also be useful to <a href="http://channel9.msdn.com/Events/TechDays/TechDays-2012-Belgium/246">develop some familiarity with the concepts behind SignalR</a>.</p>
+      <h3>The registration form</h3>
+      <p>Let’s create our form. Using a simple model class, <i>SignUpModel</i>, create the following action method:</p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:2ed01294-a973-416e-86b4-c2aca7913461" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 51px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #0000FF;">public</span>
+         <span style="color: #000000;"> ActionResult Index() { </span>
+         <span style="color: #0000FF;">return</span>
+         <span style="color: #000000;"> View(</span>
+         <span style="color: #0000FF;">new</span>
+         <span style="color: #000000;"> SignUpModel()); } </span>
+        </div></pre>
+      </div>
+      <p>This action method is accompanied with a view, a simple form requesting the required information from our user:</p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:d25a7f4a-f21e-4d16-8627-16bc8b7be27d" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 301px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #000000;">@using (Html.BeginForm(</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">SignUp</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">, </span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">Home</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">, FormMethod.Post)) { @Html.ValidationSummary(</span>
+         <span style="color: #0000FF;">true</span>
+         <span style="color: #000000;">) </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">fieldset</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">legend</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;">Sign Up </span>
+         <span style="color: #0000FF;">for</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">this</span>
+         <span style="color: #000000;"> awesome service</span>
+         <span style="color: #000000;">&lt;/</span>
+         <span style="color: #000000;">legend</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> @</span>
+         <span style="color: #000000;">*</span>
+         <span style="color: #000000;"> etc etc etc </span>
+         <span style="color: #000000;">*</span>
+         <span style="color: #000000;">@ </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">div </span>
+         <span style="color: #0000FF;">class</span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">editor-label</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> @Html.LabelFor(model </span>
+         <span style="color: #000000;">=&gt;</span>
+         <span style="color: #000000;"> model.Phone) </span>
+         <span style="color: #000000;">&lt;/</span>
+         <span style="color: #000000;">div</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">div </span>
+         <span style="color: #0000FF;">class</span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">editor-field</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> @Html.EditorFor(model </span>
+         <span style="color: #000000;">=&gt;</span>
+         <span style="color: #000000;"> model.Phone) @Html.ValidationMessageFor(model </span>
+         <span style="color: #000000;">=&gt;</span>
+         <span style="color: #000000;"> model.Phone) </span>
+         <span style="color: #000000;">&lt;/</span>
+         <span style="color: #000000;">div</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">p</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">input type</span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">submit</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;"> value</span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">Sign up!</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">/&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;/</span>
+         <span style="color: #000000;">p</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;/</span>
+         <span style="color: #000000;">fieldset</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> }</span>
+        </div></pre>
+      </div>
+      <p>We’ll spice up this form with a dialog first. Using jQuery UI, we can create a simple &lt;div&gt; element which will serve as the dialog’s content. Note the <i>ui-helper-hidden</i> class which is used to make it invisible to view.</p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:8db07a2c-a79a-4e4a-8270-fdc7d5c9b197" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 89px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">div id</span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">phoneDialog</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">class</span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">ui-helper-hidden</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">h1</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;">Keep an eye on your phone...</span>
+         <span style="color: #000000;">&lt;/</span>
+         <span style="color: #000000;">h1</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">p</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;">Pick up the phone and follow the instructions.</span>
+         <span style="color: #000000;">&lt;/</span>
+         <span style="color: #000000;">p</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">p</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;">You will be asked to enter the following code:</span>
+         <span style="color: #000000;">&lt;/</span>
+         <span style="color: #000000;">p</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">h2</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #800080;">1743</span>
+         <span style="color: #000000;">&lt;/</span>
+         <span style="color: #000000;">h2</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;/</span>
+         <span style="color: #000000;">div</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+        </div></pre>
+      </div>
+      <p>This is a simple dialog in which we’ll show a hardcoded confirmation code which the user will have to provide when called using Twilio.</p>
+      <p>Next, let’s code our JavaScript logic which will spice up this form. First, add the required JavaScript libraries for SignalR (more on that later):</p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:84741e61-65d7-4e45-b51e-aa885c028ac7" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 68px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">script src</span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">@Url.Content(</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">~/</span>
+         <span style="color: #000000;">Scripts</span>
+         <span style="color: #000000;">/</span>
+         <span style="color: #000000;">jquery.signalR</span>
+         <span style="color: #000000;">-</span>
+         <span style="color: #800080;">0.5</span>
+         <span style="color: #000000;">.</span>
+         <span style="color: #800080;">0</span>
+         <span style="color: #000000;">.min.js</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">)</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;"> type</span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">text/javascript</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">&gt;&lt;/</span>
+         <span style="color: #000000;">script</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">script src</span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">@Url.Content(</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">~/</span>
+         <span style="color: #000000;">signalr</span>
+         <span style="color: #000000;">/</span>
+         <span style="color: #000000;">hubs</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">)</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;"> type</span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">text/javascript</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">&gt;&lt;/</span>
+         <span style="color: #000000;">script</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;"> </span>
+        </div></pre>
+      </div>
+      <p>Next, capture the form’s <i>submit</i> event and, if the phone number has not been validated yet, cancel the submit event and show our dialog instead:</p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:da3ba3ff-378f-4d11-aeda-e36a597b580a" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 301px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #000000;">$(</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">form:first</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">).submit(</span>
+         <span style="color: #0000FF;">function</span>
+         <span style="color: #000000;"> (e) { </span>
+         <span style="color: #0000FF;">if</span>
+         <span style="color: #000000;"> ($(</span>
+         <span style="color: #0000FF;">this</span>
+         <span style="color: #000000;">).valid() </span>
+         <span style="color: #000000;">&amp;&amp;</span>
+         <span style="color: #000000;"> $(</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">#Phone</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">).data(</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">validated</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">) </span>
+         <span style="color: #000000;">!=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">true</span>
+         <span style="color: #000000;">) { </span>
+         <span style="color: #008000;">//</span>
+         <span style="color: #008000;"> Show a dialog</span>
+         <span style="color: #008000;"> </span>
+         <span style="color: #000000;"> $(</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">#phoneDialog</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">).dialog({ title: </span>
+         <span style="color: #000000;">''</span>
+         <span style="color: #000000;">, modal: </span>
+         <span style="color: #0000FF;">true</span>
+         <span style="color: #000000;">, width: </span>
+         <span style="color: #000000;">400</span>
+         <span style="color: #000000;">, height: </span>
+         <span style="color: #000000;">400</span>
+         <span style="color: #000000;">, resizable: </span>
+         <span style="color: #0000FF;">false</span>
+         <span style="color: #000000;">, beforeClose: </span>
+         <span style="color: #0000FF;">function</span>
+         <span style="color: #000000;"> () { </span>
+         <span style="color: #0000FF;">if</span>
+         <span style="color: #000000;"> ($(</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">#Phone</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">).data(</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">validated</span>
+         <span style="color: #000000;">'</span>
+         <span style="color: #000000;">) </span>
+         <span style="color: #000000;">!=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">true</span>
+         <span style="color: #000000;">) { </span>
+         <span style="color: #0000FF;">return</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">false</span>
+         <span style="color: #000000;">; } } }); </span>
+         <span style="color: #008000;">//</span>
+         <span style="color: #008000;"> Don't submit. Yet.</span>
+         <span style="color: #008000;"> </span>
+         <span style="color: #000000;"> e.preventDefault(); } }); </span>
+        </div></pre>
+      </div>
+      <p>Nothing fancy yet. If you now run this code, you’ll see that a dialog opens and remains open for eternity. Let’s craft some SignalR code now. SignalR uses a concept of <i>Hubs</i> to enable client-server communication, but also server-client communication. We’ll need the latter to inform our view whenever the user has confirmed his phone number. In the project, add the following class:</p>
+      <p></p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:b7bb21fe-42e8-4f4a-91e3-4d743d39699b" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 134px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #000000;">[HubName(</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">phonevalidator</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">)] </span>
+         <span style="color: #0000FF;">public</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">class</span>
+         <span style="color: #000000;"> PhoneValidatorHub : Hub { </span>
+         <span style="color: #0000FF;">public</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">void</span>
+         <span style="color: #000000;"> StartValidation(</span>
+         <span style="color: #0000FF;">string</span>
+         <span style="color: #000000;"> phoneNumber) { } } </span>
+        </div></pre>
+      </div>
+      <br>This class defines a service that the client can call. SignalR will also keep the connection with the client open so that this 
+      <i>PhoneValidatorHub</i> can later send a message to the client as well. Let’s connect our view to this hub. In the form submit event handler, add the following line of code:
+      <p></p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:f8f1c9fe-1ac5-4452-9091-0b578880f094" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 46px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #008000;">//</span>
+         <span style="color: #008000;"> Validate the phone number using Twilio</span>
+         <span style="color: #008000;"> </span>
+         <span style="color: #000000;">$.connection.phonevalidator.startValidation($(</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #800000;">#Phone</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #000000;">).val()); </span>
+        </div></pre>
+      </div>
+      <p>We’ve created a C# class with a <i>StartValidation</i> method and we’re calling the <i>startValidation</i> message from JavaScript. Coincidence? No. SignalR makes this possible. But we’re not finished yet. We can now call a method on the server side, but how would the server inform the client when the phone number has been validated? I’ll get to that point later. First, let’s make sure our JavaScript code can receive that call from the server. To do so, connect to the <i>PhoneValidator</i> hub and add a callback function to it:</p>
+      <p></p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:404fd771-b7dd-4b02-bfad-cbc0729ec9f1" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 142px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #000000;">var validatorHub </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> $.connection.phonevalidator; validatorHub.validated </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> function (phoneNumber) { </span>
+         <span style="color: #0000FF;">if</span>
+         <span style="color: #000000;"> (phoneNumber </span>
+         <span style="color: #000000;">==</span>
+         <span style="color: #000000;"> $(</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #800000;">#Phone</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #000000;">).val()) { $(</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #800000;">#Phone</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #000000;">).data(</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #800000;">validated</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #000000;">, </span>
+         <span style="color: #0000FF;">true</span>
+         <span style="color: #000000;">); $(</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #800000;">#phoneDialog</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #000000;">).dialog(</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #800000;">destroy</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #000000;">); $(</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #800000;">form:first</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #000000;">).trigger(</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #800000;">submit</span>
+         <span style="color: #800000;">'</span>
+         <span style="color: #000000;">); } }; $.connection.hub.start(); </span>
+        </div></pre>
+      </div>
+      <br>
+      <p></p>
+      <p>What we’re doing here is adding a client-side function named <i>validated</i> to the SignalR hub. We can call this function, sitting at the client side, from our server-side code later on. The function itself is easy: it checks whether the phone number that was validated matches the one the user entered and, if so, it submits the form and completes the signup.</p>
+      <p>All that’s left is calling the user and, when the confirmation succeeds, we’ll have to inform our client by calling the <i>validated</i> message on the hub.</p>
+      <h3>Initiating a phone call</h3>
+      <p>The phone call to our user will be initiated in the <i>PhoneValidatorHub</i>’s <i>StartValidation</i> method. Add the following code there:</p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:9e866f26-9c05-443d-8726-221521d8e8aa" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 142px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #000000;">var twilioClient </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">new</span>
+         <span style="color: #000000;"> TwilioRestClient(</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">api user</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">, </span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">api password</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">); </span>
+         <span style="color: #0000FF;">string</span>
+         <span style="color: #000000;"> url </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">http://mas.cloudapp.net/Home/TwilioValidationMessage?passcode=1743</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">+</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">&amp;phoneNumber=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">+</span>
+         <span style="color: #000000;"> HttpContext.Current.Server.UrlEncode(phoneNumber); </span>
+         <span style="color: #008000;">//</span>
+         <span style="color: #008000;"> Instantiate the call options that are passed to the outbound call</span>
+         <span style="color: #008000;"> </span>
+         <span style="color: #000000;">CallOptions options </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">new</span>
+         <span style="color: #000000;"> CallOptions(); options.From </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">+14155992671</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">; </span>
+         <span style="color: #008000;">//</span>
+         <span style="color: #008000;"> Twilio's developer number </span>
+         <span style="color: #008000;"> </span>
+         <span style="color: #000000;">options.To </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> phoneNumber; options.Url </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> url; </span>
+         <span style="color: #008000;">//</span>
+         <span style="color: #008000;"> Make the call.</span>
+         <span style="color: #008000;"> </span>
+         <span style="color: #000000;">twilioClient.InitiateOutboundCall(options); </span>
+        </div></pre>
+      </div>
+      <p>Using the <i>TwilioRestClient</i> class, we create a request to Twilio. We also pass on a URL which points to our application. Twilio uses TwiML, an XML format to instruct their phone services. When calling the <i>InitiateOutboundCall</i> method, Twilio will issue a request to the URL we are hosting (<a href="http://.....cloudapp.net/Home/TwilioValidationMessage">http://.....cloudapp.net/Home/TwilioValidationMessage</a>) to fetch the TwiML which tells Twilio what to say, ask, record, gather, … on the phone.</p>
+      <p>Next up: implementing the <i>TwilioValidationMessage</i> action method.</p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:1f4fbdd0-0a45-4c6b-ae16-8f379e57e6e1" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 142px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #0000FF;">public</span>
+         <span style="color: #000000;"> ActionResult TwilioValidationMessage(</span>
+         <span style="color: #0000FF;">string</span>
+         <span style="color: #000000;"> passcode, </span>
+         <span style="color: #0000FF;">string</span>
+         <span style="color: #000000;"> phoneNumber) { var response </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">new</span>
+         <span style="color: #000000;"> TwilioResponse(); response.Say(</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">Hi there, welcome to Maarten's Awesome Service.</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">); response.Say(</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">To validate your phone number, please enter the 4 digit</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">+</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;"> passcode displayed on your screen followed by the pound sign.</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">); response.BeginGather(</span>
+         <span style="color: #0000FF;">new</span>
+         <span style="color: #000000;"> { numDigits </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #800080;">4</span>
+         <span style="color: #000000;">, action </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">http://mas.cloudapp.net/Home/TwilioValidationCallback?phoneNumber=</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #000000;">+</span>
+         <span style="color: #000000;"> Server.UrlEncode(phoneNumber), method </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">GET</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;"> }); response.EndGather(); </span>
+         <span style="color: #0000FF;">return</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">new</span>
+         <span style="color: #000000;"> TwiMLResult(response); } </span>
+        </div></pre>
+      </div>
+      <p>That’s right. We’re creating some <a href="https://www.twilio.com/docs/api/twiml">TwiML</a> here. Our ASP.NET MVC action method is telling Twilio to say some text and to gather 4 digits from his phone pad. These 4 digits will be posted to the <i>TwilioValidationCallback</i> action method by the Twilio service. Which is the next method we’ll have to implement.</p>
+      <div id="scid:9D7513F9-C04C-4721-824A-2B34F0212519:18324b19-8111-48a4-bfc6-0f839f444352" class="wlWriterEditableSmartContent" style="float: none; padding-bottom: 0px; padding-top: 0px; padding-left: 0px; margin: 0px; display: inline; padding-right: 0px">
+       <pre style=" width: 684px; height: 142px;background-color:White;overflow: auto;">
+        <div>
+         <span style="color: #0000FF;">public</span>
+         <span style="color: #000000;"> ActionResult TwilioValidationCallback(</span>
+         <span style="color: #0000FF;">string</span>
+         <span style="color: #000000;"> phoneNumber) { var hubContext </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> GlobalHost.ConnectionManager.GetHubContext</span>
+         <span style="color: #000000;">&lt;</span>
+         <span style="color: #000000;">PhoneValidatorHub</span>
+         <span style="color: #000000;">&gt;</span>
+         <span style="color: #000000;">(); hubContext.Clients.validated(phoneNumber); var response </span>
+         <span style="color: #000000;">=</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">new</span>
+         <span style="color: #000000;"> TwilioResponse(); response.Say(</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #800000;">Thank you! Your browser should automatically continue. Bye!</span>
+         <span style="color: #800000;">"</span>
+         <span style="color: #000000;">); response.Hangup(); </span>
+         <span style="color: #0000FF;">return</span>
+         <span style="color: #000000;"> </span>
+         <span style="color: #0000FF;">new</span>
+         <span style="color: #000000;"> TwiMLResult(response); } </span>
+        </div></pre>
+      </div>
+      <p>The <i>TwilioValidationCallback</i> action method does two things. First, it gets a reference to our SignalR hub and calls the <i>validated</i> function on it. As you may recall, we created this method on the hub’s client side, so in fact our ASP.NET MVC server application is calling a method on the client side. Doing this triggers the client to hide the validation dialog and complete the user sign-up process.</p>
+      <p>Another action we’re doing here is generating some more TwiML (it’s fun!). We thank the user for validating his phone number and, after that, we hang up the call.</p>
+      <p>You see? Working with voice (and text messages too, if you want) isn’t that hard. It enables additional scenarios that can make your application stand out from all the many others out there. Enjoy!</p>
+      <p><a href="/files/2012/11/05+ConfirmPhoneNumberDemo.zip">05 ConfirmPhoneNumberDemo.zip (1.32 mb)</a></p>
+      <p class="notice--warning"> <strong>This is an imported post.</strong> It was imported from my old blog using an automated tool and may contain formatting errors and/or broken images.</p>
+     </section>
+     <footer class="page__meta">
+      <p class="page__taxonomy"> <strong><i class="fa fa-fw fa-tags" aria-hidden="true"></i> Tags: </strong> <span itemprop="keywords"> <a href="https://blog.maartenballiauw.be/tags/#azure" class="page__taxonomy-item" rel="tag">Azure</a><span class="sep">, </span> <a href="https://blog.maartenballiauw.be/tags/#csharp" class="page__taxonomy-item" rel="tag">CSharp</a><span class="sep">, </span> <a href="https://blog.maartenballiauw.be/tags/#general" class="page__taxonomy-item" rel="tag">General</a><span class="sep">, </span> <a href="https://blog.maartenballiauw.be/tags/#software" class="page__taxonomy-item" rel="tag">Software</a> </span></p>
+      <p class="page__date"><strong><i class="fa fa-fw fa-calendar" aria-hidden="true"></i> Updated:</strong> <time datetime="2012-11-12T13:52:00+01:00">November 12, 2012</time></p>
+     </footer>
+     <section class="page__share">
+      <h4 class="page__share-title">Share on</h4>
+      <a href="https://twitter.com/intent/tweet?text=https://blog.maartenballiauw.be/post/2012/11/12/a-phone-call-from-the-cloud-windows-azure-signalr-twilio.html" class="btn btn--twitter" title="Share on Twitter"><i class="fa fa-fw fa-twitter" aria-hidden="true"></i><span> Twitter</span></a> 
+      <a href="https://www.facebook.com/sharer/sharer.php?u=https://blog.maartenballiauw.be/post/2012/11/12/a-phone-call-from-the-cloud-windows-azure-signalr-twilio.html" class="btn btn--facebook" title="Share on Facebook"><i class="fa fa-fw fa-facebook" aria-hidden="true"></i><span> Facebook</span></a> 
+      <a href="https://plus.google.com/share?url=https://blog.maartenballiauw.be/post/2012/11/12/a-phone-call-from-the-cloud-windows-azure-signalr-twilio.html" class="btn btn--google-plus" title="Share on Google Plus"><i class="fa fa-fw fa-google-plus" aria-hidden="true"></i><span> Google+</span></a> 
+      <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://blog.maartenballiauw.be/post/2012/11/12/a-phone-call-from-the-cloud-windows-azure-signalr-twilio.html" class="btn btn--linkedin" title="Share on LinkedIn"><i class="fa fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
+     </section>
+     <nav class="pagination"> 
+      <a href="https://blog.maartenballiauw.be/post/2012/11/12/sending-e-mail-from-windows-azure.html" class="pagination--pager" title="Sending e-mail from Windows Azure ">Previous</a> 
+      <a href="https://blog.maartenballiauw.be/post/2012/11/21/how-i-push-googleanalyticstracker-to-nuget.html" class="pagination--pager" title="How I push GoogleAnalyticsTracker to NuGet ">Next</a>
+     </nav>
+    </div>
+    <div class="page__comments">
+     <h4 class="page__comments-title">Leave a Comment</h4>
+     <section id="disqus_thread"></section>
+    </div>
+   </article>
+  </div>
+  <div class="page__footer">
+   <footer> 
+    <script type="text/javascript"> function _dmBootstrap(file) { var _dma = document.createElement('script'); _dma.type = 'text/javascript'; _dma.async = true; _dma.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + file; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(_dma); } function _dmFollowup(file) { if (typeof DMAds === 'undefined') _dmBootstrap('cdn2.DeveloperMedia.com/a.min.js'); } (function () { _dmBootstrap('cdn1.DeveloperMedia.com/a.min.js'); setTimeout(_dmFollowup, 2000); })(); </script> 
+    <div class="page__footer-follow">
+     <ul class="social-icons">
+      <li><strong>Follow:</strong></li>
+      <li><a href="https://twitter.com/maartenballiauw"><i class="fa fa-fw fa-twitter-square" aria-hidden="true"></i> Twitter</a></li>
+      <li><a href="http://github.com/maartenba"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</a></li>
+      <li><a href="https://blog.maartenballiauw.be/feed.xml"><i class="fa fa-fw fa-rss-square" aria-hidden="true"></i> Feed</a></li>
+     </ul>
+    </div>
+    <div class="page__footer-copyright">
+     © 2017 Maarten Balliauw {blog}. Powered by 
+     <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> &amp; 
+     <a href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal Mistakes</a>.
+    </div>
+   </footer>
+  </div>
+  <script src="https://blog.maartenballiauw.be/assets/js/main.min.js"></script> 
+  <script type="text/javascript"> var _gaq = _gaq || []; _gaq.push(['_setAccount', 'UA-576836-3']); _gaq.push(['_trackPageview']); (function() { var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true; ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js'; var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s); })(); </script> 
+  <script type="text/javascript"> /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */ var disqus_shortname = 'maartenballiauwblog'; /* * * DON'T EDIT BELOW THIS LINE * * */ (function() { var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })(); /* * * DON'T EDIT BELOW THIS LINE * * */ (function () { var s = document.createElement('script'); s.async = true; s.type = 'text/javascript'; s.src = '//' + disqus_shortname + '.disqus.com/count.js'; (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s); }()); </script> 
+  <noscript>
+   Please enable JavaScript to view the 
+   <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+  </noscript> 
+ </body>
+</html>

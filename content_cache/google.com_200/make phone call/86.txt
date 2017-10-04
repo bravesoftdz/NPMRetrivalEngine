@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+ <head> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+  <meta name="keywords" content="Dev : Extensions : Example Code : Calling Java from Javascript"> 
+  <link rel="shortcut icon" href="/favicon.ico"> 
+  <title>Dev : Extensions : Example Code : Calling Java from Javascript - MozillaZine Knowledge Base</title> 
+  <link rel="stylesheet" type="text/css" href="http://forums.mozillazine.org/static/kb/style/default.css?a"> 
+  <link rel="stylesheet" type="text/css" href="http://forums.mozillazine.org/static/kb/style/main.css" title="wiki"> 
+  <script type="text/javascript" src="/index.php?title=-&amp;action=raw&amp;gen=js"></script> 
+  <script type="text/javascript" src="/skins/common/wikibits.js"></script> 
+  <style type="text/css">/*<![CDATA[*/
+@import "/index.php?title=MediaWiki:Common.css&action=raw&ctype=text/css&smaxage=18000";
+@import "/index.php?title=MediaWiki:Monobook.css&action=raw&ctype=text/css&smaxage=18000";
+@import "/index.php?title=-&action=raw&gen=css&maxage=18000";
+/*]]>*/</style> 
+  <script type="text/javascript" src="http://apis.google.com/js/plusone.js"></script> 
+  <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-32170104-1']);
+  _gaq.push(['_setDomainName', 'mozillazine.org']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script> 
+ </head> 
+ <body class="ns-0"> 
+  <div id="masthead"> 
+   <h1><a href="http://kb.mozillazine.org/"><img src="http://forums.mozillazine.org/static/common/images/title2.gif?b" width="180" height="70" alt="MozillaZine"></a></h1> 
+   <span id="sprite"></span> 
+  </div> 
+  <table width="100%" cellpadding="7" cellspacing="0" style="table-layout: fixed">
+   <tbody>
+    <tr>
+     <td valign="top" id="main"> 
+      <div id="globalWrapper"> 
+       <a name="top" id="contentTop"></a> 
+       <h1 class="firstHeading">Dev : Extensions : Example Code : Calling Java from Javascript</h1> 
+       <div id="bodyContent"> 
+        <h3 id="siteSub">From MozillaZine Knowledge Base</h3> 
+        <div id="contentSub"></div> 
+        <!-- start content --> 
+        <p>This page is currently notes of what I had to do to call Java from Javascript from Thunderbird. </p>
+        <p>Here's an example from a blog: <a href="http://mozilla-firefox-extension-dev.blogspot.com/2004/11/calling-java-code-in-custom-jars-from.html" class="external free" title="http://mozilla-firefox-extension-dev.blogspot.com/2004/11/calling-java-code-in-custom-jars-from.html" rel="nofollow">http://mozilla-firefox-extension-dev.blogspot.com/2004/11/calling-java-code-in-custom-jars-from.html</a> </p> 
+        <pre>
+   var cl = new Packages.java.net.URLClassLoader(
+       [
+           new Packages.java.net.URL(
+               'http://foo.net/bar.jar')
+       ]
+   );
+
+   var aClass = Packages.java.lang.Class.forName("HelloWorld", true, cl);
+   var aStaticMethod = aClass.getMethod("getGreeting", []);
+   var greeting = aStaticMethod.invoke(null, []);
+   alert(greeting);
+</pre> 
+        <p><br> In order to write to the file system, I had to add this to the javascript code: java.lang.System.setSecurityManager(null); I could read a jar from the filesystem without a problem. </p>
+        <p>Calling showJavaConsole is very useful for debugging: </p> 
+        <pre>
+        var jvm = Components.classes["@mozilla.org/oji/jvm-mgr;1"].getService(Components.interfaces.nsIJVMManager);
+	jvm.showJavaConsole();
+</pre> 
+        <p>Here's the code I use to log exceptions. JSUtil.getStackTrace doesn't always work. I haven't figured out why, so I do it last, wrap it in a try catch, and print out my own "rough" stack trace first. (The rough list has no line numbers.) Wrap all java calls in a try catch and log the exception. Mozilla doesn't always report them and when it does it doesn't give the stack trace, and it's usually wrapped in a meaningless exception. I think the java console logs all exceptions though, so maybe this isn't necessary if you use that. </p> 
+        <pre>
+function logExc(e) {
+    try {
+        while(e&nbsp;!= null) {
+            debug(e);
+            e = e.getCause();
+        }
+        debug(netscape.javascript.JSUtil.getStackTrace(e));
+    } catch(exp) {
+        debug("exception while logging exception");
+        debug(exp);
+        debug("exception being logged");
+        debug(e);
+    }
+}
+</pre> 
+        <p><br> I'm still trying to figure out how to get my classes in the regular classpath so I can access them with "Packages" and not use reflection. I tried setting the classpath and it doesn't work. If you use the URLClassLoader to create an instance of a class, you can call methods on it normally. So you can say "var myclass = class.newInstance()" and then call instance methods on my class. That way you don't have to use reflection for everything. </p>
+        <p><br> Sometimes Javascript objects get passed to Java as JSObjects. I think it's doing that for me because of the reflection, since the URL[] works in the classloader example. JSObject is defined in $JAVA_HOME/jre/lib/plugins.jar. It's documented here: <a href="http://java.sun.com/products/plugin/1.3/docs/index.docs.html" class="external free" title="http://java.sun.com/products/plugin/1.3/docs/index.docs.html" rel="nofollow">http://java.sun.com/products/plugin/1.3/docs/index.docs.html</a> </p>
+        <p><br> To get the Java plugin working in Thunderbird, I had to make a ".plugins" directory in ~/.mozilla (not ~/.thunderbird), and symlink libjavaplugin_oji.so in that directory. Make sure you use one compiled with the same gcc as the thunderbird compile. It also seemed to care that it was a symlink and not a copy of the lib.so file; a copy didn't work for me until I symlinked it. </p>
+        <div class="printfooter">
+          Retrieved from "
+         <a href="http://kb.mozillazine.org/Dev_:_Extensions_:_Example_Code_:_Calling_Java_from_Javascript">http://kb.mozillazine.org/Dev_:_Extensions_:_Example_Code_:_Calling_Java_from_Javascript</a>"
+        </div> 
+        <div id="catlinks">
+         <p class="catlinks"><a href="/index.php?title=Special:Categories&amp;article=Dev_%3A_Extensions_%3A_Example_Code_%3A_Calling_Java_from_Javascript" title="Special:Categories">Category</a>: <span dir="ltr"><a href="/Category:Example_code" title="Category:Example code">Example code</a></span></p>
+        </div> 
+        <!-- end content --> 
+        <div class="visualClear"></div> 
+       </div> 
+      </div>  <br> 
+      <center> 
+       <script type="text/javascript"><!--
+google_ad_client = "pub-0651448570352947";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text";
+google_ad_channel ="2199111691";
+google_color_border = "006666";
+google_color_bg = "FAF9F6";
+google_color_link = "006666";
+google_color_url = "006666";
+google_color_text = "006666";
+//--></script> 
+       <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+      </center> <br> 
+      <div id="footer">
+        This page was last modified 18:42, 22 April 2015. This page has been accessed 55,162 times. 
+       <a href="/MozillaZine_Knowledge_Base:About" title="MozillaZine Knowledge Base:About">About MozillaZine Knowledge Base</a> - 
+       <a href="/MozillaZine_Knowledge_Base:General_disclaimer" title="MozillaZine Knowledge Base:General disclaimer">Disclaimers</a> 
+       <!-- Served by savanna.mozillazine.org in 0.20 secs. --> 
+       <br> MozillaZine and the MozillaZine Logo Copyright © 1998-2007 MozillaZine. All Rights Reserved - 
+       <a href="http://www.mozillazine.org/privacypolicy.html">Privacy Policy</a> 
+      </div> </td>
+     <td valign="top" id="sidebar"> <a href="http://www.mozillazine.org/"><img src="http://forums.mozillazine.org/static/common/images/navHeader.gif" width="175" height="36" alt="MozillaZine"></a> 
+      <div class="sidebar"> 
+       <ul>
+        <li><a href="/" style="font-weight: bold">Main Page</a></li>
+       </ul> 
+       <ul> 
+        <li><strong>This Page</strong></li> 
+        <li><a href="/Dev_:_Extensions_:_Example_Code_:_Calling_Java_from_Javascript">Article</a></li>
+        <li><a href="/index.php?title=Talk:Dev_:_Extensions_:_Example_Code_:_Calling_Java_from_Javascript&amp;action=edit">Discussion</a></li>
+        <li><a href="/index.php?title=Dev_:_Extensions_:_Example_Code_:_Calling_Java_from_Javascript&amp;action=edit">Edit</a></li>
+        <li><a href="/index.php?title=Dev_:_Extensions_:_Example_Code_:_Calling_Java_from_Javascript&amp;action=history">History</a></li> 
+        <li><a href="/Special:Whatlinkshere/Dev_:_Extensions_:_Example_Code_:_Calling_Java_from_Javascript">What links here</a></li> 
+        <li><a href="/Special:Recentchangeslinked/Dev_:_Extensions_:_Example_Code_:_Calling_Java_from_Javascript">Related changes</a></li> 
+        <li><a href="/index.php?title=Dev_:_Extensions_:_Example_Code_:_Calling_Java_from_Javascript&amp;printable=yes">Printable version</a></li> 
+        <li style="margin-top:13px">
+         <g:plusone size="small"></g:plusone></li> 
+       </ul> 
+       <ul> 
+        <li><strong>Your Account</strong></li>
+        <strong> <li><a href="/index.php?title=Special:Userlogin&amp;returnto=Dev_:_Extensions_:_Example_Code_:_Calling_Java_from_Javascript">Log in</a></li> </strong>
+       </ul>
+       <strong> 
+        <ul> 
+         <li>Tools</li> 
+         <ul>
+          <a href="/Special:Recentchanges">Recent Changes</a>
+         </ul> 
+         <li><a href="/Special:Upload">Upload file</a></li> 
+         <li><a href="/Special:Specialpages">Special pages</a></li> 
+        </ul> </strong>
+      </div><strong> <script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script> 
+       <div class="sidebar"> 
+        <ul>
+         <li>Search</li>
+        </ul> 
+        <!-- Google CSE Search Box Begins --> 
+        <form id="searchbox_003258325049489668794:ru2dpahviq8" action="http://google.com/cse"> 
+         <input type="hidden" name="cx" value="003258325049489668794:ru2dpahviq8"> 
+         <input name="q" type="text"> 
+         <input type="submit" name="sa" value="Search"> 
+         <input type="hidden" name="cof" value="FORID:0"> 
+        </form> 
+        <!-- Google CSE Search Box Ends --> 
+        <br>
+        <br> 
+        <a href="http://kb.mozillazine.org/Special:Search">Old Search</a> 
+        <!--form name="searchform" action="/Special:Search" id="searchform">
+        <input id="searchInput" name="search" type="text"
+          accesskey="f" value="" />
+        <input type='submit' name="go" class="searchButton" id="searchGoButton"
+          value="Go"
+          />&nbsp;<input type='submit' name="fulltext"
+	  class="searchButton"
+          value="Search" />
+      </form--> 
+       </div> 
+       <div class="sidebar"> 
+        <ul> 
+         <li><a href="http://www.mozillazine.org/submit/">submit news</a></li> 
+        </ul> 
+        <ul> 
+         <li><a href="http://forums.mozillazine.org/">forums</a></li> 
+         <li><a href="http://weblogs.mozillazine.org/">weblogs</a> <a href="http://feedhouse.mozillazine.org">(feedHouse)</a></li> 
+         <li><a href="http://kb.mozillazine.org/">knowledge base</a></li> 
+        </ul> 
+        <ul> 
+         <li><a href="http://www.mozillazine.org/chat/">chat</a></li> 
+         <li><a href="http://www.mozillazine.org/members/">members</a></li> 
+         <li><a href="http://www.cafeshops.com/mozillazine/">store</a></li> 
+         <li><a href="http://www.mozillazine.org/about/">about</a></li> 
+        </ul> 
+        <ul class="translations"> 
+         <li><a href="http://mozillazine-fr.org/" hreflang="fr" title="MozillaZine in French">fr</a></li> 
+         <li><a href="http://mozillazine.jp/" hreflang="ja" title="MozillaZine in Japanese">ja</a></li> 
+         <li><a href="http://www.formatvorlage.de/mozine/" hreflang="de" title="MozillaZine in German">de</a></li> 
+         <li><a href="http://www.mozilla.or.kr/mozilla/zine/" hreflang="ko" title="MozillaZine in Korean">ko</a></li> 
+         <li><a href="http://www.mozillaes.org/mozillazine/" hreflang="es" title="MozillaZine in Spanish">es</a></li> 
+         <li><a href="http://www.mozillazine.hu/" hreflang="hu" title="MozillaZine in Hungarian">hu</a></li> 
+        </ul> 
+       </div> </strong></td> 
+    </tr> 
+   </tbody>
+  </table> 
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script> 
+  <script type="text/javascript">
+_uacct = "UA-89724-3";
+urchinTracker();
+</script>   
+ </body>
+</html>

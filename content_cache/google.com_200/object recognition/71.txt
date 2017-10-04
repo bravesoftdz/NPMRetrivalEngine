@@ -1,0 +1,1596 @@
+<!doctype html>
+<html class="header-dark">
+ <head> 
+  <meta charset="utf-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"> 
+  <meta name="description" content="Angular 2 introduces a new change detection system that makes apps much faster and allows developers fine-tune the process."> 
+  <!-- <meta property="fb:admins" content="YOUR_FB_USER_ID" /> --> 
+  <meta property="fb:app_id" content="534074790006350"> 
+  <meta property="og:title" content="Understanding Angular 2 change detection"> 
+  <meta property="og:site_name" content="Auth0 - Blog"> 
+  <meta property="og:url" content="https://auth0.com/blog/understanding-angular-2-change-detection/"> 
+  <meta property="og:image" content="https://cdn.auth0.com/blog/angular/logo3.png"> 
+  <meta property="og:description" content="Angular 2 introduces a new change detection system that makes apps much faster and allows developers fine-tune the process."> 
+  <meta property="og:type" content="article"> 
+  <!-- Twitter Cards --> 
+  <meta name="twitter:site" content="@auth0"> 
+  <meta name="twitter:creator" content="@auth0"> 
+  <meta name="twitter:title" content="Understanding Angular 2 change detection"> 
+  <meta name="twitter:url" content="https://auth0.com/blog/understanding-angular-2-change-detection/"> 
+  <meta name="twitter:description" content="Angular 2 introduces a new change detection system that makes apps much faster and allows developers fine-tune the process."> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:image" content="https://cdn.auth0.com/blog/angular/logo3.png"> 
+  <meta name="twitter:image:height" content="512"> 
+  <meta name="twitter:image:width" content="1024"> 
+  <meta name="HandheldFriendly" content="True"> 
+  <meta name="MobileOptimized" content="320"> 
+  <title>Understanding Angular 2 change detection</title> 
+  <!-- Swiftype for the posts --> 
+  <meta class="swiftype" name="title" data-type="string" content="Understanding Angular 2 change detection"> 
+  <meta class="swiftype" name="type" data-type="enum" content="blog"> 
+  <meta class="swiftype" name="popularity" data-type="integer" content="1"> 
+  <link href="https://plus.google.com/+Auth0" rel="publisher"> 
+  <link rel="manifest" href="/blog/manifest.json"> 
+  <script src="//use.typekit.net/tde2fii.js"></script> 
+  <script>try{Typekit.load();}catch(e){}</script> 
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> 
+  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script> 
+  <script src="//cdn.auth0.com/w2/auth0-7.4.0.min.js"></script> 
+  <script src="//cdn.auth0.com/js/lock/10.6.1/lock.min.js"></script> 
+  <script src="//cdnjs.cloudflare.com/ajax/libs/react/15.2.0/react.min.js"></script> 
+  <script src="//cdnjs.cloudflare.com/ajax/libs/react/15.2.0/react-dom.min.js"></script> 
+  <link rel="stylesheet" href="https://cdn.auth0.com/website/web-header/4.0.32/web-header.css"> 
+  <script src="https://cdn.auth0.com/website/web-header/4.0.32/web-header.js"></script> 
+  <script src="//npmcdn.com/auth0-contact-form@2.0.3/cdn/contact-form.js"></script> 
+  <link rel="stylesheet" href="//npmcdn.com/auth0-contact-form@2.0.3/cdn/contact-form.css"> 
+  <script src="https://cdn.auth0.com/website/sliding-popup/1.0.23/sliding-popup.js"></script> 
+  <script src="//cdn.auth0.com/js/m/metrics-1.min.js"></script> 
+  <script type="text/javascript">
+      !function(){
+        var metricsLib = window.metricsLib = window.metricsLib || [];
+        // A list of the methods in metrics.js to stub.
+        metricsLib.methods = [
+          'segment',
+          'track',
+          'setUserId',
+          'identify',
+          'alias',
+          'page',
+          'getData',
+          'ready',
+          'traits'
+        ];
+        metricsLib.factory = function(method){
+          return function(){
+            var args = Array.prototype.slice.call(arguments);
+            args.unshift(method);
+            metricsLib.push(args);
+            return metricsLib;
+          };
+        };
+        for (var i = 0; i < metricsLib.methods.length; i++) {
+          var key = metricsLib.methods[i];
+          metricsLib[key] = metricsLib.factory(key);
+        }
+        metricsLib.load = function(segmentKey, dwhEndpoint){
+          if(null != window.Auth0Metrics){
+            window.metricsLib = new Auth0Metrics(segmentKey, dwhEndpoint, 'blog');
+          }else{
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.async = true;
+            script.src = ('https:' === document.location.protocol
+              ? 'https://' : 'http://')
+              + 'cdn.auth0.com/js/m/metrics-1.min.js';
+            script.onerror = function(){
+              console.error("No metrics");
+            }
+            script.onload = function(){
+              // Grab analytics and make it private
+              window.metricsLib = new Auth0Metrics(segmentKey, dwhEndpoint, 'blog');
+            }
+            var first = document.getElementsByTagName('script')[0];
+            first.parentNode.insertBefore(script, first);
+          }
+        };
+        var SEGMENT_KEY =  'aaB6w2BsRwUcGbRSUY7X22FPAa1NL3BL' ;
+        var DWH_ENDPOINT =  'https://dwh-tracking.it.auth0.com/dwh-metrics' ;
+        if (DWH_ENDPOINT) {
+          //- We should catch for an undefined DWH_ENDPOINT
+          metricsLib.load(SEGMENT_KEY, DWH_ENDPOINT);
+        } else {
+          console.error("DWH_ENDPOINT must be defined for tracking to work.")
+        }
+        }();
+    </script> 
+  <script src="//cdn.auth0.com/js/ab/ab-1.min.js"></script> 
+  <script src="//cdn.auth0.com/js/ab/ab-loader-1.min.js"></script> 
+  <link rel="canonical" href="https://auth0.com/blog/understanding-angular-2-change-detection/"> 
+  <!-- amphtml
+
+    
+      
+        <link rel="amphtml" href="https://auth0.com/blog/amp/understanding-angular-2-change-detection/" />
+      
+     --> 
+  <link rel="shortcut icon" href="https://cdn.auth0.com/styleguide/components/1.0.8/media/logos/img/favicon.png"> 
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="https://auth0.com/blog/rss.xml"> 
+  <link type="application/opensearchdescription+xml" rel="search" href="https://auth0.com/blog/osd.xml"> 
+  <link rel="preload" href="https://cdn.auth0.com/styleguide/core/2.0.4/fonts/fakt/FaktPro-Normal.woff2" as="font" type="font/woff2" crossorigin> 
+  <link rel="stylesheet" href="https://cdn.auth0.com/styleguide/core/2.0.4/core.min.css"> 
+  <link rel="stylesheet" href="https://cdn.auth0.com/styleguide/components/1.0.8/components.min.css"> 
+  <link rel="stylesheet" href="/blog/css/index.css"> 
+  <link rel="stylesheet" href="/blog/css/vendor/selection-sharer.min.css"> 
+  <!-- <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css"> --> 
+ </head> 
+ <body itemscope itemtype="http://schema.org/WebPage"> 
+  <div id="header"></div> 
+  <aside id="popup"></aside> 
+  <div class="container"> 
+   <div class="pn-popup" role="alert"> 
+    <div class="pn-popup-container"> 
+     <p>?????Do you want to receive a desktop notification when new content is published?</p> 
+     <div class="pn-buttons"> 
+      <button id="push-allow">YES</button> 
+      <button id="push-block">NO</button> 
+     </div> 
+     <div class="arrow"></div> 
+    </div> 
+   </div> 
+  </div> 
+  <script>
+    (function () {
+      var config = {
+        auth0Domain: 'auth0.auth0.com',
+        auth0ClientID: 'zEYfpoFzUMEzilhkHilcWoNkrFfJ3hAI',
+        auth0CallbackURL: 'https://manage.auth0.com/callback',
+      };
+      var auth0js = new Auth0({
+        domain: config.auth0Domain,
+        clientID: config.auth0ClientID,
+        callbackURL: config.auth0CallbackURL,
+        responseType: 'token'
+      });
+      var lockOptions = {
+        auth: { redirectUrl: config.auth0CallbackURL },
+        theme: {
+          logo: 'https://cdn.auth0.com/styleguide/components/1.0.8/media/logos/img/badge.png'
+        },
+        rememberLastLogin: true,
+        integratedWindowsLogin: false,
+        socialButtonStyle: 'big',
+        languageDictionary: {
+          emailInputPlaceholder: 'Work email',
+          passwordInputPlaceholder: 'Your password',
+          signUpTerms: 'By signing up, you agree to our <a href="/terms" target="_new">terms of service</a> and <a href="/privacy" target="_new">privacy policy</a>'
+        }
+      };
+      var lock = window.lock = new Auth0Lock(
+        config.auth0ClientID,
+        config.auth0Domain,
+        lockOptions
+      );
+
+      lock.on('signup ready', function () {
+        metricsLib.track('open:signup', getBasicInfo());
+      });
+
+      lock.on('signin ready', function () {
+        metricsLib.track('open:signin', getBasicInfo());
+      });
+
+      window.login = function login() {
+        metricsLib.track('click:signin', getBasicInfo());
+        lock.show({ initialScreen: 'login' });
+      }
+
+      window.signup = function() {
+        metricsLib.track('click:signup', getBasicInfo());
+        window.location.href = '/signup';
+      }
+
+      // Header
+      var React = window.React;
+      var ReactDOM = window.ReactDOM;
+      var Auth0WebHeader = window.Auth0WebHeader.default;
+      var Auth0ContactForm = window.Auth0ContactForm.default;
+      var Header = React.createClass({
+        getInitialState: function () {
+          return {
+            logged: false
+          };
+        },
+
+        componentDidMount: function () {
+          var _this = this;
+          auth0js.getSSOData(false, function (err, data) {
+            var logged = data.sso;
+            _this.setState({ logged: logged });
+          });
+
+          var contactFormOptions = {
+            onModalOpen: function () {
+              metricsLib.track('open:talk-to-sales');
+            },
+            onFormSuccess: function (metricsData) {
+              metricsLib.track('register:lead:talk-to-sales-modal', metricsData);
+              metricsLib.track('sent:talk-to-sales', metricsData);
+            },
+            onFormFail: function (metricsData) {
+              metricsLib.track('fail:register:lead:talk-to-sales-modal', metricsData);
+              metricsLib.track('fail-sent:talk-to-sales', metricsData);
+            }
+          };
+          var contactForm = new Auth0ContactForm(contactFormOptions);
+          this.setState({
+            showContactForm: function () {
+              contactForm.show({includePhoneField: true });
+            }
+          });
+        },
+
+        render: function () {
+          var HeaderProps = {
+            logged: this.state.logged,
+            showContactForm: this.state.showContactForm
+          };
+          var Auth0WebHeaderProps = toAuth0WebHeaderProps(HeaderProps);
+
+          return React.createElement(Auth0WebHeader, Auth0WebHeaderProps);
+        }
+      });
+
+      function toAuth0WebHeaderProps(props) {
+        var Auth0WebHeaderProps = {
+          theme: 'dark',
+          talkToSalesButtonLink: null,
+          talkToSalesButtonOnClick: props.showContactForm,
+          loginButtonOnClick: window.login
+        };
+
+        if (props.logged) {
+          Auth0WebHeaderProps.signupButtonLink = 'https://manage.auth0.com';
+        } else {
+          Auth0WebHeaderProps.signupButtonOnClick = window.signup;
+        }
+
+        return Auth0WebHeaderProps;
+      }
+
+      var SlidingPopup = window.Auth0SlidingPopup.default;
+      ReactDOM.render(React.createElement(Header, null), document.getElementById('header'));
+      ReactDOM.render(React.createElement(SlidingPopup, { source: 'blog' }), document.getElementById('popup'));
+
+    })();
+    </script> 
+  <div id="pjax"> 
+   <!-- Facebook --> 
+   <div id="fb-root"></div> 
+   <script>
+        (function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=534074790006350&version=v2.0";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+      </script> 
+   <!-- Twitter --> 
+   <script type="text/javascript">
+        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+      </script> 
+   <!-- Twitter Conversion --> 
+   <script src="//platform.twitter.com/oct.js" type="text/javascript"></script> 
+   <!-- Twitter Conversion --> 
+   <script type="text/javascript">
+  twttr.conversion.trackPid('l4rua');
+</script> 
+   <noscript> 
+    <img height="1" width="1" style="display:none;" alt="" src="https://analytics.twitter.com/i/adsct?txn_id=l4rua&amp;p_id=Twitter"> 
+    <img height="1" width="1" style="display:none;" alt="" src="//t.co/i/adsct?txn_id=l4rua&amp;p_id=Twitter"> 
+   </noscript> 
+   <article itemprop="mainEntity" itemscope itemtype="http://schema.org/BlogPosting"> 
+    <link itemprop="mainEntityOfPage" href="https://auth0.com/blog/understanding-angular-2-change-detection/"> 
+    <section class="banner banner-post" style="background: #012C6C"> 
+     <div class="container banner-container"> 
+      <i class="icon-budicon-697 hide"></i> 
+      <h2 class="banner-subtitle"><a href="/blog/" target="_blank">Blog</a></h2> 
+      <a href="/blog/understanding-angular-2-change-detection/" style="
+
+ 
+
+" class="entry-thumbnail"> 
+       <div class="holder" itemprop="image" itemscope itemtype="http://schema.org/ImageObject"> 
+        <img style="
+  
+ 
+  
+    
+  
+ 
+  
+ 
+  
+" src="https://cdn.auth0.com/blog/angular/logo3.png" alt="Understanding Angular 2 change detection"> 
+        <meta itemprop="url" content="https://cdn.auth0.com/blog/angular/logo3.png"> 
+        <meta itemprop="width" content="128"> 
+        <meta itemprop="height" content="128"> 
+       </div> </a> 
+      <h1 class="entry-title"><a href="/blog/understanding-angular-2-change-detection/" title="Published: September 23, 2016"><span itemprop="headline">Understanding Angular 2 change detection</span></a></h1> 
+      <div class="entry-content" itemprop="description"> 
+       <p>Angular 2 introduces a new change detection system that makes apps much faster and allows developers fine-tune the process.</p> 
+      </div> 
+      <div class="post-info"> 
+       <div class="author"> 
+        <a href="https://twitter.com/WojciechKwiatek"><img src="https://en.gravatar.com/userimage/102277541/a28d70be6ae2b9389db9ad815cab510e.png?size=200" width="27" height="27"> <span class="name" itemprop="author">Wojciech Kwiatek</span></a> 
+       </div> 
+       <div class="date"> 
+        <time datetime="September 23, 2016" class="published updated">September 23, 2016</time> 
+        <meta itemprop="datePublished" content="2016-09-23"> 
+       </div> 
+       <div class="social-stats"> 
+        <a href="#" data-url="https://auth0.com/blog/understanding-angular-2-change-detection/" data-type="twitter" data-txt="Understanding Angular 2 change detection" data-via="auth0" data-count="true" class="network"> 
+         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="22" height="22" viewbox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"> 
+          <path id="twitter-icon" d="M462,128.223c-15.158,6.724-31.449,11.269-48.547,13.31c17.449-10.461,30.854-27.025,37.164-46.764
+
+      c-16.333,9.687-34.422,16.721-53.676,20.511c-15.418-16.428-37.386-26.691-61.698-26.691c-54.56,0-94.668,50.916-82.337,103.787
+
+      c-70.25-3.524-132.534-37.177-174.223-88.314c-22.142,37.983-11.485,87.691,26.158,112.85c-13.854-0.438-26.891-4.241-38.285-10.574
+
+      c-0.917,39.162,27.146,75.781,67.795,83.949c-11.896,3.237-24.926,3.978-38.17,1.447c10.754,33.58,41.972,58.018,78.96,58.699
+
+      C139.604,378.282,94.846,390.721,50,385.436c37.406,23.982,81.837,37.977,129.571,37.977c156.932,0,245.595-132.551,240.251-251.435
+
+      C436.339,160.061,450.668,145.174,462,128.223z" /> 
+         </svg> </a> 
+        <a href="#" data-url="https://auth0.com/blog/understanding-angular-2-change-detection/" data-type="linkedin" data-txt="Understanding Angular 2 change detection" data-count="true" class="network"> 
+         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="22" height="22" viewbox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"> 
+          <path id="linkedin-icon" d="M411.945,50h-312c-27.614,0-50,22.386-50,50v312c0,27.614,22.386,50,50,50h312
+
+      c27.614,0,50-22.386,50-50V100C461.945,72.386,439.56,50,411.945,50z M180.996,392.99h-56.537V210.336h56.537V392.99z
+
+       M152.457,186.417c-18.465,0-33.432-15.09-33.432-33.703c0-18.614,14.967-33.704,33.432-33.704c18.463,0,33.432,15.09,33.432,33.704
+
+      C185.889,171.327,170.92,186.417,152.457,186.417z M392.865,392.99h-56.262c0,0,0-69.582,0-95.881
+
+      c0-26.296-9.988-40.974-30.781-40.974c-22.629,0-34.453,15.289-34.453,40.974c0,28.133,0,95.881,0,95.881h-54.223V210.336h54.223
+
+      v24.599c0,0,16.309-30.171,55.041-30.171s66.455,23.648,66.455,72.572C392.865,326.262,392.865,392.99,392.865,392.99z" /> 
+         </svg> </a> 
+        <a href="#" data-url="https://auth0.com/blog/understanding-angular-2-change-detection/" data-type="facebook" data-txt="Understanding Angular 2 change detection" data-count="true" class="network"> 
+         <svg width="17" height="17" viewbox="0 0 412 412" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"> 
+          <g id="facebook-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> 
+           <path d="M283.80119,412 L361.995375,412 C389.611494,412 412,389.612167 412,361.995375 L412,50.0046252 C412,22.3885058 389.612167,0 361.995375,0 L50.0046252,0 C22.3885058,0 0,22.3878333 0,50.0046252 L0,361.995375 C0,389.611494 22.3878333,412 50.0046252,412 L219.907783,412 L219.907783,254.137637 L166.482996,254.137637 L166.482996,192.266054 L219.907783,192.266054 L219.907783,146.637452 C219.907783,93.6867027 252.247398,64.8530656 299.484232,64.8530656 C322.110827,64.8530656 341.559134,66.5376524 347.225329,67.2916602 L347.225329,122.6301 L314.462578,122.644417 C288.775412,122.644417 283.80119,134.851707 283.80119,152.764958 L283.80119,192.266054 L345.068293,192.266054 L337.089173,254.137637 L283.80119,254.137637 L283.80119,412 Z" id="Rectangle-1" fill="#000000" sketch:type="MSShapeGroup"></path> 
+          </g> 
+         </svg> </a> 
+       </div> 
+      </div> 
+     </div> 
+    </section> 
+    <div class="utility-bar"> 
+     <div class="container"> 
+      <div class="pull-left"> 
+       <a href="javascript:signup()" class="signup-button btn btn-success btn-md mf-listen">Use Auth0 for Free</a> 
+      </div> 
+      <div class="pull-right share-container"> 
+       <span class="share-label">Share this post</span> 
+       <div class="social-stats"> 
+        <a href="#" data-url="https://auth0.com/blog/understanding-angular-2-change-detection/" data-type="twitter" data-txt="Understanding Angular 2 change detection" data-via="auth0" data-count="true" class="network"> 
+         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="22" height="22" viewbox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"> 
+          <path id="twitter-icon" d="M462,128.223c-15.158,6.724-31.449,11.269-48.547,13.31c17.449-10.461,30.854-27.025,37.164-46.764
+
+      c-16.333,9.687-34.422,16.721-53.676,20.511c-15.418-16.428-37.386-26.691-61.698-26.691c-54.56,0-94.668,50.916-82.337,103.787
+
+      c-70.25-3.524-132.534-37.177-174.223-88.314c-22.142,37.983-11.485,87.691,26.158,112.85c-13.854-0.438-26.891-4.241-38.285-10.574
+
+      c-0.917,39.162,27.146,75.781,67.795,83.949c-11.896,3.237-24.926,3.978-38.17,1.447c10.754,33.58,41.972,58.018,78.96,58.699
+
+      C139.604,378.282,94.846,390.721,50,385.436c37.406,23.982,81.837,37.977,129.571,37.977c156.932,0,245.595-132.551,240.251-251.435
+
+      C436.339,160.061,450.668,145.174,462,128.223z" /> 
+         </svg> </a> 
+        <a href="#" data-url="https://auth0.com/blog/understanding-angular-2-change-detection/" data-type="linkedin" data-txt="Understanding Angular 2 change detection" data-count="true" class="network"> 
+         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="22" height="22" viewbox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"> 
+          <path id="linkedin-icon" d="M411.945,50h-312c-27.614,0-50,22.386-50,50v312c0,27.614,22.386,50,50,50h312
+
+      c27.614,0,50-22.386,50-50V100C461.945,72.386,439.56,50,411.945,50z M180.996,392.99h-56.537V210.336h56.537V392.99z
+
+       M152.457,186.417c-18.465,0-33.432-15.09-33.432-33.703c0-18.614,14.967-33.704,33.432-33.704c18.463,0,33.432,15.09,33.432,33.704
+
+      C185.889,171.327,170.92,186.417,152.457,186.417z M392.865,392.99h-56.262c0,0,0-69.582,0-95.881
+
+      c0-26.296-9.988-40.974-30.781-40.974c-22.629,0-34.453,15.289-34.453,40.974c0,28.133,0,95.881,0,95.881h-54.223V210.336h54.223
+
+      v24.599c0,0,16.309-30.171,55.041-30.171s66.455,23.648,66.455,72.572C392.865,326.262,392.865,392.99,392.865,392.99z" /> 
+         </svg> </a> 
+        <a href="#" data-url="https://auth0.com/blog/understanding-angular-2-change-detection/" data-type="facebook" data-txt="Understanding Angular 2 change detection" data-count="true" class="network"> 
+         <svg width="17" height="17" viewbox="0 0 412 412" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"> 
+          <g id="facebook-icon" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage"> 
+           <path d="M283.80119,412 L361.995375,412 C389.611494,412 412,389.612167 412,361.995375 L412,50.0046252 C412,22.3885058 389.612167,0 361.995375,0 L50.0046252,0 C22.3885058,0 0,22.3878333 0,50.0046252 L0,361.995375 C0,389.611494 22.3878333,412 50.0046252,412 L219.907783,412 L219.907783,254.137637 L166.482996,254.137637 L166.482996,192.266054 L219.907783,192.266054 L219.907783,146.637452 C219.907783,93.6867027 252.247398,64.8530656 299.484232,64.8530656 C322.110827,64.8530656 341.559134,66.5376524 347.225329,67.2916602 L347.225329,122.6301 L314.462578,122.644417 C288.775412,122.644417 283.80119,134.851707 283.80119,152.764958 L283.80119,192.266054 L345.068293,192.266054 L337.089173,254.137637 L283.80119,254.137637 L283.80119,412 Z" id="Rectangle-1" fill="#000000" sketch:type="MSShapeGroup"></path> 
+          </g> 
+         </svg> </a> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+    <div id="container" class="container"> 
+     <div class="row sticky-container"> 
+      <section class="col-md-8 content-column"> 
+       <main class="blog-post blog-single"> 
+        <div class="inner"> 
+         <div class="entry-content js-entry-content" itemprop="articleBody"> 
+          <div class="alert alert-info alert-icon"> 
+           <i class="icon-budicon-664"></i> 
+           <strong>Get the "Migrating an Angular 1 App to Angular 2" book for Free.</strong> Spread the word and 
+           <a href="https://auth0.com/e-books/migrating-to-angular2">download it now!</a> 
+          </div> 
+          <hr> 
+          <p><strong>TL;DR</strong> Angular 2 introduces a reinvented change detection system that drops digest cycles in favor of one-way flow. Additionally, change detection can now be controlled and fine-tuned by developers to get the most of the framework's performance.</p> 
+          <hr> 
+          <h2>Introduction to Change Detection</h2> 
+          <p>Angular 2 final has been released. You've probably heard about some of the changes due to the major version bump: it's has been completely rewritten, TypeScript was selected as the language of choice, reinvented forms, RxJS, a completely new router, etc. In my opinion, the most valuable thing is the redesign of the core change detection system. As you may remember, the digest loop performance of AngularJS (aka Angular 1) was problematic. Now it's not.</p> 
+          <h3>Why Do We Need Change Detection?</h3> 
+          <p>Why bother? Generally, the power of modern JavaScript frameworks works something like this: an event changes in the model and forcing a change in the UI. This is change detection, the system that monitors events and acts on them. Something has to trigger this propagation to the view. As mentioned before, in Angular 1 we had digest loops that checked every single reference that was set to be watched for value changes. When Angular found out that everything was stable (no infinite loops, etc.), it propagated changes to the view. Although this was not efficient, it worked for a long time. Also, the problem was tracking asynchronous events. You also probably used <code>$scope.$apply(...)</code> if you worked with Angular 1. To understand why it was needed, let's start from the beginning.</p> 
+          <h3>How Javascript works</h3> 
+          <p>The JavaScript runtime works on a single threaded engine. You've probably heard about the stack (possibly from other programming languages). Let's take the code below:</p> 
+          <pre><code class="js">console.log('Hey')
+setTimeout(() =&gt; {
+   console.log('Hello from timeout!')
+}, 1000);
+console.log('Hi')
+</code></pre> 
+          <p>We'll see this in a console as:</p> 
+          <pre><code class="html">Hey
+Hi
+Hello from timeout!
+</code></pre> 
+          <p>Moreover, nothing is blocked during the one-second wait period. So how would the JS engine do this with a single thread?</p> 
+          <h4>Synchronous code</h4> 
+          <p>Let's go step by step. If you have code like this:</p> 
+          <pre><code class="js">console.log('1')
+console.log('2')
+console.log('3')
+</code></pre> 
+          <p>every instruction will be put onto the stack and will run one by one. There's no possibility of seeing 3 before 2 or 1. So we'll end up with the following:</p> 
+          <pre><code>1
+2
+3
+</code></pre> 
+          <p>Every time. Everywhere.</p> 
+          <h4>Asynchronous code</h4> 
+          <p>But let's go back to the timeout:</p> 
+          <pre><code class="js">console.log('1')
+setTimeout(() =&gt; {
+  console.log('2')
+}, 0)
+console.log('3')
+</code></pre> 
+          <p>What happens now? On the stack, we'll have:</p> 
+          <pre><code class="js">console.log
+setTimeout
+console.log
+</code></pre> 
+          <p>The trick here is how <code>setTimeout</code> works and what it really is. Yes, it will be invoked as a normal synchronous action, but all the JS engine does is give the wheel to something else. There's a bunch of browser APIs that aren't part of this single threaded process. And there's a thing called event loop. This event loop goes one by one through the stack instructions, and if it's empty, it then goes to the <em>callback queue</em>. The reference to the <code>setTimeout</code> code is there. Once callback is done, the code will go to the stack.</p> 
+          <p>What does it mean? Two things:</p> 
+          <ul> 
+           <li>Everything that's inside an asynchronous callback (as in <code>setTimeout</code>) will be run <em>after</em> any other synchronous code; this is why hacks like <code>setTimeout(() =&gt; {}, 0)</code> work.</li> 
+           <li>We have no way of ensuring 1000ms is <em>exactly</em> 1000ms (but we know it's at least 1000ms).</li> 
+          </ul> 
+          <p>For complete understanding of event loop and what's going on in the browser, I encourage you to take a look at this <a href="https://www.youtube.com/watch?v=8aGhZQkoFbQ">Philip Roberts talk</a>.</p> 
+          <h3>How Zones Relate to Change Detection</h3> 
+          <p>How does all of this relate to Angular and change detection? Tracking objects with synchronous code is fairly easy. However, when it comes to asynchronous code, things get complicated. That's because Angular 1 forced us to use <code>$scope.$apply(...)</code> each time an asynchronous action was made or use the Angular way of doing asynchronous actions: <code>$timeout</code>, <code>$http</code>, and so on. The thing is, if something was made outside of the controller (even a perfectly valid change to the reference object), Angular didn't know about it, so it didn't fire any event to reflect changes to the UI.</p> 
+          <p>On the other hand, we now have Angular 2. It dropped all of the stuff connected to digest cycles and now uses <em>Zones</em>. Zones are able to track the context of asynchronous actions by monkey-patching them (i.e., overwriting them with its own code), which then invokes the desired action but with some additional information attached. This additional information is the context. This way, Angular will know which component the asynchronous action was invoked from.</p> 
+          <p>The big win of this approach is that we can use the browser APIs natively, and Angular will know what's going on without forcing us to manually tell it a change has occured. The drawback is that Zones overwrite asynchronous actions, which is kind of a hacky solution and may affect other (existing) code if we're not relying only on Angular in the app.</p> 
+          <p>But exactly how is Angular notified of the change? Angular uses its own version of the Zone called <code>NgZone</code>, which relays finished asynchronous actions with the <code>onTurnDone</code> event. Angular change detection waits for the event to perform change detection and checks what needs to be updated in the UI. That's the core behavior.</p> 
+          <h2>Make Use of Change Detection In Your App</h2> 
+          <p>Everything described above is going on under the hood. Equally important is how we can make use of it. Unlike Angular 1, Angular 2 gives us the possibility of controlling the change detection. However, the Angular team claims that even without any performance tweaking, it's 3 to 10 times faster than the previous one, and for most apps this will be fast enough. But it can be much faster. Let's look at an example.</p> 
+          <iframe src="https://embed.plnkr.co/HR7ssEuPaWwlVKJPzZtJ/" width="100%" height="800"></iframe> 
+          <p>Here's a very typical problem: rendering a list. There's one component containing a list of other components that have some input data. Generally, we have a container with data and a dumb component just for rendering a single list item. Nothing fancy here, just the getter and <code>ngOnChange</code>. What's being done here? <code>ngOnChange</code> reacts on every input change, and the getter adds additional logging each time <code>rowData</code> are fetched. Note that we're not using it anywhere outside of the template.</p> 
+          <p>This means the getter is fired by Angular itself. And guess what happens? We have a single change on the input, but there are hundreds of getter logs over there.</p> 
+          <p>Why is that?</p> 
+          <p>Angular is notified about the change from some component and has to check how that affects the current state, so it checks all the values for the change. Actually, the team says it can make thousands of such checks in milliseconds, but it's still a waste of time and can even harm our big data-driven application.</p> 
+          <h3>Immutability</h3> 
+          <p>The cool thing about the new change detection system is that now we can tune it. Let's take a break from Angular and consider following code:</p> 
+          <pre><code class="js">const users = [{
+  name: 'John',
+  age: 27
+}, {
+  name: 'Anna',
+  age: 23
+}]
+
+users.push({
+  name: 'Max',
+  age: 30
+})
+</code></pre> 
+          <p>The most important thing here is the <code>const</code> declaration. If <code>users</code> is constant, how can we modify it? Well, that's how JavaScript works! The <code>const</code> prevents us from modifying a reference to the particular object in JavaScript. What the <code>push</code> method of <code>Array</code> is really doing is appending another object to the existing array (with no reference change). Let's go on to another very typical example:</p> 
+          <pre><code class="js">const user = {
+  name: 'Max',
+  age: 30
+}
+
+user.age = 31
+</code></pre> 
+          <p>The same thing applies. Although we can't modify the whole object to make it be another one (reference change), we still can change part of the object!</p> 
+          <p>This is why the checks we discussed before aren't so good. If you want to check whether the object is the same as it was before, you have to <em>deeply check all of its properties</em>. It's not efficient.</p> 
+          <p>How can we force the object to be a new one with the changed property? It's actually quite easy with the new <a href="https://github.com/sebmarkbage/ecmascript-rest-spread">ECMAScript Object spread properties proposal</a>:</p> 
+          <pre><code class="js">const user = {
+  name: 'Max',
+  age: 30
+}
+
+const modifiedUser = { ...user, age: 31 }
+</code></pre> 
+          <h3>Change Detection Strategies</h3> 
+          <p>The good part about all this is that now we can say to Angular that <em>we know what we're doing</em>. To modify the change detection behavior, we can use the <code>ChangeDetectionStrategy</code> API, which has one very interesting value: <code>OnPush</code>. It makes a component with this strategy applied look at the values inside only when the reference on the input changes or some event has been fired from the component.</p> 
+          <p>Let's add the <code>OnPush</code> strategy to our previous example:</p> 
+          <pre><code class="ts">import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+
+@Component({
+  selector: 'row',
+  template: `
+    &lt;pre&gt;&lt;/pre&gt;
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class RowComponent {
+  ...
+}
+</code></pre> 
+          <p>You can try it on Plunker and see the difference.</p> 
+          <iframe src="https://embed.plnkr.co/d9b07qginx7z9hGYyeME/" width="100%" height="800"></iframe> 
+          <p> The huge improvement is that there's now only one getter call for one change! We didn't need anything more as our input data are strings that are being changed, so that reference on input changes. The reference for the rest of the components hasn't changed, so Angular doesn't even look at it.</p> 
+          <h3>App Structure</h3> 
+          <p>How can we build a highly performing app? With Angular 2, it's actually quite easy. As in all of the component frameworks nowadays, you should have dumb and smart components. The dumb components, which are meant only for displaying data from the input or handling user events, are ideal volunteers for having the <code>OnPush</code> strategy. Smart components will sometimes require that you watch for more things than the input and the events, so be careful with setting the <code>OnPush</code> strategy there.</p> 
+          <h2>Aside: Authenticate an Angular App and Node API with Auth0</h2> 
+          <p>We can protect our applications and APIs so that only authenticated users can access them. Let's explore how to do this with an Angular application and a Node API using <a href="https://auth0.com">Auth0</a>. You can clone this sample app and API from the <a href="https://github.com/auth0-blog/angular-auth0-aside">angular-auth0-aside repo on GitHub</a>.</p> 
+          <p><img src="https://cdn2.auth0.com/blog/angular-aside/angular-aside-login.jpg" alt="Auth0 hosted login screen"></p> 
+          <h3>Features</h3> 
+          <p>The <a href="https://github.com/auth0-blog/angular-auth0-aside">sample Angular application and API</a> has the following features:</p> 
+          <ul> 
+           <li>Angular application generated with <a href="https://github.com/angular/angular-cli">Angular CLI</a> and served at <a href="http://localhost:4200">http://localhost:4200</a></li> 
+           <li>Authentication with <a href="https://auth0.com/docs/libraries/auth0js/v8">auth0.js</a> using a hosted <a href="https://auth0.com/lock">Lock</a> instance</li> 
+           <li>Node server protected API route <code>http://localhost:3001/api/dragons</code> returns JSON data for authenticated <code>GET</code> requests</li> 
+           <li>Angular app fetches data from API once user is authenticated with Auth0</li> 
+           <li>Profile page requires authentication for access using route guards</li> 
+           <li>Authentication service uses a subject to propagate authentication status events to the entire app</li> 
+           <li>User profile is fetched on authentication and stored in authentication service</li> 
+           <li>Access token, ID token, and profile are stored in local storage and removed upon logout</li> 
+           <li>Authenticated API requests are made with the <a href="https://github.com/auth0/angular2-jwt">angular2-jwt</a> helper library</li> 
+          </ul> 
+          <h3>Sign Up for Auth0</h3> 
+          <p>You'll need an <a href="https://auth0.com">Auth0</a> account to manage authentication. You can sign up for a <a href="javascript:signup()">free account here</a>. Next, set up an Auth0 client app and API so Auth0 can interface with an Angular app and Node API.</p> 
+          <h3>Set Up a Client App</h3> 
+          <ol> 
+           <li>Go to your <a href="https://manage.auth0.com/#/"><strong>Auth0 Dashboard</strong></a> and click the "<a href="https://manage.auth0.com/#/clients/create">create a new client</a>" button.</li> 
+           <li>Name your new app and select "Single Page Web Applications".</li> 
+           <li>In the <strong>Settings</strong> for your new Auth0 client app, add <code>http://localhost:4200/callback</code> to the <strong>Allowed Callback URLs</strong> and <code>http://localhost:4200</code> to the <strong>Allowed Origins (CORS)</strong>.</li> 
+           <li>Scroll down to the bottom of the <strong>Settings</strong> section and click "Show Advanced Settings". Choose the <strong>OAuth</strong> tab and change the <strong>JsonWebToken Signature Algorithm</strong> to <code>RS256</code>.</li> 
+           <li>If you'd like, you can <a href="https://manage.auth0.com/#/connections/social">set up some social connections</a>. You can then enable them for your app in the <strong>Client</strong> options under the <strong>Connections</strong> tab. The example shown in the screenshot above utilizes username/password database, Facebook, Google, and Twitter.</li> 
+          </ol> 
+          <h3>Set Up an API</h3> 
+          <ol> 
+           <li>Under your account name in the upper right corner of your <a href="https://manage.auth0.com/#/"><strong>Auth0 Dashboard</strong></a>, choose <strong>Account Settings</strong> from the dropdown, then select the <a href="https://manage.auth0.com/#/account/advanced"><strong>Advanced</strong></a> tab. Scroll down to the <strong>Settings</strong> section and turn on the toggle for <strong>Enable APIs Section</strong>. Now you will have a link to manage <a href="https://manage.auth0.com/#/apis">APIs</a> in your dashboard left sidebar navigation.</li> 
+           <li>Go to <a href="https://manage.auth0.com/#/apis"><strong>APIs</strong></a> in your dashboard and click on the "Create API" button. Enter a name for the API. Set the <strong>Identifier</strong> to your API endpoint URL. In this example, this is <code>http://localhost:3001/api/</code>. The <strong>Signing Algorithm</strong> should be <code>RS256</code>.</li> 
+           <li>You can consult the Node.js example under the <strong>Quick Start</strong> tab in your new API's settings. We'll implement our Node API in this fashion, using <a href="https://expressjs.com/">Express</a>, <a href="https://github.com/auth0/express-jwt">express-jwt</a>, and <a href="https://github.com/auth0/node-jwks-rsa">jwks-rsa</a>.</li> 
+          </ol> 
+          <p>We're now ready to implement Auth0 authentication on both our Angular client and Node backend API.</p> 
+          <h3>Dependencies and Setup</h3> 
+          <p>The Angular app utilizes the <a href="https://github.com/angular/angular-cli">Angular CLI</a>. Make sure you have the CLI installed globally:</p> 
+          <pre><code class="bash">$ npm install -g @angular/cli
+</code></pre> 
+          <p>Once you've cloned <a href="https://github.com/auth0-blog/angular-auth0-aside">the project</a>, install the Node dependencies for both the Angular app and the Node server by running the following commands in the root of your project folder:</p> 
+          <pre><code class="bash">$ npm install
+$ cd server
+$ npm install
+</code></pre> 
+          <p>The Node API is located in the <a href="https://github.com/auth0-blog/angular-auth0-aside/tree/master/server"><code>/server</code> folder</a> at the root of our sample application.</p> 
+          <p>Open the <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/server/server.js"><code>server.js</code> file</a>:</p> 
+          <pre><code class="js">// server/server.js
+...
+// @TODO: change [CLIENT_DOMAIN] to your Auth0 domain name.
+// @TODO: change [AUTH0_API_AUDIENCE] to your Auth0 API audience.
+var CLIENT_DOMAIN = '[CLIENT_DOMAIN].auth0.com';
+var AUTH0_AUDIENCE = '[AUTH0_API_AUDIENCE]';  // http://localhost:3001/api in this example
+
+var jwtCheck = jwt({
+    secret: jwks.expressJwtSecret({
+      cache: true,
+      rateLimit: true,
+      jwksRequestsPerMinute: 5,
+      jwksUri: `https://${CLIENT_DOMAIN}/.well-known/jwks.json`
+    }),
+    audience: AUTH0_AUDIENCE,
+    issuer: `https://${CLIENT_DOMAIN}/`,
+    algorithms: ['RS256']
+});
+...
+//--- GET protected dragons route
+app.get('/api/dragons', jwtCheck, function (req, res) {
+  res.json(dragonsJson);
+});
+...
+</code></pre> 
+          <p>Change the <code>CLIENT_DOMAIN</code> variable to your Auth0 client domain. The <code>/api/dragons</code> route will be protected with <a href="https://github.com/auth0/express-jwt">express-jwt</a> and <a href="https://github.com/auth0/node-jwks-rsa">jwks-rsa</a>.</p> 
+          <blockquote>
+           <p><strong>Note:</strong> To learn more about RS256 and JSON Web Key Set, read <a href="https://auth0.com/blog/navigating-rs256-and-jwks/">Navigating RS256 and JWKS</a>.</p>
+          </blockquote> 
+          <p>Our API is now protected, so let's make sure that our Angular application can also interface with Auth0. To do this, we'll activate the <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth0-variables.ts.example"><code>src/app/auth/auth0-variables.ts.example</code> file</a> by deleting the <code>.example</code> from the file extension. Then open the file and change the <code>[CLIENT_ID]</code> and <code>[CLIENT_DOMAIN]</code> strings to your Auth0 information:</p> 
+          <pre><code class="js">// src/app/auth/auth0-variables.ts
+...
+export const AUTH_CONFIG: AuthConfig = {
+  CLIENT_ID: '[CLIENT_ID]',
+  CLIENT_DOMAIN: '[CLIENT_DOMAIN].auth0.com',
+  ...
+</code></pre> 
+          <p>Our app and API are now set up. They can be served by running <code>$ ng serve</code> from the root folder and <code>$ node server.js</code> from the <code>/server</code> folder.</p> 
+          <p>With the Node API and Angular app running, let's take a look at how authentication is implemented.</p> 
+          <h3>Authentication Service</h3> 
+          <p>Authentication logic on the front end is handled with an <code>AuthService</code> authentication service: <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth.service.ts"><code>src/app/auth/auth.service.ts</code> file</a>.</p> 
+          <pre><code class="js">import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { AUTH_CONFIG } from './auth0-variables';
+import { tokenNotExpired } from 'angular2-jwt';
+import { UserProfile } from './profile.model';
+
+// Avoid name not found warnings
+declare var auth0: any;
+
+@Injectable()
+export class AuthService {
+  // Create Auth0 web auth instance
+  // @TODO: Update AUTH_CONFIG and remove .example extension in src/app/auth/auth0-variables.ts.example
+  auth0 = new auth0.WebAuth({
+    clientID: AUTH_CONFIG.CLIENT_ID,
+    domain: AUTH_CONFIG.CLIENT_DOMAIN
+  });
+
+  userProfile: UserProfile;
+
+  // Create a stream of logged in status to communicate throughout app
+  loggedIn: boolean;
+  loggedIn$ = new BehaviorSubject&lt;boolean&gt;(this.loggedIn);
+
+  constructor(private router: Router) {
+    // If authenticated, set local profile property and update login status subject
+    if (this.authenticated) {
+      this.userProfile = JSON.parse(localStorage.getItem('profile'));
+      this.setLoggedIn(true);
+    }
+  }
+
+  setLoggedIn(value: boolean) {
+    // Update login status subject
+    this.loggedIn$.next(value);
+    this.loggedIn = value;
+  }
+
+  login() {
+    // Auth0 authorize request
+    // Note: nonce is automatically generated: https://auth0.com/docs/libraries/auth0js/v8#using-nonce
+    this.auth0.authorize({
+      responseType: 'token id_token',
+      redirectUri: AUTH_CONFIG.REDIRECT,
+      audience: AUTH_CONFIG.AUDIENCE,
+      scope: AUTH_CONFIG.SCOPE
+    });
+  }
+
+  handleAuth() {
+    // When Auth0 hash parsed, get profile
+    this.auth0.parseHash((err, authResult) =&gt; {
+      if (authResult &amp;&amp; authResult.accessToken &amp;&amp; authResult.idToken) {
+        window.location.hash = '';
+        this._getProfile(authResult);
+        this.router.navigate(['/']);
+      } else if (err) {
+        this.router.navigate(['/']);
+        console.error(`Error: ${err.error}`);
+      }
+    });
+  }
+
+  private _getProfile(authResult) {
+    // Use access token to retrieve user's profile and set session
+    this.auth0.client.userInfo(authResult.accessToken, (err, profile) =&gt; {
+      this._setSession(authResult, profile);
+    });
+  }
+
+  private _setSession(authResult, profile) {
+    // Save session data and update login status subject
+    localStorage.setItem('access_token', authResult.accessToken);
+    localStorage.setItem('id_token', authResult.idToken);
+    localStorage.setItem('profile', JSON.stringify(profile));
+    this.userProfile = profile;
+    this.setLoggedIn(true);
+  }
+
+  logout() {
+    // Remove tokens and profile and update login status subject
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('id_token');
+    localStorage.removeItem('profile');
+    this.userProfile = undefined;
+    this.setLoggedIn(false);
+  }
+
+  get authenticated() {
+    // Check if there's an unexpired access token
+    return tokenNotExpired('access_token');
+  }
+
+}
+</code></pre> 
+          <p>This service uses the config variables from <code>auth0-variables.ts</code> to instantiate an <code>auth0.js</code> WebAuth instance.</p> 
+          <blockquote>
+           <p><strong>Note:</strong> <code>auth0.js</code> is linked in the <code>index.html</code> file from CDN.</p>
+          </blockquote> 
+          <p>An <a href="https://github.com/Reactive-Extensions/RxJS/blob/master/doc/api/subjects/behaviorsubject.md">RxJS <code>BehaviorSubject</code></a> is used to provide a stream of authentication status events that you can subscribe to anywhere in the app.</p> 
+          <p>The <code>login()</code> method authorizes the authentication request with Auth0 using your config variables. An Auth0 hosted Lock instance will be shown to the user and they can then log in:</p> 
+          <blockquote>
+           <p><strong>Note:</strong> If it's the user's first visit to our app <em>and</em> our callback is on <code>localhost</code>, they'll also be presented with a consent screen where they can grant access to our API. First party clients on non-localhost domains will not be presented with the consent dialog.</p>
+          </blockquote> 
+          <p>We'll receive an <code>id_token</code> and an <code>access_token</code> in the hash from Auth0 when returning to our app. The <code>handleAuth()</code> method uses Auth0's <code>parseHash()</code> method callback to get the user's profile (<code>_getProfile()</code>) and set the session (<code>_setSession()</code>) by saving the tokens and profile to local storage and updating the <code>loggedIn$</code> subject so that any subscribed components in the app are informed that the user is now authenticated.</p> 
+          <blockquote>
+           <p><strong>Note:</strong> The profile takes the shape of <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/profile.model.ts"><code>profile.model.ts</code></a> from the <a href="https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims">OpenID standard claims</a>.</p>
+          </blockquote> 
+          <p>The <code>handleAuth()</code> method can then be called in the <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.component.ts"><code>app.component.ts</code> constructor</a> like so:</p> 
+          <pre><code class="js">// src/app/app.component.ts
+import { AuthService } from './auth/auth.service';
+...
+  constructor(private auth: AuthService) {
+    // Check for authentication and handle if hash present
+    auth.handleAuth();
+  }
+...
+</code></pre> 
+          <p>Finally, we have a <code>logout()</code> method that clears data from local storage and updates the <code>loggedIn$</code> subject and an <code>authenticated()</code> accessor to return current authentication status.</p> 
+          <p>Once <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.module.ts#L32"><code>AuthService</code> is provided in <code>app.module.ts</code></a>, its methods and properties can be used anywhere in our app, such as the <a href="https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/home">home component</a>.</p> 
+          <p>The <a href="https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/callback">callback component</a> is where the app is redirected after authentication. This component simply shows a loading message until hash parsing is completed and the Angular app redirects back to the home page.</p> 
+          <h3>Making Authenticated API Requests</h3> 
+          <p>In order to make authenticated HTTP requests, we're using <a href="https://github.com/auth0/angular2-jwt">angular2-jwt</a>. The <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth-http.factory.ts"><code>auth-http.factory.ts</code> factory</a> supplies an <code>authHttp</code> method that sends the <code>access_token</code> from local storage. This is provided in the <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app.module.ts"><code>app.module.ts</code> file</a>:</p> 
+          <pre><code class="js">// src/app/app.module.ts
+...
+import { authHttpFactory } from './auth/auth-http.factory';
+...
+  providers: [
+    ...,
+    {
+      provide: AuthHttp,
+      useFactory: authHttpFactory,
+      deps: [Http, RequestOptions]
+    }
+  ],
+</code></pre> 
+          <p>We can then call our API in the <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/api.service.ts"><code>api.service.ts</code> file</a> with <code>AuthHttp</code> to authorize requests.</p> 
+          <pre><code class="js">// src/app/api.service.ts
+...
+import { AuthHttp, AuthConfig } from 'angular2-jwt';
+...
+  getDragons$(): Observable&lt;any[]&gt; {
+    return this.authHttp
+      .get(`${this.baseUrl}dragons`)
+      .map(this._handleSuccess)
+      .catch(this._handleError);
+  }
+...
+</code></pre> 
+          <h3>Final Touches: Route Guard and Profile Page</h3> 
+          <p>A <a href="https://github.com/auth0-blog/angular-auth0-aside/tree/master/src/app/profile">profile page component</a> can show an authenticated user's profile information. However, we only want this component to be accessible if the user is logged in.</p> 
+          <p>With an <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/home/home.component.ts">authenticated API request and login/logout</a> implemented, the final touch is to protect our profile route from unauthorized access. The <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/auth/auth.guard.ts"><code>auth.guard.ts</code> route guard</a> can check authentication and activate routes conditionally. The guard is implemented on specific routes of our choosing in the <a href="https://github.com/auth0-blog/angular-auth0-aside/blob/master/src/app/app-routing.module.ts"><code>app-routing.module.ts</code> file</a> like so:</p> 
+          <pre><code class="js">// src/app/app-routing.module.ts
+...
+import { AuthGuard } from './auth/auth.guard';
+...
+      {
+        path: 'profile',
+        component: ProfileComponent,
+        canActivate: [
+          AuthGuard
+        ]
+      },
+...
+</code></pre> 
+          <h3>More Resources</h3> 
+          <p>That's it! We have an authenticated Node API and Angular application with login, logout, profile information, and protected routes. To learn more, check out the following resources:</p> 
+          <ul> 
+           <li><a href="https://auth0.com/blog/why-should-use-accesstokens-to-secure-an-api/">Why You Should Always Use Access Tokens to Secure an API</a></li> 
+           <li><a href="https://auth0.com/blog/navigating-rs256-and-jwks/">Navigating RS256 and JWKS</a></li> 
+           <li><a href="https://auth0.com/docs/tokens/access-token">Access Token</a></li> 
+           <li><a href="https://auth0.com/docs/api-auth/tutorials/verify-access-token">Verify Access Tokens</a></li> 
+           <li><a href="https://auth0.com/docs/api-auth/grant/implicit">Call APIs from Client-side Web Apps</a></li> 
+           <li><a href="https://auth0.com/docs/api-auth/tutorials/implicit-grant">How to implement the Implicit Grant</a></li> 
+           <li><a href="https://auth0.com/docs/libraries/auth0js/v8">Auth0.js v8 Documentation</a></li> 
+           <li><a href="https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims">OpenID Standard Claims</a></li> 
+          </ul> 
+          <h2>Conclusions</h2> 
+          <h3>Performance Advantages</h3> 
+          <p>One of the big advantages of using stricter change detection is the performance gains. Angular is meant to be used for large applications that can handle lots of dynamic data. The Angular team has given the developer the tools necessary to fine-tune and improve performance from the get-go. By default, every change should be reflected on the UI, as Angular takes care of that, but the price is lower performance. Immutable or reactive code is harder to write but easier to maintain and reason out. The choice is yours.</p> 
+          <h3>Eventually Angular can be tweaked</h3> 
+          <p>The good thing is that we have a choice with Angular 2. In Angular 1, it was impossible to get away from the digest cycle. At a certain point, it was advantageous to use React or another library to render UI instead of Angular templates, as it was too slow when handling a large amount of dynamic data. Now, you have a complete solution with much more control over the internal behavior. This, in combination with the other changes made to Angular 2, makes the learning curve of the framework steeper but worth it.</p> 
+         </div> 
+        </div> 
+       </main> 
+       <div class="bottom-module"> 
+        <section class="custom-try-banner  "> 
+         <div class="banner-wrapper"> 
+          <a href="https://auth0.com/" target="_blank" class="banner-logo"></a> 
+          <p class="banner-text"> Auth0 makes it easy to add authentication to your AngularJS application. </p> 
+          <a href="javascript:signup()" class="signup-button btn btn-success btn-md">Use Auth0 for Free</a> 
+         </div> 
+        </section> 
+        <div class="try-banner" style="display:none;"> 
+         <a href="javascript:signup()" class="signup-button btn btn-success   btn-lg">Use Auth0 for Free</a> 
+        </div> 
+       </div> 
+       <div id="disqus_thread"></div> 
+      </section> 
+      <aside class="col-md-4 sidebar-column" data-sticky-padding="90" itemscope itemtype="http://schema.org/WPSideBar"> 
+       <section id="newsletter-subs"> 
+        <form class="newsletter-subscriber hide"> 
+         <span data-close></span> 
+         <h5 class="title">Subscribe to more awesome content!</h5> 
+         <div class="fields"> 
+          <button type="submit" class="btn btn-lg btn-success"> 
+           <svg fill="#FFFFFF" height="24" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"> 
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" /> 
+            <path d="M0 0h24v24H0z" fill="none" /> 
+           </svg> </button> 
+          <span><input class="form-control" type="text" placeholder="your@email.com"></span> 
+         </div> 
+        </form> 
+       </section> 
+       <section class="popular-posts"> 
+        <h5 class="section-title">Related Posts</h5> 
+        <article class="popular-post"> 
+         <div class="image-container"> 
+          <a href="/blog/create-a-desktop-app-with-angular-2-and-electron/" style="
+
+  background: #fff;
+
+ 
+
+" class="entry-thumbnail"> 
+           <div class="holder" itemprop="image" itemscope itemtype="http://schema.org/ImageObject"> 
+            <img style="
+  
+ 
+  
+    
+    max-width: 75%;
+    
+  
+ 
+  
+ 
+  
+" src="https://cdn.auth0.com/blog/angular2-electron/angular2-electron-logo.png" alt="Create a Desktop App with Angular 2 and Electron"> 
+            <meta itemprop="url" content="https://cdn.auth0.com/blog/angular2-electron/angular2-electron-logo.png"> 
+            <meta itemprop="width" content="128"> 
+            <meta itemprop="height" content="128"> 
+           </div> </a> 
+         </div> 
+         <div class="text-container"> 
+          <a href="/blog/create-a-desktop-app-with-angular-2-and-electron/"><h2 class="popular-post-title h4">Create a Desktop App with Angular 2 and Electron</h2></a> 
+          <span class="popular-post-author"><a href="#" rel="author">Ryan Chenkie</a></span> 
+         </div> 
+        </article> 
+        <article class="popular-post"> 
+         <div class="image-container"> 
+          <a href="/blog/introducing-angular2-jwt-a-library-for-angular2-authentication/" style="
+
+  background: linear-gradient(#0143A3,#0273D4);
+
+ 
+
+" class="entry-thumbnail"> 
+           <div class="holder" itemprop="image" itemscope itemtype="http://schema.org/ImageObject"> 
+            <img style="
+  
+ 
+  
+    
+    max-width: 70%;
+    
+  
+ 
+  
+ 
+  
+" src="https://cdn.auth0.com/blog/angular2-series/angular2-logo.png" alt="Introducing angular2-jwt: A Library for Angular 2 Authentication"> 
+            <meta itemprop="url" content="https://cdn.auth0.com/blog/angular2-series/angular2-logo.png"> 
+            <meta itemprop="width" content="128"> 
+            <meta itemprop="height" content="128"> 
+           </div> </a> 
+         </div> 
+         <div class="text-container"> 
+          <a href="/blog/introducing-angular2-jwt-a-library-for-angular2-authentication/"><h2 class="popular-post-title h4">Introducing angular2-jwt: A Library for Angular 2 Authentication</h2></a> 
+          <span class="popular-post-author"><a href="#" rel="author">Ryan Chenkie</a></span> 
+         </div> 
+        </article> 
+        <article class="popular-post"> 
+         <div class="image-container"> 
+          <a href="/blog/creating-your-first-real-world-angular-2-app-from-authentication-to-calling-an-api-and-everything-in-between/" style="
+
+ 
+
+" class="entry-thumbnail"> 
+           <div class="holder" itemprop="image" itemscope itemtype="http://schema.org/ImageObject"> 
+            <img style="
+  
+ 
+  
+    
+  
+ 
+  
+ 
+  
+" src="https://cdn.auth0.com/blog/angular/logo3.png" alt="Build your Angular 2 App: From Auth to calling an API"> 
+            <meta itemprop="url" content="https://cdn.auth0.com/blog/angular/logo3.png"> 
+            <meta itemprop="width" content="128"> 
+            <meta itemprop="height" content="128"> 
+           </div> </a> 
+         </div> 
+         <div class="text-container"> 
+          <a href="/blog/creating-your-first-real-world-angular-2-app-from-authentication-to-calling-an-api-and-everything-in-between/"><h2 class="popular-post-title h4">Build your Angular 2 App: From Auth to calling an API</h2></a> 
+          <span class="popular-post-author"><a href="#" rel="author">Martin Gontovnikas</a></span> 
+         </div> 
+        </article> 
+       </section> 
+       <script type="text/javascript">
+$('.popular-post a').click(function(e) {
+  metricsLib.track('click:blog-related');
+})
+</script> 
+       <section class="guest-author-widget"> 
+        <article> 
+         <h2 class="guest-author-title">Join the Auth0<br> Guest Author Program</h2> 
+         <button data-close class="close-btn"> 
+          <svg width="15px" height="15px" viewbox="0 0 15 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> 
+           <title>Button - Close</title> 
+           <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.25999999"> 
+            <g transform="translate(-1230.000000, -1219.000000)" fill="#000000"> 
+             <g transform="translate(989.000000, 1204.000000)"> 
+              <path d="M248.5,30 C252.642136,30 256,26.6421356 256,22.5 C256,18.3578644 252.642136,15 248.5,15 C244.357864,15 241,18.3578644 241,22.5 C241,26.6421356 244.357864,30 248.5,30 Z M244.75,19.8214286 L245.821429,18.75 L248.5,21.4285714 L251.178571,18.75 L252.25,19.8214286 L249.571429,22.5 L252.25,25.1785714 L251.178571,26.25 L248.5,23.5714286 L245.821429,26.25 L244.75,25.1785714 L247.428571,22.5 L244.75,19.8214286 Z" id="Button---Clear"></path> 
+             </g> 
+            </g> 
+           </g> 
+          </svg> </button> 
+         <a class="img-link" href="https://auth0.com/guest-authors"><img class="guest-author-image" src="https://cdn.auth0.com/blog/guest-authors/pencil.png" alt="Auth0 Guest Author Program"></a> 
+         <a class="guest-author-link" href="https://auth0.com/guest-authors" rel="external"> Learn More 
+          <svg width="6px" height="9px" viewbox="0 0 6 9" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> 
+           <title>Learn More</title> 
+           <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> 
+            <g transform="translate(-1166.000000, -1345.000000)" fill="#0A86B1"> 
+             <g transform="translate(989.000000, 1204.000000)"> 
+              <g transform="translate(87.000000, 132.000000)"> 
+               <polygon id="Path" points="90 9 95.5514274 13.4411825 90 17.8820874"></polygon> 
+              </g> 
+             </g> 
+            </g> 
+           </g> 
+          </svg> </a> 
+        </article> 
+        <script type="text/javascript">
+(function() {
+if (Math.random() >= .5) {
+        title = document.getElementsByClassName("guest-author-title")[0];
+        title.innerHTML = 'Join the Auth0<br> Ambassador Program'
+        img = document.getElementsByClassName("guest-author-image")[0];
+        img.src = 'https://cdn.auth0.com/website/assets/pages/ambassador-program/assets/ambassador-spaceman-stand-up-1x-c7f68dd805.gif'
+        img.alt = 'Auth0 Ambassador Program'
+        imgLink = document.getElementsByClassName("img-link")[0];
+        imgLink.href = 'https://auth0.com/ambassador-program'
+	learnLink = document.getElementsByClassName("guest-author-link")[0];
+	learnLink.href = 'https://auth0.com/ambassador-program'
+}})();
+</script> 
+       </section> 
+      </aside> 
+     </div> 
+     <div itemprop="publisher" itemscope itemtype="https://schema.org/Organization"> 
+      <div itemprop="logo" itemscope itemtype="https://schema.org/ImageObject"> 
+       <meta itemprop="url" content="https://i.cloudup.com/BngR4GufYd-3000x3000.png"> 
+       <meta itemprop="width" content="100"> 
+       <meta itemprop="height" content="37"> 
+      </div> 
+      <meta itemprop="name" content="Auth0"> 
+     </div> 
+     <script>
+
+        var disqus_shortname = 'auth0blog'; // required: replace example with your forum shortname
+
+        var disqus_config = function () {
+            this.page.url = location.href.split('?')[0];
+        };
+
+        (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+            var d = document, s = d.createElement('script');
+
+            s.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script> 
+     <noscript>
+      Please enable JavaScript to view the 
+      <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a>
+     </noscript> 
+    </div> 
+   </article> 
+   <footer class="site-footer"> 
+    <div class="container"> 
+     <div class="logo">
+      <img src="https://cdn.auth0.com/styleguide/components/1.0.8/media/logos/img/badge.png" width="30">
+     </div> 
+     <div class="footer-grid"> 
+      <div class="column"> 
+       <div class="item"> 
+        <h6>Product</h6> 
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/pricing">Pricing</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/why-auth0">Why Auth0</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/how-it-works">How It Works</a>
+       </div> 
+      </div> 
+      <div class="column"> 
+       <div class="item"> 
+        <h6>Company</h6> 
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/about">About Us</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/blog">Blog</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/jobs">Jobs</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/press">Press</a>
+       </div> 
+      </div> 
+      <div class="column"> 
+       <div class="item"> 
+        <h6>Security</h6> 
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/availability-trust">Availability &amp; Trust</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/security">Security</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/whitehat">White Hat</a>
+       </div> 
+      </div> 
+      <div class="column"> 
+       <div class="item"> 
+        <h6>Learn</h6> 
+       </div> 
+       <div class="item">
+        <a href="https://support.auth0.com">Help &amp; Support</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/docs">Documentation</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/opensource">Open Source</a>
+       </div> 
+      </div> 
+      <div class="column"> 
+       <div class="item"> 
+        <h6>Extend</h6> 
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/lock">Lock</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/wordpress">WordPress</a>
+       </div> 
+       <div class="item">
+        <a href="https://auth0.com/docs/apiv2">API Explorer</a>
+       </div> 
+      </div> 
+      <div class="contact"> 
+       <div class="column"> 
+        <div class="item"> 
+         <h6>Contact</h6> 
+        </div> 
+        <div class="item item-text">
+         10900 NE 8th St.
+         <br>Suite 700
+         <br>Bellevue, WA 98004
+        </div> 
+       </div> 
+       <div class="column no-heading"> 
+        <div class="item">
+         <a href="tel:+18882352699">+1 (888) 235-2699</a>
+        </div> 
+        <div class="item">
+         <a href="tel:+14253126521">+1 (425) 312-6521</a>
+        </div> 
+        <div class="item">
+         <a href="https://support.auth0.com">Support Center</a>
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="colophon"> 
+      <div class="column"> 
+       <div class="social"> 
+        <div class="twitter"> 
+         <iframe allowtransparency="true" frameborder="0" scrolling="no" src="//platform.twitter.com/widgets/follow_button.html?screen_name=auth0" class="twitter"></iframe> 
+        </div> 
+        <div class="facebook"> 
+         <iframe src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Ffacebook.com%2Fgetauth0&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=false&amp;show_count=false&amp;share=false&amp;height=21&amp;appId=507756515938786" scrolling="no" frameborder="0" allowtransparency="true" class="facebook"></iframe> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="column"> 
+       <ul class="list-inline text-right"> 
+        <li><a href="https://auth0.com/privacy">Privacy Policy</a></li> 
+        <li><a href="https://auth0.com/terms">Terms of Service</a></li> 
+        <li><span>© 2013-2016 Auth0 ® Inc. All Rights Reserved.</span> </li> 
+       </ul> 
+      </div> 
+     </div> 
+    </div> 
+   </footer> 
+  </div> 
+  <script src="/blog/push-notification.js" type="text/javascript"></script> 
+  <script src="/blog/js/vendor/js-cookie.js" type="text/javascript"></script> 
+  <!-- btn ontact us  ---> 
+  <script type="text/javascript">
+      var Auth0ContactForm = window.Auth0ContactForm.default;
+      var contactFormOptions = {
+        onModalOpen: function () {
+          metricsLib.track('open:talk-to-sales');
+        },
+        onFormSuccess: function (metricsData) {
+          metricsLib.track('register:lead:talk-to-sales-modal', metricsData);
+          metricsLib.track('sent:talk-to-sales', metricsData);
+        },
+        onFormFail: function (metricsData) {
+          metricsLib.track('fail:register:lead:talk-to-sales-modal', metricsData);
+          metricsLib.track('fail-sent:talk-to-sales', metricsData);
+        }
+      };
+      var contactForm = new Auth0ContactForm(contactFormOptions);
+
+
+      $('.contact-us').on('click', function() {
+        contactForm.show({includePhoneField: true });
+      });
+
+    </script> 
+  <script type="text/javascript">
+    try {
+      window.abTestingLib.load({ fetchFn: function () { return $.get('https://ab.it.auth0.com/?application=website'); }});
+      window.abTestingLib.integration('auth0metrics').start({ metrics: window.metricsLib});
+      window.abTestingLib.start().then(enhanceAnalytics).then(function () {
+        try {
+          window.abLoaded = true;
+          // Save experiments on the global scope
+          window.experiments = window.abTestingLib.getExperiments();
+          executeABExperiments();
+
+        } catch (e) {
+          console.error('Error running AB experiments.');
+          $('#pjax').css('visibility', 'visible');
+          window.abLoaded = true;
+        }
+      });
+
+      function enhanceAnalytics() {
+        var analytics = window.abTestingLib.analytics;
+
+        var originalSetCurrentVariantName = analytics.setCurrentVariantName.bind(analytics);
+        var originalGetCurrentVariantName = analytics.getCurrentVariantName.bind(analytics);
+
+        var enhancedSetCurrentVariantName = function (variantName, value) {
+          setCurrentVariantName(variantName, value);
+          originalSetCurrentVariantName(variantName, value);
+        };
+
+        var enhancedGetCurrentVariantName = function (variantName) {
+          var originalValue = originalGetCurrentVariantName(variantName);
+          var cookieValue = getCurrentVariantName(variantName);
+
+          if (originalValue != cookieValue) {
+            originalSetCurrentVariantName(variantName, cookieValue);
+          }
+
+          return cookieValue;
+        };
+
+        analytics.setCurrentVariantName = enhancedSetCurrentVariantName;
+        analytics.getCurrentVariantName = enhancedGetCurrentVariantName;
+        window.setVariant = enhancedSetCurrentVariantName;
+        window.getVariant = enhancedGetCurrentVariantName;
+      }
+
+      function setCurrentVariantName(variantName, value) {
+        var variants = loadCookieVariants();
+        variants[variantName] = value;
+        saveCookieVariants(variants);
+      }
+
+      function getCurrentVariantName(variantName) {
+        var variants = loadCookieVariants();
+        return variants[variantName];
+      }
+
+      function loadCookieVariants() {
+        return JSON.parse(Cookies.get('ajs_ab.traits') || '{}');
+      }
+
+      function saveCookieVariants(variants) {
+        return Cookies.set('ajs_ab.traits', JSON.stringify(variants), {
+          expires: 365,
+          path: '/'
+        });
+      }
+    } catch (e) {
+      console.error('Error initializing ABTesting lib. ABTesting will be disabled');
+      $('#pjax').css('visibility', 'visible');
+      window.abLoaded = true;
+    }
+    </script> 
+  <script type="text/javascript">
+    function executeABExperiments () {
+      var path = window.location.pathname;
+      var experiments = window.experiments;
+
+      if(!window.abLoaded) {
+        return;
+      }
+
+      if(!experiments) {
+        // Restore content
+        $('#pjax').css('visibility', 'visible');
+        return;
+      }
+
+      try {
+        var experimentsForPath = experiments.runAllByPath(path);
+        var winningVariants = [];
+
+        experimentsForPath.experiments.forEach(function (e) {
+          winningVariants = winningVariants.concat(e.getCurrentVariant().getPropertiesByType('js'));
+        });
+
+        var variantContext = {};
+        variantContext.$ = $;
+
+        winningVariants.forEach(function(v) {
+          v.runInContext(variantContext);
+        });
+      } catch (e) {
+        console && console.error("Error running experiments for path:%s", path);
+      } finally {
+        // Restore content
+        $('#pjax').css('visibility', 'visible');
+      }
+    }
+    </script> 
+  <script type="text/javascript">
+      // ab-watchdog, after 1500ms, show the site content no matter the state
+      // of the experiments
+      setTimeout(function () {
+        $('#pjax').css('visibility', 'visible');
+      }, 400);
+    </script> 
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/styles/default.min.css"> 
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.5.0/highlight.min.js"></script> 
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/languages/go.min.js"></script> 
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/languages/elm.min.js"></script> 
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.pjax/1.9.6/jquery.pjax.min.js"></script> 
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script> 
+  <script src="/blog/js/vendor/nprogress.js"></script> 
+  <script src="/blog/js/vendor/moment.min.js"></script> 
+  <script src="/blog/js/vendor/jquery.csbuttons.min.js"></script> 
+  <script async src="/blog/js/vendor/html2canvas.js"></script> 
+  <script src="/blog/js/vendor/selection-sharer.min.js"></script> 
+  <script src="/blog/js/vendor/jquery.sticky-kit.min.js"></script> 
+  <script src="/blog/js/vendor/jquery.ba-throttle-debounce.min.js"></script> 
+  <script type="text/javascript">
+      var getBasicInfo = function () {
+        return {
+          path: window.location.pathname,
+          url: window.location.toString(),
+          title: document.title,
+          referrer: document.referrer,
+          category: 'Lock',
+          label: 'blog'
+        }
+      };
+
+      var getBlogImage = function(getDOM) {
+          var img = $('.banner .entry-thumbnail img').first();
+
+          if(img.length) {
+              convertToDataURLviaCanvas(img.attr('src'), function(dataURL) {
+                img.replaceWith('<img src="' + dataURL + '">');
+              });
+          }
+
+          setTimeout(function() {
+            var banner = $('.banner');
+            var dom = $('.banner .entry-thumbnail');
+
+            if(getDOM === 'banner') {
+              dom = banner;
+            } else {
+              banner.addClass('export-icon');
+            }
+
+            banner.addClass('export');
+
+            html2canvas(dom.get(0), {
+              onrendered: function(canvas) {
+                var img = canvas.toDataURL("image/png");
+
+                banner.removeClass('export');
+
+                window.location = img;
+              }
+            });
+          }, 20);
+
+          function convertToDataURLviaCanvas(url, callback, outputFormat){
+            var img = new Image();
+
+            img.crossOrigin = 'Anonymous';
+
+            img.onload = function(){
+                var canvas = document.createElement('CANVAS');
+                var ctx = canvas.getContext('2d');
+                var dataURL;
+
+                canvas.height = this.height;
+                canvas.width = this.width;
+                ctx.drawImage(this, 0, 0);
+                dataURL = canvas.toDataURL(outputFormat);
+                callback(dataURL);
+                canvas = null;
+            };
+
+            img.src = url;
+          }
+      };
+
+      var getBlogBanner = function() {
+          getBlogImage('banner');
+      };
+
+      $(function() {
+
+
+        function stickyElements() {
+
+          function stickElement($elem, options) {
+            $elem.stick_in_parent(Object.assign({},{
+              offset_top: parseInt($elem.attr("data-sticky-padding")) || 0
+            }, options ));
+          }
+
+          stickElement($('.sidebar-column'));
+          stickElement($('.utility-bar'));
+          stickElement($('.blog-navigation'), {parent: "body"});
+        }
+
+        function initBlogSubscriber() {
+          if(localStorage.isBlogSubscriber !== true) {
+            $('form.newsletter-subscriber').removeClass('hide');
+          }
+
+          function closeSticky($module, animation) {
+            $module.addClass('animated ' + animation );
+            $module.on('animationend webkitAnimationEnd oAnimationEnd', function () {
+              $module.remove()
+              $(document.body).trigger("sticky_kit:recalc");
+            });
+          }
+
+          $('form.newsletter-subscriber').on('click', '[data-close]', function() {
+            var $module = $(this).closest('form');
+
+            closeSticky($module, 'fadeOutUp');
+          });
+
+          $('.guest-author-widget').on('click', '[data-close]', function() {
+            var $module = $(this).closest('section');
+            closeSticky($module, 'fadeOutRight');
+          });
+
+          $('form.newsletter-subscriber').on('submit', function(e) {
+            var $module = $(this);
+            var o_content = $module.html();
+            var value = $module.find('input').val();
+
+            e.preventDefault();
+
+            if(isValidEmail(value)) {
+              onValid();
+            } else {
+              alert('Please enter a valid email');
+            }
+
+            function isValidEmail(val) {
+              if(/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(val)) {
+                return true;
+              }
+
+              return false;
+            }
+
+            function onValid() {
+              $module.find('.fields').html('<p class="loading">Sending...</p>');
+
+              $.ajax({
+                type: "POST",
+                url: 'https://webtask.it.auth0.com/api/run/wt-martin-gon_to-0/auth0-blog-user?webtask_no_cache=1',
+                data: {
+                  email: value
+                },
+                success: onSuccess,
+                error: onFail
+              });
+            }
+
+            function onFail(response) {
+              $module.find('.fields').html('<p class="subscription-failed">There’s a problem subscribing to the list right now. Please try again later or <a href="https://support.auth0.com">contact support</a>.</p>');
+            }
+
+            function onSuccess(response) {
+              localStorage.setItem('isBlogSubscriber', true);
+
+              var blogRegData = getBasicInfo();
+              blogRegData.trackData = value;
+              blogRegData.email = value;
+              blogRegData.formId = '1052';
+              blogRegData.lpId = '1117';
+              blogRegData.Blog_Subs__c = true;
+              metricsLib.track('register:lead:blog-newsletter', blogRegData);
+
+              $module.find('.title').text('Thanks for subscribing');
+              $module.find('.fields').html('<p>You’ll be getting lots of awesome content!</p>');
+
+            }
+          });
+        }
+
+        function initialize() {
+          initBlogSubscriber();
+
+          $('pre code').each(function(i, block) {
+             hljs.highlightBlock(block);
+          });
+
+          $('.post-info time').each(function() {
+            var $current = $(this);
+            var dateString = new Date($current.text());
+            var diff = moment(dateString).diff(moment(new Date()), 'days');
+            var dateFormat;
+
+            dateFormat = moment(dateString).fromNow();
+
+            if(diff > -10) {
+              $current.text(dateFormat);
+            }
+
+            if (diff === 0) {
+              $current.text('Today');
+            }
+
+            $current.addClass('rendered');
+          });
+
+          // Social Buttons
+          $('.social-stats .network').cSButtons();
+
+          // Force content links to _blank if not explicitly set to _self
+          $('.entry-content a').each(function() {
+            var _$this = $(this);
+            var _target = _$this.attr('target');
+
+            if (_target !== '_self') {
+             _$this.attr('target', '_blank');
+            }
+          });
+
+          // Handle scroll pos
+          if($(window).data('navScroll')) {
+            $(window).scrollTop($(window).data('navScroll'));
+
+            $(window).data('navScroll', 0);
+          } else {
+            $(window).scrollTop(0);
+          }
+
+          stickyElements();
+        }
+
+        function setEvents() {
+          hljs.configure({
+            tabReplace: '  ', // 4 spaces
+            classPrefix: ''
+          });
+
+          NProgress.configure({ showSpinner: false, trickleSpeed: 600 });
+
+          metricsLib.page();
+
+          $('p').selectionSharer();
+
+          var selectionSharerFacebook = $('#selectionSharerPopover-inner .action.facebook')[0];
+          $(selectionSharerFacebook).on('click', function() {
+            metricsLib.track('blog:share:custom:facebook');
+          });
+
+          var selectionSharerTwitter = $('#selectionSharerPopover-inner .action.tweet')[0];
+          $(selectionSharerTwitter).on('click', function() {
+            metricsLib.track('blog:share:custom:twitter');
+          });
+
+          var selectionSharerEmail = $('#selectionSharerPopover-inner .action.email')[0];
+          $(selectionSharerEmail).on('click', function() {
+            metricsLib.track('blog:share:custom:email');
+          });
+
+          $(window).on('load', function() {
+            $(document.body).trigger("sticky_kit:recalc");
+          });
+
+
+          $('body').on('click', '.blog-navigation a', function() {
+            var tabs = $('.blog-navigation li');
+            var activeTab = $(this).parent();
+
+            $(window).data('navScroll', $(window).scrollTop());
+
+            tabs.removeClass('active');
+            activeTab.addClass('active');
+          });
+
+          initialize();
+        }
+
+        setEvents();
+      });
+    </script> 
+  <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'auth0blog'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script'); s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script> 
+  <script>
+      (function(h,o,t,j,a,r){
+          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+          h._hjSettings={hjid:301495,hjsv:5};
+          a=o.getElementsByTagName('head')[0];
+          r=o.createElement('script');r.async=1;
+          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+          a.appendChild(r);
+      })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>   
+ </body>
+</html>

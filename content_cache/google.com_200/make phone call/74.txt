@@ -1,0 +1,108 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+ <head> 
+  <link href="http://gmpg.org/xfn/11" rel="profile"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"> 
+  <!-- Enable responsiveness on mobile devices--> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"> 
+  <title>
+    Home · EncloseJS
+  </title> 
+  <!-- CSS --> 
+  <link rel="stylesheet" href="/public/css/poole.css"> 
+  <link rel="stylesheet" href="/public/css/syntax.css"> 
+  <link rel="stylesheet" href="/public/css/hyde.css"> 
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface"> 
+  <!-- Icons --> 
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/public/apple-touch-icon-144-precomposed.png"> 
+  <link rel="shortcut icon" href="/public/favicon.ico"> 
+ </head> 
+ <body> 
+  <div class="sidebar"> 
+   <div class="container sidebar-sticky"> 
+    <div class="sidebar-about"> 
+     <h1> <a href="/"> EncloseJS </a> </h1> 
+     <p class="lead">Compile your Node.js project. No sources aboard.</p> 
+    </div> 
+    <nav class="sidebar-nav"> 
+     <a class="sidebar-nav-item" href="/">home</a> 
+     <a class="sidebar-nav-item" href="https://github.com/igorklopov/enclose/wiki/02.Packaging">docs</a> 
+     <a class="sidebar-nav-item" href="/faq">faq</a> 
+     <a class="sidebar-nav-item" href="https://github.com/igorklopov/enclose/issues">issues</a> 
+     <a class="sidebar-nav-item" href="https://gitter.im/igorklopov/enclose">chat</a> 
+     <a class="sidebar-nav-item" href="/buy">buy</a> 
+    </nav> 
+    <p>© 2017. Igor Klopov.<br>All rights reserved.<br>igor (at) klopov (dot) com</p> 
+   </div> 
+  </div> 
+  <div class="content container"> 
+   <p><img src="//screenshot.png" alt="Hello, world!"></p> 
+   <h3 id="use-cases">Use cases</h3> 
+   <ul> 
+    <li>Make a commercial version of your application without sources</li> 
+    <li>Make a demo/evaluation/trial version of your app without sources</li> 
+    <li>Make some kind of self-extracting archive or installer</li> 
+    <li>Make a closed source GUI application using <a href="https://github.com/breach/node-thrust">node-thrust</a></li> 
+    <li>No need to install Node.js and npm to deploy the compiled application</li> 
+    <li>No need to download hundreds of files via <code class="highlighter-rouge">npm install</code> to deploy your application. Deploy it as a single independent file</li> 
+    <li>Put your assets inside the executable to make it even more portable</li> 
+    <li>Test your app against new Node.js version without installing it</li> 
+   </ul> 
+   <h3 id="install">Install</h3> 
+   <div class="highlighter-rouge">
+    <pre class="highlight"><code>npm install -g enclose
+</code></pre> 
+   </div> 
+   <h3 id="usage">Usage</h3> 
+   <p>Run <code class="highlighter-rouge">enclose</code> without arguments to see help.</p> 
+   <p>In short, as input you specify the entry file of your project <code class="highlighter-rouge">/path/app.js</code>. As output you get a standalone executable <code class="highlighter-rouge">/path/app</code>. When it is run, it does the same as <code class="highlighter-rouge">node /path/app.js</code></p> 
+   <h3 id="command-line-of-the-executable">Command line of the executable</h3> 
+   <p>Command line call <code class="highlighter-rouge">./app a b</code> is equivalent to <code class="highlighter-rouge">node ./app.js a b</code></p> 
+   <h3 id="dependencies">Dependencies</h3> 
+   <p>The compiler parses your sources, detects calls to <code class="highlighter-rouge">require</code>, traverses the dependencies of your project and includes them into the executable. You don’t need to list them manually.</p> 
+   <h3 id="assets">Assets</h3> 
+   <p>If your project has assets (HTML templates, CSS, etc), for example to serve via HTTP, you can bundle them into the executable. Just list them as a <a href="https://github.com/sindresorhus/globby">glob</a> in the configuration file.</p> 
+   <h3 id="compilation-srsly">Compilation? Srsly?</h3> 
+   <p>Both Yes and No.</p> 
+   <p>Yes. Because JavaScript code is transformed into native code at compile-time using <a href="https://github.com/v8/v8-git-mirror/blob/master/src/compiler.cc">V8 internal compiler</a>. Hence, your sources are not required to execute the binary, and they are not packaged.</p> 
+   <p>No. Optimized native code can be generated only at run-time, using information collected at run-time. Without that information EncloseJS can generate only “unoptimized” code. It runs about 2x slower, than optimized one.</p> 
+   <p>Also, Node.js code is put inside the executable (along with your code) to support Node.js API for your application at run-time. This increases output file size.</p> 
+   <p>So, this is not that static compilation we used to know. But nevertheless you get fully functional binary without sources. Also, performance and file size overhead are vectors of future work.</p> 
+   <h3 id="code-protection">Code protection?</h3> 
+   <p>The code protection is as strong as possible when the sources are compiled to native code. Hackers will deal with <a href="https://github.com/v8/v8-git-mirror/blob/master/src/full-codegen/x87/full-codegen-x87.cc#L1110">that push-mov stuff</a>. No need to obfuscate, no need to encrypt, no “hidden” decryption keys. Also</p> 
+   <div class="highlighter-rouge">
+    <pre class="highlight"><code>myfunc.toString()
+function myfunc() { [native code] }
+</code></pre> 
+   </div> 
+   <h3 id="versions-of-nodejs">Versions of Node.js</h3> 
+   <p>You can choose what runtime version to wrap your project in - 0.12.x, 4.2.x or 5.x.</p> 
+   <h3 id="vanilla-nodejs">Vanilla Node.js</h3> 
+   <p>EncloseJS project does not aim to add new features to Node.js - to avoid undesirable issues, to have predictable stability and to make Node.js native modules compatible with enclosed executables.</p> 
+   <h3 id="fast">Fast</h3> 
+   <p>It takes seconds to make an executable. You don’t need to build Node.js from sources in order to make the binary. EncloseJS is shipped with precompiled parts, ready for bundling.</p> 
+   <h3 id="compatibility-with-non-enclosed-run">Compatibility with non-enclosed run</h3> 
+   <p>Projects like <code class="highlighter-rouge">npm</code>, <code class="highlighter-rouge">browserify</code>, <code class="highlighter-rouge">eslint</code> can be compiled using EncloseJS (see <a href="https://github.com/igorklopov/enclose/tree/master/examples/22-npm">examples directory</a>). Probably, your existing project can be compiled too, with minimal adjustments. The adjustments preserve the ability to run you project via <code class="highlighter-rouge">node ./app.js</code></p> 
+   <h3 id="platforms">Platforms</h3> 
+   <p>EncloseJS can build executables for Linux, Windows and Mac OS X. Cross compilation is not currently supported, but will be supported in future.</p> 
+   <h3 id="native-modules">Native modules</h3> 
+   <p>Native modules (.node files) are supported for all platforms (<a href="https://github.com/igorklopov/enclose/issues/12#issuecomment-82587865">more info</a>, <a href="https://github.com/igorklopov/enclose/tree/master/examples/24-serialport">serialport example</a>, <a href="https://github.com/igorklopov/enclose/tree/master/examples/25-oracle">oracle example</a>).</p> 
+   <ul> 
+    <li>EncloseJS cannot package a native module inside the executable.</li> 
+    <li>You have to deploy your native modules along with your final executable.</li> 
+    <li>On Windows, native modules (built with node-gyp) require executable name to be ‘node.exe’. In order to make a module compatible with your ‘myserver.exe’ EncloseJS makes a copy of the module, patches IAT of the copy (binds it to ‘myserver.exe’), and then calls <code class="highlighter-rouge">dlopen</code> against the copy. This workaround will be deprecated soon.</li> 
+   </ul> 
+   <h3 id="license">License</h3> 
+   <p>Proprietary.</p> 
+  </div>  
+  <script>
+    var host = window.location.host;
+    var deploy = "enclosejs.com";
+    var develop = "dev.enclosejs.com";
+    if ((host !== deploy) && (host !== develop)) {
+      window.location.replace("http://" + deploy);
+    }
+  </script>  
+ </body>
+</html>

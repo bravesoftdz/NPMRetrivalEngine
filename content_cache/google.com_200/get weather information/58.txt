@@ -1,0 +1,1285 @@
+<!doctype html>
+<html lang="en-us">
+ <head profile="http://www.w3.org/1999/xhtml/vocab"> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+  <meta name="viewport" content="width=1140"> 
+  <meta name="locale" content="en-us"> 
+  <link rel="shortcut icon" href="//xamarin.com/favicon.ico?2"> 
+  <meta name="viewport" content="width=device-width, user-scalable=no"> 
+  <script type="text/javascript" src="/theme/assets/js/structure/template.js"></script> 
+  <script type="text/javascript" src="/theme/assets/js/URI.js"></script> 
+  <meta name="google-site-verification" content="ujkHvVrw2twK1FN5Tch44Zeh_jqeLSX4QSv6y1myzCU"> 
+  <title>Call a REST Web Service - Xamarin</title> 
+  <link rel="stylesheet" href="/theme/assets/css/structure/template.css" type="text/css"> 
+  <link rel="stylesheet" href="/theme/assets/css/structure/grid.css" type="text/css"> 
+  <link rel="stylesheet" href="/theme/assets/css/structure/typography.css" type="text/css"> 
+  <link rel="stylesheet" href="/theme/assets/css/developer-center.css?v=2.8" type="text/css"> 
+  <link rel="stylesheet" href="/theme/assets/js/libraries/swipebox/swipebox.css"> 
+  <script language="javascript">
+      window.PageLocale = "en-us";
+      window.FeedbackText = {
+        LoveIt: "I love it!",
+        Problem: "I have a problem.",
+        Cancel: "Cancel"
+      };
+    </script> 
+  <meta name="description" content="This recipe shows how to call a RESTful service using HTTP, parse JSON results, and display the results on the screen."> 
+ </head> 
+ <body> 
+  <!--eu-cookie--> 
+  <div id="top-container"> 
+   <div id="global-header"> 
+    <div class="global-bar"> 
+     <div class="wrapper"> 
+      <h1 class="xamarin logo"> <a href="http://xamarin.com">Xamarin</a> </h1> 
+      <div class="navigation"> 
+       <a class="label"> <span class="menu">Menu</span> <span class="close icon"></span> </a> 
+       <ul> 
+        <li class="dropdown"> <a data-toggle="dropdown" href="http://xamarin.com/products">Products</a> 
+         <ul class="products-list" role="menu"> 
+          <li> 
+           <ul> 
+            <li class="platfrom"> <a href="//xamarin.com/platform"> Xamarin Platform <small>C# on iOS, Android, Mac &amp; Windows</small> </a> </li> 
+            <li class="test-cloud"> <a href="//xamarin.com/test-cloud"> Xamarin Test Cloud <small>Find bugs before your users do</small> </a> </li> 
+            <li class="insights"> <a href="//xamarin.com/insights"> Xamarin Insights <small>Improve your apps with real-time monitoring</small> </a> </li> 
+            <li class="university"> <a href="//xamarin.com/university"> Xamarin University <small>Unlimited, live mobile development training</small> </a> </li> 
+           </ul> </li> 
+          <li> 
+           <ul> 
+            <li class="all"><a href="http://xamarin.com/products">All Products</a></li> 
+           </ul> </li> 
+         </ul> </li> 
+        <li><a href="https://xamarin.com/customers">Customers</a></li> 
+        <li><a href="https://store.xamarin.com">Pricing</a></li> 
+        <li class="active"><a href="/">Developers</a></li> 
+        <li class="hide-on-mobile dropdown"> <a href="http://xamarin.com/support">Support</a> 
+         <ul role="menu"> 
+          <li><a href="http://xamarin.com/support">Developer Support</a></li> 
+          <li><a href="http://xamarin.com/partners">Consulting Partners</a></li> 
+          <li><a href="http://xamarin.com/partners/services">Consulting Services</a></li> 
+          <li><a href="https://xamarin.com/contact-us">Contact Sales</a></li> 
+         </ul> </li> 
+        <li class="hide-on-mobile dropdown"> <a data-toggle="dropdown" href="http://xamarin.com/resources">Resources</a> 
+         <ul role="menu"> 
+          <li><a href="http://blog.xamarin.com">Blog</a></li> 
+          <li><a href="http://xamarin.com/faq">FAQ</a></li> 
+          <li><a href="http://xamarin.com/partners">Partners</a></li> 
+          <li><a href="http://xamarin.com/resources/webinars">Webinars</a></li> 
+          <li><a href="http://xamarin.com/about">About Xamarin</a></li> 
+         </ul> </li> 
+        <li class="show-on-mobile"><a href="http://blog.xamarin.com">Blog</a></li> 
+        <li class="show-on-mobile"><a href="http://xamarin.com/about">About Xamarin</a></li> 
+        <li id="loginbutton" class="user" data-hover="dropdown"><a href="https://xamarin.com/account/login">Sign In</a></li> 
+       </ul> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="local-bar"> 
+   <div class="wrapper"> 
+    <aside> 
+     <div class="search"> 
+      <form id="search-stub" action="/search.json" method="GET"> 
+       <span class="icon">Search</span> 
+       <input type="search" placeholder="Search ..." id="search" name="search" autocomplete="off"> 
+      </form> 
+     </div> 
+     <div class="search-results"> 
+      <div class="search-pointer"></div> 
+      <div class="results-inner"> 
+      </div> 
+     </div> 
+    </aside> 
+    <div class="navigation"> 
+     <ul> 
+      <li><a href="/">Welcome</a></li> 
+      <li><a href="/guides">Guides</a></li> 
+      <li><a href="/workbooks">Workbooks</a></li> 
+      <li class="active"><a href="/recipes">Recipes</a></li> 
+      <li><a href="/api/">APIs</a></li> 
+      <li><a href="/samples-all">Samples</a></li> 
+      <li><a href="http://forums.xamarin.com">Forums</a></li> 
+      <li><a href="/videos">Videos</a></li> 
+     </ul> 
+    </div> 
+   </div> 
+  </div> 
+  <section class="content-with-sidebar"> 
+   <div class="wrapper"> 
+    <aside class="tree-sidebar"> 
+     <div class="sidebar-container"> 
+      <ul> 
+       <li class="product  cross-platform"> <a href="#">Cross-Platform</a> 
+        <ul> 
+         <li class="expandable"> <a href="/recipes/cross-platform/xamarin-forms/">Xamarin.Forms</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/cross-platform/xamarin-forms/controls/">Controls</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/controls/call-javascript/">Call JavaScript from C#</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/controls/choose-keyboard-for-entry/">Choose a Keyboard for an Entry</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/controls/screen-orientation/">Display an Image based on Screen Orientation</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/controls/display-pdf/">Display a Local PDF File in a WebView</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/controls/listview-hide-separator-line/">Hide Separator Lines in TableView</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/controls/multiselect/">Multiple Selection in a ListView</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/controls/rotation/">Rotate Views</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/cross-platform/xamarin-forms/general/">General</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/general/store-credentials/">Securely Store Credentials</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/cross-platform/xamarin-forms/ios/">iOS</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/ios/add-done-to-keyboard/">Add 'Done' to Keyboard</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/ios/customize-tabs/">Customize Tab color and font</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/ios/prevent-keyboard-suggestions/">Prevent keyboard suggestions</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/ios/core-spotlight-search/">Search a Xamarin.Forms App with Core Spotlight</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/ios/nsuseractivity-search/">Search a Xamarin.Forms App with Activities</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/cross-platform/xamarin-forms/maps/">Maps</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/maps/geocode/">Geocode a Street Address</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/maps/reverse-geocode/">Reverse Geocode a Street Address</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/xamarin-forms/maps/map-navigation/">Perform Map-Based Navigation</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/cross-platform/ide/">IDE</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/cross-platform/ide/change_updates_channel/">Change the Updates Channel</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/cross-platform/ide/change_updates_channel/extension-gallery/">Install the Xamarin Updates Extension</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/cross-platform/ide/debugging/">Debugging</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/cross-platform/ide/debugging/output_information_to_log_window/">Output Information to Log Window</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/ide/debugging/set_a_breakpoint/">Set A Breakpoint</a> </li> 
+             <li class=""> <a href="/recipes/cross-platform/ide/debugging/step_through_code/">Step Through Code</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/cross-platform/game_development/">Game Development</a> 
+          <ul> 
+           <li class=""> <a href="/recipes/cross-platform/game_development/audio_ccs/">Audio</a> </li> 
+           <li class=""> <a href="/recipes/cross-platform/game_development/async_actions/">Async CCActions</a> </li> 
+           <li class=""> <a href="/recipes/cross-platform/game_development/collision/">Collision</a> </li> 
+           <li class=""> <a href="/recipes/cross-platform/game_development/scrolling/">Scrolling a CCLayer</a> </li> 
+           <li class=""> <a href="/recipes/cross-platform/game_development/sprite_color/">Sprite Color</a> </li> 
+           <li class=""> <a href="/recipes/cross-platform/game_development/time_based_movement/">Time Based Movement</a> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/cross-platform/networking/">Networking</a> 
+          <ul> 
+           <li class=""> <a href="/recipes/cross-platform/networking/download_progress/">Report Download Progress</a> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/cross-platform/app-links/">App Links</a> 
+          <ul> 
+           <li class=""> <a href="/recipes/cross-platform/app-links/app-links-ios/">App Links for iOS</a> </li> 
+           <li class=""> <a href="/recipes/cross-platform/app-links/app-links-android/">App Links for Android</a> </li> 
+          </ul> </li> 
+        </ul> </li> 
+       <li class="product  active expanded android"> <a href="#">Android</a> 
+        <ul> 
+         <li class="expandable"> <a href="/recipes/android/controls/">Controls</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/android/controls/autocomplete_text_view/">Autocomplete Text View</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/controls/autocomplete_text_view/add_an_autocomplete_text_input/">Add an Autocomplete Text Input</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/controls/edittext/">EditText</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/controls/edittext/capture_user_input_text/">Capture User Input Text</a> </li> 
+             <li class=""> <a href="/recipes/android/controls/edittext/textinputlayout/">TextInputLayout</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/controls/imagebutton/">ImageButton</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/controls/imagebutton/create_an_imagebutton/">Create An ImageButton</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/controls/imageview/">ImageView</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/controls/imageview/display_an_image/">Display An Image</a> </li> 
+            </ul> </li> 
+           <li class=""> <a href="/recipes/android/controls/listview/">ListView</a> </li> 
+           <li class=""> <a href="/recipes/android/controls/seekbar/">SeekBar</a> </li> 
+           <li class="expandable"> <a href="/recipes/android/controls/webview/">WebView</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/controls/webview/call_csharp_from_javascript/">Call C# from JavaScript</a> </li> 
+             <li class=""> <a href="/recipes/android/controls/webview/load_a_web_page/">Load a Web Page</a> </li> 
+             <li class=""> <a href="/recipes/android/controls/webview/load_local_content/">Load Local Content</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/android/data/">Data</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/android/data/adapters/">Adapters</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/data/adapters/create_a_custom_adapter_for_contacts/">Create a Custom Adapter for Contacts</a> </li> 
+             <li class=""> <a href="/recipes/android/data/adapters/use_an_arrayadapter/">Use an ArrayAdapter</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/data/contentproviders/">ContentProviders</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/data/contentproviders/read_contacts/">Read Contacts</a> </li> 
+             <li class=""> <a href="/recipes/android/data/contentproviders/update_the_users_profile/">Update the User's Profile</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/data/files/">Files</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/data/files/browse_files/">Browse Files</a> </li> 
+             <li class=""> <a href="/recipes/android/data/files/selecting_a_gallery_image/">Selecting a Gallery Image</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/data/databases/">Databases</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/data/databases/adonet/">Creating a database with ADO.NET</a> </li> 
+             <li class=""> <a href="/recipes/android/data/databases/sqlite/">Creating a database using SQLite</a> </li> 
+             <li class=""> <a href="/recipes/android/data/databases/sqlite-component/">Creating a database with the SQLite component</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/android/fundamentals/">Fundamentals</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/android/fundamentals/activity/">Activity</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/fundamentals/activity/pass_data_between_activity/">Pass Data Between Activity</a> </li> 
+             <li class=""> <a href="/recipes/android/fundamentals/activity/start_an_activity/">Start an Activity</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/fundamentals/intent/">Intent</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/fundamentals/intent/launch_the_map_application/">Launch the Map Application</a> </li> 
+             <li class=""> <a href="/recipes/android/fundamentals/intent/launch_the_phone_dialer/">Launch the Phone Dialer</a> </li> 
+             <li class=""> <a href="/recipes/android/fundamentals/intent/open_a_webpage_in_the_browser_application/">Open a Webpage in the Browser Application</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/fundamentals/service/">Service</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/fundamentals/service/create_a_simple_service/">Create a Simple Service</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/android/general/">General</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/android/general/projects/">Projects</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/general/projects/add_permissions_to_android_manifest/">Add Permissions to Android Manifest</a> </li> 
+             <li class=""> <a href="/recipes/android/general/projects/create_an_android_project/">Create an Android Project</a> </li> 
+             <li class=""> <a href="/recipes/android/general/projects/specify_default_namespace/">Specify Default Namespace</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/android/layout/">Layout</a> 
+          <ul> 
+           <li class=""> <a href="/recipes/android/layout/compound_view/">Compound View</a> </li> 
+           <li class="expandable"> <a href="/recipes/android/layout/grid_view/">Grid View</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/layout/grid_view/create_a_grid_view/">Create a Grid View</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/layout/table_layout/">Table Layout</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/layout/table_layout/create_a_table_layout/">Create a Table Layout</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/android/media/">Media</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/android/media/audio/">Audio</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/media/audio/play_audio/">Play Audio</a> </li> 
+             <li class=""> <a href="/recipes/android/media/audio/record_audio/">Record Audio</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/media/video/">Video</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/media/video/play_video/">Play Video</a> </li> 
+             <li class=""> <a href="/recipes/android/media/video/record_video/">Record Video</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/android/networking/">Networking</a> 
+          <ul> 
+           <li class=""> <a href="/recipes/android/networking/detect-network-connection/">Detect Network Connection</a> </li> 
+           <li class="expandable"> <a href="/recipes/android/networking/email/">Email</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/networking/email/send_an_email/">Send an Email</a> </li> 
+            </ul> </li> 
+           <li class=""> <a href="/recipes/android/networking/gsm_strength/">Detect Strength of GSM Signal</a> </li> 
+           <li class="expandable"> <a href="/recipes/android/networking/sms/">SMS</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/networking/sms/send_an_sms/">Send an SMS</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/android/os_device_resources/">OS/Device Resources</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/android/os_device_resources/accelerometer/">Accelerometer</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/os_device_resources/accelerometer/get_accelerometer_readings/">Get Accelerometer Readings</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/os_device_resources/geocoder/">Geocoder</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/os_device_resources/geocoder/geocode_an_address/">Geocode an Address</a> </li> 
+             <li class=""> <a href="/recipes/android/os_device_resources/geocoder/reverse_geocode_a_location/">Reverse Geocode a Location</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/os_device_resources/gps/">GPS</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/os_device_resources/gps/get_current_device_location/">Get Current Device Location</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/android/other_ux/">Other UX</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/android/other_ux/animation/">Animation</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/other_ux/animation/animate_listview_deletion/">Animate ListView Deletion</a> </li> 
+             <li class=""> <a href="/recipes/android/other_ux/animation/frame_animation/">Frame Animation</a> </li> 
+             <li class=""> <a href="/recipes/android/other_ux/animation/rotate_animation/">Rotate Animation</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/other_ux/camera_intent/">Camera Intent</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/other_ux/camera_intent/take_a_picture_and_save_using_camera_app/">Take a Picture and Save Using Camera App</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/other_ux/drawing/">Drawing</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/other_ux/drawing/blur_an_image_with_renderscript/">Blur an Image with Renderscript</a> </li> 
+             <li class=""> <a href="/recipes/android/other_ux/drawing/blur_an_image_with_managed_code/">Blur an Image with Managed Code</a> </li> 
+             <li class=""> <a href="/recipes/android/other_ux/drawing/draw_2d_graphics/">Draw 2D Graphics</a> </li> 
+             <li class=""> <a href="/recipes/android/other_ux/drawing/fill_a_polygon/">Fill A Polygon</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/other_ux/fragment/">Fragment</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/other_ux/fragment/create_a_fragment/">Create a Fragment</a> </li> 
+             <li class=""> <a href="/recipes/android/other_ux/fragment/select_a_date_in_a_fragment/">Select A Date in a Fragment</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/other_ux/gestures/">Gestures</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/other_ux/gestures/create_a_gesture_listener/">Create a Gesture Listener</a> </li> 
+             <li class=""> <a href="/recipes/android/other_ux/gestures/detect_a_touch/">Detect a Touch</a> </li> 
+            </ul> </li> 
+           <li class=""> <a href="/recipes/android/other_ux/pick_image/">Pick Image on Device</a> </li> 
+           <li class="expandable"> <a href="/recipes/android/other_ux/textureview/">TextureView</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/other_ux/textureview/display_a_stream_from_the_camera/">Display a stream from the camera</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/android/resources/">Resources</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/android/resources/device_specific/">Device Specific</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/resources/device_specific/detect_screen_size/">Detect Screen Size</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/android/resources/general/">General</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/android/resources/general/load_large_bitmaps_efficiently/">Load Large Bitmaps Efficiently</a> </li> 
+             <li class=""> <a href="/recipes/android/resources/general/pluralize_values/">Pluralize Values</a> </li> 
+             <li class=""> <a href="/recipes/android/resources/general/style_a_button/">Style a Button</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable active expanded"> <a href="/recipes/android/web_services/">Web Services</a> 
+          <ul> 
+           <li class="expandable active expanded"> <a href="/recipes/android/web_services/consuming_services/">Consuming Services</a> 
+            <ul> 
+             <li class=" active expanded current-page"> <a href="/recipes/android/web_services/consuming_services/call_a_rest_web_service/">Call a REST Web Service</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+        </ul> </li> 
+       <li class="product  ios"> <a href="#">iOS</a> 
+        <ul> 
+         <li class="expandable"> <a href="/recipes/ios/animation/">Animation</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/ios/animation/coreanimation/">CoreAnimation</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/animation/coreanimation/animate_a_uiview_using_uikit/">Animate a UIView using UIKit</a> </li> 
+             <li class=""> <a href="/recipes/ios/animation/coreanimation/create_an_animation_block/">Create an Animation Block</a> </li> 
+             <li class=""> <a href="/recipes/ios/animation/coreanimation/create_an_animation_group/">Create an Animation Group</a> </li> 
+             <li class=""> <a href="/recipes/ios/animation/coreanimation/create_an_explicit_animation/">Create An Explicit Animation</a> </li> 
+             <li class=""> <a href="/recipes/ios/animation/coreanimation/create_an_implicit_animation/">Create an Implicit Animation</a> </li> 
+             <li class=""> <a href="/recipes/ios/animation/coreanimation/create_a_keyframe_animation/">Create a Keyframe Animation</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/ios/content_controls/">Content Controls</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/ios/content_controls/collection_view/">Collection View</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/content_controls/collection_view/collection_view_zoom/">Zoom a Collection View</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/content_controls/map_view/">Map View</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/content_controls/map_view/add_an_annotation_to_a_map/">Add an Annotation to a Map</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/map_view/add_an_overlay_to_a_map/">Add an Overlay to a Map</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/map_view/change_map_modes/">Change Map Modes</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/map_view/display_a_location/">Display a Location</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/map_view/display_device_location/">Display Device Location</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/map_view/handle_annotation_click/">Handle Annotation Click</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/content_controls/navigation_controller/">Navigation Controller</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/content_controls/navigation_controller/add_an_image_to_a_nav_bar_button/">Add an Image to a Nav Bar Button</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/navigation_controller/add_a_nav_bar_bottom_toolbar/">Add a Nav Bar Bottom ToolBar</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/navigation_controller/add_a_nav_bar_right_button/">Add a Nav Bar Right Button</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/navigation_controller/change_the_back_button/">Change the Back Button</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/navigation_controller/change_the_nav_bar_color/">Change the Nav Bar Color</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/navigation_controller/change_the_nav_bar_style/">Change the Nav Bar Style</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/navigation_controller/change_the_nav_bar_title/">Change the Nav Bar Title</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/navigation_controller/change_the_nav_bar_transparency/">Change the Nav Bar Transparency</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/navigation_controller/make_the_nav_bar_disappear/">Make the Nav Bar Disappear</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/content_controls/other_ux/">Other UX</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/content_controls/other_ux/use_initial_screen_in_tab_controller/">Use Initial Screen in Tab Controller</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/content_controls/scroll_view/">Scroll View</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/content_controls/scroll_view/create_a_horizontal_scrolling_button_list/">Create a Horizontal Scrolling Button List</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/scroll_view/implement_tap-to-zoom/">Implement Tap-to-Zoom</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/scroll_view/use_a_scrollview/">Use a ScrollView</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/scroll_view/zoom_a_scrollview/">Zoom a ScrollView</a> </li> 
+            </ul> </li> 
+           <li class=""> <a href="/recipes/ios/content_controls/search-controller/">Search Controller</a> </li> 
+           <li class="expandable"> <a href="/recipes/ios/content_controls/split_view/">Split View</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/content_controls/split_view/communicate_between_master_and_detail_controllers/">Communicate Between Master and Detail Controllers</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/split_view/show_and_hide_the_master_view_button/">Show and Hide the Master View Button</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/split_view/use_multiple_detail_controllers/">Use Multiple Detail Controllers</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/split_view/use_split_view_to_show_two_controllers/">Use Split View to Show two Controllers</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/content_controls/tables/">Tables</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/content_controls/tables/add_a_cell_accessory/">Add a Cell Accessory</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/tables/create_a_login_window_using_monotouch.dialog/">Create a Login Window Using MonoTouch.Dialog</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/tables/handle_a_row_click/">Handle a Row Click</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/tables/populate_a_table/">Populate a Table</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/tables/specify_the_cell_type/">Specify the Cell Type</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/tables/custom-tableviewcell/">Create a Custom TableViewCell using a .xib</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/content_controls/tab_bar/">Tab Bar</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/content_controls/tab_bar/add_a_badge_to_a_tab_item/">Add a Badge to a Tab Item</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/tab_bar/create_a_tab_bar/">Create a Tab Bar</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/tab_bar/persist_customized_tab_bar_buttons/">Persist Customized Tab Bar Buttons</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/tab_bar/specify_customizable_tab_bar_buttons/">Specify Customizable Tab Bar Buttons</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/content_controls/web_view/">Web View</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/content_controls/web_view/load_a_web_page/">Load a Web Page</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/web_view/load_local_content/">Load Local Content</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/web_view/load_non-web_documents/">Load Non-Web Documents</a> </li> 
+             <li class=""> <a href="/recipes/ios/content_controls/web_view/handle_javascript_alerts/">Handle JavaScript Alerts</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/ios/data/">Data</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/ios/data/sqlite/">SQLite</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/data/sqlite/create_a_database_with_ado.net/">Create a Database with ADO.NET</a> </li> 
+             <li class=""> <a href="/recipes/ios/data/sqlite/create_a_database_with_sqlitenet/">Create a Database with SQLiteNET</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/ios/general/">General</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/ios/general/file_system/">File System</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/general/file_system/enumerate_directories/">Enumerate Directories</a> </li> 
+             <li class=""> <a href="/recipes/ios/general/file_system/load_a_file/">Load a File</a> </li> 
+             <li class=""> <a href="/recipes/ios/general/file_system/save_documents/">Save Documents</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/general/projects/">Projects</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/general/projects/create_an_ios_project/">Create an iOS Project</a> </li> 
+             <li class=""> <a href="/recipes/ios/general/projects/environment_checks/">Environment Checks</a> </li> 
+             <li class=""> <a href="/recipes/ios/general/projects/specify_default_root_namespace/">Specify Default Root Namespace</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/general/storyboard/">Storyboard</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/general/storyboard/storyboard_a_tableview/">Storyboard a TableView</a> </li> 
+             <li class=""> <a href="/recipes/ios/general/storyboard/unwind_segue/">Creating an Unwind Segue</a> </li> 
+             <li class=""> <a href="/recipes/ios/general/storyboard/container_view_to_child_view_controller/">Use an External Storyboard With a Container View</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/general/templates/">.xib Templates</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/general/templates/using_the_ios_view_xib_template/">Using the View .xib Template</a> </li> 
+             <li class=""> <a href="/recipes/ios/general/templates/launchscreen-xib/">Creating a Launch Screen using a .xib</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/ios/graphics_and_drawing/">Graphics and Drawing</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/ios/graphics_and_drawing/core_text/">Core Text</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/graphics_and_drawing/core_text/draw_unicode_text_with_coretext/">Draw Unicode Text with CoreText</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/graphics_and_drawing/core_graphics/">Core Graphics</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/graphics_and_drawing/core_graphics/transparent_region_view/">Create a Transparent Region in a View</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/ios/input/">Input</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/ios/input/accelerometer/">Accelerometer</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/input/accelerometer/use_coremotion_with_accelerometer/">Use CoreMotion with Accelerometer</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/input/keyboards/">Keyboards</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/input/keyboards/dismiss_the_keyboard/">Dismiss the Keyboard</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/input/touch/">Touch</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/input/touch/drag_rotate_image/">Drag and Rotate an Image</a> </li> 
+             <li class=""> <a href="/recipes/ios/input/touch/tap-gesture/">Use a Tap Gesture</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/ios/media/">Media</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/ios/media/airplay/">Airplay</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/media/airplay/enable_or_disable_airplay/">Enable or Disable Airplay</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/media/coreimage/">CoreImage</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/media/coreimage/adjust_contrast_and_brightness_of_an_image/">Adjust Contrast and Brightness of an Image</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/media/images/">Images</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/media/images/access_image_metadata/">Access Image Metadata</a> </li> 
+             <li class=""> <a href="/recipes/ios/media/images/merge_images/">Merge Images</a> </li> 
+             <li class=""> <a href="/recipes/ios/media/images/rotate_an_image/">Rotate An Image</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/media/sound/">Sound</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/media/sound/record_sound/">Record Sound</a> </li> 
+             <li class=""> <a href="/recipes/ios/media/sound/query_now_playing/">Query Now Playing</a> </li> 
+             <li class=""> <a href="/recipes/ios/media/sound/syssound-example/">Use System Sound Services</a> </li> 
+             <li class=""> <a href="/recipes/ios/media/sound/avaudioplayer/">Playing Sound with AVAudioPlayer</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/media/video_and_photos/">Video and Photos</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/media/video_and_photos/choose_a_photo_from_the_gallery/">Choose a Photo From the Gallery</a> </li> 
+             <li class=""> <a href="/recipes/ios/media/video_and_photos/play_a_video_using_avplayer/">Play a Video Using AVPlayer</a> </li> 
+             <li class=""> <a href="/recipes/ios/media/video_and_photos/play_a_video_using_mpmovieplayercontroller/">Play a Video Using MPMoviePlayerController</a> </li> 
+             <li class=""> <a href="/recipes/ios/media/video_and_photos/save_photo_to_album_with_metadata/">Save Photo to Album with Metadata</a> </li> 
+             <li class=""> <a href="/recipes/ios/media/video_and_photos/save_photo_to_app_directory/">Save Photo to App Directory</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/ios/multitasking/">Multitasking &amp; Location</a> 
+          <ul> 
+           <li class=""> <a href="/recipes/ios/multitasking/detect_if_multitasking_is_available/">Detect Multitasking</a> </li> 
+           <li class=""> <a href="/recipes/ios/multitasking/track_significant_location_change/">Track Significant Location Change</a> </li> 
+           <li class=""> <a href="/recipes/ios/multitasking/check_background_refresh_setting/">Check Background Refresh Setting</a> </li> 
+           <li class=""> <a href="/recipes/ios/multitasking/geofencing/">Create Geofence</a> </li> 
+           <li class=""> <a href="/recipes/ios/multitasking/test_location_changes_in_simulator/">Test Location Changes in Simulator</a> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/ios/network/">Network</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/ios/network/reachability/">Reachability</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/network/reachability/detect_if_network_is_available/">Detect if Network is Available</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/network/web_requests/">Web Requests</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/network/web_requests/download_an_image/">Download an Image</a> </li> 
+             <li class=""> <a href="/recipes/ios/network/web_requests/download_a_file/">Download a File</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/ios/shared_resources/">Shared Resources</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/ios/shared_resources/contacts/">Contacts</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/shared_resources/contacts/choose_a_contact/">Choose a Contact</a> </li> 
+             <li class=""> <a href="/recipes/ios/shared_resources/contacts/create_a_new_contact/">Create a New Contact</a> </li> 
+             <li class=""> <a href="/recipes/ios/shared_resources/contacts/find_a_contact/">Find a Contact</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/shared_resources/email/">Email</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/shared_resources/email/send_an_email/">Send an Email</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/shared_resources/extensions/">Extensions</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/shared_resources/extensions/today_widget/">Today Widget</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/shared_resources/sms/">SMS</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/shared_resources/sms/send_an_sms_or_imessage/">Send an SMS or iMessage</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/shared_resources/phone/">Phone</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/shared_resources/phone/dial-phone-uri/">Dial Phone By URI</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/ios/standard_controls/">Standard Controls</a> 
+          <ul> 
+           <li class=""> <a href="/recipes/ios/standard_controls/alertcontroller/">AlertController</a> </li> 
+           <li class=""> <a href="/recipes/ios/standard_controls/actionsheet/">ActionSheet</a> </li> 
+           <li class="expandable"> <a href="/recipes/ios/standard_controls/buttons/">Buttons</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/standard_controls/buttons/create_different_types_of_buttons/">Create Different Types of Buttons</a> </li> 
+             <li class=""> <a href="/recipes/ios/standard_controls/buttons/handle_clicks/">Handle Clicks</a> </li> 
+             <li class=""> <a href="/recipes/ios/standard_controls/buttons/set_button_text/">Set Button Text</a> </li> 
+             <li class=""> <a href="/recipes/ios/standard_controls/buttons/use_an_image_for_a_button/">Use an Image for a Button</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/standard_controls/fonts/">Fonts</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/standard_controls/fonts/enumerate_fonts/">Enumerate Fonts</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/standard_controls/image_view/">Image View</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/standard_controls/image_view/animate_an_imageview/">Animate an ImageView</a> </li> 
+             <li class=""> <a href="/recipes/ios/standard_controls/image_view/load_an_image/">Load an Image</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/standard_controls/labels/">Labels</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/standard_controls/labels/change_the_font/">Change the Font</a> </li> 
+             <li class=""> <a href="/recipes/ios/standard_controls/labels/uilabel-truncate-wrap-text/">Truncate and Wrap Text</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/standard_controls/popovers/">Popovers</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/standard_controls/popovers/display_a_loading_message/">Display a Loading Message</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/standard_controls/segmented_button_control/">Segmented Button Control</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/standard_controls/segmented_button_control/configure_segments_(uisegmentedcontrol)/">Configure Segments (UISegmentedControl)</a> </li> 
+             <li class=""> <a href="/recipes/ios/standard_controls/segmented_button_control/specify_segment_sizes/">Specify Segment Sizes</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/standard_controls/sliders/">Sliders</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/standard_controls/sliders/specify_slider_appearance/">Specify Slider Appearance</a> </li> 
+             <li class=""> <a href="/recipes/ios/standard_controls/sliders/specify_slider_value/">Specify Slider Value</a> </li> 
+            </ul> </li> 
+           <li class="expandable"> <a href="/recipes/ios/standard_controls/text_field/">Text Field</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/ios/standard_controls/text_field/validate_input/">Validate Input</a> </li> 
+             <li class=""> <a href="/recipes/ios/standard_controls/text_field/style_text/">Style Text</a> </li> 
+             <li class=""> <a href="/recipes/ios/standard_controls/text_field/set-uitextfield-focus/">Set Focus to UITextField</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+        </ul> </li> 
+       <li class="product  mac"> <a href="#">Mac</a> 
+        <ul> 
+         <li class="expandable"> <a href="/recipes/mac/general/">General</a> 
+          <ul> 
+           <li class=""> <a href="/recipes/mac/general/environment-checks/">Environment Checks</a> </li> 
+          </ul> </li> 
+         <li class="expandable"> <a href="/recipes/mac/ui/">User Interface</a> 
+          <ul> 
+           <li class="expandable"> <a href="/recipes/mac/ui/outlineview/">Outline View</a> 
+            <ul> 
+             <li class=""> <a href="/recipes/mac/ui/outlineview/populate_outlineview/">Populate an Outline View</a> </li> 
+            </ul> </li> 
+          </ul> </li> 
+        </ul> </li> 
+       <li class="product  testcloud"> <a href="#">Test Cloud</a> 
+        <ul> 
+         <li class=""> <a href="/recipes/testcloud/set-accessibilityidentifier-ios/">Set the Accessibility Identifier in iOS</a> </li> 
+         <li class=""> <a href="/recipes/testcloud/start-activity-with-backdoor/">Start an Activity with a Backdoor</a> </li> 
+        </ul> </li> 
+      </ul> 
+     </div> 
+    </aside> 
+    <main> 
+     <div class="breadcrumb"> 
+      <a href="/recipes/android/">Android</a> 
+      <a href="/recipes/android/web_services/">Web Services</a> 
+      <a href="/recipes/android/web_services/consuming_services/">Consuming Services</a> 
+     </div> 
+     <h1 class="dark-blue">Call a REST Web Service</h1> 
+     <div class="auth-only" style="display:none">
+       ?? &nbsp; 
+      <a href="https://github.com/xamarin/documentation/blob/master/recipes/android/web_services/consuming_services/call_a_rest_web_service/index.md">Edit on GitHub</a> 
+     </div> 
+     <p class="feature"></p> 
+     <div class="specs-box"> 
+      <dl> 
+       <dt>
+        PDF for offline use
+       </dt> 
+       <dd> 
+        <ul> 
+         <li> <a href="offline.pdf" target="_blank" rel="nofollow">Download PDF</a> </li> 
+        </ul> 
+       </dd> 
+       <dt>
+        Sample Code:
+       </dt> 
+       <dd> 
+        <ul> 
+         <li> <a href="/samples/monodroid/WeatherREST" target="_blank">WeatherREST</a> </li> 
+        </ul> 
+       </dd> 
+       <dt>
+        Related Articles:
+       </dt> 
+       <dd> 
+        <ul> 
+         <li> <a href="/guides/cross-platform/application_fundamentals/web_services">Introduction to Web Services</a> </li> 
+        </ul> 
+       </dd> 
+      </dl> 
+      <div class="content-feedback"> 
+       <div id="feedback-input"> 
+        <p>Let us know how you feel about this</p> 
+        <p> <input type="button" id="pos-button" value="I love it!"> <input type="button" id="neg-button" value="I have a problem."> </p> 
+        <ul id="pos-list" class="feedback-list"> 
+         <li> <input type="radio" name="sentiment" id="answered-my-question" value="answered-my-question"> <label for="answered-my-question">Answered my question</label> </li> 
+         <li> <input type="radio" name="sentiment" id="well-written" value="well-written"> <label for="well-written">This was well written</label> </li> 
+         <li> <input type="radio" name="sentiment" id="unique-insight" value="unique-insight"> <label for="unique-insight">I learned a new concept</label> </li> 
+        </ul> 
+        <ul id="neg-list" class="feedback-list"> 
+         <li> <input type="radio" name="sentiment" id="sample-code-problem" value="sample-code-problem"> <label for="sample-code-problem">Problem with the sample code</label> </li> 
+         <li> <input type="radio" name="sentiment" id="incorrect-info" value="incorrect-info"> <label for="incorrect-info">Information presented was incorrect</label> </li> 
+         <li> <input type="radio" name="sentiment" id="out-of-date" value="out-of-date"> <label for="out-of-date">This is out of date</label> </li> 
+         <li> <input type="radio" name="sentiment" id="missing-something" value="missing-something"> <label for="missing-something">Something is missing</label> </li> 
+        </ul> 
+        <div id="loc-feedback"> 
+         <p>Translation Quality</p> 
+         <ul id="loc-list" class="feedback-list"> 
+          <li> <input type="radio" name="loc" id="loc-excellent" value="loc-excellent"> <label for="loc-excellent">Excellent</label> </li> 
+          <li> <input type="radio" name="loc" id="loc-ok" value="loc-ok"> <label for="loc-ok">Ok</label> </li> 
+          <li> <input type="radio" name="loc" id="loc-needswork" value="loc-needswork"> <label for="loc-needswork">Needs Work</label> </li> 
+         </ul> 
+        </div> 
+        <div id="submission"> 
+         <textarea id="feedback-text"></textarea> 
+         <br clear="all"> 
+         <span id="remaining">0/250</span> 
+         <input id="input-locale" type="hidden" value="en-us"> 
+         <input id="submit-feedback" type="submit" value="Submit"> 
+        </div> 
+       </div> 
+       <div id="thanks"> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="doc-content"> 
+      <p class="small feature">This recipe shows how to call a RESTful service using HTTP, parse JSON results, and display the results on the screen.</p> 
+      <h1>Recipe</h1> 
+      <p>In this recipe, we'll create an app that reports weather information, such as temperature, humidity, and current conditions. This app issues a request to a REST service to get weather data, parses the response, and displays the results on the screen. The user keys in global latitude and longitude coordinates before pressing a <strong>Get Weather</strong> button to view information about the weather at that location. </p> 
+      <p><a href="Images/1-example-screenshot.png" class=" fancybox"> <img src="Images/1-example-screenshot-sml.png" alt=""></a></p> 
+      <p>Our example app will send latitude and longitude information to <em>geonames.org</em> in an HTTP request. The resulting weather information is returned in JSON format. When the HTTP response is received, our app will parse the results and display a subset of the weather information in <code>TextBox</code> fields in the lower half of the screen (as shown in the above screenshot). A more advanced version of this app could use GPS to determine the current latitude and longitude of the device, but that is beyond the scope of this article. </p> 
+      <p>Follow these steps to create an app that issues a REST request to an HTTP server, parses the results, and displays the results on the screen. </p> 
+      <ul> 
+       <li><p>First, we'll create a new Xamarin.Android app. The example screenshots in this article were taken using the Android L Developer Preview, but an earlier Android version such as KitKat (API level 19) can be used. If you are new to Android development with Xamarin, see <a href="/guides/android/getting_started/hello,android/">Hello, Android</a> to learn how to create Xamarin.Android applications. </p></li> 
+       <li><p>Next, we'll use the Xamarin.Android Designer to create a UI (see <a href="/guides/android/user_interface/designer_overview/">Designer Overview</a> if you are not familiar with the Android interface designer). Let's start by replacing the contents of <strong>Resources/layout/Main.axml</strong> with the XML example below. This code begins the GUI layout with two <code>EditText</code> elements. These elements allow the user to enter longitude and latitude values. Let's use the id's <code>latText</code> and <code>longText</code> for these <code>EditBox</code> elements: </p></li> 
+      </ul> 
+      <pre><code syntax="xml" class=" syntax brush-xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"&gt;
+    &lt;LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:id="@+id/latSection"&gt;
+        &lt;TextView
+            android:text="Enter Latitude:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="140dp"
+            android:layout_height="40dp"
+            android:gravity="right"
+            android:id="@+id/latLabel" /&gt;
+        &lt;EditText
+            android:text="47.7"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:id="@+id/latText"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_marginLeft="5dp" /&gt;
+    &lt;/LinearLayout&gt;
+    &lt;LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:id="@+id/longSection"&gt;
+        &lt;TextView
+            android:text="Enter Longitude:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="140dp"
+            android:layout_height="40dp"
+            android:gravity="right"
+            android:id="@+id/longLabel" /&gt;
+        &lt;EditText
+            android:text="-122.5"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:id="@+id/longText"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_marginLeft="5dp" /&gt;
+    &lt;/LinearLayout&gt;</code></pre> 
+      <ul> 
+       <li>Next, let's add a button that the user can press to get the weather. Let's give this button the id <code>getWeatherButton</code>. Append the following XML to layout in <strong>Resources/layout/Main.axml</strong> (started above): </li> 
+      </ul> 
+      <pre><code syntax="xml" class=" syntax brush-xml">&lt;LinearLayout
+        android:orientation="vertical"
+        android:layout_marginTop="28dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:id="@+id/getSection"&gt;
+        &lt;Button
+            android:id="@+id/getWeatherButton"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Get Weather" /&gt;
+    &lt;/LinearLayout&gt;</code></pre> 
+      <ul> 
+       <li>Let's add four <code>TextView</code> elements for reporting location name, temperature, humidity, and current conditions; let's assign the id's <code>locationText</code>, <code>tempText</code>, <code>humidText</code>, and <code>condText</code>, respectively. Append the following XML to <strong>Resources/layout/Main.axml</strong>: </li> 
+      </ul> 
+      <pre><code syntax="xml" class=" syntax brush-xml">&lt;LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/locSection"&gt;
+        &lt;TextView
+            android:text="Location:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:gravity="left"
+            android:id="@+id/locLabel" /&gt;
+        &lt;TextView
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:gravity="left"
+            android:id="@+id/locationText" /&gt;
+    &lt;/LinearLayout&gt;
+    &lt;LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tempSection"&gt;
+        &lt;TextView
+            android:text="Temperature:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:gravity="left"
+            android:id="@+id/tempLabel" /&gt;
+        &lt;TextView
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:gravity="left"
+            android:id="@+id/tempText" /&gt;
+    &lt;/LinearLayout&gt;
+    &lt;LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/humidSection"&gt;
+        &lt;TextView
+            android:text="Humidity:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:gravity="left"
+            android:id="@+id/humidLabel" /&gt;
+        &lt;TextView
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:gravity="left"
+            android:id="@+id/humidText" /&gt;
+    &lt;/LinearLayout&gt;
+    &lt;LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/condSection"&gt;
+        &lt;TextView
+            android:text="Conditions:"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="120dp"
+            android:layout_height="30dp"
+            android:gravity="left"
+            android:id="@+id/condLabel" /&gt;
+        &lt;TextView
+            android:text=""
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:gravity="left"
+            android:id="@+id/condText" /&gt;
+    &lt;/LinearLayout&gt;
+&lt;/LinearLayout&gt;</code></pre> 
+      <ul> 
+       <li><p>Let's save our layout and exit the designer. Here is an example of how the UI looks after we add the above XML code sections: </p> <p><a href="Images/2-display-elements.png" class=" fancybox"> <img src="Images/2-display-elements-sml.png" alt=""></a></p></li> 
+       <li><p>In our <code>MainActivity</code> subclass, let's add the following code to the <code>OnCreate</code> method. This code gets the user-entered latitude and longitude values from the UI, packages these values in an HTTP request, fetches the data, parses the result, and updates the screen. We'll create the <code>FetchWeatherAsync</code> and <code>ParseAndDisplay</code> methods in subsequent steps. </p></li> 
+      </ul> 
+      <pre><code syntax="C#" class=" syntax brush-C#">// Set our view from the "main" layout resource
+SetContentView(Resource.Layout.Main);
+
+// Get the latitude/longitude EditBox and button resources:
+EditText latitude = FindViewById&lt;EditText&gt;(Resource.Id.latText);
+EditText longitude = FindViewById&lt;EditText&gt;(Resource.Id.longText);
+Button button = FindViewById&lt;Button&gt;(Resource.Id.getWeatherButton);
+
+// When the user clicks the button ...
+button.Click += async (sender, e) =&gt; {
+
+    // Get the latitude and longitude entered by the user and create a query.
+    string url = "http://api.geonames.org/findNearByWeatherJSON?lat=" +
+                 latitude.Text +
+                 "&amp;lng=" +
+                 longitude.Text +
+                 "&amp;username=demo";
+
+    // Fetch the weather information asynchronously, 
+    // parse the results, then update the screen:
+    JsonValue json = await FetchWeatherAsync (url);
+    // ParseAndDisplay (json);
+};</code></pre> 
+      <ul> 
+       <li><p>Before we send the HTTP request to the server, we must be prepared to wait for the HTTP response, which – depending on the latency of the network connection – could come back quickly or could take many seconds to return. During this wait, we don't want the application UI to freeze up while the UI thread waits for a response. Therefore, the HTTP request must be an <em>asynchronous</em> HTTP request. We use <code>async</code>/<code>await</code> to keep the UI thread responsive to user input while the app waits for the HTTP request and response to complete. For more about asynchronous programming techniques, see <a href="/guides/android/advanced_topics/writing_responsive_applications">Writing Reponsive Applications</a>. </p> <p>Let's add the following method after the <code>OnCreate</code> method. This method issues the HTTP request, waits for a response, and returns the response to the caller:</p></li> 
+      </ul> 
+      <pre><code syntax="C#" class=" syntax brush-C#">// Gets weather data from the passed URL.
+private async Task&lt;JsonValue&gt; FetchWeatherAsync (string url)
+{
+    // Create an HTTP web request using the URL:
+    HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create (new Uri (url));
+    request.ContentType = "application/json";
+    request.Method = "GET";
+
+    // Send the request to the server and wait for the response:
+    using (WebResponse response = await request.GetResponseAsync ())
+    {
+        // Get a stream representation of the HTTP web response:
+        using (Stream stream = response.GetResponseStream ())
+        {
+            // Use this stream to build a JSON document object:
+            JsonValue jsonDoc = await Task.Run (() =&gt; JsonObject.Load (stream));
+            Console.Out.WriteLine("Response: {0}", jsonDoc.ToString ());
+
+            // Return the JSON document:
+            return jsonDoc;
+        }
+    }
+}</code></pre> 
+      <ul> 
+       <li><p>The above example converts the HTTP response stream into a <code>JsonValue</code> object — this makes it easier for us to extract the weather information that we will need in later steps. Because we will be using <code>System.Json</code> to parse the response, we must add a reference to <code>System.Json</code> to our project: </p> 
+        <ul> 
+         <li><p>In Xamarin Studio, right-click the project's <strong>References</strong> node, select <strong>Edit References…</strong>, click the <strong>All</strong> tab, and enter <strong>System.Json</strong> into the search field. Next, select the <strong>System.Json</strong> assembly when it appears and then click <strong>OK</strong>. </p></li> 
+         <li><p>In Visual Studio, right-click the project's <strong>References</strong> node, select <strong>Add Reference…</strong>, and enter <strong>System.Json</strong> into the search field. Next, select the <strong>System.Json</strong> assembly when it appears and click <strong>OK</strong>. </p></li> 
+        </ul> <p>Note that, for clarity, this example omits exception handlers. Parsing operations can throw exceptions (if, for example, the expected field name is not found during a name/value lookup). Also, network connection errors can generate exceptions. In a production app, these code paths should be wrapped with exception handlers to handle real-life error conditions. </p></li> 
+       <li><p>Next, we'll build and run our app, testing it to see if we can get a response to our HTTP request. When the app launches, we'll enter latitude and longitude information into its UI (or use the default coordinates) and press the <strong>Get Weather</strong> button. If the HTTP request and response succeeds, we should get a JSON-formatted HTTP response that resembles the following example (the JSON response string should be visible in the IDE debug output): </p></li> 
+      </ul> 
+      <pre><code syntax="C#" class=" syntax brush-C#">{
+    "weatherObservation": {
+        "ICAO": "KBFI",
+        "clouds": "broken clouds",
+        "cloudsCode": "BKN",
+        "countryCode": "US",
+        "datetime": "2014-12-05 22:53:00",
+        "dewPoint": "8.3",
+        "elevation": 4,
+        "humidity": 79,
+        "lat": 47.55,
+        "lng": -122.31666666666666,
+        "observation": "KBFI 052253Z 32003KT 10SM BKN070 BKN090 12/08 A2989 RMK AO2 SLP122 T01170083",
+        "seaLevelPressure": 1012.2,
+        "stationName": "Seattle, Seattle Boeing Field",
+        "temperature": "11.7",
+        "weatherCondition": "n/a",
+        "windDirection": 320,
+        "windSpeed": "03"
+    }
+}</code></pre> 
+      <ul> 
+       <li>Now that we have successfully sent an HTTP response that elicits a valid response, we'll parse the <code>JsonValue</code> object to extract the weather information that we want to display. In the example JSON response shown above, we want to extract the <code>stationName</code>, <code>temperature</code>, <code>humidity</code>, <code>clouds</code>, and <code>weatherCondition</code> name/value pairs, using this information to fill out the bottom portion of the weather app display. Let's add the following method after the <code>FetchWeatherAsync</code> method: </li> 
+      </ul> 
+      <pre><code syntax="C#" class=" syntax brush-C#">// Parse the weather data, then write temperature, humidity, 
+// conditions, and location to the screen.
+private void ParseAndDisplay (JsonValue json)
+{
+    // Get the weather reporting fields from the layout resource:
+    TextView location = FindViewById&lt;TextView&gt;(Resource.Id.locationText);
+    TextView temperature = FindViewById&lt;TextView&gt;(Resource.Id.tempText);
+    TextView humidity = FindViewById&lt;TextView&gt;(Resource.Id.humidText);
+    TextView conditions = FindViewById&lt;TextView&gt;(Resource.Id.condText);
+
+    // Extract the array of name/value results for the field name "weatherObservation". 
+    JsonValue weatherResults = json["weatherObservation"];
+
+    // Extract the "stationName" (location string) and write it to the location TextBox:
+    location.Text = weatherResults["stationName"];
+
+    // The temperature is expressed in Celsius:
+    double temp = weatherResults["temperature"];
+    // Convert it to Fahrenheit:
+    temp = ((9.0 / 5.0) * temp) + 32;
+    // Write the temperature (one decimal place) to the temperature TextBox:
+    temperature.Text = String.Format("{0:F1}", temp) + "° F";
+
+    // Get the percent humidity and write it to the humidity TextBox:
+    double humidPercent = weatherResults["humidity"];
+    humidity.Text = humidPercent.ToString() + "%";
+
+    // Get the "clouds" and "weatherConditions" strings and 
+    // combine them. Ignore strings that are reported as "n/a":
+    string cloudy = weatherResults["clouds"];
+    if (cloudy.Equals ("n/a"))
+        cloudy = "";
+    string cond = weatherResults["weatherCondition"];
+    if (cond.Equals ("n/a"))
+        cond = "";
+
+    // Write the result to the conditions TextBox:
+    conditions.Text = cloudy + " " + cond;
+}</code></pre> 
+      <ul> 
+       <li><p>In the <code>OnCreate</code> method, let's uncomment the call to <code>ParseAndDisplay</code> so that it will run. Next, let's build and run our app again, testing it to see if the results are successfully parsed and written to the screen. If everything works as expected, we should see a result that is similar to the first screenshot, above. </p> <p>Note that this sample uses a <em>geonames.org</em> demo account, which supports a limited number of accesses. If an exception is generated or the display does not report weather information, check your IDE output window to view the HTTP response. If the response contains a "daily limit has been exceeded" message, you will have to try the test again later. </p></li> 
+      </ul> 
+      <h1>Additional Information</h1> 
+      <p>The <code>HttpWebRequest</code> class allows apps to interact directly with servers using HTTP. The <code>System.Json</code> class can be used to parse JSON results from an HTTP request. Because HTTP interaction is handled asynchronously via <code>async</code>/<code>await</code>, the app is responsive to user input during network operations. </p> 
+      <p>For more information about integrating with web services, <a href="/guides/cross-platform/application_fundamentals/web_services/">Introduction to Web Services</a> explains how to integrate REST, WCF, and SOAP web service technologies with Xamarin mobile applications. </p> 
+     </div> 
+     <div id="wboverlay"> 
+      <div class="feedback"> 
+       <div class="content-feedback"> 
+        <div id="feedback-input"> 
+         <p>Let us know how you feel about this</p> 
+         <p> <input type="button" id="pos-button" value="I love it!"> <input type="button" id="neg-button" value="I have a problem."> </p> 
+         <ul id="pos-list" class="feedback-list"> 
+          <li> <input type="radio" name="sentiment" id="answered-my-question" value="answered-my-question"> <label for="answered-my-question">Answered my question</label> </li> 
+          <li> <input type="radio" name="sentiment" id="well-written" value="well-written"> <label for="well-written">This was well written</label> </li> 
+          <li> <input type="radio" name="sentiment" id="unique-insight" value="unique-insight"> <label for="unique-insight">I learned a new concept</label> </li> 
+         </ul> 
+         <ul id="neg-list" class="feedback-list"> 
+          <li> <input type="radio" name="sentiment" id="sample-code-problem" value="sample-code-problem"> <label for="sample-code-problem">Problem with the sample code</label> </li> 
+          <li> <input type="radio" name="sentiment" id="incorrect-info" value="incorrect-info"> <label for="incorrect-info">Information presented was incorrect</label> </li> 
+          <li> <input type="radio" name="sentiment" id="out-of-date" value="out-of-date"> <label for="out-of-date">This is out of date</label> </li> 
+          <li> <input type="radio" name="sentiment" id="missing-something" value="missing-something"> <label for="missing-something">Something is missing</label> </li> 
+         </ul> 
+         <div id="loc-feedback"> 
+          <p>Translation Quality</p> 
+          <ul id="loc-list" class="feedback-list"> 
+           <li> <input type="radio" name="loc" id="loc-excellent" value="loc-excellent"> <label for="loc-excellent">Excellent</label> </li> 
+           <li> <input type="radio" name="loc" id="loc-ok" value="loc-ok"> <label for="loc-ok">Ok</label> </li> 
+           <li> <input type="radio" name="loc" id="loc-needswork" value="loc-needswork"> <label for="loc-needswork">Needs Work</label> </li> 
+          </ul> 
+         </div> 
+         <div id="submission"> 
+          <textarea id="feedback-text"></textarea> 
+          <br clear="all"> 
+          <span id="remaining">0/250</span> 
+          <input id="input-locale" type="hidden" value="en-us"> 
+          <input id="submit-feedback" type="submit" value="Submit"> 
+         </div> 
+        </div> 
+        <div id="thanks"> 
+        </div> 
+       </div> 
+      </div> 
+      <h1 id="wbtitle">Xamarin Workbook</h1> 
+      <p> If it's not already installed, <a href="/guides/cross-platform/workbooks/install/">install</a> the Xamarin Workbooks app first. The workbook file should download automatically, but if it doesn't, just click to <a href="#" id="wburl">start the workbook download manually</a>. </p> 
+      <p class="wbclose"> <input type="button" value="Close"> </p> 
+     </div> 
+    </main> 
+   </div> 
+  </section> 
+  <section class="pagination"> 
+   <div class="wrapper"> 
+    <a href="/recipes/android/web_services/consuming_services/" class="prev"> <span>Previous</span> <strong>Consuming Services</strong> </a> 
+    <a href="/recipes/ios/" class="next"> <span>Next</span> <strong>iOS</strong> </a> 
+   </div> 
+  </section> 
+  <div id="global-footer"> 
+   <div class="wrapper width-10"> 
+    <a href="https://www.xamarin.com" class="hexagon"></a> 
+    <div class="social-icons show-on-mobile"> 
+     <a class="facebook" href="https://facebook.com/xamarinhq">Facebook</a> 
+     <a class="twitter" href="https://twitter.com/xamarinhq">Twitter</a> 
+     <a class="github" href="https://github.com/xamarin">GitHub</a> 
+    </div> 
+    <div class="navigation hide-on-mobile"> 
+     <ul> 
+      <li>Products 
+       <ul> 
+        <li><a href="https://www.xamarin.com/platform">Xamarin for Visual Studio</a></li> 
+        <li><a href="https://www.xamarin.com/test-cloud">Xamarin Test Cloud</a></li> 
+        <li><a href="https://www.xamarin.com/insights">Xamarin Insights</a></li> 
+        <li><a href="https://www.xamarin.com/university">Xamarin University</a></li> 
+        <li><a href="https://www.xamarin.com/studio">Xamarin Studio</a></li> 
+        <li><a href="https://www.xamarin.com/visual-studio">Visual Studio</a></li> 
+        <li><a href="https://www.xamarin.com/forms">Xamarin.Forms</a></li> 
+        <li><a href="https://www.xamarin.com/prebuilt-apps">Pre-built apps</a></li> 
+        <li><a href="https://www.xamarin.com/licensing">Mono Licensing</a></li> 
+       </ul> </li> 
+      <li>Company 
+       <ul> 
+        <li><a href="https://www.xamarin.com/about">About us</a></li> 
+        <li><a href="https://www.xamarin.com/customers">Customers</a></li> 
+        <li><a href="https://www.xamarin.com/consulting-partners">Partners</a></li> 
+        <li><a href="https://blog.xamarin.com">Blog</a></li> 
+        <li><a href="https://www.xamarin.com/jobs">Jobs</a></li> 
+        <li><a href="https://www.xamarin.com/press">Press</a></li> 
+        <li><a href="https://store.xamarin.com">Pricing</a></li> 
+       </ul> </li> 
+      <li>Developer Center 
+       <ul> 
+        <li><a href="/">Get Started</a></li> 
+        <li><a href="/guides">Guides</a></li> 
+        <li><a href="/recipes">Recipes</a></li> 
+        <li><a href="http://iosapi.xamarin.com/">Xamarin.iOS APIs</a></li> 
+        <li><a href="http://androidapi.xamarin.com/">Xamarin.Android APIs</a></li> 
+        <li><a href="http://macapi.xamarin.com/">Xamarin.Mac APIs</a></li> 
+        <li><a href="https://forums.xamarin.com">Forums</a></li> 
+        <li><a href="/videos/">Videos</a></li> 
+       </ul> </li> 
+      <li>Connect 
+       <ul> 
+        <li><a href="https://www.xamarin.com/support">Developer Support</a></li> 
+        <li><a href="https://www.xamarin.com/resources">Resources</a></li> 
+        <li><a href="https://www.xamarin.com/consulting-partners/services">Consulting Services</a></li> 
+        <li><a href="https://www.xamarin.com/contact-us">Contact Sales</a></li> 
+        <li><a href="https://twitter.com/xamarinhq">Twitter</a></li> 
+        <li><a href="https://github.com/xamarin">GitHub</a></li> 
+        <li><a href="http://stackoverflow.com/questions/tagged/xamarin">Stack Overflow</a></li> 
+        <li><a href="https://www.facebook.com/xamarinhq">Facebook</a></li> 
+        <li><a href="https://plus.google.com/101300081691995092351/posts">Google+</a></li> 
+        <li><a href="https://www.youtube.com/user/XamarinVideos">YouTube</a></li> 
+       </ul> </li> 
+     </ul> 
+    </div> 
+   </div> 
+   <footer> 
+    <div class="wrapper"> 
+     <div class="contact"> 
+      <select id="locale-picker" aria-label="Change Page Language" style="color:black"> <option value="en-us" selected>English</option> <option value="es-es">Español</option> <option value="pt-br">Português (Brasil)</option> <option value="zh-cn">?? (??)</option> 
+       <!--
+                    <option value="cs-cz">?eština</option>
+                    <option value="de-de">Deutsch</option>
+                    <option value="fr-fr">Français</option>
+                    <option value="it-it">Italiano</option>
+                    <option value="ja-jp">???</option>
+                    <option value="ko-kr">???</option>
+                    <option value="nl-nl">Nederlands</option>
+                    <option value="pl-pl">Polski</option>
+                    <option value="pt-br">Português (Brasil)</option>
+                    <option value="ru-ru">P??????</option>
+                    <option value="tr-tr">Türkçe</option>
+                    <option value="zh-tw">?? (??)</option>
+--> </select> 
+     </div> 
+     <a class="microsoft-logo" href="https://www.microsoft.com"><img src="/theme/assets/images/microsoft-logo-invert.svg" alt="Microsoft"></a> 
+     <div class="legal"> 
+      <a href="https://store.xamarin.com/terms">Terms of Use</a> 
+      <span>© 
+       <noscript>
+        2017
+       </noscript><script>document.write(new Date().getFullYear())</script> Xamarin Inc.</span> 
+     </div> 
+    </div> 
+   </footer> 
+   <div class="sub-footer centered"> 
+    <p>Xamarin Inc., as a wholly-owned Microsoft subsidiary acting as a separate legal entity, adheres to the Microsoft Privacy Statement: <a href="https://privacy.microsoft.com/en-us/privacystatement">Privacy &amp; cookies</a></p> 
+   </div> 
+  </div> 
+  <script type="text/javascript" src="/theme/assets/js/locale.js"></script> 
+  <!-- jQuery --> 
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script> 
+  <script>window.jQuery || document.write('<script src="/theme/assets/js/libraries/jquery-1.11.2.min.js"><\/script>')</script> 
+  <script>var jq190 = jQuery;</script> 
+  <!--<script type="text/javascript" src="/theme/assets/js/libraries/jquery-migrate-1.2.1.min.js"></script>--> 
+  <script type="text/javascript" src="/theme/assets/js/libraries/fastclick.js"></script> 
+  <script type="text/javascript" src="/theme/assets/js/libraries/bootstrap.min.js"></script> 
+  <script type="text/javascript" src="/theme/assets/js/libraries/hisrc.js"></script> 
+  <script type="text/javascript" src="/theme/assets/js/libraries/jquery.sticky-kit.min.js"></script> 
+  <script type="text/javascript" src="/theme/assets/js/libraries/swipebox/jquery.swipebox.min.js"></script> 
+  <script type="text/javascript"> $(function() { $('.fancybox').swipebox(); }); </script> 
+  <script type="text/javascript" src="/theme/assets/js/libraries/moment.min.js"></script> 
+  <script type="text/javascript" src="/theme/assets/js/developer-center.js?v=2.6.4"></script> 
+  <script type="text/javascript" src="/theme/assets/js/partials/developers/search.js"></script> 
+  <style type="text/css"> comment { display: none !important; } </style> 
+  <script type="text/javascript" src="/theme/assets/js/structure/mobile.js"></script> 
+  <script type="text/javascript">
+    jQuery(function ($) {
+        $.syntax({ blockLayout: "plain" });
+    });
+</script> 
+  <!--cookie-start--> 
+  <script type="text/javascript">
+window.CreateCookies = true;
+</script> 
+  <noscript>
+   <iframe src="//www.googletagmanager.com/ns.html?id=GTM-57C4Z7" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript> 
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-57C4Z7');</script> 
+  <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-23759232-5']);
+  _gaq.push(['_setDomainName', 'xamarin.com']);
+  _gaq.push(['_addIgnoredRef', 'xamarin.com']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(ga, s);
+  })();
+</script> 
+  <script type="text/javascript">
+  (function() {
+    function initMunchkin() {
+      Munchkin.init('975-JOX-769');
+      // custom handling after marketo is ready
+      if (typeof marketo_ready != 'undefined') marketo_ready();
+    }
+    var s = document.createElement('script');
+    s.type = 'text/javascript';
+    s.async = true;
+    s.src = document.location.protocol + '//munchkin.marketo.net/munchkin.js';
+    s.onreadystatechange = function() {
+      if (this.readyState == 'complete' || this.readyState == 'loaded') {
+        initMunchkin();
+      }
+    };
+    s.onload = initMunchkin;
+    document.getElementsByTagName('body')[0].appendChild(s);
+  })();
+</script> 
+  <script type="text/javascript" src="//cdn.bizible.com/scripts/bizible.js" async></script> 
+  <script src="https://apis.google.com/js/client.js?onload=loadCalendar"></script> 
+  <!--cookie-end--> 
+  <script src="/theme/assets/js/libraries/jquery.syntax/jquery.syntax.min.js" type="text/javascript"></script> 
+  <script src="/theme/assets/js/libraries/moment-loc/en-us.js"></script> 
+  <script type="text/javascript">
+        window.IsLocaleAdjusted = false;
+        $(function() {
+            moment.locale("en-us");
+        });
+        </script> 
+  <script type="text/javascript">
+        $(function() {
+
+            var loadMedia = function(media) {
+                if (media == 'mobile') {
+
+                    $(".sidebar-container").trigger("sticky_kit:detach");
+
+                } else {
+
+                    $(".sidebar-container").stick_in_parent({recalc_every: 50})
+
+                    $(window).load(function() {
+                        $(document.body).trigger("sticky_kit:recalc");
+                    });
+
+                }
+            }
+
+            $('body').on('load-media', function(e, media) {
+                loadMedia(media);
+            });
+
+        });
+    </script>   
+ </body>
+</html>

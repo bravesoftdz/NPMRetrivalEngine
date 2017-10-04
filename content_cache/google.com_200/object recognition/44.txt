@@ -1,0 +1,621 @@
+<!doctype html>
+<html>
+ <head> 
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"> 
+  <meta name="theme-color" content="#4F7DC9"> 
+  <meta charset="UTF-8"> 
+  <title>Using Cloud Vision with Node.js</title> 
+  <script src="../../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script> 
+  <link rel="import" href="../../elements/codelab.html"> 
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono"> 
+  <style>
+    body {
+      font-family: "Roboto",sans-serif;
+    }
+  </style> 
+ </head> 
+ <body unresolved class="fullbleed"> 
+  <google-codelab title="Using Cloud Vision with Node.js" environment="web" feedback-link="https://github.com/googlecodelabs/cloud-vision/issues/new?labels[]=content-platform&amp;labels[]=cloud"> 
+   <google-codelab-step label="Overview" duration="1"> 
+    <p>In this codelab, you'll learn how to integrate Google Cloud Platform services into a Node.js web application to authenticate users, store data, upload images and use vision detection features.</p> 
+    <h3 class="checklist"><strong>What you'll learn</strong></h3> 
+    <ul class="checklist"> 
+     <li>How to authenticate users using OAuth 2.0</li> 
+     <li>How to fetch user profiles using the Google+ API</li> 
+     <li>How to upload images to Cloud Storage</li> 
+     <li>How to use Cloud Vision API to detect image features</li> 
+    </ul> 
+    <h3><strong>W</strong><strong>hat you'll need</strong></h3> 
+    <ul> 
+     <li>node.js</li> 
+     <li>npm</li> 
+     <li>The sample code</li> 
+     <li>Familiarity with standard Linux text editors such as Vim, EMACs or Nano</li> 
+    </ul> 
+    <google-codelab-survey survey-id="cloud-vision-nodejs-1"> 
+     <h4>How will you use this tutorial?</h4> 
+     <paper-radio-group> 
+      <paper-radio-button>
+       Read it through only
+      </paper-radio-button> 
+      <paper-radio-button>
+       Read it and complete the exercises
+      </paper-radio-button> 
+     </paper-radio-group> 
+     <h4>How would rate your experience with building node.js apps?</h4> 
+     <paper-radio-group> 
+      <paper-radio-button>
+       Novice
+      </paper-radio-button> 
+      <paper-radio-button>
+       Intermediate
+      </paper-radio-button> 
+      <paper-radio-button>
+       Proficient
+      </paper-radio-button> 
+     </paper-radio-group> 
+     <h4>How would you rate your experience with using Google Cloud Platform services?</h4> 
+     <paper-radio-group> 
+      <paper-radio-button>
+       Novice
+      </paper-radio-button> 
+      <paper-radio-button>
+       Intermediate
+      </paper-radio-button> 
+      <paper-radio-button>
+       Proficient
+      </paper-radio-button> 
+     </paper-radio-group> 
+    </google-codelab-survey> 
+   </google-codelab-step> 
+   <google-codelab-step label="Setup and Requirements" duration="5"> 
+    <h2><strong>Self-paced environment setup</strong></h2> 
+    <aside class="warning">
+     <p><strong>Important</strong>: If you are doing this lab from an account we provided, you may skip this section. </p> 
+     <p>The staff will be sharing with you temporary accounts with existing projects that are already setup so you do not need to worry about enabling billing or any cost associated with running this codelab. Note that all these accounts will be disabled soon after the codelab is over.</p> 
+     <p>Once you have received a temporary username / password to login from our staff, log into Google Cloud Console: https://console.cloud.google.com/. </p> 
+    </aside> 
+    <p>If you don't already have a Google Account (Gmail or Google Apps), you must <a href="https://accounts.google.com/SignUp" target="_blank">create one</a>. Sign-in to Google Cloud Platform console (<a href="http://console.cloud.google.com" target="_blank">console.cloud.google.com</a>) and create a new project:</p> 
+    <p><img style="max-width: 278.00px" src="img/3c50189ec031c0cf.png"></p> 
+    <p><img style="max-width: 499.00px" src="img/c1dfa522f67ae46d.png"></p> 
+    <p>Remember the project ID, a unique name across all Google Cloud projects (the name above has already been taken and will not work for you, sorry!). It will be referred to later in this codelab as <code>PROJECT_ID</code>.</p> 
+    <p>Next, you'll need to <a href="https://console.developers.google.com/billing" target="_blank">enable billing</a> in the Developers Console in order to use Google Cloud resources like Cloud Datastore and Cloud Storage.</p> 
+    <p>Running through this codelab shouldn't cost you more than a few dollars, but it could be more if you decide to use more resources or if you leave them running (see "cleanup" section at the end of this document). Prices are documented here: <a href="https://cloud.google.com/datastore/#pricing" target="_blank">Cloud Datastore</a> &amp; <a href="https://cloud.google.com/storage/pricing" target="_blank">Cloud Storage</a></p> 
+    <p>New users of Google Cloud Platform are eligible for a <a href="https://console.developers.google.com/billing/freetrial?hl=en" target="_blank">$300 free trial</a>.</p> 
+   </google-codelab-step> 
+   <google-codelab-step label="Using Google Cloud Shell" duration="2"> 
+    <p>While 'Using Cloud Vision with Node.js' can be operated remotely from your laptop, in this codelab we will be using <a href="https://cloud.google.com/cloud-shell/" target="_blank">Google Cloud Shell</a>, a command line environment running in the Cloud. </p> 
+    <p>This Debian-based virtual machine is loaded with all the development tools you'll need. It offers a persistent 5GB home directory, and runs on the Google Cloud, greatly enhancing network performance and authentication. This means that all you will need for this codelab is a browser (yes, it works on a Chromebook).</p> 
+    <p>To activate Google Cloud Shell, from the developer console simply click the button on the top right-hand side (it should only take a few moments to provision and connect to the environment):</p> 
+    <p><img style="max-width: 346.00px" src="https://lh6.googleusercontent.com/22DrN42027NBruj4-HIO5dvgzn-QM41pMWFJFLrYdYQhZ4H400-uFCqnhGWYqgsxOr1ZX-nIvc6JjeGzc8kXM76jIFkKxV3iVYkmG9OLDOWANSa4mhK8Ro3cKXk3rrTF_x6c_kor"></p> 
+    <p><img style="max-width: 624.00px" src="https://lh4.googleusercontent.com/WhCEL0yp5KCfhG9ujWEEB2WUgws5gLE_3p8JTtR2JQvlbAh93_opmWPh6CARQtTfe9X4AgkvEcEHCCZkplkh-cTPwn80RncatgKhsEvv5OKytkjgV9TuEK6H9TDJhv19-Nqh1ACx"></p> 
+    <p><img style="max-width: 473.00px" src="https://lh3.googleusercontent.com/gIapDiAQnc48YbidLqgnNuQIKdB6L1Z4-tyTQjlVz-LjYdags3jTqvVghlDVYfxy1LqRHK_OP-xYtzUFix-o2mPG2QLZQ0D94XayhJ-HP2zaAZEW41Qtsu4Xx-DdgAtdkSE4P26H"></p> 
+    <p>Once connected to the cloud shell, you should see that you are already authenticated and that the project is already set to your <code>PROJECT_ID</code> :</p> 
+    <pre>gcloud auth list</pre> 
+    <h3><strong>Command output</strong></h3> 
+    <pre>Credentialed accounts:
+ - &lt;myaccount&gt;@&lt;mydomain&gt;.com (active)</pre> 
+    <aside class="special">
+     <p>Note: <code>gcloud</code> is the powerful and unified command-line tool for Google Cloud Platform. Full documentation is available from <a href="https://cloud.google.com/sdk/gcloud/" target="_blank">https://cloud.google.com/sdk/gcloud</a>. It comes pre-installed on CloudShell and you will surely enjoy its support for tab-completion.</p> 
+    </aside> 
+    <pre>gcloud config list project</pre> 
+    <h3><strong>Command output</strong></h3> 
+    <pre>[core]
+project = &lt;PROJECT_ID&gt;</pre> 
+    <p>If for some reason the project is not set, simply issue the following command :</p> 
+    <pre>gcloud config set project &lt;PROJECT_ID&gt;</pre> 
+    <p>Looking for you <code>PROJECT_ID</code>? Check out what ID you used in the setup steps or look it up in the console dashboard :</p> 
+    <p><img style="max-width: 624.00px" src="https://lh6.googleusercontent.com/3yMVbBgcqg0cCKyKkcGnwfzjQI3cWaozQJwkM_PySyABPULyH6LduwkbX8sQKb6TXwDHtmfCLGH-ZNsTd4FNnYwE4V5U0C-GxJ9pTpVf9IHOhjEe7DZJjlxZHYuLpDW-QFtr5kMn"></p> 
+    <p>IMPORTANT. Finally, set the default zone and project configuration:</p> 
+    <pre>gcloud config set compute/zone us-central1-f</pre> 
+    <p>You can pick and choose different zones too. Learn more about zones in <a href="https://cloud.google.com/compute/docs/regions-zones/regions-zones" target="_blank">Regions &amp; Zones documentation</a>.</p> 
+    <aside class="special">
+     <p>Note: When you run <code>gcloud</code> on your own machine, the config settings would've been persisted across sessions. But in Cloud Shell, you will need to set this for every new session or reconnection.</p> 
+    </aside> 
+   </google-codelab-step> 
+   <google-codelab-step label="Get the sample code" duration="1"> 
+    <p>In Cloud Shell on the command-line, run the following command to clone the Github repository:</p> 
+    <pre><code>git clone https://github.com/googlecodelabs/cloud-vision.git</code></pre> 
+    <p>Change directory into <code>cloud-vision/start</code></p> 
+    <pre><code>cd cloud-vision/start</code></pre> 
+    <h2><strong>Next up</strong></h2> 
+    <p>Next, you will run the sample application.</p> 
+   </google-codelab-step> 
+   <google-codelab-step label="Try out the sample code" duration="4"> 
+    <p>The sample has the following layout:</p> 
+    <pre><code>app.js                  /* Express.js web application */
+config.js               /* Application configuration variables */
+lib/
+  cloudVisionClient.js  /* Cloud Vision client to consume the API */
+  oauth2.js             /* OAuth2 client for login */
+  routes.js             /* Application endpoints */
+  storageClient.js      /* Cloud Storage client to consume the API */
+package.json            /* npm package file including dependencies */
+views/
+  base.dust             /* HTML template */
+public/
+  style.css             /* CSS stylesheet */</code></pre> 
+    <p>To run the sample application in Cloud Shell let's perform the following steps:</p> 
+    <p>1. Install dependencies. Enter the following command:</p> 
+    <pre><code>$ npm install
+...</code></pre> 
+    <p>2. Run app.js to start the node.js server:</p> 
+    <pre><code>$ node app.js
+App listening at http://:::8080</code></pre> 
+    <p>3. Click the "Web preview"<img style="max-width: 19.00px" src="img/a0c920da29c2c9e7.png">icon that appears at the top left side of the cloud shell window and select "Preview on port 8080" to see the app in a web browser. </p> 
+    <aside class="special">
+     <p>Note: Usually you would test with <a href="http://localhost:8080" target="_blank">http://localhost:8080</a> but the Google Cloud Shell environment requires requests to be proxied.</p> 
+    </aside> 
+    <aside class="special">
+     <p>Note: To kill the running server at anytime press Control+C.</p> 
+    </aside> 
+    <p>You will see a page that looks like this:</p> 
+    <p><img style="max-width: 624.00px" src="img/cdeda69fcb376c50.png"></p> 
+    <p>The application currently displays a not-yet-implemented user login. Let's fix that by setting up user authentication.</p> 
+    <h2><strong>Summary</strong></h2> 
+    <p>In this step, you set up and ran the codelab sample application.</p> 
+    <h2><strong>Next up</strong></h2> 
+    <p>Next, you will use OAuth 2.0 to add user login to the application and Google+ API to fetch user profile.</p> 
+   </google-codelab-step> 
+   <google-codelab-step label="Authenticate users" duration="12"> 
+    <p>In this step, you will set up the Oauth 2.0 client.</p> 
+    <p>First, you need to create a web application client for authentication. </p> 
+    <p>The simplest authentication mechanism involves passing an API key directly to the service. In using the Vision API, we recommend that you enable an API key for testing purposes, and a <a href="https://cloud.google.com/vision/docs/getting-started#setting_up_a_service_account" target="_blank">service account</a> for production usage. From the Google Cloud console :</p> 
+    <ol type="1" start="1"> 
+     <li>From the left navigation, click <strong>API Manager &gt; Credentials</strong></li> 
+     <li>Click <strong>Create credentials &gt; OAuth Client ID</strong></li> 
+     <li>Click <strong>Configure consent screen.</strong></li> 
+     <li>Enter any product name you like, and fill in any relevant optional fields. Click <strong>Save</strong>.</li> 
+     <li>Choose <strong>Web application </strong>for the Application type.</li> 
+     <li>Under <strong>Name, </strong>enter any name you like.</li> 
+     <li>Under Authorized redirect URIs enter the URL you've been using to access the application from the browser:</li> 
+    </ol> 
+    <pre><code>https://8080-dot-&lt;digit number&gt;-dot-devshell.appspot.com/oauth2callback</code></pre> 
+    <ol type="1" start="8"> 
+     <li>Click <strong>Create.</strong></li> 
+     <li>Note the <strong>Client ID</strong> and <strong>Client Secret </strong>that are displayed since you'll need them for configuration.</li> 
+    </ol> 
+    <p>Here is a screenshot of the page used to create the client ID :</p> 
+    <p><img style="max-width: 624.00px" src="img/a4ddf1c68e3927e9.png"></p> 
+    <p>And here is the resulting client ID and secret: </p> 
+    <p><img style="max-width: 553.00px" src="img/946274294142c6c8.png"></p> 
+    <h3><strong>Update configuration</strong></h3> 
+    <p>The node.js application needs to be configured to use the Client ID you created.</p> 
+    <p>In the project directory, edit the <code>config.js</code> file.</p> 
+    <p>1. Open the file in an editor. For example this command will open <code>config.js</code> using Nano:</p> 
+    <pre><code>nano -m config.js</code></pre> 
+    <p>2. Set the values of <code>clientId</code>, <code>clientSecret</code>, and <code>redirectUrl</code> with the values you set / obtained in the last step.</p> 
+    <h3>config.js</h3> 
+    <pre><code>var clientId = 'REPLACE_WITH_YOUR_CLIENT_ID';
+var clientSecret = 'REPLACE_WITH_YOUR_CLIENT_SECRET';
+var redirectUrl = 'REPLACE_WITH_CALLBACK_URL_FROM_ABOVE';</code></pre> 
+    <h3><strong>Redirect to sign in screen</strong></h3> 
+    <p>To begin, install the <a href="https://www.npmjs.com/package/googleapis" target="_blank"><code>googleapis</code></a> npm package, which you will use to generate the authentication URL and fetch the profile information for the logged in user, and also install <code>cookie-session</code> is a node.js middleware for providing signed cookie-based sessions.</p> 
+    <pre><code>npm install cookie-session googleapis --save</code></pre> 
+    <aside class="special">
+     <p>The <a href="https://github.com/google/google-api-nodejs-client/" target="_blank"><code>googleapis</code></a> node package is Google's officially supported node.js client library for using Google APIs.</p> 
+     <p>Cookies are signed with the value of <code>config.secret</code> to protect against forgery.</p> 
+    </aside> 
+    <p>In the project directory, edit the <code>app.js</code> file.</p> 
+    <p>1. Open the file in an editor. For example this command will open <code>app.js</code> using Nano:</p> 
+    <pre><code>nano -m app.js</code></pre> 
+    <p> 2. Add the following code to register the OAuth2 middlewares and router:</p> 
+    <h3>app.js</h3> 
+    <pre><code>var session = require('cookie-session');
+// ...
+ 
+// Set view template engine
+// ... 
+
+// Configure the session and session storage.
+app.use(session({
+  secret: config.secret,
+  signed: true
+}));
+
+
+// OAuth2
+var oauth2 = require('./lib/oauth2')(config.oauth2);
+app.use(oauth2.router);
+app.use(oauth2.aware);
+app.use(oauth2.template);
+
+// Configure routes
+// ...</code></pre> 
+    <aside class="special">
+     <p><code>oauth2.template</code> is the middleware that exposes the user's profile as well as login/logout URLs to any templates.</p> 
+     <p><code>oauth2.aware</code> is the middleware that makes the user's credentials available in the request as ``req.oauth2client``.</p> 
+     <p><code>oauth2.router</code> registers the authorization flow endpoints.</p> 
+    </aside> 
+    <h3><strong>Fetch user profile</strong></h3> 
+    <p>Enable the Google+ API so the application can call the API to fetch user profiles. From the Google Cloud Console :</p> 
+    <ol type="1" start="1"> 
+     <li>From the left navigation, click <strong>API Manager</strong> &gt; Library, search for the "<em>Google+ API</em>".</li> 
+     <li>Click on Google+ API.</li> 
+     <li>Click <strong>Enable.</strong></li> 
+    </ol> 
+    <p>To fetch the profile of the authenticated user, the <code>/oauth2callback</code> route that Google Oauth2.0 redirects to calls <code>getUserProfile</code> from <code>lib/oauth.js</code>, passing it the provided <code>?code</code> query string that can be used to fetch user's profile.</p> 
+    <p>The returned user profile is stored in the application session via cookies.</p> 
+    <p>Now, let's change the view to use the template values added by the OAuth2 middleware. In the project directory, edit the <code>views/base.dust</code> file.</p> 
+    <p>1. Open the file in an editor. For example this command will open <code>base.dust</code> using Nano:</p> 
+    <pre><code>nano -m views/base.dust</code></pre> 
+    <p>2. Replace the next two sections:</p> 
+    <h3>base.dust</h3> 
+    <pre><code>//...
+&lt;p class="navbar-text navbar-right"&gt;
+  &lt;a href="#"&gt;Login&lt;/a&gt;
+&lt;/p&gt;
+
+//...
+
+&lt;div class="alert alert-info"&gt;
+  Please &lt;strong&gt; &lt;a href="#"&gt;login&lt;/a&gt; &lt;/strong&gt; to continue
+&lt;/div&gt;
+
+//...</code></pre> 
+    <p>with the following code:</p> 
+    <h3>base.dust</h3> 
+    <pre><code>//...
+&lt;p class="navbar-text navbar-right"&gt;
+  {?profile}
+    {?profile.image}
+      &lt;img src="{profile.image.url}" width="24" class="img-circle"&gt;
+    {/profile.image}
+    &lt;span&gt;{profile.displayName} &amp;nbsp;&lt;a href="{logout}"&gt;(logout)&lt;/a&gt;&lt;/span&gt;
+  {:else}
+    &lt;a href="{login}"&gt;Login&lt;/a&gt;
+  {/profile}
+&lt;/p&gt;
+
+//...
+{?profile}
+  &lt;div class="alert alert-success"&gt;
+    Welcome {profile.displayName}
+  &lt;/div&gt;
+{:else}
+  &lt;div class="alert alert-info"&gt;
+    Please &lt;strong&gt; &lt;a href="{login}"&gt;login&lt;/a&gt; &lt;/strong&gt; to continue
+  &lt;/div&gt;
+{/profile}</code></pre> 
+    <p>Restart the node application then try and sign in. </p> 
+    <p>You should see your name and profile displayed!</p> 
+    <h2><strong>Summary</strong></h2> 
+    <p>In this step, you implemented an OAuth 2.0 web authentication flow and fetched the authenticated user's profile information.</p> 
+    <h2><strong>Next up</strong></h2> 
+    <p>Next, you will use Google Cloud Storage to upload images.</p> 
+   </google-codelab-step> 
+   <google-codelab-step label="Upload images to storage" duration="10"> 
+    <p>In this step, you will write the code to save image in Google Cloud Storage.</p> 
+    <h3><strong>Set up Google Cloud Storage</strong></h3> 
+    <p>The default bucket uses the same project ID for name:</p> 
+    <ol type="1" start="1"> 
+     <li>From the left navigation, click <strong>App Engine &gt; Settings.</strong></li> 
+     <li>Under <strong>Default Cloud Storage Bucket</strong>, click <strong>Create.</strong></li> 
+     <li>Set public-read as the default object ACLs to existing and new objects in the bucket:</li> 
+    </ol> 
+    <pre><code>$ gsutil defacl set public-read gs://&lt;your-project-id&gt;.appspot.com
+Setting default object ACL on gs://&lt;your-project-id&gt;.appspot.com/...</code></pre> 
+    <aside class="special">
+     <p>Note: You can also create buckets using the command: <code>gsutil mb gs://&lt;your-bucket-name&gt;.appspot.com</code></p> 
+    </aside> 
+    <p>Next, you'll need to install the <a href="https://github.com/GoogleCloudPlatform/gcloud-node" target="_blank">gcloud</a> npm package, which you will use to interact with Cloud Storage, and the node.js middleware <a href="https://github.com/expressjs/multer" target="_blank">Multer</a> for handling <code>multipart/form-data</code> forms for uploading files.</p> 
+    <pre><code>$ npm install gcloud multer --save</code></pre> 
+    <p>In the project directory, edit the <code>config.js</code> file.</p> 
+    <p>1. Open the file in an editor. For example this command will open <code>config.js</code> using Nano:</p> 
+    <pre><code>$ nano -m config.js</code></pre> 
+    <p>2. Replace the placeholder value for <code>projectId</code> with the ID of the project that you created and also replace the placeholder value for <code>bucketName</code> with the name of the bucket you created:</p> 
+    <h3>config.js</h3> 
+    <pre><code>var projectId = 'your-project-id';
+var bucketName = 'your-bucket-name';</code></pre> 
+    <p>Now, let's register the cloud storage client. </p> 
+    <p>In the project directory, edit the <code>app.js</code> file.</p> 
+    <p>1. Open the file in an editor. For example this command will open <code>app.js</code> using Nano:</p> 
+    <pre><code>nano -m app.js</code></pre> 
+    <p>2. Add the following code so the storage client creates a <a href="http://googlecloudplatform.github.io/gcloud-node/#/docs/v0.14.0/storage/bucket" target="_blank"><code>bucket</code></a> object that provides the API you will use to interact with your Google Cloud Storage bucket:</p> 
+    <h3>app.js</h3> 
+    <pre><code>var storageClient = require('./lib/storageClient')(
+  config.gcloud, 
+  config.gcloudStorageBucket
+);
+
+// Configure routes
+app.use('/', require('./lib/routes')(
+  storageClient
+));</code></pre> 
+    <p>To upload the image to Cloud Storage and return a publicly accessible URL for displaying the image and the object URI to be later used for the Cloud Vision API, add a 'post' function to <code>lib/routes.js</code>:</p> 
+    <p>1. Open the file in an editor. For example this command will open <code>routes.js</code> using Nano:</p> 
+    <pre><code>nano -m lib/routes.js</code></pre> 
+    <p>2. Add the following 'post' function to <code>lib/routes.js</code>:</p> 
+    <h3>routes.js</h3> 
+    <pre><code>var routes = function(storageClient) {
+  //...
+
+  router.post('/', 
+    storageClient.multer.single('image'),
+    storageClient.uploadToStorage,
+    function(req, res) {
+      if (req.file &amp;&amp; req.file.cloudStoragePublicUrl) {
+        res.render('base', {
+          imageUrl: req.file.cloudStoragePublicUrl
+        });
+      }
+  });
+
+  return router;
+};</code></pre> 
+    <p>The publicly accesible URL for the image file will be <a href="https://storage.googleapis.com/" target="_blank"><code>https://storage.googleapis.com/</code></a><code>&lt;bucket-name&gt;/&lt;filename&gt;</code> and the Google Cloud Storage image URI will be <code>gs://bucket-name/object-name</code>.</p> 
+    <p>Finally, we need to change the <code>views/base.dust</code> file to display the form to upload images and to render the image using the Cloud Storage URL.</p> 
+    <p>1. Open the file in an editor. For example this command will open <code>base.dust</code> using Nano:</p> 
+    <pre><code>nano -m views/base.dust</code></pre> 
+    <p>2. Replace the current <code>{?profile}</code> block with the following lines:</p> 
+    <h3><a href="https://github.com/Zarmada/cloudvision-nodejs/blob/develop/step-2-upload-to-storage/views/base.dust" target="_blank">base.dust</a></h3> 
+    <pre><code>//...
+&lt;h3&gt;Google Cloud Vision&lt;/h3&gt;
+
+{?profile}
+  &lt;form action="/" method="post" enctype="multipart/form-data"&gt;
+    &lt;div class="form-group"&gt;
+      &lt;label for="image"&gt;Image&lt;/label&gt;
+      &lt;input type="file" name="image" id="image" class="form-control"&gt;
+    &lt;/div&gt;
+
+    &lt;div class="form-group"&gt;
+      &lt;button type="submit" class="btn btn-success"&gt;Submit&lt;/button&gt;
+    &lt;/div&gt;  
+  &lt;/form&gt;
+
+  {?imageUrl}
+    &lt;div class="panel panel-default"&gt;
+      &lt;div class="panel-heading"&gt;
+        &lt;h3 class="panel-title"&gt;Output&lt;/h3&gt;
+      &lt;/div&gt;
+      &lt;div id="panel-body" class="panel-body"&gt;
+        &lt;img src="{.imageUrl}" height="600" width="600"&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  {/imageUrl}
+{:else}
+//... </code></pre> 
+    <p>Restart the node application and try uploading an image.</p> 
+    <p>It should work!</p> 
+    <h2><strong>Summary</strong></h2> 
+    <p>In this step, you created a Google Cloud Storage bucket, uploaded images into it and rendered them using the public URL.</p> 
+    <h2><strong>Next up</strong></h2> 
+    <p>Next, you will set up the Google Cloud Vision API for your project.</p> 
+   </google-codelab-step> 
+   <google-codelab-step label="Set up Cloud Vision API" duration="5"> 
+    <p>In this step, you will set up Google Cloud Vision and configure the application to run detection on images from it.</p> 
+    <h3><strong>Create Credentials</strong></h3> 
+    <p>For the node.js application to access this project's services, it needs to be authenticated. The simplest authentication mechanism involves passing an API key directly to the service. In using the Vision API, we recommend that you enable an API key for testing purposes, and a <a href="https://cloud.google.com/vision/docs/getting-started#setting_up_a_service_account" target="_blank">service account</a> for production usage.</p> 
+    <ol type="1" start="1"> 
+     <li>Visit <a href="https://console.developers.google.com/" target="_blank">Google Developers Console</a>.</li> 
+     <li>Navigate to the project you created.</li> 
+     <li>From the left navigation, click <strong>API Manager &gt; </strong><a href="https://console.developers.google.com/project/_/apiui/credential" target="_blank"><strong>Credentials</strong></a>.</li> 
+     <li>Click <strong>Create credentials &gt; API key</strong>.</li> 
+     <li>Choose <strong>Browser key, </strong>enter a name for this key and click <strong>Create</strong>.</li> 
+     <li>Copy the key from the dialog box and keep it secure. </li> 
+    </ol> 
+    <aside class="special">
+     <p>Note: You can always retrieve the key from the Developer Console as well. For testing purposes, you can leave the referrer field blank, but if you plan to deploy a browser key in production, you should set this field to an appropriate domain.</p> 
+    </aside> 
+    <h3><strong>Enable Cloud Vision API</strong></h3> 
+    <p>The credentials you created allow your application to authenticate with Google Cloud Vision API. Enable the Cloud Vision API: </p> 
+    <ol type="1" start="1"> 
+     <li>From the left navigation, click <strong>API Manager</strong> &gt; Overview, search for the "<em>Cloud Vision API</em>".</li> 
+     <li>Click on <a href="https://console.developers.google.com/project/_/apiui/apiview/vision.googleapis.com/overview" target="_blank">Cloud Vision API</a>.</li> 
+     <li>Click <strong>Enable API.</strong></li> 
+    </ol> 
+    <h3><strong>Update configuration variables</strong></h3> 
+    <p>To configure the node.js sample application to authenticate with the project you created, edit the <code>config.js</code> file in the project directory.</p> 
+    <p>1. Open the file in an editor. For example this command will open <code>config.js</code> using Nano:</p> 
+    <pre><code>nano -m config.js</code></pre> 
+    <h3>2. Replace the placeholder value for credentialsApiKey with the API key you created:</h3> 
+    <h3>config.js</h3> 
+    <pre><code>var credentialsApiKey = 'your-credentials-api-key';</code></pre> 
+    <h2><strong>Summary</strong></h2> 
+    <p>In this step, you configured the node.js application with the credentials needed to consume the Cloud Vision API.</p> 
+    <h2><strong>Next up</strong></h2> 
+    <p>Next, you will update the application to send the images stored in Google Cloud Storage to the Cloud Vision API. </p> 
+   </google-codelab-step> 
+   <google-codelab-step label="Run detection on images" duration="8"> 
+    <p>In this step, you'll write the code to configure the Cloud Vision client.</p> 
+    <p>First, in the project directory, edit the <code>app.js</code> file.</p> 
+    <p>1. Open the file in an editor. For example this command will open <code>app.js</code> using Nano:</p> 
+    <pre><code>nano -m app.js</code></pre> 
+    <p>2. Add the following code so the Cloud Vision client use the key created in the previous step to authenticate the calls to the API:</p> 
+    <h3>app.js</h3> 
+    <pre><code>//...
+var cloudVisionClient = require('./lib/cloudVisionClient')(
+  config.gcloudVision
+);
+
+// Configure routes
+app.use('/', require('./lib/routes')(
+  storageClient,
+  cloudVisionClient
+));</code></pre> 
+    <p>Now, we need to modify <code>lib/routes.js</code> file, to expose the different feature types available in the API through the <code>cloudVisionClient</code> to run detection on images and to add the call to the API to send the Google Cloud Storage URI, how many results we want to get and the feature type:</p> 
+    <p>1. Open the file in an editor. For example this command will open <code>routes.js</code> using Nano:</p> 
+    <pre><code>nano -m lib/routes.js</code></pre> 
+    <p>2. Edit the file:</p> 
+    <h3><a href="https://github.com/Zarmada/cloudvision-nodejs/blob/develop/step-3-detect-image/lib/routes.js" target="_blank">routes.js</a></h3> 
+    <pre><code>// ...
+var assign = require('lodash').assign;
+var values = require('lodash').values;
+
+var routes = function(storageClient, cloudVisionClient) {
+  var defaultContext = {
+    featureTypes: values(cloudVisionClient.featureTypes)
+  };
+
+  router.get('/', function(req, res) {
+    res.render('base', defaultContext);
+  });
+
+  router.post('/', 
+    storageClient.multer.single('image'),
+    storageClient.uploadToStorage,
+    function(req, res) {
+      var context = {
+        vision: {}
+      };
+
+      if (req.file &amp;&amp; req.file.cloudStoragePublicUrl) {
+        cloudVisionClient.detectImage(
+          req.file.cloudStorageUri, 
+          req.body.imageType, 
+          req.body.maxResults,
+          function(error, response) {
+            if (error) {
+              context.error = error;
+            } else {
+              // Indent 2 spaces the json response if exists.
+              context.vision.prettyprint = response ? 
+                  JSON.stringify(response, null, 2) : null;
+              context.vision.imageUrl = req.file.cloudStoragePublicUrl;
+              context.vision.response = JSON.stringify(response.responses);
+            }
+
+            res.render('base', assign(context, defaultContext));
+          }
+        );        
+      } else {
+        context.error = 'Something went wrong uploading the image!';
+        res.render('base', assign(context, defaultContext));
+      }
+  });
+//...</code></pre> 
+    <h3><strong>Render Cloud Vision API response</strong></h3> 
+    <p>We need to change the <code>views/base.dust</code> file to add a select drop-down menu element containing the feature types obtained by the client. We also need to add one more select drop-down menu element to pick how many results we want in the response and the output container. </p> 
+    <p>1. Open the file in an editor. For example this command will open <code>base.dust</code> using Nano:</p> 
+    <pre><code>nano -m views/base.dust</code></pre> 
+    <p>2. Using the following code, replace the <code>{?profile}</code> block:</p> 
+    <h3>base.dust</h3> 
+    <pre><code>//...
+&lt;h3&gt;Google Cloud Vision&lt;/h3&gt;
+
+{?profile}
+  &lt;form action="/" method="post" enctype="multipart/form-data"&gt;
+    &lt;div class="form-group"&gt;
+      &lt;label for="image"&gt;Image&lt;/label&gt;
+      &lt;input type="file" name="image" id="image" class="form-control"&gt;
+    &lt;/div&gt;
+
+    {?featureTypes}
+      &lt;div class="form-group"&gt;
+        &lt;label for="imageType"&gt;Type of image feature:&lt;/label&gt;
+        &lt;select class="form-control" name="imageType"&gt;
+          {#featureTypes}
+            &lt;option&gt;{.}&lt;/option&gt;
+          {/featureTypes}
+        &lt;/select&gt;
+      &lt;/div&gt;
+
+      &lt;div class="form-group"&gt;
+        &lt;label for="maxResults"&gt;Max results:&lt;/label&gt;
+        &lt;select class="form-control" name="maxResults"&gt;
+           &lt;option&gt;1&lt;/option&gt;
+           &lt;option&gt;2&lt;/option&gt;
+           &lt;option&gt;3&lt;/option&gt;
+           &lt;option&gt;4&lt;/option&gt;
+           &lt;option&gt;5&lt;/option&gt;
+           &lt;option&gt;6&lt;/option&gt;
+           &lt;option&gt;7&lt;/option&gt;
+           &lt;option&gt;8&lt;/option&gt;
+           &lt;option&gt;9&lt;/option&gt;
+           &lt;option&gt;10&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/div&gt;
+    {/featureTypes}
+    &lt;div class="form-group"&gt;
+      &lt;button type="submit" class="btn btn-success"&gt;Submit&lt;/button&gt;
+    &lt;/div&gt;  
+  &lt;/form&gt;
+
+  {?vision}
+    {#vision}
+      &lt;div class="panel panel-default"&gt;
+        &lt;div class="panel-heading"&gt;
+          &lt;h3 class="panel-title"&gt;Output&lt;/h3&gt;
+        &lt;/div&gt;
+        &lt;div id="panel-body" class="panel-body"&gt;
+          {?.prettyprint}
+            &lt;pre class="prettyprint"&gt;{.prettyprint}&lt;/pre&gt;
+          {/.prettyprint}
+          &lt;canvas id="panel-canvas" class="canvas"&gt;&lt;/canvas&gt;
+          &lt;script&gt;
+            initCanvas('{.imageUrl}', '{.response|s}');
+          &lt;/script&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    {/vision}
+  {/vision}
+
+  {?error}
+    &lt;div class="alert alert-danger" role="alert"&gt;{error}&lt;/div&gt;
+  {/error}
+{:else}
+//... </code></pre> 
+    <p>Let's restart node application and try uploading <a href="https://cloud.google.com/vision/docs/images/faulkner.jpg" target="_blank">this image</a>, select "Execute Image Content Analysis on the entire image and return", leave the results as 2 and submit.</p> 
+    <p>You should get a label annotation saying there is a dog in the image!</p> 
+    <aside class="special">
+     <p>Give it a shot uploading an image with some faces to run "Face detection" and check how the <code>public/script.js</code> draws the annotations and landmarks for every face detected.</p> 
+    </aside> 
+    <h2><strong>Summary</strong></h2> 
+    <p>In this step, you configured the Cloud Vision client to send images from Google Cloud Storage to the Cloud Vision API to run detection of images.</p> 
+   </google-codelab-step> 
+   <google-codelab-step label="Congratulations!" duration="0"> 
+    <p>You learned how to integrate Cloud Storage and Cloud Vision into a node.js application and use OAuth 2.0 to authenticate users!</p> 
+    <h3 class="checklist"><strong>What we've covered</strong></h3> 
+    <ul class="checklist"> 
+     <li>Using the <code>googleapis</code> library to authenticate users via OAuth 2.0.</li> 
+     <li>Using the <code>googleapis</code> library to fetch user profiles from the Google+ API</li> 
+     <li>Using the <code>gcloud</code> library to access Google Cloud Storage.</li> 
+     <li>Using the <code>Cloud Vision API</code> to run detection on images.</li> 
+    </ul> 
+    <h3><strong>Next Steps</strong></h3> 
+    <ul> 
+     <li>Deploy your node.js application to Google App Engine <a href="https://cloud.google.com/nodejs/getting-started/hello-world#running_hello_world" target="_blank">Managed VMs</a>.</li> 
+    </ul> 
+    <h3><strong>Give us your feedback</strong></h3> 
+    <ul> 
+     <li>Please take a moment to complete our very short <a href="http://goo.gl/forms/ZaV8NtYJb3" target="_blank">survey</a></li> 
+    </ul> 
+   </google-codelab-step> 
+   <google-codelab-step label="Learn More" duration="0"> 
+    <ul> 
+     <li><a href="https://cloud.google.com/nodejs/" target="_blank">Getting started with Node.js on the Google Cloud Platform</a></li> 
+     <li><a href="https://googlecloudplatform.github.io/gcloud-node/" target="_blank">Google Cloud Client Library for Node.js</a></li> 
+     <li><a href="https://cloud.google.com/vision/" target="_blank">Cloud Vision API</a></li> 
+    </ul> 
+   </google-codelab-step> 
+  </google-codelab> 
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-49880327-14', 'auto');
+
+    (function() {
+      var gaCodelab = 'UA-66226300-1';
+      if (gaCodelab) {
+        ga('create', gaCodelab, 'auto', {name: 'codelab'});
+      }
+
+      var gaView;
+      var parts = location.search.substring(1).split('&');
+      for (var i = 0; i < parts.length; i++) {
+        var param = parts[i].split('=');
+        if (param[0] === 'viewga') {
+          gaView = param[1];
+          break;
+        }
+      }
+      if (gaView && gaView !== gaCodelab) {
+        ga('create', gaView, 'auto', {name: 'view'});
+      }
+    })();
+  </script>   
+ </body>
+</html>

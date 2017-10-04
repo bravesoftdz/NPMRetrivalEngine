@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="en-US" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width"> 
+  <title>Node.js Async Tutorial - Justin Klemm</title> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="pingback" href="http://justinklemm.com/xmlrpc.php"> 
+  <!--[if lt IE 9]>
+<script src="http://justinklemm.com/wp-content/themes/crisp-persona/js/html5.js" type="text/javascript"></script>
+<![endif]--> 
+  <!-- This site is optimized with the Yoast SEO plugin v4.9 - https://yoast.com/wordpress/plugins/seo/ --> 
+  <meta name="description" content="A simple tutorial covering basic usage of the Node.js Async package for managing asynchronous operations in Node. Code examples included."> 
+  <link rel="canonical" href="http://justinklemm.com/node-js-async-tutorial/"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="Node.js Async Tutorial - Justin Klemm"> 
+  <meta property="og:description" content="A simple tutorial covering basic usage of the Node.js Async package for managing asynchronous operations in Node. Code examples included."> 
+  <meta property="og:url" content="http://justinklemm.com/node-js-async-tutorial/"> 
+  <meta property="og:site_name" content="Justin Klemm"> 
+  <meta property="article:section" content="Node.js"> 
+  <meta property="article:published_time" content="2013-12-16T10:36:08+00:00"> 
+  <meta property="article:modified_time" content="2014-08-13T01:10:42+00:00"> 
+  <meta property="og:updated_time" content="2014-08-13T01:10:42+00:00"> 
+  <meta property="fb:admins" content="6205951"> 
+  <meta property="og:image" content="http://justinklemm.com/wp-content/uploads/2013/12/nodejs-300x168.png"> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:description" content="A simple tutorial covering basic usage of the Node.js Async package for managing asynchronous operations in Node. Code examples included."> 
+  <meta name="twitter:title" content="Node.js Async Tutorial - Justin Klemm"> 
+  <meta name="twitter:site" content="@justinklemm"> 
+  <meta name="twitter:image" content="http://justinklemm.com/wp-content/uploads/2013/12/nodejs-300x168.png"> 
+  <meta name="twitter:creator" content="@justinklemm"> 
+  <!-- / Yoast SEO plugin. --> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="Justin Klemm » Feed" href="http://justinklemm.com/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Justin Klemm » Comments Feed" href="http://justinklemm.com/comments/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Justin Klemm » Node.js Async Tutorial Comments Feed" href="http://justinklemm.com/node-js-async-tutorial/feed/"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/justinklemm.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.8"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,56826,8203,55356,56819),0,0),c=j.toDataURL(),b===c&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55358,56794,8205,9794,65039),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55358,56794,8203,9794,65039),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <link rel="stylesheet" id="crisp-persona-style-css" href="http://justinklemm.com/wp-content/themes/crisp-persona/style.css?ver=1.0.6" type="text/css" media="all"> 
+  <!-- This site uses the Google Analytics by MonsterInsights plugin v6.2.0 - Using Analytics tracking - https://www.monsterinsights.com/ --> 
+  <script type="text/javascript" data-cfasync="false">
+	/* Function to detect opted out users */
+	function __gaTrackerIsOptedOut() {
+		return document.cookie.indexOf(disableStr + '=true') > -1;
+	}
+
+	/* Disable tracking if the opt-out cookie exists. */
+	var disableStr = 'ga-disable-UA-19094752-1';
+	if ( __gaTrackerIsOptedOut() ) {
+		window[disableStr] = true;
+	}
+
+	/* Opt-out function */
+	function __gaTrackerOptout() {
+	  document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+	  window[disableStr] = true;
+	}
+
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','__gaTracker');
+
+	__gaTracker('create', 'UA-19094752-1', 'auto');
+	__gaTracker('set', 'forceSSL', true);
+	__gaTracker('send','pageview');
+</script> 
+  <!-- / Google Analytics by MonsterInsights --> 
+  <link rel="https://api.w.org/" href="http://justinklemm.com/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://justinklemm.com/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://justinklemm.com/wp-includes/wlwmanifest.xml"> 
+  <meta name="generator" content="WordPress 4.8"> 
+  <link rel="shortlink" href="http://justinklemm.com/?p=1925"> 
+  <link rel="alternate" type="application/json+oembed" href="http://justinklemm.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fjustinklemm.com%2Fnode-js-async-tutorial%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="http://justinklemm.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fjustinklemm.com%2Fnode-js-async-tutorial%2F&amp;format=xml"> 
+  <style type="text/css" id="syntaxhighlighteranchor"></style> 
+ </head> 
+ <body class="post-template-default single single-post postid-1925 single-format-standard"> 
+  <div class="hfeed site"> 
+   <div class="site-main"> 
+    <div class="site-personal" role="complementary"> 
+     <header class="site-header" role="banner"> 
+      <div class="site-avatar">
+       <a href="http://justinklemm.com/" title="Justin Klemm" rel="home"><img class="round" src="/avatar.jpg" alt="Justin Klemm"></a>
+      </div> 
+      <div class="site-branding"> 
+       <div class="site-title">
+        <a href="http://justinklemm.com/" title="Justin Klemm" rel="home">Justin Klemm</a>
+       </div> 
+       <div class="site-description">
+        Web Developer &amp; Wannabe Entrepreneur
+       </div> 
+       <div class="bottom"></div> 
+      </div> 
+     </header>
+     <!-- .site-header --> 
+     <aside class="widget social-links"> 
+      <div class="title">
+       Find me on the web
+      </div> 
+      <ul class="linear group"> 
+       <li><a class="twitter" href="https://twitter.com/justinklemm" title="Twitter"></a></li> 
+       <li><a class="gplus" href="https://plus.google.com/+JustinKlemm/" title="Google+"></a></li> 
+       <li><a class="linkedin" href="http://www.linkedin.com/in/justinklemm" title="Linked In"></a></li> 
+       <li><a class="rss" href="http://justinklemm.com/feed/" title="RSS"></a></li> 
+      </ul> 
+     </aside> 
+     <aside id="execphp-2" class="widget widget_execphp"> 
+      <div class="execphpwidget">
+       <p style="color: #888;"><a href="https://ghostinspector.com/"><img style="max-width: 100%; height: auto;" src="https://s3.amazonaws.com/ghostinspector-web/uploads/2014/10/logo.png" alt="Automated Website Testing"></a><br>I'm working on a side project that makes automated website testing easy! Record UI tests right in your browser. We'll execute them continuously from the cloud to check for issues.</p> 
+       <a class="pure-button" style="background-color: #5cb85c;" href="https://ghostinspector.com/" title="Automated Website Testing">Ghost Inspector ?</a>
+      </div> 
+     </aside> 
+    </div>
+    <!-- .site-personal --> 
+    <div id="content" class="site-content" role="main"> 
+     <article id="post-1925" class="post-1925 post type-post status-publish format-standard hentry category-node-js"> 
+      <header class="entry-header"> 
+       <h1 class="entry-title">Node.js Async Tutorial</h1> 
+       <div class="entry-meta">
+        Posted on 
+        <a href="http://justinklemm.com/node-js-async-tutorial/" title="10:36 am" rel="bookmark"><time class="entry-date" datetime="2013-12-16T10:36:08+00:00">December 16, 2013</time></a>
+        <span class="byline"> by <span class="author vcard"><a class="url fn n" href="http://justinklemm.com/author/justin/" title="About Justin" rel="author">Justin</a></span></span>
+       </div> 
+      </header>
+      <!-- .entry-header --> 
+      <div class="entry-content"> 
+       <p><img src="http://justinklemm.com/wp-content/uploads/2013/12/nodejs-300x168.png" alt="Node.js" width="300" height="168" class="alignright size-medium wp-image-1945" srcset="http://justinklemm.com/wp-content/uploads/2013/12/nodejs-300x168.png 300w, http://justinklemm.com/wp-content/uploads/2013/12/nodejs-900x506.png 900w, http://justinklemm.com/wp-content/uploads/2013/12/nodejs-150x84.png 150w, http://justinklemm.com/wp-content/uploads/2013/12/nodejs.png 1024w" sizes="(max-width: 300px) 100vw, 300px"></p> 
+       <p>I’ve been doing a lot of backend development in Node.js recently. Node.js runs on a single threaded event loop and leverages asynchronous calls for doing various things, like I/O operations. While other languages will send a database query and wait there for the result to come back, Node.js will not. When you send a database query, Node.js will continue executing the code that comes after it, then jump back when the result is available.</p> 
+       <p><span id="more-1925"></span></p> 
+       <p>This is a powerful concept that enables gains in efficiency, but occasionally requires a bit more work on your end to deal with certain situations. One of those situations, which I’ve run into quite frequently, is the need to wait for a number of asynchronous operations to finish before executing additional code.</p> 
+       <p>For example, maybe you have an array of items that you want to save to your database. Once they’re all saved, you want to execute a function that calculates some stats.</p> 
+       <p>Your first thought might be to do something like this:</p> 
+       <pre class="brush: jscript; title: ; notranslate" title="">
+// Loop through some items
+items.forEach(function(item){
+  // Call asynchronous function, often a save() to DB
+  item.someAsyncCall();
+});
+
+// At this point, we've fired a bunch of async calls
+// but they're probably not all done executing yet
+
+// This function is meant to be executed once all the async
+// calls above are done, but we don't know if/when they are,
+// and therein lies the problem with this approach
+doSomethingOnceAllAreDone();
+</pre> 
+       <p>As you can see in the comments above, there’s an issue here. You may (and probably will) execute <code>doSomethingOnceAllAreDone()</code> before everything above it is actually done.</p> 
+       <p>One of the best solutions to this problem is to use the <a href="https://github.com/caolan/async">node-async</a> package which includes a number of functions for dealing with situations like this. I’m going to show you how to resolve this issue using two different node-async features.</p> 
+       <h2>async.each()</h2> 
+       <p>First, we’ll look at the <code>async.each()</code> function. This is the simpler solution to the problem. The function takes an array of items, then iterates over them calling a wrapper function which accepts the item as an argument. When all the calls are complete, you specify a final function to be called.</p> 
+       <pre class="brush: jscript; title: ; notranslate" title="">
+// Include the async package
+// Make sure you add "async" to your package.json
+async = require("async");
+ 
+// 1st para in async.each() is the array of items
+async.each(items,
+  // 2nd param is the function that each item is passed to
+  function(item, callback){
+    // Call an asynchronous function, often a save() to DB
+    item.someAsyncCall(function (){
+      // Async call is done, alert via callback
+      callback();
+    });
+  },
+  // 3rd param is the function to call when everything's done
+  function(err){
+    // All tasks are done now
+    doSomethingOnceAllAreDone();
+  }
+);
+</pre> 
+       <h2>async.parallel()</h2> 
+       <p>The solution above works well if you simply need to iterate over a collection, but what if we have a more complex situation? Rather than iterating over a collection, <code>async.parallel()</code> allows you to push a bunch of (potentially unrelated) asynchronous calls into an array. Once we have the array populated, we execute all the tasks inside it, then call a function when we’re done.</p> 
+       <pre class="brush: jscript; title: ; notranslate" title="">
+// Include the async package
+// Make sure you add "async" to your package.json
+async = require("async");
+
+// Array to hold async tasks
+var asyncTasks = [];
+
+// Loop through some items
+items.forEach(function(item){
+  // We don't actually execute the async action here
+  // We add a function containing it to an array of "tasks"
+  asyncTasks.push(function(callback){
+    // Call an async function, often a save() to DB
+    item.someAsyncCall(function(){
+      // Async call is done, alert via callback
+      callback();
+    });
+  });
+});
+
+// At this point, nothing has been executed.
+// We just pushed all the async tasks into an array.
+
+// To move beyond the iteration example, let's add
+// another (different) async task for proof of concept
+asyncTasks.push(function(callback){
+  // Set a timeout for 3 seconds
+  setTimeout(function(){
+    // It's been 3 seconds, alert via callback
+    callback();
+  }, 3000);
+});
+
+// Now we have an array of functions doing async tasks
+// Execute all async tasks in the asyncTasks array
+async.parallel(asyncTasks, function(){
+  // All tasks are done now
+  doSomethingOnceAllAreDone();
+});
+</pre> 
+       <h2>Conclusion</h2> 
+       <p>Asynchronous functionality is available in lots of programming languages, not just Javascript. If you’re new to the concept, it can take a little time to wrap your head around the challenges. Luckily for Node.js developers, the node-async package provides a ton of useful features for dealing with those challenges. The examples above solve some of the simpler situations, but only scratch the surface. Check out the <a href="https://github.com/caolan/async">node-async</a> repo for more code and examples.</p> 
+       <p><em>I’ve uploaded full (executable) code for the examples in this post to GitHub here:</em> <a href="https://github.com/justinklemm/nodejs-async-tutorial">https://github.com/justinklemm/nodejs-async-tutorial</a></p> 
+       <div id="fsb-social-bar" class="fsb-social-bar fsb-no-float" data-post-id="1925" data-socialite="true">
+        <style type="text/css">            #fsb-social-bar { width: 100%; border-bottom: 1px solid #dbdbdb; border-top: 1px solid #dbdbdb; padding: 10px 0; margin: 0px 0 20px 0; float: left; background: #fff; position: relative; clear: both; }            #fsb-social-bar a { border: 0px !important }            #fsb-social-bar.fsb-fixed { position: fixed; top: -2px; z-index: 99999; }            #fsb-social-bar .fsb-title { display: block; float: left; margin: 3px 20px 0 0; font-size: 16px; font-family: Arial, Helvetica, sans-serif; text-decoration: none; color: #333; }            #fsb-social-bar .fsb-share-facebook { width: 120px; float: left; padding: 3px 0 2px; height: 25px; }            #fsb-social-bar .fsb-share-facebook.fsb-hide-count { width: 44px; overflow: hidden; margin-right: 30px; }            #fsb-social-bar .fsb-share-twitter { float: left; width: 135px; padding: 3px 0 2px; height: 25px; }            #fsb-social-bar .fsb-share-twitter.fsb-hide-count { width: 61px; overflow: hidden; margin-right: 30px; }            #fsb-social-bar .fsb-share-google { float: left; width: 105px; padding: 3px 0 2px; height: 25px; }            #fsb-social-bar .fsb-share-google.fsb-hide-count { width: 33px; overflow: hidden; margin-right: 30px; }            #fsb-social-bar .fsb-share-linkedin { float: left; width: 135px; padding: 3px 0 2px; height: 25px; }            #fsb-social-bar .fsb-share-linkedin.fsb-hide-count { width: 61px; overflow: hidden; margin-right: 30px; }            #fsb-social-bar .fsb-share-pinterest { float: left; width: 115px; padding: 3px 0 2px; height: 25px;}            #fsb-social-bar .fsb-share-pinterest.fsb-hide-count { width: 43px; overflow: hidden; margin-right: 30px; }            #fsb-social-bar .socialite { display: block; position: relative; background: url(http://justinklemm.com/wp-content/plugins/floating-social-bar/images/fsb-sprite.png) no-repeat scroll 0 0; }            #fsb-social-bar .socialite-loaded { background: none !important; }            #fsb-social-bar .fsb-service-title { display: none; }            #fsb-social-bar a { color: #333; text-decoration: none; font-size: 12px; font-family: Arial, Helvetica, sans-serif; }            #fsb-social-bar .fsb-twitter { width: 105px; height: 25px; background-position: -13px -10px; line-height: 25px; vertical-align: middle; }            #fsb-social-bar .fsb-twitter .fsb-count { width: 30px; text-align: center; display: inline-block; margin: 0px 0 0 69px; color: #333; }            #fsb-social-bar .fsb-google { width: 75px; height: 25px; background-position: -136px -10px; line-height: 25px; vertical-align: middle; }            #fsb-social-bar .fsb-google .fsb-count { width: 30px; text-align: center; display: inline-block; margin: 0px 0 0 41px; color: #333; }            #fsb-social-bar .fsb-google .socialite-button { margin: 0 !important; }            #fsb-social-bar .fsb-share-google .socialite-loaded .socialite-button{padding: 2px 0 0}            #fsb-social-bar .fsb-facebook { width: 89px; height: 25px; background-position: -231px -10px; line-height: 25px; vertical-align: middle; }            #fsb-social-bar .fsb-facebook .fsb-count { width: 30px; text-align: center; display: inline-block; margin: 0px 0 0 52px; color: #333; }            #fsb-social-bar .fsb-facebook .socialite-button { margin: 0 !important;}            #fsb-social-bar .fsb-share-facebook .socialite-loaded .socialite-button {padding: 2px 0 0}            #fsb-social-bar .fsb-linkedin { width: 105px; height: 25px; background-position: -347px -10px; line-height: 25px; vertical-align: middle; }            #fsb-social-bar .fsb-linkedin .fsb-count { width: 30px; text-align: center; display: inline-block; margin: 0px 0 0 70px; color: #333; }            #fsb-social-bar .fsb-linkedin .socialite-button { margin: 0 !important; }            #fsb-social-bar .fsb-pinterest { width: 88px; height: 25px; background-position: -484px -10px; line-height: 25px; vertical-align: middle; }            #fsb-social-bar .fsb-pinterest .fsb-count { width: 30px; text-align: center; display: inline-block; margin: 0px 0 0 50px; color: #333; }            #fsb-social-bar .fsb-pinterest .socialite-button { margin: 0 !important; }            .fsb-clear { clear: both; }            .fsb-clear:after { clear:both; content:; display:block; height:0; line-height:0; overflow:auto; visibility:hidden; zoom:1; }            @media (max-width: 768px) { #fsb-social-bar.fsb-fixed { position: relative !important; top: auto !important; } }        </style>
+        <div class="fsb-share-twitter fsb-hide-count">
+         <a href="https://twitter.com/share?original_referer=http%3A%2F%2Fjustinklemm.com%2F&amp;source=tweetbutton&amp;text=Node.js+Async+Tutorial&amp;url=http%3A%2F%2Fjustinklemm.com%2Fnode-js-async-tutorial%2F&amp;via=justinklemm" class="socialite twitter fsb-twitter" data-fsb-service="twitter" rel="nofollow" target="_blank" title="Be the first one to tweet this article!"><span class="fsb-service-title">Twitter</span><span class="fsb-count">0</span></a>
+        </div>
+        <div class="fsb-share-google fsb-hide-count">
+         <a href="https://plus.google.com/share?url=http://justinklemm.com/node-js-async-tutorial/" class="socialite googleplus fsb-google" data-fsb-service="google" data-size="medium" data-href="http://justinklemm.com/node-js-async-tutorial/" rel="nofollow" target="_blank"><span class="fsb-service-title">Google+</span><span class="fsb-count">0</span></a>
+        </div>
+        <div class="fsb-share-linkedin">
+         <a href="https://www.linkedin.com/cws/share?url=http://justinklemm.com/node-js-async-tutorial/" class="socialite linkedin fsb-linkedin" data-fsb-service="linkedin" data-size="medium" data-href="http://justinklemm.com/node-js-async-tutorial/" rel="nofollow" target="_blank"><span class="fsb-service-title">LinkedIn</span><span class="fsb-count">15</span></a>
+        </div>
+       </div>
+       <div class="fsb-clear"></div> 
+      </div>
+      <!-- .entry-content --> 
+      <footer class="entry-meta">
+        This entry was posted in 
+       <a href="http://justinklemm.com/category/node-js/" rel="category tag">Node.js</a>. Bookmark the 
+       <a href="http://justinklemm.com/node-js-async-tutorial/" title="Permalink to Node.js Async Tutorial" rel="bookmark">permalink</a>. 
+      </footer>
+      <!-- .entry-meta --> 
+     </article>
+     <!-- #post-## --> 
+     <div id="disqus_thread"> 
+      <div id="dsq-content"> 
+       <ul id="dsq-comments"> 
+        <li class="comment even thread-even depth-1" id="dsq-comment-194"> 
+         <div id="dsq-comment-header-194" class="dsq-comment-header"> 
+          <cite id="dsq-cite-194"> <span id="dsq-author-user-194">Neal Griffin</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-194" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-194" class="dsq-comment-message">
+           <p>Hi there – thanks for the article. Everytime I do something asynchronously in node.js, I feel like I’m going against the grain and should be trying to figure another way. Most likely it’s just me – thanks again for the article – Neal</p> 
+          </div> 
+         </div> 
+         <ul class="children"> 
+          <li class="comment odd alt depth-2" id="dsq-comment-195"> 
+           <div id="dsq-comment-header-195" class="dsq-comment-header"> 
+            <cite id="dsq-cite-195"> <a id="dsq-author-user-195" href="http://justinklemm.com/" target="_blank" rel="nofollow">Justin Klemm</a> </cite> 
+           </div> 
+           <div id="dsq-comment-body-195" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-195" class="dsq-comment-message">
+             <p>Hey Neal, you should strive to be asynchronous wherever possible! It’s more efficient and it’s what Node was meant for. Some situations can take a little extra effort (maybe that’s what makes you feel like you’re going against the grain?), but that’s just a reality of asynchronous programming in any imperative languages. Hope the article was helpful.</p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+          <li class="comment even depth-2" id="dsq-comment-216"> 
+           <div id="dsq-comment-header-216" class="dsq-comment-header"> 
+            <cite id="dsq-cite-216"> <span id="dsq-author-user-216">BadOPCode</span> </cite> 
+           </div> 
+           <div id="dsq-comment-body-216" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-216" class="dsq-comment-message">
+             <p>Actually I find myself more like Justin. My thoughts go to a more monolith looping world. I mean even in the world of threads those threads are processing tasks usually in some form of loop or another. I have to stand back for a second and remember that it’s more efficient in JavaScript to say<br> str.replace(/(s|t|n)/g, function(me,ws) { if (ws==’s’) return ‘[space]’; if (ws==’t’) return ‘[tab]’; if (ws==’n’) return ‘[enter]’ });<br> As a unverified off the top of my head example.</p> 
+             <p>Node and JavaScript focus IS definitely async but it’s not through threads and loops like we have grown used to.</p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+         </ul>
+         <!-- .children --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-220"> 
+         <div id="dsq-comment-header-220" class="dsq-comment-header"> 
+          <cite id="dsq-cite-220"> <span id="dsq-author-user-220">slashzero</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-220" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-220" class="dsq-comment-message">
+           <p>THANK YOU!!!!!!!!!!!</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="dsq-comment-226"> 
+         <div id="dsq-comment-header-226" class="dsq-comment-header"> 
+          <cite id="dsq-cite-226"> <span id="dsq-author-user-226">Santiago</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-226" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-226" class="dsq-comment-message">
+           <p>Hi there…..loved this actually, it helped me a lot before….but now I need to iterate through a set of keys, grab something from redis for each one of them, add the resulting object to an array, and wait for all the gets are done….so how the final callback can receive the resulting array so I can call the “final final” callback that sends the array to the caller ?</p> 
+          </div> 
+         </div> 
+         <ul class="children"> 
+          <li class="comment odd alt depth-2" id="dsq-comment-227"> 
+           <div id="dsq-comment-header-227" class="dsq-comment-header"> 
+            <cite id="dsq-cite-227"> <a id="dsq-author-user-227" href="http://justinklemm.com/" target="_blank" rel="nofollow">Justin Klemm</a> </cite> 
+           </div> 
+           <div id="dsq-comment-body-227" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-227" class="dsq-comment-message">
+             <p>Hi Santiago, I’m glad the article was useful. It’s hard for me to understand exactly what you need to do, but you may need to nest multiple async calls. So for example, loop through a group of async calls, then execute callback1() when they’re complete. In callback1() you loop through another group of async calls and execute callback2() when that’s done, and so on. It’s common to go multiple callbacks deeps in Node.</p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+         </ul>
+         <!-- .children --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-229"> 
+         <div id="dsq-comment-header-229" class="dsq-comment-header"> 
+          <cite id="dsq-cite-229"> <a id="dsq-author-user-229" href="http://www.blacklime.co.uk/" target="_blank" rel="nofollow">Ken Whipday</a> </cite> 
+         </div> 
+         <div id="dsq-comment-body-229" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-229" class="dsq-comment-message">
+           <p>Hi – that was a great example of asyn.each. Just what I was looking for (I’m updating mongodb from an array). A minor question – should the 3rd comment in the async.each example state ‘first parameter in async.each..’ rather than ‘first parameter in async.map..’ ?<br> Thanks again for the article!</p> 
+          </div> 
+         </div> 
+         <ul class="children"> 
+          <li class="comment odd alt depth-2" id="dsq-comment-230"> 
+           <div id="dsq-comment-header-230" class="dsq-comment-header"> 
+            <cite id="dsq-cite-230"> <a id="dsq-author-user-230" href="http://justinklemm.com/" target="_blank" rel="nofollow">Justin Klemm</a> </cite> 
+           </div> 
+           <div id="dsq-comment-body-230" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-230" class="dsq-comment-message">
+             <p>Hey Ken, I’m glad the example was useful to you, and yes, you’re right. That comment should be async.each(). I’ve updated it. Thanks for catching that and letting me know!</p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+         </ul>
+         <!-- .children --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="dsq-comment-236"> 
+         <div id="dsq-comment-header-236" class="dsq-comment-header"> 
+          <cite id="dsq-cite-236"> <span id="dsq-author-user-236">Michael Höglund</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-236" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-236" class="dsq-comment-message">
+           <p>Github async docs actually makes sense now, because of this tutorial.Thanks a bunch, Justin.</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-246"> 
+         <div id="dsq-comment-header-246" class="dsq-comment-header"> 
+          <cite id="dsq-cite-246"> <span id="dsq-author-user-246">Jim R</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-246" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-246" class="dsq-comment-message">
+           <p>Thanks for the interesting article! Any suggested pattern for the following type of problem, where I can’t predict in advance which async calls I will need to make?</p> 
+           <p>I’m following a path through a large map, not all of which is in memory, so I load it from DB “block-by-block” as needed. I don’t know where the path will go — if it wanders out of the memory-resident part of the map, I call readMapBlock( … ) to asynchronously grab the next block of the map.</p> 
+           <p>while (notReachedEndOfPath) {<br> moveAlongPath( );<br> if (movedPastBoundary(x,y )) {<br> readMapBlock(x,y, function(mapData ) {<br> moveAlongPath( );</p> 
+           <p> // [[ … ]]<br> }<br> }</p> 
+           <p>With a synchronous DB call, execution just resumes in-line after readMapBlock( ) returns. With Node’s …<br> I can’t nest callbacks, since I don’t know how many times I’ll run of the map — each requiring a callback!?!</p> 
+           <p>Do I simply need to restructure the algorithm — have my callback be recursive? </p> 
+           <p>function traverseAsFarAsPossible( ) {<br> …<br> readMapBlock(x,y, traverseAsFarAsPossible( ) {<br> }<br> }</p> 
+           <p>This problem is not as contrived as it might sounds — traversing a social network or crawling the web could be similar. This seems like the solution — is this typical in Node-land? Restructuring the underlying flow to be more asynchronous and event-driven?</p> 
+           <p>P.S. Your examples are just what I need in other cases — pre-load a bunch of map blocks to display on client.</p> 
+          </div> 
+         </div> 
+         <ul class="children"> 
+          <li class="comment even depth-2" id="dsq-comment-247"> 
+           <div id="dsq-comment-header-247" class="dsq-comment-header"> 
+            <cite id="dsq-cite-247"> <a id="dsq-author-user-247" href="http://justinklemm.com/" target="_blank" rel="nofollow">Justin Klemm</a> </cite> 
+           </div> 
+           <div id="dsq-comment-body-247" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-247" class="dsq-comment-message">
+             <p>Hi Jim,</p> 
+             <p>That’s an interest scenario — though probably not that uncommon. It doesn’t sound like you’ll be able to leverage an asynchronous setup here, since your database query is “blocking”…meaning your algorithm can’t continue until it’s returned its result. This really sounds like something you’ll need to step through synchronously.</p> 
+             <p>The recursion approach is what comes to mind for me first as an efficient way to solve this. The code support is bad in these comments, so I’ve attached some sudo-code as a screenshot. I hope that’s helpful to you!</p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+         </ul>
+         <!-- .children --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-even depth-1" id="dsq-comment-248"> 
+         <div id="dsq-comment-header-248" class="dsq-comment-header"> 
+          <cite id="dsq-cite-248"> <a id="dsq-author-user-248" href="http://mayurrokade.com/" target="_blank" rel="nofollow">Mayur Rokade</a> </cite> 
+         </div> 
+         <div id="dsq-comment-body-248" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-248" class="dsq-comment-message">
+           <p>async.parallel will it execute all tasks in array simultaenously? Or one by one? </p> 
+          </div> 
+         </div> 
+         <ul class="children"> 
+          <li class="comment even depth-2" id="dsq-comment-251"> 
+           <div id="dsq-comment-header-251" class="dsq-comment-header"> 
+            <cite id="dsq-cite-251"> <a id="dsq-author-user-251" href="http://justinklemm.com/" target="_blank" rel="nofollow">Justin Klemm</a> </cite> 
+           </div> 
+           <div id="dsq-comment-body-251" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-251" class="dsq-comment-message">
+             <p>It will execute them simultaneously. You can see the specifics here: <a href="https://github.com/caolan/async#parallel" rel="nofollow">https://github.com/caolan/async#parallel</a></p> 
+            </div> 
+           </div> 
+           <ul class="children"> 
+            <li class="comment odd alt depth-3" id="dsq-comment-252"> 
+             <div id="dsq-comment-header-252" class="dsq-comment-header"> 
+              <cite id="dsq-cite-252"> <a id="dsq-author-user-252" href="http://mayurrokade.com/" target="_blank" rel="nofollow">Mayur Rokade</a> </cite> 
+             </div> 
+             <div id="dsq-comment-body-252" class="dsq-comment-body"> 
+              <div id="dsq-comment-message-252" class="dsq-comment-message">
+               <p>Heyy, I tried async.parallel on 40,000 async tasks. I think a lot of the tasks went missing. I mean for each output I get some output on the terminal. But a lot of tasks were missing from the output. Any idea why this happens ? Or more details are needed ?</p> 
+              </div> 
+             </div> 
+             <ul class="children"> 
+              <li class="comment even depth-4" id="dsq-comment-253"> 
+               <div id="dsq-comment-header-253" class="dsq-comment-header"> 
+                <cite id="dsq-cite-253"> <a id="dsq-author-user-253" href="http://justinklemm.com/" target="_blank" rel="nofollow">Justin Klemm</a> </cite> 
+               </div> 
+               <div id="dsq-comment-body-253" class="dsq-comment-body"> 
+                <div id="dsq-comment-message-253" class="dsq-comment-message">
+                 <p>40,000 is a pretty huge number of operations to be running simultaneously. You’ll almost certainly run into system resource issues. That may be why tasks are disappearing.(Imagine if each task is using 1MB of memory. That would be ~40GB of memory, which I doubt your system has.) </p> 
+                 <p>You might consider using the parallelLimit() function, which allows you to cap the number of operations running at one time. You could specify the 40,000 tasks, but then make sure that only 20, 30, 50 or whatever are running simultaneously to make sure you don’t run into resource issues.</p> 
+                 <p>You should experiment with that number relative to your systems resources (both memory and CPU) and your tasks operations to figure out the optimum configuration.</p> 
+                </div> 
+               </div> </li>
+              <!-- #comment-## --> 
+             </ul>
+             <!-- .children --> </li>
+            <!-- #comment-## --> 
+           </ul>
+           <!-- .children --> </li>
+          <!-- #comment-## --> 
+         </ul>
+         <!-- .children --> </li>
+        <!-- #comment-## --> 
+        <li class="post pingback"> <p>Pingback: <a href="http://www.theagencyonline.co.uk/2014/06/04/node-js-powering-the-real-time-web/" rel="external nofollow" class="url">Node.js – Powering The Real-Time Web | The Agency</a>()</p> </li> 
+        <!-- #comment-## --> 
+        <li class="post pingback"> <p>Pingback: <a href="http://4nodejs.com/2014/06/node-js-async-tutorial/" rel="external nofollow" class="url">Node.js Async Tutorial | 4Nodejs</a>()</p> </li> 
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-1438"> 
+         <div id="dsq-comment-header-1438" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1438"> <span id="dsq-author-user-1438">Hrushikesh Mohapatra</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1438" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1438" class="dsq-comment-message">
+           <p>var data = {};</p> 
+           <p>async.parallel([function () {</p> 
+           <p> mysqlQuery(“select * from albums”, function (rows) {</p> 
+           <p> data.album = rows;</p> 
+           <p> })</p> 
+           <p>}, function () {</p> 
+           <p> mysqlQuery(“select * from songs”, function (rows) {</p> 
+           <p> data.songs = rows;</p> 
+           <p> })</p> 
+           <p>}], function () {</p> 
+           <p> res.view(data)</p> 
+           <p>});</p> 
+           <p>In the above code mysqlQuery runs asynchronously. async call back is never executed . What mistake am i doing ?</p> 
+          </div> 
+         </div> 
+         <ul class="children"> 
+          <li class="comment even depth-2" id="dsq-comment-1439"> 
+           <div id="dsq-comment-header-1439" class="dsq-comment-header"> 
+            <cite id="dsq-cite-1439"> <span id="dsq-author-user-1439">Bondi French</span> </cite> 
+           </div> 
+           <div id="dsq-comment-body-1439" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-1439" class="dsq-comment-message">
+             <p>You need to pass a callback in the first two functions and you will get a result in the 3rd one. See <a href="https://github.com/caolan/async#parallel" rel="nofollow">https://github.com/caolan/async#parallel</a></p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+          <li class="comment odd alt depth-2" id="dsq-comment-1440"> 
+           <div id="dsq-comment-header-1440" class="dsq-comment-header"> 
+            <cite id="dsq-cite-1440"> <span id="dsq-author-user-1440">RusAlexander</span> </cite> 
+           </div> 
+           <div id="dsq-comment-body-1440" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-1440" class="dsq-comment-message">
+             <p>This is what I was looking today</p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+         </ul>
+         <!-- .children --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="dsq-comment-1441"> 
+         <div id="dsq-comment-header-1441" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1441"> <span id="dsq-author-user-1441">nor</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1441" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1441" class="dsq-comment-message">
+           <p>Amazing article, thanks! now i understand this.</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-1468"> 
+         <div id="dsq-comment-header-1468" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1468"> <span id="dsq-author-user-1468">Madhur Mehta</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1468" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1468" class="dsq-comment-message">
+           <p>async.each nested in async.waterfall</p> 
+           <p>I have recently started using async api. Now my requirement is to perform a join on 3 collections namely fields, scripts and statements. fields can have multiple scripts, and scripts can have multiple statements.</p> 
+           <p>here is what I have tried so far:(to join Fields collection with scripts)</p> 
+           <p>// Array to hold async tasks<br> var asyncTasks = [];</p> 
+           <p>async.waterfall([<br> function(callback){<br> // fetches fields based on some Id and it returns 2 fields<br> db.fields.find({entity_id: mongojs.ObjectId(“54440a448bbbcbb4070131ab”)}, function (err, fields) {<br> console.log(JSON.stringify(fields, null, 2));<br> callback(null, fields);<br> })<br> },<br> function(arg1, callback){<br> // arg1 now equals fields<br> arg1.forEach(function(eachField){<br> asyncTasks.push(function(callback){<br> db.scripts.find({fieldId: eachField._id.valueOf()}, function(err, scripts) {<br> // Async call is done then alert via callback<br> console.log(JSON.stringify(scripts, null, 2));<br> callback(null, scripts);<br> });<br> });<br> });</p> 
+           <p> // Now we have an array of functions doing async tasks<br> // Execute all async tasks in the asyncTasks array<br> async.parallel(asyncTasks, function(err, results) {<br> // All tasks are done now<br> console.log(“Scripts” + JSON.stringify(results, null, 2));<br> callback(null, “done”);<br> });</p> 
+           <p> }<br> ], function (err, result) {<br> console.log(result);<br> });</p> 
+           <p>// for the above code here is what i get the output<br> [<br> {<br> “_id”: “54440a548bbbcbb4070131ac”,<br> “name”: “t1”,<br> “type”: “String”,<br> “entity_id”: “54440a448bbbcbb4070131ab”<br> },<br> {<br> “_id”: “54447f1d20c103981fa1a27c”,<br> “name”: “t2”,<br> “type”: “String”,<br> “entity_id”: “54440a448bbbcbb4070131ab”<br> }<br> ]<br> size of array 2<br> []<br> []<br> Scripts[<br> [],<br> []<br> ]<br> done</p> 
+           <p>The above output doesn’t print any scripts even though there are 2 scripts in database. My database is is in MongoDB, and i am using NodeJs, MongoJS api. why is db.scripts.find() returning empty array? Any help is appreciated</p> 
+           <p>I tested this piece of code to see if scripts returning the o/p. Please find below my code</p> 
+           <p> test2();<br> function test2(){</p> 
+           <p> var getScriptFunction = function(eachField, doneCallback){<br> if(eachField !== undefined) {<br> var fieldId = eachField;<br> console.log(fieldId);<br> db.scripts.find({fieldId: fieldId}, function (err, result) {<br> // Async call is done, alert via callback<br> doneCallback(null, result);<br> });<br> }<br> }<br> // The array is the id of fields<br> async.map([“54440a548bbbcbb4070131ac”, “54447f1d20c103981fa1a27c”], getScriptFunction, function (err, results) {<br> // Square has been called on each of the numbers<br> // so we’re now done!<br> if (err){<br> console.log(“error!” + err);<br> } else {<br> console.log(“printed from helper function n” + JSON.stringify(results, null, 2));<br> }<br> });<br> }</p> 
+           <p>This is the o/p of the above code to fetch scripts ran individually</p> 
+           <p>printed from helper function<br> [<br> [<br> {<br> “_id”: “54440a678bbbcbb4070131ad”,<br> “name”: “s1”,<br> “fieldId”: “54440a548bbbcbb4070131ac”<br> },<br> {<br> “_id”: “544af260eb7a486824a5c306”,<br> “name”: “s2”,<br> “fieldId”: “54440a548bbbcbb4070131ac”<br> }<br> ],<br> []<br> ]</p> 
+           <p>This is how fields look like (db.fields.find().pretty())</p> 
+           <p>[<br> {<br> “_id”: “54440a548bbbcbb4070131ac”,<br> “name”: “t1”,<br> “type”: “String”,<br> “entity_id”: “54440a448bbbcbb4070131ab”<br> },<br> {<br> “_id”: “54447f1d20c103981fa1a27c”,<br> “name”: “t2”,<br> “type”: “String”,<br> “entity_id”: “54440a448bbbcbb4070131ab”<br> }<br> ]</p> 
+          </div> 
+         </div> 
+         <ul class="children"> 
+          <li class="comment even depth-2" id="dsq-comment-1548"> 
+           <div id="dsq-comment-header-1548" class="dsq-comment-header"> 
+            <cite id="dsq-cite-1548"> <span id="dsq-author-user-1548">Ibn Ibraahim, Ismail al-Maldee</span> </cite> 
+           </div> 
+           <div id="dsq-comment-body-1548" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-1548" class="dsq-comment-message">
+             <p>hi madhur<br> did you manage to solve the problem , if so please share as i am having the same issue</p> 
+             <p>thanks</p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+         </ul>
+         <!-- .children --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-even depth-1" id="dsq-comment-1470"> 
+         <div id="dsq-comment-header-1470" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1470"> <a id="dsq-author-user-1470" href="http://BigSonata.com/" target="_blank" rel="nofollow">Big Sonata</a> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1470" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1470" class="dsq-comment-message">
+           <p>Thanks for your article! It really helps me alot.</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-1497"> 
+         <div id="dsq-comment-header-1497" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1497"> <span id="dsq-author-user-1497">agniva</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1497" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1497" class="dsq-comment-message">
+           <p>Thanks ! This was helpful</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-even depth-1" id="dsq-comment-1539"> 
+         <div id="dsq-comment-header-1539" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1539"> <span id="dsq-author-user-1539">Neil M</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1539" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1539" class="dsq-comment-message">
+           <p>Thank you. </p> 
+           <p>I was just doing a Mean IO course and saw this line.</p> 
+           <p>require(‘async’).parallel(fns, done);</p> 
+           <p>Looked it up and came here. Not realising until I read your blog post, that this was the code that was doing the actual work and the foreach loop above (see below) was actually doing the prep work. </p> 
+           <p>So thanks for enlightening me, since it now means I can close my db connection at the correct time ?</p> 
+           <p>var fns = [];<br> moviesjson.movies.forEach(function(result) {<br> fns.push(function(callback) {<br> dbInterface.insert(db, result, callback);<br> });<br> });<br> require(‘async’).parallel(fns, done);</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-1545"> 
+         <div id="dsq-comment-header-1545" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1545"> <span id="dsq-author-user-1545">Alejandro Ventura</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1545" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1545" class="dsq-comment-message">
+           <p>I works great!<br> But I have a question, what about the performance?<br> I have an api and on every request I have to iterate at least 25 objects in an array but also it could be more. Does this method could help me in order to not to spend too much time to respond the request?</p> 
+          </div> 
+         </div> 
+         <ul class="children"> 
+          <li class="comment odd alt depth-2" id="dsq-comment-1546"> 
+           <div id="dsq-comment-header-1546" class="dsq-comment-header"> 
+            <cite id="dsq-cite-1546"> <a id="dsq-author-user-1546" href="http://justinklemm.com/" target="_blank" rel="nofollow">Justin Klemm</a> </cite> 
+           </div> 
+           <div id="dsq-comment-body-1546" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-1546" class="dsq-comment-message">
+             <p>Hi Alejandro, that question is a little outside the scope of what I’ve covered above. The short answer is that because Node is single threaded, it’s really up to you to avoid CPU intensive situations where the thread will be tied up for a long period of time.</p> 
+             <p>The async library I talk about in the post does have some functions that may help (like async.setImmediate), but it will likely take some planning on your side.</p> 
+             <p>For reference, looping through an array of 25 objects is likely not going to be a big deal, unless you’re doing some CPU intensive stuff within the loop. You may want to look at time performance, as well as the load situation your application is dealing with, to determine whether a straight loop is acceptable. Is it taking 10ms? Maybe that’s ok. Is it taking 500ms? May not be ok. Those are things that need to be evaluation based on your situation.</p> 
+             <p>Hope that’s helpful!</p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+         </ul>
+         <!-- .children --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="dsq-comment-1549"> 
+         <div id="dsq-comment-header-1549" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1549"> <span id="dsq-author-user-1549">Malcolm Brooks</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1549" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1549" class="dsq-comment-message">
+           <p>Justin…thanks for the clear writing and examples. Very helpful….Malcolm Brooks</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-1551"> 
+         <div id="dsq-comment-header-1551" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1551"> <span id="dsq-author-user-1551">shishir sonekar</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1551" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1551" class="dsq-comment-message">
+           <p>why calling callback() is necessary in second parameter function of async.each()</p> 
+           <p>as a notices it doesnt work without calling callback()</p> 
+           <p>here in first feature : </p> 
+           <p>// 2nd param is the function that each item is passed to</p> 
+           <p> function(item, callback){</p> 
+           <p> // Call an asynchronous function, often a save() to DB</p> 
+           <p> item.someAsyncCall(function (){</p> 
+           <p> // Async call is done, alert via callback</p> 
+           <p> callback();</p> 
+           <p> });</p> 
+          </div> 
+         </div> 
+         <ul class="children"> 
+          <li class="comment even depth-2" id="dsq-comment-1552"> 
+           <div id="dsq-comment-header-1552" class="dsq-comment-header"> 
+            <cite id="dsq-cite-1552"> <a id="dsq-author-user-1552" href="http://justinklemm.com/" target="_blank" rel="nofollow">Justin Klemm</a> </cite> 
+           </div> 
+           <div id="dsq-comment-body-1552" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-1552" class="dsq-comment-message">
+             <p>You need to call callback() in order to notify the async.each() construct that you’re done with that particular iteration. By calling callback(), you’re basically telling the async setup “Ok, this item is done. Go to the next.”</p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+         </ul>
+         <!-- .children --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-even depth-1" id="dsq-comment-1561"> 
+         <div id="dsq-comment-header-1561" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1561"> <span id="dsq-author-user-1561">Alfredo Borrero</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1561" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1561" class="dsq-comment-message">
+           <p>How can I dynamically using for loop, push functions with different arguments to an array?</p> 
+           <p>Currently I am trying to run in parallel the same function with different arguments using Node.JS</p> 
+           <p>For this I use Async.js and i am struggling trying to push/stack functions to an array. </p> 
+           <p>The problem is that the functions are executed with the same arguments. This is what I have:</p> 
+           <p>var async = require(“async”);<br> var array = [];<br> var x = [1,2,3,4];</p> 
+           <p>// This portion of code works perfect and the arguments are passed perfectly<br> // The results that i am getting are: [100, 200, 300, 400]</p> 
+           <p>array.push(function(callback){ callback(null,calculate(x[0]))});<br> array.push(function(callback){ callback(null,calculate(x[1]))});<br> array.push(function(callback){ callback(null,calculate(x[2]))});<br> array.push(function(callback){ callback(null,calculate(x[3]))});</p> 
+           <p>// This portion of code does not work and I don’t know why …<br> // The results that i am getting are: [400, 400, 400, 400]<br> // Obviously the function is receiving the same argument a=4 every time is called</p> 
+           <p>for (i=0;i&lt;3;i++){<br> array.push(function(callback){ callback(null,calculate(x[i]))});<br> }</p> 
+           <p>async.parallel(array,function(err,result){<br> if (err) {<br> console.log(err);<br> return;<br> }<br> console.log("Results are: " + result);<br> });</p> 
+           <p>function calculate(a) {<br> return a*100<br> }</p> 
+          </div> 
+         </div> 
+         <ul class="children"> 
+          <li class="comment even depth-2" id="dsq-comment-1613"> 
+           <div id="dsq-comment-header-1613" class="dsq-comment-header"> 
+            <cite id="dsq-cite-1613"> <span id="dsq-author-user-1613">kadir akar</span> </cite> 
+           </div> 
+           <div id="dsq-comment-body-1613" class="dsq-comment-body"> 
+            <div id="dsq-comment-message-1613" class="dsq-comment-message">
+             <p>+1</p> 
+            </div> 
+           </div> </li>
+          <!-- #comment-## --> 
+         </ul>
+         <!-- .children --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-1567"> 
+         <div id="dsq-comment-header-1567" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1567"> <span id="dsq-author-user-1567">Ahmed Azraq</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1567" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1567" class="dsq-comment-message">
+           <p>Thank you!</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="dsq-comment-1586"> 
+         <div id="dsq-comment-header-1586" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1586"> <span id="dsq-author-user-1586">Fernando Guedes</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1586" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1586" class="dsq-comment-message">
+           <p>Thanks man, this solve my long problem with various promises non concurrenctly.</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-1598"> 
+         <div id="dsq-comment-header-1598" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1598"> <span id="dsq-author-user-1598">Yusuf Akhsan Hidayat</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1598" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1598" class="dsq-comment-message">
+           <p>yeay, it;s worked nicely thanks for asyncronous</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="dsq-comment-1631"> 
+         <div id="dsq-comment-header-1631" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1631"> <span id="dsq-author-user-1631">Sam Erickson</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1631" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1631" class="dsq-comment-message">
+           <p>this is an interesting article. thanks for the insights. we’ve written lots of similar articles on <a href="https://www.stackchief.com" rel="nofollow">https://www.stackchief.com</a> </p> 
+           <p>thanks for any feedback.</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-1689"> 
+         <div id="dsq-comment-header-1689" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1689"> <span id="dsq-author-user-1689">despingator</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1689" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1689" class="dsq-comment-message">
+           <p>Liked the async.each approach, no test necessary. Just like with until and whilst, but with no test. THANK YOU!!!</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="dsq-comment-1690"> 
+         <div id="dsq-comment-header-1690" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1690"> <span id="dsq-author-user-1690">despingator</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1690" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1690" class="dsq-comment-message">
+           <p>One thing I would say is add more details about error handling flow when passing the callbacks.</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-1701"> 
+         <div id="dsq-comment-header-1701" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1701"> <span id="dsq-author-user-1701">justin</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1701" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1701" class="dsq-comment-message">
+           <p>Absolutely wonderful! Needs this desperately!</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="dsq-comment-1744"> 
+         <div id="dsq-comment-header-1744" class="dsq-comment-header"> 
+          <cite id="dsq-cite-1744"> <span id="dsq-author-user-1744">Eric Liang</span> </cite> 
+         </div> 
+         <div id="dsq-comment-body-1744" class="dsq-comment-body"> 
+          <div id="dsq-comment-message-1744" class="dsq-comment-message">
+           <p>Nice explanation!</p> 
+          </div> 
+         </div> </li>
+        <!-- #comment-## --> 
+       </ul> 
+      </div> 
+     </div> 
+     <script type="text/javascript">
+var disqus_url = 'http://justinklemm.com/node-js-async-tutorial/';
+var disqus_identifier = '1925 http://justinklemm.com/?p=1925';
+var disqus_container_id = 'disqus_thread';
+var disqus_shortname = 'justinklemm';
+var disqus_title = "Node.js Async Tutorial";
+var disqus_config_custom = window.disqus_config;
+var disqus_config = function () {
+    /*
+    All currently supported events:
+    onReady: fires when everything is ready,
+    onNewComment: fires when a new comment is posted,
+    onIdentify: fires when user is authenticated
+    */
+    
+    
+    this.language = '';
+        this.callbacks.onReady.push(function () {
+
+        // sync comments in the background so we don't block the page
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = '?cf_action=sync_comments&post_id=1925';
+
+        var firstScript = document.getElementsByTagName('script')[0];
+        firstScript.parentNode.insertBefore(script, firstScript);
+    });
+    
+    if (disqus_config_custom) {
+        disqus_config_custom.call(this);
+    }
+};
+
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script> 
+    </div>
+    <!-- .site-content --> 
+   </div>
+   <!-- .site-main --> 
+   <footer class="site-footer group" role="contentinfo"> 
+    <div class="footer-content"> 
+     <div class="footer-links group"> 
+      <div class="col popular-posts"> 
+       <h3>Popular Posts</h3> 
+       <ul> 
+        <li class="post"> 
+         <div class="post-title">
+          <a href="http://justinklemm.com/node-js-async-tutorial/">Node.js Async Tutorial</a>
+         </div> <p class="post-content">I've been doing a lot of backend development in Node.js recently. Node.js runs on a single threaded...</p> </li> 
+        <li class="post"> 
+         <div class="post-title">
+          <a href="http://justinklemm.com/angularjs-filter-ordering-objects-ngrepeat/">AngularJS Filter for Ordering Objects (Associative Arrays or Hashes) with ngRepeat</a>
+         </div> <p class="post-content">I ran into an issue today using the ngRepeat directive in AngularJS. ngRepeat let's you iterate...</p> </li> 
+       </ul> 
+      </div> 
+      <div class="col category-links"> 
+       <h3>Categories</h3> 
+       <ul> 
+        <li class="cat-item cat-item-190"><a href="http://justinklemm.com/category/web-development/">Web Development</a> (8) </li> 
+        <li class="cat-item cat-item-196"><a href="http://justinklemm.com/category/node-js/">Node.js</a> (3) </li> 
+        <li class="cat-item cat-item-189"><a href="http://justinklemm.com/category/wordpress/">Wordpress</a> (2) </li> 
+        <li class="cat-item cat-item-191"><a href="http://justinklemm.com/category/personal/">Personal</a> (2) </li> 
+        <li class="cat-item cat-item-197"><a href="http://justinklemm.com/category/php/">PHP</a> (2) </li> 
+        <li class="cat-item cat-item-198"><a href="http://justinklemm.com/category/angularjs/">AngularJS</a> (1) </li> 
+       </ul> 
+      </div> 
+      <div class="col page-links"> 
+       <h3>Other Sections</h3> 
+       <ul id="menu-other-sections" class="menu">
+        <li id="menu-item-1648" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1648"><a href="http://justinklemm.com/about/">About Justin Klemm</a></li> 
+        <li id="menu-item-1647" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1647"><a href="http://justinklemm.com/crisp-persona/">Crisp Persona Theme</a></li> 
+        <li id="menu-item-1646" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1646"><a href="http://justinklemm.com/nyc-recommendations/">NYC Recommendations</a></li> 
+       </ul> 
+      </div> 
+     </div> 
+     <div class="site-info"> 
+      <p>I'm using the <a href="http://justinklemm.com/crisp-persona/">Crisp Persona</a> WordPress theme.</p> 
+     </div> 
+    </div>
+    <!-- .footer-content --> 
+   </footer>
+   <!-- .site-footer --> 
+  </div>
+  <!-- .site --> 
+  <script type="text/javascript">
+        // <![CDATA[
+        var disqus_shortname = 'justinklemm';
+        (function () {
+            var nodes = document.getElementsByTagName('span');
+            for (var i = 0, url; i < nodes.length; i++) {
+                if (nodes[i].className.indexOf('dsq-postid') != -1 && nodes[i].parentNode.tagName == 'A') {
+                    nodes[i].parentNode.setAttribute('data-disqus-identifier', nodes[i].getAttribute('data-dsqidentifier'));
+                    url = nodes[i].parentNode.href.split('#', 1);
+                    if (url.length == 1) { url = url[0]; }
+                    else { url = url[1]; }
+                    nodes[i].parentNode.href = url + '#disqus_thread';
+                }
+            }
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+        // ]]>
+        </script> 
+  <script type="text/javascript" src="http://justinklemm.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter2/scripts/shCore.js?ver=2.1.364"></script> 
+  <script type="text/javascript" src="http://justinklemm.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter2/scripts/shBrushJScript.js?ver=2.1.364"></script> 
+  <script type="text/javascript">
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "http://justinklemm.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter2/styles/shCore.css?ver=2.1.364";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.getElementsByTagName("head")[0].insertBefore( corecss, document.getElementById("syntaxhighlighteranchor") );
+		var themecssurl = "http://justinklemm.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter2/styles/shThemeRDark.css?ver=2.1.364";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		//document.getElementById("syntaxhighlighteranchor").appendChild(themecss);
+		document.getElementsByTagName("head")[0].insertBefore( themecss, document.getElementById("syntaxhighlighteranchor") );
+	})();
+	SyntaxHighlighter.config.clipboardSwf = 'http://justinklemm.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter2/scripts/clipboard.swf';
+	SyntaxHighlighter.config.strings.expandSource = 'show source';
+	SyntaxHighlighter.config.strings.viewSource = 'view source';
+	SyntaxHighlighter.config.strings.copyToClipboard = 'copy to clipboard';
+	SyntaxHighlighter.config.strings.copyToClipboardConfirmation = 'The code is in your clipboard now';
+	SyntaxHighlighter.config.strings.print = 'print';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = 'Can\'t find brush for: ';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush wasn\'t configured for html-script option: ';
+	SyntaxHighlighter.defaults['auto-links'] = false;
+	SyntaxHighlighter.defaults['gutter'] = false;
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['tab-size'] = 2;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.all();
+</script> 
+  <script type="text/javascript" src="http://justinklemm.com/wp-content/themes/crisp-persona/js/skip-link-focus-fix.js?ver=20130601"></script> 
+  <script type="text/javascript" src="http://justinklemm.com/wp-includes/js/comment-reply.min.js?ver=4.8"></script> 
+  <script type="text/javascript" src="http://justinklemm.com/wp-includes/js/wp-embed.min.js?ver=4.8"></script> 
+  <script type="text/javascript" src="http://justinklemm.com/wp-includes/js/jquery/jquery.js?ver=1.12.4"></script> 
+  <script type="text/javascript" src="http://justinklemm.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var fsb = {"ajax":"http:\/\/justinklemm.com\/wp-admin\/admin-ajax.php","nonce":"00131941e5"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="http://justinklemm.com/wp-content/plugins/floating-social-bar/js/fsb.js?ver=1.1.7"></script>   
+  <!-- Performance optimized by W3 Total Cache. Learn more: https://www.w3-edge.com/products/
+
+Page Caching using disk: enhanced
+Database Caching 2/45 queries in 0.026 seconds using disk
+
+ Served from: justinklemm.com @ 2017-10-03 07:43:44 by W3 Total Cache -->
+ </body>
+</html>

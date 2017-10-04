@@ -1,0 +1,637 @@
+<html>
+ <head> 
+  <title>Data Science Toolkit</title> 
+  <link href="/css/main.css" rel="stylesheet" type="text/css"> 
+  <script src="/scripts/jquery.min.js" type="text/javascript"></script> 
+  <script src="/scripts/jquery.dstk.js" type="text/javascript"></script> 
+ </head> 
+ <body> 
+  <div class="centering" style="text-align: center;"> 
+   <div class="ui-corner-all" id="container" style="text-align: left;"> 
+    <div class="ui-corner-all" id="header"> 
+     <a href="/" style="text-decoration:none;"> <img class="headerlogo" height="27" src="/images/textlogo.png" width="293"> </a> 
+    </div> 
+    <div class="clearer" style="clear:both"></div> 
+    <div class="headline">
+     Developer Documentation
+    </div> 
+    <div class="clearer" style="clear:both"></div> 
+    <div class="ui-corner-all"> 
+     <div class="clearer" style="clear:both"> 
+      <div class="subtitle" style="margin-top:-20px; font-size: 125%;"></div> 
+      <div class="toc" style="margin-top:30px; margin-bottom:30px; font-size: 125%;"> 
+       <a href="#usage">Usage</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#commandline">Command Line on OS X and Linux</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#commandlinewindows">Command Line on Windows</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#python">Python</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#javascript">Javascript</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#rlanguage">R Language</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#ruby">Ruby</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#excel">Excel Macros</a> 
+       <br> 
+       <a href="#api">API</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#geodict">Geodict</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#text2places">Text to Places</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#ip2coordinates">IP Address to Coordinates</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#street2coordinates">Street Address to Coordinates</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#googlestylegeocoder">Google-style geocoder</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#coordinates2politics">Coordinates to Politics</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#file2text">File to Text</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#text2sentences">Text to Sentences</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#html2text">HTML to Text</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#html2story">HTML to Story</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#text2people">Text to People</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#text2times">Text to Times</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#text2sentiment">Text to Sentiment</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#coordinates2statistics">Coordinates to Statistics</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#twofishes">TwoFishes Geocoder</a> 
+       <br> 
+       <a href="#setup">Setting up your own server</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#amazon">Amazon EC2</a> 
+       <br> &nbsp;&nbsp;&nbsp;&nbsp; 
+       <a href="#vagrant">Vagrant</a> 
+       <br> 
+       <br> Questions? Get help from 
+       <a href="http://groups.google.com/group/dstk-users">http://groups.google.com/group/dstk-users</a> 
+       <br> 
+      </div> 
+      <div class="developerinfo" style="margin-top:20px; font-size: 125%;"> 
+       <a name="usage"></a> 
+       <h3>Usage</h3> 
+       <br> 
+       <a name="commandline"></a> 
+       <h4>Command Line on OS X and Linux</h4> 
+       <p>Download <a href="/python_tools.zip">python_tools.zip</a>, extract into a new folder, <code>cd</code> into it and run <code>./install</code></p> 
+       <p>This will create a set of scripts you can run directly from the command line, like this:</p> 
+       <p><code>html2text http://nytimes.com | text2people</code></p> 
+       <p>The command above fetches the New York Times front page, extracts a plain text version, and then pulls out likely names. There's command-line scripts for all the API calls, and they're designed to work according to the normal Unix conventions. That means you can pipe the output from one command to another, since if no inputs are specified the commands will read from stdin. The calls that take in large chunks of text interpret any arguments as file names or URLs to read. If a name starts with "http://" the document at that location will be fetched and processed, as in the New York Times example above. If a file name is a directory, it will recurse down through the folder structure, reading in all files it finds. For example:</p> 
+       <p><code>file2text -h ~/scanned_documents/*.jpg &gt; scanned_text.txt</code></p> 
+       <p>This will run OCR on all the JPEG images in that folder (the same command also works on PDF, DOC and XLS files). The -h switch is applicable to most commands, and tells them to output header information, in this case the file name for each chunk of text pulled from an image.</p> 
+       <p>Commands that take in inputs that aren't natural-language text or html treat their arguments as the strings to process, rather than file names. For example, this call looks up the given IP address, not the file with that name:</p> 
+       <p><code>ip2coordinates "67.169.73.113"</code></p> 
+       <p>If you do want to run one of these commands on a large number of inputs, you can pipe them in from a file on stdin, and each line in the file will be treated as an input:</p> 
+       <p><code>ip2coordinates &lt; someips.txt</code></p> 
+       <p>The commands that produce structured results (something other than a blob of text) write out their information in comma-separated value format. This means you can redirect their output into a .csv file and then load that into your favorite spreadsheet, or read it into your own scripts to do custom processing. Here's an example of how that works:</p> 
+       <p><code>text2places -h http://nytimes.com/ &gt; nytimes_places.csv</code></p> 
+       <p>By default, the command-line tools will use the <a href="http://www.datasciencetoolkit.org">datasciencetoolkit.org</a> server to do the processing, but if <a href="#setup">you set up your own server</a> you can redirect all calls to that URL by setting the enviroment variable <code>DSTK_API_BASE</code> or using the -a switch for each command, eg:</p> 
+       <p> <code>export DSTK_API_BASE=http://example.com</code></p> 
+       <br> 
+       <a name="commandlinewindows"></a> 
+       <h4>Command Line on Windows</h4> 
+       <p>Because Windows doesn't come with Python installed by default, you'll need to go through a few extra steps:</p> 
+       <p>Go to <a href="http://www.python.org/download/releases/">http://www.python.org/download/releases/</a> and follow the link starting with 2.6 (for example in April 2011, that's <a href="http://www.python.org/download/releases/2.6.6/">2.6.6</a>).</p> 
+       <p>Click on the "Windows x86 MSI Installer" link. (If you're technically savvy, and know you have a 64 bit PC, you can choose "Windows X86-64 MSI Installer", but if you're in doubt, stick with the standard one.)</p> 
+       <p>The file should now be downloading. Once it has finished, run it and an installer should start up. Click "Next" to choose the default options, and then end with "Finish" once it's done.</p> 
+       <p>Open up a DOS prompt by going to "All Programs"-&gt;"Accessories"-&gt;"Command Prompt" from the Start Menu.</p> 
+       <p>Type the command below to make sure Python has been installed.</p> 
+       <p><code>C:\Python26\python.exe</code></p> 
+       <p>If it works, you'll see some text followed by a prompt. Type the command <code>exit()</code> to leave this mode.</p> 
+       <p><img src="/images/windowsshot1.png" alt="DOS Prompt Screenshot"></p> 
+       <p>Download <a href="/python_tools.zip">python_tools.zip</a>, extract into a new folder and <code>cd</code> into it from the DOS prompt.</p> 
+       <p>On my machine the default location is <code>C:\Users\Administrators\Downloads\python_tools.zip</code>, I can unzip it by double-clicking that archive in the file view and selecting "Extract All Files", and then to enter the new directory I type <code>cd C:\Users\Administrators\Downloads\python_tools</code> into the DOS prompt. The exact directories will vary depending on your user name and which version of Windows you're running.</p> 
+       <p>To make sure the Toolkit interface was installed correctly, run this command:</p> 
+       <p><code>C:\Python26\python.exe python\dstk.py</code></p> 
+       <p>You should see a help message appear showing the options that you can pass into the script.</p> 
+       <p>To run something useful, you need to put the name of the command you want at the end of this, along with some data to analyze. For example, you could retrieve information about an IP address like this:</p> 
+       <p><code>C:\Python26\python.exe python\dstk.py ip2coordinates 67.169.73.113</code></p> 
+       <p><img src="/images/windowsshot2.png" alt="DOS Prompt Screenshot"></p> 
+       <p>You can now run all of the commands as described in the <a href="#commandline">Unix section</a>, by adding the <code>C:\Python26\python.exe python\dstk.py</code> part at the start of each line. You can get rid of that extra typing by adding Python to your command path and installing <a href="http://www.cygwin.com/">Cygwin</a>, but that's not required.</p> 
+       <br> 
+       <a name="python"></a> 
+       <h4>Python</h4> 
+       <p>A package is <a href="https://pypi.python.org/pypi/dstk/">available on PyPi</a> so you can run <code>pip install dstk</code>, or you can manually download <a href="/python_tools.zip">python_tools.zip</a>, extract into a new folder, <code>cd</code> into it and run <code>python setup.py</code></p> 
+       <p>This installs the DSTK interface as a module. If you run the Python interactive console, you can test it out:</p> 
+       <p><code>&gt;&gt;&gt; import dstk</code></p> 
+       <p><code>&gt;&gt;&gt; dstk = dstk.DSTK()</code></p> 
+       <p><code>&gt;&gt;&gt; dstk.street2coordinates('2543 Graystone Place, Simi Valley, CA 93065')</code></p> 
+       <p><code>{'2543 Graystone Place, Simi Valley, CA 93065': {'confidence': 0.92200000000000004, 'street_number': '2543', 'locality': 'Simi Valley', 'street_name': 'Graystone Pl', 'fips_county': '06111', 'country_code3': 'USA', 'country_name': 'United States', 'longitude': -118.76620699999999, 'country_code': 'US', 'latitude': 34.280873999999997, 'region': 'CA', 'street_address': '2543 Graystone Pl'}}</code></p> 
+       <p>You can access all of the API methods by calling the corresponding function on the interface object. Most functions can take either a single string, or an array of input strings, and return either an array or dictionary of results. The individual methods' documentation explains the exact format of their output.</p> 
+       <p>By default, the <a href="http://www.datasciencetoolkit.org">datasciencetoolkit.org</a> server is called, but if the <code>DSTK_API_BASE</code> environment variable is set, that URL will be used instead. You can also pass in a custom server URL in the options structure when you create the interface object:</p> 
+       <p><code>dstk = dstk.DSTK({'apiBase':'http://example.com'})</code></p> 
+       <p> If no Data Science Toolkit server is detected at the URL, an exception is thrown. You can skip the call required to pull the server information by setting <code>checkVersion</code> to False in the constructor options.</p> 
+       <p> For a full example of the Python interface in action, look at the command-line tool included at the bottom of the dstk.py file inside python_tools.zip.</p> 
+       <br> 
+       <a name="javascript"></a> 
+       <h4>Javascript</h4> 
+       <p>The Javascript interface is available as a jQuery plugin, to get started download <a href="/scripts/jquery.dstk.js">jquery.dstk.js</a>. Once you've included that in your page, you'll be able to call it like this:</p> 
+       <p><code>var dstk = $.DSTK();</code></p> 
+       <p><code>dstk.ip2coordinates('67.169.73.113', function(result) {</code></p> 
+       <p>&nbsp;&nbsp;<code>if (typeof result['error'] !== 'undefined') {</code></p> 
+       <p>&nbsp;&nbsp;&nbsp;&nbsp;<code>alert('Error: '+result['error']);</code></p> 
+       <p>&nbsp;&nbsp;&nbsp;&nbsp;<code>return</code></p> 
+       <p>&nbsp;&nbsp;<code>}</code></p> 
+       <p>&nbsp;&nbsp;<code>for (var ip in result) {</code></p> 
+       <p>&nbsp;&nbsp;&nbsp;&nbsp;<code>var info = result[ip];</code></p> 
+       <p>&nbsp;&nbsp;&nbsp;&nbsp;<code>alert(ip+' is at '+info['latitude']+','+info['longitude']);</code></p> 
+       <p>&nbsp;&nbsp;<code>}</code></p> 
+       <p><code>});</code></p> 
+       <p>The DSTK interface object supports all of the API calls except <a href="#file2text">file2text</a>, since there's no simple way to upload files directly from Javascript. It uses JSONP calls where possible, injecting script tags to allow cross-domain access, so scripts on your own sites' pages can run using the default <a href="http://www.datasciencetoolkit.org">datasciencetoolkit.org</a> server. Since JSONP relies on the GET method, it runs into URL size limits when dealing with larger text inputs (over about 8k). It will automatically switch to using jQuery's AJAX POST method, but this will fail if you're running cross-domain. You can work around this by setting up a proxy on your own domain, either <a href="#setup">a full copy of the server</a> or a proxy pointing to the datasciencetoolkit.org site. You specify which server to use by setting the <code>apiBase</code> option in the constructor, eg:</p> 
+       <p><code>var dstk = $.DSTK({apiBase:'http://example.com'});</code></p> 
+       <br> 
+       <a name="rlanguage"></a> 
+       <h4>R Language</h4> 
+       <p>You can use the toolkit from R by grabbing <a href="http://cran.r-project.org/web/packages/RDSTK/index.html">the package from CRAN</a>. Big thanks go to <a href="http://twitter.com/rtelmore">Ryan Elmore</a> and Andrew Heiss for putting this together.</p> 
+       <p>To use it, just run <code>require('RDSTK')</code> and then one of the functions corresponding to an API name, eg</p> 
+       <p><code>coordinates2statistics(37.769456, -122.429128, 'population_density')</code></p> 
+       <p><code>text2sentiment("I love this hotel!")</code></p> 
+       <br> 
+       <a name="ruby"></a> 
+       <h4>Ruby</h4> 
+       <p>Install the gem using <code>gem install dstk</code> and then create an instance of the client like this:</p> 
+       <p><code>dstk = DSTK::DSTK.new</code></p> 
+       <p>Then you can call functions corresponding to an API name, eg</p> 
+       <p><code>dstk.coordinates2statistics([37.769456, -122.429128], 'population_density')</code></p> 
+       <p><code>dstk.text2sentiment('I love this hotel!')</code></p> 
+       <p>Thanks go to <a href="http://twitter.com/cam_peterson">Cam Peterson</a> for coding help on this gem.</p> 
+       <br> 
+       <a name="excel"></a> 
+       <h4>Excel Macros</h4> 
+       <p>You can use the geocoding functions from Excel by installing <a href="https://github.com/lukewp/dstk_excel">this VBA file from github</a>. Thanks to <a href="https://twitter.com/LWP">Luke Peterson</a> for creating this.</p> 
+       <p>Feed a USA street address to <code>getGeocode()</code> to get an API response, which you can pass through <code>getLatitude()</code> and <code>getLongitude()</code> in order to put the Long/Lat into separate columns. Best-practice is to pull the API response into a single field with <code>getGeocode()</code>, then parse that field with <code>getLatitude()</code> and <code>getLongitude()</code>, rather than using <code>getLatitude(getGeocode([Address]))</code> and <code>getLongitude(getGeocode([Address]))</code>, since the latter will double the number of requests to the dstk server.</p> 
+       <a name="api"></a> 
+       <h3>API</h3> 
+       <br> 
+       <a name="geodict"></a> 
+       <h4>Geodict</h4> 
+       <p>As an emulation of Yahoo's service, a good place to start is <a href="http://developer.yahoo.com/geo/placemaker/guide/web-service.html">their Placemaker documentation</a>. There's also concrete examples of how to call the Placemaker API in the test_suite folder, and for Javascript in the source of the home page of this server. I've focused on supporting the most commonly used features of Yahoo's interface, so if you have some code that relies on something that's missing, <a href="mailto:pete@petewarden.com">email me a sample of your source</a> and I'll do my best to add that in.</p> 
+       <p>Here's how the <a href="http://swift.ushahidi.com">Ushahidi Swift project</a> calls Placemaker to pull the first location mentioned in a document.</p> 
+       <p>For the original Yahoo API:</p> 
+       <hr> 
+       <p><code>define('BASE_URL', 'http://wherein.yahooapis.com/');</code></p> 
+       <p><code>define('APP_ID', '&lt;Their API Key&gt;');</code></p> 
+       <hr> 
+       <p>Using GeodictAPI:</p> 
+       <hr> 
+       <p><code>define('BASE_URL', 'http://www.datasciencetoolkit.org/');</code></p> 
+       <p><code>define('APP_ID', ''); // No API key needed</code></p> 
+       <hr> 
+       <p>Code for calling the API and parsing the results:</p> 
+       <hr> 
+       <p><code>$encodedLocation = \urlencode($location);</code></p> 
+       <p><code>$url = BASE_URL."v1/document";</code></p> 
+       <p><code>$postvars = "documentContent=$encodedLocation&amp;documentType=text/plain&amp;appid=$appid";</code></p> 
+       <p><code>$return = curl_request($url, $postvars);</code></p> 
+       <p><code>$xml = new \SimpleXMLElement($return);</code></p> 
+       <p><code>$long = (float) $xml-&gt;document-&gt;placeDetails-&gt;place-&gt;centroid-&gt;longitude;</code></p> 
+       <p><code>$latt = (float) $xml-&gt;document-&gt;placeDetails-&gt;place-&gt;centroid-&gt;latitude;</code></p> 
+       <hr> 
+       <p>The results will differ between the two APIs, as the algorithms are quite different. In particular, I designed Geodict for applications that are intolerant of false positives, so for example Placemaker will flag "New York Times" as a location whereas Geodict will ignore it.</p> 
+       <a name="text2places"></a> 
+       <h4>Text to Places</h4> 
+       <p>This is the friendly interface to the same underlying functionality as Geodict. It uses a much simpler JSON format, taking an array with a single string as its input and returning an array of the locations found in that text. Here's an example:</p> 
+       <hr> 
+       <p><code>curl "http://www.datasciencetoolkit.org/text2places/%5b%22Cairo%2c+Egypt%22%5d"</code></p> 
+       <p><code>[{"type":"CITY","start_index":"0","end_index":"4","matched_string":"Cairo, Egypt",</code></p> 
+       <p><code>"latitude":"30.05","longitude":"31.25","name":"Cairo"}]</code></p> 
+       <hr> 
+       <a name="ip2coordinates"></a> 
+       <h4>IP Address to Coordinates</h4> 
+       <p>This API takes either a single numerical IP address, a comma-separated list, or a JSON-encoded array of addresses, and returns a JSON object with a key for every IP. The value for each key is either null if no information was found for the address, or an object containing location information, including country, region, city and latitude/longitude coordinates. Here's an example:</p> 
+       <hr> 
+       <p><code>{"67.169.73.113":{</code></p> 
+       <p><code>"country_name":"United States",</code></p> 
+       <p><code>"area_code":415,</code></p> 
+       <p><code>"region":"CA",</code></p> 
+       <p><code>"postal_code":"94114",</code></p> 
+       <p><code>"city":"San Francisco",</code></p> 
+       <p><code>"latitude":37.7587013244629,</code></p> 
+       <p><code>"country_code":"US",</code></p> 
+       <p><code>"longitude":-122.438102722168,</code></p> 
+       <p><code>"country_code3":"USA",</code></p> 
+       <p><code>"dma_code":807}};</code></p> 
+       <hr> 
+       <p>To call the API, you can make either a GET or a POST request to <code>/ip2coordinates</code>. If you make a GET request, then you need to pass in the IP addresses in the suffix of the URL, eg <code>/ip2coordinates/130.12.1.34%2C67.169.73.113</code>.</p> 
+       <p>Using GET you can also pass in a callback parameter in the URL, making it possible to run this as a JSONP cross-domain request. You can see this method in action if you view source on the home page of this server.</p> 
+       <p>You can also make a POST request passing in the IP addresses in the body of the request. This is useful if you have very large arrays of IP addresses you need to process, since you won't hit any URL size limits.</p> 
+       <p>This API uses data from <a href="http://www.maxmind.com/">http://www.maxmind.com/</a>.</p> 
+       <a name="street2coordinates"></a> 
+       <h4>Street Address to Coordinates</h4> 
+       <p>This API takes either a single string representing a postal address, or a JSON-encoded array of addresses, and returns a JSON object with a key for every address. The value for each key is either null if no information was found for the address, or an object containing location information, including country, region, city and latitude/longitude coordinates. Here's an example:</p> 
+       <hr> 
+       <p><code>curl "http://www.datasciencetoolkit.org/street2coordinates/2543+Graystone+Place%2c+Simi+Valley%2c+CA+93065"</code></p> 
+       <p><code>{"2543 Graystone Place, Simi Valley, CA 93065":{</code></p> 
+       <p><code>"street_name":"Graystone Pl",</code></p> 
+       <p><code>"country_code":"US",</code></p> 
+       <p><code>"latitude":34.280874,</code></p> 
+       <p><code>"street_address":"2543 Graystone Pl",</code></p> 
+       <p><code>"country_code3":"USA",</code></p> 
+       <p><code>"fips_county":"06111",</code></p> 
+       <p><code>"longitude":-118.766207,</code></p> 
+       <p><code>"country_name":"United States",</code></p> 
+       <p><code>"confidence":0.922,</code></p> 
+       <p><code>"region":"CA",</code></p> 
+       <p><code>"street_number":"2543",</code></p> 
+       <p><code>"locality":"Simi Valley"}}</code></p> 
+       <hr> 
+       <p>To call the API, you can make either a GET or a POST request to <code>/street2coordinates</code>. If you make a GET request, then you need to pass in the addresses in the suffix of the URL, as above.</p> 
+       <p>Using GET you can also pass in a callback parameter in the URL, making it possible to run this as a JSONP cross-domain request. You can see this method in action if you view source on the home page of this server.</p> 
+       <p>You can also make a POST request passing in the addresses in the body of the request. This is useful if you have very large arrays of addresses you need to process, since you won't hit any URL size limits. You pass them in as a JSON string, eg ["2543 Graystone Place, Simi Valley, CA 93065", "400 Duboce Ave, San Francisco, CA 94114"]</p> 
+       <p><code>curl -X POST --data '["2543 Graystone Place, Simi Valley, CA 93065", "400 Duboce Ave, San Francisco, CA 94114"]' 'http://www.datasciencetoolkit.org/street2coordinates'</code></p> 
+       <p>This API uses data from the US Census and <a href="http://www.openstreetmap.org">OpenStreetMap</a>, along with code from <a href="http://www.geoiq.com/">GeoIQ</a> and<a href="https://github.com/geocommons/geocoder">Schuyler Erle</a>.</p> 
+       <a name="googlestylegeocoder"></a> 
+       <h4>Google-style geocoder</h4> 
+       <p>This emulates <a href="https://developers.google.com/maps/documentation/geocoding/">Google's geocoding API</a>. It's designed to take the same arguments and return the same data structure as their service, to make it easy to port existing code. It's very similar in functionality to <a href="#street2coordinates">street2coordinates</a>, taking a string representing a place or address, and converting it into structured data about the position of that location. Here's an example:</p> 
+       <hr> 
+       <p><code>curl "http://www.datasciencetoolkit.org/maps/api/geocode/json?sensor=false&amp;address=1600+Amphitheatre+Parkway,+Mountain+View,+CA"</code></p> 
+       <p><code>{"results": [{</code></p> 
+       <p><code>"types": ["street_address"],</code></p> 
+       <p><code>"formatted_address": "1600 Amphitheatre Parkway, Mountain View, CA",</code></p> 
+       <p><code>"geometry": {</code></p> 
+       <p><code> "location": {"lat": 37.42382, "lng": -122.08999},</code></p> 
+       <p><code> "location_type": "ROOFTOP",</code></p> 
+       <p><code> "viewport": {</code></p> 
+       <p><code> "southwest": {"lat": 37.42282, "lng": -122.09099},</code></p> 
+       <p><code> "northeast": {"lat": 37.42482, "lng": -122.08899} }},</code></p> 
+       <p><code>"address_components":[{"types": ["street_number"],"long_name": "1600","short_name": "1600"},</code></p> 
+       <p><code> {"types": ["route"],"long_name": "Amphitheatre Pkwy","short_name": "Amphitheatre Pkwy"},</code></p> 
+       <p><code> {"types": ["locality","political"],"long_name": "Mountain View","short_name": "Mountain View"},</code></p> 
+       <p><code> {"types": ["administrative_area_level_1","political"],"long_name": "CA","short_name": "CA"},</code></p> 
+       <p><code> {"types": ["country","political"],"long_name": "United States","short_name": "US"}]}],</code></p> 
+       <p><code>"status": "OK"}</code></p> 
+       <hr> 
+       <p>To call the API, you can make a GET request to <code>/maps/api/geocode/json</code>. You pass in the address you're querying for as a parameter in the URL as shown above. Other parameters that Google requires (like sensor or your API key) are accepted but ignored.</p> 
+       <p>You can pass in a callback parameter in the URL, making it possible to run this as a JSONP cross-domain request. You can see this method in action if you view source on the home page of this server.</p> 
+       <p>Reverse geocoding (getting information about what's located at particular coordinates) and XML output formats are not supported.</p> 
+       <p>This API uses data from the US Census and <a href="http://www.openstreetmap.org">OpenStreetMap</a>, along with code from <a href="http://www.geoiq.com/">GeoIQ</a> and<a href="https://github.com/geocommons/geocoder">Schuyler Erle</a>.</p> 
+       <a name="coordinates2politics"></a> 
+       <h4>Coordinates to Politics</h4> 
+       <p>This API takes either a single string representing a comma-separated pair of latitude/longitude coordinates, or a JSON-encoded array of objects containing two keys, one for latitude and one for longitude. It returns a JSON array containing an object for every input location. The location member holds the coordinates that were queried, and politics holds an array of countries, states, provinces, cities, constituencies and neighborhoods that the point lies within. Here's an example:</p> 
+       <hr> 
+       <p><code>curl "http://www.datasciencetoolkit.org/coordinates2politics/37.769456%2c-122.429128"</code></p> 
+       <p><code>[{"location":{"latitude":"37.769456","longitude":"-122.429128"},"politics":[</code></p> 
+       <p><code>{"type":"admin2","code":"usa","friendly_type":"country","name":"United States"},</code></p> 
+       <p><code>{"type":"admin4","code":"us06","friendly_type":"state","name":"California"},</code></p> 
+       <p><code>{"type":"admin6","code":"06_075","friendly_type":"county","name":"San Francisco"},</code></p> 
+       <p><code>{"type":"admin5","code":"06_67000","friendly_type":"city","name":"San Francisco"},</code></p> 
+       <p><code>{"type":"constituency","code":"06_08","friendly_type":"constituency","name":"Eighth district, CA"}]}]</code></p> 
+       <hr> 
+       <p>To combat errors caused by lack of precision, there's a small amount of fuzziness built into the algorithm, so that points that lie very close to borders get information on both possible areas they could be within.</p> 
+       <p>To call the API, you can make either a GET or a POST request to <code>/coordinates2politics</code>. If you make a GET request, then you need to pass in the locations in the suffix of the URL, as above.</p> 
+       <p>Using GET you can also pass in a callback parameter in the URL, making it possible to run this as a JSONP cross-domain request. You can see this method in action if you view source on the home page of this server.</p> 
+       <p>You can also make a POST request passing in the locations in the body of the request. This is useful if you have very large arrays of locations you need to process, since you won't hit any URL size limits.</p> 
+       <p>This API relies on data gathered by volunteers around the world for <a href="http://www.openheatmap.com/">OpenHeatMap</a>, along with US census information and <a href="http://www.zillow.com/howto/api/neighborhood-boundaries.htm">neighborhood maps from Zillow</a>.</p> 
+       <a name="file2text"></a> 
+       <h4>File to Text</h4> 
+       <p>If you pass in an image, this API will run an optical character recognition algorithm to extract any words or sentences it can from the picture. If you upload a PDF file, Word document, Excel spreadsheet or HTML file, it will return a plain text version of the content. Unlike most of the calls, this one takes its input in the standard multipart form-encoded format that's used when browsers upload files, rather than as JSON. It returns any content it finds as a stream of text.</p> 
+       <hr> 
+       <p><code>curl --form inputfile=@ExecutiveSummary.docx "http://www.datasciencetoolkit.org/file2text"</code></p> 
+       <p><code>OverviewMoveableCode, inc. is a seed stage company funded by a National Science Foundation Phase 1 SBIR grant. The company is developing software applications for mobile devices with a particular emphasis on Augmented Reality (AR).</code></p> 
+       <hr> 
+       <p>This API relies on the <a href="http://code.google.com/p/ocropus/">Ocropus project</a> for handling images, and <a href="http://wagner.pp.ru/~vitus/software/catdoc/">catdoc</a> for pre-XML Word and Excel documents.</p> 
+       <a name="text2sentences"></a> 
+       <h4>Text to Sentences</h4> 
+       <p>This call takes some text, and returns any fragments of it that look like proper sentences organized into paragraphs. It's most useful for taking documents that may be full of uninteresting boilerplate like headings and captions, and returning only the descriptive passages for further analysis.</p> 
+       <hr> 
+       <p><code>curl -d "*Does*not*look_like999A sentence." "http://www.datasciencetoolkit.org/text2sentences"</code></p> 
+       <p><code>{"sentences":""}</code></p> 
+       <p><code>curl -d "But this does, it contains enough words. So does this one, it appears correct. This is long and complete enough too." "http://www.datasciencetoolkit.org/text2sentences"</code></p> 
+       <p><code>{"sentences":"But this does, it contains enough words. So does this one, it appears correct. This is long and complete enough too. \n"}</code></p> 
+       <hr> 
+       <p>The GET form of this call takes a JSON-encoded array of a single string containing the text to analyze. This string must be less than about 8,000 characters long, or the URL size limit will be exceeded. The Javascript interface automatically switches to POST for long text requests, which means they will not work cross-domain.</p> 
+       <p>The POST form takes the input text as a single raw string in the body of the request. The result is a JSON-encoded object with a "sentences" member containing the matching parts of the input.</p> 
+       <a name="html2text"></a> 
+       <h4>HTML to Text</h4> 
+       <p>This call takes an HTML document, and analyzes it to determine what text would be displayed when it is rendered. This includes all headers, ads and other boilerplate. If you want only the main body text (for example the story section in a news article) then you should use <a href="#html2story">html2story</a> on the HTML.</p> 
+       <hr> 
+       <p><code>curl -d "&lt;html&gt;&lt;head&gt;&lt;title&gt;MyTitle&lt;/title&gt;&lt;/head&gt;&lt;body&gt;&lt;script type="text/javascript"&gt;something();&lt;/script&gt;&lt;div&gt;Some actual text&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;" "http://www.datasciencetoolkit.org/html2text"</code></p> 
+       <p><code>{"text":"Some actual text\n"}</code></p> 
+       <hr> 
+       <p>The GET form of this call takes a JSON-encoded array of a single string containing the text to analyze. This string must be less than about 8,000 characters long, or the URL size limit will be exceeded. The Javascript interface automatically switches to POST for long text requests, which means they will not work cross-domain.</p> 
+       <p>The POST form takes the input text as a single raw string in the body of the request. The result is a JSON-encoded object with a "text" member containing the matching parts of the input.</p> 
+       <p>This API relies on the <a href="http://hpricot.com/">Hpricot</a> library to parse the HTML.</p> 
+       <a name="html2story"></a> 
+       <h4>HTML to Story</h4> 
+       <p>This call takes an HTML document, and extracts the sections of text that appear to be the main body of a news story, or more generally the long, descriptive passages in any page. This is especially useful when you want to run an analysis only on the unique content of each page, ignoring all the repeated navigation elements.</p> 
+       <hr> 
+       <p><code>curl -d "</code><em>The contents of a real page</em><code>" "http://www.datasciencetoolkit.org/html2story"</code></p> 
+       <p><code>{"story":"</code><em>The story text</em><code>"}</code></p> 
+       <hr> 
+       <p>This one is tough to demonstrate in a succinct example, because it requires a non-trivial document before it will accept its contents as a valid story.</p> 
+       <p>The GET form of this call takes a JSON-encoded array of a single string containing the text to analyze. This string must be less than about 8,000 characters long, or the URL size limit will be exceeded. The Javascript interface automatically switches to POST for long text requests, which means they will not work cross-domain.</p> 
+       <p>The POST form takes the input text as a single raw string in the body of the request. The result is a JSON-encoded object with a "story" member containing the matching parts of the input.</p> 
+       <p>This API relies on the <a href="http://code.google.com/p/boilerpipe/">Boilerpipe</a> library to recognize and extract the story text.</p> 
+       <a name="text2people"></a> 
+       <h4>Text to People</h4> 
+       <p>Extracts any sequences of words that look like people's names, and tries to guess their gender, likely age, and ethnicity from the statistical properties of any names found. It's largely based on American surveys, and so works best on names that are common in English-speaking countries, though it does cover the most popular foreign-language names too. It also looks for some common titles like Mr and Mrs to help it spot possible people. It relies on capitalization of names, so it will only work on more formal texts.</p> 
+       <p>There will inevitably be some noise (is "Will Hunting" in "Good Will Hunting" a name?) so you'll need an application where some false positives aren't a problem. For example, you could use this to spot the most popular people in a collection of crawled news pages.</p> 
+       <hr> 
+       <p><code>curl -d "Tim O'Reilly, Archbishop Huxley" "http://www.datasciencetoolkit.org/text2people"</code></p> 
+       <p><code>[{"first_name": "Tim",</code></p> 
+       <p><code> "title": "",</code></p> 
+       <p><code> "surnames": "O'Reilly",</code></p> 
+       <p><code> "likely_age": 53,</code></p> 
+       <p><code> "start_index": 0,</code></p> 
+       <p><code> "end_index": 12,</code></p> 
+       <p><code> "ethnicity": null,</code></p> 
+       <p><code> "matched_string": "Tim O'Reilly",</code></p> 
+       <p><code> "gender": "m"},</code></p> 
+       <p><code>{"first_name": "",</code></p> 
+       <p><code> "title": "archbishop",</code></p> 
+       <p><code> "surnames": "Huxley",</code></p> 
+       <p><code> "likely_age": null,</code></p> 
+       <p><code> "start_index": 14,</code></p> 
+       <p><code> "end_index": 31,</code></p> 
+       <p><code> "ethnicity": { "percentage_of_total": 0.0002,</code></p> 
+       <p><code> "percentage_hispanic": 0.0,</code></p> 
+       <p><code> "percentage_white": 94.81,</code></p> 
+       <p><code> "percentage_black": 0.0,</code></p> 
+       <p><code> "percentage_asian_or_pacific_islander": 0.93,</code></p> 
+       <p><code> "percentage_american_indian_or_alaska_native": 0.0,</code></p> 
+       <p><code> "rank": 38587,</code></p> 
+       <p><code> "percentage_two_or_more": 3.34},</code></p> 
+       <p><code> "matched_string": "Archbishop Huxley",</code></p> 
+       <p><code> "gender": "u"}]</code></p> 
+       <hr> 
+       <p>The text is passed in either as a JSON-encoded array in the remainder of the URL for a GET call, or in the raw body of the request for POST. The usual 8,000 character limit on GET URLs applies, so use POST for larger texts.</p> 
+       <p>This API uses my Ruby port of Eamon Daly and Jon Orwant's original <a href="http://search.cpan.org/~edaly/Text-GenderFromName-0.32/GenderFromName.pm">GenderFromName Perl module</a> to guess the gender of first names. It also uses information from <a href="http://www.ssa.gov/oact/babynames/limits.html">the US Social Security Administration's analysis of baby names</a> to guess both gender. The likely age guessing uses the baby names data, and <a href="http://www.cdc.gov/nchs/data/nvsr/nvsr61/nvsr61_03.pdf">actuarial tables from the NCHS</a> to normalize for life expectancy.</p> 
+       <p>The ethnicity breakdown of surnames is based on <a href="http://www.census.gov/genealogy/www/data/2000surnames/index.html">the US Census's list of all names that occurred 100 or more times in the 2000 survey</a>.</p> 
+       <a name="text2times"></a> 
+       <h4>Text to Times</h4> 
+       <p>Searches the input for strings that represent dates or times, and parses them into the standard form of a Ruby date/time string (eg "Mon Feb 01 11:00:00 -0800 2010") as well as seconds since Jan 1st 1970. It will attempt to guess the exact time for strings that are ambiguous, like "this Tuesday". Its guessing process is to look for a full date anywhere in the document, and calculate all relative times as offsets from the first date with a day, month and year it finds.</p> 
+       <p>For example, if the text was an email with "Monday Feb 1st 2010" in the content, and there was a reference to "this Tuesday", the service would guess that meant Tuesday Feb 2nd 2010. If there are no full dates at all, then the current time and date will be used as the base. Any relative dates are marked as "is_relative" in the results. It also figures out the span of time that the string covers, and puts this in seconds as "duration" within each result.</p> 
+       <p>It's designed to avoid false positives, at the cost of missing some strings that might represent dates. "I'm taking Computer Science 2010" won't be marked as the year 2010, since there's not enough evidence that it's really representing a time and isn't just a reference number.</p> 
+       <hr> 
+       <p><code>curl -d "02/01/2010-Meeting this Wednesday" "http://www.datasciencetoolkit.org/text2times"</code></p> 
+       <p><code>[{"start_index":1,"is_relative":false,"end_index":9,"time_seconds":1265011200.0,</code></p> 
+       <p><code>"matched_string":"2/01/2010","time_string":"Mon Feb 01 00:00:00 -0800 2010",</code></p> 
+       <p><code>"duration":86400},</code></p> 
+       <p><code>{"start_index":19,"is_relative":true,"end_index":32,"time_seconds":1265184000.0,</code></p> 
+       <p><code>"matched_string":"this Wednesday","time_string":"Wed Feb 03 00:00:00 -0800 2010",</code></p> 
+       <p><code>"duration":86400}]</code></p> 
+       <hr> 
+       <p>The text is passed in either as a JSON-encoded array in the remainder of the URL for a GET call, or in the raw body of the request for POST. The usual 8,000 character limit on GET URLs applies, so use POST for larger texts.</p> 
+       <p>This API uses the <a href="https://github.com/mojombo/chronic/">Chronic Ruby gem</a> to convert the strings it finds into times.</p> 
+       <a name="text2sentiment"></a> 
+       <h4>Text to Sentiment</h4> 
+       <p>Tries to guess whether the text represents a roughly positive or negative comment, and returns a score between -5 and 5. The lowest score indicates that there were words associated with unhappiness or dissatisfaction, a score of zero either means that no charged words were found, or that the positive and negative words balanced themselves out, and a high score shows that there were one or more 'good' words that occur in pleased, happy comments.</p> 
+       <p>For example, "Great trip. Thanks for the warm welcome, Dallas and Fort Worth" gets a score of +2 because "great" has a weight of +3, and "warm" gives +1, so the average is +2.</p> 
+       <p>It's using a very simple algorithm, based around <a href="http://neuro.imm.dtu.dk/wiki/AFINN">Finn Årup's annotated list of words</a> originally designed for analyzing the sentiment of Twitter messages. If you're diving deep into sentiment analysis, it's likely that you'll want to build your own algorithm trained for your particular domain, but Finn's list has proved very effective for everyday use.</p> 
+       <hr> 
+       <p><code>curl -d "I hate this hotel" "http://www.datasciencetoolkit.org/text2sentiment"</code></p> 
+       <p><code>{"score": -3.0},</code></p> 
+       <hr> 
+       <p>The text is passed in either as a JSON-encoded array in the remainder of the URL for a GET call, or in the raw body of the request for POST. The usual 8,000 character limit on GET URLs applies, so use POST for larger texts.</p> 
+       <p>This API uses <a href="http://neuro.imm.dtu.dk/wiki/AFINN">Finn Årup's annotated list of words</a> under an <a href="http://www.opendatacommons.org/licenses/odbl/1.0/">ODbL license</a>.</p> 
+       <a name="coordinates2statistics"></a> 
+       <h4>Coordinates to Statistics</h4> 
+       <p>Returns characteristics like population density, elevation, climate, ethnic makeup, and other statistics for points all around the world at a 1km-squared or finer resolution.</p> 
+       <p>By default it will return all of the statistics it can find for a given point, but you can narrow down the results by passing in a comma-separated list of the ones you want in the statistics URL parameter.</p> 
+       <p>There are more statistics available for the US than other areas, and their names are prefixed by us_. There's a full list of all the statistics and their sources below.</p> 
+       <p>The API takes either a single string representing a comma-separated pair of latitude/longitude coordinates, or a JSON-encoded array of objects containing two keys, one for latitude and one for longitude. It returns a JSON array containing an object for every input location. The location member holds the coordinates that were queried, and statistics holds a dictionary of all the information that was found. The value property holds the value of the statistic at that point, and the source<em>name, description, and units properties describe it in more detail. If it's a proportion, the proportion</em>of property tells you what other statistic it's a fraction of. Here's an example:</p> 
+       <hr> 
+       <p><code>curl "http://www.datasciencetoolkit.org/coordinates2statistics/37.769456%2c-122.429128?statistics=population_density"</code></p> 
+       <p><code>[{"location": {"latitude": 37.769456, "longitude": -122.429128},"statistics": {</code></p> 
+       <p><code>"population_density": {</code></p> 
+       <p><code> "description": "The number of inhabitants per square kilometer around this point.",</code></p> 
+       <p><code> "value": 13543,</code></p> 
+       <p><code> "source_name": "NASA Socioeconomic Data and Applications Center (SEDAC) – Hosted by CIESIN at Columbia University"</code></p> 
+       <p><code>}}}]</code></p> 
+       <p>To call the API, you can make either a GET or a POST request to <code>/coordinates2politics</code>. If you make a GET request, then you need to pass in the locations in the suffix of the URL, as above.</p> 
+       <p>Using GET you can also pass in a callback parameter in the URL, making it possible to run this as a JSONP cross-domain request. You can see this method in action if you view source on the home page of this server.</p> 
+       <p>You can also make a POST request passing in the locations in the body of the request. This is useful if you have very large arrays of locations you need to process, since you won't hit any URL size limits.</p> 
+       <p>Here are the possible statistics:</p> 
+       <p> </p>
+       <ul> 
+        <li> <b> elevation </b> - The height of the surface above sea level at this point. From the <a href="http://srtm.csi.cgiar.org/"> NASA and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> land_cover </b> - What type of environment exists around this point - urban, water, vegetation, mountains, etc. From the <a href="http://bioval.jrc.ec.europa.eu/products/glc2000/products.php"> European Commission Land Resource Management Unit Global Land Cover 2000 </a> . </li> 
+        <li> <b> mean_temperature </b> - The mean monthly temperature at this point. From the <a href="http://worldclim.org/"> WorldClim </a> . </li> 
+        <li> <b> population_density </b> - The number of inhabitants per square kilometer around this point. From the <a href="http://sedac.ciesin.columbia.edu/data/set/gpw-v3-population-density"> NASA Socioeconomic Data and Applications Center (SEDAC) – Hosted by CIESIN at Columbia University </a> . </li> 
+        <li> <b> precipitation </b> - The monthly average total precipitation at this point. From the <a href="http://worldclim.org/"> WorldClim </a> . </li> 
+        <li> <b> us_households </b> - The number of households in this area. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_households_linguistically_isolated </b> - The proportion of households in which no one aged 14 or older speaks English very well From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_households_single_mothers </b> - The proportion of households with a female householder, no husband, and one or more children under eighteen. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_housing_units </b> - The total number of housing units in this area From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_housing_units_1950_to_1969 </b> - The proportion of housing units built between 1950 and 1969. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_housing_units_1970_to_1989 </b> - The proportion of housing units built between 1970 and 1989. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_housing_units_after_1990 </b> - The proportion of housing units built after 1990. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_housing_units_before_1950 </b> - The proportion of housing units built before 1950. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_housing_units_no_vehicle </b> - The proportion of occupied housing units with no vehicle available. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_housing_units_occupied </b> - The proportion of housing units that are occupied. From the <a href=""> </a> . </li> 
+        <li> <b> us_housing_units_one_person </b> - The proportion of housing units containing only one person From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_housing_units_owner_occupied </b> - The proportion of housing units that are occupied by their owners. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_housing_units_vacation </b> - The number of vacant housing units that are used for seasonal, recreational, or occasional use. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population </b> - The number of residents in this area From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_asian </b> - The proportion of residents identifying as Asian. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_bachelors_degree </b> - The proportion of residents whose maximum educational attainment was a bachelor's degree. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_black_or_african_american </b> - The proportion of residents identifying as black or African American. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_black_or_african_american_not_hispanic </b> - The proportion of residents who didn't identify as hispanic or latino, just black or African American alone From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_eighteen_to_twenty_four_years_old </b> - The proportion of residents aged eighteen to twenty four years old. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_five_to_seventeen_years_old </b> - The proportion of residents aged five to seventeen years old. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_foreign_born </b> - The proportion of residents who were born in a different country. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_hispanic_or_latino </b> - The proportion of residents who identify themselves as hispanic or latino. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_low_income </b> - The proportion of residents who earn less than twice the poverty level From the <a href=""> </a> . </li> 
+        <li> <b> us_population_native_hawaiian_and_other_pacific_islander </b> - The proportion of residents who identify as Native Hawaiian or other Pacific islander. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_one_to_four_years_olds </b> - The proportion of residents aged one to four years old. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_over_seventy_nine_years_old </b> - The proportion of residents over seventy nine years old. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_poverty </b> - The proportion of residents whose income is below the poverty level From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_severe_poverty </b> - The proportion of residents whose income is below half the poverty level. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_sixty_five_to_seventy_nine_years_old </b> - The proportion of residents aged sixty five to seventy nine years old. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_twenty_five_to_sixty_four_years_old </b> - The proportion of residents aged twenty five to sixty four years old. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_under_one_year_old </b> - The proportion of residents under one year of age. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_white </b> - The proportion of residents who identify themselves as white. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_population_white_not_hispanic </b> - The proportion of residents who didn't identify as hispanic or latino, just white alone From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+        <li> <b> us_sample_area </b> - The total area of the grid cell US Census samples were calculated on. From the <a href="http://sedac.ciesin.columbia.edu/data/collection/usgrid/sets/browse"> US Census and the CGIAR Consortium for Spatial Information </a> . </li> 
+       </ul> 
+       <br> 
+       <p></p> 
+       <a name="twofishes"></a> 
+       <h4>TwoFishes Geocoder</h4> 
+       <p>The open-source city-level <a href="http://www.twofishes.net/">TwoFishes geocoder</a> written by <a href="http://twitter.com/blackmad">David Blackman</a> at Foursquare is included in this package. It's used as part of the <a href="#googlestylegeocoder">Google-style geocoder</a> for non-street addresses, but you can access more advanced features through the <code>/twofishes</code> endpoint. The full API is documented at <a href="http://www.twofishes.net">twofishes.net</a>, and all methods should work as described, but with <code>/twofishes</code> added to the start of the URL. Here's a simple example, demonstrating how the geocoder recognizes native-language cities worldwide and can separate out non-geographic terms:</p> 
+       <p><code>curl "http://www.datasciencetoolkit.org/twofishes?query=pizza+%D8%A7%D9%84%D9%82%D8%A7%D9%87%D8%B1%D8%A9"</code></p> 
+       <p><code>{"interpretations":[{"what":"pizza","where":"???????",</code></p> 
+       <p><code> "feature":{"cc":"EG","geometry":{"center":{"lat":30.06263,"lng":31.24967},</code></p> 
+       <p><code> "bounds":{"ne":{"lat":30.1480960846,"lng":31.3563537598},</code></p> 
+       <p><code> "sw":{"lat":29.9635601044,"lng":31.1625480652}}},</code></p> 
+       <p><code> "name":"Cairo","displayName":"Cairo, EG","woeType":7,</code></p> 
+       <p><code> "ids":[{"source":"geonameid","id":"360630"}],</code></p> 
+       <p><code> "names":[{"name":"Cairo","lang":"en","flags":[16,1]},</code></p> 
+       <p><code> {"name":"Cairo","lang":"en","flags":[16]}],"highlightedName":"&lt;b&gt;???????&lt;/b&gt;, EG",</code></p> 
+       <p><code> "matchedName":"???????, EG","id":"geonameid:360630","attributes":{</code></p> 
+       <p><code> "adm0cap":1,"scalerank":0,"labelrank":3,"natscale":600,"population":7734614},</code></p> 
+       <p><code> "longId":"72057594038288566"},"scores":{}}]}</code></p> 
+       <a name="setup"></a> 
+       <h3>Setting up your own server</h3> 
+       <p>You can get started using the "http://www.datasciencetoolkit.org/" server, but for intensive use or to run behind a firewall, you'll probably want to create your own machine.</p> 
+       <a name="amazon"></a> 
+       <p>The simplest way to create a server is to grab a virtual machine. This whole server is available ready-to-go as either a Vagrant VM or Amazon EC2 Image.</p> 
+       <p>For Amazon, find the AMI with the id <code>ami-18c99b70</code> if you're on US-East-1 (<a href="https://sites.google.com/site/planetblix/cloud-technologies/amazon-aws">see here for the details of tracking down an image</a>). Here are the AMI IDs for the other regions:</p> 
+       <ul> 
+        <li> US-West (Oregon) : ami-771e3f47 </li> 
+        <li> US-West (N. California) : ami-e70feaa3 </li> 
+        <li> EU (Ireland) : ami-2be4725c </li> 
+        <li> EU (Frankfurt) : ami-d00c3ecd </li> 
+        <li> Asia Pacific (Singapore) : ami-e24473b0 </li> 
+        <li> Asia Pacific (Tokyo) : ami-5bc62b5b </li> 
+        <li> Asia Pacific (Sydney) : ami-21f3851b </li> 
+        <li> South America (Sao Paulo) : ami-cb0bb5d6 </li> 
+       </ul> 
+       <p>Start a new instance from the chosen image (for example with <code>ec2-run-instances ami-18c99b70 -t m1.large -z us-east-1d</code>), wait a couple of minutes for the machine to boot up, and then paste the public DNS name of the instance into your browser. You should see the normal home page of this site. You can test that it's working by pasting text into the main input. You can then just change your code base URL to that DNS name, and start using the API from your own server immediately. If you don't, check to make sure that your security group rules allow you to access port 80.</p> 
+       <a name="vagrant"></a> 
+       <p><a href="http://www.vagrantup.com/">Vagrant</a> is a free and easy way to run VMs on your local machine. Once you've <a href="http://docs.vagrantup.com/v1/docs/getting-started/index.html">set up the base software</a>, you can run</p> 
+       <p><code>vagrant box add dstk http://static.datasciencetoolkit.org/dstk_0.50.box</code></p> 
+       <p>to download the DSTK image. The VM is almost 20GB, because of the large amount of geographical data included locally, so you'll need a good connection. You may want to try <a href="http://static.datasciencetoolkit.org/dstk_0.50.torrent">this BitTorrent</a> if the standard HTTP download is too slow. Once you have the image, create a new directory and run</p> 
+       <p><code>vagrant init</code></p> 
+       <p><code>vagrant up</code></p> 
+       <p>and you should have a local copy of the toolkit accessible at http://localhost:8080. <code>vagrant ssh</code> will give you shell access, or the username and password are both 'vagrant' if you need to log in through VirtualBox's GUI.</p> 
+       <p>If you want to roll your own server from source on an in-house machine, or on another hosting provider, docs/ec2setup.txt in the <a href="http://github.com/petewarden/dstk">github repository</a> contains instructions on the exact steps I took to create that image starting from a clean Ubuntu 12.04 installation. You can also download <a href="http://static.datasciencetoolkit.org/dstk_0.50.ova">a VMware-compatible .ova image</a>. 
+        <add md5></add></p> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div id="footer"> 
+    <a href="http://github.com/petewarden/dstk">Source Code</a> | 
+    <a href="/developerdocs">Documentation</a> | 
+    <a href="/about">About</a> 
+   </div> 
+   <div class="footer_byline"></div> 
+  </div> 
+  <script type="text/javascript">
+      //<![CDATA[
+        (function ($) {
+            $.fn.staticfade = function(elements, settings) {
+        
+                this.__constructor = function(elements, settings) {
+        
+                    var defaults = {
+                        fadeTime: 500,
+                        holdTime: 3000
+                    };
+             
+                    if (settings) 
+                        settings = $.extend(defaults, settings);
+                    else
+                        settings = defaults;
+        
+                    this.settings = settings;
+        
+                    this.animationFunctions = [];
+                    
+                    var self = this;
+                    this.each(function() {
+                    
+                        $(this).empty();
+        
+                        for (var index in elements) {
+                            var element = elements[index];
+                                                
+                            var isLast = (index==(elements.length-1));
+                            var nextIndex;
+                            if (isLast) {
+                                nextIndex = 0;
+                            } else {
+                                nextIndex = ((Number)(index)+1);
+                            }
+        
+                            self.animationFunctions[index] = function() {
+                                var myElement = element;
+                                var mySelf = self;
+                                var myNextIndex = nextIndex;
+        
+                                return function() {
+        
+                                    myElement
+                                    .stop()
+                                    .css({display:'block'})
+                                    .animate({opacity:1.0 }, mySelf.settings.fadeTime )
+                                    .animate({opacity:1.0}, mySelf.settings.holdTime)
+                                    .animate({opacity:0.0 }, mySelf.settings.fadeTime, 'swing', function() {
+                                        mySelf.animationFunctions[myNextIndex]();
+                                    })
+                                    .animate({opacity:0.0}, 0, 'swing', function() { myElement.css({display:'none'}); });
+                                };
+                            }();
+                        }
+                        
+                        var isFirst = true;
+                        for (index in elements) {
+                            var element = elements[index];
+                            
+                            if (isFirst) {
+                                element.css({
+                                    opacity: 1.0
+                                });
+                            } else {
+                                element.css({
+                                    opacity: 0.0,
+                                    display: 'none'
+                                });
+                            }
+                            
+                            $(this).append(element);
+                            
+                            isFirst = false;
+                        }
+                        
+                        self.animationFunctions[0]();
+                    });
+                    
+                };
+        
+                this.__constructor(elements, settings);
+                
+                return this;
+            };
+        
+        }(jQuery));
+        
+        $(function() {
+          var bylineElements = [
+            $('<div>Using geocoding code from <a href="http://www.geoiq.com/">GeoIQ</a> and <a href="https://github.com/geocommons/geocoder">Schuyler Erle</a></div>'),
+            $('<div>Incorporates the city-level <a href="http://www.twofishes.net/">TwoFishes geocoder</a> written by <a href="http://twitter.com/blackmad">David Blackman</a> at Foursquare.</div>'),
+            $('<div>Country boundaries by <a href="http://thematicmapping.org/">Thematic Mapping</a></div>'),
+            $('<div>Contains Ordnance Survey data <a href="http://www.ordnancesurvey.co.uk/oswebsite/opendata/licence/index.html">© Crown copyright and database right 2010</a></div>'),
+            $('<div>Irish boundaries by <a href="http://www.tallyroom.com.au/maps">Ben Raue</a></div>'),
+            $('<div>New Zealand boundaries from <a href="http://www.stats.govt.nz/">Statistics NZ</a>, converted using <a href="http://www.koordinates.com">Koordinates</a></div>'),
+            $('<div>Worldwide states and provinces from <a href="http://naturalearthdata.com">Natural Earth</a></div>'),
+            $('<div>US neighborhood boundaries provided by <a href="http://www.zillow.com/howto/api/neighborhood-boundaries.htm">Zillow</a></div>'),
+            $('<div>This product includes GeoLite data created by MaxMind, available from <a href="http://www.maxmind.com/">http://www.maxmind.com/</a></div>'),
+            $('<div>Uses the <a href="http://code.google.com/p/ocropus/">Ocropus project</a> for OCR on images</div>'),
+            $('<div>Uses <a href="http://wagner.pp.ru/~vitus/software/catdoc/">catdoc</a> for parsing Word and Excel documents</div>'),
+            $('<div>Uses the <a href="http://hpricot.com/">hpricot</a> library for parsing HTML</div>'),
+            $('<div>Using the <a href="http://code.google.com/p/boilerpipe/">Boilerpipe</a> text-processing library</div>'),
+            $('<div>Using code adapted from the <a href="http://search.cpan.org/~edaly/Text-GenderFromName-0.32/GenderFromName.pm">GenderFromName</a> Perl module</div>'),
+            $('<div>Uses region and postal code data from <a href="http://www.geonames.org/">GeoNames</a></div>'),
+            $('<div>Uses street and place data from <a href="http://www.openstreetmap.org/">OpenStreetMap</a></div>'),
+            $('<div>Uses sentiment-annotated word list from <a href="http://neuro.imm.dtu.dk/wiki/AFINN">Finn Årup</a></div>')
+          ];
+          $('.footer_byline').staticfade(bylineElements,
+            {
+              fadeTime: 1000,
+              holdTime: 5000
+            }
+          );
+          $('.header_byline').staticfade(bylineElements,
+            {
+              fadeTime: 1000,
+              holdTime: 5000
+            }
+          );
+        });
+      //]]>
+    </script>   
+ </body>
+</html>

@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"> 
+  <title>
+ How to use World Weather Online historical API with Node.js - World Weather Online Blog | 
+ World Weather Online Blog </title> 
+  <meta name="generator" content="Magazine3 Framework"> 
+  <link rel="profile" href="https://gmpg.org/xfn/11"> 
+  <link rel="pingback" href="https://www.worldweatheronline.com/blog/xmlrpc.php"> 
+  <!--[if lt IE 9]>
+<script src="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/themes/mediablog-single-pro/js/html5.js" type="text/javascript"></script>
+<![endif]--> 
+  <!-- OpenGraph Facebook Start --> 
+  <!-- OpenGraph Facebook Start --> 
+  <meta property="og:title" content="How to use World Weather Online historical API with Node.js"> 
+  <meta property="og:description" content="We're going to guide you through making a simple node.js application that will check what the weather was like on Christmas Day in New York each year since 2008. Did you know our historical API provid...">
+  <meta property="og:image" content="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/uploads/2015/02/historical-api-with-nodejs-150x150.png"> 
+  <!-- OpenGraph Facebook Ends --> 
+  <!-- Google Fonts --> 
+  <!-- Google Fonts --> 
+  <!-- Google Fonts --> 
+  <!-- Google Fonts --> 
+  <!-- Google Fonts --> 
+  <!-- Google Fonts --> 
+  <!-- Google Fonts --> 
+  <!-- Google Fonts --> 
+  <style>
+.single-wrapper .entry-content p, .single-wrapper .entry-content  {font-size: px !important; }
+ .entry-content h1 {font-family: Arial,Helvetica,sans-serif ;font-size: 26px !important; color:  #000 ;}
+ .entry-content h2 {font-family:  Arial,Helvetica,sans-serif ;font-size: 20px !important; color:  #000 ;}
+ .entry-content h3 {font-family:  Arial,Helvetica,sans-serif ;font-size: 15px !important; color:  #000 ;}
+ .entry-content h4 {font-family:  Arial,Helvetica,sans-serif ;font-size: 13px !important; color:  #000 ;}
+ .entry-content h5 {font-family:  Arial,Helvetica,sans-serif ;font-size: 12px !important; color:  #000 ;}
+ .entry-content h6 {font-family:  Arial,Helvetica,sans-serif ;font-size: 10px !important; color:  #000 ;}
+
+ 
+  
+
+.entry-content a {
+ color: #FF5400 !important;
+text-decoration : none;
+}  </style> 
+  <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css"> 
+  <link href="https://fonts.googleapis.com/css?family=Droid+Serif:400,400italic,700,700italic" rel="stylesheet" type="text/css"> 
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,700italic" rel="stylesheet" type="text/css"> 
+  <link href="https://fonts.googleapis.com/css?family=Merriweather:400,700" rel="stylesheet" type="text/css"> 
+  <!-- This site is optimized with the Yoast SEO plugin v5.5.1 - https://yoast.com/wordpress/plugins/seo/ --> 
+  <meta name="description" content="Does your website require past weather? Here's a guide of how to use World Weather Online's historical API with Node.js"> 
+  <meta name="robots" content="noindex,follow"> 
+  <link rel="canonical" href="https://www.worldweatheronline.com/blog/2015/02/27/using-world-weather-online-historical-api-node-js/"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="How to use World Weather Online historical API with Node.js - World Weather Online Blog"> 
+  <meta property="og:description" content="Does your website require past weather? Here's a guide of how to use World Weather Online's historical API with Node.js"> 
+  <meta property="og:url" content="https://www.worldweatheronline.com/blog/2015/02/27/using-world-weather-online-historical-api-node-js/"> 
+  <meta property="og:site_name" content="World Weather Online Blog"> 
+  <meta property="article:publisher" content="https://facebook.com/worldweatheronline"> 
+  <meta property="article:tag" content="api"> 
+  <meta property="article:tag" content="API guide"> 
+  <meta property="article:tag" content="free API"> 
+  <meta property="article:tag" content="Node.JS"> 
+  <meta property="article:tag" content="premium API"> 
+  <meta property="article:tag" content="Weather API"> 
+  <meta property="article:section" content="Past Weather"> 
+  <meta property="article:published_time" content="2015-02-27T14:20:24+00:00"> 
+  <meta property="article:modified_time" content="2015-03-03T08:48:23+00:00"> 
+  <meta property="og:updated_time" content="2015-03-03T08:48:23+00:00"> 
+  <meta property="og:image" content="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/uploads/2015/02/historical-api-with-nodejs.png"> 
+  <meta property="og:image:secure_url" content="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/uploads/2015/02/historical-api-with-nodejs.png"> 
+  <meta property="og:image:width" content="1466"> 
+  <meta property="og:image:height" content="353"> 
+  <meta name="twitter:card" content="summary_large_image"> 
+  <meta name="twitter:description" content="Does your website require past weather? Here's a guide of how to use World Weather Online's historical API with Node.js"> 
+  <meta name="twitter:title" content="How to use World Weather Online historical API with Node.js - World Weather Online Blog"> 
+  <meta name="twitter:site" content="@worldweatheronl"> 
+  <meta name="twitter:image" content="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/uploads/2015/02/historical-api-with-nodejs.png"> 
+  <meta name="twitter:creator" content="@worldweatheronl"> 
+  <script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"WebSite","@id":"#website","url":"https:\/\/masterwwo.wpengine.com\/","name":"World Weather Online Blog","potentialAction":{"@type":"SearchAction","target":"https:\/\/masterwwo.wpengine.com\/?s={search_term_string}","query-input":"required name=search_term_string"}}</script> 
+  <!-- / Yoast SEO plugin. --> 
+  <link rel="dns-prefetch" href="//fonts.googleapis.com"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="World Weather Online Blog » Feed" href="https://www.worldweatheronline.com/blog/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="World Weather Online Blog » Comments Feed" href="https://www.worldweatheronline.com/blog/comments/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="World Weather Online Blog » How to use World Weather Online historical API with Node.js Comments Feed" href="https://www.worldweatheronline.com/blog/2015/02/27/using-world-weather-online-historical-api-node-js/feed/"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/masterwwo.wpengine.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.8.2"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,56826,8203,55356,56819),0,0),c=j.toDataURL(),b!==c&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55358,56794,8205,9794,65039),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55358,56794,8203,9794,65039),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <style type="text/css">
+				</style> 
+  <link rel="stylesheet" id="apixu-weather-css" href="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/plugins/apixu-weather-widget/apixu-weather.css?ver=4.8.2" type="text/css" media="all"> 
+  <style id="apixu-weather-inline-css" type="text/css">
+.apixu-weather-wrap { font-family: 'Open Sans', sans-serif;  font-weight: 300; font-size: 16px; line-height: 14px; } 
+</style> 
+  <link rel="stylesheet" id="opensans-googlefont-css" href="https://fonts.googleapis.com/css?family=Open+Sans%3A400%2C300&amp;ver=4.8.2" type="text/css" media="all"> 
+  <link rel="stylesheet" id="style-css" href="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/themes/mediablog-single-pro/style.css?ver=4.8.2" type="text/css" media="all"> 
+  <link rel="stylesheet" id="smc-widget-style-css" href="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/plugins/social-media-icons/styles/smc_front.css?ver=1.2.5" type="text/css" media="all"> 
+  <link rel="stylesheet" id="wp-paginate-css" href="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/plugins/wp-paginate/css/wp-paginate.css?ver=2.0.3" type="text/css" media="screen"> 
+  <script type="text/javascript" src="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-includes/js/jquery/jquery.js?ver=1.12.4"></script> 
+  <script type="text/javascript" src="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1"></script> 
+  <script type="text/javascript" src="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/themes/mediablog-single-pro/js/jquery.flexslider-min.js?ver=4.8.2"></script> 
+  <script type="text/javascript" src="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/themes/mediablog-single-pro/js/js.js?ver=4.8.2"></script> 
+  <script type="text/javascript" src="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/themes/mediablog-single-pro/js/ddsmoothmenu1.js?ver=4.8.2"></script> 
+  <script type="text/javascript" src="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/themes/mediablog-single-pro/js/jmm.js?ver=4.8.2"></script> 
+  <link rel="https://api.w.org/" href="https://www.worldweatheronline.com/blog/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://www.worldweatheronline.com/blog/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-includes/wlwmanifest.xml"> 
+  <link rel="shortlink" href="https://www.worldweatheronline.com/blog/?p=1430"> 
+  <link rel="alternate" type="application/json+oembed" href="https://www.worldweatheronline.com/blog/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fmasterwwo.wpengine.com%2F2015%2F02%2F27%2Fusing-world-weather-online-historical-api-node-js%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="https://www.worldweatheronline.com/blog/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fmasterwwo.wpengine.com%2F2015%2F02%2F27%2Fusing-world-weather-online-historical-api-node-js%2F&amp;format=xml"> 
+  <link rel="shortcut icon" href="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/uploads/2013/12/favicon.ico"> 
+  <link rel="stylesheet" href="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/themes/mediablog-single-pro/responsive.css" type="text/css" media="screen"> 
+ </head> 
+ <body data-rsssl="1" class="post-template-default single single-post postid-1430 single-format-standard"> 
+  <div class="top1">
+   <a name="top"></a>
+  </div> 
+  <div id="headerwrapper"> 
+   <header id="masthead" role="banner"> 
+    <div class="site-header"> 
+     <div class="logo-wrapper"> 
+      <div class="logo-holder"> 
+       <div class="logo">
+        <a href="https://www.worldweatheronline.com/blog"><img src="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/uploads/2013/12/logo1.png" alt=""> </a> 
+       </div> 
+      </div> 
+      <div class="social-wrapper"> 
+       <div class="social-holder"> 
+        <ul class="social-networks"> 
+         <li><a href="https://www.facebook.com/worldweatheronline" class="facebook">facebook</a></li> 
+         <li><a href="https://plus.google.com/106567872334142691169/posts" class="google">google</a></li> 
+         <li><a href="/feed/" class="rss">rss</a></li> 
+         <li><a href="https://twitter.com/worldweatheronl" class="twitter">twitter</a></li> 
+        </ul> 
+        <div class="social-text">
+         Lets Get Social:
+        </div> 
+       </div> 
+       <!-- social-holder ends --> 
+       <div id="top-search" class="social-holder headsearch"> 
+        <form method="get" class="searchform" action="https://www.worldweatheronline.com/blog/"> 
+         <label for="s" class="assistive-text"></label> 
+         <input type="text" class="field s" name="s" placeholder=""> 
+         <input type="submit" class="submit searchsubmit" name="submit" value=""> 
+        </form> 
+       </div> 
+       <div class="cb"></div> 
+      </div> 
+      <div class="cb"></div> 
+     </div> 
+    </div> 
+   </header> 
+   <div id="main-menu-wrapper"> 
+    <div id="main-menu"> 
+     <nav> 
+      <nav id="mobile-menu" role="navigation"></nav> 
+      <div id="menu-22" class="ddsmoothmenu">
+       <ul id="menu-home" class="menu">
+        <li id="menu-item-15" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-15"><a href="https://www.worldweatheronline.com/blog">Blog Home</a></li> 
+        <li id="menu-item-46" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-46"><a href="https://www.worldweatheronline.com">Weather</a></li> 
+        <li id="menu-item-841" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-841"><a href="https://developer.worldweatheronline.com/">Weather API</a></li> 
+        <li id="menu-item-1168" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1168"><a href="https://www.worldweatheronline.com/holiday-weather.aspx">Holiday Weather</a></li> 
+        <li id="menu-item-1169" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1169"><a href="https://www.worldweatheronline.com/map-search.aspx">Interactive Map</a></li> 
+        <li id="menu-item-843" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-843"><a href="https://www.worldweatheronline.com/contact.aspx">Contact Us</a></li> 
+       </ul>
+      </div> 
+     </nav> 
+    </div> 
+   </div> 
+  </div> 
+  <div id="wrapper"> 
+   <!-- main --> 
+   <section id="main"> 
+    <div id="content-wrapper" class="site-content"> 
+     <h1 class="entry-title single-entry-title"> How to use World Weather Online historical API with Node.js</h1> 
+     <div class="content-holder"> 
+      <div class="primary"> 
+       <div id="content" role="main" class="single-wrapper"> 
+        <div class="single-post-meta">
+         <div class="home-post-meta">
+           By admin - On Feb 27th 2015 - in 
+          <b><a href="https://www.worldweatheronline.com/blog/category/past-weather/">Past Weather</a> <a href="https://www.worldweatheronline.com/blog/category/seo-2/">SEO</a> <a href="https://www.worldweatheronline.com/blog/category/weather-2/">Weather</a> <a href="https://www.worldweatheronline.com/blog/category/weather-api/">Weather API</a> <a href="https://www.worldweatheronline.com/blog/category/website/">Website</a></b> 
+          <span class="comment"> <a href="https://www.worldweatheronline.com/blog/2015/02/27/using-world-weather-online-historical-api-node-js/#comments">1 Comment</a> / 
+           <div class="counter">
+            4514
+           </div></span>
+         </div> 
+        </div> 
+        <!-- .entry-header --> 
+        <section> 
+         <div id="single-heading-content"> 
+          <div class="single-right-big"> 
+           <article id="post-1430" class="post-1430 post type-post status-publish format-standard has-post-thumbnail hentry category-past-weather category-seo-2 category-weather-2 category-weather-api category-website tag-api tag-api-guide tag-free-api tag-node-js tag-premium-api tag-weather-api"> 
+            <div class="entry-content"> 
+             <p>We’re going to guide you through making a simple <a href="http://nodejs.org/">node.js</a> application that will check what the weather was like on Christmas Day in New York each year since 2008.</p> 
+             <p>Did you know our <a href="http://www.worldweatheronline.com/api/historical-weather-api.aspx">historical API</a> provides data as far back as 1st July 2008. We’re using this example to see how often New York has a white Christmas!</p> 
+             <p><strong>Getting your API Key</strong></p> 
+             <p>If you’re new to using our online weather API, you should have a read through our previous guides on getting started.</p> 
+             <p>We have a <a href="https://www.worldweatheronline.com/blog/2015/02/05/getting-started-world-weather-online-api-php/">PHP</a> and a <a href="https://www.worldweatheronline.com/blog/2015/02/19/getting-started-world-weather-online-api-node-js/">Node.js</a> guide which also shows you how to get your hands on and use your API key. This API key can be used for all of our weather API’s.</p> 
+             <p><strong>Getting Started</strong></p> 
+             <p>Firstly, we’ll setup the basics of our node application, create our package.json file first:<br> Firstly, we’ll setup the basics of our node application, create our package.json file first:</p> 
+             <pre>{
+  "name": "wwo-historical-api-with-node",
+  "version": "1.0.0",
+  "description": "How often do New York get snow on christmas day",
+  "dependencies": {
+    "express": "4.2.x",
+    "request": "^2.53.0"
+  },
+  "private": true,
+  "license": "MIT"
+}
+</pre> 
+             <p>This tells node.js what packages/dependencies our application will need, we’ll be using the express and request node libraries. Now lets start adding some code, create a new app.js file:</p> 
+             <pre>// file: app.js
+var express = require('express');
+var app = express();
+var request = require('request');
+var apiKey = 'YOUR API KEY';
+
+app.get('/', function (req, res) {
+   console.log("Welcome to your node.js application");
+});
+
+var server = app.listen(3000, function () {
+    var host = server.address().address;
+    var port = server.address().port;
+    console.log('Your app listening at http://%s:%s', host, port);
+});
+</pre> 
+             <p>You can now run this application by running <code>node app.js</code> in a terminal window that’s in your project directory. It won’t do much at the minute, but we’ve got a good starting point.</p> 
+             <p><strong>Making requests to our API</strong></p> 
+             <p>The historic API works very similar to our Local weather API, except you can also provide a date (and even a range of dates) to get access to historical information.</p> 
+             <p>The main difference is the base URL in which we’ll make requests to. The below URLs are available for the historical API:</p> 
+             <h3>Base URL</h3> 
+             <p><b>Free API:</b><br> HTTP: <a href="http://api.worldweatheronline.com/free/v2/past-weather.ashx">http://api.worldweatheronline.com/free/v2/past-weather.ashx</a><br> HTTPS: <a href="https://api.worldweatheronline.com/free/v2/past-weather.ashx">https://api.worldweatheronline.com/free/v2/past-weather.ashx</a></p> 
+             <p><b>Premium API:</b><br> HTTP: <a href="http://api.worldweatheronline.com/premium/v1/past-weather.ashx">http://api.worldweatheronline.com/premium/v1/past-weather.ashx</a><br> HTTPS: <a href="https://api.worldweatheronline.com/premium/v1/past-weather.ashx">https://api.worldweatheronline.com/premium/v1/past-weather.ashx</a></p> 
+             <p>For our application, we want to pass a number of parameters to ensure that we get the correct response from our API, here’s what we need:</p> 
+             <p><strong>Date:</strong> We want to pass in the date for each Christmas day since 2008.<br> <strong>Search String:</strong> For our location we want information for New York.<br> <strong>Format:</strong> We want our information returned in JSON format.<br> <strong>API Key:</strong> Our API key for authorisation.</p> 
+             <p>So to get information for Christmas day in 2008 our URL would look like this:</p> 
+             <pre>https://api.worldweatheronline.com/premium/v1/past-weather.ashx?q=new+york&amp;tp=24&amp;format=json&amp;key=ourApiKey&amp;date=2008-12-25</pre> 
+             <p><strong>Retrieving and displaying API Data</strong></p> 
+             <p>Now lets update our app.get function; replace the console.log in the app.get function with the below:</p> 
+             <pre>var requestUrl = 'https://api.worldweatheronline.com/premium/v1/past-weather.ashx?q=new+york&amp;tp=24&amp;format=json&amp;key=' + apiKey;
+
+var years = [2008, 2009, 2010, 2011, 2012, 2013, 2014];
+var dateString = '-12-25';
+
+var results = [];
+
+years.forEach(function(year, index) {
+   var currentUrl = requestUrl + '&amp;date=' + year + dateString;
+
+   request(currentUrl, function (error, response, body) {
+        if (!error &amp;&amp; response.statusCode == 200) {
+            var result = JSON.parse(body);
+            results[index] = result.data.weather[0];
+        } else {
+            console.log(error, response);
+        }
+    });
+});
+</pre> 
+             <p>Here we’re setting a base API URL that stores the parts of the URL which won’t change for each year. As we’re querying a number of separate years, we need to make multiple requests to retrieve all of the information we require.</p> 
+             <p>In the next few lines we setup some variables to hold all the years which we want information for and to hold the results.</p> 
+             <p>We then repeat for each year we want information for, to build the date string for Christmas Day on each year and make the request to the API. We then store the results in the results array using the an index to keep them in the right order.</p> 
+             <p>Because of the way node.js handles these connections asynchronously, the requests can finish in a different order than they were made.</p> 
+             <p>Therefore we make sure we keep the results in order by using the year index but we also need to make sure all requests have finished before working with the data, but we’ll do this next in our app.get function</p> 
+             <pre>    var checkTimer = setInterval(function() {
+        if (results.length == years.length) {
+            console.log("we've got all of the results");
+            clearInterval(checkTimer);
+            displayResults(results);
+        } else {
+            console.log("Not finished yet, lets wait another 100ms");
+        }
+    }, 100);
+</pre> 
+             <p>Here we’re setting a 100ms timer to check the progress of the requests. We compare the length of the years array to the length of the results array and once they match we can then work on displaying this information.</p> 
+             <p>Lets display our results in a tabular format, our displayResults function goes below the above code in the app.get function:</p> 
+             <pre>    
+    var displayResults = function(results) {
+
+        // generate a HTML table
+        var html = '&lt;table style="font-size: 10px; font-family: Arial, Helvetica, sans-serif"&gt;';
+
+        // loop through each row
+        for (var i = 0; i &lt; 3; i++) {
+            html += "&lt;tr&gt;";
+
+            results.forEach(function(result) {
+                html += "&lt;td&gt;";
+                switch (i) {
+                    case 0:
+                        html += result.date;
+                        break;
+                    case 1:
+                        html += result.hourly[0].weatherDesc[0].value;
+                        break;
+                    case 2:
+                        var imgSrc = result.hourly[0].weatherIconUrl[0].value;
+                        html += '&lt;img src="'+ imgSrc + '" /&gt;';
+                        break;
+                }
+                html += "&lt;/td&gt;";
+            });
+            html += "&lt;/tr&gt;";
+        }
+
+        res.end(html);
+    };
+</pre> 
+             <p>This code just iterates over the results creating a HTML table to display the results. Once you have entered this you can run it again by running node app.js and you should see the following displayed</p> 
+             <p><a href="https://scriptableltd.files.wordpress.com/2015/02/screen-shot-2015-02-12-at-20-24-17.png"><img class="alignnone wp-image-34 size-full" src="https://scriptableltd.files.wordpress.com/2015/02/screen-shot-2015-02-12-at-20-24-17.png" alt="Christmas snow fall in New York" width="1466" height="353"></a></p> 
+             <p><strong>Summary</strong></p> 
+             <p>This shows us that New York has not had a white Christmas for at least the last 7 years, which is quite disappointing for traditionalists!</p> 
+             <p>However it does show how you can use our API to get historical data. You can play around with this, change the location to your home location and see the results.</p> 
+             <p>The full code for this guide has been posted on <a href="http://jsfiddle.net/7ahj920y/">JsFiddle</a> for your reference.</p> 
+             <p>This isjust a quick starter guide to give you ideas how can use our API in your own applications. Keep checking back for more useful guides!</p> 
+             <p><strong>If you have any more questions concerning our API, visit <a href="http://stackoverflow.com/">StackOverflow</a> and post a question where our team is always looking to help World Weather Online customers get up and running.</strong></p> 
+             <h2><strong>Other API Resources</strong></h2> 
+             <ul> 
+              <li><a title="Compare Free vs Premium API Access" href="http://www.worldweatheronline.com/api/compare.aspx" target="_blank">Compare Free vs Premium API Access</a></li> 
+              <li><a title="Purchase Weather Icon Packs" href="http://www.worldweatheronline.com/api/docs/weather-icons.aspx" target="_blank">Purchase Weather Icon Packs</a></li> 
+             </ul> 
+            </div>
+            <!-- .entry-content --> 
+           </article>
+           <!-- #post-1430 --> 
+          </div>
+          <!-- .single-right --> 
+          <div class="cb"></div> 
+         </div> 
+         <p>Tags: <a href="https://www.worldweatheronline.com/blog/tag/api/" rel="tag">api</a>, <a href="https://www.worldweatheronline.com/blog/tag/api-guide/" rel="tag">API guide</a>, <a href="https://www.worldweatheronline.com/blog/tag/free-api/" rel="tag">free API</a>, <a href="https://www.worldweatheronline.com/blog/tag/node-js/" rel="tag">Node.JS</a>, <a href="https://www.worldweatheronline.com/blog/tag/premium-api/" rel="tag">premium API</a>, <a href="https://www.worldweatheronline.com/blog/tag/weather-api/" rel="tag">Weather API</a></p> 
+         <div id="authorarea-wrap"> 
+          <div id="authorarea"> 
+           <div class="author-image">
+            <a href="https://www.worldweatheronline.com/blog/author/admin"><img alt="" src="https://secure.gravatar.com/avatar/e53eed5afbab30eb8c80b9563a80da50?s=54&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/e53eed5afbab30eb8c80b9563a80da50?s=108&amp;d=mm&amp;r=g 2x" class="avatar avatar-54 photo" height="54" width="54"></a>
+           </div> 
+           <div class="authorinfo"> 
+            <div class="author-name">
+             ABOUT THE AUTHOR: 
+             <a href="https://www.worldweatheronline.com/blog/author/admin/" title="Posts by admin" rel="author">admin</a> 
+            </div> 
+            <p></p> 
+           </div> 
+           <div class="cb"></div> 
+          </div> 
+         </div> 
+         <div class="single-pagi"> 
+          <div class="prev-nav">
+           &lt; Previous Article
+           <a href="https://www.worldweatheronline.com/blog/2015/02/19/getting-started-world-weather-online-api-node-js/"><br>Getting started with World Weather Online API &amp; Node.JS</a>
+          </div> 
+          <div class="next-nav">
+           Next Article &gt; 
+           <a href="https://www.worldweatheronline.com/blog/2015/03/06/weather-satellite-explodes-orbit/"><br>Weather satellite explodes during orbit</a>
+          </div> 
+          <div class="cb"></div> 
+         </div> 
+         <div class="cat-links-holder-single">
+          Related posts that might interest you 
+         </div> 
+         <div class="related"> 
+          <div class="relatedpost"> 
+           <h3><a href="https://www.worldweatheronline.com/blog/2017/06/16/places-visit-prague-within-24-hours/" rel="bookmark" title="Places to Visit: Prague within 24 Hours">Places to Visit: Prague within 24 Hours</a></h3> 
+          </div> 
+          <div class="relatedpost"> 
+           <h3><a href="https://www.worldweatheronline.com/blog/2017/06/12/beautiful-places-visit-montenegro/" rel="bookmark" title="The Most Beautiful Places to Visit in Montenegro">The Most Beautiful Places to Visit in Montenegro</a></h3> 
+          </div> 
+          <div class="relatedpost"> 
+           <h3><a href="https://www.worldweatheronline.com/blog/2017/06/08/greek-islands-rest/" rel="bookmark" title="Greek Islands: Where to Rest?">Greek Islands: Where to Rest?</a></h3> 
+          </div> 
+          <div class="relatedpost"> 
+           <h3><a href="https://www.worldweatheronline.com/blog/2017/05/03/stay-europe-interesting-hostels/" rel="bookmark" title="Where to Stay in Europe: the Most Interesting Hostels">Where to Stay in Europe: the Most Interesting Hostels</a></h3> 
+          </div> 
+          <div class="relatedpost"> 
+           <h3><a href="https://www.worldweatheronline.com/blog/2017/02/28/britains-7-best-beaches/" rel="bookmark" title="Britain’s 7 best beaches">Britain’s 7 best beaches</a></h3> 
+          </div> 
+         </div> 
+         <!-- You can start editing here. --> 
+         <h3 class="numberofcomments"><span><a href="https://www.worldweatheronline.com/blog/2015/02/27/using-world-weather-online-historical-api-node-js/#comments">1 Comment</a> on this article. Feel free to join this conversation.</span></h3> 
+         <div id="comments">
+          <div id="comments-content"> 
+           <ol class="commentlist"> 
+            <li class="comment even thread-even depth-1" id="comment-67502"> 
+             <div class="the-comment"> 
+              <img alt="" src="https://secure.gravatar.com/avatar/9714e72431a7da302b443cc62c639d04?s=60&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/9714e72431a7da302b443cc62c639d04?s=120&amp;d=mm&amp;r=g 2x" class="avatar avatar-60 photo" height="60" width="60"> 
+              <div class="comment-arrow"></div> 
+              <div class="comment-box"> 
+               <div class="comment-author"> 
+                <strong><a href="http://textycafe.com/impressum-facebook-what-is-impressum-on-facebook/" rel="external nofollow" class="url">Mels</a></strong> 
+                <small>September 10, 2015 at 2:32 am - <a rel="nofollow" class="comment-reply-login" href="https://www.worldweatheronline.com/blog/wp-login.php?redirect_to=https%3A%2F%2Fmasterwwo.wpengine.com%2F2015%2F02%2F27%2Fusing-world-weather-online-historical-api-node-js%2F">Log in to Reply</a></small> 
+               </div> 
+               <div class="comment-text"> 
+                <p>Thanks for the api tutorial. </p> 
+               </div> 
+              </div> 
+             </div> </li>
+            <!-- #comment-## --> 
+           </ol> 
+           <div class="comments-navigation"> 
+            <div class="alignleft"></div> 
+            <div class="alignright"></div> 
+           </div> 
+          </div>
+         </div> 
+         <div id="respond"> 
+          <h3>Leave A Response</h3> 
+          <div id="respond-content"> 
+           <p class="cancel-comment-reply"><a rel="nofollow" id="cancel-comment-reply-link" href="/2015/02/27/using-world-weather-online-historical-api-node-js/#respond" style="display:none;">Click here to cancel reply.</a></p> 
+           <p>You must be <a href="https://www.worldweatheronline.com/blog/wp-login.php?redirect_to=https%3A%2F%2Fmasterwwo.wpengine.com%2F2015%2F02%2F27%2Fusing-world-weather-online-historical-api-node-js%2F">logged in </a> to post a comment. </p> 
+          </div> 
+         </div>
+        </section> 
+       </div>
+       <!-- #content --> 
+      </div> 
+      <div class="secondary"> 
+       <div id="sidebar" class="sidebar-single"> 
+        <div class="sidebar-wrapper"> 
+         <div id="aside"> 
+          <div class="sidebar"> 
+           <aside id="tag_cloud-3" class="widget widget_tag_cloud">
+            <div class="widget-title">
+             Tags
+            </div>
+            <div class="tagcloud">
+             <a href="https://www.worldweatheronline.com/blog/tag/api/" class="tag-cloud-link tag-link-30 tag-link-position-1" style="font-size: 14.0576923077pt;" aria-label="api (19 items)">api</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/attractions/" class="tag-cloud-link tag-link-733 tag-link-position-2" style="font-size: 11.0961538462pt;" aria-label="attractions (11 items)">attractions</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/australia/" class="tag-cloud-link tag-link-675 tag-link-position-3" style="font-size: 9.34615384615pt;" aria-label="Australia (8 items)">Australia</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/beach/" class="tag-cloud-link tag-link-648 tag-link-position-4" style="font-size: 10.5576923077pt;" aria-label="Beach (10 items)">Beach</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/beautiful-places/" class="tag-cloud-link tag-link-1985 tag-link-position-5" style="font-size: 19.4423076923pt;" aria-label="beautiful places (49 items)">beautiful places</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/climate/" class="tag-cloud-link tag-link-167 tag-link-position-6" style="font-size: 13.5192307692pt;" aria-label="climate (17 items)">climate</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/climate-change/" class="tag-cloud-link tag-link-147 tag-link-position-7" style="font-size: 15.5384615385pt;" aria-label="climate change (25 items)">climate change</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/earthquake/" class="tag-cloud-link tag-link-679 tag-link-position-8" style="font-size: 10.5576923077pt;" aria-label="Earthquake (10 items)">Earthquake</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/environment/" class="tag-cloud-link tag-link-572 tag-link-position-9" style="font-size: 8.67307692308pt;" aria-label="environment (7 items)">environment</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/europe/" class="tag-cloud-link tag-link-611 tag-link-position-10" style="font-size: 14.3269230769pt;" aria-label="Europe (20 items)">Europe</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/extreme-weather/" class="tag-cloud-link tag-link-159 tag-link-position-11" style="font-size: 11.0961538462pt;" aria-label="extreme weather (11 items)">extreme weather</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/flood-2/" class="tag-cloud-link tag-link-42 tag-link-position-12" style="font-size: 15.8076923077pt;" aria-label="flood (26 items)">flood</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/global-warming/" class="tag-cloud-link tag-link-157 tag-link-position-13" style="font-size: 14.5961538462pt;" aria-label="global warming (21 items)">global warming</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/holiday/" class="tag-cloud-link tag-link-268 tag-link-position-14" style="font-size: 14.5961538462pt;" aria-label="holiday (21 items)">holiday</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/holiday-destinations/" class="tag-cloud-link tag-link-732 tag-link-position-15" style="font-size: 11.0961538462pt;" aria-label="Holiday destinations (11 items)">Holiday destinations</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/hurricane/" class="tag-cloud-link tag-link-665 tag-link-position-16" style="font-size: 13.7884615385pt;" aria-label="Hurricane (18 items)">Hurricane</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/india-2/" class="tag-cloud-link tag-link-86 tag-link-position-17" style="font-size: 10.0192307692pt;" aria-label="india (9 items)">india</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/island/" class="tag-cloud-link tag-link-2023 tag-link-position-18" style="font-size: 8pt;" aria-label="island (6 items)">island</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/italy/" class="tag-cloud-link tag-link-140 tag-link-position-19" style="font-size: 8.67307692308pt;" aria-label="Italy (7 items)">Italy</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/love-nature/" class="tag-cloud-link tag-link-1989 tag-link-position-20" style="font-size: 13.7884615385pt;" aria-label="love nature (18 items)">love nature</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/nature/" class="tag-cloud-link tag-link-595 tag-link-position-21" style="font-size: 15.8076923077pt;" aria-label="nature (26 items)">nature</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/ocean/" class="tag-cloud-link tag-link-363 tag-link-position-22" style="font-size: 9.34615384615pt;" aria-label="ocean (8 items)">ocean</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/places-in-the-world/" class="tag-cloud-link tag-link-1987 tag-link-position-23" style="font-size: 19.7115384615pt;" aria-label="places in the world (52 items)">places in the world</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/rain/" class="tag-cloud-link tag-link-89 tag-link-position-24" style="font-size: 10.5576923077pt;" aria-label="rain (10 items)">rain</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/renewable-energy/" class="tag-cloud-link tag-link-346 tag-link-position-25" style="font-size: 8.67307692308pt;" aria-label="Renewable energy (7 items)">Renewable energy</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/snow/" class="tag-cloud-link tag-link-137 tag-link-position-26" style="font-size: 9.34615384615pt;" aria-label="snow (8 items)">snow</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/spain/" class="tag-cloud-link tag-link-677 tag-link-position-27" style="font-size: 8.67307692308pt;" aria-label="Spain (7 items)">Spain</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/storm/" class="tag-cloud-link tag-link-59 tag-link-position-28" style="font-size: 13.1153846154pt;" aria-label="storm (16 items)">storm</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/summer/" class="tag-cloud-link tag-link-47 tag-link-position-29" style="font-size: 9.34615384615pt;" aria-label="summer (8 items)">summer</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/tourism/" class="tag-cloud-link tag-link-318 tag-link-position-30" style="font-size: 11.5pt;" aria-label="tourism (12 items)">tourism</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/tourist/" class="tag-cloud-link tag-link-266 tag-link-position-31" style="font-size: 14.5961538462pt;" aria-label="tourist (21 items)">tourist</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/travel/" class="tag-cloud-link tag-link-282 tag-link-position-32" style="font-size: 13.1153846154pt;" aria-label="travel (16 items)">travel</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/travel-destination/" class="tag-cloud-link tag-link-1444 tag-link-position-33" style="font-size: 11.0961538462pt;" aria-label="travel destination (11 items)">travel destination</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/traveler/" class="tag-cloud-link tag-link-292 tag-link-position-34" style="font-size: 10.0192307692pt;" aria-label="traveler (9 items)">traveler</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/travelling/" class="tag-cloud-link tag-link-1986 tag-link-position-35" style="font-size: 20.25pt;" aria-label="travelling (57 items)">travelling</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/uk/" class="tag-cloud-link tag-link-671 tag-link-position-36" style="font-size: 12.7115384615pt;" aria-label="UK (15 items)">UK</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/us/" class="tag-cloud-link tag-link-22 tag-link-position-37" style="font-size: 13.1153846154pt;" aria-label="us (16 items)">us</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/usa/" class="tag-cloud-link tag-link-667 tag-link-position-38" style="font-size: 12.4423076923pt;" aria-label="USA (14 items)">USA</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/vacation/" class="tag-cloud-link tag-link-277 tag-link-position-39" style="font-size: 14.8653846154pt;" aria-label="vacation (22 items)">vacation</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/weather/" class="tag-cloud-link tag-link-24 tag-link-position-40" style="font-size: 22pt;" aria-label="weather (77 items)">weather</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/weather-api/" class="tag-cloud-link tag-link-668 tag-link-position-41" style="font-size: 11.0961538462pt;" aria-label="Weather API (11 items)">Weather API</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/weather-forecast/" class="tag-cloud-link tag-link-799 tag-link-position-42" style="font-size: 11.0961538462pt;" aria-label="weather forecast (11 items)">weather forecast</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/website-2/" class="tag-cloud-link tag-link-16 tag-link-position-43" style="font-size: 9.34615384615pt;" aria-label="website (8 items)">website</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/winter/" class="tag-cloud-link tag-link-220 tag-link-position-44" style="font-size: 10.5576923077pt;" aria-label="winter (10 items)">winter</a> 
+             <a href="https://www.worldweatheronline.com/blog/tag/wonderful-place/" class="tag-cloud-link tag-link-1988 tag-link-position-45" style="font-size: 18.9038461538pt;" aria-label="wonderful place (45 items)">wonderful place</a>
+            </div> 
+           </aside> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+       <div class="cb"></div> 
+      </div> 
+      <div class="cb"></div> 
+     </div> 
+     <div id="sharebox"> 
+      <div class="wdt">
+       <a href="https://www.worldweatheronline.com/blog/2015/02/27/using-world-weather-online-historical-api-node-js/" class="twitter-share-button" data-count="vertical">Tweet</a>
+      </div> 
+      <div class="wdt">
+       <div id="fb-root"></div>
+       <fb:like href="https://www.worldweatheronline.com/blog/2015/02/27/using-world-weather-online-historical-api-node-js/" send="true" layout="box_count" show_faces="false" action="like" font=""></fb:like>
+      </div> 
+      <div class="wdt"> 
+       <!-- Place this tag where you want the +1 button to render --> 
+       <g:plusone size="tall"></g:plusone> 
+       <script type="text/javascript">   (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+      </div> 
+      <div class="wdt"> 
+       <a href="http://pinterest.com/pin/create/button/?url=https://www.worldweatheronline.com/blog/2015/02/27/using-world-weather-online-historical-api-node-js/&amp;media=https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-content/uploads/2015/02/historical-api-with-nodejs-150x150.png&amp;description=How to use World Weather Online historical API with Node.js" class="pin-it-button" count-layout="vertical">Pin It</a> 
+      </div> 
+      <div class="wdt">
+       <a class="addthis_counter"></a>
+      </div> 
+     </div> 
+    </div> 
+   </section>
+  </div> 
+  <!-- #wrapper --> 
+  <div id="footer"> 
+   <div class="footer2-holder"> 
+    <div class="footer2-wrapper"> 
+     <div class="footer2"> 
+      <div id="footerwrapper1" class="box-hold footerwrapper"> 
+       <div class="box footer1"> 
+        <div class="widget">
+         <h3>About Us</h3> 
+         <div class="textwidget">
+          <p>World Weather Online provides global weather forecast and weather content for websites, businesses and travel industry. We specialize in worldwide City and Town, Sailing, Hill and Mountain, Ski and Sports weather. Our weather forecast is trusted and used from SME’s to large corporate clients.</p> 
+          <p>Our <a href="https://developer.worldweatheronline.com/">Weather API</a> which allows developers and programmers to access 14 day weather forecast, historical weather, marine and ski weather content in XML, CSV, JSON, etc. format for any location via. City name, Postcode, Zipcode or by using Latitude and Longitude.</p> 
+         </div> 
+        </div> 
+        <div class="cb"></div> 
+       </div> 
+       <div class="box footer2"> 
+        <div class="cb"></div> 
+       </div> 
+       <div class="box footer3"> 
+        <div class="widget">
+         <h3>Search</h3>
+         <div class="search-form"> 
+          <form method="get" class="searchform" action="https://www.worldweatheronline.com/blog/"> 
+           <label for="s" class="assistive-text"></label> 
+           <input type="text" class="field s" name="s" placeholder=""> 
+           <input type="submit" class="submit searchsubmit" name="submit" value=""> 
+          </form> 
+         </div> 
+        </div> 
+        <div class="cb"></div> 
+       </div> 
+       <div class="box footer4"> 
+        <div class="cb"></div> 
+       </div> 
+       <div class="cb"></div> 
+      </div> 
+     </div> 
+    </div>
+    <!-- footer2-wrapper --> 
+   </div>
+   <!-- footer2-holder --> 
+   <div class="footer3-wrapper"> 
+    <div class="footer3"> 
+     <div id="fnav"> 
+     </div> 
+     <div id="bottomfooter"> 
+      <div class="site-footer">
+        © 2017 World Weather Online Blog. All Rights Reserved. | 
+       <a class="backtop" href="#top"> Back to top </a> 
+      </div> 
+      <!-- .site-footer .site-footer --> 
+      <div class="cb"> 
+      </div> 
+     </div>
+     <!-- #bottomfooter --> 
+    </div> 
+   </div>
+   <!-- footer3-wrapper --> 
+  </div>
+  <!-- #footer --> 
+  <script type="text/javascript" src="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-includes/js/comment-reply.min.js?ver=4.8.2"></script> 
+  <script type="text/javascript" src="https://50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com/wp-includes/js/wp-embed.min.js?ver=4.8.2"></script> 
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37693005-1', 'worldweatheronline.com');
+  ga('send', 'pageview');
+
+</script> 
+  <script type="text/javascript" src="https://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-502a37d77e789bc2"></script> 
+  <script type="text/javascript" src="https://assets.pinterest.com/js/pinit.js"></script>   
+  <script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script> 
+  <script type="text/javascript" src="https://assets.pinterest.com/js/pinit.js"></script> 
+  <script src="https://connect.facebook.net/en_US/all.js#xfbml=1"></script> 
+  <!-- Performance optimized by W3 Total Cache. Learn more: https://www.w3-edge.com/products/
+
+Object Caching 1582/2183 objects using disk
+Page Caching using disk: enhanced
+Content Delivery Network via 50f155634690663c2ca78ab1-zoomashltd.netdna-ssl.com
+
+ Served from: masterwwo.wpengine.com @ 2017-10-03 12:52:27 by W3 Total Cache -->
+ </body>
+</html>

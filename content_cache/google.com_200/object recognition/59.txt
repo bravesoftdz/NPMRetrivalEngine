@@ -1,0 +1,1049 @@
+<html>
+ <head>
+  <title>Node.js Server Source | Segment</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Segment">
+  <meta property="og:title" content="Node.js Source Documentation - Segment">
+  <meta property="og:url" content="https://segment.com/docs/sources/server/node/">
+  <meta property="og:image" content="https://segment.com/build/public/public/images/open-graph.png">
+  <meta name="viewport" content="width=1200">
+  <meta name="twitter:site" content="@segment">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="description" content="">
+  <meta property="og:description" content="">
+  <meta class="swiftype" name="section" data-type="enum" content="Docs">
+  <meta class="swiftype" name="title" data-type="string" content="Node.js Source">
+  <meta class="swiftype" name="priority" data-type="integer" content="2">
+  <link rel="icon" sizes="192x192" href="https://segment.com/build/public/public/images/touch-icon.png">
+  <link rel="apple-touch-icon" href="https://segment.com/build/public/public/images/touch-icon.png">
+  <link rel="mask-icon" href="https://segment.com/build/public/public/images/favicon-mask.svg" color="#49B882">
+  <meta name="application-name" content="Segment">
+  <meta name="theme-color" content="#00386C">
+  <link rel="stylesheet" href="/docs/bundle.css">
+  <script>!function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="3.1.0";
+
+      window.analytics.load("zaySL4FGIiLsxt3I7omU5uLxXqxaBMPh");
+        window.analytics.page('Docs', {
+          section: 'Sources',
+          topic: 'Node.js Source'
+        });
+    }}();</script>
+ </head>
+ <body>
+  <header role="banner" class="Site-header">
+   <nav role="navigation" class="Navigation">
+    <div class="Navigation-left">
+     <h1 class="Navigation-item"><a href="/" class="Navigation-logo">Segment</a></h1>
+     <span class="Navigation-subtitle">Documentation</span>
+    </div>
+    <div class="Navigation-middle">
+     <header class="Page-header">
+      <nav class="DocsNav">
+       <a class="DocsNav-tab" href="/docs/">Home</a> 
+       <a class="DocsNav-tab" href="/docs/spec">Spec</a> 
+       <a class="DocsNav-tab" href="/docs/sources">Sources</a> 
+       <a class="DocsNav-tab" href="/docs/destinations">Destinations</a> 
+       <a class="DocsNav-tab" href="/docs/guides">Guides</a>
+      </nav>
+     </header>
+    </div>
+    <div class="Navigation-right">
+     <div class="Navigation-LinkList Navigation-item">
+      <a href="https://community.segment.com">Community</a> 
+      <a href="/contact">Contact Support</a>
+     </div>
+    </div>
+   </nav>
+  </header>
+  <div class="Page">
+   <div class="Page-body">
+    <main class="Page-main Prose">
+     <h1 class="Page-title">Node.js Source</h1>
+     <div class="Page-contents" data-swiftype-name="body" data-swiftype-type="text">
+      <p>Our Node.js library lets you record analytics data from your node code. The requests hit our servers, and then we route your data to any analytics service you enable on your destinations page.</p>
+      <p>This library is open-source, so you can <a href="https://github.com/segmentio/analytics-node">check it out on Github</a>.</p>
+      <p>All of our server-side libraries are built for high-performance, so you can use them in your web server controller code. This library uses an internal queue to make <code>identify</code> and <code>track</code> calls non-blocking and fast. It also batches messages and flushes asynchronously to our servers.</p>
+      <p>Want to stay updated on releases? Subscribe to the <a href="https://github.com/segmentio/analytics-node/releases.atom">release feed</a>.</p>
+      <h2 id="getting-started">Getting Started</h2>
+      <h3 id="install-the-module">Install the Module</h3>
+      <p>Run:</p>
+      <pre><code>npm install --save analytics-node
+</code></pre>
+      <p>This will add our Node library module to your <code>package.json</code>. The module exposes an <code>Analytics</code> constructor, which you need to initialize with your Segment source’s <strong>Write Key</strong>, like so:</p>
+      <pre><code class="lang-javascript">var Analytics = require('analytics-node');
+var analytics = new Analytics('YOUR_WRITE_KEY');
+</code></pre>
+      <p>Of course, you’ll want to replace <code>YOUR_WRITE_KEY</code> with your actual <strong>Write Key</strong> which you can find in Segment under your source settings.</p>
+      <p>This will create an instance of <code>Analytics</code> that you can use to send data to Segment for your project. The default initialization settings are production-ready and queue 20 messages before sending any requests. In development you might want to use <a href="/docs/sources/server/node/#development">development settings</a>.</p>
+      <h2 id="identify">Identify</h2>
+      <p><code>identify</code> lets you tie a user to their actions and record traits about them. It includes a unique User ID and any optional traits you know about them.</p>
+      <p>We recommend calling <code>identify</code> a single time when the user’s account is first created, and only identifying again later when their traits change.</p>
+      <p>Example <code>identify</code> call:</p>
+      <pre><code class="lang-javascript">analytics.identify({
+  userId: '019mr8mf4r',
+  traits: {
+    name: 'Michael Bolton',
+    email: 'mbolton@initech.com',
+    plan: 'Enterprise',
+    friends: 42
+  }
+});
+</code></pre>
+      <p>This call is identifying Michael by his unique User ID (the one you know him by in your database) and labeling him with <code>name</code>, <code>email</code>, <code>plan</code> and <code>friends</code> traits.</p>
+      <p>The <code>identify</code> call has the following fields:</p>
+      <table class="api-table">
+       <tbody>
+        <tr>
+         <td><code>userId</code> _String</td>
+         <td>The ID for this user in your database.</td>
+        </tr>
+        <tr>
+         <td><code>traits</code> <em>Object, optional</em></td>
+         <td>A dictionary of <a href="/docs/spec/identify#traits">traits</a> you know about the user. Things like: <code>email</code>, <code>name</code> or <code>friends</code>.</td>
+        </tr>
+        <tr>
+         <td><code>timestamp</code> <em>Date, optional</em></td>
+         <td>A Javascript date object representing when the identify took place. If the identify just happened, leave it out and we’ll use the server’s time. If you’re importing data from the past make sure you to send a <code>timestamp</code>.</td>
+        </tr>
+        <tr>
+         <td><code>context</code> <em>Object, optional</em></td>
+         <td>A dictionary of extra <a href="">context</a> to attach to the call. <em>Note: <code>context</code> differs from <code>traits</code> because it is not attributes of the user itself.</em></td>
+        </tr>
+        <tr>
+         <td><code>anonymousId</code> <em>String, optional</em></td>
+         <td>An ID to associated with the user when you don’t know who they are (eg., <a href="/docs/sources/website/analytics.js/#anonymous-id">the anonymousId generated by <code>analytics.js</code></a>)</td>
+        </tr>
+       </tbody>
+      </table>
+      <p>Find details on the <strong>identify method payload</strong> in our <a href="/docs/spec/identify/">Spec</a>.</p>
+      <h2 id="track">Track</h2>
+      <p><code>track</code> lets you record the actions your users perform. Every action triggers what we call an “event”, which can also have associated properties.</p>
+      <p>You’ll want to track events that are indicators of success for your site, like <strong>Signed Up</strong>, <strong>Item Purchased</strong> or <strong>Article Bookmarked</strong>.</p>
+      <p>To get started, we recommend tracking just a few important events. You can always add more later!</p>
+      <p>Example <code>track</code> call:</p>
+      <pre><code class="lang-javascript">analytics.track({
+  userId: '019mr8mf4r',
+  event: 'Item Purchased',
+  properties: {
+    revenue: 39.95,
+    shippingMethod: '2-day'
+  }
+});
+</code></pre>
+      <p>This example <code>track</code> call tells us that your user just triggered the <strong>Item Purchased</strong> event with a revenue of $39.95 and chose your hypothetical ‘2-day’ shipping.</p>
+      <p><code>track</code> event properties can be anything you want to record. In this case, revenue and shipping method.</p>
+      <p>The <code>track</code> call has the following fields:</p>
+      <table>
+       <tbody>
+        <tr>
+         <td><code>userId</code> _String</td>
+         <td>The ID for this user in your database.</td>
+        </tr>
+        <tr>
+         <td><code>event</code> <em>String</em></td>
+         <td>The name of the event you’re tracking. We recommend human-readable names like <code>Song Played</code> or <code>Status Updated</code>.</td>
+        </tr>
+        <tr>
+         <td><code>properties</code> <em>Object, optional</em></td>
+         <td>A dictionary of properties for the event. If the event was <code>Product Added</code>, it might have properties like <code>price</code> or <code>product</code>.</td>
+        </tr>
+        <tr>
+         <td><code>timestamp</code> <em>Date, optional</em></td>
+         <td>A Javascript date object representing when the track took place. If the track just happened, leave it out and we’ll use the server’s time. If you’re importing data from the past make sure you to send a <code>timestamp</code>.</td>
+        </tr>
+        <tr>
+         <td><code>context</code> <em>Object, optional</em></td>
+         <td>A dictionary of extra <a href="">context</a> to attach to the call. <em>Note: <code>context</code> differs from <code>traits</code> because it is not attributes of the user itself.</em></td>
+        </tr>
+        <tr>
+         <td><code>anonymousId</code> <em>String, optional</em></td>
+         <td>An ID to associated with the user when you don’t know who they are (eg., <a href="/docs/sources/website/analytics.js/#anonymous-id">the anonymousId generated by <code>analytics.js</code></a>)</td>
+        </tr>
+       </tbody>
+      </table>
+      <p>Find details on <strong>best practices in event naming</strong> as well as the <strong><code>track</code> method payload</strong> in our <a href="/docs/spec/track/">Spec</a>.</p>
+      <h2 id="page">Page</h2>
+      <p>The <a href="/docs/spec/page/"><code>page</code></a> method lets you record page views on your website, along with optional extra information about the page being viewed.</p>
+      <p>If you’re using our client-side setup in combination with the Node.js library, page calls are <strong>already tracked for you</strong> by default. However, if you want to record your own page views manually and aren’t using our client-side library, read on!</p>
+      <p>Example <code>page</code> call:</p>
+      <pre><code class="lang-js">analytics.page({
+  userId: '019mr8mf4r',
+  category: 'Docs',
+  name: 'Node.js Library',
+  properties: {
+    url: 'https://segment.com/docs/libraries/node',
+    path: '/docs/libraries/node/',
+    title: 'Node.js Library - Segment',
+    referrer: 'https://github.com/segmentio/analytics-node'
+  }
+});
+</code></pre>
+      <p>The <code>page</code> call has the following fields:</p>
+      <table>
+       <tbody>
+        <tr>
+         <td><code>userId</code> _String</td>
+         <td>The ID for this user in your database.</td>
+        </tr>
+        <tr>
+         <td><code>category</code> <em>String, optional</em></td>
+         <td>The category of the page. Useful for things like ecommerce where many pages often live under a larger category.</td>
+        </tr>
+        <tr>
+         <td><code>name</code> <em>String, optional</em></td>
+         <td>The name of the of the page, for example <strong>Signup</strong> or <strong>Home</strong>.</td>
+        </tr>
+        <tr>
+         <td><code>properties</code> <em>Object, optional</em></td>
+         <td>A dictionary of properties of the page. A few properties specially recognized and automatically translated: <code>url</code>, <code>title</code>, <code>referrer</code> and <code>path</code>, but you can add your own too!</td>
+        </tr>
+        <tr>
+         <td><code>timestamp</code> <em>Date, optional</em></td>
+         <td>A Javascript date object representing when the track took place. If the track just happened, leave it out and we’ll use the server’s time. If you’re importing data from the past make sure you to send a <code>timestamp</code>.</td>
+        </tr>
+        <tr>
+         <td><code>context</code> <em>Object, optional</em></td>
+         <td>A dictionary of extra <a href="">context</a> to attach to the call. <em>Note: <code>context</code> differs from <code>traits</code> because it is not attributes of the user itself.</em></td>
+        </tr>
+        <tr>
+         <td><code>anonymousId</code> <em>String, optional</em></td>
+         <td>An ID to associated with the user when you don’t know who they are (eg., <a href="/docs/sources/website/analytics.js/#anonymous-id">the anonymousId generated by <code>analytics.js</code></a>)</td>
+        </tr>
+       </tbody>
+      </table>
+      <p>Find details on the <strong><code>page</code> payload</strong> in our <a href="/docs/spec/page/">Spec</a>.</p>
+      <h2 id="group">Group</h2>
+      <p><code>group</code> lets you associate an <a href="/docs/sources/server/node/#identify">identified user</a> with a group. A group could be a company, organization, account, project or team! It also lets you record custom traits about the group, like industry or number of employees.</p>
+      <p>This is useful for tools like <a href="/docs/integrations/intercom/">Intercom</a>, <a href="/docs/integrations/preact/">Preact</a> and <a href="/docs/integrations/totango/">Totango</a>, as it ties the user to a <strong>group</strong> of other users.</p>
+      <p>Example <code>group</code> call:</p>
+      <pre><code class="lang-javascript">analytics.group({
+  userId: '019mr8mf4r',
+  groupId: '56',
+  traits: {
+    name: 'Initech',
+    description: 'Accounting Software'
+  }
+});
+</code></pre>
+      <p>The <code>group</code> call has the following fields:</p>
+      <table class="api-table">
+       <tbody>
+        <tr>
+         <td><code>userId</code> _string</td>
+         <td>The ID for the user that is a part of the group.</td>
+        </tr>
+        <tr>
+         <td><code>groupId</code> _string</td>
+         <td>The ID of the group.</td>
+        </tr>
+        <tr>
+         <td><code>traits</code> <em>dict, optional</em></td>
+         <td>A dict of traits you know about the group. For a company, they might be things like <code>name</code>, <code>address</code>, or <code>phone</code>.</td>
+        </tr>
+        <tr>
+         <td><code>context</code> <em>dict, optional</em></td>
+         <td>A dict containing any context about the request. To see the full reference of supported keys, check them out in the <a href="/docs/spec/common/#context">context reference</a></td>
+        </tr>
+        <tr>
+         <td><code>timestamp</code> <em>datetime, optional</em></td>
+         <td>A <code>datetime</code> object representing when the group took place. If the group just happened, leave it out and we’ll use the server’s time. If you’re importing data from the past make sure you send <code>timestamp</code>.</td>
+        </tr>
+        <tr>
+         <td><code>anonymousId</code> <em>String, optional</em></td>
+         <td>An ID to associated with the user when you don’t know who they are (eg., <a href="/docs/sources/website/analytics.js/#anonymous-id">the anonymousId generated by <code>analytics.js</code></a>)</td>
+        </tr>
+        <tr>
+         <td><code>integrations</code> <em>dict, optional</em></td>
+         <td>A dictionary of destinations to enable or disable</td>
+        </tr>
+       </tbody>
+      </table>
+      <p>Find more details about <code>group</code>, including the <strong><code>group</code> payload</strong>, in our <a href="/docs/spec/group/">Spec</a>.</p>
+      <h2 id="alias">Alias</h2>
+      <p><code>alias</code> is how you associate one identity with another. This is an advanced method, but it is required to manage user identities successfully in <em>some</em> of our destinations.</p>
+      <p>In <a href="/docs/integrations/mixpanel/#alias">Mixpanel</a> it’s used to associate an anonymous user with an identified user once they sign up. For <a href="/docs/integrations/kissmetrics/#alias">KISSmetrics</a>, if your user switches IDs, you can use ‘alias’ to rename the ‘userId’.</p>
+      <p>Example <code>alias</code> call:</p>
+      <pre><code class="lang-javascript">analytics.alias({
+  previousId: 'old_id',
+  userId: 'new_id'
+});
+</code></pre>
+      <p>The <code>alias</code> call has the following fields:</p>
+      <table class="api-table">
+       <tbody>
+        <tr>
+         <td><code>userId</code> <em>String</em></td>
+         <td>The ID for this user in your database.</td>
+        </tr>
+        <tr>
+         <td><code>previousId</code> <em>String</em></td>
+         <td>The previous ID to alias from.</td>
+        </tr>
+       </tbody>
+      </table>
+      <p>Here’s a full example of how we might use the <code>alias</code> call:</p>
+      <pre><code class="lang-javascript">// the anonymous user does actions ...
+analytics.track({ userId: 'anonymous_user', event: 'Anonymous Event' })
+// the anonymous user signs up and is aliased
+analytics.alias({ previousId: 'anonymous_user', userId: 'identified@gmail.com' })
+// the identified user is identified
+analytics.identify({ userId: 'identified@gmail.com', traits: { plan: 'Free' } })
+// the identified user does actions ...
+analytics.track({ userId: 'identified@gmail.com', event: 'Identified Action' })
+</code></pre>
+      <p>For more details about <code>alias</code>, including the <strong><code>alias</code> call payload</strong>, check out our <a href="/docs/spec/alias/">Spec</a>.</p>
+      <hr>
+      <h2 id="configuration">Configuration</h2>
+      <p>The second argument to the <code>Analytics</code> constructor is an optional dictionary of settings to configure the module.</p>
+      <pre><code class="lang-javascript">var analytics = new Analytics('YOUR_WRITE_KEY', {
+  flushAt: 20,
+  flushInterval: 10000
+});
+</code></pre>
+      <table>
+       <tbody>
+        <tr>
+         <td><code>flushAt</code> <em>Number</em></td>
+         <td>The number of messages to enqueue before flushing.</td>
+        </tr>
+        <tr>
+         <td><code>flushInterval</code> <em>Number</em></td>
+         <td>The number of milliseconds to wait before flushing the queue automatically.</td>
+        </tr>
+       </tbody>
+      </table>
+      <h2 id="development">Development</h2>
+      <p>You can use this initialization during development to make the library flush every time a message is submitted, so that you can be sure your calls are working properly before pushing to production.</p>
+      <pre><code class="lang-javascript">var analytics = new Analytics('YOUR_WRITE_KEY', { flushAt: 1 });
+</code></pre>
+      <h2 id="selecting-destinations">Selecting Destinations</h2>
+      <p>The <code>alias</code>, <code>group</code>, <code>identify</code>, <code>page</code> and <code>track</code> calls can all be passed an object of <code>integrations</code> that lets you turn certain destinations on or off. By default all destinations are enabled.</p>
+      <p>Here’s an example with the <code>integrations</code> object shown:</p>
+      <pre><code class="lang-javascript">analytics.track({
+  event: 'Membership Upgraded',
+  userId: '97234974',
+  integrations: {
+    'All': false,
+    'Vero': true,
+    'Google Analytics': false
+  }
+})
+</code></pre>
+      <p>In this case, we’re specifying that we want this <code>track</code> to only go to Vero. <code>All: false</code> says that no destination should be enabled unless otherwise specified. <code>Vero: true</code> turns on Vero, etc.</p>
+      <p>Destination flags are <strong>case sensitive</strong> and match <a href="/docs/integrations">the destination’s name in the docs</a> (i.e. “AdLearn Open Platform”, “awe.sm”, “MailChimp”, etc.).</p>
+      <p><strong>Note:</strong></p>
+      <ul>
+       <li><p>Available at the business level, filtering track calls can be done right from the Segment UI on your source schema page. We recommend using the UI if possible since it’s a much simpler way of managing your filters and can be updated with no code changes on your side.</p></li>
+       <li><p>If you are on a grandfathered plan, events sent server-side that are filtered through the Segment dashboard will still count towards your API usage.</p></li>
+      </ul>
+      <h2 id="historical-import">Historical Import</h2>
+      <p>You can import historical data by adding the <code>timestamp</code> argument to any of your method calls. This can be helpful if you’ve just switched to Segment.</p>
+      <p>Historical imports can only be done into destinations that can accept historical timestamp’ed data. Most analytics tools like Mixpanel, Amplitude, Kissmetrics, etc. can handle that type of data just fine. One common destination that does not accept historical data is Google Analytics since their API cannot accept historical data.</p>
+      <p><strong>Note:</strong> If you’re tracking things that are happening right now, leave out the <code>timestamp</code> and our servers will timestamp the requests for you.</p>
+      <h2 id="batching">Batching</h2>
+      <p>Our libraries are built to support high performance environments. That means it is safe to use our Node library on a web server that’s serving hundreds of requests per second.</p>
+      <p>Every method you call <strong>does not</strong> result in an HTTP request, but is queued in memory instead. Messages are then flushed in batch in the background, which allows for much faster operation.</p>
+      <p>By default, our library will flush:</p>
+      <ul>
+       <li>The very first time it gets a message.</li>
+       <li>Every 20 messages (controlled by <code>options.flushAt</code>).</li>
+       <li>If 10 seconds has passed since the last flush (controlled by <code>options.flushInterval</code>)</li>
+      </ul>
+      <p>There is a maximum of <code>500kb</code> per batch request and <code>15kb</code> per call.</p>
+      <p>If you don’t want to batch messages, you can turn batching off by setting the <code>flushAt</code> option to <code>1</code>, like so:</p>
+      <pre><code class="lang-javascript">var analytics = new Analytics('YOUR_WRITE_KEY', { flushAt: 1 });
+</code></pre>
+      <p>Batching means that your message might not get sent right away. But every method call takes an optional <code>callback</code>, which you can use to know when a particular message is flushed from the queue, like so:</p>
+      <pre><code class="lang-javascript">analytics.track({
+  userId: '019mr8mf4r',
+  event: 'Ultimate Played'
+}, function(err, batch){
+  if (err) // There was an error flushing your message...
+  // Your message was successfully flushed!
+});
+</code></pre>
+      <p>You can also flush on demand. For example, at the end of your program, you need to flush to make sure that nothing is left in the queue. To do that, call the <code>flush</code> method:</p>
+      <pre><code class="lang-javascript">analytics.flush(function(err, batch){
+  console.log('Flushed, and now this program can exit!');
+});
+</code></pre>
+      <h2 id="multiple-clients">Multiple Clients</h2>
+      <p>Different parts of your application may require different types of batching, or even sending to multiple Segment sources. In that case, you can initialize multiple instances of <code>Analytics</code> with different settings:</p>
+      <pre><code class="lang-javascript">var Analytics = require('analytics-node');
+var marketingAnalytics = new Analytics('MARKETING_WRITE_KEY');
+var appAnalytics = new Analytics('APP_WRITE_KEY');
+</code></pre>
+      <h2 id="troubleshooting">Troubleshooting</h2>
+      <p>If you’re having trouble we have a few tips that help common problems.</p>
+      <h3 id="no-events-in-my-debugger">No events in my debugger</h3>
+      <ol>
+       <li><p>Double check that you’ve followed all the steps in the <a href="#getting-started">Quickstart</a>.</p></li>
+       <li><p>Make sure that you’re calling one of our API methods once the library is successfully installed—<a href="#identify"><code>identify</code></a>, <a href="#track"><code>track</code></a>, etc.</p></li>
+      </ol>
+      <h3 id="no-events-in-my-end-tools">No events in my end tools</h3>
+      <ol>
+       <li><p>Double check your credentials for that destination.</p></li>
+       <li><p>Make sure that the destination you are troubleshooting can accept server-side API calls. Compatibility is shown on the <a href="/docs/integrations/">destination docs</a> pages and on the sheets on your Segment source Destinations page.</p></li>
+       <li><p>Check out the <a href="/docs/integrations/">destination’s documentation</a> to see if there are other requirements for using the method and destination you’re trying to get working.</p></li>
+      </ol>
+      <hr>
+      <p>If you have any questions or see anywhere we can improve our documentation, please <a href="/contact/">let us know</a> or kick off a conversation in the <a href="https://community.segment.com/">Segment Community</a>!</p>
+     </div>
+     <footer class="Page-footer">
+      <span class="Feedback"><span>Was this document helpful?</span> <span class="Feedback-btn-wrapper"><label id="Feedback-yes" class="Feedback-btn"><input type="radio"> <span class="Feedback-btn-label">Yes</span></label><label id="Feedback-no" class="Feedback-btn"><input type="radio"> <span class="Feedback-btn-label">No</span></label></span></span>
+     </footer>
+    </main>
+   </div>
+   <div class="Page-sidebar">
+    <form class="DocsNav-search-form">
+     <i class="DocsNav-search-icon"></i> 
+     <input type="search" class="DocsNav-search-input st-search-input" placeholder="Search...">
+    </form>
+    <h1 class="Page-sidebar-title"></h1>
+    <ul class="PageNav">
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources">Overview</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="PageNav-item-link" data-slug="Overview-website" href="/docs/sources#website">Website</a> 
+       <a class="PageNav-item-link" data-slug="Overview-mobile" href="/docs/sources#mobile">Mobile</a> 
+       <a class="PageNav-item-link" data-slug="Overview-server" href="/docs/sources#server">Server</a> 
+       <a class="PageNav-item-link" data-slug="Overview-cloud-apps" href="/docs/sources#cloud-apps">Cloud Apps</a> 
+       <a class="PageNav-item-link" data-slug="Overview-faqs" href="/docs/sources#faqs">FAQs</a>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/activecampaign"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/mobile/amp"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/mobile/android/wear"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/mobile/android"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/appboy"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/autopilothq"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/blueshift"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/chatlio"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/server/clojure"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/customer.io"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/delighted"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/drip"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/facebook-ads"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/facebook-lead-ads"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/server/go"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/adwords"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/server/http"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/hubspot"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/intercom"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/mobile/ios"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/iterable"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/server/java"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/website/analytics.js"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/klaviyo"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/looker"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/mailchimp"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/mailjet"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/mandrill"></a></li>
+     <li class="PageNav-item" stick><a class="PageNav-item-header" href="/docs/sources/server/node"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/nudgespot"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/server/php"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/server/python"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/radar"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/server/ruby"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/salesforce"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/selligent"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/sendgrid"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/stripe"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/twilio"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/vero"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/mobile/xamarin"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/cloud-apps/zendesk"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/sources/server/net"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Website Libraries</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/website/analytics.js">Javascript</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="javascript-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="javascript-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="javascript-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="javascript-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="javascript-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="javascript-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="javascript-ready" href="#ready">Ready</a> 
+        <a class="PageNav-item-link" data-slug="javascript-querystring-api" href="#querystring-api">Querystring API</a> 
+        <a class="PageNav-item-link" data-slug="javascript-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="javascript-user-group-information" href="#user-group-information">User &amp; Group Information</a> 
+        <a class="PageNav-item-link" data-slug="javascript-anonymous-id" href="#anonymous-id">Anonymous ID</a> 
+        <a class="PageNav-item-link" data-slug="javascript-debug" href="#debug">Debug</a> 
+        <a class="PageNav-item-link" data-slug="javascript-emitter" href="#emitter">Emitter</a> 
+        <a class="PageNav-item-link" data-slug="javascript-extending-timeout" href="#extending-timeout">Extending Timeout</a> 
+        <a class="PageNav-item-link" data-slug="javascript-performance" href="#performance">Performance</a> 
+        <a class="PageNav-item-link" data-slug="javascript-cross-domain-analytics" href="#cross-domain-analytics">Cross-Domain Analytics</a> 
+        <a class="PageNav-item-link" data-slug="javascript-cross-subdomain-analytics" href="#cross-subdomain-analytics">Cross-Subdomain Analytics</a> 
+        <a class="PageNav-item-link" data-slug="javascript-anonymizing-ip" href="#anonymizing-ip">Anonymizing IP</a> 
+        <a class="PageNav-item-link" data-slug="javascript-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Mobile Libraries</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/mobile/amp">AMP</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="amp-choosing-a-segment-source-type" href="#choosing-a-segment-source-type">Choosing a Segment Source type</a> 
+        <a class="PageNav-item-link" data-slug="amp-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="amp-default-properties-collected" href="#default-properties-collected">Default Properties Collected</a> 
+        <a class="PageNav-item-link" data-slug="amp-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="amp-events" href="#events">Events</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/mobile/android">Android</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="android-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="android-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="android-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="android-formatting-order-completed-events" href="#formatting-order-completed-events">Formatting Order Completed Events</a> 
+        <a class="PageNav-item-link" data-slug="android-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="android-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="android-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="android-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="android-context" href="#context">Context</a> 
+        <a class="PageNav-item-link" data-slug="android-anonymousid" href="#anonymousid">AnonymousId</a> 
+        <a class="PageNav-item-link" data-slug="android-debugging" href="#debugging">Debugging</a> 
+        <a class="PageNav-item-link" data-slug="android-proxy-http-calls" href="#proxy-http-calls">Proxy HTTP Calls</a> 
+        <a class="PageNav-item-link" data-slug="android-automatic-screen-tracking" href="#automatic-screen-tracking">Automatic Screen Tracking</a> 
+        <a class="PageNav-item-link" data-slug="android-stats" href="#stats">Stats</a> 
+        <a class="PageNav-item-link" data-slug="android-bleeding-edge-releases" href="#bleeding-edge-releases">Bleeding Edge Releases</a> 
+        <a class="PageNav-item-link" data-slug="android-opt-out" href="#opt-out">Opt-out</a> 
+        <a class="PageNav-item-link" data-slug="android-middlewares" href="#middlewares">Middlewares</a> 
+        <a class="PageNav-item-link" data-slug="android-sending-data-to-destinations" href="#sending-data-to-destinations">Sending Data to destinations</a> 
+        <a class="PageNav-item-link" data-slug="android-anonymizing-ip" href="#anonymizing-ip">Anonymizing IP</a> 
+        <a class="PageNav-item-link" data-slug="android-migrating-to-v4" href="#migrating-to-v4">Migrating to v4</a> 
+        <a class="PageNav-item-link" data-slug="android-faq" href="#faq">FAQ</a> 
+        <a class="PageNav-item-link" data-slug="android-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/mobile/ios">iOS</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="ios-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="ios-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="ios-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="ios-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="ios-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="ios-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="ios-anonymousid" href="#anonymousid">AnonymousId</a> 
+        <a class="PageNav-item-link" data-slug="ios-reset" href="#reset">Reset</a> 
+        <a class="PageNav-item-link" data-slug="ios-migrating-to-v3" href="#migrating-to-v3">Migrating to v3</a> 
+        <a class="PageNav-item-link" data-slug="ios-submitting-to-the-app-store" href="#submitting-to-the-app-store">Submitting to the App Store</a> 
+        <a class="PageNav-item-link" data-slug="ios-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="ios-configuration" href="#configuration">Configuration</a> 
+        <a class="PageNav-item-link" data-slug="ios-bleeding-edge-releases" href="#bleeding-edge-releases">Bleeding Edge Releases</a> 
+        <a class="PageNav-item-link" data-slug="ios-logging" href="#logging">Logging</a> 
+        <a class="PageNav-item-link" data-slug="ios-proxy-http-calls" href="#proxy-http-calls">Proxy HTTP Calls</a> 
+        <a class="PageNav-item-link" data-slug="ios-opt-out" href="#opt-out">Opt-out</a> 
+        <a class="PageNav-item-link" data-slug="ios-packaging-destinations-with-device-based-connection-modes" href="#packaging-destinations-with-device-based-connection-modes">Packaging Destinations with Device-based Connection Modes</a> 
+        <a class="PageNav-item-link" data-slug="ios-anonymizing-ip" href="#anonymizing-ip">Anonymizing IP</a> 
+        <a class="PageNav-item-link" data-slug="ios-faq" href="#faq">FAQ</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/mobile/xamarin">Xamarin</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="xamarin-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-development-settings" href="#development-settings">Development Settings</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-options" href="#options">Options</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-historical-import" href="#historical-import">Historical Import</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-context" href="#context">Context</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-anonymous-id" href="#anonymous-id">Anonymous ID</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-nested-properties" href="#nested-properties">Nested Properties</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-batching" href="#batching">Batching</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-configuration" href="#configuration">Configuration</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-logging" href="#logging">Logging</a> 
+        <a class="PageNav-item-link" data-slug="xamarin-anonymizing-ip" href="#anonymizing-ip">Anonymizing IP</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Server Libraries</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/server/net">.NET</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug=".net-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug=".net-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug=".net-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug=".net-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug=".net-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug=".net-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug=".net-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug=".net-development-settings" href="#development-settings">Development Settings</a> 
+        <a class="PageNav-item-link" data-slug=".net-historical-import" href="#historical-import">Historical Import</a> 
+        <a class="PageNav-item-link" data-slug=".net-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug=".net-context" href="#context">Context</a> 
+        <a class="PageNav-item-link" data-slug=".net-anonymous-id" href="#anonymous-id">Anonymous ID</a> 
+        <a class="PageNav-item-link" data-slug=".net-nested-properties" href="#nested-properties">Nested Properties</a> 
+        <a class="PageNav-item-link" data-slug=".net-batching" href="#batching">Batching</a> 
+        <a class="PageNav-item-link" data-slug=".net-configuration" href="#configuration">Configuration</a> 
+        <a class="PageNav-item-link" data-slug=".net-multiple-clients" href="#multiple-clients">Multiple Clients</a> 
+        <a class="PageNav-item-link" data-slug=".net-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug=".net-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/server/clojure">Clojure</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="clojure-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="clojure-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="clojure-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="clojure-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="clojure-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="clojure-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="clojure-builder" href="#builder">Builder</a> 
+        <a class="PageNav-item-link" data-slug="clojure-logging" href="#logging">Logging</a> 
+        <a class="PageNav-item-link" data-slug="clojure-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/server/go">Go</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="go-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="go-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="go-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="go-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="go-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="go-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="go-development-settings" href="#development-settings">Development Settings</a> 
+        <a class="PageNav-item-link" data-slug="go-logging" href="#logging">Logging</a> 
+        <a class="PageNav-item-link" data-slug="go-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="go-historical-import" href="#historical-import">Historical Import</a> 
+        <a class="PageNav-item-link" data-slug="go-batching" href="#batching">Batching</a> 
+        <a class="PageNav-item-link" data-slug="go-options" href="#options">Options</a> 
+        <a class="PageNav-item-link" data-slug="go-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/server/http">HTTP API</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="http-api-headers" href="#headers">Headers</a> 
+        <a class="PageNav-item-link" data-slug="http-api-errors" href="#errors">Errors</a> 
+        <a class="PageNav-item-link" data-slug="http-api-rate-limits" href="#rate-limits">Rate Limits</a> 
+        <a class="PageNav-item-link" data-slug="http-api-max-request-size" href="#max-request-size">Max Request Size</a> 
+        <a class="PageNav-item-link" data-slug="http-api-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="http-api-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="http-api-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="http-api-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="http-api-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="http-api-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="http-api-historical-import" href="#historical-import">Historical Import</a> 
+        <a class="PageNav-item-link" data-slug="http-api-batch" href="#batch">Batch</a> 
+        <a class="PageNav-item-link" data-slug="http-api-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="http-api-collecting-ip-address" href="#collecting-ip-address">Collecting IP Address</a> 
+        <a class="PageNav-item-link" data-slug="http-api-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/server/java">Java</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="java-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="java-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="java-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="java-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="java-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="java-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="java-historical-import" href="#historical-import">Historical Import</a> 
+        <a class="PageNav-item-link" data-slug="java-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="java-context" href="#context">Context</a> 
+        <a class="PageNav-item-link" data-slug="java-batching" href="#batching">Batching</a> 
+        <a class="PageNav-item-link" data-slug="java-multiple-clients" href="#multiple-clients">Multiple Clients</a> 
+        <a class="PageNav-item-link" data-slug="java-logging" href="#logging">Logging</a> 
+        <a class="PageNav-item-link" data-slug="java-snapshots" href="#snapshots">Snapshots</a> 
+        <a class="PageNav-item-link" data-slug="java-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/server/node">Node.js</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="node.js-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="node.js-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="node.js-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="node.js-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="node.js-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="node.js-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="node.js-configuration" href="#configuration">Configuration</a> 
+        <a class="PageNav-item-link" data-slug="node.js-development" href="#development">Development</a> 
+        <a class="PageNav-item-link" data-slug="node.js-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="node.js-historical-import" href="#historical-import">Historical Import</a> 
+        <a class="PageNav-item-link" data-slug="node.js-batching" href="#batching">Batching</a> 
+        <a class="PageNav-item-link" data-slug="node.js-multiple-clients" href="#multiple-clients">Multiple Clients</a> 
+        <a class="PageNav-item-link" data-slug="node.js-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/server/php">PHP</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="php-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="php-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="php-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="php-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="php-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="php-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="php-historical-import" href="#historical-import">Historical Import</a> 
+        <a class="PageNav-item-link" data-slug="php-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="php-flush" href="#flush">Flush</a> 
+        <a class="PageNav-item-link" data-slug="php-configuration" href="#configuration">Configuration</a> 
+        <a class="PageNav-item-link" data-slug="php-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="php-3rd-party-libraries" href="#3rd-party-libraries">3rd-Party Libraries</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/server/python">Python</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="python-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="python-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="python-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="python-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="python-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="python-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="python-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="python-historical-import" href="#historical-import">Historical Import</a> 
+        <a class="PageNav-item-link" data-slug="python-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="python-batching" href="#batching">Batching</a> 
+        <a class="PageNav-item-link" data-slug="python-logging" href="#logging">Logging</a> 
+        <a class="PageNav-item-link" data-slug="python-options" href="#options">Options</a> 
+        <a class="PageNav-item-link" data-slug="python-django" href="#django">Django</a> 
+        <a class="PageNav-item-link" data-slug="python-google-app-engine" href="#google-app-engine">Google App Engine</a> 
+        <a class="PageNav-item-link" data-slug="python-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/server/ruby">Ruby</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="ruby-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="ruby-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="ruby-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="ruby-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="ruby-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="ruby-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="ruby-historical-import" href="#historical-import">Historical Import</a> 
+        <a class="PageNav-item-link" data-slug="ruby-selecting-destinations" href="#selecting-destinations">Selecting Destinations</a> 
+        <a class="PageNav-item-link" data-slug="ruby-performance" href="#performance">Performance</a> 
+        <a class="PageNav-item-link" data-slug="ruby-flush" href="#flush">Flush</a> 
+        <a class="PageNav-item-link" data-slug="ruby-turbolinks" href="#turbolinks">Turbolinks</a> 
+        <a class="PageNav-item-link" data-slug="ruby-multiple-clients" href="#multiple-clients">Multiple Clients</a> 
+        <a class="PageNav-item-link" data-slug="ruby-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Cloud Apps</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/adwords">Google AdWords</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="adwords-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="adwords-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="adwords-collections" href="#collections">Collections</a> 
+        <a class="PageNav-item-link" data-slug="adwords-permissions" href="#permissions">Permissions</a> 
+        <a class="PageNav-item-link" data-slug="adwords-reference" href="#reference">Reference</a> 
+        <a class="PageNav-item-link" data-slug="adwords-troubleshooting" href="#troubleshooting">Troubleshooting</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/appboy">Appboy</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="appboy-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="appboy-appboy-events" href="#appboy-events">Appboy Events</a> 
+        <a class="PageNav-item-link" data-slug="appboy-appboy-event-properties" href="#appboy-event-properties">Appboy Event Properties</a> 
+        <a class="PageNav-item-link" data-slug="appboy-user-identification" href="#user-identification">User Identification</a> 
+        <a class="PageNav-item-link" data-slug="appboy-send-segment-data-to-appboy" href="#send-segment-data-to-appboy">Send Segment Data to Appboy</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/autopilothq">AutopilotHQ</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="autopilothq-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="autopilothq-autopilot-events" href="#autopilot-events">Autopilot Events</a> 
+        <a class="PageNav-item-link" data-slug="autopilothq-autopilot-event-properties" href="#autopilot-event-properties">Autopilot Event Properties</a> 
+        <a class="PageNav-item-link" data-slug="autopilothq-userid" href="#userid">UserId</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/blueshift">Blueshift</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="blueshift-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="blueshift-blueshift-events" href="#blueshift-events">Blueshift Events</a> 
+        <a class="PageNav-item-link" data-slug="blueshift-blueshift-event-properties" href="#blueshift-event-properties">Blueshift Event Properties</a> 
+        <a class="PageNav-item-link" data-slug="blueshift-userid" href="#userid">UserId</a> 
+        <a class="PageNav-item-link" data-slug="blueshift-send-data-to-blueshift" href="#send-data-to-blueshift">Send Data to Blueshift</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/delighted">Delighted</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="delighted-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="delighted-delighted-events" href="#delighted-events">Delighted Events</a> 
+        <a class="PageNav-item-link" data-slug="delighted-delighted-event-properties" href="#delighted-event-properties">Delighted Event Properties</a> 
+        <a class="PageNav-item-link" data-slug="delighted-userid" href="#userid">UserId</a> 
+        <a class="PageNav-item-link" data-slug="delighted-send-data-to-delighted" href="#send-data-to-delighted">Send Data to Delighted</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/drip">Drip</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="drip-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="drip-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="drip-collections" href="#collections">Collections</a> 
+        <a class="PageNav-item-link" data-slug="drip-send-data-to-drip" href="#send-data-to-drip">Send data to Drip</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/facebook-ads">Facebook Ads</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="facebook-ads-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="facebook-ads-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="facebook-ads-collections" href="#collections">Collections</a> 
+        <a class="PageNav-item-link" data-slug="facebook-ads-permissions" href="#permissions">Permissions</a> 
+        <a class="PageNav-item-link" data-slug="facebook-ads-facebook-ads-source-upgrade-to-v210" href="#facebook-ads-source-upgrade-to-v210">Facebook Ads Source Upgrade to v2.10</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/facebook-lead-ads">Facebook Lead Ads</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="facebook-lead-ads-overview" href="#overview">Overview</a> 
+        <a class="PageNav-item-link" data-slug="facebook-lead-ads-setup" href="#setup">Setup</a> 
+        <a class="PageNav-item-link" data-slug="facebook-lead-ads-adding-destinations" href="#adding-destinations">Adding Destinations</a> 
+        <a class="PageNav-item-link" data-slug="facebook-lead-ads-collections" href="#collections">Collections</a> 
+        <a class="PageNav-item-link" data-slug="facebook-lead-ads-behavior" href="#behavior">Behavior</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/hubspot">HubSpot</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="hubspot-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="hubspot-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="hubspot-collections" href="#collections">Collections</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/intercom">Intercom</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="intercom-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="intercom-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="intercom-collections" href="#collections">Collections</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/iterable">Iterable</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="iterable-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="iterable-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="iterable-collections" href="#collections">Collections</a> 
+        <a class="PageNav-item-link" data-slug="iterable-send-data-to-iterable" href="#send-data-to-iterable">Send data to Iterable</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/klaviyo">Klaviyo</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="klaviyo-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="klaviyo-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="klaviyo-collections" href="#collections">Collections</a> 
+        <a class="PageNav-item-link" data-slug="klaviyo-send-data-to-klaviyo" href="#send-data-to-klaviyo">Send data to Klaviyo</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/looker">Looker</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="looker-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="looker-defining-looks" href="#defining-looks">Defining Looks</a> 
+        <a class="PageNav-item-link" data-slug="looker-send-looks-to-your-segment-destinations" href="#send-looks-to-your-segment-destinations">Send Looks to your Segment Destinations</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/mailchimp">Mailchimp</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="mailchimp-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="mailchimp-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="mailchimp-collections" href="#collections">Collections</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/mailjet">Mailjet</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="mailjet-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="mailjet-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="mailjet-collections" href="#collections">Collections</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/mandrill">Mandrill</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="mandrill-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="mandrill-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="mandrill-collections" href="#collections">Collections</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/nudgespot">Nudgespot</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="nudgespot-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="nudgespot-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="nudgespot-collections" href="#collections">Collections</a> 
+        <a class="PageNav-item-link" data-slug="nudgespot-send-data-to-nudgespot" href="#send-data-to-nudgespot">Send data to Nudgespot</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/salesforce">Salesforce</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="salesforce-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-api-access" href="#api-access">API Access</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-collections" href="#collections">Collections</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/selligent">Selligent</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="selligent-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="selligent-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="selligent-collections" href="#collections">Collections</a> 
+        <a class="PageNav-item-link" data-slug="selligent-send-data-to-selligent" href="#send-data-to-selligent">Send data to Selligent</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/sendgrid">SendGrid</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="sendgrid-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="sendgrid-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="sendgrid-collections" href="#collections">Collections</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/stripe">Stripe</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="stripe-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="stripe-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="stripe-collections" href="#collections">Collections</a> 
+        <a class="PageNav-item-link" data-slug="stripe-v2-changelog" href="#v2-changelog">V2 Changelog</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/twilio">Twilio</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="twilio-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="twilio-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="twilio-collections" href="#collections">Collections</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/vero">Vero</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="vero-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="vero-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="vero-collections" href="#collections">Collections</a> 
+        <a class="PageNav-item-link" data-slug="vero-send-data-to-vero" href="#send-data-to-vero">Send data to Vero</a>
+       </nav>
+       <a class="SidebarLink SidebarArrow" href="/docs/sources/cloud-apps/zendesk">Zendesk</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="PageNav-item-link" data-slug="zendesk-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="zendesk-components" href="#components">Components</a> 
+        <a class="PageNav-item-link" data-slug="zendesk-collections" href="#collections">Collections</a>
+       </nav>
+      </nav></li>
+    </ul>
+   </div>
+  </div>
+  <script>(function () {
+  var helpful = document.querySelector('#Feedback-yes')
+  var unhelpful = document.querySelector('#Feedback-no')
+  var feedback = document.querySelector('.Feedback')
+  helpful.addEventListener('click', function (e) {
+    feedback.innerText = 'Thanks for your feedback!'
+    window.analytics.track('Docs Rated', {
+      title: 'Node.js Source',
+      helpful: true,
+      url: document.URL
+    })
+  })
+  unhelpful.addEventListener('click', function (e) {
+    feedback.innerText = 'Thanks for your feedback!'
+    window.analytics.track('Docs Rated', {
+      title: 'Node.js Source',
+      helpful: false,
+      url: document.URL
+    })
+  })
+
+  var categorySlug = window.location.pathname.split('/')[3]
+  var sourceSlug =  window.location.pathname.split('/')[4]
+
+  var pageBody = document.querySelector('.Page-body')
+  var pageNav = document.querySelector('.PageNav')
+  var sectionTitles = Array.prototype.slice.call(pageBody.querySelectorAll('h2'))
+  var lastScrollTop = 0
+  var cachedTitles = {}
+
+  /**
+   * resetHighlightedNavItems
+   * iterate all .PageNav-item-link elements and remove any
+   * .PageNav-item-link--highlighted class
+   */
+  function resetHighlightedNavItems () {
+    var items = Array.prototype.slice.call(pageNav.querySelectorAll('.PageNav-item-link'))
+    items.map(function (item) {
+      item.classList.remove('PageNav-item-link--highlighted')
+    })
+  }
+
+  /**
+   * highlightPageNavItemLinkBySlug
+   * First, check if sourceSlug equals "analytics.js"
+   * The JavaScript links point to "/analytics.js" yet are named 'javascript'
+   * Take a slug, locate an element with matching data-slug attribute value
+   * and add .PageNav-item-link--highlighted class name
+   * @param  {String} slug : getting-started
+   */
+  function highlightPageNavItemLinkBySlug (slug) {
+    var srcSlug = sourceSlug === "analytics.js"
+      ? "javascript"
+      : sourceSlug
+
+    var navItem = srcSlug
+      ? pageNav.querySelector(`[data-slug=${srcSlug}-${slug}]`)
+      : pageNav.querySelector(`[data-slug=Overview-${slug}]`)
+
+    if (navItem) {
+      navItem.classList.add('PageNav-item-link--highlighted')
+    }
+
+  }
+
+  /**
+   * getObjectValues
+   * Return an array of values for an object
+   * @param  {Object} obj - an object
+   * @return {Array}
+   */
+  function getObjectValues(obj) {
+    var values = []
+    for(var key in obj){
+      if (obj.hasOwnProperty(key)) values.push(obj[key])
+    }
+    return values
+  }
+
+  /**
+   * highlightScrolledTitles
+   * Highlight 'active' H2 titles when they are scrolled within the top 100px
+   * of the window.
+   * @param  {Event} e - scroll
+   */
+  function highlightScrolledTitles(e) {
+    sectionTitles.map(function (title) {
+      var titlePosition = title.getBoundingClientRect().top
+      var slug = title.getAttribute('id') // getting-started
+
+      if (pageBody.scrollTop > lastScrollTop) {
+        // scrolling down
+        // find a navigation link with matching data-slug value + set it highlighted
+        // cache this title in `cachedTitles`
+        if (titlePosition <= 100) {
+          resetHighlightedNavItems()
+          highlightPageNavItemLinkBySlug(slug)
+          cachedTitles[slug] = title
+        }
+      } else {
+        // scrolling up
+        // delete this title from `cachedTitles`
+        // locate the previous title and find a navigation link with
+        // matching data-slug value + set it highlighted
+        if (titlePosition > 100 && cachedTitles[slug]) {
+          delete cachedTitles[slug]
+          resetHighlightedNavItems()
+          var values = getObjectValues(cachedTitles)
+          var previousTitle = values[values.length - 1]
+          if (previousTitle) {
+            var previousSlug = previousTitle.getAttribute('id')
+            highlightPageNavItemLinkBySlug(previousSlug)
+          }
+        }
+      }
+    })
+
+    lastScrollTop = pageBody.scrollTop
+  }
+
+  pageBody.addEventListener('scroll', highlightScrolledTitles, {passive: false})
+
+  if (!sourceSlug || !categorySlug) return
+
+  var path = `/docs/sources/${categorySlug}/${sourceSlug}`
+  var source = document.querySelector('a.SidebarLink[href="' + path + '"]')
+  source.classList.add('SidebarLink--active', 'SidebarArrow--active')
+
+  var menu = source.nextSibling
+  if (!menu && !menu.classList) return
+  menu.classList.add('visible')
+
+  source.scrollIntoView()
+
+  // check the position of the source. If flush (60) apply 100px offset
+  if (source.getBoundingClientRect().top === 60) {
+    var offset = 100
+    var sideBar = document.querySelector('.Page-sidebar')
+    sideBar.scrollTop = sideBar.scrollTop - offset
+  }
+}())</script>
+  <script type="text/javascript">(function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+    })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+    _st('install','88uzHTr3KAoQsWgkEHje','2.0.0');</script>
+  <script src="/docs/bundle.js"></script>
+  <script type="application/ld+json">[
+    {
+      "@context": "http://schema.org",
+      "@type": "WebSite",
+      "name": "Segment",
+      "url": "https://segment.com"
+    }, {
+      "@context": "http://schema.org",
+      "@type": "Organization",
+      "name": "Segment",
+      "url": "https://segment.com",
+      "logo": "https://segment.com/build/public/public/images/touch-icon.png",
+      "sameAs": [
+        "https://twitter.com/segment",
+        "https://www.linkedin.com/company/segment-io"
+      ]
+    }
+  ]</script>
+ </body>
+</html>

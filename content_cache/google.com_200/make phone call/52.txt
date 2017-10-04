@@ -1,0 +1,2314 @@
+<html>
+ <head>
+  <title>Intercom Destination Documentation - Segment</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Segment">
+  <meta property="og:title" content="Intercom Destination Documentation - Segment">
+  <meta property="og:url" content="https://segment.com/docs/destinations/intercom/">
+  <meta property="og:image" content="https://segment.com/build/public/public/images/open-graph.png">
+  <meta name="viewport" content="width=1200">
+  <meta name="twitter:site" content="@segment">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="description" content="">
+  <meta property="og:description" content="">
+  <meta class="swiftype" name="section" data-type="enum" content="Docs">
+  <meta class="swiftype" name="title" data-type="string" content="Intercom Destination">
+  <meta class="swiftype" name="priority" data-type="integer" content="2">
+  <link rel="icon" sizes="192x192" href="https://segment.com/build/public/public/images/touch-icon.png">
+  <link rel="apple-touch-icon" href="https://segment.com/build/public/public/images/touch-icon.png">
+  <link rel="mask-icon" href="https://segment.com/build/public/public/images/favicon-mask.svg" color="#49B882">
+  <meta name="application-name" content="Segment">
+  <meta name="theme-color" content="#00386C">
+  <link rel="stylesheet" href="/docs/bundle.css">
+  <script>!function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="3.1.0";
+
+      window.analytics.load("zaySL4FGIiLsxt3I7omU5uLxXqxaBMPh");
+        window.analytics.page('Docs', {
+          section: 'Destinations',
+          topic: 'Intercom Destination'
+        });
+    }}();</script>
+ </head>
+ <body>
+  <header role="banner" class="Site-header">
+   <nav role="navigation" class="Navigation">
+    <div class="Navigation-left">
+     <h1 class="Navigation-item"><a href="/" class="Navigation-logo">Segment</a></h1>
+     <span class="Navigation-subtitle">Documentation</span>
+    </div>
+    <div class="Navigation-middle">
+     <header class="Page-header">
+      <nav class="DocsNav">
+       <a class="DocsNav-tab" href="/docs/">Home</a> 
+       <a class="DocsNav-tab" href="/docs/spec">Spec</a> 
+       <a class="DocsNav-tab" href="/docs/sources">Sources</a> 
+       <a class="DocsNav-tab" href="/docs/destinations">Destinations</a> 
+       <a class="DocsNav-tab" href="/docs/guides">Guides</a>
+      </nav>
+     </header>
+    </div>
+    <div class="Navigation-right">
+     <div class="Navigation-LinkList Navigation-item">
+      <a href="https://community.segment.com">Community</a> 
+      <a href="/contact">Contact Support</a>
+     </div>
+    </div>
+   </nav>
+  </header>
+  <div class="Page">
+   <div class="Page-body">
+    <main class="Page-main Prose">
+     <h1 class="Page-title">Intercom Destination</h1>
+     <div class="Page-contents" data-swiftype-name="body" data-swiftype-type="text">
+      <p>Segment makes it easy to send your data to <a href="http://intercom.com?utm_source=segmentio&amp;utm_medium=docs&amp;utm_campaign=partners">Intercom</a> (and lots of other destinations). Once you've tracked your data through our open source <a href="/libraries">libraries</a> we'll translate and route your data to Intercom in the format they understand. <a href="/integrations/intercom">Learn more about how to use Intercom with Segment.</a></p>
+      <h2 id="getting-started">Getting Started</h2>
+      <ol>
+       <li>Authorize your Intercom account in Segment and select the Intercom Account you want to sync with Segment. You can choose which account to sync in the drop down menu in the top right.</li>
+      </ol>
+      <p><img src="https://i.gyazo.com/733dad7de64f4db9be7af3c34a53f222.png" alt=""></p>
+      <ol>
+       <li>Now that you have authenticated, activate the Intercom destination.</li>
+      </ol>
+      <p><img src="https://i.gyazo.com/9c21f88ec9c4011e8316a5151e36d125.png" alt=""></p>
+      <ol>
+       <li>Once you have activated the destination this is what happens:</li>
+      </ol>
+      <ul>
+       <li>Our CDN is updated within 5-10 minutes. Then our snippet will start asynchronously loading Intercom’s library.js onto your page. This means you should remove Intercom’s snippet from your page.</li>
+       <li>Because Intercom only associates Track events with known users, an <a href="#identify">Identify</a> call with a userId is required before Track events will be associated properly.</li>
+      </ul>
+      <hr>
+      <h2 id="page">Page</h2>
+      <p>Calling <a href="/docs/spec/page/"><code>page</code></a> in Analytics.js triggers the Intercom update method, which will look for new Intercom messages that should be displayed to the current user.</p>
+      <p>The <a href="/docs/spec/page/"><code>page</code></a> and <a href="/docs/spec/screen/"><code>screen</code></a> methods don’t have any effect on Intercom when used from our server-side or mobile SDKs.</p>
+      <p>If you have the Intercom’s <strong>Respond</strong> package, simply calling <code>.page()</code> (which is already included in our snippet) will trigger the chat widget to appear. Otherwise, you would need to call <code>identify</code> to make the chat widget appear.</p>
+      <p><strong>Note:</strong> If you have the <strong>Respond</strong> package and calling <code>page</code> still does not show your chat widget, be sure to check your “Visitors on your website” setting inside your Intercom account!</p>
+      <h2 id="identify">Identify</h2>
+      <h3 id="from-the-browser">From the Browser</h3>
+      <p>When you call <a href="/docs/spec/identify/"><code>identify</code></a> on <code>analytics.js</code>, we create the <code>intercomSettings</code> object and load Intercom’s javascript into the page. Here’s an example <code>identify</code> call that you can send:</p>
+      <pre><code class="lang-javascript">analytics.identify('user1234', {
+  email: 'teemo@segment.com',
+  name: 'Teemo',
+  company: {
+    id: '813',
+    name: 'Teemo Holding Company'
+    createdAt: 'Thu Mar 24 2016 17:44:51 GMT+0000 (UTC)'
+  },
+  createdAt: 'Thu Mar 24 2016 17:46:45 GMT+0000 (UTC)'
+});
+</code></pre>
+      <p>Here’s how we create the <code>intercomSettings</code> object:</p>
+      <ul>
+       <li>The <code>userId</code> parameter (the first argument) is set to <code>intercomSettings.user_id</code>.</li>
+       <li>The <code>traits</code> parameter (the second argument) is set to <code>intercomSettings.custom_attributes</code>.</li>
+       <li>If you send <code>traits.email</code> we set it as <code>intercomSettings.email</code>.</li>
+       <li>If you send <code>traits.name</code> we set it as <code>intercomSettings.name</code>.</li>
+       <li>If you send <code>traits.company</code> we set it as <code>intercomSettings.company</code>.</li>
+       <li>If you send <code>traits.createdAt</code> as a javascript Date object, a valid date string, milliseconds since the epoch, or as seconds like a Unix timestamp, we set <code>intercomSettings.created_at</code> as the unix timestamp in seconds for that created date.</li>
+      </ul>
+      <p><strong>Note:</strong> -<code>traits.avatar</code> is read-only. Intercom determines the avatar based on the email address of the user.</p>
+      <ul>
+       <li>Passing <code>traits.company</code> will create a new Intercom Company if the <code>company_id</code> does not match a known company. If company is a string, we will set the <code>company_id</code> as a hash of <code>company_name</code> as an id is required to <a href="https://developers.intercom.io/reference#user-model">associate the user to the company</a>.</li>
+      </ul>
+      <p>The <a href="/docs/spec/group/"><code>group</code> call</a> may be used to create/update company profiles explicitly.</p>
+      <h3 id="collect-context">Collect Context</h3>
+      <p>With this option selected, <code>identify</code> calls will include contextual information collected by <a href="/docs/sources/#mobile">Segment’s mobile libraries</a> if it is available. This info will be set as Custom Attributes on the Intercom user.</p>
+      <p>The fields collected from the <a href="/docs/spec/common/">context object</a> are device.type, device.manufacturer, device.model, os.name, os.version, app.name, app.version and will populate in Intercom as device_type, device_manufacturer, etc.</p>
+      <h3 id="server-side-mobile">Server-Side &amp; Mobile</h3>
+      <p>When you call <a href="/docs/spec/identify/"><code>identify</code></a> from any of the server-side or mobile sources, we create or update a user in Intercom. We’ll map our <a href="/docs/spec/identify#special-traits">special traits</a> (<code>email</code>, <code>firstName</code>, <code>lastName</code>, <code>createdAt</code>, and <code>company</code>) to Intercom special properties.</p>
+      <p>If you want to use Intercom’s <code>last_request_at</code>, you’ll need to pass in <code>active: true</code> in the context object. Then, by default we will set <code>last_request_at</code> to the current time; however, if you pass in your own timestamp, pass it in as <code>lastRequestAt</code> (in camelCase), and we’ll set <code>last_request_at</code> to that value in our server-side sources (coming soon on mobile!).</p>
+      <p>If you want to include <code>last_seen_user_agent</code> then include it in the <code>context.userAgent</code>. Similarly with <code>last_seen_ip</code> which is used for geolocation, you can include the IP address at <code>context.ip</code>. <a href="#last-seen">Click here for an example</a>.</p>
+      <h2 id="track">Track</h2>
+      <p>Segment supports Intercom events in all of our sources through the <a href="/docs/spec/track/"><code>track</code></a> method.</p>
+      <p>If you send <code>properties.revenue</code> and <code>properties.currency</code>, we will format that according to <a href="https://developers.intercom.io/reference#event-metadata-types">Intercom’s Monetary Amount</a> and send it as:</p>
+      <pre><code>price: {
+  amount: &lt;properties.revenue&gt; * 100, // since Intercom requires this in cents
+  currency: &lt;properties.currency&gt; // will default to 'usd'
+}
+</code></pre>
+      <h3 id="limited-properties">Limited Properties</h3>
+      <p>Intercom can only store <a href="http://docs.intercom.io/Intercom-for-user-analysis/Tracking-User-Events-in-Intercom#metadata-support">5 event properties</a> per event. That means if you send an event to Segment with more than 5 properties, Intercom will only show the first 5 properties.</p>
+      <h3 id="limited-events">Limited Events</h3>
+      <p>Intercom only allows a total of <a href="http://docs.intercom.io/Intercom-for-user-analysis/Tracking-User-Events-in-Intercom#events-faqs">120 unique event names</a> (see the questions titled “Is there a limit on the number of event types I can send?”). That means if you are sending Segment more than 120 unique event names, Intercom will only accept the first 120 events that hit their servers.</p>
+      <h3 id="server-side-race-condition">Server-side Race Condition</h3>
+      <p>Because our server-side libraries batch calls by default, it may happen that an Identify call intended to create a user arrives simultaneously with a Track event associated with this user. If the Track event is processed before the user is created, an error will result and the event will not be recorded.</p>
+      <p><a href="/docs/sources/server/node/#batching">Adding a Flush method</a> immediately following the Identify, and before any subsequent Track event, will help the Identify call reach Intercom first to create the user. Generally, this prevents the race condition, but an additional timeout can be used if necessary.</p>
+      <h2 id="group">Group</h2>
+      <p>Segment supports Intercom companies in all of our sources through the <a href="/docs/spec/group/"><code>group</code></a> method. Users can be put into multiple groups, which will associate them to multiple companies in Intercom.</p>
+      <pre><code class="lang-javascript">analytics.group('companyId123', {
+  name: 'Segment'
+});
+</code></pre>
+      <p>Segment also maps to Intercom’s special properties <code>monthly_spend</code> and <code>plan</code>. All you have to do is set <code>traits.monthlySpend</code> and <code>traits.plan</code>.</p>
+      <p><strong>Note:</strong> In order for the Company Sessions Count to update within Intercom, the company must first be recorded in an <code>identify</code> call.</p>
+      <hr>
+      <h2 id="features">Features</h2>
+      <h3 id="arrays-and-objects">Arrays and Objects</h3>
+      <p>Intercom does <strong>not</strong> support custom arrays or objects. Per Intercom’s request, we removed support for this feature starting Aug 21st, 2017. This means that if you want a certain user <code>trait</code> or event <code>property</code> to be sent to Intercom, you must send them at the top level.</p>
+      <p>This limitation does not apply however for mapping <code>company</code> objects. We will continue to handle that in the same way. This is only applicable for any custom traits or properties.</p>
+      <h3 id="disassociating-users-from-a-company">Disassociating Users from a Company</h3>
+      <p>You can unassociate a user from a company by passing in a field inside the <code>company</code> trait with <code>remove: true</code> in your <code>identify</code> calls.</p>
+      <pre><code class="lang-javascript">analytics.identify({
+  userId: '019mr8mf4r',
+  traits: {
+    name: 'Michael Bolton',
+    email: 'mbolton@initech.com',
+    plan: 'Enterprise',
+    company: {
+      id: 12345,
+      remove: true
+    }
+  }
+});
+</code></pre>
+      <h3 id="identity-verification">Identity Verification</h3>
+      <p>If you want to enable Intercom <a href="https://docs.intercom.com/configure-intercom-for-your-product-or-site/staying-secure/enable-identity-verification-on-your-web-product">identity verification</a> for <code>analytics.js</code>, you can pass in the <code>user_hash</code> variable inside the context object.</p>
+      <p>The <code>user_hash</code> should be a SHA256 hash of your Intercom API secret and the <strong>userId</strong>. The hash is not based on the email, it’s based on the <code>userId</code>. Here’s an example rendering an identify call with identity verification:</p>
+      <pre><code class="lang-javascript">analytics.identify('&lt;%= current_user.id %&gt;', {
+    email: '&lt;%= current_user.email %&gt;',
+    createdAt: '&lt;%= current_user.created %&gt;'
+}, {
+     Intercom: {
+        user_hash: '&lt;%= OpenSSL::HMAC.hexdigest("sha256", "YOUR_INTERCOM_APP_SECRET", current_user.id) %&gt;'
+     }
+});
+</code></pre>
+      <p><code>YOUR_INTERCOM_APP_SECRET</code> is found in Intercom’s identity verification setup guide.</p>
+      <h4 id="identity-verification-plus-filtering-via-destinations-object">Identity verification plus filtering via Destinations Object</h4>
+      <p>If using Intercom identity verification AND <a href="https://segment.com/docs/sources/website/analytics.js/#selecting-integrations">selective destinations functionality</a>, the context object will look like this:</p>
+      <pre><code class="lang-json">{
+     integrations: {
+         All: false,
+         Intercom: {
+            user_hash: '&lt;%= OpenSSL::HMAC.hexdigest("sha256", "YOUR_INTERCOM_APP_SECRET", current_user.id) %&gt;'
+         }
+     }
+}
+</code></pre>
+      <h3 id="unsubscribe-users">Unsubscribe Users</h3>
+      <p>To unsubscribe users from emails, you may set a flag from <strong>server side</strong> libraries, <code>unsubscribedFromEmails</code>, inside <code>context</code> object:</p>
+      <p><code>node.js</code> example:</p>
+      <pre><code class="lang-javascript">analytics.identify({
+  userId: '4832094283057439285723523452345',
+  anonymousId:'43254364571',
+  context:{
+    Intercom: { unsubscribedFromEmails: true }
+  },
+  traits: {
+    firstName: 'John ',
+    lastName: 'Jacob',
+    email: 'jingleheimer@schmidt.com'
+  }
+});
+</code></pre>
+      <p><strong>Note</strong>: This will only work from server side libraries. NOT <code>analytics.js</code>!</p>
+      <h3 id="last-seen">Last Seen</h3>
+      <p>By default Intercom updates the <strong>Last Seen</strong> user trait whenever a user’s profile is updated by <code>identify</code> calls, or if a group call is sent with a user’s userId. If you want to update a user without updating their <strong>Last Seen</strong> time, pass <code>active</code> with a value of <code>false</code> into the context (see example below) of your <code>identify</code> or <code>group</code> calls. Note that this only works server-side; <strong>Last Seen</strong> will always be updated client-side. Please note that id or name are necessary to update company.</p>
+      <p>Here’s a full <code>python</code> example of an <code>identify</code> call with <code>active</code> set to <code>false</code>:</p>
+      <pre><code class="lang-python">analytics.identify(user_id='some_user_id', traits={
+    "email": "ben@intercom.io",
+    "firstName": "Ben",
+    "lastName": "McRedmond"
+    "createdAt": 1363902294011,
+    "plan": "Premium"
+}, context={
+    "ip": "192.168.0.1",
+    "active": False,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.47 Safari/537.36"
+})
+</code></pre>
+      <h3 id="intercom-tags">Intercom Tags</h3>
+      <p>Our API doesn’t support Intercom tags. Traits can be used instead of tags to create segments of users, and the advantage is you can use those traits in other destinations like Segment.</p>
+      <h3 id="conditionally-show-the-intercom-chat-widget">Conditionally show the Intercom chat widget</h3>
+      <p>You can take advantage of Intercom’s <code>hide_default_launcher</code> option to selectively show the chat widget. According to Intercom’s <a href="https://docs.intercom.io/configure-intercom-for-your-product-or-site/customize-the-intercom-messenger/customize-the-intercom-messenger-technical#show-the-intercom-messenger-to-selected-users-for-web-">docs</a>, you want to first hide the Messenger for all users inside their UI via Messenger settings. Then think about how you want to programmatically decide which users you’d like to show the widget to. Then you can pass an Intercom specific destination setting like this:</p>
+      <pre><code class="lang-js">// with analytics.js
+analytics.identify('teemo', { someTrait: 'x'}, {
+  Intercom: { hideDefaultLauncher: true }
+});
+</code></pre>
+      <p><strong>Note</strong>: You can pass in the Intercom specific option via all supported calls for this destination (<code>page</code>, <code>identify</code>, and <code>group</code>)!</p>
+      <hr>
+      <h2 id="troubleshooting">Troubleshooting</h2>
+      <h3 id="i-m-seeing-a-403-forbidden-error">I’m seeing a <code>403 Forbidden</code> error</h3>
+      <p>You probably have <a href="#identity-verification">Intercom’s identity verification</a> setting turned on but are not passing the <code>user_hash</code> correctly or at all.</p>
+      <p>You may also have to <a href="https://docs.intercom.io/configuring-for-your-product-or-site/customizing-the-intercom-messenger#whitelist-the-domains-you-want-to-use-intercom-with">whitelist your domain</a> in Intercom’s dashboard. Otherwise, events on non-whitelisted pages may be rejected with a 403 error.</p>
+      <h3 id="my-intercom-widget-doesn-t-show-up">My Intercom Widget doesn’t show up</h3>
+      <p>Make sure you are sending a <code>page</code> and <code>identify</code> call when the page is loaded. This allows Intercom to register the page and the user, which would enable the widget to appear.</p>
+      <p>If you are sending those two calls, then check that the CSS selector for the widget is correct. The default is <code>#IntercomDefaultWidget</code>, but if you <a href="http://docs.intercom.io/configuring-Intercom/in-app-messenger#custom-style">customize your widget</a>, then be sure to update this field accordingly.</p>
+      <h3 id="my-client-side-and-server-side-calls-are-going-to-one-segment-source-but-different-intercom-projects">My client-side and server-side calls are going to one Segment source, but different Intercom projects</h3>
+      <p>Server-side calls go the the project selected when you authenticated your Intercom account while setting up the destination. Client-side calls go to the project referenced with the <a href="#app-id-required-for-analytics-js-">App ID setting</a>. Make sure those projects are the same.</p>
+      <hr>
+      <h2 id="supported-sources-and-connection-modes">Supported Sources and Connection Modes</h2>
+      <table>
+       <tbody>
+        <tr>
+         <th></th>
+         <th>Web</th>
+         <th>Mobile</th>
+         <th>Server</th>
+        </tr>
+        <tr>
+         <td>? Device-based</td>
+         <td>?</td>
+         <td></td>
+         <td></td>
+        </tr>
+        <tr>
+         <td>?? Cloud-based</td>
+         <td></td>
+         <td>?</td>
+         <td>?</td>
+        </tr>
+       </tbody>
+      </table>
+      <p>To learn more about about Connection Modes and what dictates which we support, <a href="https://segment.com/docs/integrations/#connection-modes">see here</a>.</p>
+      <h2 id="settings">Settings</h2>
+      <p>Segment lets you change these destination settings via your Segment dashboard without having to touch any code.</p>
+      <h3 id="custom-inbox-button-selector">Custom Inbox Button Selector</h3>
+      <p>By default, Intercom will inject their own inbox button onto the page, but you can choose to use your own custom button instead by providing a CSS selector like: <code>#my-button</code>. <em>Note: you must have enabled the <strong>Show the Intercom Inbox</strong> setting for this to work.</em> The default value is <code>#IntercomDefaultWidget</code></p>
+      <h3 id="enter-your-api-key">Enter your API Key</h3>
+      <p>Note: this is <strong>required</strong> to send data to Intercom from your servers. You can find your API key after activating your account under the <strong>Configure &gt; API Keys</strong> at <a href="https://intercom.io">Intercom.io</a>. It should be 40 characters long, and look something like this: <code>4ad6ce80fc1d441324cfb11cdf8d3ade8fc7e8fd</code>.</p>
+      <h3 id="app-id-required-for-analytics-js-">App ID (required for analytics.js)</h3>
+      <p>Note: this is <strong>required</strong> to send data to Intercom from your browser. You can find your App ID after activating your account under the <strong>Gear Menu &gt; App Settings &gt; API Keys</strong> at <a href="https://intercom.io">Intercom.io</a>. It should look something like this: <code>9iefb489.</code></p>
+      <h3 id="include-context-with-identify-calls">Include Context with Identify Calls</h3>
+      <p>Pass context data with Identify calls as Custom Attributes. Includes device.type, device.manufacturer, device.model, os.name, os.version, app.name, app.version</p>
+      <h3 id="isbulkapienabled">isBulkAPIEnabled</h3>
+      <h3 id="oauth">OAuth</h3>
+      <p>Intercom uses an OAuth-like interface for reading/writing to their system. This option stores the various values that are needed by Intercom to validate requests (replaces API keys), and the user-specific values for UI display (e.g. user’s email, avatar, list of accounts, etc.). These fields are unique to Intercom, and are cleared out en masse when disconnecting (revoking authorization).</p>
+      <h3 id="rich-link-properties">Rich Link Properties</h3>
+      <p>To use Intercom’s Rich Link object, list the name of the exact Segment property name and make sure the value of those properties only include <code>url</code> and <code>value</code> keys.</p>
+      <hr>
+      <p>If you have any questions or see anywhere we can improve our documentation, please <a href="/contact/">let us know</a> or kick off a conversation in the <a href="https://community.segment.com/">Segment Community</a>!</p>
+     </div>
+     <footer class="Page-footer">
+      <span class="Feedback"><span>Was this document helpful?</span> <span class="Feedback-btn-wrapper"><label id="Feedback-yes" class="Feedback-btn"><input type="radio"> <span class="Feedback-btn-label">Yes</span></label><label id="Feedback-no" class="Feedback-btn"><input type="radio"> <span class="Feedback-btn-label">No</span></label></span></span>
+     </footer>
+    </main>
+   </div>
+   <div class="Page-sidebar">
+    <form class="DocsNav-search-form">
+     <i class="DocsNav-search-icon"></i> 
+     <input type="search" class="DocsNav-search-input st-search-input" placeholder="Search...">
+    </form>
+    <h1 class="Page-sidebar-title"></h1>
+    <ul class="PageNav">
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations">Overview</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="PageNav-item-link" data-slug="Overview-sources-vs-destinations" href="/docs/destinations#sources-vs-destinations">Sources vs Destinations</a> 
+       <a class="PageNav-item-link" data-slug="Overview-source-compatibility" href="/docs/destinations#source-compatibility">Source Compatibility</a> 
+       <a class="PageNav-item-link" data-slug="Overview-connection-modes" href="/docs/destinations#connection-modes">Connection Modes</a> 
+       <a class="PageNav-item-link" data-slug="Overview-data-deliverability" href="/docs/destinations#data-deliverability">Data Deliverability</a> 
+       <a class="PageNav-item-link" data-slug="Overview-warehouse-schemas" href="/docs/destinations#warehouse-schemas">Warehouse Schemas</a> 
+       <a class="PageNav-item-link" data-slug="Overview-catalog" href="/docs/destinations#catalog">Catalog</a> 
+       <a class="PageNav-item-link" data-slug="Overview-faqs" href="/docs/destinations#faqs">FAQs</a>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/activecampaign"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/adjust"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/adlearn-open-platform"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/adobe-analytics"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/adroll"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/adwords"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/alexa"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/amazon-kinesis"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/amazon-kinesis-firehose"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/amazon-s3"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/ambassador"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/amplitude"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/appboy"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/appcues"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/appnexus"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/appsflyer"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/apptimize"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/atatus"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/attribution"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/autopilothq"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/bigquery"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/bing-ads"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/blueshift"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/boomtrain"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/branch-metrics"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/bronto"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/bugherd"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/bugsnag"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/calq"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/castle"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/chartbeat"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/clearbit-enrichment"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/clearbit-reveal"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/clevertap"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/clicky"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/clientsuccess"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/comscore"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/convertro"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/countly"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/crazy-egg"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/criteo"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/crittercism"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/curebit"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/customer.io"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/delighted"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/doubleclick-floodlight"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/drift"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/drip"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/elevio"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/eloqua"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/email-aptitude"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/errorception"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/evergage"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/extole"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/facebook-app-events"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/facebook-offline-conversions"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/facebook-pixel"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/flurry"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/foxmetrics"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/freshsales"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/fullstory"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/gainsight"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/gauges"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/goedle"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/google-analytics"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/google-tag-manager"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/gosquared"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/hasoffers"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/heap"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/hello-bar"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/help-scout"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/hindsight"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/hittail"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/hotjar"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/hubspot"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/hull"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/improvely"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/indicative"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/infinario"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/inspectlet"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/intellimize"></a></li>
+     <li class="PageNav-item" stick><a class="PageNav-item-header" href="/docs/destinations/intercom"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/iron.io"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/iterable"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/kahuna"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/keen-io"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/kissmetrics"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/klaviyo"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/kochava"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/leanplum"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/librato"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/linkedin-insight-tag"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/livechat"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/localytics"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/lucky-orange"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/lytics"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/madkudu"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/mailchimp"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/mailjet"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/marketo-v2"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/mediamath"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/millennial-media"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/mixpanel"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/moengage"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/monetate"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/mouseflow"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/mousestats"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/nanigans"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/natero"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/navilytics"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/new-relic"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/nudgespot"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/olark"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/onesignal"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/optimizely"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/outbound"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/pardot"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/parsely"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/pendo"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/perfect-audience"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/pingdom"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/pinterest-tag"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/piwik"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/planhat"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/pointillist"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/postgres"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/promoter.io"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/qualaroo"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/quantcast"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/quanticmind"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/quora-conversion-pixel"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/radiumone-connect"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/ramen"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/redshift"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/repeater"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/responsys"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/rollbar"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/saasquatch"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/sailthru"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/salesforce"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/salesforce-marketing-cloud"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/salesmachine"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/satismeter"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/seg"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/sentry"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/shareasale"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/simplereach"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/slack"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/smyte"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/snapengage"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/sparkpage"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/spinnakr"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/stitch-data"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/stripe-radar"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/taplytics"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/tapstream"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/totango"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/track-js"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/tractionboard"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/tray.io"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/treasure-data"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/tune"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/tv-squared"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/twitter-ads"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/urban-airship"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/userlike"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/uservoice"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/vero"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/visual-website-optimizer"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/webengage"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/webhooks"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/whale-alerts"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/whale-watch"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/wigzo"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/wishpond"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/woopra"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/wootric"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/xplenty"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/yandex-metrica"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/yellowhammer"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/youbora"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/zaius"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/zendesk"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/zopim"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/linkedin-conversion-tag"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/cubitic"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/cordialio"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/insidevault"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/frontleaf"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/apteligent"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/aboardly"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/framed.io"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/tableau"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header" href="/docs/destinations/preact"></a></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Data Warehousing</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/redshift">Redshift</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/redshift"></a>
+        <a class="PageNav-item-link" data-slug="redshift-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="redshift-permissioning-segment-to-redshift" href="#permissioning-segment-to-redshift">Permissioning Segment to Redshift</a> 
+        <a class="PageNav-item-link" data-slug="redshift-electing-to-encrypt-your-data" href="#electing-to-encrypt-your-data">Electing to encrypt your data</a> 
+        <a class="PageNav-item-link" data-slug="redshift-syncing-data-in-and-out-of-segment-warehouse" href="#syncing-data-in-and-out-of-segment-warehouse">Syncing data in and out of Segment Warehouse</a> 
+        <a class="PageNav-item-link" data-slug="redshift-sync-schedule" href="#sync-schedule">Sync schedule</a> 
+        <a class="PageNav-item-link" data-slug="redshift-distribution-key" href="#distribution-key">Distribution Key</a> 
+        <a class="PageNav-item-link" data-slug="redshift-reserved-words" href="#reserved-words">Reserved Words</a> 
+        <a class="PageNav-item-link" data-slug="redshift-query-speed" href="#query-speed">Query Speed</a> 
+        <a class="PageNav-item-link" data-slug="redshift-security" href="#security">Security</a> 
+        <a class="PageNav-item-link" data-slug="redshift-cpu" href="#cpu">CPU</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/postgres">Postgres</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/postgres"></a>
+        <a class="PageNav-item-link" data-slug="postgres-heroku-postgres" href="#heroku-postgres">Heroku Postgres</a> 
+        <a class="PageNav-item-link" data-slug="postgres-rds-postgres" href="#rds-postgres">RDS Postgres</a> 
+        <a class="PageNav-item-link" data-slug="postgres-compose-postgres" href="#compose-postgres">Compose Postgres</a> 
+        <a class="PageNav-item-link" data-slug="postgres-database-setup" href="#database-setup">Database Setup</a> 
+        <a class="PageNav-item-link" data-slug="postgres-connect-with-segment" href="#connect-with-segment">Connect with Segment</a> 
+        <a class="PageNav-item-link" data-slug="postgres-sync-schedule" href="#sync-schedule">Sync schedule</a> 
+        <a class="PageNav-item-link" data-slug="postgres-query-speed" href="#query-speed">Query Speed</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/bigquery">BigQuery</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/bigquery"></a>
+        <a class="PageNav-item-link" data-slug="bigquery-overview" href="#overview">Overview</a> 
+        <a class="PageNav-item-link" data-slug="bigquery-setup" href="#setup">Setup</a> 
+        <a class="PageNav-item-link" data-slug="bigquery-schema" href="#schema">Schema</a> 
+        <a class="PageNav-item-link" data-slug="bigquery-best-practices" href="#best-practices">Best Practices</a> 
+        <a class="PageNav-item-link" data-slug="bigquery-pricing" href="#pricing">Pricing</a> 
+        <a class="PageNav-item-link" data-slug="bigquery-streaming-inserts" href="#streaming-inserts">Streaming Inserts</a> 
+        <a class="PageNav-item-link" data-slug="bigquery-sync-schedule" href="#sync-schedule">Sync schedule</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">A/B Testing</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/apptimize">Apptimize</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/apptimize"></a>
+        <a class="PageNav-item-link" data-slug="apptimize-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="apptimize-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="apptimize-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="apptimize-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="apptimize-send-experiment-data-from-apptimize" href="#send-experiment-data-from-apptimize">Send Experiment Data from Apptimize</a> 
+        <a class="PageNav-item-link" data-slug="apptimize-manually-initialize-apptimize" href="#manually-initialize-apptimize">Manually Initialize Apptimize</a> 
+        <a class="PageNav-item-link" data-slug="apptimize-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/leanplum">Leanplum</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/leanplum"></a>
+        <a class="PageNav-item-link" data-slug="leanplum-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="leanplum-server-side" href="#server-side">Server-Side</a> 
+        <a class="PageNav-item-link" data-slug="leanplum-mobile" href="#mobile">Mobile</a> 
+        <a class="PageNav-item-link" data-slug="leanplum-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="leanplum-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="leanplum-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="leanplum-how-to-push-notifications" href="#how-to-push-notifications">How To - Push Notifications:</a> 
+        <a class="PageNav-item-link" data-slug="leanplum-how-to-ab-testing" href="#how-to-ab-testing">How To - A/B Testing:</a> 
+        <a class="PageNav-item-link" data-slug="leanplum-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/monetate">Monetate</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/monetate"></a>
+        <a class="PageNav-item-link" data-slug="monetate-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="monetate-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="monetate-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="monetate-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/optimizely">Optimizely</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/optimizely"></a>
+        <a class="PageNav-item-link" data-slug="optimizely-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="optimizely-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="optimizely-sending-experiment-data-to-segment" href="#sending-experiment-data-to-segment">Sending Experiment Data to Segment</a> 
+        <a class="PageNav-item-link" data-slug="optimizely-optimizely-x-fullstack" href="#optimizely-x-fullstack">Optimizely X Fullstack</a> 
+        <a class="PageNav-item-link" data-slug="optimizely-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="optimizely-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/taplytics">Taplytics</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/taplytics"></a>
+        <a class="PageNav-item-link" data-slug="taplytics-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="taplytics-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="taplytics-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="taplytics-reset" href="#reset">Reset</a> 
+        <a class="PageNav-item-link" data-slug="taplytics-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/visual-website-optimizer">Visual Website Optimizer</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/visual-website-optimizer"></a>
+        <a class="PageNav-item-link" data-slug="visual-website-optimizer-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="visual-website-optimizer-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="visual-website-optimizer-send-experiment-data-from-vwo" href="#send-experiment-data-from-vwo">Send Experiment Data from VWO</a> 
+        <a class="PageNav-item-link" data-slug="visual-website-optimizer-sending-revenue" href="#sending-revenue">Sending Revenue</a> 
+        <a class="PageNav-item-link" data-slug="visual-website-optimizer-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Advertising</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/adlearn-open-platform">AdLearn Open Platform</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/adlearn-open-platform"></a>
+        <a class="PageNav-item-link" data-slug="adlearn-open-platform-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/adroll">AdRoll</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/adroll"></a>
+        <a class="PageNav-item-link" data-slug="adroll-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="adroll-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="adroll-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="adroll-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="adroll-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/adwords">AdWords</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/adwords"></a>
+        <a class="PageNav-item-link" data-slug="adwords-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="adwords-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="adwords-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="adwords-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/appnexus">AppNexus</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/appnexus"></a>
+        <a class="PageNav-item-link" data-slug="appnexus-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/bing-ads">Bing Ads</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/bing-ads"></a>
+        <a class="PageNav-item-link" data-slug="bing-ads-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="bing-ads-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="bing-ads-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="bing-ads-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/criteo">Criteo</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/criteo"></a>
+        <a class="PageNav-item-link" data-slug="criteo-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="criteo-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="criteo-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="criteo-other-features" href="#other-features">Other Features</a> 
+        <a class="PageNav-item-link" data-slug="criteo-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="criteo-faq" href="#faq">FAQ</a> 
+        <a class="PageNav-item-link" data-slug="criteo-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/doubleclick-floodlight">DoubleClick Floodlight</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/doubleclick-floodlight"></a>
+        <a class="PageNav-item-link" data-slug="doubleclick-floodlight-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="doubleclick-floodlight-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="doubleclick-floodlight-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="doubleclick-floodlight-setting-up-custom-variables" href="#setting-up-custom-variables">Setting up Custom Variables</a> 
+        <a class="PageNav-item-link" data-slug="doubleclick-floodlight-copa-compliance" href="#copa-compliance">COPA Compliance</a> 
+        <a class="PageNav-item-link" data-slug="doubleclick-floodlight-sending-personally-identifiable-information-pii" href="#sending-personally-identifiable-information-pii">Sending Personally Identifiable Information (PII)</a> 
+        <a class="PageNav-item-link" data-slug="doubleclick-floodlight-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/facebook-app-events">Facebook App Events</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/facebook-app-events"></a>
+        <a class="PageNav-item-link" data-slug="facebook-app-events-segment-sdk-destination" href="#segment-sdk-destination">Segment SDK Destination</a> 
+        <a class="PageNav-item-link" data-slug="facebook-app-events-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="facebook-app-events-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="facebook-app-events-packaged-destination" href="#packaged-destination">Packaged Destination</a> 
+        <a class="PageNav-item-link" data-slug="facebook-app-events-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="facebook-app-events-other-features" href="#other-features">Other Features</a> 
+        <a class="PageNav-item-link" data-slug="facebook-app-events-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="facebook-app-events-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/facebook-offline-conversions">Facebook Offline Conversions</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/facebook-offline-conversions"></a>
+        <a class="PageNav-item-link" data-slug="facebook-offline-conversions-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="facebook-offline-conversions-additional-prerequisite-configurations" href="#additional-prerequisite-configurations">Additional Prerequisite Configurations</a> 
+        <a class="PageNav-item-link" data-slug="facebook-offline-conversions-sending-track-events-to-offline-sets" href="#sending-track-events-to-offline-sets">Sending .track() Events to Offline Sets</a> 
+        <a class="PageNav-item-link" data-slug="facebook-offline-conversions-attribution-and-match-keys" href="#attribution-and-match-keys">Attribution and "Match Keys"</a> 
+        <a class="PageNav-item-link" data-slug="facebook-offline-conversions-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/facebook-pixel">Facebook Pixel</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/facebook-pixel"></a>
+        <a class="PageNav-item-link" data-slug="facebook-pixel-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="facebook-pixel-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="facebook-pixel-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="facebook-pixel-ecommerce-events-and-facebook-dynamic-product-ads" href="#ecommerce-events-and-facebook-dynamic-product-ads">Ecommerce Events and Facebook Dynamic Product Ads</a> 
+        <a class="PageNav-item-link" data-slug="facebook-pixel-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="facebook-pixel-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/hasoffers">HasOffers</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/hasoffers"></a>
+        <a class="PageNav-item-link" data-slug="hasoffers-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/linkedin-insight-tag">LinkedIn Insight Tag</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/linkedin-insight-tag"></a>
+        <a class="PageNav-item-link" data-slug="linkedin-insight-tag-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="linkedin-insight-tag-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/mediamath">MediaMath</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/mediamath"></a>
+        <a class="PageNav-item-link" data-slug="mediamath-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/millennial-media">Millennial Media</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/millennial-media"></a>
+        <a class="PageNav-item-link" data-slug="millennial-media-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="millennial-media-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/nanigans">Nanigans</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/nanigans"></a>
+        <a class="PageNav-item-link" data-slug="nanigans-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="nanigans-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="nanigans-server-side" href="#server-side">Server-Side</a> 
+        <a class="PageNav-item-link" data-slug="nanigans-mobile" href="#mobile">Mobile</a> 
+        <a class="PageNav-item-link" data-slug="nanigans-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/perfect-audience">Perfect Audience</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/perfect-audience"></a>
+        <a class="PageNav-item-link" data-slug="perfect-audience-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="perfect-audience-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="perfect-audience-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="perfect-audience-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="perfect-audience-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/pinterest-tag">Pinterest Tag</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/pinterest-tag"></a>
+        <a class="PageNav-item-link" data-slug="pinterest-tag-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="pinterest-tag-segment-specified-pinterest-tag-events" href="#segment-specified-pinterest-tag-events">Segment Specified Pinterest Tag Events</a> 
+        <a class="PageNav-item-link" data-slug="pinterest-tag-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/quantcast">Quantcast</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/quantcast"></a>
+        <a class="PageNav-item-link" data-slug="quantcast-web-destination" href="#web-destination">Web Destination</a> 
+        <a class="PageNav-item-link" data-slug="quantcast-mobile-destination" href="#mobile-destination">Mobile Destination</a> 
+        <a class="PageNav-item-link" data-slug="quantcast-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/quanticmind">QuanticMind</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/quanticmind"></a>
+        <a class="PageNav-item-link" data-slug="quanticmind-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/quora-conversion-pixel">Quora Conversion Pixel</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/quora-conversion-pixel"></a>
+        <a class="PageNav-item-link" data-slug="quora-conversion-pixel-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="quora-conversion-pixel-overview" href="#overview">Overview</a> 
+        <a class="PageNav-item-link" data-slug="quora-conversion-pixel-the-quora-track-event" href="#the-quora-track-event">The Quora Track Event</a> 
+        <a class="PageNav-item-link" data-slug="quora-conversion-pixel-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/radiumone-connect">RadiumOne Connect</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/radiumone-connect"></a>
+        <a class="PageNav-item-link" data-slug="radiumone-connect-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/shareasale">ShareASale</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/shareasale"></a>
+        <a class="PageNav-item-link" data-slug="shareasale-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="shareasale-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="shareasale-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="shareasale-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/simplereach">SimpleReach</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/simplereach"></a>
+        <a class="PageNav-item-link" data-slug="simplereach-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="simplereach-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/tv-squared">TV Squared</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/tv-squared"></a>
+        <a class="PageNav-item-link" data-slug="tv-squared-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="tv-squared-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="tv-squared-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="tv-squared-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/twitter-ads">Twitter Ads</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/twitter-ads"></a>
+        <a class="PageNav-item-link" data-slug="twitter-ads-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="twitter-ads-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="twitter-ads-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="twitter-ads-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="twitter-ads-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/yellowhammer">Yellowhammer</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/yellowhammer"></a>
+        <a class="PageNav-item-link" data-slug="yellowhammer-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Analytics</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/adobe-analytics">Adobe Analytics</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/adobe-analytics"></a>
+        <a class="PageNav-item-link" data-slug="adobe-analytics-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="adobe-analytics-device-based-data-sent-via-analyticsjs" href="#device-based-data-sent-via-analyticsjs">Device-Based (data sent via analytics.js)</a> 
+        <a class="PageNav-item-link" data-slug="adobe-analytics-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="adobe-analytics-server-side-data-sent-via-mobile-or-server-side-libraries" href="#server-side-data-sent-via-mobile-or-server-side-libraries">Server side (data sent via mobile or server side libraries)</a> 
+        <a class="PageNav-item-link" data-slug="adobe-analytics-list-variables" href="#list-variables">List Variables</a> 
+        <a class="PageNav-item-link" data-slug="adobe-analytics-faq" href="#faq">FAQ</a> 
+        <a class="PageNav-item-link" data-slug="adobe-analytics-sending-data-via-mobile-library" href="#sending-data-via-mobile-library">Sending data via mobile library</a> 
+        <a class="PageNav-item-link" data-slug="adobe-analytics-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/alexa">Alexa</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/alexa"></a>
+        <a class="PageNav-item-link" data-slug="alexa-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="alexa-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/amazon-kinesis">Amazon Kinesis</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/amazon-kinesis"></a>
+        <a class="PageNav-item-link" data-slug="amazon-kinesis-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="amazon-kinesis-data-model" href="#data-model">Data Model</a> 
+        <a class="PageNav-item-link" data-slug="amazon-kinesis-quickstart" href="#quickstart">Quickstart</a> 
+        <a class="PageNav-item-link" data-slug="amazon-kinesis-debugging" href="#debugging">Debugging</a> 
+        <a class="PageNav-item-link" data-slug="amazon-kinesis-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/amazon-kinesis-firehose">Amazon Kinesis Firehose</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/amazon-kinesis-firehose"></a>
+        <a class="PageNav-item-link" data-slug="amazon-kinesis-firehose-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="amazon-kinesis-firehose-event-mapping" href="#event-mapping">Event Mapping</a> 
+        <a class="PageNav-item-link" data-slug="amazon-kinesis-firehose-data-model" href="#data-model">Data Model</a> 
+        <a class="PageNav-item-link" data-slug="amazon-kinesis-firehose-quickstart" href="#quickstart">Quickstart</a> 
+        <a class="PageNav-item-link" data-slug="amazon-kinesis-firehose-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/amazon-s3">Amazon S3</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/amazon-s3"></a>
+        <a class="PageNav-item-link" data-slug="amazon-s3-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="amazon-s3-required-steps" href="#required-steps">Required Steps</a> 
+        <a class="PageNav-item-link" data-slug="amazon-s3-data-format" href="#data-format">Data format</a> 
+        <a class="PageNav-item-link" data-slug="amazon-s3-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/amplitude">Amplitude</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/amplitude"></a>
+        <a class="PageNav-item-link" data-slug="amplitude-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="amplitude-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="amplitude-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="amplitude-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="amplitude-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="amplitude-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="amplitude-order-completed" href="#order-completed">Order Completed</a> 
+        <a class="PageNav-item-link" data-slug="amplitude-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/calq">Calq</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/calq"></a>
+        <a class="PageNav-item-link" data-slug="calq-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/clicky">Clicky</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/clicky"></a>
+        <a class="PageNav-item-link" data-slug="clicky-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="clicky-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="clicky-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="clicky-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/comscore">comScore</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/comscore"></a>
+        <a class="PageNav-item-link" data-slug="comscore-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="comscore-analyticsjs" href="#analyticsjs">Analytics.js</a> 
+        <a class="PageNav-item-link" data-slug="comscore-mobile" href="#mobile">Mobile</a> 
+        <a class="PageNav-item-link" data-slug="comscore-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="comscore-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="comscore-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="comscore-flush" href="#flush">Flush</a> 
+        <a class="PageNav-item-link" data-slug="comscore-video-streaming" href="#video-streaming">Video Streaming</a> 
+        <a class="PageNav-item-link" data-slug="comscore-additional-video-destinations-specific-options" href="#additional-video-destinations-specific-options">Additional Video Destinations Specific Options</a> 
+        <a class="PageNav-item-link" data-slug="comscore-faq" href="#faq">FAQ</a> 
+        <a class="PageNav-item-link" data-slug="comscore-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/countly">Countly</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/countly"></a>
+        <a class="PageNav-item-link" data-slug="countly-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="countly-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="countly-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/flurry">Flurry</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/flurry"></a>
+        <a class="PageNav-item-link" data-slug="flurry-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="flurry-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="flurry-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="flurry-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/foxmetrics">FoxMetrics</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/foxmetrics"></a>
+        <a class="PageNav-item-link" data-slug="foxmetrics-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="foxmetrics-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="foxmetrics-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="foxmetrics-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/gauges">Gauges</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/gauges"></a>
+        <a class="PageNav-item-link" data-slug="gauges-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="gauges-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="gauges-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="gauges-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/goedle">Goedle</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/goedle"></a>
+        <a class="PageNav-item-link" data-slug="goedle-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="goedle-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="goedle-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="goedle-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="goedle-page-and-screen" href="#page-and-screen">Page and Screen</a> 
+        <a class="PageNav-item-link" data-slug="goedle-ecommerce" href="#ecommerce">Ecommerce</a> 
+        <a class="PageNav-item-link" data-slug="goedle-ab-testing" href="#ab-testing">A/B Testing</a> 
+        <a class="PageNav-item-link" data-slug="goedle-mobile" href="#mobile">Mobile</a> 
+        <a class="PageNav-item-link" data-slug="goedle-unique-features-of-the-goedleio-integration" href="#unique-features-of-the-goedleio-integration">Unique features of the goedle.io integration</a> 
+        <a class="PageNav-item-link" data-slug="goedle-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="goedle-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/google-analytics">Google Analytics</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/google-analytics"></a>
+        <a class="PageNav-item-link" data-slug="google-analytics-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="google-analytics-page-screen" href="#page-screen">Page &amp; Screen</a> 
+        <a class="PageNav-item-link" data-slug="google-analytics-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="google-analytics-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="google-analytics-e-commerce" href="#e-commerce">E-Commerce</a> 
+        <a class="PageNav-item-link" data-slug="google-analytics-enhanced-e-commerce" href="#enhanced-e-commerce">Enhanced E-Commerce</a> 
+        <a class="PageNav-item-link" data-slug="google-analytics-mobile-apps" href="#mobile-apps">Mobile Apps</a> 
+        <a class="PageNav-item-link" data-slug="google-analytics-server-side" href="#server-side">Server Side</a> 
+        <a class="PageNav-item-link" data-slug="google-analytics-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="google-analytics-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="google-analytics-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/heap">Heap</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/heap"></a>
+        <a class="PageNav-item-link" data-slug="heap-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="heap-required-field" href="#required-field">Required Field</a> 
+        <a class="PageNav-item-link" data-slug="heap-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="heap-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="heap-web" href="#web">Web</a> 
+        <a class="PageNav-item-link" data-slug="heap-nested-objects-and-arrays" href="#nested-objects-and-arrays">Nested Objects and Arrays</a> 
+        <a class="PageNav-item-link" data-slug="heap-dates" href="#dates">Dates</a> 
+        <a class="PageNav-item-link" data-slug="heap-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/hindsight">Hindsight</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/hindsight"></a>
+        <a class="PageNav-item-link" data-slug="hindsight-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/hittail">HitTail</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/hittail"></a>
+        <a class="PageNav-item-link" data-slug="hittail-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="hittail-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/hubspot">HubSpot</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/hubspot"></a>
+        <a class="PageNav-item-link" data-slug="hubspot-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="hubspot-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="hubspot-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="hubspot-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="hubspot-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="hubspot-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/indicative">Indicative</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/indicative"></a>
+        <a class="PageNav-item-link" data-slug="indicative-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="indicative-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="indicative-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="indicative-page-and-screen" href="#page-and-screen">Page and Screen</a> 
+        <a class="PageNav-item-link" data-slug="indicative-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="indicative-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/infinario">Infinario</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/infinario"></a>
+        <a class="PageNav-item-link" data-slug="infinario-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="infinario-common-restrictions" href="#common-restrictions">Common restrictions</a> 
+        <a class="PageNav-item-link" data-slug="infinario-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="infinario-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="infinario-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="infinario-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="infinario-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="infinario-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="infinario-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/keen-io">Keen IO</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/keen-io"></a>
+        <a class="PageNav-item-link" data-slug="keen-io-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="keen-io-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="keen-io-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="keen-io-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/kissmetrics">KISSmetrics</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/kissmetrics"></a>
+        <a class="PageNav-item-link" data-slug="kissmetrics-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="kissmetrics-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="kissmetrics-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="kissmetrics-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="kissmetrics-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="kissmetrics-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="kissmetrics-engage" href="#engage">Engage</a> 
+        <a class="PageNav-item-link" data-slug="kissmetrics-e-commerce" href="#e-commerce">E-Commerce</a> 
+        <a class="PageNav-item-link" data-slug="kissmetrics-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="kissmetrics-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/librato">Librato</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/librato"></a>
+        <a class="PageNav-item-link" data-slug="librato-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="librato-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="librato-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/localytics">Localytics</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/localytics"></a>
+        <a class="PageNav-item-link" data-slug="localytics-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="localytics-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="localytics-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="localytics-push-notifications" href="#push-notifications">Push Notifications</a> 
+        <a class="PageNav-item-link" data-slug="localytics-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/lytics">Lytics</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/lytics"></a>
+        <a class="PageNav-item-link" data-slug="lytics-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="lytics-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="lytics-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/madkudu">Madkudu</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/madkudu"></a>
+        <a class="PageNav-item-link" data-slug="madkudu-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="madkudu-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="madkudu-mapping" href="#mapping">Mapping</a> 
+        <a class="PageNav-item-link" data-slug="madkudu-questions" href="#questions">Questions?</a> 
+        <a class="PageNav-item-link" data-slug="madkudu-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/mixpanel">Mixpanel</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/mixpanel"></a>
+        <a class="PageNav-item-link" data-slug="mixpanel-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="mixpanel-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="mixpanel-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="mixpanel-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="mixpanel-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="mixpanel-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="mixpanel-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="mixpanel-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/new-relic">New Relic</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/new-relic"></a>
+        <a class="PageNav-item-link" data-slug="new-relic-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="new-relic-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/parsely">Parsely</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/parsely"></a>
+        <a class="PageNav-item-link" data-slug="parsely-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="parsely-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="parsely-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="parsely-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/pendo">Pendo</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/pendo"></a>
+        <a class="PageNav-item-link" data-slug="pendo-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="pendo-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="pendo-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="pendo-settings" href="#settings">Settings</a> 
+        <a class="PageNav-item-link" data-slug="pendo-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/piwik">Piwik</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/piwik"></a>
+        <a class="PageNav-item-link" data-slug="piwik-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="piwik-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="piwik-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="piwik-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="piwik-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/pointillist">Pointillist</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/pointillist"></a>
+        <a class="PageNav-item-link" data-slug="pointillist-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="pointillist-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="pointillist-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="pointillist-api-key" href="#api-key">API Key</a> 
+        <a class="PageNav-item-link" data-slug="pointillist-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/tractionboard">Tractionboard</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/tractionboard"></a>
+        <a class="PageNav-item-link" data-slug="tractionboard-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="tractionboard-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="tractionboard-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="tractionboard-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="tractionboard-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="tractionboard-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="tractionboard-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="tractionboard-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/whale-watch">Whale Watch</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/whale-watch"></a>
+        <a class="PageNav-item-link" data-slug="whale-watch-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/wigzo">Wigzo</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/wigzo"></a>
+        <a class="PageNav-item-link" data-slug="wigzo-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="wigzo-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="wigzo-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="wigzo-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="wigzo-need-more-information" href="#need-more-information">Need more information?</a> 
+        <a class="PageNav-item-link" data-slug="wigzo-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/woopra">Woopra</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/woopra"></a>
+        <a class="PageNav-item-link" data-slug="woopra-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="woopra-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="woopra-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="woopra-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="woopra-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="woopra-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="woopra-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="woopra-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/yandex-metrica">Yandex Metrica</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/yandex-metrica"></a>
+        <a class="PageNav-item-link" data-slug="yandex-metrica-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="yandex-metrica-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/youbora">Youbora</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/youbora"></a>
+        <a class="PageNav-item-link" data-slug="youbora-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="youbora-video-contentad-playing" href="#video-contentad-playing">Video Content/Ad Playing</a> 
+        <a class="PageNav-item-link" data-slug="youbora-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Attribution</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/adjust">Adjust</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/adjust"></a>
+        <a class="PageNav-item-link" data-slug="adjust-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="adjust-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="adjust-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="adjust-reset" href="#reset">Reset</a> 
+        <a class="PageNav-item-link" data-slug="adjust-install-attributed" href="#install-attributed">Install Attributed</a> 
+        <a class="PageNav-item-link" data-slug="adjust-other-features" href="#other-features">Other Features</a> 
+        <a class="PageNav-item-link" data-slug="adjust-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/appsflyer">AppsFlyer</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/appsflyer"></a>
+        <a class="PageNav-item-link" data-slug="appsflyer-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="appsflyer-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="appsflyer-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="appsflyer-other-features" href="#other-features">Other Features</a> 
+        <a class="PageNav-item-link" data-slug="appsflyer-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/attribution">Attribution</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/attribution"></a>
+        <a class="PageNav-item-link" data-slug="attribution-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/convertro">Convertro</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/convertro"></a>
+        <a class="PageNav-item-link" data-slug="convertro-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="convertro-using-analyticsjs-library" href="#using-analyticsjs-library">Using analytics.js Library</a> 
+        <a class="PageNav-item-link" data-slug="convertro-using-mobile-libraries" href="#using-mobile-libraries">Using Mobile Libraries</a> 
+        <a class="PageNav-item-link" data-slug="convertro-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="convertro-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="convertro-application-installed" href="#application-installed">Application Installed</a> 
+        <a class="PageNav-item-link" data-slug="convertro-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/improvely">Improvely</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/improvely"></a>
+        <a class="PageNav-item-link" data-slug="improvely-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/kochava">Kochava</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/kochava"></a>
+        <a class="PageNav-item-link" data-slug="kochava-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="kochava-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="kochava-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/tapstream">Tapstream</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/tapstream"></a>
+        <a class="PageNav-item-link" data-slug="tapstream-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/tune">TUNE</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/tune"></a>
+        <a class="PageNav-item-link" data-slug="tune-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="tune-sdk-version" href="#sdk-version">SDK version</a> 
+        <a class="PageNav-item-link" data-slug="tune-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="tune-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="tune-postbacks" href="#postbacks">Postbacks</a> 
+        <a class="PageNav-item-link" data-slug="tune-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="tune-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">CRM</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/freshsales">Freshsales</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/freshsales"></a>
+        <a class="PageNav-item-link" data-slug="freshsales-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="freshsales-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="freshsales-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="freshsales-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="freshsales-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="freshsales-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/salesforce">Salesforce</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/salesforce"></a>
+        <a class="PageNav-item-link" data-slug="salesforce-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-trait-validation" href="#trait-validation">Trait Validation</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/whale-alerts">Whale Alerts</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/whale-alerts"></a>
+        <a class="PageNav-item-link" data-slug="whale-alerts-about-whalr" href="#about-whalr">About Whalr</a> 
+        <a class="PageNav-item-link" data-slug="whale-alerts-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="whale-alerts-contact-whalr" href="#contact-whalr">Contact Whalr</a> 
+        <a class="PageNav-item-link" data-slug="whale-alerts-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Customer Success</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/clientsuccess">ClientSuccess</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/clientsuccess"></a>
+        <a class="PageNav-item-link" data-slug="clientsuccess-getting-started-for-csms" href="#getting-started-for-csms">Getting Started (for CSMs)</a> 
+        <a class="PageNav-item-link" data-slug="clientsuccess-getting-started-for-developers" href="#getting-started-for-developers">Getting Started (for Developers)</a> 
+        <a class="PageNav-item-link" data-slug="clientsuccess-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="clientsuccess-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="clientsuccess-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="clientsuccess-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="clientsuccess-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/gainsight">Gainsight</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/gainsight"></a>
+        <a class="PageNav-item-link" data-slug="gainsight-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="gainsight-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="gainsight-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="gainsight-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="gainsight-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/natero">Natero</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/natero"></a>
+        <a class="PageNav-item-link" data-slug="natero-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/planhat">Planhat</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/planhat"></a>
+        <a class="PageNav-item-link" data-slug="planhat-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="planhat-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="planhat-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/ramen">Ramen</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/ramen"></a>
+        <a class="PageNav-item-link" data-slug="ramen-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="ramen-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="ramen-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="ramen-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="ramen-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="ramen-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="ramen-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/salesmachine">Salesmachine</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/salesmachine"></a>
+        <a class="PageNav-item-link" data-slug="salesmachine-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="salesmachine-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="salesmachine-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="salesmachine-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="salesmachine-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="salesmachine-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="salesmachine-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/slack">Slack</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/slack"></a>
+        <a class="PageNav-item-link" data-slug="slack-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="slack-incoming-webhooks-url" href="#incoming-webhooks-url">Incoming Webhooks URL</a> 
+        <a class="PageNav-item-link" data-slug="slack-whitelist-identify-traits" href="#whitelist-identify-traits">Whitelist Identify Traits</a> 
+        <a class="PageNav-item-link" data-slug="slack-identify-template" href="#identify-template">Identify Template</a> 
+        <a class="PageNav-item-link" data-slug="slack-event-channels" href="#event-channels">Event Channels</a> 
+        <a class="PageNav-item-link" data-slug="slack-track-event-templates" href="#track-event-templates">Track Event Templates</a> 
+        <a class="PageNav-item-link" data-slug="slack-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="slack-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/totango">Totango</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/totango"></a>
+        <a class="PageNav-item-link" data-slug="totango-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="totango-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="totango-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="totango-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="totango-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="totango-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="totango-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Deep Linking</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/branch-metrics">Branch Metrics</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/branch-metrics"></a>
+        <a class="PageNav-item-link" data-slug="branch-metrics-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="branch-metrics-1-configure-the-sdk" href="#1-configure-the-sdk">1 - Configure the SDK</a> 
+        <a class="PageNav-item-link" data-slug="branch-metrics-2-setup-deep-linking" href="#2-setup-deep-linking">2 - Setup deep linking</a> 
+        <a class="PageNav-item-link" data-slug="branch-metrics-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="branch-metrics-1-configure-the-sdk" href="#1-configure-the-sdk">1 - Configure the SDK</a> 
+        <a class="PageNav-item-link" data-slug="branch-metrics-2-setup-deep-linking" href="#2-setup-deep-linking">2 - Setup deep linking</a> 
+        <a class="PageNav-item-link" data-slug="branch-metrics-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Email</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/activecampaign">ActiveCampaign</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/activecampaign"></a>
+        <a class="PageNav-item-link" data-slug="activecampaign-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="activecampaign-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="activecampaign-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="activecampaign-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="activecampaign-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/autopilothq">AutopilotHQ</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/autopilothq"></a>
+        <a class="PageNav-item-link" data-slug="autopilothq-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/blueshift">Blueshift</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/blueshift"></a>
+        <a class="PageNav-item-link" data-slug="blueshift-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/bronto">Bronto</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/bronto"></a>
+        <a class="PageNav-item-link" data-slug="bronto-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="bronto-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="bronto-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/customer.io">Customer.io</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/customer.io"></a>
+        <a class="PageNav-item-link" data-slug="customer.io-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="customer.io-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="customer.io-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="customer.io-sending-data-from-customerio" href="#sending-data-from-customerio">Sending Data from Customer.io</a> 
+        <a class="PageNav-item-link" data-slug="customer.io-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="customer.io-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/drift">Drift</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/drift"></a>
+        <a class="PageNav-item-link" data-slug="drift-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="drift-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="drift-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="drift-page-and-screen" href="#page-and-screen">Page and Screen</a> 
+        <a class="PageNav-item-link" data-slug="drift-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="drift-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/drip">Drip</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/drip"></a>
+        <a class="PageNav-item-link" data-slug="drip-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="drip-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="drip-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="drip-sending-data-from-drip" href="#sending-data-from-drip">Sending Data from Drip</a> 
+        <a class="PageNav-item-link" data-slug="drip-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/eloqua">Eloqua</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/eloqua"></a>
+        <a class="PageNav-item-link" data-slug="eloqua-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="eloqua-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="eloqua-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="eloqua-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/email-aptitude">Email Aptitude</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/email-aptitude"></a>
+        <a class="PageNav-item-link" data-slug="email-aptitude-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/evergage">Evergage</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/evergage"></a>
+        <a class="PageNav-item-link" data-slug="evergage-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/iterable">Iterable</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/iterable"></a>
+        <a class="PageNav-item-link" data-slug="iterable-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="iterable-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="iterable-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="iterable-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="iterable-sending-email-data-from-iterable" href="#sending-email-data-from-iterable">Sending Email Data from Iterable</a> 
+        <a class="PageNav-item-link" data-slug="iterable-sending-push-notification-data-from-iterable" href="#sending-push-notification-data-from-iterable">Sending Push Notification Data from Iterable</a> 
+        <a class="PageNav-item-link" data-slug="iterable-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/klaviyo">Klaviyo</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/klaviyo"></a>
+        <a class="PageNav-item-link" data-slug="klaviyo-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="klaviyo-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="klaviyo-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="klaviyo-ecommerce" href="#ecommerce">Ecommerce</a> 
+        <a class="PageNav-item-link" data-slug="klaviyo-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/mailchimp">MailChimp</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/mailchimp"></a>
+        <a class="PageNav-item-link" data-slug="mailchimp-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="mailchimp-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="mailchimp-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="mailchimp-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="mailchimp-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/mailjet">Mailjet</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/mailjet"></a>
+        <a class="PageNav-item-link" data-slug="mailjet-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="mailjet-sending-data-from-mailjet" href="#sending-data-from-mailjet">Sending Data from Mailjet</a> 
+        <a class="PageNav-item-link" data-slug="mailjet-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/marketo-v2">Marketo V2</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/marketo-v2"></a>
+        <a class="PageNav-item-link" data-slug="marketo-v2-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="marketo-v2-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="marketo-v2-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="marketo-v2-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="marketo-v2-tracking-anonymous-activity-in-marketo" href="#tracking-anonymous-activity-in-marketo">Tracking Anonymous Activity in Marketo</a> 
+        <a class="PageNav-item-link" data-slug="marketo-v2-marketo-api-limits" href="#marketo-api-limits">Marketo API Limits</a> 
+        <a class="PageNav-item-link" data-slug="marketo-v2-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/moengage">MoEngage</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/moengage"></a>
+        <a class="PageNav-item-link" data-slug="moengage-web" href="#web">Web</a> 
+        <a class="PageNav-item-link" data-slug="moengage-ios" href="#ios">iOS</a> 
+        <a class="PageNav-item-link" data-slug="moengage-android" href="#android">Android</a> 
+        <a class="PageNav-item-link" data-slug="moengage-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/nudgespot">Nudgespot</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/nudgespot"></a>
+        <a class="PageNav-item-link" data-slug="nudgespot-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="nudgespot-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="nudgespot-server-side" href="#server-side">Server Side</a> 
+        <a class="PageNav-item-link" data-slug="nudgespot-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="nudgespot-sending-data-from-nudgespot" href="#sending-data-from-nudgespot">Sending Data from Nudgespot</a> 
+        <a class="PageNav-item-link" data-slug="nudgespot-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="nudgespot-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/outbound">Outbound</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/outbound"></a>
+        <a class="PageNav-item-link" data-slug="outbound-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="outbound-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="outbound-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="outbound-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="outbound-mobile" href="#mobile">Mobile</a> 
+        <a class="PageNav-item-link" data-slug="outbound-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="outbound-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/pardot">Pardot</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/pardot"></a>
+        <a class="PageNav-item-link" data-slug="pardot-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="pardot-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="pardot-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/responsys">Responsys</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/responsys"></a>
+        <a class="PageNav-item-link" data-slug="responsys-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="responsys-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="responsys-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="responsys-faq" href="#faq">FAQ</a> 
+        <a class="PageNav-item-link" data-slug="responsys-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/sailthru">Sailthru</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/sailthru"></a>
+        <a class="PageNav-item-link" data-slug="sailthru-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="sailthru-implementation-checklist" href="#implementation-checklist">Implementation Checklist</a> 
+        <a class="PageNav-item-link" data-slug="sailthru-abandonded-cart-events" href="#abandonded-cart-events">Abandonded Cart Events</a> 
+        <a class="PageNav-item-link" data-slug="sailthru-settings" href="#settings">Settings</a> 
+        <a class="PageNav-item-link" data-slug="sailthru-faq" href="#faq">FAQ</a> 
+        <a class="PageNav-item-link" data-slug="sailthru-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/salesforce-marketing-cloud">Salesforce Marketing Cloud</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/salesforce-marketing-cloud"></a>
+        <a class="PageNav-item-link" data-slug="salesforce-marketing-cloud-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-marketing-cloud-data-formatting" href="#data-formatting">Data Formatting</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-marketing-cloud-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-marketing-cloud-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-marketing-cloud-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="salesforce-marketing-cloud-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/seg">Seg</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/seg"></a>
+        <a class="PageNav-item-link" data-slug="seg-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/sparkpage">SparkPage</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/sparkpage"></a>
+        <a class="PageNav-item-link" data-slug="sparkpage-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="sparkpage-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="sparkpage-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="sparkpage-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/vero">Vero</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/vero"></a>
+        <a class="PageNav-item-link" data-slug="vero-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="vero-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="vero-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="vero-sending-data-from-vero" href="#sending-data-from-vero">Sending Data from Vero</a> 
+        <a class="PageNav-item-link" data-slug="vero-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="vero-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="vero-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="vero-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/wishpond">Wishpond</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/wishpond"></a>
+        <a class="PageNav-item-link" data-slug="wishpond-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="wishpond-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="wishpond-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="wishpond-troubleshooting-faq" href="#troubleshooting-faq">Troubleshooting/ FAQ</a> 
+        <a class="PageNav-item-link" data-slug="wishpond-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/zaius">Zaius</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/zaius"></a>
+        <a class="PageNav-item-link" data-slug="zaius-zaius-destination" href="#zaius-destination">Zaius Destination</a> 
+        <a class="PageNav-item-link" data-slug="zaius-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="zaius-data-details" href="#data-details">Data Details</a> 
+        <a class="PageNav-item-link" data-slug="zaius-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Enrichment</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/clearbit-enrichment">Clearbit Enrichment</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/clearbit-enrichment"></a>
+        <a class="PageNav-item-link" data-slug="clearbit-enrichment-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="clearbit-enrichment-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/clearbit-reveal">Clearbit Reveal</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/clearbit-reveal"></a>
+        <a class="PageNav-item-link" data-slug="clearbit-reveal-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="clearbit-reveal-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="clearbit-reveal-troubleshooting-faq" href="#troubleshooting-faq">Troubleshooting/ FAQ</a> 
+        <a class="PageNav-item-link" data-slug="clearbit-reveal-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Heatmaps &amp; Recordings</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/crazy-egg">Crazy Egg</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/crazy-egg"></a>
+        <a class="PageNav-item-link" data-slug="crazy-egg-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="crazy-egg-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="crazy-egg-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/fullstory">FullStory</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/fullstory"></a>
+        <a class="PageNav-item-link" data-slug="fullstory-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="fullstory-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="fullstory-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/hotjar">Hotjar</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/hotjar"></a>
+        <a class="PageNav-item-link" data-slug="hotjar-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="hotjar-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/inspectlet">Inspectlet</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/inspectlet"></a>
+        <a class="PageNav-item-link" data-slug="inspectlet-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="inspectlet-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="inspectlet-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="inspectlet-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="inspectlet-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/lucky-orange">Lucky Orange</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/lucky-orange"></a>
+        <a class="PageNav-item-link" data-slug="lucky-orange-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/mouseflow">Mouseflow</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/mouseflow"></a>
+        <a class="PageNav-item-link" data-slug="mouseflow-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="mouseflow-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="mouseflow-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="mouseflow-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/mousestats">MouseStats</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/mousestats"></a>
+        <a class="PageNav-item-link" data-slug="mousestats-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/navilytics">Navilytics</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/navilytics"></a>
+        <a class="PageNav-item-link" data-slug="navilytics-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Helpdesk</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/elevio">Elevio</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/elevio"></a>
+        <a class="PageNav-item-link" data-slug="elevio-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/help-scout">Help Scout</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/help-scout"></a>
+        <a class="PageNav-item-link" data-slug="help-scout-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="help-scout-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="help-scout-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/uservoice">UserVoice</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/uservoice"></a>
+        <a class="PageNav-item-link" data-slug="uservoice-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="uservoice-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="uservoice-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="uservoice-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/zendesk">Zendesk</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/zendesk"></a>
+        <a class="PageNav-item-link" data-slug="zendesk-credentials-for-our-zendesk-destination" href="#credentials-for-our-zendesk-destination">Credentials for our Zendesk Destination</a> 
+        <a class="PageNav-item-link" data-slug="zendesk-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="zendesk-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="zendesk-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/zopim">Zopim</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/zopim"></a>
+        <a class="PageNav-item-link" data-slug="zopim-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="zopim-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="zopim-record-live-chat-events" href="#record-live-chat-events">Record Live Chat Events</a> 
+        <a class="PageNav-item-link" data-slug="zopim-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="zopim-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Livechat</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/intercom">Intercom</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/intercom"></a>
+        <a class="PageNav-item-link" data-slug="intercom-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="intercom-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="intercom-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="intercom-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="intercom-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="intercom-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="intercom-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="intercom-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/livechat">LiveChat</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/livechat"></a>
+        <a class="PageNav-item-link" data-slug="livechat-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="livechat-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="livechat-record-live-chat-events" href="#record-live-chat-events">Record Live Chat Events</a> 
+        <a class="PageNav-item-link" data-slug="livechat-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/olark">Olark</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/olark"></a>
+        <a class="PageNav-item-link" data-slug="olark-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="olark-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="olark-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="olark-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="olark-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="olark-record-live-chat-events" href="#record-live-chat-events">Record Live Chat Events</a> 
+        <a class="PageNav-item-link" data-slug="olark-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/snapengage">SnapEngage</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/snapengage"></a>
+        <a class="PageNav-item-link" data-slug="snapengage-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="snapengage-record-live-chat-events" href="#record-live-chat-events">Record Live Chat Events</a> 
+        <a class="PageNav-item-link" data-slug="snapengage-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/userlike">Userlike</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/userlike"></a>
+        <a class="PageNav-item-link" data-slug="userlike-record-live-chat-events" href="#record-live-chat-events">Record Live Chat Events</a> 
+        <a class="PageNav-item-link" data-slug="userlike-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Performance Monitoring</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/atatus">Atatus</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/atatus"></a>
+        <a class="PageNav-item-link" data-slug="atatus-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/bugherd">BugHerd</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/bugherd"></a>
+        <a class="PageNav-item-link" data-slug="bugherd-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="bugherd-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/bugsnag">Bugsnag</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/bugsnag"></a>
+        <a class="PageNav-item-link" data-slug="bugsnag-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="bugsnag-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="bugsnag-error-reporting" href="#error-reporting">Error Reporting</a> 
+        <a class="PageNav-item-link" data-slug="bugsnag-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/crittercism">Crittercism</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/crittercism"></a>
+        <a class="PageNav-item-link" data-slug="crittercism-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/errorception">Errorception</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/errorception"></a>
+        <a class="PageNav-item-link" data-slug="errorception-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="errorception-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="errorception-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/pingdom">Pingdom</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/pingdom"></a>
+        <a class="PageNav-item-link" data-slug="pingdom-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="pingdom-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/rollbar">Rollbar</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/rollbar"></a>
+        <a class="PageNav-item-link" data-slug="rollbar-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="rollbar-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="rollbar-enabling-source-maps" href="#enabling-source-maps">Enabling Source Maps</a> 
+        <a class="PageNav-item-link" data-slug="rollbar-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/sentry">Sentry</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/sentry"></a>
+        <a class="PageNav-item-link" data-slug="sentry-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="sentry-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="sentry-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/track-js">Track JS</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/track-js"></a>
+        <a class="PageNav-item-link" data-slug="track-js-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="track-js-non-supported-options" href="#non-supported-options">Non-supported options</a> 
+        <a class="PageNav-item-link" data-slug="track-js-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Personalization</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/appcues">Appcues</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/appcues"></a>
+        <a class="PageNav-item-link" data-slug="appcues-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="appcues-js-and-server-side-destinations" href="#js-and-server-side-destinations">JS and Server-side Destinations</a> 
+        <a class="PageNav-item-link" data-slug="appcues-javascript-api" href="#javascript-api">JavaScript API</a> 
+        <a class="PageNav-item-link" data-slug="appcues-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="appcues-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="appcues-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="appcues-appcues-features" href="#appcues-features">Appcues Features</a> 
+        <a class="PageNav-item-link" data-slug="appcues-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/boomtrain">Boomtrain</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/boomtrain"></a>
+        <a class="PageNav-item-link" data-slug="boomtrain-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="boomtrain-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="boomtrain-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="boomtrain-settings" href="#settings">Settings</a> 
+        <a class="PageNav-item-link" data-slug="boomtrain-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/chameleon">Chameleon</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/chameleon"></a>
+        <a class="PageNav-item-link" data-slug="chameleon-getting-started" href="#getting-started">Getting started</a> 
+        <a class="PageNav-item-link" data-slug="chameleon-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="chameleon-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="chameleon-help" href="#help">Help</a> 
+        <a class="PageNav-item-link" data-slug="chameleon-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/hello-bar">Hello Bar</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/hello-bar"></a>
+        <a class="PageNav-item-link" data-slug="hello-bar-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/hull">Hull</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/hull"></a>
+        <a class="PageNav-item-link" data-slug="hull-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="hull-tracking-data-from-anonymous-users-and-leads" href="#tracking-data-from-anonymous-users-and-leads">Tracking Data from anonymous users and Leads</a> 
+        <a class="PageNav-item-link" data-slug="hull-publishing-data-back-to-segment" href="#publishing-data-back-to-segment">Publishing data back to Segment</a> 
+        <a class="PageNav-item-link" data-slug="hull-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="hull-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="hull-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="hull-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="hull-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="hull-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="hull-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/intellimize">Intellimize</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/intellimize"></a>
+        <a class="PageNav-item-link" data-slug="intellimize-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="intellimize-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="intellimize-page-screen-track-group-alias" href="#page-screen-track-group-alias">Page, Screen, Track, Group &amp; Alias</a> 
+        <a class="PageNav-item-link" data-slug="intellimize-settings" href="#settings">Settings</a> 
+        <a class="PageNav-item-link" data-slug="intellimize-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/spinnakr">Spinnakr</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/spinnakr"></a>
+        <a class="PageNav-item-link" data-slug="spinnakr-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/tray.io">tray.io</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/tray.io"></a>
+        <a class="PageNav-item-link" data-slug="tray.io-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Raw Data</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/iron.io">Iron.io</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/iron.io"></a>
+        <a class="PageNav-item-link" data-slug="iron.io-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="iron.io-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/repeater">Repeater</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/repeater"></a>
+        <a class="PageNav-item-link" data-slug="repeater-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/stitch-data">Stitch Data</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/stitch-data"></a>
+        <a class="PageNav-item-link" data-slug="stitch-data-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/treasure-data">Treasure Data</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/treasure-data"></a>
+        <a class="PageNav-item-link" data-slug="treasure-data-table-structure" href="#table-structure">Table Structure</a> 
+        <a class="PageNav-item-link" data-slug="treasure-data-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/webhooks">Webhooks</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/webhooks"></a>
+        <a class="PageNav-item-link" data-slug="webhooks-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-sending-to-multiple-webhooks" href="#sending-to-multiple-webhooks">Sending to multiple webhooks</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-authentication" href="#authentication">Authentication</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-ssl-certification" href="#ssl-certification">SSL Certification</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-retries" href="#retries">Retries</a> 
+        <a class="PageNav-item-link" data-slug="webhooks-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/xplenty">Xplenty</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/xplenty"></a>
+        <a class="PageNav-item-link" data-slug="xplenty-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Realtime Dashboards</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/chartbeat">Chartbeat</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/chartbeat"></a>
+        <a class="PageNav-item-link" data-slug="chartbeat-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="chartbeat-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="chartbeat-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/gosquared">GoSquared</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/gosquared"></a>
+        <a class="PageNav-item-link" data-slug="gosquared-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="gosquared-website-tracking" href="#website-tracking">Website Tracking</a> 
+        <a class="PageNav-item-link" data-slug="gosquared-mobile-and-server-side-tracking" href="#mobile-and-server-side-tracking">Mobile and Server-Side Tracking</a> 
+        <a class="PageNav-item-link" data-slug="gosquared-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="gosquared-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="gosquared-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="gosquared-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="gosquared-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="gosquared-ecommerce" href="#ecommerce">Ecommerce</a> 
+        <a class="PageNav-item-link" data-slug="gosquared-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Referrals</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/ambassador">Ambassador</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/ambassador"></a>
+        <a class="PageNav-item-link" data-slug="ambassador-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="ambassador-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="ambassador-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="ambassador-mapping-campaigns-to-urls" href="#mapping-campaigns-to-urls">Mapping campaigns to URLs</a> 
+        <a class="PageNav-item-link" data-slug="ambassador-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/curebit">Curebit</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/curebit"></a>
+        <a class="PageNav-item-link" data-slug="curebit-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="curebit-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/extole">Extole</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/extole"></a>
+        <a class="PageNav-item-link" data-slug="extole-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="extole-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="extole-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="extole-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/saasquatch">SaaSquatch</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/saasquatch"></a>
+        <a class="PageNav-item-link" data-slug="saasquatch-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="saasquatch-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="saasquatch-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">SMS &amp; Push Notifications</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/appboy">Appboy</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/appboy"></a>
+        <a class="PageNav-item-link" data-slug="appboy-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="appboy-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="appboy-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="appboy-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="appboy-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="appboy-android" href="#android">Android</a> 
+        <a class="PageNav-item-link" data-slug="appboy-ios" href="#ios">iOS</a> 
+        <a class="PageNav-item-link" data-slug="appboy-web" href="#web">Web</a> 
+        <a class="PageNav-item-link" data-slug="appboy-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/clevertap">CleverTap</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/clevertap"></a>
+        <a class="PageNav-item-link" data-slug="clevertap-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="clevertap-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="clevertap-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="clevertap-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="clevertap-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="clevertap-android" href="#android">Android</a> 
+        <a class="PageNav-item-link" data-slug="clevertap-ios" href="#ios">iOS</a> 
+        <a class="PageNav-item-link" data-slug="clevertap-server-side" href="#server-side">Server-Side</a> 
+        <a class="PageNav-item-link" data-slug="clevertap-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/kahuna">Kahuna</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/kahuna"></a>
+        <a class="PageNav-item-link" data-slug="kahuna-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="kahuna-mobile" href="#mobile">Mobile</a> 
+        <a class="PageNav-item-link" data-slug="kahuna-reset" href="#reset">Reset</a> 
+        <a class="PageNav-item-link" data-slug="kahuna-server-side" href="#server-side">Server-Side</a> 
+        <a class="PageNav-item-link" data-slug="kahuna-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="kahuna-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="kahuna-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="kahuna-e-commerce" href="#e-commerce">E-Commerce</a> 
+        <a class="PageNav-item-link" data-slug="kahuna-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/onesignal">OneSignal</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/onesignal"></a>
+        <a class="PageNav-item-link" data-slug="onesignal-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="onesignal-identify-track" href="#identify-track">Identify &amp; Track</a> 
+        <a class="PageNav-item-link" data-slug="onesignal-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/urban-airship">Urban Airship</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/urban-airship"></a>
+        <a class="PageNav-item-link" data-slug="urban-airship-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="urban-airship-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="urban-airship-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="urban-airship-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="urban-airship-android" href="#android">Android</a> 
+        <a class="PageNav-item-link" data-slug="urban-airship-ios" href="#ios">iOS</a> 
+        <a class="PageNav-item-link" data-slug="urban-airship-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/webengage">WebEngage</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/webengage"></a>
+        <a class="PageNav-item-link" data-slug="webengage-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="webengage-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="webengage-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="webengage-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="webengage-reset" href="#reset">Reset</a> 
+        <a class="PageNav-item-link" data-slug="webengage-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Security &amp; Fraud</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/castle">Castle</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/castle"></a>
+        <a class="PageNav-item-link" data-slug="castle-introduction" href="#introduction">Introduction</a> 
+        <a class="PageNav-item-link" data-slug="castle-integration-steps" href="#integration-steps">Integration steps</a> 
+        <a class="PageNav-item-link" data-slug="castle-tracking-successful-and-failed-logins" href="#tracking-successful-and-failed-logins">Tracking successful and failed logins</a> 
+        <a class="PageNav-item-link" data-slug="castle-extending-server-side-tracking-with-request-properties" href="#extending-server-side-tracking-with-request-properties">Extending server-side tracking with request properties</a> 
+        <a class="PageNav-item-link" data-slug="castle-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="castle-secure-mode" href="#secure-mode">Secure Mode</a> 
+        <a class="PageNav-item-link" data-slug="castle-requesting-a-risk-score" href="#requesting-a-risk-score">Requesting a risk score</a> 
+        <a class="PageNav-item-link" data-slug="castle-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/perimeterx">Perimeterx</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/perimeterx"></a>
+        <a class="PageNav-item-link" data-slug="perimeterx-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="perimeterx-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="perimeterx-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/smyte">Smyte</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/smyte"></a>
+        <a class="PageNav-item-link" data-slug="smyte-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="smyte-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="smyte-group" href="#group">Group</a> 
+        <a class="PageNav-item-link" data-slug="smyte-alias" href="#alias">Alias</a> 
+        <a class="PageNav-item-link" data-slug="smyte-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="smyte-screen" href="#screen">Screen</a> 
+        <a class="PageNav-item-link" data-slug="smyte-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/stripe-radar">Stripe Radar</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/stripe-radar"></a>
+        <a class="PageNav-item-link" data-slug="stripe-radar-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="stripe-radar-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Surveys</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/delighted">Delighted</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/delighted"></a>
+        <a class="PageNav-item-link" data-slug="delighted-getting-started" href="#getting-started">Getting started</a> 
+        <a class="PageNav-item-link" data-slug="delighted-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="delighted-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="delighted-sending-data-from-delighted-back-to-segment-optional" href="#sending-data-from-delighted-back-to-segment-optional">Sending data from Delighted back to Segment (optional)</a> 
+        <a class="PageNav-item-link" data-slug="delighted-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="delighted-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/promoter.io">Promoter.io</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/promoter.io"></a>
+        <a class="PageNav-item-link" data-slug="promoter.io-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="promoter.io-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="promoter.io-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="promoter.io-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/qualaroo">Qualaroo</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/qualaroo"></a>
+        <a class="PageNav-item-link" data-slug="qualaroo-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="qualaroo-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="qualaroo-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="qualaroo-sending-data-from-qualaroo" href="#sending-data-from-qualaroo">Sending Data from Qualaroo</a> 
+        <a class="PageNav-item-link" data-slug="qualaroo-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/satismeter">SatisMeter</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/satismeter"></a>
+        <a class="PageNav-item-link" data-slug="satismeter-features" href="#features">Features</a> 
+        <a class="PageNav-item-link" data-slug="satismeter-get-started" href="#get-started">Get Started</a> 
+        <a class="PageNav-item-link" data-slug="satismeter-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="satismeter-client-side-destination" href="#client-side-destination">Client-side destination</a> 
+        <a class="PageNav-item-link" data-slug="satismeter-server-side-destination" href="#server-side-destination">Server-side destination</a> 
+        <a class="PageNav-item-link" data-slug="satismeter-sending-data-from-satismeter-back-to-segment-optional" href="#sending-data-from-satismeter-back-to-segment-optional">Sending data from SatisMeter back to Segment (optional)</a> 
+        <a class="PageNav-item-link" data-slug="satismeter-satismeter-traits-and-events" href="#satismeter-traits-and-events">SatisMeter traits and events</a> 
+        <a class="PageNav-item-link" data-slug="satismeter-settings" href="#settings">Settings</a>
+       </nav> 
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/wootric">Wootric</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/wootric"></a>
+        <a class="PageNav-item-link" data-slug="wootric-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="wootric-identify" href="#identify">Identify</a> 
+        <a class="PageNav-item-link" data-slug="wootric-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="wootric-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+     <li class="PageNav-item"><a class="PageNav-item-header">Tag Managers</a>
+      <nav class="PageNav-item-nav--open">
+       <a class="SidebarLink SidebarArrow" href="/docs/destinations/google-tag-manager">Google Tag Manager</a>
+       <nav class="PageNav-item-nav--nested">
+        <a class="SidebarLink SidebarArrow" href="/docs/destinations/google-tag-manager"></a>
+        <a class="PageNav-item-link" data-slug="google-tag-manager-getting-started" href="#getting-started">Getting Started</a> 
+        <a class="PageNav-item-link" data-slug="google-tag-manager-page" href="#page">Page</a> 
+        <a class="PageNav-item-link" data-slug="google-tag-manager-track" href="#track">Track</a> 
+        <a class="PageNav-item-link" data-slug="google-tag-manager-userid-and-anonymousid" href="#userid-and-anonymousid">UserId and AnonymousId</a> 
+        <a class="PageNav-item-link" data-slug="google-tag-manager-troubleshooting" href="#troubleshooting">Troubleshooting</a> 
+        <a class="PageNav-item-link" data-slug="google-tag-manager-settings" href="#settings">Settings</a>
+       </nav>
+      </nav></li>
+    </ul>
+   </div>
+  </div>
+  <script>(function () {
+  var helpful = document.querySelector('#Feedback-yes')
+  var unhelpful = document.querySelector('#Feedback-no')
+  var feedback = document.querySelector('.Feedback')
+  helpful.addEventListener('click', function (e) {
+    feedback.innerText = 'Thanks for your feedback!'
+    window.analytics.track('Docs Rated', {
+      title: 'Intercom Destination',
+      helpful: true,
+      url: document.URL
+    })
+  })
+  unhelpful.addEventListener('click', function (e) {
+    feedback.innerText = 'Thanks for your feedback!'
+    window.analytics.track('Docs Rated', {
+      title: 'Intercom Destination',
+      helpful: false,
+      url: document.URL
+    })
+  })
+
+  var pageBody = document.querySelector('.Page-body')
+  var pageNav = document.querySelector('.PageNav')
+  var sectionTitles = Array.prototype.slice.call(pageBody.querySelectorAll('h2'))
+  var destinationSlug = window.location.pathname.split('/')[3]
+  var lastScrollTop = 0
+  var cachedTitles = {}
+
+  /**
+   * resetHighlightedNavItems
+   * iterate all .PageNav-item-link elements and remove any
+   * .PageNav-item-link--highlighted class
+   */
+  function resetHighlightedNavItems () {
+    var items = Array.prototype.slice.call(pageNav.querySelectorAll('.PageNav-item-link'))
+    items.map(function (item) {
+      item.classList.remove('PageNav-item-link--highlighted')
+    })
+  }
+
+  /**
+   * highlightPageNavItemLinkBySlug
+   * Take a slug, locate an element with matching data-slug attribute value
+   * and add .PageNav-item-link--highlighted class name
+   * @param  {String} slug : getting-started
+   */
+  function highlightPageNavItemLinkBySlug (slug) {
+    var navItem = destinationSlug
+      ? pageNav.querySelector(`[data-slug=${destinationSlug}-${slug}]`)
+      : pageNav.querySelector(`[data-slug=Overview-${slug}]`)
+
+    if (navItem) {
+      navItem.classList.add('PageNav-item-link--highlighted')
+    }
+  }
+
+  /**
+   * getObjectValues
+   * Return an array of values for an object
+   * @param  {Object} obj - an object
+   * @return {Array}
+   */
+  function getObjectValues(obj) {
+    var values = []
+    for(var key in obj){
+      if (obj.hasOwnProperty(key)) values.push(obj[key])
+    }
+    return values
+  }
+
+  /**
+    * highlightScrolledTitles
+    * Highlight 'active' H2 titles when they are scrolled within the top 100px
+    * of the window.
+    * @param  {Event} e - scroll
+    */
+  function highlightScrolledTitles(e) {
+    sectionTitles.map(function (title) {
+      var titlePosition = title.getBoundingClientRect().top
+      var slug = title.getAttribute('id') // getting-started
+
+      if (pageBody.scrollTop > lastScrollTop) {
+        // scrolling down
+        // find a navigation link with matching data-slug value + set it highlighted
+        // cache this title in `cachedTitles`
+        if (titlePosition <= 100) {
+          resetHighlightedNavItems()
+          highlightPageNavItemLinkBySlug(slug)
+          cachedTitles[slug] = title
+        }
+      } else {
+        // scrolling up
+        // delete this title from `cachedTitles`
+        // locate the previous title and find a navigation link with
+        // matching data-slug value + set it highlighted
+        if (titlePosition > 100 && cachedTitles[slug]) {
+          delete cachedTitles[slug]
+
+          resetHighlightedNavItems()
+          var values = getObjectValues(cachedTitles)
+          var previousTitle = values[values.length - 1]
+          if (previousTitle) {
+            var previousSlug = previousTitle.getAttribute('id')
+            highlightPageNavItemLinkBySlug(previousSlug)
+          }
+        }
+      }
+    })
+
+    lastScrollTop = pageBody.scrollTop
+  }
+
+  pageBody.addEventListener('scroll', highlightScrolledTitles, {passive: false})
+
+  if (!destinationSlug) return
+  var destination = document.querySelector('a.SidebarLink[href="/docs/destinations/' + destinationSlug + '"]')
+  if (!destination) return
+  destination.classList.add('SidebarLink--active', 'SidebarArrow--active')
+
+  var menu = destination.nextSibling
+  if (!menu && !menu.classList) return
+  menu.classList.add('visible')
+
+  destination.scrollIntoView()
+
+  // check the position of the destination. If flush (60) apply 100px offset
+  if (destination.getBoundingClientRect().top === 60) {
+    var offset = 100
+    var sideBar = document.querySelector('.Page-sidebar')
+    sideBar.scrollTop = sideBar.scrollTop - offset
+  }
+}())</script>
+  <script type="text/javascript">(function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+    })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+    _st('install','88uzHTr3KAoQsWgkEHje','2.0.0');</script>
+  <script src="/docs/bundle.js"></script>
+  <script type="application/ld+json">[
+    {
+      "@context": "http://schema.org",
+      "@type": "WebSite",
+      "name": "Segment",
+      "url": "https://segment.com"
+    }, {
+      "@context": "http://schema.org",
+      "@type": "Organization",
+      "name": "Segment",
+      "url": "https://segment.com",
+      "logo": "https://segment.com/build/public/public/images/touch-icon.png",
+      "sameAs": [
+        "https://twitter.com/segment",
+        "https://www.linkedin.com/company/segment-io"
+      ]
+    }
+  ]</script>
+ </body>
+</html>

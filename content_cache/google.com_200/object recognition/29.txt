@@ -1,0 +1,316 @@
+<!doctype html>
+<!--[if lt IE 9]> <html class="crappy-browser" lang="en"> <![endif]-->
+<!--[if IE 9]> <html class="ie9"> <![endif]-->
+<!--[if gt IE 9]> <html class="gtie9"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en" xmlns:fb="http://www.facebook.com/2008/fbml" xmlns:og="http://ogp.me/ns#" xmlns="http://www.w3.org/1999/xhtml">
+ <!--<![endif]-->
+ <head> 
+  <title>Getting Started with Protractor and Page Objects for AngularJS E2E Testing</title> 
+  <meta charset="utf-8"> 
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" name="viewport"> 
+  <meta content="Going through the Protractor docs and getting started can still be a daunting task. My goal is to alleviate some of that by sharing my configuration and..." name="description"> 
+  <meta content="Gaslight LLC" name="author"> 
+  <link href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet" type="text/css"> 
+  <meta content="Gaslight Blog" property="og:site_title"> 
+  <meta content="Gaslight" property="og:site_name"> 
+  <link href="https://plus.google.com/b/108634148069175104559/108634148069175104559" rel="publisher"> 
+  <meta content="#<Person:0x007feeaee4da78>" property="author"> 
+  <meta content="article" property="og:type"> 
+  <meta content="Getting Started with Protractor and Page Objects for AngularJS E2E Testing" property="og:title"> 
+  <meta content="2014-04-23T09:00:00-04:00" property="og:article:published_time"> 
+  <meta content="https://teamgaslight.com/blog/getting-started-with-protractor-and-page-objects-for-angularjs-e2e-testing" property="og:url"> 
+  <meta content="Going through the Protractor docs and getting started can still be a daunting task. My goal is to alleviate some of that by sharing my configuration and..." property="og:description"> 
+  <meta content="angularjs javascript testing" property="og:article:tag"> 
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="https://teamgaslight.com/blog/rss"> 
+  <link rel="shortcut icon" type="image/x-icon" href="//drxwg5otdx721.cloudfront.net/assets/32x32icon-40111bece7dd797e0b2bc3df502f9eab.png"> 
+  <link rel="stylesheet" media="screen" href="//drxwg5otdx721.cloudfront.net/assets/application-61044b46a59dade3850433d13cd82b5f.css"> 
+  <script src="//drxwg5otdx721.cloudfront.net/assets/modernizr-4d0412585241ad912244e6457ce55948.js"></script> 
+  <meta name="csrf-param" content="authenticity_token"> 
+  <meta name="csrf-token" content="4WueJx3EQ99q4+ZCKGEhoG8IjQE7blnMGLa2tmPrvuhnULB/5+0Vhb7n5mgeeGRroG5DcIC6fv6n8WJ2aYlpAw=="> 
+ </head> 
+ <body class="posts show"> 
+  <nav class="top-bar"> 
+   <div class="row"> 
+    <div class="large-12 columns"> 
+     <a class="top-bar__logo" rel="Main Navigation" href="/"><img alt="gaslight-logo" src="//drxwg5otdx721.cloudfront.net/assets/logoSmall-50abc20a020d496501111bd245501b06.svg"> </a>
+     <a class="top-bar__expand"> <i class="icon--hamburger"> <span class="line--horizontal"></span> <span class="line--horizontal"></span> <span class="line--horizontal"></span> </i> </a> 
+     <ul class="top-bar__nav"> 
+      <li><a rel="Main Navigation" href="/work">Work</a></li> 
+      <li><a rel="Main Navigation" href="/services">Services</a></li> 
+      <li><a rel="Main Navigation" href="/about">About</a></li> 
+      <li><a rel="Main Navigation" class="active" href="/blog/">Blog</a></li> 
+      <li><a rel="Main Navigation" href="/events">Events</a></li> 
+      <li><a rel="Main Navigation" href="/contact">Contact</a></li> 
+     </ul> 
+    </div> 
+   </div> 
+  </nav> 
+  <div id="main"> 
+   <div class="row"> 
+    <div class="large-8 large-centered columns"> 
+     <article class="post" id="post-361" itemscope="true" itemtype="http://schema.org/BlogPosting"> 
+      <header class="post__header instapaper_title"> 
+       <h1 class="post__title"> Getting Started with Protractor and Page Objects for AngularJS E2E Testing </h1> 
+       <div class="post__author center"> 
+        <span class="post__author__name" itemscope="true" itemtype="http://schema.org/Person"> <a rel="author" itemprop="name" href="/blog/?author=jim-anders">Jim Anders</a> posted on <time class="post__author__time" datetime="2014-04-23T09:00:00-04:00" itemprop="datePublished" pubdate="true"> April 23, 2014 </time> </span> 
+       </div> 
+      </header> 
+      <section class="post__body instapaper_body" itemprop="articleBody"> 
+       <p>When it was announced that Protractor would be replacing the karma runner as <em>THE</em> end to end test framework for AngularJS, I’ll admit, I was a bit sad. While I didn’t have a deep love for the karma runner, it was crazy simple to setup and run, and my initial perusal of the Protractor docs was intimidating. After spending some time with Protractor though, I have come to enjoy using it in the same manner in which I would test a Rails application.</p> 
+       <p>Going through the Protractor docs and getting started can still be a daunting task. My goal is to alleviate some of that by sharing my configuration and setup, as well as using the page object pattern for creating an API through which we’ll interact with our web pages. We’ll also be using the jasmine-given library to help clean up our specs.</p> 
+       <h2>The Setup</h2> 
+       <p>The first thing we will need to do is make sure we have Protractor and jasmine-given available to our application.</p> 
+       <div class="highlight">
+        <pre><span class="nv">$ </span>npm install protractor jasmine-given --save-dev
+</pre>
+       </div> 
+       <p>Please note the <code>--save-dev</code>. This is so that node will add these as dev dependencies to <code>package.json</code>. It is also important to note that Protractor can be installed globally with the <code>-g</code> switch. Personally, I do not like to install application dependencies globally, and try to avoid them if at all possible.</p> 
+       <p>Protractor has two dependencie of it’s own, selenium server and a browser driver. There exists pages of documentation for running the selenium server stand alone and managing browser drivers, but Protractor gives us a script to manage both.</p> 
+       <p>In your project directory, run the following command:</p> 
+       <div class="highlight">
+        <pre><span class="nv">$ </span>node_modules/protractor/bin/webdriver-manager update
+</pre>
+       </div> 
+       <p>This will install the selenium server jar file and the chrome driver executable locally to your project. Now to start the selenium server, simply run the following command in a separate terminal window.</p> 
+       <div class="highlight">
+        <pre><span class="nv">$ </span>node_modules/protractor/bin/webdriver-manager start
+</pre>
+       </div> 
+       <p>The last piece of our setup puzzle is the config file that we’ll pass to Protractor when running our specs.</p> 
+       <p>In spec-e2e.conf.js</p> 
+       <div class="highlight">
+        <pre><span class="vg">exports</span><span class="o">.</span><span class="vg">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nl">seleniumAddress:</span><span class="w"> </span><span class="s2">"http://127.0.0.1:4444/wd/hub"</span><span class="p">,</span>
+<span class="w">  </span><span class="nl">seleniumPort:</span><span class="w"> </span><span class="vg">null</span><span class="p">,</span>
+<span class="w">  </span><span class="nl">seleniumArgs:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">  </span><span class="nl">specs:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="c1">'../spec-e2e/**/*spec.{js,coffee}'</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nl">capabilities:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">'browserName': 'chrome'</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nl">baseUrl:</span><span class="w"> </span><span class="c1">'http://localhost:8000',</span>
+<span class="w">  </span><span class="nl">jasmineNodeOpts:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nl">onComplete:</span><span class="w"> </span><span class="vg">null</span><span class="p">,</span>
+<span class="w">    </span><span class="nl">isVerbose:</span><span class="w"> </span><span class="vg">false</span><span class="p">,</span>
+<span class="w">    </span><span class="nl">showColors:</span><span class="w"> </span><span class="vg">true</span><span class="p">,</span>
+<span class="w">    </span><span class="nl">includeStackTrace:</span><span class="w"> </span><span class="vg">false</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">};</span>
+</pre>
+       </div> 
+       <p>With that, we tell protractor where to find our selenium server, which browser(s) to test against, and any jasmine options we choose to pass along. You may reference the example <a href="https://github.com/angular/protractor/blob/master/referenceConf.js">config</a> in the Protractor repo for additional config options.</p> 
+       <h2>Our first test</h2> 
+       <p>For a simple example of using Protractor to test drive an application, we are going to use logging into a web application. In <code>spec/e2e/login_spec.js</code> we setup our test using jasmine-given and page objects.</p> 
+       <div class="highlight">
+        <pre><span class="vg">require</span><span class="p">(</span><span class="s2">"protractor/jasminewd"</span><span class="p">);</span>
+<span class="vg">require</span><span class="p">(</span><span class="c1">'jasmine-given');</span>
+
+<span class="vg">var</span><span class="w"> </span><span class="vg">LoginPage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="vg">require</span><span class="p">(</span><span class="s2">"./pages/login_page"</span><span class="p">);</span>
+
+<span class="vg">describe</span><span class="p">(</span><span class="s2">"app"</span><span class="p">,</span><span class="w"> </span><span class="vg">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="vg">var</span><span class="w"> </span><span class="vg">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="vg">new</span><span class="w"> </span><span class="vg">LoginPage</span><span class="p">();</span>
+<span class="w">  </span><span class="vg">describe</span><span class="p">(</span><span class="s2">"visiting the login page"</span><span class="p">,</span><span class="w"> </span><span class="vg">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="vg">Given</span><span class="p">(</span><span class="vg">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="vg">page</span><span class="o">.</span><span class="vg">visitPage</span><span class="p">();</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="w">    </span><span class="vg">describe</span><span class="p">(</span><span class="s2">"when a user logs in"</span><span class="p">,</span><span class="w"> </span><span class="vg">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="vg">Given</span><span class="p">(</span><span class="vg">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="vg">page</span><span class="o">.</span><span class="vg">fillEmail</span><span class="p">(</span><span class="s2">"testy@example.com"</span><span class="p">);</span>
+<span class="w">      </span><span class="p">});</span>
+<span class="w">      </span><span class="vg">Given</span><span class="p">(</span><span class="vg">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="vg">page</span><span class="o">.</span><span class="vg">fillPassword</span><span class="p">();</span>
+<span class="w">      </span><span class="p">});</span>
+<span class="w">      </span><span class="vg">When</span><span class="p">(</span><span class="vg">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="vg">page</span><span class="o">.</span><span class="vg">login</span><span class="p">();</span>
+<span class="w">      </span><span class="p">});</span>
+<span class="w">      </span><span class="vg">Then</span><span class="p">(</span><span class="vg">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="vg">page</span><span class="o">.</span><span class="vg">getCurrentUser</span><span class="p">()</span><span class="o">.</span><span class="vg">then</span><span class="p">(</span><span class="vg">function</span><span class="p">(</span><span class="vg">text</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">       </span><span class="vg">expect</span><span class="p">(</span><span class="vg">text</span><span class="p">)</span><span class="o">.</span><span class="vg">toEqual</span><span class="p">(</span><span class="s2">"Randy Savage"</span><span class="p">);</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">      </span><span class="p">});</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="w">  </span><span class="p">});</span>
+<span class="p">});</span>
+</pre>
+       </div> 
+       <p>First we require our protractor jasmine web driver, and also jasmine-given. Next we require our not yet existing login page object. Last, we walk through the steps of navigating to the login page, filling in and submitting the form. Last, we assert that our page knows about our <code>currentUser</code> and that it’s text is equal to Randy Savage.</p> 
+       <p>We can run this spec with the following command:</p> 
+       <div class="highlight">
+        <pre><span class="nv">$ </span>node_modules/protractor/bin/protractor path/to/spec-e2e.conf.js
+</pre>
+       </div> 
+       <p>The output from this run should throw an error that node cannot find the module <code>pages/login_page</code>, so let’s go ahead and add that.</p> 
+       <div class="highlight">
+        <pre><span class="n">var</span> <span class="n">LoginPage</span> <span class="o">=</span> <span class="p">(</span><span class="k">function</span> <span class="err">() {</span>
+    <span class="k">function</span> <span class="nf">LoginPage</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">this</span><span class="p">.</span><span class="n">emailField</span> <span class="o">=</span> <span class="n">element</span><span class="p">(</span><span class="n">By</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s">"user.email"</span><span class="p">))</span><span class="err">;</span>
+        <span class="n">this</span><span class="p">.</span><span class="n">passwordField</span> <span class="o">=</span> <span class="n">element</span><span class="p">(</span><span class="n">By</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s">"user.password"</span><span class="p">))</span><span class="err">;</span>
+        <span class="n">this</span><span class="p">.</span><span class="n">loginButton</span> <span class="o">=</span> <span class="n">element</span><span class="p">(</span><span class="n">By</span><span class="p">.</span><span class="n">id</span><span class="p">(</span><span class="s">"log-in"</span><span class="p">))</span><span class="err">;</span>
+        <span class="n">this</span><span class="p">.</span><span class="n">currentUser</span> <span class="o">=</span> <span class="n">element</span><span class="p">(</span><span class="n">By</span><span class="p">.</span><span class="n">binding</span><span class="p">(</span><span class="s">"{{currentUser.name}}"</span><span class="p">))</span><span class="err">;</span>
+    <span class="p">}</span>
+
+    <span class="n">LoginPage</span><span class="p">.</span><span class="n">prototype</span><span class="p">.</span><span class="n">visitPage</span> <span class="o">=</span> <span class="k">function</span> <span class="err">() {</span>
+        <span class="n">browser</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span><span class="err">;</span>
+    <span class="p">}</span><span class="err">;</span>
+
+    <span class="n">LoginPage</span><span class="p">.</span><span class="n">prototype</span><span class="p">.</span><span class="n">fillEmail</span> <span class="o">=</span> <span class="k">function</span> <span class="err">(</span><span class="nf">email</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">this</span><span class="p">.</span><span class="n">emailField</span><span class="p">.</span><span class="n">sendKeys</span><span class="p">(</span><span class="n">email</span><span class="p">)</span><span class="err">;</span>
+    <span class="p">}</span><span class="err">;</span>
+
+    <span class="n">LoginPage</span><span class="p">.</span><span class="n">prototype</span><span class="p">.</span><span class="n">fillPassword</span> <span class="o">=</span> <span class="k">function</span> <span class="err">(</span><span class="nf">password</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">password</span> <span class="o">==</span> <span class="n">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">password</span> <span class="o">=</span> <span class="s">"password"</span><span class="err">;</span>
+        <span class="p">}</span>
+        <span class="n">this</span><span class="p">.</span><span class="n">passwordField</span><span class="p">.</span><span class="n">sendKeys</span><span class="p">(</span><span class="n">password</span><span class="p">)</span><span class="err">;</span>
+    <span class="p">}</span><span class="err">;</span>
+
+    <span class="n">LoginPage</span><span class="p">.</span><span class="n">prototype</span><span class="p">.</span><span class="n">login</span> <span class="o">=</span> <span class="k">function</span> <span class="err">() {</span>
+        <span class="n">this</span><span class="p">.</span><span class="n">loginButton</span><span class="p">.</span><span class="n">click</span><span class="p">()</span><span class="err">;</span>
+    <span class="p">}</span><span class="err">;</span>
+
+    <span class="n">LoginPage</span><span class="p">.</span><span class="n">prototype</span><span class="p">.</span><span class="n">getCurrentUser</span> <span class="o">=</span> <span class="k">function</span> <span class="err">() {</span>
+        <span class="k">return</span> <span class="n">this</span><span class="p">.</span><span class="n">currentUser</span><span class="p">.</span><span class="n">getText</span><span class="p">()</span><span class="err">;</span>
+    <span class="p">}</span><span class="err">;</span>
+
+    <span class="k">return</span> <span class="n">LoginPage</span><span class="err">;</span>
+
+<span class="p">})()</span><span class="err">;</span>
+
+<span class="n">module</span><span class="p">.</span><span class="n">exports</span> <span class="o">=</span> <span class="n">LoginPage</span><span class="err">;</span>
+</pre>
+       </div> 
+       <p>In the constructor function of our <code>LoginPage</code> class, we setup instances of the things on the page we wish to interact with using Protractor’s locators. We use <code>By.input</code> to find an input with a binding to <code>ng-model="user.email"</code> and again for <code>ng-model="user.password"</code>. We find our submit button by id, and lastly we find the current users name by searching the page for the <code>currentUser.name</code> binding. We then setup the functions on our page object that we are calling from our spec, using the elements we setup in our constructor. It is important to note the implicit return of <code>this.currentUser.getText()</code>. This is because the <code>getText()</code> method returns a promise, which we return to and resolve in our spec. Finally we ensure that our page object is available to the spec by exporting it.</p> 
+       <p>Now, when we run our spec again, we should get an actionable failure <code>Error: No element found using locator: by.model("user.email")</code> allowing us to implement our markup and logic to get our spec passing. With just a few simple steps, we were able to get a selenium server running and Protractor configured to use it. As well as creating a pleasant testing DSL by abstracting our page specific login into a reuseable page object.</p> 
+      </section> 
+     </article> 
+     <div class="blog-ad"> 
+      <img class="blog-ad__icon" src="//drxwg5otdx721.cloudfront.net/assets/blog_app/blog-ad__test-icon-c01844b649bf4d17eaf6f0190a603bd7.svg" alt="Blog ad  test icon"> 
+      <div class="blog-ad__content"> 
+       <h3 class="blog-ad__headline"> Subscribe to the Gaslight Newsletter </h3> 
+       <p class="blog-ad__copy"> Want more content like this? Subscribe to Gaslight’s monthly email newsletter for coding tips, tech insights, events, news and more. </p> 
+       <a class="blog-ad__button" href="http://teamgaslight.com/newsletter"> Subscribe Now </a> 
+      </div> 
+     </div> 
+     <hr> 
+    </div> 
+   </div> 
+   <div class="row share"> 
+    <div class="large-8 large-centered columns"> 
+     <iframe allowtransparency="true" class="share__frame--facebook" frameborder="0" scrolling="no" src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fteamgaslight.com%2Fblog%2Fgetting-started-with-protractor-and-page-objects-for-angularjs-e2e-testing&amp;send=false&amp;layout=button_count&amp;width=300&amp;show_faces=false&amp;font&amp;colorscheme=light&amp;action=like&amp;height=80&amp;api_key=292279370880643"></iframe> 
+     <iframe allowtransparency="true" class="share__frame--twitter" frameborder="0" scrolling="no" src="https://platform.twitter.com/widgets/tweet_button.html?url=https%3A%2F%2Fteamgaslight.com%2Fblog%2Fgetting-started-with-protractor-and-page-objects-for-angularjs-e2e-testing&amp;via=teamgaslight&amp;size=m"></iframe> 
+     <div class="share__frame--linkedin"> 
+      <script src="//platform.linkedin.com/in.js" type="text/javascript">
+          lang: en_US
+        </script> 
+      <script data-counter="right" data-url="https://teamgaslight.com/blog/getting-started-with-protractor-and-page-objects-for-angularjs-e2e-testing" type="IN/Share"></script> 
+     </div> 
+     <div class="share__frame--reddit"> 
+      <a href="//www.reddit.com/submit" onclick="window.location = '//www.reddit.com/submit?url=' + encodeURIComponent(window.location); return false"> <img alt="submit to reddit" border="0" src="//www.redditstatic.com/spreddit7.gif"> </a> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="row"> 
+    <div class="large-8 large-centered columns"> 
+     <div class="row"> 
+      <div class="large-6 columns"> 
+       <a class="button--full-width post__navigation" href="/blog/im-speaking-at-railsconf-2014">« Previous Post</a> 
+      </div> 
+      <div class="large-6 columns"> 
+       <a class="button--full-width post__navigation" href="/blog/you-dont-know-what-software-you-need-until-you-build-it">Next Post »</a> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="row"> 
+    <div class="large-7 large-centered columns"> 
+     <div id="discourse-comments"></div> 
+     <noscript>
+       Please enable JavaScript to view the comments powered by Discourse. 
+     </noscript> 
+    </div> 
+   </div> 
+  </div> 
+  <footer> 
+   <div class="footer"> 
+    <div class="row"> 
+     <div class="large-4 columns footer__newsletter"> 
+      <p class="center"> <strong> Sign up for bright ideas on tech + biz: </strong> </p> 
+      <form class="nice" id="new_newsletter_subscription" action="/newsletter" accept-charset="UTF-8" method="post">
+       <input name="utf8" type="hidden" value="?">
+       <input type="hidden" name="authenticity_token" value="o6Qklyc+I3+c/87JvrwV+x9yi1iEKmeBibvlK5BKF74lnwrP3Rd1JUj7zuOIpVAw0BRFKT/+QLM2/DHrmijAVQ==">
+       <div class="row"> 
+        <div class="large-12 columns"> 
+         <label class="hide-unless-crappy-browser input_label_newsletter" for="newsletter_subscription_email">Email Address</label> 
+         <input class="required email input-text" placeholder="Email Address" type="email" name="newsletter_subscription[email]" id="newsletter_subscription_email"> 
+        </div> 
+       </div> 
+       <div class="row"> 
+        <div class="large-6 columns large-centered"> 
+         <input type="submit" name="commit" value="Subscribe" class="button button--red button--form"> 
+        </div> 
+       </div> 
+      </form> 
+     </div> 
+     <div class="large-4 columns"> 
+      <div class="row"> 
+       <div class="large-4 columns"> 
+        <ul class="footer__pages"> 
+         <li> <a href="/work">Work</a> </li> 
+         <li> <a href="/services">Services</a> </li> 
+         <li> <a href="/about">About</a> </li> 
+         <li> <a href="/blog/">Blog</a> </li> 
+         <li> <a href="/contact">Contact</a> </li> 
+        </ul> 
+       </div> 
+       <div class="large-6 columns"> 
+        <ul class="footer__pages"> 
+         <li> <a href="/careers">Careers</a> </li> 
+         <li> <a href="/elixir">Elixir</a> </li> 
+         <li> <a href="/blog/?tagged=podcast">Podcast</a> </li> 
+         <li> <a href="/coffee">Coffee Friday</a> </li> 
+        </ul> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="large-4 columns social-links"> 
+      <h4 class="social-links__header">Connect with us</h4> 
+      <a class="social-links__contact" href="mailto:hello@teamgaslight.com">hello@teamgaslight.com</a> 
+      <ul class="social-links__links"> 
+       <li> <a class="icon--twitter--footer" rel="Footer Social" target="_blank" href="http://twitter.com/teamgaslight"><img class="icon--footer__twitter" src="//drxwg5otdx721.cloudfront.net/assets/icons/twitter-f988172a54572b4556e84766f5c31ad8.svg" alt="Twitter"> </a></li> 
+       <li> <a class="icon--facebook--footer" rel="Footer Social" target="_blank" href="http://facebook.com/teamgaslight"><img class="icon--footer__facebook" src="//drxwg5otdx721.cloudfront.net/assets/icons/facebook-8582dc391a4fb7076bf2e83ec372298a.svg" alt="Facebook"> </a></li> 
+       <li> <a class="icon--github--footer" rel="Footer Social" target="_blank" href="http://github.com/gaslight"><img class="icon--footer__github" src="//drxwg5otdx721.cloudfront.net/assets/icons/github-7f2f5092f1b5f131dd6ca30aa8648ae6.svg" alt="Github"> </a></li> 
+       <li> <a class="icon--linkedin" rel="Footer Social" target="_blank" href="https://www.linkedin.com/company/gaslight"><img class="icon--footer__linkedin" src="//drxwg5otdx721.cloudfront.net/assets/icons/linkedin-0bbb4e5817706622a8f0570d392fd7da.svg" alt="Linkedin"> </a></li> 
+       <li> <a class="icon--youtube" rel="Footer Social" target="_blank" href="https://www.youtube.com/channel/UCC36CM_uLqhoKEqSy2mjqFQ"><img class="icon--footer__youtube" src="//drxwg5otdx721.cloudfront.net/assets/icons/youtube-13296411e20c68234d714bdf1e790c03.svg" alt="Youtube"> </a></li> 
+       <li> <a class="icon--instagram" rel="Footer Social" target="_blank" href="https://www.instagram.com/gaslightcincy/"><img class="icon--footer__instagram" src="//drxwg5otdx721.cloudfront.net/assets/icons/instagram-b80f825a49988fcc0476e0dbcf113cc5.svg" alt="Instagram"> </a></li> 
+      </ul> 
+     </div> 
+    </div> 
+    <div class="row hide-for-small"> 
+     <div class="large-12"> 
+      <hr> 
+     </div> 
+    </div> 
+    <div class="row hide-for-small"> 
+     <div class="large-12"> 
+      <div class="footer__info"> 
+       <p> Made with love in <a rel="Footer Contact" target="_blank" href="https://goo.gl/maps/nRbHPdR3aNJ2">Cincinnati</a> </p> • 
+       <a rel="Footer Contact" href="mailto:hello@teamgaslight.com">hello@teamgaslight.com</a> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </footer> 
+  <script src="//drxwg5otdx721.cloudfront.net/assets/application-214198008fc53da77e5f5ea8cbe98050.js"></script> 
+  <script>
+      var discourseUrl = "https://discuss.teamgaslight.com/",
+          discourseEmbedUrl = 'https://teamgaslight.com/blog/getting-started-with-protractor-and-page-objects-for-angularjs-e2e-testing';
+      (function() {
+        var d = document.createElement('script'); d.type = 'text/javascript'; d.async = true;
+          d.src = discourseUrl + 'javascripts/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(d);
+      })();
+    </script>   
+ </body>
+</html>
