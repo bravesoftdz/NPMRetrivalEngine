@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en-US">
+ <head data-template-path="https://hacks.mozilla.org/wp-content/themes/Hax"> 
+  <meta charset="utf-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <!-- Metadata for Facebook --> 
+  <meta property="og:site_name" content="Mozilla Hacks – the Web developer blog"> 
+  <meta property="og:url" content="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/"> 
+  <meta property="og:title" content="speak.js: Text-to-Speech on the Web"> 
+  <meta property="og:description" content="Text-to-Speech (TTS) can make content more accessible, but there is so far no simple and universal way to do that on the web. One possible ..."> 
+  <!-- Metadata for Twitter --> 
+  <meta property="twitter:title" content="speak.js: Text-to-Speech on the Web"> 
+  <meta property="twitter:description" content="Text-to-Speech (TTS) can make content more accessible, but there is so far no simple and universal way to do that on the web. One possible ..."> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:site" content="@mozhacks"> 
+  <link rel="alternate" type="application/rss+xml" title="Mozilla Hacks – the Web developer blog RSS Feed" href="https://hacks.mozilla.org/feed/"> 
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:400,400italic,700,700italic" rel="stylesheet" type="text/css"> 
+  <link href="//addons.cdn.mozilla.net/static/css/tabzilla/tabzilla.css" rel="stylesheet"> 
+  <link rel="stylesheet" href="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/themes/Hax/css/font-awesome.min.css"> 
+  <link rel="stylesheet" href="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/themes/Hax/style.css"> 
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/highlight.js/8.6.0/styles/solarized_light.min.css"> 
+  <title>  speak.js: Text-to-Speech on the Web ?
+        Mozilla Hacks – the Web developer blog  </title> 
+  <script type="text/javascript">
+    window.hacks = {};
+    // http://cfsimplicity.com/61/removing-analytics-clutter-from-campaign-urls
+    var removeUtms  =   function(){
+        var l = window.location;
+        if( l.hash.indexOf( "utm" ) != -1 ){
+            var anchor = l.hash.match(/#(?!utm)[^&]+/);
+            anchor  =   anchor? anchor[0]: '';
+            if(!anchor && window.history.replaceState){
+                history.replaceState({},'', l.pathname + l.search);
+            } else {
+                l.hash = anchor;
+            }
+        };
+    };
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-35433268-8'],
+              ['_setAllowAnchor', true]);
+    _gaq.push (['_gat._anonymizeIp']);
+    _gaq.push(['_trackPageview']);
+    _gaq.push( removeUtms );
+    (function(d, k) {
+      var ga = d.createElement(k); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = 'https://ssl.google-analytics.com/ga.js';
+      var s = d.getElementsByTagName(k)[0]; s.parentNode.insertBefore(ga, s);
+    })(document, 'script');
+  </script> 
+  <link rel="dns-prefetch" href="//blog.mozilla.org"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="Mozilla Hacks - the Web developer blog » speak.js: Text-to-Speech on the Web Comments Feed" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/feed/"> 
+  <link rel="stylesheet" id="simple-payments-css" href="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/plugins/jetpack/modules/simple-payments/simple-payments.css?ver=4.8.2" type="text/css" media="all"> 
+  <link rel="stylesheet" id="stcr-plugin-style-css" href="https://blog.mozilla.org/hacks/wp-content/plugins/subscribe-to-comments-reloaded/includes/css/stcr-plugin-style.css?ver=4.8.2" type="text/css" media="all"> 
+  <link rel="stylesheet" id="wp-syntax-css-css" href="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/plugins/wp-syntax/css/wp-syntax.css?ver=1.1" type="text/css" media="all"> 
+  <script type="text/javascript" src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-includes/js/jquery/jquery.js?ver=1.12.4"></script> 
+  <script type="text/javascript" src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1"></script> 
+  <script type="text/javascript" src="https://blog.mozilla.org/hacks/wp-content/plugins/subscribe-to-comments-reloaded/includes/js/stcr-plugin.js?ver=4.8.2"></script> 
+  <script type="text/javascript" src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/themes/Hax/js/analytics.js?ver=4.8.2"></script> 
+  <script type="text/javascript" src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/themes/Hax/js/socialshare.min.js?ver=4.8.2"></script> 
+  <link rel="https://api.w.org/" href="https://hacks.mozilla.org/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://hacks.mozilla.org/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://hacks.mozilla.org/wp-includes/wlwmanifest.xml"> 
+  <link rel="prev" title="Firefox 6 is here" href="https://hacks.mozilla.org/2011/08/firefox6/"> 
+  <link rel="next" title="Wiki Wednesday: August 17, 2011" href="https://hacks.mozilla.org/2011/08/wiki-wednesday-august-17-2011/"> 
+  <link rel="canonical" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/"> 
+  <link rel="shortlink" href="https://hacks.mozilla.org/?p=9213"> 
+  <link rel="alternate" type="application/json+oembed" href="https://hacks.mozilla.org/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fhacks.mozilla.org%2F2011%2F08%2Fspeak-js-text-to-speech-on-the-web%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="https://hacks.mozilla.org/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fhacks.mozilla.org%2F2011%2F08%2Fspeak-js-text-to-speech-on-the-web%2F&amp;format=xml"> 
+  <script type="text/javascript">
+                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+                ga('create', 'UA-36116321-4', 'auto');
+                ga('set', 'dimension1', 'Mozilla Hacks - the Web developer blog');
+                ga('send', 'pageview');
+            </script>
+  <link rel="shortcut icon" type="image/x-icon" href="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/themes/Hax/favicon.ico">
+  <style>#wpadminbar #wp-admin-bar-site-name>.ab-item:before { content: none !important;}li#wp-admin-bar-site-name a { background: url( "https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/themes/Hax/favicon.ico" ) left center/20px no-repeat !important; padding-left: 21px !important; background-size: 20px !important; } li#wp-admin-bar-site-name { margin-left: 5px !important; } li#wp-admin-bar-site-name {} #wp-admin-bar-site-name div a { background: none !important; }
+</style>
+ </head> 
+ <body> 
+  <div class="outer-wrapper"> 
+   <header class="section section--fullwidth header"> 
+    <div class="masthead row"> 
+     <div id="tabzilla"> 
+      <a href="https://www.mozilla.org/">Mozilla</a> 
+     </div> 
+     <div class="branding block block--3"> 
+      <h1><a href="https://hacks.mozilla.org"><img src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/themes/Hax/img/mdn-logo-mono.svg" alt="Mozilla"><span>Hac<span class="logo-askew">k</span>s</span></a></h1> 
+     </div> 
+     <div class="search block block--2"> 
+      <form class="search__form" method="get" action="https://hacks.mozilla.org/"> 
+       <input type="search" name="s" class="search__input" placeholder="Search Mozilla Hacks" value=""> 
+       <i class="fa fa-search search__badge"></i> 
+      </form> 
+     </div> 
+     <nav class="social"> 
+      <a class="social__link youtube" href="http://www.youtube.com/user/mozhacks" title="YouTube"><i class="fa fa-youtube"></i><span>Hacks on YouTube</span></a> 
+      <a class="social__link twitter" href="https://twitter.com/mozhacks" title="Twitter"><i class="fa fa-twitter"></i><span>@mozhacks on Twitter</span></a> 
+      <a class="social__link rss" href="https://hacks.mozilla.org/feed/" title="RSS Feed"><i class="fa fa-rss"></i><span>Hacks RSS Feed</span></a> 
+     </nav> 
+    </div> 
+   </header> 
+   <div id="content-head" class="section"> 
+    <h1 class="post__title">speak.js: Text-to-Speech on the Web</h1> 
+    <div class="byline"> 
+     <h3 class="post__author"> <img alt="" src="https://secure.gravatar.com/avatar/?s=64&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/?s=128&amp;d=mm&amp;r=g 2x" class="avatar avatar-64 photo avatar-default" height="64" width="64"> By </h3> 
+     <div class="post__meta">
+       Posted on 
+      <abbr class="published" title="2011-08-17T11:36:56-07:00"> August 17, 2011 </abbr> 
+      <span class="entry-cat">in <a href="https://hacks.mozilla.org/category/audio/" rel="category tag" title="View all posts in Audio">Audio</a>, <a href="https://hacks.mozilla.org/category/demo/" rel="category tag" title="View all posts in Demo">Demo</a>, <a href="https://hacks.mozilla.org/category/html5/" rel="category tag" title="View all posts in HTML5">HTML5</a>, and <a href="https://hacks.mozilla.org/category/javascript/" rel="category tag" title="View all posts in JavaScript">JavaScript</a> </span> 
+      <div class="socialshare" data-type="bubbles"></div> 
+     </div> 
+    </div> 
+   </div> 
+   <main id="content-main" class="section article"> 
+    <article class="post" role="article"> 
+     <p>Text-to-Speech (TTS) can make content more accessible, but there is so far no simple and universal way to do that on the web. One possible approach is shown in <strong><a href="http://syntensity.com/static/espeak.html">this demo</a></strong>, which is powered by <a href="https://github.com/kripken/speak.js">speak.js</a>, a new 100% pure JavaScript/HTML5 TTS implementation. speak.js is a port of <a href="http://espeak.sourceforge.net/">eSpeak</a>, an open source speech synthesizer, from C++ to JavaScript using <a href="http://emscripten.org">Emscripten</a>.</p> 
+     <p>Compiling an existing speech synthesis engine to JavaScript is a good way to avoid writing a complicated project like eSpeak from scratch. Once compiled, the eSpeak code in speak.js doesn’t know it’s running on the web: speak.js uses the <a href="https://github.com/kripken/emscripten/wiki/Filesystem-Guide"> Emscripten emulated filesystem</a> to ‘fake’ the normal file reading and writing calls that the eSpeak C++ code has (fopen, fread, etc.). This allows the normal eSpeak datafiles to be used (either through an xhr, or by converting them to JSON and bundling them with the script file). The result of running the compiled eSpeak code is that it ‘writes’ a .wav file with the generated audio to the emulated filesystem. speak.js then takes that data, encodes it using base64, and creates a data URL. That URL is then loaded in an HTML5 audio element, letting the browser handle playback. (Note that while that is a very simple way to do things, it isn’t the most efficient. speak.js has not yet focused on speed, but with some additional work it could be much faster, if that turns out to be an issue.)</p> 
+     <p>Why would you want TTS in JavaScript? Well, with speak.js you can bundle a single .js file in your website, and then generating speech is about as simple as writing</p> 
+     <blockquote> 
+      <pre>speak("hello world")</pre> 
+     </blockquote> 
+     <p>(see the <a href="https://github.com/kripken/speak.js">speak.js website</a> for instructions). The generated speech will be exactly the same on all platforms, unlike if your users each did TTS in their own way (using an OS capability, or a separate program). speak.js can also be used to build browser addons in a straightforward way, since it’s pure JavaScript – no need for platform dependent binaries, and the addon will work the same on all OSes.</p> 
+     <p>A few more comments:</p> 
+     <ul> 
+      <li>JavaScript is getting more and more capable all the time. The development versions of the top JavaScript engines today can run code compiled from C++ only 3-5X slower than a fast C++ compiler, and getting even better. As a consequence, expanding the capabilities of the web platform can in many cases be done in JavaScript or by compiling to JavaScript, instead of adding new code to the browsers themselves, which inevitably takes longer – especially if you wait for all browsers to implement a particular feature.</li> 
+      <li>While speak.js uses only standards-based APIs, due to browser limitations it can’t work everywhere yet. It won’t work in IE, Safari or Opera since they don’t support typed arrays, nor in Chrome since it doesn’t support WAV data URLs. So currently speak.js only works properly in Firefox. However, the missing features just mentioned are not huge and hopefully those browser makers will implement them soon. It is also possible to implement workarounds in speak.js for these issues (see next comment).</li> 
+      <li>Help with improving speak.js is very welcome! One important thing we need is to implement workarounds for the issues that prevent speak.js from running on the browsers it currently can’t run on. Another goal is to build browser addons using speak.js.&nbsp;Please get in touch <a href="https://github.com/kripken/speak.js">on github</a> if you want to help out.</li> 
+      <li>eSpeak supports multiple languages so speak.js can too. You do need to include the additional language files though. <a href="http://syntensity.com/static/espeak_fr.html">Here</a> is an experimental build where you can switch between English and French support (note that it is an unoptimized build, so it will run slower).</li> 
+     </ul> 
+     <section class="about"> 
+     </section> 
+    </article> 
+    <section class="discussion"> 
+     <hr class="dino"> 
+     <div class="comments"> 
+      <header class="comments__head"> 
+       <h3>14 comments</h3> 
+      </header> 
+      <ol class="hfeed"> 
+       <li id="comment-6828" class="comment even thread-even depth-1"> <b class="comment__title vcard"> <cite class="author fn">Muhammad Tarmizi bin Kamaruddin</cite> </b> 
+        <blockquote class="comment__body"> 
+         <p>I really hope that speak.js use MIT license and not GPL.</p> 
+        </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6828" rel="bookmark" title="Permanent link to this comment by Muhammad Tarmizi bin Kamaruddin"><abbr class="published" title="2011-08-17">August 17th, 2011</abbr> at 11:45</a> <p class="comment__util"> </p> </li>
+       <!-- #comment-## --> 
+       <li id="comment-6829" class="comment byuser comment-author-azakaimozilla-com bypostauthor odd alt thread-odd thread-alt depth-1"> <b class="comment__title vcard"> <cite class="author fn">azakai</cite> </b> 
+        <blockquote class="comment__body"> 
+         <p>I would prefer MIT myself, however eSpeak is GPL licensed. But I hope that isn’t a problem here. speak.js is built in a way that makes it very obvious that anything using speak.js is not a derivative work of speak.js or eSpeak – using speak.js just means writing |speak(“text”)|. That’s the entire API. So I strongly believe that using speak.js doesn’t mean your code needs to be GPL as well.</p> 
+         <p>To comply with the GPL in this case, all you should need is a link to the source code, which is on github, <a href="https://github.com/kripken/speak.js" rel="nofollow">https://github.com/kripken/speak.js</a> (unless you modified speak.js itself).</p> 
+        </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6829" rel="bookmark" title="Permanent link to this comment by azakai"><abbr class="published" title="2011-08-17">August 17th, 2011</abbr> at 11:58</a> <p class="comment__util"> </p> </li>
+       <!-- #comment-## --> 
+       <li id="comment-6830" class="comment even thread-even depth-1"> <b class="comment__title vcard"> <cite class="author fn">Prestaul</cite> </b> 
+        <blockquote class="comment__body"> 
+         <p>Works great in Chrome 14…</p> 
+        </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6830" rel="bookmark" title="Permanent link to this comment by Prestaul"><abbr class="published" title="2011-08-17">August 17th, 2011</abbr> at 12:02</a> <p class="comment__util"> </p> 
+        <ol class="children"> 
+         <li id="comment-6831" class="comment byuser comment-author-azakaimozilla-com bypostauthor odd alt depth-2"> <b class="comment__title vcard"> <cite class="author fn">azakai</cite> </b> 
+          <blockquote class="comment__body"> 
+           <p>Thanks, good to know it’s fixed in the Chrome 14 preview version.</p> 
+          </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6831" rel="bookmark" title="Permanent link to this comment by azakai"><abbr class="published" title="2011-08-17">August 17th, 2011</abbr> at 12:10</a> <p class="comment__util"> </p> </li>
+         <!-- #comment-## --> 
+        </ol>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-6832" class="comment even thread-odd thread-alt depth-1"> <b class="comment__title vcard"> <cite class="author fn">abral</cite> </b> 
+        <blockquote class="comment__body"> 
+         <p>This is just wonderful!</p> 
+        </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6832" rel="bookmark" title="Permanent link to this comment by abral"><abbr class="published" title="2011-08-17">August 17th, 2011</abbr> at 12:54</a> <p class="comment__util"> </p> </li>
+       <!-- #comment-## --> 
+       <li id="comment-6833" class="comment odd alt thread-even depth-1"> <b class="comment__title vcard"> <cite class="author fn">Eric Jung</cite> </b> 
+        <blockquote class="comment__body"> 
+         <p>I’d be pleased to write an addon which wraps this. Some ideas: speak RSS feeds, speak the current web page, speak the current web page but only elements marked with a “speak” attribute, etc.</p> 
+         <p>But after playing with the demo for a while, I just don’t see this being anything but an interesting novelty. Why? Because the speech output suffers from lack of clarity. After pasting contents of various news articles into the demo, and playing with some of the variables, I found myself really struggling to understand the speech.</p> 
+         <p>Contrast that to AT&amp;T Natural Voices:<br> <a href="http://www2.research.att.com/~ttsweb/tts/demo.php" rel="nofollow">http://www2.research.att.com/~ttsweb/tts/demo.php</a><br> and you’ll quickly see what I mean.</p> 
+         <p>Is there any way to make it more clear?</p> 
+         <p>Eric Jung<br> Author of FoxyProxy and other addons</p> 
+        </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6833" rel="bookmark" title="Permanent link to this comment by Eric Jung"><abbr class="published" title="2011-08-17">August 17th, 2011</abbr> at 14:22</a> <p class="comment__util"> </p> 
+        <ol class="children"> 
+         <li id="comment-6834" class="comment byuser comment-author-azakaimozilla-com bypostauthor even depth-2"> <b class="comment__title vcard"> <cite class="author fn">azakai</cite> </b> 
+          <blockquote class="comment__body"> 
+           <p>Well, to be honest I know very little about speech synthesis :) I just compiled eSpeak to JS and hacked it so it worked on the web.</p> 
+           <p>It’s possible that that AT&amp;T project is simply better than eSpeak. But it is also possible that we can improve eSpeak’s output by tweaking the parameters, using different voice/dictionary datafiles, etc. I didn’t try any of that yet.</p> 
+           <p>I filed issue 2 on speak.js to track this, hopefully we can get make this much better.</p> 
+           <p>Edit: Forgot to say, thanks for offering to help!</p> 
+          </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6834" rel="bookmark" title="Permanent link to this comment by azakai"><abbr class="published" title="2011-08-17">August 17th, 2011</abbr> at 14:48</a> <p class="comment__util"> </p> 
+          <ol class="children"> 
+           <li id="comment-6835" class="comment odd alt depth-3"> <b class="comment__title vcard"> <cite class="author fn">Eric Jung</cite> </b> 
+            <blockquote class="comment__body"> 
+             <p>ok, well if you do improve, email me and i’ll write a killer addon for it.</p> 
+            </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6835" rel="bookmark" title="Permanent link to this comment by Eric Jung"><abbr class="published" title="2011-08-17">August 17th, 2011</abbr> at 14:51</a> <p class="comment__util"> </p> </li>
+           <!-- #comment-## --> 
+          </ol>
+          <!-- .children --> </li>
+         <!-- #comment-## --> 
+         <li id="comment-6836" class="comment even depth-2"> <b class="comment__title vcard"> <cite class="author fn">Paul</cite> </b> 
+          <blockquote class="comment__body"> 
+           <p>You should definitely write an add-on for this. I want this addon!</p> 
+          </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6836" rel="bookmark" title="Permanent link to this comment by Paul"><abbr class="published" title="2011-08-17">August 17th, 2011</abbr> at 17:26</a> <p class="comment__util"> </p> </li>
+         <!-- #comment-## --> 
+        </ol>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-6837" class="comment odd alt thread-odd thread-alt depth-1"> <b class="comment__title vcard"> <cite class="author fn">skierpage</cite> </b> 
+        <blockquote class="comment__body"> 
+         <p>The demo phrase sounds pretty good, but it messes up Rick Astley’s immortal “Never gonna tell a lie and hurt you”: the speaker doesn’t say anything for “hurt”. I’ve got an OLPC laptop that I think also uses espeak and that makes a vague ‘t’ sound for hurt/curt/yurt.</p> 
+         <p>emscripten is incredible!</p> 
+        </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6837" rel="bookmark" title="Permanent link to this comment by skierpage"><abbr class="published" title="2011-08-17">August 17th, 2011</abbr> at 17:35</a> <p class="comment__util"> </p> </li>
+       <!-- #comment-## --> 
+       <li id="comment-6838" class="comment even thread-even depth-1"> <b class="comment__title vcard"> <cite class="author fn">anfemfjs</cite> </b> 
+        <blockquote class="comment__body"> 
+         <p>This might me caused by emscripten or something in the browser: Espeak 1.45.04-1 from Debian unstable produces <a href="http://dl.dropbox.com/u/96013/Never%20gonna%20tell%20a%20lie%20and%20hurt%20you.wav" rel="nofollow">http://dl.dropbox.com/u/96013/Never%20gonna%20tell%20a%20lie%20and%20hurt%20you.wav</a> which sounds much better.</p> 
+        </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6838" rel="bookmark" title="Permanent link to this comment by anfemfjs"><abbr class="published" title="2011-08-18">August 18th, 2011</abbr> at 03:58</a> <p class="comment__util"> </p> 
+        <ol class="children"> 
+         <li id="comment-6841" class="comment odd alt depth-2"> <b class="comment__title vcard"> <cite class="author fn">Chris</cite> </b> 
+          <blockquote class="comment__body"> 
+           <p>Rick roll’d?</p> 
+          </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6841" rel="bookmark" title="Permanent link to this comment by Chris"><abbr class="published" title="2012-09-17">September 17th, 2012</abbr> at 15:10</a> <p class="comment__util"> </p> </li>
+         <!-- #comment-## --> 
+        </ol>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-6839" class="comment even thread-odd thread-alt depth-1"> <b class="comment__title vcard"> <cite class="author fn">Gerardo Capiel</cite> </b> 
+        <blockquote class="comment__body"> 
+         <p>Chrome web app developers should look at:</p> 
+         <p><a href="http://code.google.com/chrome/extensions/trunk/tts.html" rel="nofollow">http://code.google.com/chrome/extensions/trunk/tts.html</a></p> 
+         <p>It’s in the beta build now and should be in the stable build soon. Unfortunately, you have a make a packaged web app or extension. One nice feature is word level call backs for doing things like word highlighting for dyslexic users. Check out a demo I built at:</p> 
+         <p><a href="https://github.com/gcapiel/ChromeWebAppBookshareReader" rel="nofollow">https://github.com/gcapiel/ChromeWebAppBookshareReader</a></p> 
+         <p>You can install web app on Chrome Beta by clicking on the .crx file in the downloads section.</p> 
+        </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6839" rel="bookmark" title="Permanent link to this comment by Gerardo Capiel"><abbr class="published" title="2011-08-27">August 27th, 2011</abbr> at 09:03</a> <p class="comment__util"> </p> </li>
+       <!-- #comment-## --> 
+       <li id="comment-6840" class="comment odd alt thread-even depth-1"> <b class="comment__title vcard"> <cite class="author fn">Gerardo Capiel</cite> </b> 
+        <blockquote class="comment__body"> 
+         <p>I meant to add that I’d love to see speak.js extended to support word level callbacks like the Google TTS API.</p> 
+        </blockquote> <a class="comment__meta" href="https://hacks.mozilla.org/2011/08/speak-js-text-to-speech-on-the-web/#comment-6840" rel="bookmark" title="Permanent link to this comment by Gerardo Capiel"><abbr class="published" title="2011-08-27">August 27th, 2011</abbr> at 09:05</a> <p class="comment__util"> </p> </li>
+       <!-- #comment-## --> 
+      </ol> 
+     </div> 
+     <p class="comments__closed"><b>Comments are closed for this article.</b></p> 
+     <!-- /#content-main --> 
+     <footer class="footer section section--fullwidth"> 
+      <div class="row"> 
+       <p class="block block--1"> Except where otherwise noted, content on this site is licensed under the <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="license external">Creative Commons Attribution Share-Alike License v3.0</a> or any later version. </p> 
+       <img class="footer__logo" alt="the Mozilla dino logo" src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/themes/Hax/img/dino.svg"> 
+      </div> 
+     </footer> 
+    </section>
+   </main>
+  </div> 
+  <link rel="stylesheet" id="hljstheme-css" href="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/plugins/wp-code-highlightjs/styles/default.css?ver=0.6.2" type="text/css" media="all"> 
+  <script type="text/javascript" src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/plugins/wp-syntax/js/wp-syntax.js?ver=1.1"></script> 
+  <script type="text/javascript" src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-includes/js/wp-embed.min.js?ver=4.8.2"></script> 
+  <script type="text/javascript" src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/plugins/wp-code-highlightjs/highlight.common.pack.js?ver=0.6.2"></script> 
+  <script type="text/javascript" src="https://2r4s9p1yi1fa2jd7j43zph8r-wpengine.netdna-ssl.com/wp-content/plugins/wp-code-highlightjs/highlight.custom.pack.js?ver=0.6.2"></script> 
+  <style>pre.hljs {padding: 5px;}
+pre.hljs code {}</style> 
+  <script type="text/javascript">
+    (function($, window) {
+        var init_fn_flag = false;
+        var init_fn = (function() {
+            if (init_fn_flag)
+                return;
+            init_fn_flag = true;
+             hljs.configure({"tabReplace":"    "});
+            $('pre code').each(function(i, block) {
+                hljs.highlightBlock(block);
+            });
+        });
+        $(document).ready(init_fn);
+        $(window).on("load", init_fn);
+    })(jQuery, window);
+    </script> 
+  <script>
+    // External links should open in a new tab.
+    (function () {
+      var postLinks = document.querySelectorAll('#content-main a');
+
+      var origin = location.origin;
+
+      for (var i = 0; i < postLinks.length; i++) {
+        var link = postLinks[i];
+        if (link.origin !== origin && !link.getAttribute('target')) {
+          link.setAttribute('target', '_blank');
+        }
+      }
+    })();
+
+    window.addEventListener('load', function () {
+      if (document.querySelector('#newsletterForm')) {
+        var script = document.createElement('script');
+        var path = document.head.getAttribute('data-template-path');
+        script.setAttribute('src', path + '/js/newsletter.js');
+        document.head.appendChild(script);
+      }
+    });
+  </script>   
+ </body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en-US">
+ <head> 
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+  <meta name="description" content="Web development from Brian Grinstead. JavaScript, CSS, Open Source."> 
+  <title>Video Funhouse - Convert Videos In Your Web Browser  - Brian Grinstead</title> 
+  <link rel="stylesheet" href="/blog/static/styles.css" type="text/css" media="screen"> 
+  <link rel="alternate" type="application/rss+xml" title="Brian Grinstead RSS Feed" href="http://www.briangrinstead.com/blog/feed"> 
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"> 
+ </head> 
+ <body> 
+  <div id="shadow"> 
+   <div class="container"></div> 
+  </div> 
+  <div id="page"> 
+   <div id="header"> 
+    <div id="headerimg"> 
+     <h1><a href="/blog/">Brian Grinstead</a></h1> 
+     <div class="description"></div> 
+    </div> 
+   </div> 
+   <hr> 
+   <div id="content" class="widecolumn"> 
+    <div class="post"> 
+     <h2>Video Funhouse - Convert Videos In Your Web Browser</h2> 
+     <div class="entry"> 
+      <p>We (<a href="https://twitter.com/nicolegrinstead">Nicole</a>, <a href="http://twitter.com/aaronm67">Aaron</a>, and I) have had a lot of fun doing Node Knockout the past few years. Last year (in 2012), our Missouri-based team got <a href="http://blog.nodeknockout.com/post/36076501016/node-knockout-winners">first place in the ‘Completeness’ category</a> for our app <a href="http://2012.nodeknockout.com/teams/comorichweb">asciigram</a>, which converted a webcam stream into ASCII art.</p> 
+      <p>This year we decided to up the game a little bit, and to try and convert any video file into another video format, while allowing filters to be applied to the video - <strong>all inside of the browser, without uploading anything</strong>. The result is <a href="http://devcomo.2013.nodeknockout.com/">Video Funhouse</a> (here is our <a href="http://nodeknockout.com/teams/devcomo">devcomo team page</a>). I’m particularly proud of our project and team this year, since it was a very busy weekend all around.</p> 
+      <p>Obviously, we knew we wouldn’t be able to do this in a weekend on our own without relying on great libraries and tools. There is a project called <a href="https://github.com/kripken/emscripten">Emscripten</a>, which is an LLVM to JavaScript compiler, so we figured we could try building <a href="http://ffmpeg.org/">FFmpeg</a> or <a href="https://libav.org/avconv.html">avconv</a> into JavaScript to do the heavy lifting for the project. Here’s a demo video of the result (keep reading further to see more technical information):</p> 
+      <center> 
+       <br> 
+       <br> 
+      </center> 
+      <p>Again, here is the link to the <a href="http://devcomo.2013.nodeknockout.com/">application</a> if you’d like to play with it, and here is a link to the <a href="http://2013.nodeknockout.com/teams/devcomo">team page</a>.</p> 
+      <h2 id="videoconverterjs">videoconverter.js</h2> 
+      <p>I have open sourced the build utilities and the ffmpeg.js file that we are using in the project as: <a href="https://github.com/bgrins/videoconverter.js">videoconverter.js</a>.</p> 
+      <p>Building these projects with Emscripten was a little tricky, but actually quite simple when you consider what it was doing for us. What is also amazing about these tools is that I have little experience with build systems like this, and the tools generally just worked after a bunch of trial and error.</p> 
+      <h2 id="why-would-you-compile-ffmpeg-into-javascript">Why Would You Compile FFmpeg Into JavaScript?</h2> 
+      <p>Mostly just to see if it would work. Also, it seemed like it would be a fun project.</p> 
+      <h2 id="so-how-do-you-compile-ffmpeg-into-javascript">So, How Do You Compile FFmpeg Into JavaScript?</h2> 
+      <p>Here are some of notes I made while doing this, for future reference:</p> 
+      <p>Compiling avconv seemed more promising at first, but when running it we bumped into some weird runtime errors with swscaler. Couldn’t figure it out quickly, so focused on FFmpeg. We pulled down the latest Emscripten, and the latest FFmpeg:</p> 
+      <div class="highlighter-rouge">
+       <pre class="highlight"><code>emconfigure ./configure --cc="emcc" --disable-ffplay --disable-ffprobe --disable-ffserver --disable-asm --enable-pic --disable-doc --disable-devices --disable-pthreads --disable-w32threads --disable-network --enable-small --disable-hwaccels --disable-parsers --disable-bsfs --disable-debug --disable-zlib
+</code></pre> 
+      </div> 
+      <figure class="highlight">
+       <pre><code class="language-bash" data-lang="bash">emconfigure ./configure --cc<span class="o">=</span><span class="s2">"emcc"</span> --disable-ffplay --disable-ffprobe --disable-ffserver --disable-asm --enable-pic --disable-doc --disable-devices --disable-pthreads --disable-w32threads --disable-network --enable-small --disable-hwaccels --disable-parsers --disable-bsfs --disable-debug --disable-zlib</code></pre>
+      </figure> 
+      <figure class="highlight">
+       <pre><code class="language-bash" data-lang="bash">git clone <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="70171904301719041805125e131f1d">[email&nbsp;protected]</a>:kripken/emscripten.git
+git clone git://source.ffmpeg.org/ffmpeg.git ffmpeg</code></pre>
+      </figure> 
+      <p>You may need to also get the SDK to make sure Emscripten will work. The have <a href="https://github.com/kripken/emscripten/wiki/Tutorial">documentation on their site</a> about getting this to work. Here are the basic configuration options we ended up using. Most of the configuration options are actually disabling features that either don’t make sense, or are there to save space. After a lot of trial and error, here is the minimal amount of flags to pass into emconfigure: <code class="highlighter-rouge">--disable-ffplay --disable-ffprobe --disable-ffserver --disable-asm --enable-pic</code>.</p> 
+      <p>The first time we got a successful build it was a 100MB JS file. By removing a bunch of the other stuff, we get it down to 25MB. It could actually get smaller as well - <strong>we were unable to minify the script because the closure compiler process ran out of memory</strong>. The following commands are updated after we figured out some better options. The demo as it is right now doesn’t run any optimizations on the JS file, and it is about double the size. We can’t update the demo, as the weekend is over, but <a href="https://github.com/bgrins/videoconverter.js/commit/b84541dc5c11642858c3c42cc133b84907880312">this commit</a> is promising: <code class="highlighter-rouge">ffmpeg.js: 190 additions, 1463201 deletions not shown</code>.</p> 
+      <figure class="highlight">
+       <pre><code class="language-bash" data-lang="bash">emconfigure ./configure --cc<span class="o">=</span><span class="s2">"emcc"</span> --disable-ffplay --disable-ffprobe --disable-ffserver --disable-asm --enable-pic --disable-doc --disable-devices --disable-pthreads --disable-w32threads --disable-network --enable-small --disable-hwaccels --disable-parsers --disable-bsfs --disable-debug --disable-zlib
+
+emmake make;
+
+emcc -O2 -s <span class="nv">VERBOSE</span><span class="o">=</span>1 -s <span class="nv">ASM_JS</span><span class="o">=</span> -s <span class="nv">ALLOW_MEMORY_GROWTH</span><span class="o">=</span>1 -v libavutil/<span class="k">*</span>.o libavcodec/<span class="k">*</span>.o libavformat/<span class="k">*</span>.o libavdevice/<span class="k">*</span>.o libswresample/<span class="k">*</span>.o libavfilter/<span class="k">*</span>.o libswscale/<span class="k">*</span>.o <span class="k">*</span>.o -o ../ffmpeg.js --pre-js ../ffmpeg_pre.js --post-js ../ffmpeg_post.js</code></pre>
+      </figure> 
+      <h2 id="peformance">Peformance</h2> 
+      <p>The FFmpeg process runs inside of a web worker to prevent locking up the UI. This was the first optimization, as it was necessary for doing any testing on the project at all. Data is piped back from stdout and stderr to the frontend of the demo app, which is listening for these and logging them to a pre tag. This logging could be limited or removed to limit the impact on the DOM, as a lot of data can be generated by the system.</p> 
+      <p>We experimented with firing up 2 different workers, one for the metadata probe and actual processing, and one for taking screenshots of a video right after receiving it. But we noticed some general instability when both were running at once (many times a tab or browser would crash), so we removed the screenshotting functionality. I’m sure we could have traced it down and improved the performance if we had more than a weekend for the project.</p> 
+      <p>The processing itself is a little slow, but I haven’t done benchmarks to compare with native. I generally avoided processing videos of much size. Also, our demo app prints <em>a lot</em> of logs which may not be helping matters. We are looking into how to set up performance tests, but if anyone wants to help with this please let me know or submit a PR on the <a href="https://github.com/bgrins/videoconverter.js">videoconverter.js project</a>.</p> 
+      <p>I believe this could be quite a bit faster - it <strong>couldn’t actually use <a href="http://asmjs.org/">asm.js</a></strong> because it is <a href="https://github.com/kripken/emscripten/blob/350550a5ccfacd19f512bca2ded186e143ea9579/src/compiler.js#L187">explicitly disabled</a> when <strong>ALLOW_MEMORY_GROWTH</strong> is defined. It would be worth experimenting to see if we could set a large max memory size and enable asm to see what kind of speedup we saw.</p> 
+      <p>I’m interested to see if we can get some sort of performance benchmarking set up to compare how fast it runs in different JavaScript environments, and to see how it compares with native performance.</p> 
+      <h2 id="potential-uses">Potential Uses</h2> 
+      <ul> 
+       <li>This could be extended to bundle other encoding libraries. I wasn’t able to figure out how to get the linking to work for libvpx, x264, libtheora, zlib, etc over the weekend, so certain formats cannot be encoded. It would be neat to have this functionality, as it would allow conversion into web friendly video, which could then allow further previewing and processing. As performance improves and <a href="http://caniuse.com/#feat=filesystem">FileSystem API support</a> improve it may be possible to build a web-based video or audio editing tool using this.</li> 
+       <li>Compile the other utilities - there are other programs that ship with FFmpeg that we are excluding right now. <code class="highlighter-rouge">ffprobe</code> in particular seems like it could be better for gathering the metadata after the initial load of the file.</li> 
+       <li>As mentioned previously, this could be useful as a benchmarking tool.</li> 
+       <li>Probably other things I haven’t thought of as well. <h3 id="comments">Comments</h3> </li> 
+      </ul> 
+      <ol class="commentlist"> 
+       <li class="alt" id="comment-98136"> <img alt="" src="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=32&amp;d=identicon&amp;r=g" srcset="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite><a href="http://karolsobczak.com" rel="external nofollow" class="url">sopel39</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-98136" title="">November 13th, 2013 at 2:53 am</a> </small> <p>Interesting stuff. I am trying to port ffmpeg myself, but rather for audio conversions. While I have managed to compile and run ffmpeg.js on audio files, the performance lacks quite badly (even though I do not have ALLOW_MEMORY_GROWTH enabled). Do you have some preliminary data on JS vs native performance? In my case I got really slow execution times (&gt;10x slower vs native). Additionally I found Firefox slower than node.js, which is surprising given that Mozilla asm.js should be superior. Do you have some optimization ideas?</p> </li> 
+       <li id="comment-98170"> <img alt="" src="http://2.gravatar.com/avatar/be8f5537edc7e7fd5c226741108c81ae?s=32&amp;d=identicon&amp;r=g" srcset="http://2.gravatar.com/avatar/be8f5537edc7e7fd5c226741108c81ae?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite><a href="http://briangrinstead.com" rel="external nofollow" class="url">Brian</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-98170" title="">November 13th, 2013 at 6:21 am</a> </small> <p>Have you enabled ASM and -O2 in the build script? In <a href="https://github.com/bgrins/videoconverter.js/blob/master/ffmpeg_build/build_lgpl.sh" rel="nofollow">https://github.com/bgrins/videoconverter.js/blob/master/ffmpeg_build/build_lgpl.sh</a> we are using -O2, but not ASM, since we need memory growth to be allowed. Also, how big is your generated ffmpeg.js file? You may consider disabling as much as possible in the configure call if you only need audio.</p> <p>Regarding performance, Aaron is starting to set up some benchmarks to compare, but we don’t have enough data to say yet. You can check out <a href="https://github.com/bgrins/videoconverter.js/tree/master/perf-tests" rel="nofollow">https://github.com/bgrins/videoconverter.js/tree/master/perf-tests</a> if you are interested. We are also setting up a jsPerf test – I will post later once that is ready.</p> </li> 
+       <li class="alt" id="comment-98339"> <img alt="" src="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=32&amp;d=identicon&amp;r=g" srcset="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite><a href="http://karolsobczak.com" rel="external nofollow" class="url">sopel39</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-98339" title="">November 14th, 2013 at 5:35 am</a> </small> <p>I use -O3 for LLVM compilation and -O2 for bytecode to JS conversion. I compiled with minimal mp3 decoding and ogg encoding/decoding support. Output JS is rather small (I believe it never exceeds 10MB and I think it is optimized when compiled to HTML). Anyway, check Firefox console for asm logs, so you can be sure that asm actually kicks in. Why do you need growing memory?</p> </li> 
+       <li id="comment-98344"> <img alt="" src="http://2.gravatar.com/avatar/be8f5537edc7e7fd5c226741108c81ae?s=32&amp;d=identicon&amp;r=g" srcset="http://2.gravatar.com/avatar/be8f5537edc7e7fd5c226741108c81ae?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite><a href="http://briangrinstead.com" rel="external nofollow" class="url">Brian</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-98344" title="">November 14th, 2013 at 6:17 am</a> </small> <p>Can you share your configure and emcc options to get these optimizations, especially for the LLVM compilation? I’d like to make sure I am optimizing and shrinking the file as much as possible. Here is what I am using: <a href="https://github.com/bgrins/videoconverter.js/blob/master/build/build_lgpl.sh" rel="nofollow">https://github.com/bgrins/videoconverter.js/blob/master/build/build_lgpl.sh</a>.</p> <p>Regarding memory growth, essentially any time I tried to convert a video I would get an error that I needed to enable that option. I’ve considered setting a very high max limit and compiling with asm.js just to compare the speedup.</p> </li> 
+       <li class="alt" id="comment-98703"> <img alt="" src="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=32&amp;d=identicon&amp;r=g" srcset="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite><a href="http://karolsobczak.com" rel="external nofollow" class="url">sopel39</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-98703" title="">November 16th, 2013 at 6:55 am</a> </small> <p>My config script is:<br> RANLIB=emranlib ./configure –cross-prefix=em –cc=emcc –enable-cross-compile –target-os=none –arch=x86_32\<br> –cpu=generic –disable-hwaccels –disable-stripping –disable-pthreads –disable-doc –disable-debug –disable-asm\<br> –disable-network –disable-everything –disable-ffplay –disable-ffprobe –disable-ffserver –disable-outdev=sdl\<br> –enable-optimizations –enable-protocol=file –enable-filter=aresample\<br> –enable-decoder=mp3 –enable-decoder=vorbis –enable-encoder=vorbis\<br> –enable-demuxer=mp3 –enable-muxer=mp3 –enable-demuxer=ogg –enable-muxer=ogg<br> for now, but I am planning to incorporate other libraries.</p> <p>I think the biggest problem with practical use of ffmpeg.js for video is that without HTML5 filesystem API ffmpeg output has to saved to memory, which for bigger files cannot be done easily. Also I wonder what are the legal implications of having patented code distributed via compiled JS.</p> </li> 
+       <li id="comment-98704"> <img alt="" src="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=32&amp;d=identicon&amp;r=g" srcset="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite><a href="http://karolsobczak.com" rel="external nofollow" class="url">sopel39</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-98704" title="">November 16th, 2013 at 6:56 am</a> </small> <p>bugger … you do not need RANLIB env variable</p> </li> 
+       <li class="alt" id="comment-98761"> <img alt="" src="http://2.gravatar.com/avatar/be8f5537edc7e7fd5c226741108c81ae?s=32&amp;d=identicon&amp;r=g" srcset="http://2.gravatar.com/avatar/be8f5537edc7e7fd5c226741108c81ae?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite><a href="http://briangrinstead.com" rel="external nofollow" class="url">Brian</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-98761" title="">November 16th, 2013 at 2:48 pm</a> </small> <p>sopel39, Nice! I’m interested in how you have managed to incorporate mp3 and ogg. I’ve never quite been able to get those building alongside. Also, mind sharing your emcc call, and or wherever you optimize with -O3 and -O2?</p> <p>Here are the two scripts I’m using for with/without asm:</p> <p>Without ASM: <a href="https://github.com/bgrins/videoconverter.js/blob/master/build/build_lgpl.sh" rel="nofollow">https://github.com/bgrins/videoconverter.js/blob/master/build/build_lgpl.sh</a><br> With asm (needed to set TOTAL_MEMORY to 33554432 to get this work – maybe because there are more things enabled on my build?): <a href="https://github.com/bgrins/videoconverter.js/blob/master/build/build_lgpl_asm.sh" rel="nofollow">https://github.com/bgrins/videoconverter.js/blob/master/build/build_lgpl_asm.sh</a></p> </li> 
+       <li id="comment-98903"> <img alt="" src="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=32&amp;d=identicon&amp;r=g" srcset="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite><a href="http://karolsobczak.com" rel="external nofollow" class="url">sopel39</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-98903" title="">November 17th, 2013 at 8:25 am</a> </small> <p>Hi Brian,</p> <p>My emcc is: emcc -O2 -s OUTLINING_LIMIT=100000 -s TOTAL_MEMORY=67108864 dist/ffmpeg.bc -o dist/ffmpeg.js –pre-js ffmpeg_pre.js –post-js ffmpeg_post.js. Nothing really too fancy. I allocate around 64MB of memory, but I don’t think this is a big issue in modern browsers.</p> <p>Anyway, I have finally put audio converter on the web: <a href="http://quick-apps.com/audio/" rel="nofollow">http://quick-apps.com/audio/</a> and the performance is really good using FF. It does not use external libs yet, but I will incorporate them later. The really interesting question is how to minimize the size of code that has to be loaded (different workers for encoding, decoding and cross worker binary communication?). Heck, you could probably port Java apps too with VMkit.</p> </li> 
+       <li class="alt" id="comment-99501"> <img alt="" src="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=32&amp;d=identicon&amp;r=g" srcset="http://0.gravatar.com/avatar/3937bd5ea8852fb62a77884c36970b26?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite><a href="http://karolsobczak.com" rel="external nofollow" class="url">sopel39</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-99501" title="">November 21st, 2013 at 12:52 am</a> </small> <p>Hi,<br> I have compiled ffmpeg for audio transcoding with external libraries (lame, vorbis, fdk-aac) and pushed it to github: <a href="https://github.com/sopel39/audioconverter.js" rel="nofollow">https://github.com/sopel39/audioconverter.js</a>.</p> </li> 
+       <li id="comment-99595"> <img alt="" src="http://2.gravatar.com/avatar/be8f5537edc7e7fd5c226741108c81ae?s=32&amp;d=identicon&amp;r=g" srcset="http://2.gravatar.com/avatar/be8f5537edc7e7fd5c226741108c81ae?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite><a href="http://briangrinstead.com" rel="external nofollow" class="url">Brian</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-99595" title="">November 21st, 2013 at 7:29 am</a> </small> <p>Wow, this is awesome! I just tried out the app, and it worked like a charm. There is so much potential for a site like this to simplify audio conversions for people. And thanks for sharing the build script – I’m going to have a look at if I can pull in some extra video codecs using the same method.</p> </li> 
+       <li class="alt" id="comment-143886"> <img alt="" src="http://2.gravatar.com/avatar/e3116b59273deba57bed659bbb2320e6?s=32&amp;d=identicon&amp;r=g" srcset="http://2.gravatar.com/avatar/e3116b59273deba57bed659bbb2320e6?s=64&amp;d=identicon&amp;r=g 2x" class="avatar avatar-32 photo" height="32" width="32"> <cite>Pat Friedl</cite> Says: <br> <small class="commentmetadata"><a href="#comment-143886" title="">October 25th, 2014 at 7:03 pm</a> </small> <p>Fantastic work on this. However, I’m running into an issue when trying to convert a set of PNGs into MP4 and it’s erroring out with “missing function madvise”. Do you know what configuration flags would be needed to enable the conversion of multiple images into an MP4? Thanks!</p> </li> 
+       <li id="comment-145250"> <cite><a href="https://entwickler.de/online/tools/ffmpeg-js-videos-clientseitig-konvertieren-137577.html" rel="external nofollow" class="url">ffmpeg.js: Videos clientseitig konvertieren - entwickler.de</a></cite> Says: <br> <small class="commentmetadata"><a href="#comment-145250" title="">May 8th, 2015 at 1:58 am</a> </small> <p>[…] ist auch der Weg, wie Grinstead zu der JavaScript-Variante gelangt ist. In seinem dazu entstandenen Blog Post schreibt er, dass er zunächst einige Laufzeitfehler beheben musste, bis eine halbwegs stabile […]</p> </li> 
+      </ol> 
+      <h4>Comments are closed. Please <a href="/blog/about">contact me</a> instead.</h4> 
+     </div> 
+    </div> 
+   </div> 
+   <div id="sidebar"> 
+    <ul> 
+     <li> <a href="https://twitter.com/bgrins">bgrins on twitter</a><br> <a href="https://github.com/bgrins">bgrins on github</a><br> <a href="https://feeds.feedburner.com/briangrinstead">Subscribe to RSS</a> </li> 
+     <li class="pagenav"><h2>Pages</h2> 
+      <ul> 
+       <li class="page_item"><a href="/blog/about">About</a></li> 
+       <li class="page_item"><a href="/blog/colorstash">ColorStash</a></li> 
+       <li class="page_item"><a href="/blog/instant-sprite">Instant Sprite</a></li> 
+       <li class="page_item"><a href="/blog/ios-uicolor-picker">iOS UIColor Picker</a></li> 
+       <li class="page_item"><a href="/blog/spectrum">Spectrum</a></li> 
+       <li class="page_item"><a href="/blog/tinycolor">TinyColor</a></li> 
+       <li class="page_item"><a href="/blog/read-files-in-javascript">Read Files In JavaScript</a></li> 
+      </ul></li> 
+     <li><h2>Some Projects</h2> 
+      <ul> 
+       <li><a href="https://bgrins.github.com/spectrum/">Spectrum Colorpicker</a></li> 
+       <li><a href="https://bgrins.github.com/filereader.js/">FileReader.js</a></li> 
+       <li><a href="https://bgrins.github.com/videoconverter.js">videoconverter.js</a></li> 
+       <li><a href="https://bgrins.github.com/ui.anglepicker/">jQuery UI Anglepicker</a></li> 
+       <li><a href="http://instantsprite.com/">Instant Sprite</a></li> 
+       <li><a href="//gradient">Gradient Generator</a></li> 
+       <li><a href="https://bgrins.github.com/TinyColor/">JS Color Parsing</a></li> 
+       <li><a href="https://bgrins.github.io/devtools-snippets/">DevTools Snippets</a></li> 
+      </ul> </li> 
+     <li><h2>Some Posts</h2> 
+      <ul> 
+       <li><a href="/blog/astar-search-algorithm-in-javascript-updated">A* Graph Search</a></li> 
+       <li><a href="/files/bindWithDelay/">bindWithDelay jQuery Plugin</a></li> 
+       <li><a href="/blog/multipart-form-post-in-c">Multipart Form Post in C#</a></li> 
+       <li><a href="/blog/chrome-developer-tools-monitorevents">monitorevents</a></li> 
+      </ul> </li> 
+     <li class="categories"><h2>Categories</h2> 
+      <ul> 
+       <li class="cat-item"><a href="/blog/category/algorithms">Algorithms</a></li> 
+       <li class="cat-item"><a href="/blog/category/devtools">Developer Tools</a></li> 
+       <li class="cat-item"><a href="/blog/category/open-source">Open Source</a></li> 
+       <li class="cat-item"><a href="/blog/category/plugins">Plugins</a></li> 
+       <li class="cat-item"><a href="/blog/category/web-development">Web Development</a></li> 
+      </ul></li> 
+    </ul> 
+   </div> 
+   <hr> 
+   <div id="footer"> 
+   </div> 
+   <script>!function(e,t,r,n,c,a,l){function i(t,r){return r=e.createElement('div'),r.innerHTML='<a href="'+t.replace(/"/g,'&quot;')+'"></a>',r.childNodes[0].getAttribute('href')}function o(e,t,r,n){for(r='',n='0x'+e.substr(t,2)|0,t+=2;t<e.length;t+=2)r+=String.fromCharCode('0x'+e.substr(t,2)^n);return i(r)}try{for(c=e.getElementsByTagName('a'),l='/cdn-cgi/l/email-protection#',n=0;n<c.length;n++)try{(t=(a=c[n]).href.indexOf(l))>-1&&(a.href='mailto:'+o(a.href,t+l.length))}catch(e){}for(c=e.querySelectorAll('.__cf_email__'),n=0;n<c.length;n++)try{(a=c[n]).parentNode.replaceChild(e.createTextNode(o(a.getAttribute('data-cfemail'),0)),a)}catch(e){}}catch(e){}}(document);</script>
+   <script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-8259845-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script> 
+  </div>  
+ </body>
+</html>

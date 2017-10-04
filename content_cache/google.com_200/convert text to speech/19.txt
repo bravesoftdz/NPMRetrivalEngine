@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width"> 
+  <title>Node.js Text to Speech using AWS Polly - CronJ Blog</title> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="shortcut icon" href=""> 
+  <link rel="pingback" href="https://www.cronj.com/blog/xmlrpc.php"> 
+  <!--[if lt IE 9]>
+    <script src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/html5.js"></script>
+    <![endif]--> 
+  <!-- This site is optimized with the Yoast SEO plugin v3.4.2 - https://yoast.com/wordpress/plugins/seo/ --> 
+  <link rel="canonical" href="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="Node.js Text to Speech using AWS Polly - CronJ Blog"> 
+  <meta property="og:description" content="Amazon has made it easy for Developers to build&nbsp;applications which can&nbsp;talk. The new AWS Polly services allows you to pass a text and Amazon turns it into a life like speech in real-time. It supports >24&nbsp;languages&nbsp;in varied male and female voices&nbsp;and the output is pretty&nbsp;impressive when compared to similar offerings. Advanced users can also make …"> 
+  <meta property="og:url" content="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/"> 
+  <meta property="og:site_name" content="CronJ Blog"> 
+  <meta property="article:publisher" content="https://www.facebook.com/CronJ"> 
+  <meta property="article:section" content="Custom Software Development"> 
+  <meta property="article:published_time" content="2017-06-06T21:54:04+00:00"> 
+  <meta property="article:modified_time" content="2017-06-08T15:13:16+00:00"> 
+  <meta property="og:updated_time" content="2017-06-08T15:13:16+00:00"> 
+  <meta property="og:image" content="https://www.cronj.com/blog/wp-content/uploads/AKASH.jpg"> 
+  <meta property="og:image:width" content="932"> 
+  <meta property="og:image:height" content="500"> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:description" content="Amazon has made it easy for Developers to build&nbsp;applications which can&nbsp;talk. The new AWS Polly services allows you to pass a text and Amazon turns it into a life like speech in real-time. It supports >24&nbsp;languages&nbsp;in varied male and female voices&nbsp;and the output is pretty&nbsp;impressive when compared to similar offerings. Advanced users can also make […]"> 
+  <meta name="twitter:title" content="Node.js Text to Speech using AWS Polly - CronJ Blog"> 
+  <meta name="twitter:site" content="@cron_j"> 
+  <meta name="twitter:image" content="https://www.cronj.com/blog/wp-content/uploads/AKASH.jpg"> 
+  <meta name="twitter:creator" content="@cron_j"> 
+  <!-- / Yoast SEO plugin. --> 
+  <link rel="alternate" type="application/rss+xml" title="CronJ Blog » Feed" href="https://www.cronj.com/blog/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="CronJ Blog » Comments Feed" href="https://www.cronj.com/blog/comments/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="CronJ Blog » Node.js Text to Speech using AWS Polly Comments Feed" href="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/feed/"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"https:\/\/www.cronj.com\/blog\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.6"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <link rel="stylesheet" id="validate-engine-css-css" href="https://www.cronj.com/blog/wp-content/plugins/wysija-newsletters/css/validationEngine.jquery.css?ver=2.7.5" type="text/css" media="all"> 
+  <link rel="stylesheet" id="a3-pvc-style-css" href="https://www.cronj.com/blog/wp-content/plugins/page-views-count/assets/css/style.min.css?ver=1.4.0" type="text/css" media="all"> 
+  <link rel="stylesheet" id="pc_google_analytics-frontend-css" href="https://www.cronj.com/blog/wp-content/plugins/pc-google-analytics/assets/css/frontend.css?ver=1.0.0" type="text/css" media="all"> 
+  <link rel="stylesheet" id="wp-prism-syntax-highlighter-css" href="https://www.cronj.com/blog/wp-content/plugins/wp-prism-syntax-highlighter/css/prism.css?ver=4.5.6" type="text/css" media="all"> 
+  <link rel="stylesheet" id="google-raleway-css" href="https://fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C700italic%2C800italic%2C400%2C300%2C600%2C700%2C800&amp;ver=4.5.6" type="text/css" media="all"> 
+  <link rel="stylesheet" id="ascent-bootstrap-css" href="https://www.cronj.com/blog/wp-content/themes/ascent/includes/resources/bootstrap/css/bootstrap.css?ver=4.5.6" type="text/css" media="all"> 
+  <link rel="stylesheet" id="ascent-swipebox-css" href="https://www.cronj.com/blog/wp-content/themes/ascent/includes/css/swipebox.css?ver=4.5.6" type="text/css" media="all"> 
+  <link rel="stylesheet" id="ascent-owl-carousel-css" href="https://www.cronj.com/blog/wp-content/themes/ascent/includes/css/owl.carousel.css?ver=4.5.6" type="text/css" media="all"> 
+  <link rel="stylesheet" id="ascent-owl-theme-css" href="https://www.cronj.com/blog/wp-content/themes/ascent/includes/css/owl.theme.css?ver=4.5.6" type="text/css" media="all"> 
+  <link rel="stylesheet" id="ascent-animations-css" href="https://www.cronj.com/blog/wp-content/themes/ascent/includes/css/animations.css?ver=4.5.6" type="text/css" media="all"> 
+  <link rel="stylesheet" id="ascent-meanmenu-css" href="https://www.cronj.com/blog/wp-content/themes/ascent/includes/css/meanmenu.css?ver=4.5.6" type="text/css" media="all"> 
+  <link rel="stylesheet" id="ascent-main-css" href="https://www.cronj.com/blog/wp-content/themes/ascent/includes/css/main.css?ver=4.5.6" type="text/css" media="all"> 
+  <link rel="stylesheet" id="sccss_style-css" href="https://www.cronj.com/blog/?sccss=1&amp;ver=4.5.6" type="text/css" media="all"> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-includes/js/jquery/jquery.js?ver=1.12.4"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/plugins/pc-google-analytics/assets/js/frontend.min.js?ver=1.0.0"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/resources/bootstrap/js/bootstrap.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/bootstrap-wp.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/smoothscroll.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/jquery.swipebox.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/swipebox-config.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/owl.carousel.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/jquery.appear.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/jquery.meanmenu.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/jquery.velocity.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/appear.config.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/main.js?ver=4.5.6"></script> 
+  <link rel="https://api.w.org/" href="https://www.cronj.com/blog/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://www.cronj.com/blog/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://www.cronj.com/blog/wp-includes/wlwmanifest.xml"> 
+  <meta name="generator" content="WordPress 4.5.6"> 
+  <link rel="shortlink" href="https://www.cronj.com/blog/?p=2633"> 
+  <link rel="alternate" type="application/json+oembed" href="https://www.cronj.com/blog/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="https://www.cronj.com/blog/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;format=xml"> 
+  <script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		
+		ga('create', 'UA-58884491-1', 'auto');
+		ga('send', 'pageview');
+		
+		</script> 
+  <style type="text/css">
+        
+        
+        
+                    </style> 
+  <style type="text/css"></style> 
+  <style type="text/css">
+.synved-social-resolution-single {
+display: inline-block;
+}
+.synved-social-resolution-normal {
+display: inline-block;
+}
+.synved-social-resolution-hidef {
+display: none;
+}
+
+@media only screen and (min--moz-device-pixel-ratio: 2),
+only screen and (-o-min-device-pixel-ratio: 2/1),
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (min-device-pixel-ratio: 2),
+only screen and (min-resolution: 2dppx),
+only screen and (min-resolution: 192dpi) {
+	.synved-social-resolution-normal {
+	display: none;
+	}
+	.synved-social-resolution-hidef {
+	display: inline-block;
+	}
+}
+</style> 
+  <link rel="amphtml" href="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/amp/">
+  <link rel="icon" href="https://www.cronj.com/blog/wp-content/uploads/2015/09/lg.png" sizes="32x32"> 
+  <link rel="icon" href="https://www.cronj.com/blog/wp-content/uploads/2015/09/lg.png" sizes="192x192"> 
+  <link rel="apple-touch-icon-precomposed" href="https://www.cronj.com/blog/wp-content/uploads/2015/09/lg.png"> 
+  <meta name="msapplication-TileImage" content="https://www.cronj.com/blog/wp-content/uploads/2015/09/lg.png"> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/plugins/wp-spamshield/js/jscripts.php"></script> 
+ </head> 
+ <body class="single single-post postid-2633 single-format-standard group-blog"> 
+  <header id="masthead" class="site-header" role="banner"> 
+   <div class="header-top"> 
+    <div class="container"> 
+     <div class="row"> 
+      <div class="col-sm-6"> 
+       <div class="mail-info"> 
+        <span class="phone-info"><i class="fa fa-phone"></i> +91-7093801977</span> 
+        <span><i class="fa fa-envelope"></i> <a href="mailto:contact@cronj.com">contact@cronj.com</a></span> 
+       </div> 
+      </div>
+      <!-- .col-sm-6--> 
+      <div class="col-sm-6"> 
+       <div class="header-social-icon-wrap"> 
+        <ul class="social-icons"> 
+         <li class="social-icon"><a target="_blank" href="https://twitter.com/cron_j"><i class="fa fa-twitter"></i></a></li>
+         <li class="social-icon"><a target="_blank" href="http://facebook.com/CronJ"><i class="fa fa-facebook"></i></a></li>
+         <li class="social-icon"><a target="_blank" href="http://lus.google.com/+CronJ"><i class="fa fa-google-plus"></i></a></li>
+         <li class="social-icon"><a target="_blank" href="https://www.linkedin.com/company/cron-j"><i class="fa fa-linkedin"></i></a></li>
+         <li class="social-icon"><a target="_blank" href="skype:monukumar180?chat"><i class="fa fa-skype"></i></a></li>
+         <li class="social-icon"><a target="_blank" href="https://github.com/Cron-J"><i class="fa fa-github"></i></a></li>
+         <li class="social-icon"><a target="_blank" href="https://www.pinterest.com/cronj2015"><i class="fa fa-pinterest"></i></a></li>
+         <li class="social-icon"><a target="_blank" href="http://www.cronj.com/javascript-news/feed/"><i class="fa fa-rss"></i></a></li> 
+        </ul> 
+       </div>
+       <!--.header-social-icon-wrap--> 
+      </div>
+      <!-- .col-sm-6--> 
+     </div> 
+    </div> 
+   </div> 
+   <div id="header-main" class="header-bottom"> 
+    <div class="header-bottom-inner"> 
+     <div class="container"> 
+      <div class="row"> 
+       <div class="col-sm-3"> 
+        <div id="logo"> 
+         <div class="site-header-inner col-sm-12"> 
+          <div class="site-branding"> 
+           <h1 class="site-title"> <a href="https://www.cronj.com/blog/" title="CronJ Blog" rel="home"> CronJ Blog </a> </h1> 
+           <h4 class="site-description">Node.js | AngularJS | React | Blog</h4> 
+          </div> 
+         </div> 
+        </div> 
+       </div>
+       <!--.col-sm-3--> 
+       <div class="col-sm-9"> 
+        <div class="header-search pull-right"> 
+         <div id="header-search-button">
+          <i class="fa fa-search"></i>
+         </div> 
+        </div> 
+        <div class="site-navigation pull-right"> 
+         <nav class="main-menu"> 
+          <ul id="menu-site-navigation" class="header-nav clearfix">
+           <li id="menu-item-1156" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1156"><a href="https://www.cronj.com">Home</a></li> 
+           <li id="menu-item-1235" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1235"><a href="http://www.cronj.com/blog">Blog Home</a></li> 
+           <li id="menu-item-1981" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-1981"><a href="https://www.cronj.com/blog/category/cronj-news/">CronJ News</a> 
+            <ul class="sub-menu"> 
+             <li id="menu-item-2289" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2289"><a href="https://www.cronj.com/blog/category/angular-js/">Angular.js</a></li> 
+             <li id="menu-item-2290" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-2290"><a href="https://www.cronj.com/blog/category/nodejs-web-development/">Node.js</a></li> 
+             <li id="menu-item-2291" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2291"><a href="https://www.cronj.com/blog/category/react-js/">React.js</a></li> 
+             <li id="menu-item-2293" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2293"><a href="https://www.cronj.com/blog/category/web-design/">Web Design</a></li> 
+             <li id="menu-item-2292" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2292"><a href="https://www.cronj.com/blog/category/seo/">SEO</a></li> 
+             <li id="menu-item-2288" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2288"><a href="https://www.cronj.com/blog/category/interview-questions/">Interview Questions</a></li> 
+            </ul> </li> 
+           <li id="menu-item-1160" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1160"><a href="http://www.cronj.com/about-us.html">About Us</a></li> 
+           <li id="menu-item-1161" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1161"><a href="http://www.cronj.com/partner.html">Partnership</a></li> 
+           <li id="menu-item-1162" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1162"><a href="http://www.cronj.com/portfolio.html">Portfolio</a></li> 
+           <li id="menu-item-1163" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1163"><a href="http://www.cronj.com/careers.html">Careers</a></li> 
+           <li id="menu-item-1165" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1165"><a href="http://www.cronj.com/contact-us.html">Contact Us</a></li> 
+          </ul> 
+         </nav> 
+         <div id="responsive-menu-container"></div> 
+        </div>
+        <!-- .site-navigation --> 
+       </div>
+       <!--.col-sm-9--> 
+      </div>
+      <!--.row--> 
+     </div>
+     <!-- .container --> 
+    </div>
+    <!--.header-bottom-inner--> 
+   </div>
+   <!--.header-bottom--> 
+   <div id="header-search-form-wrap" class="header-search-form-wrap"> 
+    <div class="container"> 
+     <form role="search" method="get" class="header-search-form search-form" action="https://www.cronj.com/blog/"> 
+      <div class="control-group"> 
+       <i class="fa fa-search"></i> 
+       <input type="search" class="search-field" placeholder="Search …" value="" name="s" title="Search for:"> 
+       <button class="search" type="submit"><i class="icon-search"></i></button> 
+      </div> 
+     </form> 
+    </div> 
+   </div> 
+  </header>
+  <!-- #masthead --> 
+  <div id="banner"> 
+   <img src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/images/banner.jpg" alt="CronJ Blog-Banner"> 
+  </div> 
+  <div class="main-content"> 
+   <div class="container"> 
+    <div id="content" class="main-content-inner"> 
+     <div class="row"> 
+      <div class="col-sm-12 col-md-9"> 
+       <article id="post-2633" class="post-2633 post type-post status-publish format-standard has-post-thumbnail hentry category-custom-development category-nodejs-web-development"> 
+        <div class="row"> 
+         <!--<div class="post-meta-info col-sm-12 col-md-2">
+	    		<div class="entry-meta">
+		    <time class="entry-time updated" itemprop="datePublished" datetime="2017-06-06T21:54:04+00:00">Jun<strong>06</strong></time>
+		    <span class="comments_count clearfix entry-comments-link"><a href="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/#comments">3</a></span>
+		</div>-->
+         <!-- .entry-meta --> 
+         <!--	</div>-->
+         <!--.post-meta-info--> 
+         <div class="post-content-wrap"> 
+          <header class="page-header"> 
+           <h1 class="entry-title">Node.js Text to Speech using AWS Polly</h1> 
+           <span class="entry-author"> Posted by <span class="author vcard entry-author-link"> <a href="https://www.cronj.com/blog/author/akash/" title="Posts by Akash Budhia" rel="author">Akash Budhia</a> </span> on June 6, 2017 </span> 
+          </header>
+          <!-- .entry-header --> 
+          <div class="entry-content"> 
+           <figure> 
+            <a class="swipebox" href="https://www.cronj.com/blog/wp-content/uploads/AKASH.jpg" title="Node.js Text to Speech using AWS Polly"> <img width="732" height="393" src="https://www.cronj.com/blog/wp-content/uploads/AKASH-732x393.jpg" class="attachment-blog-page size-blog-page wp-post-image" alt="AWS Polly" srcset="https://www.cronj.com/blog/wp-content/uploads/AKASH-732x393.jpg 732w, https://www.cronj.com/blog/wp-content/uploads/AKASH-300x161.jpg 300w, https://www.cronj.com/blog/wp-content/uploads/AKASH-768x412.jpg 768w, https://www.cronj.com/blog/wp-content/uploads/AKASH-600x322.jpg 600w, https://www.cronj.com/blog/wp-content/uploads/AKASH.jpg 932w" sizes="(max-width: 732px) 100vw, 732px"> </a> 
+           </figure> 
+           <p>Amazon has made it easy for Developers to build&nbsp;applications which can&nbsp;talk. The new AWS Polly services allows you to pass a text and Amazon turns it into a life like speech in real-time. It supports &gt;<a href="http://docs.aws.amazon.com/polly/latest/dg/SupportedLanguage.html">24&nbsp;languages</a>&nbsp;in varied male and female voices&nbsp;and the output is pretty&nbsp;impressive when compared to similar offerings. Advanced users can also make use of SSML, custom Lexicons(dictionary), Speech Marks and more to customize the speeches as per their need. You can signup/login&nbsp;to your AWS Console to see Polly in action and play-around with it&nbsp;<a href="https://console.aws.amazon.com/polly/home/SynthesizeSpeech">here</a>.</p> 
+           <p>With a free-tier offering of 5 million characters and pay-as-you-go&nbsp;$4.00 per million thereafter&nbsp;makes it a ‘must&nbsp;add’ magic&nbsp;ingredient&nbsp;to your apps! Moreover the responses can be saved and cached for offline replay which can further&nbsp;reduce the costs significantly.</p> 
+           <p><img class="size-full wp-image-2653" src="https://www.cronj.com/blog/wp-content/uploads/AWS-Polly.jpg" alt="AWS Polly" width="932" height="490" srcset="https://www.cronj.com/blog/wp-content/uploads/AWS-Polly.jpg 932w, https://www.cronj.com/blog/wp-content/uploads/AWS-Polly-300x158.jpg 300w, https://www.cronj.com/blog/wp-content/uploads/AWS-Polly-768x404.jpg 768w, https://www.cronj.com/blog/wp-content/uploads/AWS-Polly-600x315.jpg 600w, https://www.cronj.com/blog/wp-content/uploads/AWS-Polly-732x385.jpg 732w" sizes="(max-width: 932px) 100vw, 932px">AWS Polly</p> 
+           <p>Let’s have a&nbsp;look at how easy is it to write a script which&nbsp;uses&nbsp;the AWS Polly service to add&nbsp;voice to your texts. In most cases you will need to stream the audio response to your front-end interface, for the sake of simplicity we will go ahead and create a quick Node.js script which plays it directly on the host’s&nbsp;speaker. For this tutorial we will be assuming that you are familiar with the basics of Node.js. You will also need a registered <a href="http://console.aws.amazon.com">AWS Account</a> and an authorized IAM User Access Key and Secret.</p> 
+           <p>To begin, initialize a Node.js project using the <code>npm init</code> command.</p> 
+           <p>Following npm&nbsp;modules need to be installed to the project:</p> 
+           <ol> 
+            <li><a href="https://www.npmjs.com/package/aws-sdk">aws-sdk</a> &nbsp;– AWS JavaScript SDK which provides interface to use the Polly service. <pre class="line-numbers"><code class="language-javascript">npm install aws-sdk --save</code></pre> </li> 
+            <li><a href="https://www.npmjs.com/package/speaker">speaker</a>&nbsp;– Stream PCM audio to the speaker. It can also be used to stream mp3 audio to a browser client. <pre class="line-numbers"><code class="language-javascript">npm install speaker --save</code></pre> </li> 
+           </ol> 
+           <p>Create a generic&nbsp;file&nbsp;<em>polly.js</em> which can&nbsp;directly&nbsp;be included in any&nbsp;node application&nbsp;to convert text to speech. In <em>polly.js </em>require&nbsp;the discussed&nbsp;modules and configure your AWS Credentials.</p> 
+           <pre class="line-numbers" data-src="/polly.js"><code class="language-javascript">var AWS = require('aws-sdk');
+var Speaker = require('speaker');
+var Stream = require('stream');
+
+//Warning: Don't hardcode your AWS Keys
+//Read more at http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html
+var Polly = new AWS.Polly({
+    region: 'eu-west-1',
+    accessKeyId: 'REPLACETHISWITHYOURACCESSKEYID',
+    secretAccessKey: 'rePlaceThisWithYourSecretAccessKey1234567890'
+});</code></pre> 
+           <p><strong><br> Warning!</strong>&nbsp;Don’t hardcode&nbsp;your AWS Keys. Read more on <a href="http://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html">AWS recommendation for storing Access Keys</a>.</p> 
+           <p>Prepare the Speaker to receive PCM audio from Polly. Parameters will depend on the output type and can be checked&nbsp;from <a href="http://docs.aws.amazon.com/polly/latest/dg/API_SynthesizeSpeech.html">here</a>.</p> 
+           <pre class="line-numbers" data-src="/polly.js"><code class="language-javascript">var getPlayer = function() {
+    return new Speaker({
+        channels: 1,
+        bitDepth: 16,
+        sampleRate: 16000
+    });
+}</code></pre> 
+           <p>Since this will be a reusable wrapper function, the getPlayer function will return a new Speaker instance for every call.</p> 
+           <p>Once the Speaker instance is pre-configured, all we need to do is call the Polly.synthesizeSpeech API with the text and&nbsp;additional parameters and stream the&nbsp;response to a new Speaker instance. The speak function is exported and can be&nbsp;called from any JS&nbsp;code in your application.</p> 
+           <pre class="line-numbers" data-src="/polly.js"><code class="language-javascript">var params = { OutputFormat: 'pcm', VoiceId: 'Raveena' }
+var speak = function(text) {
+    params.Text = text;
+    Polly.synthesizeSpeech(params, function(err, res) {
+        if (err) {
+            console.log('err', err)
+        } else if (res &amp;&amp; res.AudioStream instanceof Buffer) {
+            var bufferStream = new Stream.PassThrough()
+            bufferStream.end(res.AudioStream)
+            bufferStream.pipe(getPlayer());
+        }
+    })
+}
+module.exports = { Speak: speak };</code></pre> 
+           <p>VoiceId can be chosen from the Polly <a href="https://console.aws.amazon.com/polly/home/SynthesizeSpeech">console</a> and <a href="http://docs.aws.amazon.com/polly/latest/dg/API_Voice.html">valid&nbsp;ids</a>. Additional parameters are defined <a href="http://docs.aws.amazon.com/polly/latest/dg/API_SynthesizeSpeech.html">here</a>.</p> 
+           <p>We are all set. Now, from any file, say&nbsp;<em>index.js</em>, require&nbsp;<em>polly.js</em> and call the Speak function:</p> 
+           <pre class="line-numbers" data-src="/index.js"><code class="language-javascript">var Polly = require('./polly');
+Polly.Speak('Node.js is beautiful and so is AWS Polly!');</code></pre> 
+           <p>Run the <em>index.js</em> file using <code>node index.js</code>&nbsp; command and let your computer talk to you ?</p> 
+           <p>As mentioned, the script used in this example will stream audio to the host speaker, but with little work it can also be streamed to a browser or a phone app. Current&nbsp;example&nbsp;will come in handy if you are working on one of those IoT projects on&nbsp;a Raspberry Pi or similar.</p> 
+           <p>In comments let us know how you used Polly for your project.</p> 
+           <p>&nbsp; </p>
+           <div class="pvc_clear"></div> 
+           <p class="pvc_stats" element-id="2633">2,583&nbsp;total views, 12&nbsp;views today</p> 
+           <div class="pvc_clear"></div> 
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-facebook nolightbox" data-provider="facebook" target="_blank" rel="nofollow" title="Share on Facebook" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;t=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly&amp;s=100&amp;p[url]=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;p[images][0]=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fwp-content%2Fuploads%2FAKASH.jpg&amp;p[title]=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="Facebook" title="Share on Facebook" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/facebook.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-twitter nolightbox" data-provider="twitter" target="_blank" rel="nofollow" title="Share on Twitter" href="http://twitter.com/share?url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;text=Informative%20article" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="twitter" title="Share on Twitter" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/twitter.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-google_plus nolightbox" data-provider="google_plus" target="_blank" rel="nofollow" title="Share on Google+" href="https://plus.google.com/share?url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="google_plus" title="Share on Google+" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/google_plus.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-reddit nolightbox" data-provider="reddit" target="_blank" rel="nofollow" title="Share on Reddit" href="http://www.reddit.com/submit?url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;title=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="reddit" title="Share on Reddit" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/reddit.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-pinterest nolightbox" data-provider="pinterest" target="_blank" rel="nofollow" title="Pin it with Pinterest" href="http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;media=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fwp-content%2Fuploads%2FAKASH.jpg&amp;description=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="pinterest" title="Pin it with Pinterest" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/pinterest.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-linkedin nolightbox" data-provider="linkedin" target="_blank" rel="nofollow" title="Share on Linkedin" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;title=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="linkedin" title="Share on Linkedin" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/linkedin.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-tumblr nolightbox" data-provider="tumblr" target="_blank" rel="nofollow" title="Share on tumblr" href="http://tumblr.com/share?s=&amp;v=3&amp;t=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly&amp;u=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="tumblr" title="Share on tumblr" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/tumblr.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-mail nolightbox" data-provider="mail" rel="nofollow" title="Share by email" href="mailto:?subject=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly&amp;body=Informative%20article:%20https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;"><img alt="mail" title="Share by email" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/mail.png"></a> 
+          </div>
+          <!-- .entry-content --> 
+          <footer class="footer-meta"> 
+           <div class="cat-tag-meta-wrap"> 
+            <span class="cats-meta"><i class="fa fa-folder"></i> <a href="https://www.cronj.com/blog/category/custom-development/" rel="category tag">Custom Software Development</a>, <a href="https://www.cronj.com/blog/category/nodejs-web-development/" rel="category tag">Node.js</a></span> 
+           </div> 
+          </footer>
+          <!-- .entry-meta --> 
+         </div>
+         <!--.post-content-wrap--> 
+        </div>
+        <!--.row--> 
+       </article>
+       <!-- #post-## --> 
+       <nav role="navigation" id="nav-below" class="post-navigation"> 
+        <h1 class="screen-reader-text">Post navigation</h1> 
+        <ul class="pager"> 
+         <li class="nav-previous previous"><a href="https://www.cronj.com/blog/gst-rates-rolls-out-in-india-from-july-1-2017/" rel="prev"><span class="meta-nav">?</span> GST rates rolls out in India from July 1, 2017</a></li> 
+         <li class="nav-next next"><a href="https://www.cronj.com/blog/reasons-every-business-needs-erp-system-gst-ready/" rel="next">Reasons why every Business needs an ERP system to be GST Ready <span class="meta-nav">?</span></a></li> 
+        </ul> 
+       </nav>
+       <!-- #nav-below --> 
+       <div id="comments" class="comments-area"> 
+        <header class="page-header"> 
+         <h2 class="comments-title"> 3 thoughts on “<span>Node.js Text to Speech using AWS Polly</span>” </h2> 
+        </header> 
+        <ol class="comment-list media-list"> 
+         <li id="comment-575" class="comment even thread-even depth-1 parent"> 
+          <article id="div-comment-575" class="comment-body media"> 
+           <a class="pull-left" href="#"> <img alt="" src="https://secure.gravatar.com/avatar/eacc955c22657e5b5a3ee17a0e95d662?s=50&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/eacc955c22657e5b5a3ee17a0e95d662?s=100&amp;d=mm&amp;r=g 2x" class="avatar avatar-50 photo" height="50" width="50"> </a> 
+           <div class="media-body"> 
+            <div class="media-body-wrap"> 
+             <div class="comment-heading"> 
+              <h5 class="media-heading"><cite class="fn">Freddie Weiner</cite> </h5> 
+              <div class="comment-meta"> 
+               <a href="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/#comment-575"> <time class="updated" datetime="2017-07-03T21:24:56+00:00"> July 3, 2017 at 9:24 pm </time> </a> 
+              </div> 
+             </div> 
+             <div class="comment-content"> 
+              <p>I’m confused. I assume the code here is server side. How do you call it from the client especially if you are using a server like Windows Server?</p> 
+             </div>
+             <!-- .comment-content --> 
+             <div class="reply comment-reply">
+              <a rel="nofollow" class="comment-reply-link" href="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/?replytocom=575#respond" onclick="return addComment.moveForm( &quot;div-comment-575&quot;, &quot;575&quot;, &quot;respond&quot;, &quot;2633&quot; )" aria-label="Reply to Freddie Weiner">Reply</a>
+             </div>
+             <!-- .reply --> 
+            </div> 
+           </div>
+           <!-- .media-body --> 
+          </article>
+          <!-- .comment-body --> 
+          <ul class="children"> 
+           <li id="comment-576" class="comment odd alt depth-2 parent"> 
+            <article id="div-comment-576" class="comment-body media"> 
+             <a class="pull-left" href="#"> <img alt="" src="https://secure.gravatar.com/avatar/c1f2fb662a1498d85af1124d326558b5?s=50&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/c1f2fb662a1498d85af1124d326558b5?s=100&amp;d=mm&amp;r=g 2x" class="avatar avatar-50 photo" height="50" width="50"> </a> 
+             <div class="media-body"> 
+              <div class="media-body-wrap"> 
+               <div class="comment-heading"> 
+                <h5 class="media-heading"><cite class="fn"><a href="https://www.cronj.com/" rel="external nofollow" class="url">Akash Budhia</a></cite> </h5> 
+                <div class="comment-meta"> 
+                 <a href="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/#comment-576"> <time class="updated" datetime="2017-07-05T09:48:03+00:00"> July 5, 2017 at 9:48 am </time> </a> 
+                </div> 
+               </div> 
+               <div class="comment-content"> 
+                <p>Freddie,</p> 
+                <p>Are you familiar with Node.js. Above example is to stream audio using server’s speaker, the same can be a multipart stream to a browser as well!</p> 
+               </div>
+               <!-- .comment-content --> 
+               <div class="reply comment-reply">
+                <a rel="nofollow" class="comment-reply-link" href="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/?replytocom=576#respond" onclick="return addComment.moveForm( &quot;div-comment-576&quot;, &quot;576&quot;, &quot;respond&quot;, &quot;2633&quot; )" aria-label="Reply to Akash Budhia">Reply</a>
+               </div>
+               <!-- .reply --> 
+              </div> 
+             </div>
+             <!-- .media-body --> 
+            </article>
+            <!-- .comment-body --> 
+            <ul class="children"> 
+             <li id="comment-580" class="comment even depth-3"> 
+              <article id="div-comment-580" class="comment-body media"> 
+               <a class="pull-left" href="#"> <img alt="" src="https://secure.gravatar.com/avatar/eacc955c22657e5b5a3ee17a0e95d662?s=50&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/eacc955c22657e5b5a3ee17a0e95d662?s=100&amp;d=mm&amp;r=g 2x" class="avatar avatar-50 photo" height="50" width="50"> </a> 
+               <div class="media-body"> 
+                <div class="media-body-wrap"> 
+                 <div class="comment-heading"> 
+                  <h5 class="media-heading"><cite class="fn">Frederick Weiner</cite> </h5> 
+                  <div class="comment-meta"> 
+                   <a href="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/#comment-580"> <time class="updated" datetime="2017-07-28T21:04:58+00:00"> July 28, 2017 at 9:04 pm </time> </a> 
+                  </div> 
+                 </div> 
+                 <div class="comment-content"> 
+                  <p>Novice with Node. Do you have any references for multipart stream?</p> 
+                 </div>
+                 <!-- .comment-content --> 
+                 <div class="reply comment-reply">
+                  <a rel="nofollow" class="comment-reply-link" href="https://www.cronj.com/blog/node-js-text-speech-using-aws-polly/?replytocom=580#respond" onclick="return addComment.moveForm( &quot;div-comment-580&quot;, &quot;580&quot;, &quot;respond&quot;, &quot;2633&quot; )" aria-label="Reply to Frederick Weiner">Reply</a>
+                 </div>
+                 <!-- .reply --> 
+                </div> 
+               </div>
+               <!-- .media-body --> 
+              </article>
+              <!-- .comment-body --> </li>
+             <!-- #comment-## --> 
+            </ul>
+            <!-- .children --> </li>
+           <!-- #comment-## --> 
+          </ul>
+          <!-- .children --> </li>
+         <!-- #comment-## --> 
+        </ol>
+        <!-- .comment-list --> 
+        <div id="respond" class="comment-respond"> 
+         <h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/blog/node-js-text-speech-using-aws-polly/#respond" style="display:none;">Cancel Reply</a></small></h3> 
+         <form action="https://www.cronj.com/blog/wp-comments-post.php" method="post" id="commentform" class="comment-form"> 
+          <p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> Required fields are marked <span class="required">*</span></p>
+          <p><textarea placeholder="Start typing..." id="comment" class="form-control" name="comment" cols="45" rows="8" aria-required="true"></textarea></p>
+          <p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" aria-required="true" required></p> 
+          <p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="text" value="" size="30" maxlength="100" aria-describedby="email-notes" aria-required="true" required></p> 
+          <p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="text" value="" size="30" maxlength="200"></p> 
+          <p class="form-submit"><input name="submit" type="submit" id="commentsubmit" class="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="2633" id="comment_post_ID"> <input type="hidden" name="comment_parent" id="comment_parent" value="0"> </p> 
+          <noscript>
+           <input type="hidden" name="JS04X7" value="NS1">
+          </noscript> 
+          <noscript>
+           <p><strong>Currently you have JavaScript disabled. In order to post comments, please make sure JavaScript and Cookies are enabled, and reload the page.</strong> <a href="http://enable-javascript.com/" rel="nofollow external">Click here for instructions on how to enable JavaScript in your browser.</a></p>
+          </noscript> 
+         </form> 
+        </div>
+        <!-- #respond --> 
+       </div>
+       <!-- #comments --> 
+      </div> 
+      <div class="col-sm-12 col-md-3"> 
+       <div class="sidebar"> 
+        <div class="sidebar-padder"> 
+         <aside id="wysija-2" class="widget widget_wysija">
+          <h3 class="widget-title"></h3>
+          <div class="widget_wysija_cont">
+           <div id="msg-form-wysija-2" class="wysija-msg ajax"></div>
+           <form id="form-wysija-2" method="post" action="#wysija" class="widget_wysija"> 
+            <p class="wysija-paragraph"> <input type="text" name="wysija[user][email]" class="wysija-input validate[required,custom[email]]" title="Email" placeholder="Email" value=""> <span class="abs-req"> <input type="text" name="wysija[user][abs][email]" class="wysija-input validated[abs][email]" value=""> </span> </p> 
+            <input class="wysija-submit wysija-submit-field" type="submit" value="Subscribe!"> 
+            <input type="hidden" name="form_id" value="1"> 
+            <input type="hidden" name="action" value="save"> 
+            <input type="hidden" name="controller" value="subscribers"> 
+            <input type="hidden" value="1" name="wysija-page"> 
+            <input type="hidden" name="wysija[user_list][list_ids]" value="1"> 
+           </form>
+          </div>
+         </aside>
+         <aside id="search-2" class="widget widget_search">
+          <form role="search" method="get" class="search-form" action="https://www.cronj.com/blog/"> 
+           <label> <input type="search" class="search-field" placeholder="Search …" value="" name="s" title="Search for:"> </label> 
+           <input type="submit" class="search-submit" value="Search"> 
+          </form> 
+         </aside>
+         <aside id="categories-2" class="widget widget_categories">
+          <h3 class="widget-title">Categories</h3> 
+          <ul> 
+           <li class="cat-item cat-item-185"><a href="https://www.cronj.com/blog/category/angular-js/">Angular.js</a> </li> 
+           <li class="cat-item cat-item-394"><a href="https://www.cronj.com/blog/category/cronj-news/" title="News of the internal happening and activities at CronJ">CronJ News</a> </li> 
+           <li class="cat-item cat-item-188"><a href="https://www.cronj.com/blog/category/custom-development/">Custom Software Development</a> </li> 
+           <li class="cat-item cat-item-244"><a href="https://www.cronj.com/blog/category/gaming/">Gaming</a> </li> 
+           <li class="cat-item cat-item-446"><a href="https://www.cronj.com/blog/category/hapi/">hapi</a> </li> 
+           <li class="cat-item cat-item-220"><a href="https://www.cronj.com/blog/category/html/">HTML</a> </li> 
+           <li class="cat-item cat-item-445"><a href="https://www.cronj.com/blog/category/interview-questions/">Interview Questions</a> </li> 
+           <li class="cat-item cat-item-225"><a href="https://www.cronj.com/blog/category/marketing/">Marketing</a> </li> 
+           <li class="cat-item cat-item-226"><a href="https://www.cronj.com/blog/category/mobile/">Mobile</a> </li> 
+           <li class="cat-item cat-item-191"><a href="https://www.cronj.com/blog/category/mobile-applications/">Mobile Applications</a> </li> 
+           <li class="cat-item cat-item-197"><a href="https://www.cronj.com/blog/category/node-js-back-end/">Node JS – Back End</a> </li> 
+           <li class="cat-item cat-item-198"><a href="https://www.cronj.com/blog/category/node-package-manager/">Node Package Manager</a> </li> 
+           <li class="cat-item cat-item-200"><a href="https://www.cronj.com/blog/category/nodejs-web-development/">Node.js</a> </li> 
+           <li class="cat-item cat-item-277"><a href="https://www.cronj.com/blog/category/react-js/">React.js</a> </li> 
+           <li class="cat-item cat-item-401"><a href="https://www.cronj.com/blog/category/seo/">SEO</a> </li> 
+           <li class="cat-item cat-item-1"><a href="https://www.cronj.com/blog/category/uncategorized/">Uncategorized</a> </li> 
+           <li class="cat-item cat-item-203"><a href="https://www.cronj.com/blog/category/unitofmeasure/">UnitofMeasure</a> </li> 
+           <li class="cat-item cat-item-209"><a href="https://www.cronj.com/blog/category/web-design/">Web Design</a> </li> 
+          </ul> 
+         </aside>
+         <aside id="synved_social_share-2" class="widget widget_synved_social_share">
+          <h3 class="widget-title">Share</h3>
+          <div>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-facebook nolightbox" data-provider="facebook" target="_blank" rel="nofollow" title="Share on Facebook" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;t=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly&amp;s=100&amp;p[url]=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;p[images][0]=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fwp-content%2Fuploads%2FAKASH.jpg&amp;p[title]=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="Facebook" title="Share on Facebook" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/facebook.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-twitter nolightbox" data-provider="twitter" target="_blank" rel="nofollow" title="Share on Twitter" href="http://twitter.com/share?url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;text=Informative%20article" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="twitter" title="Share on Twitter" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/twitter.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-google_plus nolightbox" data-provider="google_plus" target="_blank" rel="nofollow" title="Share on Google+" href="https://plus.google.com/share?url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="google_plus" title="Share on Google+" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/google_plus.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-reddit nolightbox" data-provider="reddit" target="_blank" rel="nofollow" title="Share on Reddit" href="http://www.reddit.com/submit?url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;title=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="reddit" title="Share on Reddit" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/reddit.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-pinterest nolightbox" data-provider="pinterest" target="_blank" rel="nofollow" title="Pin it with Pinterest" href="http://pinterest.com/pin/create/button/?url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;media=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fwp-content%2Fuploads%2FAKASH.jpg&amp;description=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="pinterest" title="Pin it with Pinterest" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/pinterest.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-linkedin nolightbox" data-provider="linkedin" target="_blank" rel="nofollow" title="Share on Linkedin" href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F&amp;title=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="linkedin" title="Share on Linkedin" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/linkedin.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-tumblr nolightbox" data-provider="tumblr" target="_blank" rel="nofollow" title="Share on tumblr" href="http://tumblr.com/share?s=&amp;v=3&amp;t=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly&amp;u=https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;margin-right:5px;"><img alt="tumblr" title="Share on tumblr" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/tumblr.png"></a>
+           <a class="synved-social-button synved-social-button-share synved-social-size-32 synved-social-resolution-single synved-social-provider-mail nolightbox" data-provider="mail" rel="nofollow" title="Share by email" href="mailto:?subject=Node.js%20Text%20to%20Speech%20using%20AWS%20Polly&amp;body=Informative%20article:%20https%3A%2F%2Fwww.cronj.com%2Fblog%2Fnode-js-text-speech-using-aws-polly%2F" style="font-size: 0px; width:32px;height:32px;margin:0;margin-bottom:5px;"><img alt="mail" title="Share by email" class="synved-share-image synved-social-image synved-social-image-share" width="32" height="32" style="display: inline; width:32px;height:32px; margin: 0; padding: 0; border: none; box-shadow: none;" src="https://www.cronj.com/blog/wp-content/plugins/social-media-feather/synved-social/image/social/regular/64x64/mail.png"></a>
+          </div>
+         </aside> 
+        </div>
+        <!-- close .sidebar-padder --> 
+       </div>
+       <!-- close .sidebar --> 
+      </div> 
+     </div> 
+    </div>
+    <!-- close .*-inner (main-content) --> 
+   </div>
+   <!-- close .container --> 
+  </div>
+  <!-- close .main-content --> 
+  <footer id="colophon" class="site-footer" role="contentinfo"> 
+   <div class="container animated fadeInLeft"> 
+    <div class="row"> 
+     <div class="site-footer-inner col-sm-12 clearfix"> 
+      <div class="sidebar-padder"> 
+       <aside id="text-3" class="widget widget_text col-3">
+        <h3 class="widget-title">About Us</h3> 
+        <div class="textwidget">
+         CronJ is a full service Information Technology services company. We provide an array of technology, consulting and outsourcing services. In a short span of time we have successfully delivered our high quality services to a global clientele. We holistically combine your present state-of-the-art architecture with our world class services to take your business to the next level of excellence.
+        </div> 
+       </aside>
+       <aside id="text-4" class="widget widget_text col-3">
+        <h3 class="widget-title">Services</h3> 
+        <div class="textwidget">
+         <p>Node.js Development</p> 
+         <p>DevOps</p> 
+         <p>eCommerce Development</p> 
+         <p>Mobile Application Development</p> 
+         <p>Software Consultancy</p> 
+         <p>Realtime Applications</p> 
+        </div> 
+       </aside>
+       <aside id="text-2" class="widget widget_text col-3">
+        <h3 class="widget-title">Talk to us</h3> 
+        <div class="textwidget">
+         <p>Would you like to have our expertise in your Web &amp; Mobile projects?</p> 
+         <p>IND : +91-7093801977<br> NL : +31-303200554<br> contact@cronj.com</p> 
+        </div> 
+       </aside> 
+      </div>
+      <!-- close .sidebar-padder --> 
+     </div> 
+    </div> 
+   </div>
+   <!-- close .container --> 
+   <div id="footer-info"> 
+    <div class="container"> 
+     <div class="site-info"> 
+      <a href="http://cronj.com" title="A Web &amp; Application Development Company">© 2016 CronJ IT Technologies Private Limited. All rights reserved</a> 
+     </div>
+     <!-- close .site-info --> 
+    </div> 
+   </div> 
+  </footer>
+  <!-- close #colophon --> 
+  <a href="#top" id="scroll-top"></a> 
+  <script src="https://www.cronj.com/blog/wp-content/plugins/wp-prism-syntax-highlighter/js/prism.js"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+r3f5x9JS=escape(document['referrer']);
+hf4N='23a11f206c52807c54af2e8e7b295d6e';
+hf4V='24c29a47be7d3ecc410b26914e77a34f';
+cm4S="form[action='https://www.cronj.com/blog/wp-comments-post.php']";
+jQuery(document).ready(function($){var e="#commentform, .comment-respond form, .comment-form, "+cm4S+", #lostpasswordform, #registerform, #loginform, #login_form, #wpss_contact_form";$(e).submit(function(){$("<input>").attr("type","hidden").attr("name","r3f5x9JS").attr("value",r3f5x9JS).appendTo(e);$("<input>").attr("type","hidden").attr("name",hf4N).attr("value",hf4V).appendTo(e);return true;});$("#comment").attr({minlength:"15",maxlength:"15360"})});
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/themes/ascent/includes/js/skip-link-focus-fix.js?ver=20130115"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-includes/js/comment-reply.min.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/plugins/wp-spamshield/js/jscripts-ftr-min.js"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-includes/js/wp-embed.min.js?ver=4.5.6"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/plugins/wysija-newsletters/js/validate/languages/jquery.validationEngine-en.js?ver=2.7.5"></script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/plugins/wysija-newsletters/js/validate/jquery.validationEngine.js?ver=2.7.5"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var wysijaAJAX = {"action":"wysija_ajax","controller":"subscribers","ajaxurl":"https:\/\/www.cronj.com\/blog\/wp-admin\/admin-ajax.php","loadingTrans":"Loading...","is_rtl":""};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://www.cronj.com/blog/wp-content/plugins/wysija-newsletters/js/front-subscribers.js?ver=2.7.5"></script> 
+  <script>
+
+   jQuery(".btn").click(function(){
+        jQuery("#toggleDemo").collapse('toggle');
+    });
+
+</script>  
+ </body>
+</html>
