@@ -1,0 +1,912 @@
+<!doctype html>
+<html>
+ <head> 
+  <!-- head-common-bootstrap-individual --> 
+  <meta charset="utf-8"> 
+  <meta name="generator" content="http://www.typepad.com/"> 
+  <meta name="description" content="In the last post we added a gaze cursor and some command support for our ABB industrial robot inside HoloLens. The next step I took was to add spatial mapping, allowing the user to select the base of the robot and move it around within the spatially mapped environs. The Holograms 101 tutorial provided very straightforward instructions on how to implement spatial mapping. I once again had to export the “wireframe” material asset from the provided project to get it across into my own, but that was a minor detail. Unfortunately when testing the capability – just as with..."> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <meta property="og:title" content="Adding voice commands and spatial mapping to our Unity model in HoloLens"> 
+  <meta property="og:site_name" content="Through the Interface"> 
+  <meta property="og:type" content="blog"> 
+  <meta property="og:url" content="http://through-the-interface.typepad.com/through_the_interface/2016/07/adding-voice-commands-and-spatial-mapping-to-our-unity-model-in-hololens.html"> 
+  <meta property="og:description" content="In the last post we added a gaze cursor and some command support for our ABB industrial robot inside HoloLens. The next step I took was to add spatial mapping, allowing the user to select the base of the robot and move it around within the spatially mapped environs. The Holograms 101 tutorial provided very straightforward instructions on how to implement spatial mapping. I once again had to export the “wireframe” material asset from the provided project to get it across into my own, but that was a minor detail. Unfortunately when testing the capability – just as with..."> 
+  <meta property="fb:admins" content=""> 
+  <meta property="og:image" content="http://through-the-interface.typepad.com/.a/6a00d83452464869e201b8d206eec1970c-600wi"> 
+  <meta name="twitter:card" content="summary_large_image"> 
+  <meta name="twitter:site" content=""> 
+  <meta name="twitter:creator" content=""> 
+  <meta name="twitter:title" content="Adding voice commands and spatial mapping to our Unity model in HoloLens"> 
+  <meta name="twitter:description" content="In the last post we added a gaze cursor and some command support for our ABB industrial robot inside HoloLens. The next step I took was to add spatial mapping, allowing the user to select the base of the robot and move it around within the spatially mapped environs. The Holograms 101 tutorial provided very straightforward instructions on how to implement spatial mapping. I once again had to export the “wireframe” material asset from the provided project to get it across into my own, but that was a minor detail. Unfortunately when testing the capability – just as with..."> 
+  <meta name="twitter:image" content="http://through-the-interface.typepad.com/.a/6a00d83452464869e201b8d206eec1970c-pi"> 
+  <!-- Custom fonts for this template --> 
+  <!-- Bootstrap core CSS --> 
+  <link href="/.shared/themes/common/bootstrap/css/bootstrap.min.css" rel="stylesheet"> 
+  <!-- Bootstrap bridge --> 
+  <link href="/.shared/themes/common/bootstrap/css/bootstrap-bridge.css" rel="stylesheet"> 
+  <!-- Custom styles for this template --> 
+  <link rel="stylesheet" href="http://through-the-interface.typepad.com/through_the_interface/styles.css?v=6" type="text/css" media="screen"> 
+  <style>.navbar-header, .nav { display:block !important; }</style> 
+  <link rel="stylesheet" href="http://static.typepad.com/.shared:v84e787a:typepad:en_us/themes/common/print.css" type="text/css" media="print"> 
+  <link rel="alternate" type="application/atom+xml" title="Posts on 'Through the Interface' (Atom)" href="http://through-the-interface.typepad.com/through_the_interface/atom.xml"> 
+  <link rel="alternate" type="application/rss+xml" title="Posts on 'Through the Interface' (RSS 1.0)" href="http://through-the-interface.typepad.com/through_the_interface/index.rdf"> 
+  <link rel="alternate" type="application/rss+xml" title="Posts on 'Through the Interface' (RSS 2.0)" href="http://through-the-interface.typepad.com/through_the_interface/rss.xml"> 
+  <script src="//code.jquery.com/jquery.js"></script> 
+  <script type="text/javascript">
+                var TPApp = {};
+                TPApp.app_uri = "http://www.typepad.com/";
+        </script> 
+  <script type="text/javascript" src="http://static.typepad.com/.shared:v84e787a:typepad:en_us/js/yui/yahoo-dom-event.js,/js/app/thumbnail-gallery-min.js,/js/app/flyouts-min.js"></script> 
+  <script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-225723-36', 'auto', {'name': 'Typepad'}, {'allowLinker': true} );  // Separate tracker for Typepad.
+ga('Typepad.require', 'linker');
+ga('Typepad.linker:autoLink', ['none']);
+ga('Typepad.set', 'dimension1', '6a00d83452464869e200d83452baa169e2');
+ga('Typepad.set', 'dimension2', 'Individual');
+ga('Typepad.send', 'pageview');
+</script> 
+  <meta name="robots" content="NOODP"> 
+  <link rel="icon" href="/favicon.ico" type="image/x-icon"> 
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"> 
+  <meta name="application-name" content="Through the Interface"> 
+  <meta name="msapplication-tooltip" content="Open Kean's blog"> 
+  <meta name="msapplication-starturl" content="http://through-the-interface.typepad.com"> 
+  <meta name="msapplication-window" content="width=1024;height=768"> 
+  <meta name="msapplication-navbutton-color" content="#000000"> 
+  <meta name="msapplication-task" content="name=Search TtIf;action-uri=http://www.google.com/search?btnG=%C2%BB&amp;domains=through-the-interface.typepad.com&amp;sitesearch=through-the-interface.typepad.com;icon-uri=http://google.com/favicon.ico"> 
+  <meta name="msapplication-task" content="name=Post Index;action-uri=http://through-the-interface.typepad.com/through_the_interface/posts.html;icon-uri=/favicon.ico"> 
+  <meta name="msapplication-task" content="name=Reverse Index;action-uri=http://through-the-interface.typepad.com/through_the_interface/reverse.html;icon-uri=/favicon.ico"> 
+  <meta name="msapplication-task" content="name=Twitter (@keanw);action-uri=http://twitter.com/keanw;icon-uri=http://twitter.com/favicon.ico"> 
+  <meta name="msapplication-TileColor" content="#000000"> 
+  <meta name="msapplication-TileImage" content="/tile.png"> 
+  <meta property="twitter:card" content="summary"> 
+  <meta property="twitter:site" content="@keanw"> 
+  <meta property="twitter:title" content="Through the Interface"> 
+  <meta property="twitter:description" content="A blog for programmers working with AutoCAD and other Autodesk technology."> 
+  <meta property="twitter:image" content="http://through-the-interface.typepad.com/files/fusion-selfie.png"> 
+  <meta property="twitter:url" content="http://autode.sk/ttif"> 
+  <link href="//fonts.googleapis.com/css?family=Lato|Open+Sans" rel="stylesheet" type="text/css"> 
+  <script src="//api.autodesk.com/content/gateway/2013.1.363776.288/z/Scripts/a360Viewer/widget.js"></script> 
+  <!-- Resize IFrame - for Xmas card post --> 
+  <script language="javascript" type="text/javascript">
+  function resizeIframe(obj, factor) {
+    factor = factor || 1.0;
+    obj.style.height = factor * obj.contentWindow.document.body.scrollHeight + 'px';
+  }
+</script> 
+  <!--Google Analytics CODE--> 
+  <!--
+This code causes an undefined object error, as ga.js loads too quickly.
+See fix below.
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+pageTrackerBlog = _gat._getTracker("UA-4460969-18");
+pageTrackerBlog._setDomainName("typepad.com");
+pageTrackerBlog._initData();
+pageTrackerBlog._trackPageview();
+
+pageTrackerRU = _gat._getTracker("UA-4460969-1");
+pageTrackerRU._setDomainName("none");
+pageTrackerRU._initData();
+pageTrackerRU._trackPageview();
+
+pageTrackerCom = _gat._getTracker("UA-2967772-45");
+pageTrackerCom._setDomainName("none");
+pageTrackerCom._initData();
+pageTrackerCom._trackPageview();
+</script>
+ --> 
+  <!-- Fix from http://www.maifith.com/news/_gat-is-undefined-new-analytics-code --> 
+  <script src="http://www.google-analytics.com/ga.js" type="text/javascript"></script> 
+  <script type="text/javascript">
+var pageTrackerBlog;
+var pageTrackerRU;
+var pageTrackerCom;
+function startGA(num_tries)
+{
+try{
+pageTrackerBlog = _gat._getTracker("UA-4460969-18");
+pageTrackerBlog._setDomainName("typepad.com");
+pageTrackerBlog._initData();
+pageTrackerBlog._trackPageview();
+
+pageTrackerRU = _gat._getTracker("UA-4460969-1");
+//pageTrackerRU._setDomainName("none");
+pageTrackerRU._initData();
+pageTrackerRU._trackPageview();
+
+pageTrackerCom = _gat._getTracker("UA-2967772-45");
+//pageTrackerCom._setDomainName("none");
+pageTrackerCom._initData();
+pageTrackerCom._trackPageview();
+
+} catch(err)
+{
+window.status = err;
+if (num_tries < 10) {
+  setTimeout('startGA(' + (num_tries+1) + ');', 500);
+}
+}
+}
+startGA(1);
+</script> 
+  <!--Google Analytics CODE--> 
+  <title>Adding voice commands and spatial mapping to our Unity model in HoloLens - Through the Interface</title> 
+  <link rel="start" href="http://through-the-interface.typepad.com/through_the_interface/" title="Home"> 
+  <link rel="prev" href="http://through-the-interface.typepad.com/through_the_interface/2016/07/le-tour-de-france-hits-switzerland.html?no_prefetch=1" title="Le Tour de France hits Switzerland"> 
+  <link rel="next" href="http://through-the-interface.typepad.com/through_the_interface/2016/07/developing-for-hololens-on-windows-10.html?no_prefetch=1" title="Developing for HoloLens on Windows 10"> 
+  <script src="//code.jquery.com/jquery-1.11.2.min.js"></script> 
+ </head> 
+ <body class="layout-two-column-right post"> 
+  <div id="container" class="container"> 
+   <div id="container-inner" class="pkg"> 
+    <div class="row"> 
+     <a id="home"></a> 
+     <div id="banner" class="jumbotron"> 
+      <h1><a href="http://through-the-interface.typepad.com/through_the_interface/" accesskey="1">Through the Interface</a></h1> 
+      <h2>A blog for developers programming with Autodesk platforms, particularly AutoCAD and Forge. With a special focus on AR/VR and IoT.</h2> 
+     </div> 
+     <div id="autocollapse" class="navbar navbar-default navbar-fixed-top"> 
+      <div class="navbar-inner"> 
+       <div class="navbar-header"> 
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse"> <span class="icon-bar"></span> </button> 
+        <a class="navbar-brand" href="http://through-the-interface.typepad.com/through_the_interface/">Home</a> 
+       </div> 
+       <div class="navbar-collapse collapse"> 
+        <ul class="nav navbar-nav"> 
+         <li><a href="http://through-the-interface.typepad.com/through_the_interface/archives.html">Archives</a></li> 
+         <li><a href="http://through-the-interface.typepad.com/through_the_interface/atom.xml">Subscribe</a></li> 
+         <li><a href="http://blogs.autodesk.com/">Autodesk Blogs</a></li> 
+         <li class="spacer"></li> 
+         <li><a class="socialnav" rel="me" href="http://www.facebook.com/through.the.interface"><span class="socialname">Facebook Page</span></a></li> 
+         <li><a class="socialnav" rel="me" href="http://plus.google.com/111739174732269215736"><span class="socialname">Google Plus</span></a></li> 
+         <li><a class="socialnav" rel="me" href="http://www.linkedin.com/in/keanw"><span class="socialname">LinkedIn</span></a></li> 
+         <li><a class="socialnav" rel="me" href="http://twitter.com/keanw"><span class="socialname">Twitter</span></a></li> 
+        </ul>
+        <!-- end main navbar --> 
+       </div>
+       <!--/.nav-collapse--> 
+      </div>
+      <!--/.navbar-inner--> 
+     </div>
+     <!--/.navbar--> 
+     <div id="pagebody"> 
+      <div id="pagebody-inner" class="pkg"> 
+       <div id="alpha" class="col-xs-12 col-sm-8 col-md-8 col-lg-8"> 
+        <div id="alpha-inner" class="pkg"> 
+         <!-- the plain version removes the extra jquery --> 
+         <!-- content nav --> 
+         <p class="content-nav"> <a class="content-nav-prev" href="http://through-the-interface.typepad.com/through_the_interface/2016/07/le-tour-de-france-hits-switzerland.html">« Le Tour de France hits Switzerland</a> | <a class="content-nav-main" href="http://through-the-interface.typepad.com/through_the_interface/">Main</a> | <a class="content-nav-next" href="http://through-the-interface.typepad.com/through_the_interface/2016/07/developing-for-hololens-on-windows-10.html">Developing for HoloLens on Windows 10 »</a> </p> 
+         <script type="text/javascript">
+   $(function(){
+       var query = window.location.search.substring(1);
+       if( query == "pintix=1" ) {
+          var e=document.createElement('script');e.setAttribute('type','text/javascript');e.setAttribute('charset','UTF-8');e.setAttribute('src','http://static.typepad.com/.shared:v84e787a:typepad:en_us//js/pinmarklet.js?r='+Math.random()*99999999);document.body.appendChild(e);
+       }
+   });
+</script> 
+         <script type="text/javascript">
+    window.ZemantaBlogSettings = "";
+    window.ZemantaPostSettings = "";
+</script> 
+         <script type="text/javascript" src="http://content.zemanta.com/static/typepad/js/recommend.js"></script> 
+         <input type="hidden" name="zemanta-related" val=""> 
+         <!-- entry --> 
+         <h2 class="date-header">July 19, 2016</h2> 
+         <div class="entry-category-augmented_reality entry-category-hololens entry-category-robotics entry-category-unity3d entry-author-kean_walmsley entry-type-post entry" id="entry-6a00d83452464869e201b7c87d174b970b"> 
+          <div class="entry-inner"> 
+           <h3 class="entry-header">Adding voice commands and spatial mapping to our Unity model in HoloLens</h3> 
+           <div class="entry-content"> 
+            <div class="entry-body"> 
+             <p>In the last post we added a <a href="http://through-the-interface.typepad.com/through_the_interface/2016/07/adding-gaze-and-gestures-to-control-our-unity-model-in-hololens.html" target="_blank">gaze cursor and some command support for our ABB industrial robot inside HoloLens</a>. The next step I took was to add spatial mapping, allowing the user to select the base of the robot and move it around within the spatially mapped environs.</p> 
+             <p>The <a href="https://developer.microsoft.com/en-us/windows/holographic/holograms_101" target="_blank">Holograms 101</a> tutorial provided very straightforward instructions on how to implement <a href="https://developer.microsoft.com/en-us/windows/holographic/holograms_101#chapter_6_-_spatial_mapping" target="_blank">spatial mapping</a>. I once again had to export the “wireframe” material asset from the provided project to get it across into my own, but that was a minor detail.</p> 
+             <p>Unfortunately when testing the capability – just as with voice commands – it didn’t work. In an attempt to track down the issue, I went and launched the app from the debugger, at which point I spotted this information in the debug output:</p> 
+             <div style="font-size: 8pt; font-family: courier new; background: white; color: black; line-height: 140%"> 
+              <p style="margin: 0px">Capability 'spatialPerception' is required, please enable it in Package.appxmanifest in order to enable spatial mapping functionality.</p> 
+              <p style="margin: 0px">(Filename: C:\buildslave\unity\build\PlatformDependent/MetroPlayer/MetroCapabilities.cpp Line: 126)</p> 
+              <p style="margin: 0px">?</p> 
+              <p style="margin: 0px">Capability 'microphone' is required, please enable it in Package.appxmanifest in order to enable speech recognition functionality.</p> 
+              <p style="margin: 0px">(Filename: C:\buildslave\unity\build\PlatformDependent/MetroPlayer/MetroCapabilities.cpp Line: 126)</p> 
+              <p style="margin: 0px">?</p>
+             </div> 
+             <p>So it was that I realised that – just like with the <a href="http://through-the-interface.typepad.com/through_the_interface/2016/07/displaying-your-unity-model-in-3d-using-hololens.html" target="_blank">original issue that stopped our robot hologram from appearing in 3D</a> – there were a couple of project settings I needed to enable to allow both voice and spatial mapping to work properly. You can find them in Unity under File –&gt; Build Settings… –&gt; Player Settings… –&gt; Capabilities. The settings are called “Microphone” and “SpatialPerception”.</p> 
+             <p><a href="http://through-the-interface.typepad.com/.a/6a00d83452464869e201b8d206eebc970c-pi" target="_blank"><img title="Changing Unity project settings" style="float: none; margin: 30px auto; display: block" alt="Changing Unity project settings" src="http://through-the-interface.typepad.com/.a/6a00d83452464869e201b8d206eec1970c-pi" width="500" height="348"></a></p> 
+             <p>Rebuilding the project magically enabled both the voice commands and spatial mapping features I’d added by following Holograms 101.</p> 
+             <p>Here’s the <em>SpeechManager.cs</em> file, modified from the one in the tutorial:</p> 
+             <div style="font-size: 8pt; font-family: courier new; background: white; color: black; line-height: 140%"> 
+              <p style="margin: 0px"><span style="color: blue">using</span> System.Collections.Generic;</p> 
+              <p style="margin: 0px"><span style="color: blue">using</span> System.Linq;</p> 
+              <p style="margin: 0px"><span style="color: blue">using</span> UnityEngine;</p> 
+              <p style="margin: 0px"><span style="color: blue">using</span> UnityEngine.Windows.Speech;</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px"><span style="color: blue">public</span> <span style="color: blue">class</span> <span style="color: #2b91af">SpeechManager</span> : MonoBehaviour</p> 
+              <p style="margin: 0px">{</p> 
+              <p style="margin: 0px">&nbsp; KeywordRecognizer keywordRecognizer = <span style="color: blue">null</span>;</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: #2b91af">Dictionary</span>&lt;<span style="color: blue">string</span>, System.<span style="color: #2b91af">Action</span>&gt; keywords = <span style="color: blue">new</span> <span style="color: #2b91af">Dictionary</span>&lt;<span style="color: blue">string</span>, System.<span style="color: #2b91af">Action</span>&gt;();</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: green">// Use this for initialization</span></p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: blue">void</span> Start()</p> 
+              <p style="margin: 0px">&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; keywords.Add(<span style="color: #a31515">"Halt"</span>, () =&gt; <span style="color: blue">this</span>.BroadcastMessage(<span style="color: #a31515">"OnStop"</span>));</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; keywords.Add(<span style="color: #a31515">"Move"</span>, () =&gt; <span style="color: blue">this</span>.BroadcastMessage(<span style="color: #a31515">"OnStart"</span>));</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; keywords.Add(<span style="color: #a31515">"Quick"</span>, () =&gt; <span style="color: blue">this</span>.BroadcastMessage(<span style="color: #a31515">"OnQuick"</span>));</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; keywords.Add(<span style="color: #a31515">"Slow"</span>, () =&gt; <span style="color: blue">this</span>.BroadcastMessage(<span style="color: #a31515">"OnSlow"</span>));</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; keywords.Add(<span style="color: #a31515">"Stop"</span>, () =&gt;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: blue">var</span> focusObject = GazeGestureManager.Instance.FocusedObject;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: blue">if</span> (focusObject != <span style="color: blue">null</span>)</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: green">// Call the OnStop method on just the focused object.</span></p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; focusObject.SendMessage(<span style="color: #a31515">"OnStop"</span>);</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; });</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; keywords.Add(<span style="color: #a31515">"Spin"</span>, () =&gt;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: blue">var</span> focusObject = GazeGestureManager.Instance.FocusedObject;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: blue">if</span> (focusObject != <span style="color: blue">null</span>)</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: green">// Call the OnStop method on just the focused object.</span></p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; focusObject.SendMessage(<span style="color: #a31515">"OnStart"</span>);</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; });</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; <span style="color: green">// Tell the KeywordRecognizer about our keywords.</span></p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; keywordRecognizer = <span style="color: blue">new</span> KeywordRecognizer(keywords.Keys.ToArray());</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; <span style="color: green">// Register a callback for the KeywordRecognizer and start recognizing!</span></p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; keywordRecognizer.OnPhraseRecognized += KeywordRecognizer_OnPhraseRecognized;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; keywordRecognizer.Start();</p> 
+              <p style="margin: 0px">&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: blue">private</span> <span style="color: blue">void</span> KeywordRecognizer_OnPhraseRecognized(PhraseRecognizedEventArgs args)</p> 
+              <p style="margin: 0px">&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; System.<span style="color: #2b91af">Action</span> keywordAction;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; <span style="color: blue">if</span> (keywords.TryGetValue(args.text, <span style="color: blue">out</span> keywordAction))</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; keywordAction.Invoke();</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp; }</p> 
+              <p style="margin: 0px">}</p> 
+              <p style="margin: 0px">&nbsp;</p>
+             </div> 
+             <p>Here’s the correspondingly updated PartCommands.cs file (<em>Rotate.cs</em> can stay as it was before):</p> 
+             <div style="font-size: 8pt; font-family: courier new; background: white; color: black; line-height: 140%"> 
+              <p style="margin: 0px"><span style="color: blue">using</span> UnityEngine;</p> 
+              <p style="margin: 0px"><span style="color: blue">using</span> System;</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px"><span style="color: blue">public</span> <span style="color: blue">class</span> <span style="color: #2b91af">PartCommands</span> : MonoBehaviour</p> 
+              <p style="margin: 0px">{</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: green">// Called by GazeGestureManager when the user performs a Select gesture</span></p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: blue">void</span> OnSelect()</p> 
+              <p style="margin: 0px">&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; CallOnParent(</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; r =&gt;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span style="color: blue">if</span> (r.isStopped)</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; r.speed = -r.speed;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; r.isStopped = !r.isStopped;</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; );</p> 
+              <p style="margin: 0px">&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: blue">void</span> OnStart()</p> 
+              <p style="margin: 0px">&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; CallOnParent(r =&gt; r.isStopped = <span style="color: blue">false</span>);</p> 
+              <p style="margin: 0px">&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: blue">void</span> OnStop()</p> 
+              <p style="margin: 0px">&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; CallOnParent(r =&gt; r.isStopped = <span style="color: blue">true</span>);</p> 
+              <p style="margin: 0px">&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: blue">void</span> OnQuick()</p> 
+              <p style="margin: 0px">&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; CallOnParent(r =&gt; r.isFast = <span style="color: blue">true</span>);</p> 
+              <p style="margin: 0px">&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: blue">void</span> OnSlow()</p> 
+              <p style="margin: 0px">&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; CallOnParent(r =&gt; r.isFast = <span style="color: blue">false</span>);</p> 
+              <p style="margin: 0px">&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp;</p> 
+              <p style="margin: 0px">&nbsp; <span style="color: blue">void</span> CallOnParent(<span style="color: #2b91af">Action</span>&lt;Rotate&gt; f)</p> 
+              <p style="margin: 0px">&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; <span style="color: blue">var</span> rot = <span style="color: blue">this</span>.gameObject.GetComponentInParent&lt;Rotate&gt;();</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; <span style="color: blue">if</span> (rot)</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; {</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; f(rot);</p> 
+              <p style="margin: 0px">&nbsp;&nbsp;&nbsp; }</p> 
+              <p style="margin: 0px">&nbsp; }</p> 
+              <p style="margin: 0px">}</p> 
+              <p style="margin: 0px">&nbsp;</p>
+             </div> 
+             <p>Now to see it in action… here’s a video showing both voice control and spatial mapping in our robot project:</p> 
+             <p align="center">&nbsp;</p> 
+             <p align="center"><iframe height="281" src="https://www.youtube-nocookie.com/embed/z3lGKZavBcQ?rel=0&amp;showinfo=0" frameborder="0" width="500" allowfullscreen></iframe></p> 
+             <p align="center"></p> 
+            </div> 
+            <!-- SIGNATURE --> 
+           </div> 
+           <div class="entry-footer"> 
+            <p class="entry-footer-info"> <span class="post-footers">Posted on July 19, 2016 at 02:26 PM in <a href="http://through-the-interface.typepad.com/through_the_interface/augmented-reality/">Augmented Reality</a>, <a href="http://through-the-interface.typepad.com/through_the_interface/hololens/">HoloLens</a>, <a href="http://through-the-interface.typepad.com/through_the_interface/robotics/">Robotics</a>, <a href="http://through-the-interface.typepad.com/through_the_interface/unity3d/">Unity3D</a> </span> <span class="separator">|</span> <a class="permalink" href="http://through-the-interface.typepad.com/through_the_interface/2016/07/adding-voice-commands-and-spatial-mapping-to-our-unity-model-in-hololens.html">Permalink</a> </p> 
+            <!-- technorati tags --> 
+            <!-- post footer links --> 
+            <p class="entry-footer-share entry-footer-share-buttons"> <span class="entry-footer-links-twitter"> <a href="http://twitter.com/share?url=http%3A%2F%2Fthrough-the-interface.typepad.com%2Fthrough_the_interface%2F2016%2F07%2Fadding-voice-commands-and-spatial-mapping-to-our-unity-model-in-hololens.html&amp;text=" target="_blank"><img src="/.shared/images/circle-twitter.png" alt="Twitter"></a> </span> <span class="separator">|</span> <span class="entry-footer-links-plusone"> <a href="https://plus.google.com/share?url=http://through-the-interface.typepad.com/through_the_interface/2016/07/adding-voice-commands-and-spatial-mapping-to-our-unity-model-in-hololens.html" target="_blank"><img src="/.shared/images/circle-google.png" alt="Google"></a> </span> <span class="separator">|</span> <span class="entry-footer-links-pinterest"> <a href="javascript:void((function()%7Bvar%20e=document.createElement('script');e.setAttribute('type','text/javascript');e.setAttribute('charset','UTF-8');e.setAttribute('src','http://assets.pinterest.com/js/pinmarklet.js?r='+Math.random()*99999999);document.body.appendChild(e)%7D)());"><img src="/.shared/images/circle-pinterest.png" alt="Pinterest"></a> </span> <span class="separator">|</span> <span class="entry-footer-links-facebook_like"> <a href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fthrough-the-interface.typepad.com%2Fthrough_the_interface%2F2016%2F07%2Fadding-voice-commands-and-spatial-mapping-to-our-unity-model-in-hololens.html" target="_blank"><img src="/.shared/images/circle-facebook.png" alt="Facebook"></a> </span> </p> 
+           </div> 
+          </div> 
+         </div> 
+         <div id="disqus_thread"></div> 
+         <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'ttif'; // required: replace example with your forum shortname
+            var disqus_identifier = '6a00d83452464869e201b7c87d174b970b';
+            var disqus_url = 'http://through-the-interface.typepad.com/through_the_interface/2016/07/adding-voice-commands-and-spatial-mapping-to-our-unity-model-in-hololens.html';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script> 
+         <noscript>
+          Please enable JavaScript to view the 
+          <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+         </noscript> 
+         <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a> 
+        </div> 
+       </div> 
+       <div id="beta" class="well col-xs-12 col-sm-4 col-md-4 col-lg-4"> 
+        <div id="beta-inner" class="pkg"> 
+         <!-- sidebar --> 
+         <div class="module-custom_html module"> 
+          <div class="module-content"> 
+           <script type="text/javascript">
+
+$(document).ready(function(){
+     $("a[title],img[title]").tooltip({
+         'placement': 'top'
+     });
+});
+</script> 
+          </div> 
+         </div> 
+         <div id="kean_walmsley" class="module-typelist module"> 
+          <h2 class="module-header">Kean Walmsley</h2> 
+          <div class="typelist-plain module-content"> 
+           <ul class="module-list"> 
+            <li class="module-list-item">
+             <div class="typelist-note">
+              <center>
+               <a href="http://through-the-interface.typepad.com/through_the_interface/about-the-author.html"><img src="http://through-the-interface.typepad.com/kean_walmsley_blog_portrait_200x200.jpg" border="0"></a> 
+               <br> 
+               <a href="http://through-the-interface.typepad.com/through_the_interface/about-the-author.html">About the Author</a> 
+              </center> 
+             </div></li> 
+           </ul> 
+          </div> 
+         </div> 
+         <div class="module-search module"> 
+          <h2 class="module-header">Search</h2> 
+          <div class="module-content"> 
+           <form id="search-blog" method="get" action="http://through-the-interface.typepad.com/.services/blog/6a00d83452464869e200d83452baa169e2/search" class="form-search form-inline" role="search"> 
+            <div class="form-group">
+             <input type="search" name="filter.q" results="5" value="" class="form-control" placeholder="Search">
+            </div>
+            <button type="submit" value="Search" class="btn btn-default">Submit</button> 
+           </form> 
+          </div> 
+         </div> 
+         <!-- END Blog Search Module --> 
+         <div class="module-syndicate module"> 
+          <div class="module-content"> 
+           <a href="http://through-the-interface.typepad.com/through_the_interface/atom.xml"><i class="fa fa-rss"></i> Subscribe to this blog's feed</a> 
+          </div> 
+         </div> 
+         <div id="translator" class="module-typelist module"> 
+          <h2 class="module-header">Translator</h2> 
+          <div class="module-content"> 
+           <ul class="module-list"> 
+            <li class="module-list-item"><a href=""></a><br>
+             <div id="MicrosoftTranslatorWidget" class="Dark" style="color:white;background-color:#555555"></div><script type="text/javascript">setTimeout(function(){{var s=document.createElement('script');s.type='text/javascript';s.charset='UTF-8';s.src=((location && location.href && location.href.indexOf('https') == 0)?'https://ssl.microsofttranslator.com':'http://www.microsofttranslator.com')+'/ajax/v3/WidgetV3.ashx?siteData=SCbI5QqhB_szyHm_DthE93CT-OhudIAdr6f2c4cMGARi9CLyUkAt9r-2bMFOcN6Vg5cg_A0nj_zCIpYBpOn_LqLaezd3dCSPmXO6Imqb5xyim8y_41yMbT14670V2tux&ctf=True&ui=true&settings=Manual&from=en';var p=document.getElementsByTagName('head')[0]||document.documentElement;p.insertBefore(s,p.firstChild); }},0);</script></li> 
+           </ul> 
+          </div> 
+         </div> 
+         <div id="twitter" class="module-typelist module"> 
+          <h2 class="module-header">Twitter</h2> 
+          <div class="typelist-plain module-content"> 
+           <ul class="module-list"> 
+            <li class="module-list-item">
+             <div class="typelist-note">
+              <a class="twitter-timeline" href="https://twitter.com/keanw" data-widget-id="297008525731823616">Tweets by @keanw</a> 
+              <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+             </div></li> 
+           </ul> 
+          </div> 
+         </div> 
+         <div class="module-category-cloud module"> 
+          <h2 class="module-header"><a href="http://through-the-interface.typepad.com/through_the_interface/archives.html">Categories</a></h2> 
+          <div class="module-content"> 
+           <ul class="module-list"> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/3d-printing/">3D printing</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/3ds-max/">3ds Max</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/ajax/">AJAX</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/android/">Android</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/annotation_scaling/">Annotation scaling</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/arduino/">Arduino</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/aspnet/">ASP.NET</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/async/">Async</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/au/">AU</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/augmented-reality/">Augmented Reality</a></li> 
+            <li class="module-list-item cloud-weight-10"><a href="http://through-the-interface.typepad.com/through_the_interface/autocad/">AutoCAD</a></li> 
+            <li class="module-list-item cloud-weight-9"><a href="http://through-the-interface.typepad.com/through_the_interface/autocad_net/">AutoCAD .NET</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/autocad-io/">AutoCAD I/O</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/autocad_oem/">AutoCAD OEM</a></li> 
+            <li class="module-list-item cloud-weight-4"><a href="http://through-the-interface.typepad.com/through_the_interface/autodesk/">Autodesk</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/autodesk-exchange/">Autodesk App Store</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/autodesk-research/">Autodesk Research</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/visual_lisp/">AutoLISP / Visual LISP</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/azure/">Azure</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/batch_processing/">Batch processing</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/blocks/">Blocks</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/books/">Books</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/civil_3d/">Civil 3D</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/commands/">Commands</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/concurrent_programming/">Concurrent programming</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/conferences/">Conferences</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/core-console/">Core Console</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/custom_objects/">Custom objects</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/database/">Database</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/debugging/">Debugging</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/design/">Design</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/designscript/">DesignScript</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/devcasts/">DevCasts</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/devtv/">DevTV</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/multileaders/">Dimensions</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/documents/">Documents</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/draw_order/">Draw order</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/drawing_structure/">Drawing structure</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/dwf/">DWF</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/dynamic/">Dynamic</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/dynamic-blocks/">Dynamic Blocks</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/dynamo/">Dynamo</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/excel/">Excel</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/f/">F#</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/facebook/">Facebook</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/fields/">Fields</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/forge/">Forge</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/fractals/">Fractals</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/freewheel/">Freewheel</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/games/">Games</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/generative-design/">Generative design</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/geo-location/">Geo-location</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/geometry/">Geometry</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/graphics_system/">Graphics system</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/hatches/">Hatches</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/hololens/">HoloLens</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/html/">HTML</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/installation/">Installation</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/instructables/">Instructables</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/interviews/">Interviews</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/inventor/">Inventor</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/ios/">iOS</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/iot/">IoT</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/ironpython/">IronPython</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/ironruby/">IronRuby</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/java/">Java</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/javascript/">JavaScript</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/jigs/">Jigs</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/json/">JSON</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/kinect/">Kinect</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/leap-motion/">Leap Motion</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/linq/">LINQ</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/mac/">Mac</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/mobile/">Mobile</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/morgan/">Morgan</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/netduino/">Netduino</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/notification_events/">Notification / Events</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/object_properties/">Object properties</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/objectarx/">ObjectARX</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/overrules/">Overrules</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/paas/">PaaS</a></li> 
+            <li class="module-list-item cloud-weight-3"><a href="http://through-the-interface.typepad.com/through_the_interface/personal/">Personal</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/plotting/">Plotting</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/plugin-of-the-month/">Plugin of the Month</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/point-clouds/">Point clouds</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/powershell/">PowerShell</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/purge/">Purge</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/python/">Python</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/raspberry-pi/">Raspberry Pi</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/realdwg/">RealDWG</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/reality-capture/">Reality capture</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/religion/">Religion</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/rest/">REST</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/retro-computing/">Retro computing</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/revit/">Revit</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/robotics/">Robotics</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/round-the-world/">Round the world</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/ruby/">Ruby</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/runtime/">Runtime</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/saas/">SaaS</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/security/">Security</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/selection/">Selection</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/social-media/">Social media</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/solid_modeling/">Solid modeling</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/stingray/">Stingray</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/tables/">Tables</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/tinkercad/">Tinkercad</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/training/">Training</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/transactions/">Transactions</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/translation/">Translation</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/travel/">Travel</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/uavs/">UAVs</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/unity3d/">Unity3D</a></li> 
+            <li class="module-list-item cloud-weight-3"><a href="http://through-the-interface.typepad.com/through_the_interface/user_interface/">User interface</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/virtual-reality/">Virtual Reality</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/visual_basic/">Visual Basic &amp; VBA</a></li> 
+            <li class="module-list-item cloud-weight-2"><a href="http://through-the-interface.typepad.com/through_the_interface/visual_studio/">Visual Studio</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/webtech/">Web/Tech</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/weblogs/">Weblogs</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/winrt/">WinRT</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/wpf/">WPF</a></li> 
+            <li class="module-list-item cloud-weight-1"><a href="http://through-the-interface.typepad.com/through_the_interface/xml/">XML</a></li> 
+           </ul> 
+          </div> 
+         </div> 
+         <div class="module-archives module"> 
+          <h2 class="module-header">Recent Posts</h2> 
+          <div class="module-content"> 
+           <ul class="module-list"> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/valparaiso.html">Valparaso</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/la-serena-and-the-mamalluca-observatory.html">La Serena and the Mamalluca Observatory</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/caldera-and-bahia-inglesa.html">Caldera and Baha Inglesa</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/sandboarding.html">Sandboarding</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/san-pedro-de-atacama.html">San Pedro de Atacama</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/bolivia.html">Bolivia</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/pilgrimage-to-salta.html">Pilgrimage to Salta</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/cafayate.html">Cafayate</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/tilcara-and-humahuaca.html">Tilcara and Humahuaca</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/salta-and-the-salinas-grandes.html">Salta and the Salinas Grandes</a></li> 
+           </ul> 
+          </div> 
+         </div> 
+         <!-- archives --> 
+         <div class="module-archives module"> 
+          <h2 class="module-header"><a href="http://through-the-interface.typepad.com/through_the_interface/archives.html">Archives</a></h2> 
+          <div class="module-content"> 
+           <ul class="module-list"> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/09/index.html">September 2017</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/08/index.html">August 2017</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/07/index.html">July 2017</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/06/index.html">June 2017</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/05/index.html">May 2017</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/04/index.html">April 2017</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/03/index.html">March 2017</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/02/index.html">February 2017</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2017/01/index.html">January 2017</a></li> 
+            <li class="module-list-item"><a href="http://through-the-interface.typepad.com/through_the_interface/2016/12/index.html">December 2016</a></li> 
+           </ul> 
+          </div> 
+         </div> 
+         <div id="autodesk_blogs" class="module-typelist module"> 
+          <h2 class="module-header">Autodesk Blogs</h2> 
+          <div class="module-content"> 
+           <ul class="module-list"> 
+            <li class="module-list-item"><a title="Heidi Hewett's AutoCAD blog" href="http://blogs.autodesk.com/autocadinsider">AutoCAD Insider</a></li> 
+            <li class="module-list-item"><a title="Shaan Hurley's AutoCAD blog" href="http://autodesk.blogs.com/between_the_lines/">Between the Lines</a></li> 
+            <li class="module-list-item"><a title="Scott Sheppard's Autodesk Labs blog" href="http://blogs.autodesk.com/labs">It's Alive in the Lab</a></li> 
+            <li class="module-list-item"><a title="Brian Ekins and Wayne Brill's Inventor developer blog" href="http://modthemachine.typepad.com/">Mod the Machine</a></li> 
+            <li class="module-list-item"><a title="Jeremy Tammik's Revit developer blog" href="http://thebuildingcoder.typepad.com/">The Building Coder</a></li> 
+            <li class="module-list-item"><a title="Doug Redmond's Vault developer blog" href="http://justonesandzeros.typepad.com/">It's All Just Ones and Zeros</a></li> 
+            <li class="module-list-item"><a title="Jim Quanci's partnering blog" href="http://dances-with-elephants.typepad.com">Dances with Elephants</a></li> 
+            <li class="module-list-item"><a title="The ADN team's AutoCAD developer blog" href="http://adndevblog.typepad.com/autocad">AutoCAD DevBlog</a></li> 
+            <li class="module-list-item"><a title="The ADN team's Cloud &amp; Mobile developer blog" href="http://adndevblog.typepad.com/cloud_and_mobile/">Cloud and Mobile DevBlog</a></li> 
+            <li class="module-list-item"><a title="The ADN team's AEC developer blog" href="http://adndevblog.typepad.com/aec">AEC DevBlog</a></li> 
+            <li class="module-list-item"><a title="The ADN team's Manufacturing developer blog" href="http://adndevblog.typepad.com/manufacturing">Manufacturing DevBlog</a></li> 
+            <li class="module-list-item"><a title="The ADN team's Infrastructure Modeling developer blog" href="http://adndevblog.typepad.com/infrastructure">Infrastructure Modeling DevBlog</a></li> 
+            <li class="module-list-item"><a title="Cyrille Fauvel's Maya platform developer blog" href="http://around-the-corner.typepad.com/">Around the Corner</a></li> 
+            <li class="module-list-item"><a title="Central blog list on autodesk.com" href="http://blogs.autodesk.com">More on autodesk.com...</a></li> 
+           </ul> 
+          </div> 
+         </div> 
+         <div class="module-custom_html module"> 
+          <div class="module-content"> 
+           <script>
+<MTEntries sort_order="ascend" days="1000" offset="1999">"<$MTEntryPermalinkRelative$>\" title=\"<$MTEntryDate format="%A %B %e, %Y"$>\"><$MTEntryTitle remove_html="1" generate="1" encode_js="1"$>",</MTEntries>
+</script> 
+          </div> 
+         </div> 
+         <div id="search" class="module-typelist module"> 
+          <h2 class="module-header">Search</h2> 
+          <div class="typelist-plain module-content"> 
+           <ul class="module-list"> 
+            <li class="module-list-item">
+             <div class="typelist-note">
+              <!-- Blog Search Module --> 
+              <!-- SiteSearch Google --> 
+              <form method="get" action="http://www.google.com/search"> 
+               <input type="text" name="q" size="5" maxlength="255" style="width:85px;"> 
+               <input type="submit" name="btnG" value="»" style="width:25px"> 
+               <input type="hidden" name="domains" value="through-the-interface.typepad.com"> 
+               <input type="hidden" name="sitesearch" value="through-the-interface.typepad.com"> 
+              </form> 
+              <!-- SiteSearch Google --> 
+              <!--WEBSIDESTORY CODE HBX1.0 (Universal)--> 
+              <script language="javascript">
+var _hbEC=0,_hbE=new Array;function _hbEvent(a,b){b=_hbE[_hbEC++]=new Object();b._N=a;b._C=0;return b;}
+var hbx=_hbEvent("pv");hbx.vpc="HBX0103u";hbx.gn="hb.autodesk.com";
+hbx.acct="DM5204045DDF94EN3";//ACCOUNT NUMBER(S)
+hbx.pn="PUT+PAGE+NAME+HERE";//PAGE NAME(S)
+hbx.mlc="/Blogs/through_the_interface";//MULTI-LEVEL CONTENT CATEGORY
+hbx.pndef="title";//DEFAULT PAGE NAME
+hbx.ctdef="full";//DEFAULT CONTENT CATEGORY
+hbx.lt="auto";
+</script>
+              <script language="javascript1.1" defer src="http://www.autodesk.com/hbe/hbx.js"></script> 
+              <!--END WEBSIDESTORY CODE--> 
+              <!--Google Analytics CODE--> 
+              <!--
+This code causes an undefined object error, as ga.js loads too quickly.
+See fix below.
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+pageTrackerBlog = _gat._getTracker("UA-4460969-18");
+pageTrackerBlog._setDomainName("typepad.com");
+pageTrackerBlog._initData();
+pageTrackerBlog._trackPageview();
+
+pageTrackerRU = _gat._getTracker("UA-4460969-1");
+pageTrackerRU._setDomainName("none");
+pageTrackerRU._initData();
+pageTrackerRU._trackPageview();
+
+pageTrackerCom = _gat._getTracker("UA-2967772-45");
+pageTrackerCom._setDomainName("none");
+pageTrackerCom._initData();
+pageTrackerCom._trackPageview();
+</script>
+ --> 
+              <!-- Fix from http://www.maifith.com/news/_gat-is-undefined-new-analytics-code --> 
+              <script src="http://www.google-analytics.com/ga.js" type="text/javascript"></script> 
+              <script type="text/javascript">
+var pageTrackerBlog;
+var pageTrackerRU;
+var pageTrackerCom;
+function startGA(num_tries)
+{
+try{
+pageTrackerBlog2 = _gat._getTracker("UA-86813615-3");
+pageTrackerBlog2._setDomainName("typepad.com");
+pageTrackerBlog2._initData();
+pageTrackerBlog2._trackPageview();
+
+pageTrackerBlog = _gat._getTracker("UA-4460969-18");
+pageTrackerBlog._setDomainName("typepad.com");
+pageTrackerBlog._initData();
+pageTrackerBlog._trackPageview();
+
+pageTrackerRU = _gat._getTracker("UA-4460969-1");
+//pageTrackerRU._setDomainName("none");
+pageTrackerRU._initData();
+pageTrackerRU._trackPageview();
+
+pageTrackerCom = _gat._getTracker("UA-2967772-45");
+//pageTrackerCom._setDomainName("none");
+pageTrackerCom._initData();
+pageTrackerCom._trackPageview();
+
+} catch(err)
+{
+window.status = err;
+if (num_tries < 10) {
+  setTimeout('startGA(' + (num_tries+1) + ');', 500);
+}
+}
+}
+startGA(1);
+</script> 
+              <!--Google Analytics CODE--> 
+              <!-- SiteCatalyst code version: H.15.1.
+Copyright 1997-2008 Omniture, Inc. More info available at http://www.omniture.com --> 
+              <script type="text/javascript">
+wa = new Object;
+</script> 
+              <script language="JavaScript" type="text/javascript" src="http://images.autodesk.com/metrics/s_code_bcd.js"></script> 
+              <script language="JavaScript" type="text/javascript">
+/*
+* SiteCatalyst variables can be valued below; for testing, let's use these values...
+*/
+wa.pathMain=location.pathname;
+wa.pageNameLocal=document.title;
+/************* DO NOT ALTER ANYTHING BELOW THIS LINE ! **************/
+var s_code=s.t();if(s_code)document.write(s_code);</script> 
+              <!-- End SiteCatalyst code version: H.15.1. -->
+             </div></li> 
+           </ul> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+    <!-- row --> 
+    <!-- container-footer --> 
+    <div id="footer"> 
+     <div class="row well">
+      <div class="col-md-12"> 
+       <div id="footer-inner"> 
+        <ul class="footer-list pkg list-inline"> 
+         <li class="last-footer-list-item footer-list-item"><a href="http://autodesk.com/">Autodesk</a></li> 
+        </ul> 
+       </div> 
+      </div>
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <!-- Bootstrap core JavaScript
+    ================================================== --> 
+  <script src="/.shared/themes/common/bootstrap/js/bootstrap.min.js"></script> 
+  <script type="text/javascript">
+     function autocollapse() {
+        var navbar = jQuery('#autocollapse'); navbar.removeClass('collapsed');
+            if(navbar.innerHeight() > 50) {
+               navbar.addClass('collapsed');
+               $('.navbar button').css("visibility","visible");
+             }
+     }
+autocollapse();
+
+   $('.navbar-inner').addClass('navbar-inner-center');
+
+$('.navbar-nav,.navbar-header').fadeIn('slow');
+jQuery(window).on('resize', autocollapse);
+</script> 
+  <script type="text/javascript">
+function resizebanner() {
+     var $div = $('#banner');
+     bg = $div.css('background-image');
+       if (bg) {
+         var src = bg.replace(/(^url\()|(\)$|[\"\'])/g, '');
+           $img = $('<img>').attr('src', src).on('load', function() {
+              var img = new Image;
+              img.src = src;
+              var imgW = img.width;
+              var imgH = img.height;             
+              var newW = $('#banner').width();
+              var newH = imgH / imgW * newW;
+       $('#banner').height(newH);
+       $('#banner').css('visibility', 'visible');
+      });//end when loaded
+  }//end if bg
+}//end 
+    (function($) {
+       $(document).on('ready', resizebanner);
+       $(window).on('resize', resizebanner);
+    })(jQuery);
+</script> 
+  <script type="text/javascript">
+<!--
+var extra_happy = Math.floor(1000000000 * Math.random());
+document.write('<img src="http://www.typepad.com/t/stats?blog_id=368405&amp;user_id=876965&amp;page=' + escape(location.href) + '&amp;referrer=' + escape(document.referrer) + '&amp;i=' + extra_happy + '" width="1" height="1" alt="" style="position: absolute; top: 0; left: 0;" />');
+// -->
+</script> 
+  <!-- Start Quantcast tag --> 
+  <script type="text/javascript" src="http://edge.quantserve.com/quant.js"></script> 
+  <script type="text/javascript">_qoptions = { tags:"typepad.core" }; _qacct="p-fcYWUmj5YbYKM"; quantserve();</script> 
+  <noscript> 
+   <a href="http://www.quantcast.com/p-fcYWUmj5YbYKM" target="_blank"><img src="http://pixel.quantserve.com/pixel/p-fcYWUmj5YbYKM.gif?tags=typepad.core" style="display: none" border="0" height="1" width="1" alt="Quantcast"></a> 
+  </noscript> 
+  <!-- End Quantcast tag --> 
+  <script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script> 
+  <script type="text/javascript">
+var captchaImgAttempts = 0;
+var allowAnonComments = '0';
+var registrationRequired = 0;
+var registrationOptional = 1;
+var emailRequired = 0;
+var useAvatars = 1;
+
+var showSignInMessaging = 0;
+var jsonURL = "/.services/json-rpc";
+
+var captchaSrc = "/.services/captcha?code_encrypted=";
+var alertCommentCannotBeBlank = "You can not leave an empty comment. Please enter some text in the Comment field.";
+var alertEditingExpired = "Sorry, you're no longer allowed to edit this comment. You may have taken too much time before submitting your edit or someone may have already replied to it.";
+
+var alertAuthorCannotBeBlank = "Name must not be blank.";
+var alertEmailCannotBeBlank = "Email Address must not be blank.";
+var alertAuthorAndEmailCannotBeBlank = "Name and email address are both required!";
+var alertEmailIsInvalid = "The Email Address you entered is invalid. Please enter a valid email address.";
+var alertUnauthorizedAction = "The comments on this post are closed.";
+var msgPostReplyTo = "Reply to ";  
+var msgInReplyTo = "In reply to ";
+var msgPostAComment = "Post a comment ";
+var atpCommentsPath = "/.shared/js/atpcomments_yui.js?v=5";
+var hasChanged = 0;
+var hostName = ".typepad.com";
+var tp_comment_token = "1507051803-17b980fa2b3922012b4fbe7490d0052eeb310b5d:Civs23RjZGhnCsgz";
+
+var use_recaptcha = 1;
+var recaptcha_publickey = "6Ldg1s4SAAAAAEvvZX2ILFkWp7KB-jjdL4v0JV2e";
+var isPage = 0;
+var blog_xid = "6a00d83452464869e200d83452baa169e2";
+var xid = "";
+var injectCode = '<div id=\"comment-preview\" class=\"hiddenBox\">\n\t<h3 id=\"header-verify-comment\" class=\"comments-header font-entryheader  hiddenBox\">Verify your Comment<\/h3>\n    <h3 id=\"header-preview-comment\" class=\"comments-header font-entryheader  hiddenBox\">Previewing your Comment<\/h3>\n\t<div class=\"comments-content font-entrybody\">\n\t\t<div class=\"comment comment-has-avatar\">\n\t\t\t<div id=\"comment-preview-content\" class=\"comment-content\">\n\t\t\t<\/div>\n\t\t\t<p class=\"comment-footer\">\n\t\t\t\tPosted by: \n\t\t\t\t<span id=\"comment-preview-author\"><\/span>&nbsp;|&nbsp;<span id=\"comment-preview-datetime\"><\/span>\n\t\t\t<\/p>\n\t\t<\/div>\n\t<\/div>\n<\/div>\n<div id=\"comment-preview-confirmation\" class=\"font-entrybody hiddenBox yellowBox\">\n    <p>This is only a preview. Your comment has not yet been posted.<\/p>\n        <form id=\"comment-preview-form\"\n                method=\"post\"\n                onsubmit=\"atpComments.interceptPost(1); return false;\">\n                <input type=\"submit\" class=\"form-control font-entrybody\" name=\"post\" id=\"comment-confirm-post\" value=\"&nbsp;Post&nbsp;\" onclick=\"atpComments.interceptPost(1); return false;\"/>\n                <input type=\"submit\" class=\"form-control font-entrybody\"  name=\"edit\" id=\"comment-edit\" value=\"&nbsp;&nbsp;Edit&nbsp;&nbsp;\" onclick=\"atpComments.previewOnly(2); return false;\"/>\n        <span id=\"previewFormSpinner\" class=\"hiddenBox\"><img src=\"/.shared/images/spinner.gif\" alt=\"Working...\" /><\/span>\n        <\/form>\n<\/div>\n\n<div id=\"comment-error\" class=\"hiddenBox font-entrybody redBox\">\t    \n   Your comment could not be posted. Error type: <span id=\"comment-error-msg\"><\/span> \n<\/div>\t\n<div id=\"comment-complete\" class=\"hiddenBox font-entrybody  yellowGreenBox\">\n    Your comment has been posted. <a href=\"javascript:void 0;\" onclick=\"window.location.hash=\'#comment-form\';window.location.reload(false)\">Post another comment<\/a>\n<\/div>\t\n<div id=\"comment-captcha\" class=\"hiddenBox yellowBox font-entrybody\">\t\n    <div id=\"captchaText\">\n\t    <p id=\"captchaFailMsg\" class=\"captchaErrorText hiddenBox\">The letters and numbers you entered did not match the image. Please try again.<\/p>\t    \t        \n\t    <p>As a final step before posting your comment, enter the letters and numbers you see in the image below. This prevents automated programs from posting comments.<\/p>\n\t    <p><span id=\"comment-captcha-viewalt\">Having trouble reading this image? <a href=\"#comment-captcha\" onClick=\"atpComments.generateReCaptcha();\">View an alternate.<\/a><\/span><\/p>\n    <\/div>\n    <form id=\"comment-captcha-form\" \n\t\t  method=\"post\"\n\t\t  onsubmit=\"atpComments.submitWithReCaptcha(); return false;\">\n    <div id=\"recaptcha_content\">\n      <noscript>\n        <iframe src=\"6Ldg1s4SAAAAAEvvZX2ILFkWp7KB-jjdL4v0JV2e\" height=\"300\" width=\"500\" frameborder=\"0\"><\/iframe><br />\n        <textarea name=\"recaptcha_challenge_field\" rows=\"3\" cols=\"40\"><\/textarea>\n        <input type=\'hidden\' name=\'recaptcha_response_field\' value=\'manual_challenge\' />\n      <\/noscript>\n    <\/div>\n  <script type=\"text/javascript\">\n    $(document).ready(function() {\n        Recaptcha.create(\"6Ldg1s4SAAAAAEvvZX2ILFkWp7KB-jjdL4v0JV2e\",\n                         \"recaptcha_content\", {\n                             theme: \"red\",\n                             callback: Recaptcha.focus_response_field\n        });\n    });\n  <\/script>\n        <p>\n            <input type=\"submit\" name=\"continue\" id=\"captcha-continue\" value=\"&nbsp;Continue&nbsp;\" />\n            <span id=\"captchaFormSpinner\" class=\"commentSpinner hiddenBox\"><img src=\"/.shared/images/spinner.gif\" alt=\"Working...\" /><\/span>\n        <\/p>\n    <\/form>\n<\/div>\n'; 
+var entryPermalink = "http://through-the-interface.typepad.com/through_the_interface/2016/07/adding-voice-commands-and-spatial-mapping-to-our-unity-model-in-hololens.html";
+var inlineReply = document.createElement("div");
+var commentFooterLinks;
+var commentHeader;
+var commentReplyXID;
+var commentReplyAuthor;
+var commentReplyComplete;
+var inlineReplyLoaded = 0;
+var commentFormNum = undefined; /* Deprecated but still exists in advanced template sets, so must be defined */
+
+function xidToCommentPermalink (entryUrl, xid) {
+    return entryUrl + "?cid=" + xid + "#comment-" + xid;
+}
+
+
+/* Deprecated advanced template functions */
+function handleSubmit() { return true; };
+function handleChange() { return true; };
+</script> 
+  <script type="text/javascript" src="/.shared/js/yui/yuiloader-beta-min.js"></script> 
+  <script type="text/javascript" src="/.shared/js/atpcomments.js?v=5"></script> 
+  <!-- Begin comScore Tag --> 
+  <script>
+document.write(unescape("%3Cscript src='" + (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js'%3E%3C/script%3E"));
+</script> 
+  <script>
+COMSCORE.beacon({
+  c1: 2,
+  c2: "6035669",
+  c3: "",
+  c4: "http://through-the-interface.typepad.com/through_the_interface/2016/07/adding-voice-commands-and-spatial-mapping-to-our-unity-model-in-hololens.html",
+  c5: "",
+  c6: "",
+  c15: ""
+});
+</script> 
+  <noscript> 
+   <img src="http://b.scorecardresearch.com/b?c1=2&amp;c2=6035669&amp;c3=&amp;c4=http%3A%2F%2Fthrough-the-interface.typepad.com%2Fthrough_the_interface%2F2016%2F07%2Fadding-voice-commands-and-spatial-mapping-to-our-unity-model-in-hololens.html&amp;c5=&amp;c6=&amp;c15=&amp;cv=1.3&amp;cj=1" style="display:none" width="0" height="0" alt=""> 
+  </noscript> 
+  <!-- End comScore Tag --> 
+  <!-- Begin disqus Tag --> 
+  <script type="text/javascript">
+/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+var disqus_shortname = 'ttif'; // required
+
+/* * * DON'T EDIT BELOW THIS LINE * * */
+(function () {
+var s = document.createElement('script'); s.async = true;
+s.type = 'text/javascript';
+s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+(document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());
+</script> 
+  <!-- End disqus Tag -->   
+  <!-- ph=1 --> 
+ </body>
+</html>

@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>Android - using BroadcastReceiver to receive message in Activity</title> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="pingback" href="http://inchoo.net/xmlrpc.php"> 
+  <link rel="shortcut icon" href="http://inchoo.net/wp-content/themes/inchoo4/favicon.ico"> 
+  <link rel="apple-touch-icon" href="http://inchoo.net/wp-content/themes/inchoo4/apple-touch-icon.png"> 
+  <!-- This site is optimized with the Yoast SEO plugin v4.1 - https://yoast.com/wordpress/plugins/seo/ --> 
+  <link rel="canonical" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/"> 
+  <link rel="publisher" href="https://plus.google.com/u/1/+InchooNet/posts"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="Android - using BroadcastReceiver to receive message in Activity"> 
+  <meta property="og:description" content="Let’s play a little with BroadcastReceiver: we will try to send a message from Android service we made to Activity and log that message. Let’s use our Android service tutorial project from one of my earlier articles. First of all we need to define private variable in our Activity: //... &nbsp; public class AndroidservicetutorialActivity extends..."> 
+  <meta property="og:url" content="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/"> 
+  <meta property="og:site_name" content="Inchoo"> 
+  <meta property="article:publisher" content="https://www.facebook.com/inchoo"> 
+  <meta property="article:tag" content="Activity"> 
+  <meta property="article:tag" content="Android"> 
+  <meta property="article:tag" content="BroadcastReceiver"> 
+  <meta property="article:tag" content="mobile"> 
+  <meta property="article:tag" content="Mobile development"> 
+  <meta property="article:tag" content="Service"> 
+  <meta property="article:section" content="Android development"> 
+  <meta property="article:published_time" content="2012-02-10T11:09:41+00:00"> 
+  <meta property="article:modified_time" content="2012-02-11T19:33:37+00:00"> 
+  <meta property="og:updated_time" content="2012-02-11T19:33:37+00:00"> 
+  <meta property="og:image" content="http://inchoo.net/wp-content/uploads/2012/01/Broadcasr_recv.jpg"> 
+  <meta property="og:image:width" content="609"> 
+  <meta property="og:image:height" content="241"> 
+  <!-- / Yoast SEO plugin. --> 
+  <link rel="dns-prefetch" href="//fonts.googleapis.com"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="Inchoo » Feed" href="http://inchoo.net/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Inchoo » Android – using Broadcast receiver from Activity Comments Feed" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/feed/"> 
+  <link rel="stylesheet" id="reschoo-fonts-css" href="//fonts.googleapis.com/css?family=Open+Sans%3A300%2C400%2C600%2C700%2C800" type="text/css" media="all"> 
+  <link rel="stylesheet" id="reschoo-style-css" href="http://inchoo.net/wp-content/themes/inchoo4/css/style.css?ver=1506945162" type="text/css" media="all"> 
+  <link rel="https://api.w.org/" href="http://inchoo.net/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://inchoo.net/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://inchoo.net/wp-includes/wlwmanifest.xml"> 
+  <link rel="shortlink" href="http://inchoo.net/?p=12312"> 
+  <link rel="alternate" type="application/json+oembed" href="http://inchoo.net/wp-json/oembed/1.0/embed?url=http%3A%2F%2Finchoo.net%2Fdev-talk%2Fandroid-development%2Fbroadcast-receiver-from-activity%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="http://inchoo.net/wp-json/oembed/1.0/embed?url=http%3A%2F%2Finchoo.net%2Fdev-talk%2Fandroid-development%2Fbroadcast-receiver-from-activity%2F&amp;format=xml"> 
+  <!-- Hotjar Tracking Code for http://inchoo.net/ --> 
+  <script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:322650,hjsv:5};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+ </head> 
+ <body class="post-template-default single single-post postid-12312 single-format-standard"> 
+  <!-- Google Tag Manager --> 
+  <script>dataLayer=[{"pageType":"article","Name":"Android \u2013 using Broadcast receiver from Activity","authName":"Darko Goles","commNum":"15"}];</script> 
+  <noscript>
+   <iframe src="//www.googletagmanager.com/ns.html?id=GTM-NDCZ4S" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript> 
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NDCZ4S');</script> 
+  <!-- End Google Tag Manager --> 
+  <div class="site-header__cont"> 
+   <header id="header" class="site-header" role="banner"> 
+    <div class="site-title"> 
+     <a class="home-link" href="http://inchoo.net/" title="Inchoo" rel="home"> Inchoo </a> 
+    </div> 
+    <nav id="site-navigation" class="js-menu sliding-menu-content" role="navigation"> 
+     <button type="button" class="js-menu-close icon-cancel"></button> 
+     <ul id="menu-header-menu" class="nav-menu">
+      <li id="menu-item-22972" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-home menu-item-22972"><a href="http://inchoo.net/">Home</a></li> 
+      <li id="menu-item-22971" class="menu-item menu-item-type-post_type menu-item-object-page current_page_parent menu-item-has-children menu-item-22971"><a href="http://inchoo.net/blog/">Blog</a> 
+       <ul class="sub-menu"> 
+        <li id="menu-item-22980" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-22980"><a href="http://inchoo.net/category/magento/">Magento</a></li> 
+        <li id="menu-item-23260" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23260"><a href="http://inchoo.net/category/magento-2/">Magento 2</a></li> 
+        <li id="menu-item-22981" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-22981"><a href="http://inchoo.net/category/ecommerce/">eCommerce Talk</a></li> 
+        <li id="menu-item-22982" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-22982"><a href="http://inchoo.net/category/online-marketing/">Online Marketing</a></li> 
+        <li id="menu-item-22983" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor menu-item-22983"><a href="http://inchoo.net/category/dev-talk/">Dev Talk</a></li> 
+        <li id="menu-item-22984" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-22984"><a href="http://inchoo.net/category/life-at-inchoo/">Life at Inchoo</a></li> 
+       </ul> </li> 
+      <li id="menu-item-22966" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-22966"><a href="http://inchoo.net/work/">Portfolio</a></li> 
+      <li id="menu-item-22967" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-22967"><a href="http://inchoo.net/services/">Services</a></li> 
+      <li id="menu-item-22970" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-22970"><a href="http://inchoo.net/inchoo/">About</a></li> 
+      <li id="menu-item-22968" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-22968"><a href="http://inchoo.net/contact/">Contact</a></li> 
+     </ul> 
+    </nav> 
+    <button type="button" class="js-menu-trigger sliding-menu-button"><i class="icon-menu"></i><span>Menu</span></button> 
+    <button type="button" class="btn--inchoo-green hire-btn" id="hire-button" onclick="location.href='http://inchoo.net/hire-us/'"><i class="icon-mail"></i><span>Hire us</span></button> 
+    <button type="button" id="search-button" class="search-btn"> <span class="search-button-icon"> <span class="search-button-icon-inner"></span> </span> <span class="search-button-text">Search</span> </button> 
+    <div class="js-menu-screen menu-screen"></div> 
+   </header> 
+  </div> 
+  <div class="blog-nav"> 
+   <div class="blog-nav-outter-container"> 
+    <div class="blog-nav-inner-container"> 
+     <ul id="menu-blog-menu" class="blog-menu">
+      <li id="menu-item-23223" class="menu-item menu-item-type-post_type menu-item-object-page current_page_parent menu-item-23223"><a href="http://inchoo.net/blog/">All</a></li> 
+      <li id="menu-item-22973" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-22973"><a href="http://inchoo.net/category/magento/">Magento</a></li> 
+      <li id="menu-item-23259" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23259"><a href="http://inchoo.net/category/magento-2/">Magento 2</a></li> 
+      <li id="menu-item-22974" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-22974"><a href="http://inchoo.net/category/ecommerce/">eCommerce Talk</a></li> 
+      <li id="menu-item-22975" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-22975"><a href="http://inchoo.net/category/online-marketing/">Online Marketing</a></li> 
+      <li id="menu-item-22976" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor menu-item-22976"><a href="http://inchoo.net/category/dev-talk/">Dev Talk</a></li> 
+      <li id="menu-item-22977" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-22977"><a href="http://inchoo.net/category/life-at-inchoo/">Life at Inchoo</a></li> 
+     </ul> 
+    </div> 
+   </div> 
+  </div> 
+  <div id="main"> 
+   <form class="search-form__cont" role="search" method="get" id="searchform-2" action="http://inchoo.net/"> 
+    <input type="search" class="input-text" value="" name="s" placeholder="Search here..." required> 
+   </form> 
+   <div class="js-search-screen search-screen"></div> 
+   <div id="content" role="main" class="full-width"> 
+    <div class="container--small"> 
+     <p id="breadcrumbs"><span xmlns:v="http://rdf.data-vocabulary.org/#"><span typeof="v:Breadcrumb"><a href="http://inchoo.net/" rel="v:url" property="v:title">Home</a> / <span rel="v:child" typeof="v:Breadcrumb"><a href="http://inchoo.net/blog/" rel="v:url" property="v:title">Blog</a> / <span class="breadcrumb_last">Android – using Broadcast receiver from Activity</span></span></span></span></p> 
+    </div> 
+    <article id="post-12312" class="post-12312 post type-post status-publish format-standard has-post-thumbnail hentry category-android-development tag-activity tag-android tag-broadcastreceiver tag-mobile tag-mobile-development tag-service"> 
+     <header class="entry-header"> 
+      <h1 class="entry-title post-title">Android – using Broadcast receiver from Activity</h1> 
+      <div class="entry-meta"> 
+       <span>By: Darko Goles,</span> 
+       <span class="entry-meta__date"> Feb 10, 2012 </span> 
+       <ul class="post-categories"> 
+        <li><a href="http://inchoo.net/category/dev-talk/android-development/" rel="category tag">Android development</a></li>
+       </ul> 
+      </div> 
+     </header> 
+     <div class="entry-thumbnail"> 
+      <img width="609" height="241" src="http://inchoo.net/wp-content/uploads/2012/01/Broadcasr_recv.jpg" class="attachment-full size-full wp-post-image" alt=""> 
+      <span>© ColinBroug@sxc.hu</span> 
+     </div> 
+     <div class="entry-content"> 
+      <div class="share--desktop"> 
+       <ul class="share"> 
+        <li> <a class="btn btn--facebook btn--social" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Finchoo.net%2Fdev-talk%2Fandroid-development%2Fbroadcast-receiver-from-activity%2F" title="Facebook" onclick="javascript:window.open(this.href,'','width=626,height=436,left='+((screen.width-626)/2)+',top=200,resizable=yes,scrollbars=yes');return false;"> <span class="icon-facebook"></span></a> </li> 
+        <li> <a class="btn btn--twitter btn--social" href="https://twitter.com/share?url=http%3A%2F%2Finchoo.net%2Fdev-talk%2Fandroid-development%2Fbroadcast-receiver-from-activity%2F&amp;text=Android+%E2%80%93+using+Broadcast+receiver+from+Activity" title="Twitter" onclick="javascript:window.open(this.href,'','width=550,height=450,left='+((screen.width-550)/2)+',top=200,resizable=yes,scrollbars=yes');return false;"> <span class="icon-twitter"></span></a> </li> 
+        <li> <a class="btn btn--gplus btn--social" href="https://plus.google.com/share?url=http%3A%2F%2Finchoo.net%2Fdev-talk%2Fandroid-development%2Fbroadcast-receiver-from-activity%2F" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"> <span class="icon-google-plus"></span> </a> </li> 
+       </ul> 
+      </div> 
+      <p>Let’s play a little with BroadcastReceiver: we will try to send a message from Android service we made to Activity and log that message.</p> 
+      <p>Let’s use our Android service tutorial project from one of my earlier articles.</p> 
+      <p>First of all we need to define private variable in our Activity:<span id="more-12312"></span></p> 
+      <pre class="ish"><code class="language-php"><span class="co1">//...</span>
+&nbsp;
+<span class="kw2">public</span> <span class="kw2">class</span> AndroidservicetutorialActivity <span class="kw2">extends</span> Activity <span class="br0">{</span>
+&nbsp;
+	<span class="kw2">private</span> BroadcastReceiver mReceiver<span class="sy0">;</span>
+&nbsp;
+<span class="co1">//...</span></code></pre> 
+      <p>Then we override methods onResume() where our broadcast receiver will be registered and also onPause() where will our receiver be unregistered:</p> 
+      <pre class="ish"><code class="language-php"><span class="co1">//AndroidservicetutorialActivity.java</span>
+<span class="co1">//...</span>
+	<span class="sy0">@</span>Override
+	<span class="kw2">protected</span> void onResume<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span>
+		<span class="co1">// TODO Auto-generated method stub</span>
+		super<span class="sy0">.</span>onResume<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+		IntentFilter intentFilter <span class="sy0">=</span> <span class="kw2">new</span> IntentFilter<span class="br0">(</span>
+				<span class="st0">"android.intent.action.MAIN"</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+		mReceiver <span class="sy0">=</span> <span class="kw2">new</span> BroadcastReceiver<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span>
+&nbsp;
+			<span class="sy0">@</span>Override
+			<span class="kw2">public</span> void onReceive<span class="br0">(</span>Context context<span class="sy0">,</span> Intent intent<span class="br0">)</span> <span class="br0">{</span>
+				<span class="co1">//extract our message from intent</span>
+				String msg_for_me <span class="sy0">=</span> intent<span class="sy0">.</span>getStringExtra<span class="br0">(</span><span class="st0">"some_msg"</span><span class="br0">)</span><span class="sy0">;</span>
+				<span class="co1">//log our message value</span>
+				<span class="kw3">Log</span><span class="sy0">.</span>i<span class="br0">(</span><span class="st0">"InchooTutorial"</span><span class="sy0">,</span> msg_for_me<span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+			<span class="br0">}</span>
+		<span class="br0">}</span><span class="sy0">;</span>
+		<span class="co1">//registering our receiver</span>
+		this<span class="sy0">.</span>registerReceiver<span class="br0">(</span>mReceiver<span class="sy0">,</span> intentFilter<span class="br0">)</span><span class="sy0">;</span>
+	<span class="br0">}</span>
+&nbsp;
+	<span class="sy0">@</span>Override
+	<span class="kw2">protected</span> void onPause<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span>
+		<span class="co1">// TODO Auto-generated method stub</span>
+		super<span class="sy0">.</span>onPause<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+		<span class="co1">//unregister our receiver</span>
+		this<span class="sy0">.</span>unregisterReceiver<span class="br0">(</span>this<span class="sy0">.</span>mReceiver<span class="br0">)</span><span class="sy0">;</span>
+	<span class="br0">}</span>
+<span class="co1">//...</span></code></pre> 
+      <p>Now we can try from our service (onStart) send a broadcast message and we will see what is happening in LogCat window:</p> 
+      <pre class="ish"><code class="language-php"><span class="co1">//firstService.java</span>
+package com<span class="sy0">.</span>inchoo<span class="sy0">.</span>tutorial<span class="sy0">;</span>
+&nbsp;
+import android<span class="sy0">.</span>app<span class="sy0">.</span>Service<span class="sy0">;</span>
+import android<span class="sy0">.</span>content<span class="sy0">.</span>Intent<span class="sy0">;</span>
+import android<span class="sy0">.</span>os<span class="sy0">.</span>IBinder<span class="sy0">;</span>
+import android<span class="sy0">.</span>util<span class="sy0">.</span><span class="kw3">Log</span><span class="sy0">;</span>
+&nbsp;
+<span class="kw2">public</span> <span class="kw2">class</span> FirstService <span class="kw2">extends</span> Service<span class="br0">{</span>
+&nbsp;
+	<span class="kw2">private</span> static String TAG <span class="sy0">=</span> <span class="st0">"Inchoo.net tutorial"</span><span class="sy0">;</span>
+&nbsp;
+	<span class="sy0">@</span>Override
+	<span class="kw2">public</span> IBinder onBind<span class="br0">(</span>Intent arg0<span class="br0">)</span> <span class="br0">{</span>
+		<span class="co1">// TODO Auto-generated method stub</span>
+		<span class="kw1">return</span> <span class="kw4">null</span><span class="sy0">;</span>
+	<span class="br0">}</span>
+&nbsp;
+	<span class="sy0">@</span>Override
+	<span class="kw2">public</span> void onStart<span class="br0">(</span>Intent intent<span class="sy0">,</span> int startId<span class="br0">)</span> <span class="br0">{</span>
+		<span class="co1">// TODO Auto-generated method stub</span>
+		super<span class="sy0">.</span>onStart<span class="br0">(</span>intent<span class="sy0">,</span> startId<span class="br0">)</span><span class="sy0">;</span>
+		<span class="kw3">Log</span><span class="sy0">.</span>d<span class="br0">(</span>TAG<span class="sy0">,</span> <span class="st0">"FirstService started"</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+		Intent i <span class="sy0">=</span> <span class="kw2">new</span> Intent<span class="br0">(</span><span class="st0">"android.intent.action.MAIN"</span><span class="br0">)</span><span class="sy0">.</span>putExtra<span class="br0">(</span><span class="st0">"some_msg"</span><span class="sy0">,</span> <span class="st0">"I will be sent!"</span><span class="br0">)</span><span class="sy0">;</span>
+		this<span class="sy0">.</span>sendBroadcast<span class="br0">(</span>i<span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+		this<span class="sy0">.</span>stopSelf<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+	<span class="br0">}</span>
+&nbsp;
+	<span class="sy0">@</span>Override
+	<span class="kw2">public</span> void onDestroy<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span>
+		<span class="co1">// TODO Auto-generated method stub</span>
+		super<span class="sy0">.</span>onDestroy<span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+		<span class="kw3">Log</span><span class="sy0">.</span>d<span class="br0">(</span>TAG<span class="sy0">,</span> <span class="st0">"FirstService destroyed"</span><span class="br0">)</span><span class="sy0">;</span>
+	<span class="br0">}</span>
+&nbsp;
+<span class="br0">}</span></code></pre> 
+      <p>From our service, we are sending message to our activity, and that can be seen in LogCat:</p> 
+      <p><a href="http://inchoo.net/wp-content/uploads/2012/01/BroadcastReceiver.jpg"><img class="aligncenter size-medium wp-image-12315" title="BroadcastReceiver" src="http://inchoo.net/wp-content/uploads/2012/01/BroadcastReceiver-600x151.jpg" alt="" width="600" height="151"></a></p> 
+     </div> 
+    </article> 
+    <div class="container--small"> 
+     <div class="share--mobile"> 
+      <ul class="share"> 
+       <li> <a class="btn btn--facebook btn--social" href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Finchoo.net%2Fdev-talk%2Fandroid-development%2Fbroadcast-receiver-from-activity%2F" title="Facebook" onclick="javascript:window.open(this.href,'','width=626,height=436,left='+((screen.width-626)/2)+',top=200,resizable=yes,scrollbars=yes');return false;"> <span class="icon-facebook"></span></a> </li> 
+       <li> <a class="btn btn--twitter btn--social" href="https://twitter.com/share?url=http%3A%2F%2Finchoo.net%2Fdev-talk%2Fandroid-development%2Fbroadcast-receiver-from-activity%2F&amp;text=Android+%E2%80%93+using+Broadcast+receiver+from+Activity" title="Twitter" onclick="javascript:window.open(this.href,'','width=550,height=450,left='+((screen.width-550)/2)+',top=200,resizable=yes,scrollbars=yes');return false;"> <span class="icon-twitter"></span></a> </li> 
+       <li> <a class="btn btn--gplus btn--social" href="https://plus.google.com/share?url=http%3A%2F%2Finchoo.net%2Fdev-talk%2Fandroid-development%2Fbroadcast-receiver-from-activity%2F" onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"> <span class="icon-google-plus"></span> </a> </li> 
+      </ul> 
+     </div> 
+    </div> 
+    <div class="container--small"> 
+     <div class="published-in-leave-comment__cont"> 
+      <div class="published-in__cont"> 
+       <span>Published in:</span> 
+       <ul class="post-categories"> 
+        <li><a href="http://inchoo.net/category/dev-talk/android-development/" rel="category tag">Android development</a></li>
+       </ul> 
+      </div> 
+      <a class="leave-comment-btn btn btn--inchoo-green" href="#comments"><span class="icon-comment-square"></span>Leave a comment</a> 
+     </div> 
+    </div> 
+    <div class="container--small"> 
+     <aside data-sideclick="usability-audit" class="widget services-banners usability-audit"> 
+      <a data-sideclick="usability-audit" href="http://inchoo.net/services/usability-audit//" title="Learn More about usability audit"> <span class="center-wrapper"> <h3 class="widget-title first" data-sideclick="usability-audit">Can your <br><strong>online store </strong><br> have better <strong>UX</strong>?</h3> <img data-sideclick="usability-audit" src="http://inchoo.net/wp-content/themes/inchoo4/images/banners/ilustracije_auditi-usability.svg" alt="Usability Audit"> 
+        <div class="center-wrapper-bottom"> 
+         <h3 class="widget-title second" data-sideclick="usability-audit">Let our experts <strong>check it</strong>!</h3> 
+        </div> </span> </a> 
+     </aside> 
+    </div> 
+    <div class="related-posts__outter-cont"> 
+     <div class="container"> 
+      <aside id="relatedpostswidget-3" class="widget related-posts-widget"> 
+       <h3 class="widget-title">You made it all the way down here so you must enjoyed this post! You may also like:</h3> 
+       <ul> 
+        <li> <a href="http://inchoo.net/dev-talk/android-development/android-global-variables/" title="Android global variables"><img width="609" height="240" src="http://inchoo.net/wp-content/uploads/2012/01/global_variables_android.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt=""></a> 
+         <div> 
+          <h3><a href="http://inchoo.net/dev-talk/android-development/android-global-variables/" title="Android global variables">Android global variables</a></h3> 
+          <span class="related_date">Feb 06, 2012</span> 
+         </div> </li> 
+        <li> <a href="http://inchoo.net/dev-talk/android-development/android-simple-service/" title="Android –  creating simple service"><img width="608" height="240" src="http://inchoo.net/wp-content/uploads/2011/08/symfony_service.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt=""></a> 
+         <div> 
+          <h3><a href="http://inchoo.net/dev-talk/android-development/android-simple-service/" title="Android –  creating simple service">Android – creating simple service</a></h3> 
+          <span class="related_date">Feb 01, 2012</span> 
+         </div> </li> 
+        <li> <a href="http://inchoo.net/magento/android-magento-mobile-boilerplate/" title="Android Magento mobile boilerplate"><img width="609" height="258" src="http://inchoo.net/wp-content/uploads/2011/10/Untitled-1.jpg" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt=""></a> 
+         <div> 
+          <h3><a href="http://inchoo.net/magento/android-magento-mobile-boilerplate/" title="Android Magento mobile boilerplate">Android Magento mobile boilerplate</a></h3> 
+          <span class="related_date">Oct 11, 2011</span> 
+         </div> </li> 
+       </ul> 
+      </aside> 
+     </div> 
+    </div> 
+    <div class="container--small"> 
+     <div id="comments" class="comments-area"> 
+      <h3 class="comments-title"> 15 comments </h3> 
+      <ol class="comment-list"> 
+       <li id="comment-433069" class="comment even thread-even depth-1"> 
+        <article id="div-comment-433069" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/e542582a8409923e93df370375b4a7e5?s=48&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/e542582a8409923e93df370375b4a7e5?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">Misty N Scoggin</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-433069"> <time datetime="2016-10-02T21:29:51+00:00"> 02-10-2016 at 21:29 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Is this used for all website</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=433069#respond" onclick="return addComment.moveForm( &quot;div-comment-433069&quot;, &quot;433069&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Misty N Scoggin">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-432028" class="comment odd alt thread-odd thread-alt depth-1"> 
+        <article id="div-comment-432028" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/3ef18a319bffa18705dcdcb183c23b14?s=48&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/3ef18a319bffa18705dcdcb183c23b14?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">MiG-0</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-432028"> <time datetime="2016-03-30T19:43:16+00:00"> 30-03-2016 at 19:43 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>I wish I’d met your Post earlier. Thank you.</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=432028#respond" onclick="return addComment.moveForm( &quot;div-comment-432028&quot;, &quot;432028&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to MiG-0">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-430961" class="comment even thread-even depth-1"> 
+        <article id="div-comment-430961" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/87fc02ec60657bdadb80a43b088a7017?s=48&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/87fc02ec60657bdadb80a43b088a7017?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn"><a href="http://www.androprogrammer.com" rel="external nofollow" class="url">Wasim</a></b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-430961"> <time datetime="2015-10-02T07:30:48+00:00"> 02-10-2015 at 7:30 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>hey<br> can you tell me how i can pass that data to fragment ?<br> i mean i want broadcasted data in fragment for example – i have A activity which hold 2 fragments fragment B &gt; c. so how can i pass data to fragment c ?</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=430961#respond" onclick="return addComment.moveForm( &quot;div-comment-430961&quot;, &quot;430961&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Wasim">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-430665" class="comment odd alt thread-odd thread-alt depth-1"> 
+        <article id="div-comment-430665" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/6a3102607021c94436062f4cf87358ed?s=48&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/6a3102607021c94436062f4cf87358ed?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">Sohaib Khalid</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-430665"> <time datetime="2015-07-30T21:07:56+00:00"> 30-07-2015 at 21:07 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>you made my life easier. Thanksssss dear</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=430665#respond" onclick="return addComment.moveForm( &quot;div-comment-430665&quot;, &quot;430665&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Sohaib Khalid">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-429247" class="comment even thread-even depth-1"> 
+        <article id="div-comment-429247" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/3e1691b0952c15ab9abf9edc0d62d639?s=48&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/3e1691b0952c15ab9abf9edc0d62d639?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">swati</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-429247"> <time datetime="2014-11-17T10:20:13+00:00"> 17-11-2014 at 10:20 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>thanx that vry much hlp me…………………………</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=429247#respond" onclick="return addComment.moveForm( &quot;div-comment-429247&quot;, &quot;429247&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to swati">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-73672" class="comment odd alt thread-odd thread-alt depth-1"> 
+        <article id="div-comment-73672" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/410bdf8b7f9f4ac0300d98a8a4eb0512?s=48&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/410bdf8b7f9f4ac0300d98a8a4eb0512?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">FrankenBel</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-73672"> <time datetime="2014-04-01T03:17:49+00:00"> 01-04-2014 at 3:17 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Thanks! , this tutorial helped me a lot…</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=73672#respond" onclick="return addComment.moveForm( &quot;div-comment-73672&quot;, &quot;73672&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to FrankenBel">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-52233" class="comment even thread-even depth-1"> 
+        <article id="div-comment-52233" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/62e11a8d4b3d8b6a4fa53580f82b21c8?s=48&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/62e11a8d4b3d8b6a4fa53580f82b21c8?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">Meghna</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-52233"> <time datetime="2013-06-11T18:36:30+00:00"> 11-06-2013 at 18:36 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Thanks for the clear explanation Darko… Even this <a href="http://www.compiletimeerror.com/2013/03/android-broadcast-receiver-in-detail.html" rel="nofollow">http://www.compiletimeerror.com/2013/03/android-broadcast-receiver-in-detail.html</a> might help reg Broadcast receiver… Have a look…</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=52233#respond" onclick="return addComment.moveForm( &quot;div-comment-52233&quot;, &quot;52233&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Meghna">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-40091" class="comment odd alt thread-odd thread-alt depth-1"> 
+        <article id="div-comment-40091" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/de8a4afc3e20e834ea72bc64ad1ae879?s=48&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/de8a4afc3e20e834ea72bc64ad1ae879?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">Digvijay</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-40091"> <time datetime="2013-03-11T13:35:53+00:00"> 11-03-2013 at 13:35 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Very good tutorial.Thank you! It saved my day!!.</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=40091#respond" onclick="return addComment.moveForm( &quot;div-comment-40091&quot;, &quot;40091&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Digvijay">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-39068" class="comment even thread-even depth-1"> 
+        <article id="div-comment-39068" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/8de594394cabac6fb949b63a5a411c05?s=48&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/8de594394cabac6fb949b63a5a411c05?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">Sachin</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-39068"> <time datetime="2013-02-12T12:54:42+00:00"> 12-02-2013 at 12:54 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Hi Darko Goles,</p> 
+          <p>Thank you for this… i am trying trying to create an app.. where my broadcast receiver should monitor the network status when the user is on call…and it should notify an error if the network goes out when the user is on the middle of the call… can i follow the same approach???</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=39068#respond" onclick="return addComment.moveForm( &quot;div-comment-39068&quot;, &quot;39068&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Sachin">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-38258" class="comment odd alt thread-odd thread-alt depth-1"> 
+        <article id="div-comment-38258" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/ee4abbe1fb77c042ff8942a4fe7381ec?s=48&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/ee4abbe1fb77c042ff8942a4fe7381ec?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">Akshay</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-38258"> <time datetime="2013-01-23T10:47:58+00:00"> 23-01-2013 at 10:47 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>I got the general idea about Broadcast Receivers from this tutorial. But suppose i want to catch power button click from broadcast receiver, how can i do it? can you please show me an example? (I am a newbie in android programming. Any help would be appreciated).</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=38258#respond" onclick="return addComment.moveForm( &quot;div-comment-38258&quot;, &quot;38258&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Akshay">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-33206" class="comment even thread-even depth-1"> 
+        <article id="div-comment-33206" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/464b8eea26b51b43c7805d84c401d41c?s=48&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/464b8eea26b51b43c7805d84c401d41c?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn"><a href="http://www.makkul.com" rel="external nofollow" class="url">makkul</a></b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-33206"> <time datetime="2012-09-12T11:15:29+00:00"> 12-09-2012 at 11:15 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>thanks for the article. it saves my hours.</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=33206#respond" onclick="return addComment.moveForm( &quot;div-comment-33206&quot;, &quot;33206&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to makkul">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-32835" class="comment odd alt thread-odd thread-alt depth-1"> 
+        <article id="div-comment-32835" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/fca4c30c85c7dc5dac140e7f0801050d?s=48&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/fca4c30c85c7dc5dac140e7f0801050d?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">Andres</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-32835"> <time datetime="2012-08-23T18:23:52+00:00"> 23-08-2012 at 18:23 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>@Darko Goles, thanks for the quick reply. Your tutorial is very well explained. </p> 
+          <p>I was wondering how can you notify an Activity when it is onPause and has previously launched an IntentService waiting for it to finish. </p> 
+          <p>Let’s suppose you update the UI according to a network response made by an IntentService. The Activity launches the IntentService, activity goes to background (onPause is called), IntentService finishes and wants to notify UI. If broadcast receiver is not attached, the activity will not receive the response. For this scenario I have been looking around for a robust solution and came up with these possibilities:<br> – Handle Activity-IntentService communication with StickBroadcast in order for the activity to get the last broadcast sent by the IntentService when it comes to foreground (very hacky solution I think)<br> -Handle Activity-Service communication binding the Activity to the Service and querying the Service to know if it has finished operation (binding makes source code grow up a lot i think and seems way to much effort)<br> – Handle Activity-IntentService communication and operation on a worker Fragment (setting fragment to setRetainInstance(true). I think this approach is the convenient one but comes with too much effort also.</p> 
+          <p>According to your experience, which of these possibilities is the correct one? If none, which one do you prefer to use? Thanks.</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=32835#respond" onclick="return addComment.moveForm( &quot;div-comment-32835&quot;, &quot;32835&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Andres">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-32819" class="comment byuser comment-author-darko-goles bypostauthor even thread-even depth-1"> 
+        <article id="div-comment-32819" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/140b8f037561306d67aa2270c2c3c0c2?s=48&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/140b8f037561306d67aa2270c2c3c0c2?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">Darko Goles</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-32819"> <time datetime="2012-08-23T07:50:58+00:00"> 23-08-2012 at 7:50 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>@Andres, why would Activity receive anything if it is on the Pause?</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=32819#respond" onclick="return addComment.moveForm( &quot;div-comment-32819&quot;, &quot;32819&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Darko Goles">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-32816" class="comment odd alt thread-odd thread-alt depth-1"> 
+        <article id="div-comment-32816" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/fca4c30c85c7dc5dac140e7f0801050d?s=48&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/fca4c30c85c7dc5dac140e7f0801050d?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">Andres</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-32816"> <time datetime="2012-08-23T03:52:45+00:00"> 23-08-2012 at 3:52 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>How can the activity receive the broadcast if it is onPause()? If the service has dispatch a notification that it has stopped working and the Activity is onPause(), how does the activity knows the service status if it has unregistered the receiver? thanks!</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=32816#respond" onclick="return addComment.moveForm( &quot;div-comment-32816&quot;, &quot;32816&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Andres">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-28620" class="comment even thread-even depth-1"> 
+        <article id="div-comment-28620" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/8b9880d1365aab72d2f9ba5371938871?s=48&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/8b9880d1365aab72d2f9ba5371938871?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+           <b class="fn">Leandro</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/#comment-28620"> <time datetime="2012-05-02T23:15:08+00:00"> 02-05-2012 at 23:15 </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Very nice tutorial, thank you!</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://inchoo.net/dev-talk/android-development/broadcast-receiver-from-activity/?replytocom=28620#respond" onclick="return addComment.moveForm( &quot;div-comment-28620&quot;, &quot;28620&quot;, &quot;respond&quot;, &quot;12312&quot; )" aria-label="Reply to Leandro">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+      </ol> 
+      <div id="respond" class="comment-respond"> 
+       <h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/dev-talk/android-development/broadcast-receiver-from-activity/#respond" style="display:none;">Cancel reply</a></small></h3> 
+       <form action="http://inchoo.net/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate> 
+        <p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> Required fields are marked <span class="required">*</span></p>
+        <p class="comment-form-comment"><label for="comment">Comment <span class="required">*</span></label> <textarea id="comment" name="comment" cols="45" rows="8" aria-required="true"></textarea></p>
+        <p class="form-allowed-tags">You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: <code>&lt;a href="" title=""&gt; &lt;blockquote cite=""&gt; &lt;code&gt; &lt;del datetime=""&gt; &lt;em&gt; &lt;s&gt; &lt;strike&gt; &lt;strong&gt;</code>. You may use following syntax for source code: <code>&lt;pre&gt;&lt;code&gt;$current = "Inchoo";&lt;/code&gt;&lt;/pre&gt;</code>.</p>
+        <p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" aria-required="true"></p> 
+        <p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="email" value="" size="30" aria-required="true"></p> 
+        <p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="text" value="" size="30"></p> 
+        <p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="12312" id="comment_post_ID"> <input type="hidden" name="comment_parent" id="comment_parent" value="0"> </p>
+        <p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="31defab77c"></p> 
+        <input type="text" id="comment_track_1" name="comment_track_1" value="" autocomplete="off"> 
+        <p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="48"></p> 
+       </form> 
+      </div>
+      <!-- #respond --> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <footer id="footer"> 
+   <div class="container"> 
+    <div class="footer-item"> 
+     <div class="small-headline">
+      Blog categories
+     </div> 
+     <ul id="menu-footer-menu" class="menu">
+      <li id="menu-item-23018" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23018"><a href="http://inchoo.net/category/magento/">Magento</a></li> 
+      <li id="menu-item-23256" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23256"><a href="http://inchoo.net/category/magento-2/">Magento 2</a></li> 
+      <li id="menu-item-23019" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23019"><a href="http://inchoo.net/category/ecommerce/">eCommerce Talk</a></li> 
+      <li id="menu-item-23020" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23020"><a href="http://inchoo.net/category/online-marketing/">Online Marketing</a></li> 
+      <li id="menu-item-23021" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor menu-item-23021"><a href="http://inchoo.net/category/dev-talk/">Dev Talk</a></li> 
+      <li id="menu-item-23022" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-23022"><a href="http://inchoo.net/category/life-at-inchoo/">Life at Inchoo</a></li> 
+     </ul> 
+    </div> 
+    <hr> 
+    <div class="footer-item"> 
+     <div class="small-headline">
+      Connect With Us
+     </div> 
+     <ul class="social-list"> 
+      <li><a href="https://www.facebook.com/inchoo" title="Find us on Facebook" target="_blank">Facebook</a></li> 
+      <li><a href="https://twitter.com/inchoo" title="Follow us on Twitter" target="_blank">Twitter</a></li> 
+      <li><a href="https://plus.google.com/+InchooNet" title="Connect with us on Google+" target="_blank">Google+</a></li> 
+      <li><a href="https://www.linkedin.com/company/638004" title="Find us on LinkedIn" target="_blank">LinkedIn</a></li> 
+      <li class="featured"><a href="https://www.instagram.com/inchoonet/" title="Find us on Instagram" target="_blank">Instagram</a></li> 
+     </ul> 
+    </div> 
+    <hr> 
+    <div class="newsletter"> 
+     <div class="small-headline">
+      Newsletter
+     </div> 
+     <p>Sign up for our newsletter to get your dose of useful eCommerce, Magento and Inchoo news and events.</p> 
+     <form id="newsletter-form" action="//inchoo.us1.list-manage.com/subscribe/post?u=3c0b1b4a2f5d229e8799c3adf&amp;id=737d34b030" method="post" target="_blank"> 
+      <input type="email" name="EMAIL" id="newsletter-email" placeholder="Enter email to subscribe" required> 
+      <div style="position:absolute; left:-5000px;">
+       <input type="text" name="b_3c0b1b4a2f5d229e8799c3adf_737d34b030" value="">
+      </div> 
+      <button type="submit" id="newsletter-submit" class="btn--inchoo-green"><i class="icon-mail"></i></button> 
+     </form> 
+    </div> 
+    <a class="back-to-top" href="#header"><i class="icon-back-top"></i></a> 
+    <div class="copyright">
+      2017 © Inchoo. All rights reserved. 
+    </div> 
+   </div> 
+  </footer> 
+  <script type="text/javascript" src="http://inchoo.net/wp-content/plugins/akismet/_inc/form.js?ver=3.2"></script> 
+  <link rel="stylesheet" id="ish-css" href="http://inchoo.net/wp-content/themes/inchoo4/css/ish.css?ver=4.8.1" type="text/css" media="all"> 
+  <script type="text/javascript" src="http://inchoo.net/wp-content/themes/inchoo4/js/modernizr.custom.16175.js?ver=2.8.3"></script> 
+  <script type="text/javascript" src="http://inchoo.net/wp-content/themes/inchoo4/js/jquery-2.1.1.min.js?ver=2.1.1"></script> 
+  <script type="text/javascript" src="http://inchoo.net/wp-content/themes/inchoo4/js/functions.js?ver=1.0"></script> 
+  <script type="text/javascript" src="http://inchoo.net/wp-content/themes/inchoo4/js/bourbon-modal.js?ver=1.0"></script> 
+  <script type="text/javascript" src="http://inchoo.net/wp-includes/js/wp-embed.min.js?ver=4.8.1"></script> 
+  <script type="text/javascript" src="http://inchoo.net/wp-content/themes/inchoo4/js/image-comparison-slider.js?ver=1.0"></script> 
+  <script>
+(function($) {
+	$('#comment_track_1').hide().clone().attr({ name:'comment_'+'track_'+(3-1), value:'42', id:''}).insertAfter('#comment_track_1');
+})(jQuery);
+</script> 
+  <script>
+(function($) {
+	$('#commentform').removeAttr('novalidate').find('*[aria-required=true]').attr('required','');
+})(jQuery);
+</script> 
+  <script>function lc_get_cookie(name) {var c = document.cookie;if (c.indexOf(name) != -1) {var x = c.indexOf(name)+name.length+1;var y = c.indexOf(";",x);if (y < 0) y = c.length;return decodeURIComponent(c.substring(x,y));} else return "";}if ((d = document.getElementById("commentform")) != null) { e = d.elements;var z = lc_get_cookie("comment_author_email_8c01a85652a56fcea7ac9bf2ddea8890");if (z != "") e["email"].value = z;z = lc_get_cookie("comment_author_8c01a85652a56fcea7ac9bf2ddea8890");if (z != "") e["author"].value = z.replace(/\+/g, " ");z = lc_get_cookie("comment_author_url_8c01a85652a56fcea7ac9bf2ddea8890");if (z != "") e["url"].value = z;}</script>
+  <!-- hyper cache 2017-10-03 03:09:45 -->
+ </body>
+</html>

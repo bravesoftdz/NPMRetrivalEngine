@@ -1,0 +1,651 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+ <head> 
+  <title>Speech JavaScript API Specification</title> 
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type"> 
+  <style type="text/css">
+   dt, dfn { font-weight: bold; font-style: normal; }
+   img.extra { float: right; }
+   body ins, body del { display: block; }
+   body * ins, body * del { display: inline; }
+   pre, code { color: black; background: transparent; font-size: inherit; font-family: monospace; }
+   pre strong { color: black; font: inherit; font-weight: bold; background: yellow; }
+   pre em { font-weight: bolder; font-style: normal; }
+   pre.idl :link, pre.idl :visited { color: inherit; background: transparent; }
+   pre.idl { border: solid thin; background: #EEEEEE; color: black; padding: 0.5em; }
+   table { border-collapse: collapse; border-style: hidden hidden none hidden; }
+   table thead { border-bottom: solid; }
+   table tbody th:first-child { border-left: solid; }
+   table td, table th { border-left: solid; border-right: solid; border-bottom: solid thin; vertical-align: top; padding: 0.2em; }
+   ul.toc dfn, h1 dfn, h2 dfn, h3 dfn, h4 dfn, h5 dfn, h6 dfn { font: inherit; }
+   ul.toc li ul { margin-bottom: 0.75em; }
+   ul.toc li ul li ul { margin-bottom: 0.25em; }
+   var sub { vertical-align: bottom; font-size: smaller; position: relative; top: 0.1em; }
+   @media screen { code { color: rgb(255, 69, 0); background: transparent; } }
+   .example { display: block; color: #222222; background: #FCFCFC; border-left: double; margin-left: 1em; padding-left: 1em; }
+   .issue, .big-issue { color: #E50000; background: white; border: solid red; padding: 0.5em; margin: 1em 0; }
+   .issue > :first-child, .big-issue > :first-child { margin-top: 0; }
+   p .big-issue { line-height: 3em; }
+   .note { color: green; background: transparent; }
+   .note { font-family: sans-serif; }
+   p.note:before { content: 'Note: '; }
+   .warning { color: red; background: transparent; }
+   .warning:before { font-style: normal; }
+   p.warning:before { content: '\26A0 Warning! '; }
+   .note, .warning { font-weight: bolder; font-style: italic; padding: 0.5em 2em; }
+   .copyright { margin: 0.25em 0; }
+   img { max-width: 100%; }
+   h4 + .element { margin-top: -2.5em; padding-top: 2em; }
+   h4 + p + .element { margin-top: -5em; padding-top: 4em; }
+   .element { background: #EEEEFF; color: black; margin: 0 0 1em -1em; padding: 0 1em 0.25em 0.75em; border-left: solid #9999FF 0.25em; }
+   table.matrix, table.matrix td { border: none; text-align: right; }
+   table.matrix { margin-left: 2em; }
+  </style> 
+  <style type="text/css">
+.nt, pre, .terminal, code, .prop, .esstring, .javavalue, .idlident, .idlstring, .xattr, .regex, .prod-number, .prod-lines, .prod-mid {
+  font-size: 14px;
+}
+pre code, .prod-lines .nt {
+  font-size: 14px !important;
+}
+.terminal, idl-code, html-code, .prop, .esstring, .javavalue, .idlident, .idlstring, .example, .note, blockquote {
+  background: #d9e8ff;
+}
+td code {
+  background: inherit;
+}
+.example blockquote {
+  background: #f0f6ff;
+}
+table.grammar {
+  background: #eee;
+}
+.ednote {
+  border-top: 3px solid red;
+  border-bottom: 3px solid red;
+  margin: 1em 2em;
+  padding: 0 1em 0 1em;
+  background: #f8eeee;
+}
+.ednoteHeader {
+  font-weight: bold;
+  display: block;
+  padding-top: 0.5em;
+}
+.terminal, code, .prop, .esstring, .javavalue, .idlident, .idlstring, .input {
+  font-family: /*Consolas, Monaco,*/ monospace !important;
+}
+pre.code code {
+  background: inherit;
+}
+.propattrset {
+}
+/*.prop {
+  font-family: Consolas, Monaco, monospace;
+}*/
+
+.xattr {
+  font-family: /*Consolas, Monaco,*/ monospace;
+}
+
+table { border-collapse:collapse; border-style:hidden hidden none hidden }
+table thead { border-bottom:solid }
+table tbody th:first-child { border-left:solid }
+table td, table th { border-left:solid; border-right:solid; border-bottom:solid thin; vertical-align:top; padding:0.2em }
+
+.nt, .prod-lines {
+  font-family: /*Consolas, Monaco,*/ monospace;
+  white-space: nowrap;
+}
+.idltype, .idlvalue {
+  font-weight: bold;
+}
+.idlop {
+  font-weight: bold;
+}
+.esvalue, .estype {
+  font-weight: bold;
+}
+.javatype, .javapkg {
+  font-weight: bold;
+}
+.regex {
+  font-family: /*Consolas, Monaco,*/ monospace;
+  white-space: nowrap;
+}
+.typevar {
+  font-style: italic;
+}
+.example, .note {
+  border-top: 3px solid #005a9c;
+  border-bottom: 3px solid #005a9c;
+  margin: 1em 2em;
+  padding: 0 1em 0 1em;
+}
+.exampleHeader, .noteHeader {
+  font-weight: bold;
+  display: block;
+  color: #005a9c;
+  color: black;
+  padding-top: 0.5em;
+}
+pre {
+  overflow: auto;
+  margin: 0;
+  font-family: /*Consolas, Monaco,*/ monospace;
+}
+pre.code {
+  padding: 0 1em;
+  margin: 0;
+  margin-bottom: 1em;
+}
+.block {
+  border: 1px solid #90b8de;
+  border-left: 3px double #90b8de;
+  border-left: none;
+  border-right: none;
+  background: #f0f6ff;
+  margin: 2em;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding: 0 0.5em;
+  padding-bottom: 0.5em;
+}
+.blockTitleDiv {
+  text-align: left;
+}
+.blockTitle {
+  position: relative;
+  top: -0.75em;
+  left: -1.5em;
+  /*border: 1px solid #90b8de;
+  border-left: none;
+  border-right: none;*/
+  background: #90b8de;
+  color: white;
+  padding: 0.25em 1em 0.25em 1em;
+  font-weight: bold;
+  font-size: 80%;
+}
+dfn {
+  font-weight: bold;
+  font-style: italic;
+}
+.dfnref {
+}
+.norm {
+  font-style: italic;
+}
+.rfc2119 {
+  text-transform: lowercase;
+  font-variant: small-caps;
+}
+dfn var {
+  font-style: normal;
+}
+blockquote {
+  padding: 1px 1em;
+  margin-left: 2em;
+  margin-right: 2em;
+}
+a.placeholder {
+  color: #00e;
+}
+dl.changes > dd {
+  margin-left: 0;
+}
+dd > :first-child {
+  margin-top: 0;
+}
+caption {
+  caption-side: bottom;
+  margin-top: 1em;
+  font-weight: bold;
+}
+body {
+  line-height: 1.3;
+}
+@media print {
+  .section-link {
+    display: none;
+  }
+}
+.section-link {
+  visibility: hidden;
+  width: 1px;
+  height: 1px;
+  overflow: visible;
+  font-size: 10pt;
+  font-style: normal;
+}
+.section-link a {
+  color: #666;
+  font-weight: bold;
+  text-decoration: none;
+}
+.section-link a:hover {
+  color: #c00;
+}
+.section > *:hover > .section-link {
+  visibility: visible;
+}
+div.set {
+  margin-left: 3em;
+  text-indent: -1em;
+}
+ol.algorithm ol {
+  border-left: 1px solid #90b8de;
+  margin-left: 1em;
+}
+dl.switch > dd > ol.only {
+  margin-left: 0;
+}
+dl.switch {
+  padding-left: 2em;
+}
+dl.switch > dt {
+  text-indent: -1.5em;
+  margin-top: 1em;
+}
+dl.switch > dt + dt {
+  margin-top: 0;
+}
+dl.switch > dt:before {
+  content: '\21AA';
+  padding: 0 0.5em 0 0;
+  display: inline-block;
+  width: 1em;
+  text-align: right;
+  line-height: 0.5em;
+}
+.diagram {
+  text-align: center;
+}
+iframe {
+  border: 0;
+}
+/*.ignore {
+  opacity: 0.5;
+}*/
+.comment {
+  color: #005a9c;
+}
+
+.matrix {
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+}
+.matrix th {
+  background: #d9e8ff;
+  text-align: right;
+}
+.matrix td, .matrix th {
+  border: 1px solid #90b8de;
+  padding: 4px;
+}
+.matrix th.corner {
+  border: 0;
+  background: none;
+}
+.matrix td {
+  text-align: center;
+  background: #f0f6ff;
+}
+.matrix .belowdiagonal {
+  background: #ddd;
+}
+
+ul.notes { font-size: 90%; padding-left: 0 }
+ul.notes li { list-style-type: none }
+ul.notes .note-link { vertical-align: super }
+.note-link { font-size: 90% }
+
+.code var { color: #f44; }
+
+/* For dfn.js */
+body.dfnEnabled dfn { cursor: pointer; }
+.dfnPanel {
+  display: inline;
+  position: absolute;
+  height: auto;
+  width: auto;
+  padding: 0.5em 0.75em;
+  font: small sans-serif;
+  background: #DDDDDD;
+  color: black;
+  border: outset 0.2em;
+  cursor: default;
+}
+.dfnPanel * { margin: 0; padding: 0; font: inherit; text-indent: 0; }
+.dfnPanel :link, .dfnPanel :visited { color: black; }
+.dfnPanel p { font-weight: bolder; }
+.dfnPanel li { list-style-position: inside; }
+
+   .brief { margin-top: 1em; margin-bottom: 1em; line-height: 1.1; }
+   .brief li { margin: 0; padding: 0; }
+   .brief li p { margin: 0; padding: 0; }
+
+   .category-list { margin-top: -0.75em; margin-bottom: 1em; line-height: 1.5; }
+/*   .category-list::before { content: '\21D2\A0'; font-size: 1.2em; font-weight: 900; }*/
+   .category-list li { display: inline; }
+/*   .category-list li:not(:last-child)::after { content: ', '; }*/
+   .category-list li > span, .category-list li > a { text-transform: lowercase; }
+   .category-list li * { text-transform: none; } /* don't affect <code> nested in <a> */
+  </style> 
+  <link href="http://www.w3.org/StyleSheets/TR/w3c-unofficial.css" rel="stylesheet" type="text/css"> 
+ </head>
+ <body> 
+  <div class="head"> 
+   <!--begin-logo--> 
+   <p><a href="http://www.w3.org/"><img alt="W3C" height="48" src="http://www.w3.org/Icons/w3c_home" width="72"></a> 
+    <!--end-logo--> </p>
+   <h1 id="title_heading">Speech JavaScript API Specification</h1> 
+   <h2 class="no-num no-toc" id="draft_date">Editor's Draft: 22 December 2011</h2> 
+   <dl> 
+    <dt>
+     Editors:
+    </dt> 
+    <dd>
+     Bjorn Bringert, Google Inc.
+    </dd> 
+    <dd>
+     Satish Sampath, Google Inc.
+    </dd> 
+    <dd>
+     Glen Shires, Google Inc.
+    </dd> 
+   </dl> 
+   <hr> 
+  </div> 
+  <h2 class="no-num no-toc" id="abstract">Abstract</h2> 
+  <p>This specification defines a JavaScript API to enable web developers to incorporate speech recognition and synthesis into their web pages. It enables developers to use scripting to generate text-to-speech output and to use speech recognition as an input for forms, continuous dictation and control. The JavaScript API allows web pages to control activation and timing and to handle results and alternatives </p>
+  <p>It is a fully-functional subset of the specification proposed in the <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/"> HTML Speech Incubator Group Final Report</a> <a href="#ref-1">[1]</a>. Specifically, this subset excludes the underlying transport protocol, the proposed additions to HTML markup, and it defines a simplified subset of the JavaScript API. This subset supports the majority of use-cases and sample code in the Incubator Group Final Report. This subset does not preclude future standardization of additions to the markup, API or underlying transport protocols, and indeed the Incubator Report defines a potential roadmap for such future work. </p>
+  <h2 class="no-num no-toc" id="status">Status of This Document</h2> 
+  <p>This document is an API proposal from Google Inc. to the <a href="http://www.w3.org/2008/webapps/">Web Applications (WEBAPPS) Working Group</a>. </p>
+  <p>All feedback is welcome.</p> 
+  <p>No working group is yet responsible for this specification. <strong>This is just an informal proposal at this time.</strong></p> 
+  <h2 class="no-num no-toc" id="contents">Table of Contents</h2> 
+  <!--begin-toc--> 
+  <ul class="toc"> 
+   <li><a href="#conformance"><span class="secno">1 </span>Conformance requirements</a></li> 
+   <li><a href="#introduction"><span class="secno">2 </span>Introduction</a></li> 
+   <li><a href="#use_cases"><span class="secno">3 </span>Use Cases</a></li> 
+   <li><a href="#security"><span class="secno">4 </span>Security and privacy considerations</a></li> 
+   <li><a href="#api_description"><span class="secno">5 </span>API Description</a></li> 
+   <li><a href="#examples"><span class="secno">6 </span>Examples</a></li> 
+   <li class="no-num"><a href="#acknowledgments">Acknowledgments</a> </li>
+   <li class="no-num"><a href="#references">References</a> </li>
+  </ul> 
+  <!--end-toc--> 
+  <h2 id="conformance"><span class="secno">1 </span>Conformance requirements</h2> 
+  <p>All diagrams, examples, and notes in this specification are non-normative, as are all sections explicitly marked non-normative. Everything else in this specification is normative. </p>
+  <p>The key words "MUST", "MUST NOT", "REQUIRED", 
+   <!--"SHALL", "SHALL
+  NOT",--> "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in the normative parts of this document are to be interpreted as described in RFC2119. For readability, these words do not appear in all uppercase letters in this specification. <a href="#ref-rfc2119">[RFC2119]</a></p> 
+  <p>Requirements phrased in the imperative as part of algorithms (such as "strip any leading space characters" or "return false and abort these steps") are to be interpreted with the meaning of the key word ("must", "should", "may", etc) used in introducing the algorithm. </p>
+  <p>Conformance requirements phrased as algorithms or specific steps may be implemented in any manner, so long as the end result is equivalent. (In particular, the algorithms defined in this specification are intended to be easy to follow, and not intended to be performant.) </p>
+  <p id="hardwareLimitations">User agents may impose implementation-specific limits on otherwise unconstrained inputs, e.g. to prevent denial of service attacks, to guard against running out of memory, or to work around platform-specific limitations. </p>
+  <p>Implementations that use ECMAScript to implement the APIs defined in this specification must implement them in a manner consistent with the ECMAScript Bindings defined in the Web IDL specification, as this specification uses that specification's terminology. <a href="#ref-webidl">[WEBIDL]</a> </p>
+  <h2 id="introduction"><span class="secno">2 </span>Introduction</h2> 
+  <p><em>This section is non-normative.</em> </p>
+  <p>The JavaScript Speech API aims to enable web developers to provide, in a web browser, speech-input and text-to-speech output features that are typically not available when using standard speech-recognition or screen-reader software software. The API itself is agnostic of the underlying speech recognition and synthesis implementation and can support both server-based and client-based/embedded recognition and synthesis. The API is designed to enable both brief (one-shot) speech input and continuous speech input. Speech recognition results are provided to the web page as a list of hypotheses, along with other relevant information for each hypothesis. </p>
+  <p>This specification is a subset of the API defined in the <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/"> HTML Speech Incubator Group Final Report</a>. That report is entirely informative since it is not a standards track document. This document is intended to be the basis of a standards track document, and therefore defines portions of that report to be normative. All other portions of that report may be considered informative with regards to this document, and provide an informative background to this document. </p>
+  <h2 id="use_cases"><span class="secno">3 </span>Use Cases</h2> 
+  <p><em>This section is non-normative.</em> </p>
+  <p>This specification supports the following use cases, as defined in <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech-20111206/#use-cases"> Section 4 of the Incubator Report</a>. </p>
+  <ul> 
+   <li>Voice Web Search</li> 
+   <li>Speech Command Interface</li> 
+   <li>Domain Specific Grammars Contingent on Earlier Inputs</li> 
+   <li>Continuous Recognition of Open Dialog</li> 
+   <li>Domain Specific Grammars Filling Multiple Input Fields</li> 
+   <li>Speech UI present when no visible UI need be present</li> 
+   <li>Voice Activity Detection</li> 
+   <li>Hello World</li> 
+   <li>Speech Translation</li> 
+   <li>Speech Enabled Email Client</li> 
+   <li>Dialog Systems</li> 
+   <li>Multimodal Interaction</li> 
+   <li>Speech Driving Directions</li> 
+   <li>Multimodal Video Game</li> 
+   <li>Multimodal Search</li> 
+  </ul> To keep the API to a minimum, this specification does not directly support the following use cases. This does not preclude adding support for these as future API enhancements, and indeed the Incubator report provides a roadmap for doing so. 
+  <ul> 
+   <li>Rerecognition</li> 
+   <li>Temporal Structure of Synthesis to Provide Visual Feedback</li> 
+  </ul> Note that for many usages and implementations, it is possible to avoid the need for Rerecognition by using a larger grammar, or by combining multiple grammars - both of these techniques are supported in this specification. 
+  <h2 id="security"><span class="secno">4 </span>Security and privacy considerations</h2> 
+  <ol> 
+   <li>User agents must only start speech input sessions with explicit, informed user consent. User consent can include, for example: 
+    <ul> 
+     <li>User click on a visible speech input element which has an obvious graphical representation showing that it will start speech input.</li> 
+     <li>Accepting a permission prompt shown as the result of a call to <code>SpeechReco.start</code>.</li> 
+     <li>Consent previously granted to always allow speech input for this web page.</li> 
+    </ul> </li> 
+   <li>User agents must give the user an obvious indication when audio is being recorded.</li> 
+   <ul> 
+    <li>In a graphical user agent, this could be a mandatory notification displayed by the UA as part of its chrome and not accessible by the web page. This could for example be a pulsating/blinking record icon as part of the browser chrome/address bar, an indication in the status bar, an audible notification, or anything else relevant and accessible to the user. This UI element must also allow the user to stop recording.<br> <img src="data:image/png;base64,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"> </li> 
+    <li>In a speech-only user agent, the indication may for example take the form of the system speaking the label of the speech input element, followed by a short beep.</li> 
+   </ul> 
+   <li>The user agent may also give the user a longer explanation the first time speech input is used, to let the user now what it is and how they can tune their privacy settings to disable speech recording if required.</li> 
+   <li>To minimize the chance of users unwittingly allowing web pages to record speech without their knowledge, implementations must abort an active speech input session if the web page lost input focus to another window or to another tab within the same user agent.</li> 
+  </ol> 
+  <h3>Implementation considerations</h3> 
+  <p><em>This section is non-normative.</em></p> 
+  <ol> 
+   <li>Spoken password inputs can be problematic from a security perspective, but it is up to the user to decide if they want to speak their password.</li> 
+   <li>Speech input could potentially be used to eavesdrop on users. Malicious webpages could use tricks such as hiding the input element or otherwise making the user believe that it has stopped recording speech while continuing to do so. They could also potentially style the input element to appear as something else and trick the user into clicking them. An example of styling the file input element can be seen at <a href="http://www.quirksmode.org/dom/inputfile.html">http://www.quirksmode.org/dom/inputfile.html</a>. The above recommendations are intended to reduce this risk of such attacks.</li> 
+  </ol> 
+  <h2 id="api_description"><span class="secno">5 </span>API Description</h2> 
+  <p><em>This section is normative.</em></p> (The links here reference the Incubator Report, whose descriptions of these shall also be normative.) 
+  <p>The speech reco interface is the scripted web <acronym title="Application Programming Interface">API</acronym> for controlling a given recognition.</p> 
+  <div class="block"> 
+   <div class="blockTitleDiv"> 
+    <span class="blockTitle">IDL</span> 
+   </div> 
+   <div class="blockContent"> 
+    <pre class="code"><code class="idl-code">
+    [Constructor]
+    interface <dfn id="dfn-speechreco">SpeechReco</dfn> {
+        <span class="comment">// recognition parameters</span>
+        <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-speechgrammarlist">SpeechGrammarList</a> <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-grammars">grammars</a>;
+
+        DOMString <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-lang">lang</a>;
+        attribute boolean <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-continuous">continuous</a>;
+        <span class="comment">// methods to drive the speech interaction</span>
+        void <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-start">start</a>();
+        void <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-stop">stop</a>();
+        void <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-abort">abort</a>();
+
+        <span class="comment">// event methods</span>
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onaudiostart">onaudiostart</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onsoundstart">onsoundstart</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onspeechstart">onspeechstart</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onspeechend">onspeechend</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onsoundend">onsoundend</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onaudioend">onaudioend</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onresult">onresult</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onnomatch">onnomatch</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onresultdeleted">onresultdeleted</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onerror">onerror</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onstart">onstart</a>;
+        attribute Function <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-onend">onend</a>;
+    };
+
+    SpeechReco implements EventTarget;
+    interface <dfn id="speechinputerror">SpeechInputError</dfn> {
+        const unsigned short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-sie.other">OTHER</a> = 0;
+        const unsigned short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-sie.nospeech">NO_SPEECH</a> = 1;
+        const unsigned short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-sie.aborted">ABORTED</a> = 2;
+        const unsigned short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-sie.audiocapture">AUDIO_CAPTURE</a> = 3;
+        const unsigned short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-sie.network">NETWORK</a> = 4;
+        const unsigned short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-sie.notallowed">NOT_ALLOWED</a> = 5;
+        const unsigned short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-sie.servicenotallowed">SERVICE_NOT_ALLOWED</a> = 6;
+        const unsigned short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-sie.badgrammar">BAD_GRAMMAR</a> = 7;
+        const unsigned short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-sie.languagenotsupported">LANGUAGE_NOT_SUPPORTED</a> = 8;
+
+        readonly attribute unsigned short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-code">code</a>;
+        readonly attribute DOMString <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-message">message</a>;
+    };
+
+    <span class="comment">// Item in N-best list</span>
+    interface <dfn id="speechinputalternative">SpeechInputAlternative</dfn> {
+        readonly attribute DOMString <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-transcript">transcript</a>;
+        readonly attribute float <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-confidence">confidence</a>;
+        readonly attribute any <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-interpretation">interpretation</a>;
+    };
+
+    <span class="comment">// A complete one-shot simple response</span>
+    interface <dfn id="speechinputresult">SpeechInputResult</dfn> {
+        readonly attribute unsigned long <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-length">length</a>;
+        getter <a href="#speechinputalternative">SpeechInputAlternative</a> <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-item">item</a>(in unsigned long index);
+        readonly attribute boolean <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-final">final</a>;
+    };
+
+    <span class="comment">// A collection of responses (used in continuous mode)</span>
+    interface <dfn id="speechinputresultlist">SpeechInputResultList</dfn> {
+        readonly attribute unsigned long <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-speechinputresultlistlength">length</a>;
+        getter <a href="#speechinputresult">SpeechInputResult</a> <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-speechinputresultlistitem">item</a>(in unsigned long index);
+    };
+
+    <span class="comment">// A full response, which could be interim or final, part of a continuous response or not</span>
+    interface <dfn id="speechinputresultevent">SpeechInputResultEvent</dfn> : Event {
+        readonly attribute <a href="#speechinputresult">SpeechInputResult</a> <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-result">result</a>;
+        readonly attribute <a href="#speechinputerror">SpeechInputError</a> error;
+        readonly attribute short <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-resultIndex">resultIndex</a>;
+        readonly attribute <a href="#speechinputresultlist">SpeechInputResultList</a> <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-resulthistory">resultHistory</a>;
+    };
+
+    <span class="comment">// The object representing a speech grammar</span>
+    [Constructor]
+    interface <dfn id="dfn-speechgrammar">SpeechGrammar</dfn> {
+        attribute DOMString <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-grammarSrc">src</a>;
+        attribute float <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-grammarWeight">weight</a>;
+    };
+
+    <span class="comment">// The object representing a speech grammar collection</span>
+    [Constructor]
+    interface <dfn id="dfn-speechgrammarlist">SpeechGrammarList</dfn> {
+        readonly attribute unsigned long <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-speechgrammarlistlength">length</a>;
+        getter <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-speechgrammar">SpeechGrammar</a> <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-speechgrammarlistitem">item</a>(in unsigned long index);
+        void <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-addGrammar">addFromUri</a>(in DOMString <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-grammarSrc">src</a>,
+                        optional float <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-grammarWeight">weight</a>);
+        void <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-addGrammarstring">addFromString</a>(in DOMString <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-grammarString">string</a>,
+                        optional float <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/#dfn-grammarWeight">weight</a>);
+    };
+            </code>
+          </pre> 
+   </div> 
+  </div> 
+  <p>The TTS interface is the scripted web <acronym title="Application Programming Interface">API</acronym> for controlling a text-to-speech output.</p> 
+  <div class="block"> 
+   <div class="blockTitleDiv"> 
+    <span class="blockTitle">IDL</span> 
+   </div> 
+   <div class="blockContent"> 
+    <pre class="code"><code class="idl-code">
+    [Constructor]
+      interface TTS {
+          attribute DOMString text;
+          attribute DOMString lang;
+          readonly attribute boolean paused;
+          readonly attribute boolean ended;
+
+          // methods to drive the speech interaction
+          void play();
+          void pause();
+          void stop();
+
+          attribute Function onstart;
+          attribute Function onend;
+    };
+    
+            </code>
+          </pre> 
+   </div> 
+  </div> 
+  <h2 id="examples"><span class="secno">6 </span>Examples</h2> 
+  <p><em>This section is non-normative.</em> </p>
+  <div class="example"> 
+   <div class="exampleHeader">
+     Examples 
+   </div> 
+   <p>Using speech recognition to perform a web search.</p> 
+   <div class="block"> 
+    <div class="blockTitleDiv"> 
+     <span class="blockTitle">Web search by voice with auto-submit</span> 
+    </div> 
+    <div class="blockContent"> 
+     <pre class="code"><code class="html-code">
+  &lt;script type="text/javascript"&gt;
+    var sr = new SpeechReco();
+    sr.onresult = function(event) {
+      var q = document.getElementById("q");
+      q.value = event.result[0].transcript;
+      q.form.submit();
+    }
+  &lt;/script&gt;
+
+  &lt;form action="http://www.example.com/search"&gt;
+  &lt;input type="search" id="q" name="q"&gt;
+  &lt;input type="button" value="Speak" onclick="sr.start()"&gt;
+  &lt;/form&gt;
+</code>
+</pre> 
+    </div> 
+   </div> 
+   <p>Using speech synthesis.</p> 
+   <div class="block"> 
+    <div class="blockTitleDiv"> 
+     <span class="blockTitle">TTS</span> 
+    </div> 
+    <div class="blockContent"> 
+     <pre class="code"><code class="html-code">
+  &lt;script type="text/javascript"&gt;
+     var tts = new TTS();
+     function speak(text, lang) {
+        tts.text = text;
+        tts.lang = lang;
+        tts.play();
+     }
+     speak("Hello world.", "en-US");
+  &lt;/script&gt;
+</code>
+</pre> 
+    </div> 
+   </div> 
+  </div> 
+  <p>This API supports all of the examples in the <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/"> HTML Speech Incubator Group Final Report</a> that are within the scope of the JavaScript API and are relevant to the <a href="#use_cases">Section 3 Use Cases</a>, with minimal or no changes. Specifically, the following are supported from <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech-20111206/#api_examples"> Section 7.1.7</a>. </p>
+  <ul> 
+   <li>Speech Web Search JS API Only (except for non-essential aspects: serviceURI and speedVsAccuracy)</li> 
+   <li>Web search by voice, with auto-submit</li> 
+   <li>Web search by voice, with "Did you say..."</li> 
+   <li>Speech translator</li> 
+   <li>Speech shell</li> 
+   <li>Turn-by-turn navigation</li> 
+   <li>Domain Specific Grammars Contingent on Earlier Inputs</li> 
+   <li>Speech Enabled Email Client (except for non-essential aspects: serviceURI and speedVsAccuracy)</li> 
+   <li>Simple Multimodal Example JS API Only</li> 
+   <li>Speech XG Translating Example</li> 
+  </ul> 
+  <h2 class="no-num" id="acknowledgments">Acknowledgments</h2> 
+  <p>The members of the HTML Speech Incubator Group, and the corresponding Final Report, created the basis for this proposal. </p>
+  <h2 class="no-num" id="references">References</h2> 
+  <dt id="bib-RFC2119">
+   [RFC2119]
+  </dt>
+  <dd>
+   S. Bradner. 
+   <a href="http://www.ietf.org/rfc/rfc2119.txt"><cite>Key words for use in RFCs to Indicate Requirement Levels.</cite></a> March 1997. Internet RFC 2119. URL: 
+   <a href="http://www.ietf.org/rfc/rfc2119.txt">http://www.ietf.org/rfc/rfc2119.txt</a> 
+  </dd> 
+  <dt>
+   <a id="ref-1">[1]</a> 
+  </dt>
+  <dd>
+   <cite><a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/">HTML Speech Incubator Group Final Report</a></cite>, World Wide Web Consortium, 6 December 2011. URL: 
+   <a href="http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/">http://www.w3.org/2005/Incubator/htmlspeech/XGR-htmlspeech/</a>   
+  </dd>
+ </body>
+</html>
