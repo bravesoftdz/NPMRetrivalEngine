@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+ <head> 
+  <meta charset="utf-8"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+  <meta name="viewport" content="initial-scale=1.0 width=device-width"> 
+  <title>Free Currency Converter Code</title> 
+  <meta name="description" content="Free Javascript Currency Converter Updated Daily: Latest exchange rates on your website with a few lines of javascript. Currency converter code for webmasters"> 
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"> 
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"> 
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"> 
+  <link href="//fonts.googleapis.com/css?family=Oswald:400,700,300" rel="stylesheet" type="text/css"> 
+  <link rel="stylesheet" href="/css/pick-a-color-1.2.3.min.css"> 
+  <link rel="stylesheet" href="/css/custom.css"> 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> 
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script> 
+  <script src="/js/tinycolor-0.9.15.min.js"></script> 
+  <script src="/js/pick-a-color-1.2.3.min.js"></script> 
+  <script src="/flot/jquery.flot.min.js"></script> 
+  <script src="/flot/jquery.flot.time.min.js"></script> 
+  <script src="/flot/jquery.flot.resize.min.js"></script> 
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <script src="/flot/excanvas.min.js"></script>
+    <![endif]--> 
+  <script type="text/javascript">
+
+        $(function() {
+            $(".pick-a-color").pickAColor();
+
+            var options = {
+                lines: { show: true },
+                points: { show: false },
+                xaxis: { mode: "time"},
+                grid: {
+                    borderWidth: {
+                        top: 1,
+                        right: 1,
+                        bottom: 1,
+                        left: 1
+                    }
+                }
+            };
+            $("button.fetchSeries").click(function () {
+                var button = $(this);
+                var dataurl = $(this).attr("datasrc");
+
+                function onDataReceived(series) {
+                    var data = [];
+                    data.push(series);
+                    $("h4.chart-title").text(series.currency + "/" + series.against + " One Month Chart");
+                    $("div.chart-footer").text("Source: " + series.source + "/" + series.against + " One Month Chart");
+                    $.plot("#chart", data, options);
+                }
+                $.ajax({
+                    url: dataurl,
+                    type: "GET",
+                    dataType: "json",
+                    success: onDataReceived
+                });
+            });
+            $("button.fetchSeries:first").click();
+
+            $("select.fetchSeries").change(function () {
+                var c_chart = $("#c option:selected").val();
+                var a_chart = $("#a option:selected").val();
+                var d_chart = $("#d option:selected").val();
+                var dataurl = "/ajax.php?c=" + c_chart + "&a=" + a_chart + "&d=" + d_chart + "&k=eb39rou92aefi9343j3er4vr91";
+
+                function onDataReceived(series) {
+                    var data = [];
+                    data.push(series);
+                    var d_range = $("#d option:selected").text();
+                    $("h2.chart-title").text(series.currency + " Against " + series.against + " for the Most Recent " + d_range);
+                    $("div.table-footer").text("Data Source: " + series.source);
+                    $("a.page-link").text("https://www.foreignexchangeresource.com/converter-code.php" + series.url);
+                    $("a.page-link").attr("href","https://www.foreignexchangeresource.com/converter-code.php" + series.url);
+                    $.plot("#chart", data, options);
+                }
+                $.ajax({
+                    url: dataurl,
+                    type: "GET",
+                    dataType: "json",
+                    success: onDataReceived
+                });
+            });
+
+            $("select.fetchRates").change(function () {
+                var c_chart = $("#c option:selected").val();
+                var a_chart = $("#a option:selected").val();
+                var d_chart = $("#d option:selected").val();
+                $('#rate-table').children().remove();
+                var dataurl = "/ajax.php?c=" + c_chart + "&a=" + a_chart + "&d=" + d_chart + "&df=1&k=eb39rou92aefi9343j3er4vr91";
+
+                function onDataReceived(series) {
+                    var data = [];
+                    data.push(series);
+                    var d_range = $("#d option:selected").text();
+                    $("h3.rate-title").text(series.currency + " Against " + series.against + " for the Most Recent " + d_range);
+                    $("#a-heading").text("1.00 " + series.currency + " Buys");
+                    $.each( series.data, function( i, val ) {
+                        $('#rate-table').append('<tr><td>'+val[2]+' '+series.against+'</td><td>'+val[0]+'</td></tr>');
+                    });
+                    $("div.table-footer").text("Data Source: " + series.source);
+                    $("a.page-link").text("https://www.foreignexchangeresource.com/converter-code.php" + series.url);
+                    $("a.page-link").attr("href","https://www.foreignexchangeresource.com/converter-code.php" + series.url);
+                }
+                $.ajax({
+                    url: dataurl,
+                    type: "GET",
+                    dataType: "json",
+                    success: onDataReceived
+                });
+            });
+
+            $("button.fetchConv").click(function () {
+                var c_chart = $("#c option:selected").val();
+                var a_chart = $("#a option:selected").val();
+                var d_chart = 1;
+                var amt_chart = $("#amt").val();
+                $('#rate-table').children().remove();
+                var dataurl = "/ajax.php?c=" + c_chart + "&a=" + a_chart + "&d=" + d_chart + "&amt=" + amt_chart + "&df=1&k=eb39rou92aefi9343j3er4vr91";
+
+                function onDataReceived(series) {
+                    var data = [];
+                    data.push(series);
+                    var d_range = $("#d option:selected").text();
+                    $("h3.rate-title").text("Currency Converter: " + series.currency + " to " + series.against);
+                    $.each( series.data, function( i, val ) {
+                        $('#rate-table').append('<tr><td>'+val[1]+' '+series.currency+'</td><td>'+val[2]+' '+series.against+'</td><td>'+val[0]+'</td></tr>');
+                    });
+                    $("div.table-footer").text("Data Source: " + series.source);
+                    $("a.page-link").text("https://www.foreignexchangeresource.com/converter-code.php" + series.url);
+                    $("a.page-link").attr("href","https://www.foreignexchangeresource.com/converter-code.php" + series.url);
+                    $("#amt").val(series.amount);
+
+                }
+                $.ajax({
+                    url: dataurl,
+                    type: "GET",
+                    dataType: "json",
+                    success: onDataReceived
+                });
+            });
+
+            $("select.fetchRatesByDate").change(function () {
+                var c_chart = $("#c option:selected").val();
+                var d_chart = $("#d option:selected").val();
+                $('#rate-table').children().remove();
+                var dataurl = "/ajax-multi.php?c=" + c_chart + "&d=" + d_chart + "&k=eb39rou92aefi9343j3er4vr91";
+
+                function onDataReceived(series) {
+                    var data = [];
+                    data.push(series);
+                    var d_date = $("#d option:selected").text();
+                    $("h3.rate-title").text("World Currencies Compared to " + series.currency + " on " + d_date);
+                    $("#c-heading").text("1 " + series.currency + " Buys");
+                    $.each( series.data, function( i, val ) {
+                        $('#rate-table').append('<tr><td>'+val[2]+'</td><td>'+val[0]+'</td><td>'+val[1]+' '+val[0]+'</td><td>'+d_date+'</td></tr>');
+                    });
+                    $("a.page-link").text("https://www.foreignexchangeresource.com/converter-code.php" + series.url);
+                    $("a.page-link").attr("href","https://www.foreignexchangeresource.com/converter-code.php" + series.url);
+
+                }
+                $.ajax({
+                    url: dataurl,
+                    type: "GET",
+                    dataType: "json",
+                    success: onDataReceived
+                });
+            });
+        });
+
+    </script> 
+ </head> 
+ <body> 
+  <header> 
+   <nav class="navbar navbar-inverse" role="navigation"> 
+    <div class="container-fluid" style="padding-top: 3px;"> 
+     <div class="navbar-header"> 
+      <a class="navbar-brand" href="/index.php"> <img alt="Foreign Exchange Resource" src="/img/logo.png"> Foreign Exchange Resource </a> 
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#header-nav"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button> 
+     </div> 
+     <div class="collapse navbar-collapse" id="header-nav"> 
+      <ul class="nav navbar-nav"> 
+       <li><a href="/forex_rates.php"><i class="fa fa-globe"></i> Exchange Rates</a></li> 
+       <li><a href="/forex_tables.php"><i class="fa fa-calendar"></i> Rates by Date</a></li> 
+       <li><a href="/forex_charts.php"><i class="fa fa-line-chart"></i> Forex Charts</a></li> 
+       <li><a href="/exchange-rate-currency-converter.php"><i class="fa fa-calculator"></i> Currency Converter</a></li> 
+       <li><a href="/forex_list.php"><i class="fa fa-list"></i> Currency List</a></li> 
+      </ul> 
+     </div> 
+    </div> 
+   </nav> 
+  </header> 
+  <div class="container"> 
+   <div class="row"> 
+    <div class="col-sm-9 col-sm-push-3 col-md-9 col-md-push-3 col-lg-8 col-lg-push-4"> 
+     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+     <ins class="adsbygoogle ad" data-ad-client="ca-pub-9456108336672156" data-ad-slot="8919762512"></ins> 
+     <script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script> 
+     <div class="row"> 
+      <div class="col-md-6"> 
+       <h2>Free Currency Converter Code</h2> 
+       <p>Select the size of currency converter desired along with the default conversion values you wish to use. The default value is the currency conversion that first shows when the converter is loaded, but any conversions can be performed using the converter on your website. </p> 
+       <p><span class="label label-danger">New!</span> Our simple converter now uses <a href="https://getbootstrap.com/" target="_blank">Bootstrap</a> and incorporates bootstrap contextual helper classes. This gives the users a quicker and more modern looking converter that fits easily into nearly any website design. The converter uses a <a href="https://getbootstrap.com/components/#panels" target="_blank">Bootstrap panel</a> and basic Bootstrap forms. </p> 
+       <p>The javascript currency converter code for your website will be updated based on your selections. </p> 
+       <p>You may also wish to try our <a href="/custom-currency-converter.php">Custom Currency Converter</a>. It's also free, Bootstrap powered and can be fully customized to fit more seamlessly with your website design. Learn more <a href="/custom-currency-converter.php">here</a>. </p> 
+      </div> 
+      <div class="col-md-6"> 
+       <form role="form" action="converter-code.php" method="GET"> 
+        <div class="form-group"> 
+         <label for="size">Currency Converter Size</label> 
+         <select id="size" class="form-control" name="size"> <option value="728" selected>728 x 90 pixels (Leaderboard) </option> <option value="250">250 x 250 pixels (Square) </option> <option value="200">200 x 200 pixels (Small Square) </option> <option value="120">120 x 240 pixels (Vertical Banner) </option> </select> 
+        </div> 
+        <div class="form-group"> 
+         <label for="size">Currency Converter Basic Style</label> 
+         <select id="size" class="form-control" name="panel"> <option class="bg-default" value="1" selected>Default Grey </option> <option class="bg-primary" value="2">Dark Blue </option> <option class="bg-success" value="3">Green </option> <option class="bg-info" value="4">Light Blue </option> <option class="bg-warning" value="5">Yellow </option> <option class="bg-danger" value="6">Red </option> </select> 
+        </div> 
+        <div class="form-group"> 
+         <label for="size">Currency Converter Button Style</label> 
+         <select id="size" class="form-control" name="button"> <option class="bg-default" value="1">Default Grey </option> <option class="bg-primary" value="2" selected>Dark Blue </option> <option class="bg-success" value="3">Green </option> <option class="bg-info" value="4">Light Blue </option> <option class="bg-warning" value="5">Yellow </option> <option class="bg-danger" value="6">Red </option> </select> 
+        </div> 
+        <div class="form-group"> 
+         <label for="c">Convert this Currency</label> 
+         <select id="c" class="form-control" name="c"> <option value="USD">American Dollar (USD)</option> <option value="ARS">Argentine Peso (ARS)</option> <option value="AUD">Australian Dollar (AUD)</option> <option value="BSD">Bahamian Dollar (BSD)</option> <option value="BTC">Bitcoin (BTC)</option> <option value="BRL">Brazilian Real (BRL)</option> <option value="GBP">British Pound (GBP)</option> <option value="BGN">Bulgarian Lev (BGN)</option> <option value="CAD">Canadian Dollar (CAD)</option> <option value="XAF">Central African CFA Franc (XAF)</option> <option value="CLP">Chilean Peso (CLP)</option> <option value="CNY">Chinese Yuan (CNY)</option> <option value="COP">Colombian Peso (COP)</option> <option value="HRK">Croatian Kuna (HRK)</option> <option value="CZK">Czech Koruna (CZK)</option> <option value="DKK">Danish Krone (DKK)</option> <option value="XCD">East Caribbean Dollar (XCD)</option> <option value="EUR" selected>Euro (EUR)</option> <option value="FJD">Fiji Dollar (FJD)</option> <option value="XPF">French Pacific Franc (XPF)</option> <option value="GHS">Ghanaian Cedi (GHS)</option> <option value="GTQ">Guatemalan Quetzal (GTQ)</option> <option value="Gold">Gold (Per Troy Ounce) (Gold)</option> <option value="HNL">Honduran Lempira (HNL)</option> <option value="HKD">Hong Kong Dollar (HKD)</option> <option value="HUF">Hungarian Forint (HUF)</option> <option value="ISK">Icelandic Krona (ISK)</option> <option value="INR">Indian Rupee (INR)</option> <option value="IDR">Indonesian Rupiah (IDR)</option> <option value="ILS">Israeli New Shekel (ILS)</option> <option value="JMD">Jamaican Dollar (JMD)</option> <option value="JPY">Japanese Yen (JPY)</option> <option value="LVL">Latvian Lats (LVL)</option> <option value="LTC">Litecoin (LTC)</option> <option value="LTL">Lithuanian Litas (LTL)</option> <option value="MYR">Malaysian Ringgit (MYR)</option> <option value="MXN">Mexican Peso (MXN)</option> <option value="XMR">Monero (XMR)</option> <option value="MAD">Moroccan Dirham (MAD)</option> <option value="MMK">Myanmar Kyat (MMK)</option> <option value="ANG">Netherlands Antilles Florin (ANG)</option> <option value="TWD">New Taiwan Dollar (TWD)</option> <option value="NZD">New Zealand Dollar (NZD)</option> <option value="NGN">Nigerian Naira (NGN)</option> <option value="NOK">Norwegian Krone (NOK)</option> <option value="PKR">Pakistan Rupee (PKR)</option> <option value="PAB">Panamanian Balboa (PAB)</option> <option value="PEN">Peruvian New Sol (PEN)</option> <option value="PHP">Philippine Peso (PHP)</option> <option value="PLN">Polish Zloty (PLN)</option> <option value="QAR">Qatari Riyal (QAR)</option> <option value="RON">Romanian Leu (RON)</option> <option value="RUB">Russian Rouble (RUB)</option> <option value="SAR">Saudi Riyal (SAR)</option> <option value="RSD">Serbian Dinar (RSD)</option> <option value="SGD">Singapore Dollar (SGD)</option> <option value="ZAR">South African Rand (ZAR)</option> <option value="KRW">South Korean Won (KRW)</option> <option value="LKR">Sri Lankan Rupee (LKR)</option> <option value="SEK">Swedish Krona (SEK)</option> <option value="CHF">Swiss Franc (CHF)</option> <option value="THB">Thailand Baht (THB)</option> <option value="TTD">Trinidad &amp; Tobago Dollar (TTD)</option> <option value="TND">Tunisian Dinar (TND)</option> <option value="TRY">Turkish Lira (TRY)</option> <option value="AED">U.A.E. Dirham (AED)</option> <option value="VEF">Venezuela Bolivar Fuerte (VEF)</option> <option value="VND">Vietnamese Dong (VND)</option> </select> 
+        </div> 
+        <div class="form-group"> 
+         <label for="amt">Default Currency Amount</label> 
+         <input id="amt" type="number" step="0.01" class="form-control" name="amt" value="1"> 
+        </div> 
+        <div class="form-group"> 
+         <label for="a">To this currency</label> 
+         <select id="a" class="form-control" name="a"> <option value="USD" selected>American Dollar (USD)</option> <option value="ARS">Argentine Peso (ARS)</option> <option value="AUD">Australian Dollar (AUD)</option> <option value="BSD">Bahamian Dollar (BSD)</option> <option value="BTC">Bitcoin (BTC)</option> <option value="BRL">Brazilian Real (BRL)</option> <option value="GBP">British Pound (GBP)</option> <option value="BGN">Bulgarian Lev (BGN)</option> <option value="CAD">Canadian Dollar (CAD)</option> <option value="XAF">Central African CFA Franc (XAF)</option> <option value="CLP">Chilean Peso (CLP)</option> <option value="CNY">Chinese Yuan (CNY)</option> <option value="COP">Colombian Peso (COP)</option> <option value="HRK">Croatian Kuna (HRK)</option> <option value="CZK">Czech Koruna (CZK)</option> <option value="DKK">Danish Krone (DKK)</option> <option value="XCD">East Caribbean Dollar (XCD)</option> <option value="EUR">Euro (EUR)</option> <option value="FJD">Fiji Dollar (FJD)</option> <option value="XPF">French Pacific Franc (XPF)</option> <option value="GHS">Ghanaian Cedi (GHS)</option> <option value="GTQ">Guatemalan Quetzal (GTQ)</option> <option value="Gold">Gold (Per Troy Ounce) (Gold)</option> <option value="HNL">Honduran Lempira (HNL)</option> <option value="HKD">Hong Kong Dollar (HKD)</option> <option value="HUF">Hungarian Forint (HUF)</option> <option value="ISK">Icelandic Krona (ISK)</option> <option value="INR">Indian Rupee (INR)</option> <option value="IDR">Indonesian Rupiah (IDR)</option> <option value="ILS">Israeli New Shekel (ILS)</option> <option value="JMD">Jamaican Dollar (JMD)</option> <option value="JPY">Japanese Yen (JPY)</option> <option value="LVL">Latvian Lats (LVL)</option> <option value="LTC">Litecoin (LTC)</option> <option value="LTL">Lithuanian Litas (LTL)</option> <option value="MYR">Malaysian Ringgit (MYR)</option> <option value="MXN">Mexican Peso (MXN)</option> <option value="XMR">Monero (XMR)</option> <option value="MAD">Moroccan Dirham (MAD)</option> <option value="MMK">Myanmar Kyat (MMK)</option> <option value="ANG">Netherlands Antilles Florin (ANG)</option> <option value="TWD">New Taiwan Dollar (TWD)</option> <option value="NZD">New Zealand Dollar (NZD)</option> <option value="NGN">Nigerian Naira (NGN)</option> <option value="NOK">Norwegian Krone (NOK)</option> <option value="PKR">Pakistan Rupee (PKR)</option> <option value="PAB">Panamanian Balboa (PAB)</option> <option value="PEN">Peruvian New Sol (PEN)</option> <option value="PHP">Philippine Peso (PHP)</option> <option value="PLN">Polish Zloty (PLN)</option> <option value="QAR">Qatari Riyal (QAR)</option> <option value="RON">Romanian Leu (RON)</option> <option value="RUB">Russian Rouble (RUB)</option> <option value="SAR">Saudi Riyal (SAR)</option> <option value="RSD">Serbian Dinar (RSD)</option> <option value="SGD">Singapore Dollar (SGD)</option> <option value="ZAR">South African Rand (ZAR)</option> <option value="KRW">South Korean Won (KRW)</option> <option value="LKR">Sri Lankan Rupee (LKR)</option> <option value="SEK">Swedish Krona (SEK)</option> <option value="CHF">Swiss Franc (CHF)</option> <option value="THB">Thailand Baht (THB)</option> <option value="TTD">Trinidad &amp; Tobago Dollar (TTD)</option> <option value="TND">Tunisian Dinar (TND)</option> <option value="TRY">Turkish Lira (TRY)</option> <option value="AED">U.A.E. Dirham (AED)</option> <option value="VEF">Venezuela Bolivar Fuerte (VEF)</option> <option value="VND">Vietnamese Dong (VND)</option> </select> 
+        </div> 
+        <div class="form-group"> 
+         <button type="submit" class="btn btn-success btn-block">Update</button> 
+        </div> 
+       </form> 
+      </div> 
+     </div> 
+     <div class="col-md-12"> 
+      <h3>Currency Converter Code:</h3> 
+      <form> 
+       <textarea style="width: 100%;height: 200px;" readonly onclick="this.focus();this.select();">
+&lt;!--Begin Currency Converter Code--&gt;
+&lt;div id="FEXRdiv"&gt;&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+var FEXR_c = "EUR", FEXR_a = "USD", FEXR_amt = 1, FEXR_size = 728, FEXR_panel = 1, FEXR_button = 2;
+&lt;/script&gt;
+&lt;script type="text/javascript" src="//www.foreignexchangeresource.com/converterB.js"&gt;&lt;/script&gt;
+&lt;!--End Currency Converter Code--&gt;</textarea> 
+      </form> 
+     </div> 
+     <div class="col-md-12"> 
+      <h3>Your Currency Converter Looks Like This:</h3> 
+      <div id="FEXRdiv" class="text-center"></div> 
+      <script type="text/javascript">
+                        var FEXR_c = "EUR",
+                            FEXR_a = "USD",
+                            FEXR_amt = 1,
+                            FEXR_size = 728,
+                            FEXR_panel = 1,
+                            FEXR_button = 2;
+                    </script> 
+      <script type="text/javascript" src="//www.foreignexchangeresource.com/converterB.js"></script> 
+      <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+      <ins class="adsbygoogle ad" data-ad-client="ca-pub-9456108336672156" data-ad-slot="8919762512"></ins> 
+      <script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script> 
+     </div> 
+     <div class="col-md-12"> 
+      <h3 id="optional">Want to Remove our Links?:</h3> 
+      <div>
+       If you want to remove these links and place a link to us elsewhere on your site, then click through to the next step using the button below. 
+      </div> 
+      <form action="nolinks.php" method="post"> 
+       <div class="form-group"> 
+        <button type="submit" class="btn btn-success btn-block">Continue to get instructions for removing our links. </button> 
+       </div> 
+      </form> 
+     </div> 
+    </div> 
+    <div class="col-sm-3 col-sm-pull-9 col-md-3 col-md-pull-9 col-lg-4 col-lg-pull-8"> 
+     <div class="panel panel-warning"> 
+      <div class="panel-heading">
+       <h2 class="panel-title"><i class="fa fa-bullhorn"></i> <strong>NEW!</strong> Metal Price Charts and Widgets </h2>
+      </div> 
+      <div class="panel-body">
+       <div class="row"> 
+        <div class="col-lg-6 col-lg-push-6"> 
+         <p>Get <a href="https://www.dailymetalprice.com/metalpricewidget.php">free metal price charts &amp; widgets for your website </a>from our sister site <a href="https://www.dailymetalprice.com/metalpricewidget.php">dailymetalprice.com</a>.</p> 
+         <p>Display metal price tables and and daily spot price charts on your website.</p> 
+         <p>Our responsive widgets and charts scale to nearly any display size.</p> 
+         <p><a href="https://www.dailymetalprice.com/metalpricewidget.php">Get the Code Here</a></p> 
+        </div> 
+        <div class="col-lg-6 col-lg-pull-6"> 
+         <a class="text-center" href="https://www.dailymetalprice.com/metalpricewidget.php"> <img style="width:100%" src="https://www.dailymetalprice.com/img/eg_chart.png" alt="Free Metal Price Charts for Websites"> <img style="width:100%" src="https://www.dailymetalprice.com/img/eg_table.png" alt="Free Metal Price Charts for Websites"> </a> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="panel panel-warning"> 
+      <div class="panel-heading">
+       <h2 class="panel-title"><i class="fa fa-exclamation-circle"></i> Remove Our Links from the Converter </h2>
+      </div> 
+      <div class="panel-body">
+       <div class="media"> 
+        <a class="media-left" href="/nolinks.php"> <img src="/img/currency_converter_links.png" alt="currency converter links"> </a> 
+        <div class="media-body">
+          Don't like 
+         <strong>our links on your currency converter</strong>? Completely 
+         <a href="/nolinks.php">remove the links</a> to our site from your currency converter by placing a link to us somewhere else on your website. More info 
+         <a href="/nolinks.php">here</a>. 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="panel panel-warning"> 
+      <div class="panel-heading">
+       <h2 class="panel-title"><i class="fa fa-calendar"></i> Daily Forex Updates </h2>
+      </div> 
+      <div class="panel-body">
+       <p>Updated daily. 67 Major <a href="/forex_list.php">currencies</a> covered + gold. Free <a href="forex_rates.php">foreign exchange rates</a> and <a href="/forex_charts.php">currency charts</a>: Major currency pairs, <a href="exchange-rate-currency-converter.php">currency converter</a>, <a href="/forex_tables.php">exchange rates by date</a> and more. We are your foreign exchange rate and currency resource.</p>
+       <p><span class="label label-success">NEW</span> Our currency converter <strong>now includes Gold</strong>! Compare, convert and chart gold prices to any of our covered national and digital currencies.</p> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <p>&nbsp;</p> 
+  <footer> 
+   <nav class="navbar navbar-inverse" role="navigation"> 
+    <div class="container-fluid" style="padding-top: 3px;"> 
+     <div class="navbar-header"> 
+      <div> 
+       <ul class="pull-left nav navbar-nav list-inline"> 
+        <li><a href="/free-currency-converter.php"><i class="fa fa-code"></i> Get the Free Currency Converter <span class="hidden-xs hidden-sm"> for Your Website</span></a></li> 
+       </ul> 
+      </div> 
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#footer-nav"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button> 
+     </div> 
+     <div class="collapse navbar-collapse" id="footer-nav"> 
+      <ul class="nav navbar-nav"> 
+       <li><a href="disclaimer.php">Privacy Policy and Disclaimer</a></li> 
+       <li><a href="login.php">Existing Users</a></li> 
+       <li><a href="contact.php">Contact Us</a></li> 
+      </ul> 
+     </div> 
+    </div> 
+   </nav> 
+  </footer> 
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-667606-4', 'auto');
+    ga('send', 'pageview');
+
+</script>  
+ </body>
+</html>

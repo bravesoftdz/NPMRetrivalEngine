@@ -1,0 +1,424 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+ <head> 
+  <title>Writing a JavaScript/PHP Chat Server | jenChat | jenseng.com</title> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+  <meta content="Tutorial on writing a simple chat server powered by PHP, JavaScript and MySQL." name="description"> 
+  <meta content="Jon Jensen,jenseng,PHP,chat,server,MySQL,JavaScript,ajax" name="keywords"> 
+  <link rel="Shortcut Icon" href="/favicon.ico" type="image/x-icon"> 
+  <style type="text/css">
+      @import url("http://jenseng.com/includes/default.css");
+      #toc{
+      	float: right;
+      	width: 160px;
+			  border-width: 1px;
+			  border-style: solid;
+			  overflow: auto;
+			  margin: 1em 0 1em 1em;
+			  color: #000000;
+			  background-color: #f5ede9;
+			  border-color: #dfd8c8;
+			  font-size: 0.9em;
+			  padding: 0.5em;
+      }
+      #toc h4{
+      	color: #000;
+      	margin: 0 0.5em 0.25em 0.5em;
+      	font-size: 1.1em;
+      }
+      #toc ol{
+      	margin: 0 !important;
+      	padding: 0 !important;
+      }
+      #toc li{
+      	margin: 0 0 0 2em !important;
+      	padding: 0 !important;
+      }
+      #disclaimer {
+        border: 3px solid #800;
+        padding: 0 2em 1em;
+        margin: 0 0 1em;
+        background: #ffe0e0;
+        color: #000;
+        line-height: 1.5;
+        font-size: 0.9em;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.75);
+      }
+      #disclaimer a {
+        font-weight: bold;
+      }
+      #disclaimer h2, #disclaimer h3 {
+        margin: 1em 0 0;
+        padding: 0;
+        font-style: normal;
+        text-decoration: none;
+        border: none;
+        color: #800;
+      }
+      #disclaimer h2 {
+        border-bottom: 3px solid #800;
+      }
+      #disclaimer h3 {
+        color: #000;
+      }
+    </style> 
+  <script type="text/javascript" src="http://jenseng.com/includes/navigation.js"></script> 
+  <!--[if lte IE 6]><link rel="stylesheet" href="http://jenseng.com/includes/ie.css" type="text/css" /><![endif]--> 
+ </head> 
+ <body> 
+  <div id="page"> 
+   <div id="heading"> 
+    <h1>Writing a JavaScript/PHP Chat Server</h1> 
+   </div> 
+   <div id="content"> 
+    <div id="disclaimer"> 
+     <h2>Disclaimer</h2> 
+     <p> This tutorial was written in 2003, which is truly prehistoric in internet terms. If you're looking to write a modern chat server that works in all browsers, here are a couple considerations: </p> 
+     <ul> 
+      <li> <p> <b> Don't write your own</b>, just adapt an existing one. There are plenty of good free (and bad) ones out there. A quick google search reveals lots of things like <a href="http://sixrevisions.com/tools/10-free-website-chat-widgets-to-make-your-site-interactive/">this</a>. </p> </li> 
+      <li> <p> If you are intent on writing your own, <b>don't follow this guide</b> (unless you are a time traveler from 10 years ago, or a masochist). There are nicer ways of implementing the same functionality... </p> <h3>Front-End</h3> <p> Iframe polling is silly in this day and age, you should use <a href="http://en.wikipedia.org/wiki/XMLHttpRequest" title="XMLHttpRequest">XHR</a> instead (if you're using <a href="http://docs.jquery.com/" title="jQuery Documentation">jQuery</a>, that's the reliable old <a href="http://api.jquery.com/jQuery.ajax/" title="jQuery.ajax()">$.ajax</a>). This has been available in every browser for years. </p> <p> If you want to be bleeding edge, try using <a href="http://en.wikipedia.org/wiki/WebSocket" title="Web Sockets">Web Sockets</a> instead of AJAX polling, though that will require server support... </p> <h3>Back-End</h3> <p> Apache+PHP+MySQL is not the best architecture for a realtime chat application. If I were writing one today, I'd probably use web sockets with an event-based back-end (e.g. <a href="https://github.com/eventmachine/eventmachine" title="eventmachine">eventmachine</a>, <a href="http://nodejs.org/" title="Node.js">node.js</a>, etc.). I'd might just forgo the DB and keep stuff in memory, though if you had to scale across multiple app servers, etc., <a href="http://redis.io/" title="Redis">Redis</a> might come in handy. </p> </li> 
+     </ul> 
+     <p> If you still really want to go the LAMP+iframe route, that's cool and all, but note that I probably won't respond to questions about it or be able to offer you any debugging tips. </p> 
+     <p> —Jon<br> 2012-06-12 </p> 
+    </div> 
+    <div id="about">
+     created 2003-12-19 by jon
+     <br>last updated 2006-08-16 by jon
+    </div> 
+    <h3 id="introduction">Introduction</h3> 
+    <div id="toc"> 
+     <h4>Table of Contents</h4> 
+     <ol> 
+      <li><a href="#introduction">Introduction</a></li> 
+      <li><a href="#markup">The (X)HTML</a></li> 
+      <li><a href="#database">The Database</a></li> 
+      <li><a href="#php">The PHP</a></li> 
+      <li><a href="#javascript">The Javascript</a></li> 
+      <li><a href="#conclusion">Conclusion</a></li> 
+      <li><a href="#additionalNotes">Additional Notes</a></li> 
+     </ol> 
+    </div> 
+    <p> Internet Chat is one of the most efficient forms of long-distance communication. It makes it possible to interact with people across the globe in real-time at virtually no cost to the end-user. Whether it's used to check up on the folks, get answers from a customer service rep, or talk to potential clients, Internet Chat is an invaluable tool for commercial and home users alike. </p> 
+    <p> In this article we will build a basic chat application, jenChat, which can be customized for your needs. In a general sense, we will learn how to implement remote scripting with just a little DHTML. </p> 
+    <p> Creating a chat application from scratch may seem like a daunting task, but it's really quite simple when you think about it. On the most basic level, all a chat server really does is take messages submitted by a participant and push them out to everyone else. Everything else from emoticons to buddy lists are merely extensions of this and will be left as an exercise to the reader. </p> 
+    <p> This article assumes a working knowledge of <a href="http://www.php.net">PHP</a>, <a href="http://dev.mysql.com">MySQL</a> and <a href="http://www.w3schools.com/js/default.asp">JavaScript</a>, but novice programmers should be able to follow along without too much difficulty. If you are planning on implementing a production chat server, refer to the <a href="#additionalNotes" title="Additional Notes">additional notes</a> for a couple pointers and considerations. </p> 
+    <h4 id="checklist">What you'll need</h4> 
+    <ul> 
+     <li>An hour of free time</li> 
+     <li>Access to a MySQL database and a web server running PHP</li> 
+     <li>Two or more web browsers for testing</li> 
+    </ul> 
+    <p> jenChat will be powered by PHP and MySQL, but we could just as easily write it using ASP and MS SQL. In fact, most of the work is done client-side via JavaScript, and even that is kept to a bare minimum. See the <a href="./demo/">end product</a> to get an idea of what we'll be making. If you want to skip the tutorial and start customizing jenChat immediately, you can go straight to <a href="#conclusion">the code</a>. </p> 
+    <h4 id="groundrules">A few ground rules</h4> 
+    <p> Before we get started, let's establish some requirements for our chat server. There's nothing worse than having to start over because you didn't plan fully and efficiently. </p> 
+    <ol> 
+     <li>The chat application should work across all major platforms.</li> 
+     <li>There should be no flickering in the chat window (in other words, we shouldn't merely be refreshing a page)</li> 
+     <li>It should be scalable—there should be no theoretical upper limit on the number of participants. (see the <a href="#scalability">note on scalability</a>)</li> 
+     <li>It should use minimal bandwidth—communication between client and server should be kept to a minimum.</li> 
+     <li>If a user does navigate away from the chat window, his/her session will end automatically.</li> 
+    </ol> 
+    <p> Let's focus briefly on the first point: compatibility. If you wish to code for Netscape 4, feel free, but in this article we will only focus on modern browsers that support the W3C DOM, such as Internet Explorer 5+, Opera and Mozilla. It is the opinion of the author that there are enough options available on all platforms that users should not confine themselves to obsolete browsers. </p> 
+    <h3 id="markup">The (X)HTML</h3> 
+    <p> In programming, it's generally a good idea to design the basic UI before implementing the functionality. Incidentally, this will help us tackle the biggest problem right off the bat—the issue of page reloads/flickering. Normally when a user wants the most up-to-date version of a page, he/she must send a new request to the server, which causes the page to refresh. By the same token, when a user submits information via a form, the server sends back a page, which in most browsers causes a flicker as it is loaded. The solution to both of these problems is a hidden IFRAME. Let's set up a basic page to illustrate how this can be done: </p> 
+    <div class="code">
+     <pre><code><span class="comment">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;</span>
+<span class="tag">&lt;html xmlns=<span class="string">"http://www.w3.org/1999/xhtml"</span> lang=<span class="string">"en-US"</span> xml:lang=<span class="string">"en-US"</span>&gt;</span>
+  <span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;title&gt;</span>jenChat<span class="tag">&lt;/title&gt;</span>
+    <span class="tag">&lt;style type=<span class="string">"text/css"</span>&gt;</span>
+      #chatContents{height:300px; width:200px;}
+    <span class="tag">&lt;/style&gt;</span>
+  <span class="tag">&lt;/head&gt;</span>
+  <span class="tag">&lt;body&gt;</span>
+    <span class="tag">&lt;h1&gt;</span>jenChat<span class="tag">&lt;/h1&gt;</span>
+
+    <span class="tag">&lt;a href=<span class="string">"login.php?logout=true"</span>&gt;</span>Logout<span class="tag">&lt;/a&gt;</span><span class="tag">&lt;br /&gt;</span>
+
+    <span class="tag">&lt;iframe id=<span class="string">"chatContents"</span> name=<span class="string">"chatContents"</span> src=<span class="string">"contents.html"</span>&gt;</span><span class="tag">&lt;/iframe&gt;</span>
+
+    <span class="tag">&lt;form target=<span class="string">"post"</span> method=<span class="string">"post"</span> action=<span class="string">"post.php"</span>&gt;</span>
+      <span class="tag">&lt;input type=<span class="string">"text"</span> name=<span class="string">"message"</span> id=<span class="string">"message"</span> style=<span class="string">"width: 250px"</span> /&gt;</span>
+      <span class="tag">&lt;input type=<span class="string">"submit"</span> value=<span class="string">"Send"</span> class=<span class="string">"submit"</span> /&gt;</span>
+    <span class="tag">&lt;/form&gt;</span>
+
+    <span class="tag">&lt;iframe id=<span class="string">"post"</span> name=<span class="string">"post"</span> src=<span class="string">"post.php"</span> style=<span class="string">"width: 0px; height: 0px; border: 0px;"</span>&gt;</span><span class="tag">&lt;/iframe&gt;</span>
+    <span class="tag">&lt;iframe id=<span class="string">"thread"</span> name=<span class="string">"thread"</span> src=<span class="string">"thread.php"</span> style=<span class="string">"width: 0px; height: 0px; border: 0px;"</span>&gt;</span><span class="tag">&lt;/iframe&gt;</span>
+  <span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+    </div> 
+    <p> Save this page as <a href="chat.txt">"chat.php"</a>. This will be the backbone of our chat application. Let's look at what's there. </p> 
+    <p> First, notice the "chatContents" IFRAME, where the chat messages will appear. The page we load in the IFRAME is a <a href="contents.txt">simple XHTML document</a> with a div for the contents of the chat. As we will see later, because one of our goals is to avoid any flickering, we will never actually reload the contents of this IFRAME. Rather, we will programmatically append messages to it. So why use an IFRAME at all? Why not just use a div? The reason is that there is no W3C standard for programmatically scrolling an element. But virtually all modern browsers provide a means of causing an IFRAME to scroll a specified amount, and so we use one here. </p> 
+    <p> Following the chat contents is a simple form with an input and a submit button. Notice something interesting—the target of the form is "post". This means that when we submit this form, data will be submitted via the IFRAME named "post" rather than the main window. Because of this, the contents of the IFRAME will reload each time we send a message, but the main page will not. The second IFRAME will be the all-purpose worker frame; rather than reload the current page to get new messages, we will use "thread" instead. This will help us create the illusion that the server is pushing content to the browser. </p> 
+    <h3 id="database">The Database</h3> 
+    <p> The next step is to set up our database so that we have a central location for all the messages of the chat. We will set up two tables—one for participants and another for messages. The participants table will have just three columns—a unique id, a username/handle and a timestamp of when the user last communicated with the server. The messages table will store the id of the participant that submitted it, the message itself, a timestamp of when it was sent, and a unique id. This is the SQL used to create the tables: </p> 
+    <div class="code">
+     <pre><code><span class="reservedword">CREATE TABLE</span> jenChat_Users (
+  UserID <span class="reservedword">int</span>(<span class="string">10</span>) <span class="reservedword">unsigned</span> <span class="reservedword">NOT NULL</span> <span class="reservedword">auto_increment</span>,
+  UserName <span class="reservedword">varchar</span>(<span class="string">20</span>) <span class="reservedword">NOT NULL</span> <span class="reservedword">default</span> <span class="string">''</span>,
+  LastUpdate <span class="reservedword">timestamp</span>(<span class="string">14</span>) <span class="reservedword">NOT NULL</span>,
+  <span class="reservedword">PRIMARY KEY</span>  (UserID)
+);
+<span class="reservedword">CREATE TABLE</span> jenChat_Messages (
+  MessageID <span class="reservedword">int</span>(<span class="string">10</span>) <span class="reservedword">unsigned</span> <span class="reservedword">NOT NULL</span> <span class="reservedword">auto_increment</span>,
+  UserID <span class="reservedword">int</span>(<span class="string">10</span>) <span class="reservedword">unsigned</span> <span class="reservedword">NOT NULL</span> <span class="reservedword">default</span> <span class="string">'0'</span>,
+  Posted <span class="reservedword">timestamp</span>(<span class="string">14</span>) <span class="reservedword">NOT NULL</span>,
+  Message <span class="reservedword">varchar</span>(<span class="string">255</span>) <span class="reservedword">NOT NULL</span> <span class="reservedword">default</span> <span class="string">''</span>,
+  <span class="reservedword">PRIMARY KEY</span>  (MessageID)
+);</code></pre>
+    </div> 
+    <p> With regards to database performance, see the <a href="#scalability">note on scalability</a> for ways to make jenChat as fast as possible, such as using a MySQL-based session handler and MEMORY (HEAP) tables. </p> 
+    <p> A note about our implementation: if you plan on integrating this into an existing web application that already tracks users, you should probably use your existing table, as well as make other necessary changes. The reason is that in our chat server, participants only exist for as long as they are in the chat room—we will delete participants once they have exited. By the same token, we also delete messages shortly after they are received by the server. This will help keep the size of the database to a bare minimum, even if there is a significant amount of activity. Your application may have different needs/requirements, so some things we do in this example may not be fully applicable. </p> 
+    <h3 id="php">The PHP</h3> 
+    <p> First, we will create an include file that does a few important things for us, like initialize our session and database connections. Change the appropriate database information and save this file as <a href="init.txt">"init.php"</a>. Be sure to read the comments and links in this file. </p> 
+    <div class="code">
+     <pre><code><span class="reservedword">&lt;?</span>php
+  <span class="reservedword">session_start</span>();
+  
+  <span class="comment">/* * replace the parameters used here with the appropriate information * for your system. */</span>
+  $dbhandle = <span class="reservedword">mysql_connect</span>(<span class="string">"server"</span>,<span class="string">"user"</span>,<span class="string">"password"</span>);
+  <span class="reservedword">mysql_select_db</span>(<span class="string">"database_name"</span>);
+
+    
+  <span class="comment">/* * IMPORTANT: magic quotes are bad. Ideally, you should turn them off * in your php.ini, but if you are unable to, the code below will fix * the $_POST array for you. * * See <a href="http://www.php.net/manual/en/security.magicquotes.php">http://www.php.net/manual/en/security.magicquotes.php</a> * * If you aren't using prepared statements (<a href="http://www.php.net/mysqli">mysqli</a>, <a href="http://pear.php.net/package/DB">Pear:DB</a>) or manually * escaping every variable that goes into a query, you are asking to get * pwned. For maximum portability, jenChat uses <a href="http://www.php.net/mysql_real_escape_string">mysql_real_escape_string</a>, * but prepared statements are generally the way to go. * * If you didn't understand that last paragraph (or even if you * did), read up on SQL Injection and why you need to worry about it. * * <a href="http://www.unixwiz.net/techtips/sql-injection.html" title="SQL Injection Attacks by Example">http://www.unixwiz.net/techtips/sql-injection.html</a> * * OK, carry on */</span>
+   
+  <span class="reservedword">if</span>(<span class="reservedword">get_magic_quotes_gpc</span>()){
+    $_POST = <span class="reservedword">array_map</span>(<span class="string">'stripslash'</span>, $_POST);
+  }
+  <span class="reservedword">function</span> <span class="reservedword">stripslash</span>($value){
+    <span class="reservedword">if</span>(<span class="reservedword">is_array</span>($value))
+      <span class="reservedword">return</span> <span class="reservedword">array_map</span>(<span class="string">'stripslash'</span>, $value);
+    <span class="reservedword">else</span>
+      <span class="reservedword">return</span> <span class="reservedword">stripslashes</span>($value);
+  }
+<span class="reservedword">?&gt;</span></code></pre>
+    </div> 
+    <p> Because this tutorial is an exercise in remote scripting and not in creating user logins and so forth, I have provided a <a href="login.txt">simple login script</a> for use with the chat server. Whenever someone wants to join the chat, this script creates a new participant (if the requested handle is available) and then redirects the user to the chat page. Download the file and save it as <a href="login.txt">"login.php"</a>. </p> 
+    <p> Our next task is to store messages in the database as soon as they are sent. Let's create <a href="post.txt">"post.php"</a>, the first of our two IFRAMEs. This script will actually serve an additional purpose—garbage collection. It deletes any messages that are over 30 seconds old, as well as any inactive participants. Inactive does not mean they are simply lurking—it means their browser is no longer communicating with the chat server, e.g. they closed the browser, navigated elsewhere, etc. Here is the basic source code: </p> 
+    <div class="code">
+     <pre><code><span class="reservedword">&lt;?</span>php
+  <span class="reservedword">require_once</span>(<span class="string">'init.php'</span>);
+
+  <span class="comment">/* make sure the person is logged in. */</span>
+  <span class="reservedword">if</span>(!<span class="reservedword">isset</span>($_SESSION[<span class="string">'jenChat_UserID'</span>]))
+    <span class="reservedword">exit</span>;
+  
+  <span class="comment">/* make sure something was actually posted. */</span>
+  <span class="reservedword">if</span>(<span class="reservedword">sizeof</span>($_POST)){
+    $expiretime = <span class="reservedword">date</span>(<span class="string">"YmdHis"</span>,<span class="reservedword">time</span>() - 30);
+
+    <span class="comment">/* delete expired messages. */</span>
+    <span class="reservedword">mysql_query</span>(<span class="string">"DELETE FROM jenChat_Messages WHERE Posted &lt;= '"</span> . $expiretime . <span class="string">"'"</span>); 
+    <span class="comment">/* delete inactive participants. */</span>
+    <span class="reservedword">mysql_query</span>(<span class="string">"DELETE FROM jenChat_Users WHERE LastUpdate &lt;= '"</span> . $expiretime. <span class="string">"'"</span>); 
+    <span class="comment">/* post the message. */</span>
+    <span class="reservedword">mysql_query</span>(<span class="string">"INSERT INTO jenChat_Messages (UserID,Posted,Message) VALUES( "</span> . $_SESSION[<span class="string">'jenChat_UserID'</span>] . <span class="string">", '"</span> . <span class="reservedword">date</span>(<span class="string">"YmdHis"</span>, <span class="reservedword">time</span>()) . <span class="string">"', '"</span> . <span class="reservedword">mysql_real_escape_string</span>(<span class="reservedword">strip_tags</span>($_POST[<span class="string">'message'</span>])) . <span class="string">"' )"</span>);
+  
+    <span class="reservedword">header</span>(<span class="string">"Location: post.php"</span>);
+    <span class="reservedword">exit</span>;
+  }
+<span class="reservedword">?&gt;</span></code></pre>
+    </div> 
+    <p> You may wonder why we redirect to the same page, especially considering that the page has no content. While this does impose an additional hit on the server every time a message is posted, it helps avoid navigation woes that would otherwise be an issue. Normally, when you post to a URL several times in succession, it will be added to your browser's history each time. This is true of IFRAMEs as well as normal windows, and in this case would make the "Back" button useless. But if you simply request the same URL multiple times in a row via GET, it is only added to your history the very first time (IE 5.0 Win and Mozilla 0.6 are the exceptions). By sending this header to browsers, the history problem is history. </p> 
+    <p> Next we will create our script that will poll the server for new messages, namely <a href="thread.txt">"thread.php"</a>. All this script needs to do is grab any new messages that did not exist the last time it talked to the server. </p> 
+    <div class="code">
+     <pre><code><span class="reservedword">&lt;?</span>php
+  <span class="reservedword">require_once</span>(<span class="string">'init.php'</span>);
+
+  <span class="comment">/* make sure the person is logged in. */</span>
+  <span class="reservedword">if</span>(!<span class="reservedword">isset</span>($_SESSION[<span class="string">'jenChat_UserID'</span>]))
+    <span class="reservedword">exit</span>;
+
+  $currtime = <span class="reservedword">date</span>(<span class="string">"YmdHis"</span>,<span class="reservedword">time</span>());
+
+  <span class="comment">/* maintains this user's state as active. */</span>
+  <span class="reservedword">mysql_query</span>(<span class="string">"UPDATE jenChat_Users SET LastUpdate = '"</span> . $currtime . <span class="string">"' WHERE UserID = "</span> . $_SESSION[<span class="string">'jenChat_UserID'</span>]);
+
+  <span class="comment">/* grab any messages posted since the last time we checked. Notice we say &gt;= and &lt;. This is to guarantee that we don't miss any messages that are posted at the same instant this query is executed.*/</span>
+  $sql = <span class="string">"SELECT Message,UserName FROM jenChat_Messages INNER JOIN "</span> . <span class="string">"jenChat_Users ON jenChat_Messages.UserID = jenChat_Users.UserID WHERE Posted &gt;= '"</span> . $_SESSION[<span class="string">'jenChat_Prevtime'</span>] . <span class="string">"' AND Posted &lt; '"</span> . $currtime . <span class="string">"' ORDER BY Posted"</span>;
+  $res = <span class="reservedword">mysql_query</span>($sql);
+<span class="reservedword">?&gt;</span>
+<span class="comment">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;</span>
+<span class="tag">&lt;html xmlns=<span class="string">"http://www.w3.org/1999/xhtml"</span> lang=<span class="string">"en-US"</span> xml:lang=<span class="string">"en-US"</span>&gt;</span>
+  <span class="tag">&lt;head&gt;</span><span class="tag">&lt;/head&gt;</span>
+  <span class="tag">&lt;body&gt;</span>
+  <span class="reservedword">&lt;?</span>
+    <span class="reservedword">if</span>(<span class="reservedword">mysql_num_rows</span>($res)){
+      <span class="reservedword">echo</span> <span class="string">'&lt;div id="contents"&gt;'</span>;
+      <span class="reservedword">while</span>($row = <span class="reservedword">mysql_fetch_array</span>($res)){
+        <span class="reservedword">echo</span> <span class="string">'&lt;div&gt;&lt;strong&gt;'</span> .
+              <span class="reservedword">htmlspecialchars</span>($row[<span class="string">'UserName'</span>]) . <span class="string">': &lt;/strong&gt;'</span> .
+              <span class="reservedword">htmlspecialchars</span>($row[<span class="string">'Message'</span>]) . <span class="string">'&lt;/div&gt;'</span>;
+      }
+      <span class="reservedword">echo</span> <span class="string">'&lt;/div&gt;'</span>;
+    }
+    $_SESSION[<span class="string">'jenChat_Prevtime'</span>] = $currtime;
+  <span class="reservedword">?&gt;</span>
+  <span class="tag">&lt;/body&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+    </div> 
+    <p> Now every time we refresh this page, if there are any new messages, they will be put in divs with the corresponding handle. </p> 
+    <p> Our last bit of PHP goes in "chat.php". When they first view the page, we need verify that they are actually in the chat room (logged in). The first "if" statement verifies that they are in fact authenticated, and the second one verifies their session hasn't timed out. Insert the following code at the beginning of your document: </p> 
+    <div class="code">
+     <pre><code><span class="reservedword">&lt;?</span>php
+  <span class="reservedword">session_start</span>();
+  <span class="reservedword">if</span>(!$_SESSION[<span class="string">'jenChat_UserID'</span>]){
+    <span class="reservedword">header</span>(<span class="string">"Location: ./login.php"</span>);
+    <span class="reservedword">exit</span>;
+  }
+  <span class="reservedword">else</span> <span class="reservedword">if</span>(<span class="reservedword">date</span>(<span class="string">"YmdHis"</span>,<span class="reservedword">time</span>() - 5) &gt; $_SESSION[<span class="string">'jenChat_Prevtime'</span>]){
+    <span class="reservedword">header</span>(<span class="string">"Location: ./login.php?logout=true"</span>);
+    <span class="reservedword">exit</span>;
+  }
+<span class="reservedword">?&gt;</span></code></pre>
+    </div> 
+    <h3 id="javascript">The JavaScript</h3> 
+    <p> The final step is to tie our pages together via JavaScript. Our remaining tasks are to cause "thread.php" to auto-refresh at regular intervals, to append its contents into our chatContents area in "chat.php", and to auto-scroll chatContents as it's updated. </p> 
+    <p> Because the messages are being submitted via "post.php", the contents of the form field are never cleared automatically. Every time "post.php" reloads, this script will call a function in the parent frame to reset the text field and give it focus. The following goes immediately after the PHP in "post.php": </p> 
+    <div class="code">
+     <pre><code><span class="comment">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;</span>
+<span class="tag">&lt;html xmlns=<span class="string">"http://www.w3.org/1999/xhtml"</span> lang=<span class="string">"en-US"</span> xml:lang=<span class="string">"en-US"</span>&gt;</span>
+  <span class="tag">&lt;head&gt;</span>
+    <span class="tag">&lt;script type=<span class="string">"text/javascript"</span>&gt;</span><span class="comment">&lt;!--</span>
+      <span class="reservedword">if</span>(parent.resetForm)
+        parent.resetForm();
+      <span class="comment">//--&gt;</span>
+    <span class="tag">&lt;/script&gt;</span>
+  <span class="tag">&lt;/head&gt;</span>
+<span class="tag">&lt;/html&gt;</span></code></pre>
+    </div> 
+    <p> This next snippet of code should go into "thread.php" right before the closing body tag. Each time the page loads, this will call a function in the parent to notify it if there are new messages from the server. It will then schedule a refresh to poll the server again in one second (or the interval of your choice). </p> 
+    <div class="code">
+     <pre><code><span class="tag">&lt;script type=<span class="string">"text/javascript"</span>&gt;</span><span class="comment">&lt;!--</span>
+  if(parent.insertMessages &amp;&amp; document.getElementById(<span class="string">"contents"</span>))
+    parent.insertMessages(document.getElementById(<span class="string">"contents"</span>).innerHTML);
+  
+  setTimeout(<span class="string">"getMessages()"</span>,1000); <span class="comment">//poll server again in one second</span>
+
+  <span class="reservedword">function</span> getMessages(){
+    document.location.reload();
+  }
+  <span class="comment">//--&gt;</span>
+<span class="tag">&lt;/script&gt;</span></code></pre>
+    </div> 
+    <p> The last chunk of code goes into "chat.php" in the document head. This is where it all comes together. To start off, the function chat_init is called when the page loads. This sets up cDocument and cWindow—references to the document and window objects of our chat area. </p> 
+    <p> As you'll remember from above, once "thread.php" has loaded, the getMessages function passes any new messages to insertMessages, which in turn will append them to the chatContents area. After appending the messages, we scroll to the bottom of the IFRAME. </p> 
+    <p> Finally, as explained earlier, the function resetForm simply resets the text field and gives it focus each time a message is sent. Here is the code for "chat.php": </p> 
+    <div class="code">
+     <pre><code><span class="tag">&lt;script type=<span class="string">"text/javascript"</span>&gt;</span><span class="comment">&lt;!--</span>
+  <span class="reservedword">var</span> cDocument;
+  <span class="reservedword">var</span> cWindow;
+
+  window.onload = chat_init;
+
+  <span class="reservedword">function</span> chat_init(){
+    <span class="reservedword">var</span> chatContents = document.getElementById(<span class="string">"chatContents"</span>);
+
+    <span class="comment">//set up a reference to the window object of the IFRAME</span>
+    <span class="reservedword">if</span>(window.frames &amp;&amp; window.frames[<span class="string">"chatContents"</span>]) <span class="comment">//IE5, Konq, Safari</span>
+      cWindow = window.frames[<span class="string">"chatContents"</span>];
+    <span class="reservedword">else if</span>(chatContents.contentWindow) <span class="comment">//IE5.5+, Moz 1.0+, Opera</span>
+      cWindow = chatContents.contentWindow;
+    <span class="reservedword">else</span> <span class="comment">//Moz &lt; 0.9 (Netscape 6.0)</span>
+      cWindow = chatContents;
+
+    <span class="comment">//set up a reference to the document object of the IFRAME</span>
+    <span class="reservedword">if</span>(cWindow.document) <span class="comment">//Moz 0.9+, Konq, Safari, IE, Opera</span>
+      cDocument = cWindow.document;
+    <span class="reservedword">else</span> <span class="comment">//Moz &lt; 0.9 (Netscape 6.0)</span>
+      cDocument = cWindow.contentDocument;
+  }
+  <span class="reservedword">function</span> insertMessages(content){
+    <span class="comment">//place the new messages in a div</span>
+    <span class="reservedword">var</span> newDiv = cDocument.createElement(<span class="string">"DIV"</span>);
+    newDiv.innerHTML = content;
+
+    <span class="comment">//append the messages to the contents</span>
+    cDocument.getElementById(<span class="string">"contents"</span>).appendChild(newDiv);
+
+    <span class="comment">//scroll the chatContents area to the bottom</span>
+    cWindow.scrollTo(0,cDocument.getElementById(<span class="string">"contents"</span>).offsetHeight);
+  }
+  <span class="reservedword">function</span> resetForm(){
+    document.getElementById(<span class="string">"message"</span>).value = <span class="string">""</span>;
+    document.getElementById(<span class="string">"message"</span>).focus();
+  }<span class="comment">//--&gt;</span>
+<span class="tag">&lt;/script&gt;</span></code></pre>
+    </div> 
+    <h3 id="conclusion">Conclusion</h3> 
+    <p> And with that, we're done. Go ahead and give it a spin in your favorite browser(s). In case you think you may have missed something, you can view/download the individual files below, or download them all in a zipped archive (<a href="jenChat.zip">jenChat.zip</a>). If you'd like to see a demo, try this slightly <a href="./demo/">optimized version</a>. </p> 
+    <ul id="files"> 
+     <li><a href="init.txt">init.php</a> - common include script</li> 
+     <li><a href="login.txt">login.php</a> - login page/script</li> 
+     <li><a href="chat.txt">chat.php</a> - main chat page</li> 
+     <li><a href="contents.txt">contents.html</a> - chat contents</li> 
+     <li><a href="post.txt">post.php</a> - message submission script</li> 
+     <li><a href="thread.txt">thread.php</a> - worker thread</li> 
+    </ul> 
+    <h4 id="aboveandbeyond">Above and beyond</h4> 
+    <p> Now that wasn't so bad—we created a working chat application in no time at all. While it's true that jenChat is lacking in features, its simplicity makes it very easy to customize. Inventive coders should have no trouble adding things such as rooms, buddy lists, emoticons, and other features that help make chat such a powerful tool and pleasant waste of time. </p> 
+    <p> Questions? Corrections? Suggestions? <a href="mailto:jon@jenseng.com">Email me</a>. Feel free to use these scripts throughout your site with or without modification or acknowledgement, although a link to me is always appreciated. Email me if you would like permission to reproduce this article. </p> 
+    <h3 id="additionalNotes">Additional Notes</h3> 
+    <h4 id="scalability">Scalability</h4> 
+    <p> I have had many questions regarding the scalability of jenChat. It scales remarkably well if you <a href="http://www.daniweb.com/code/snippet43.html">use a MySQL-based session handler</a> and <a href="http://dev.mysql.com/doc/refman/5.0/en/memory-storage-engine.html">store all tables in memory</a> (including the sessions). <strong>If you do not, you will very quickly hit the bottleneck that is your hard disk.</strong> </p> 
+    <p> Every time a client polls the server there are two database queries, as well as a read and write of the PHP session data. That's on top of everything Apache/PHP does to read/parse/execute the PHP script. We're talking multiple reads/writes to multiple files for every user every second. With a significant number of users, your hard disk will have a hard time keeping up. So by moving the sessions to the database, and the database to memory, the slowdown is greatly reduced. </p> 
+    <p> Using in-memory tables, I found that 25 concurrent users accessing a P4 1.4GHz machine over a LAN cost Apache about 4 MB of memory and kept CPU utilization right around 20%. YMMV. Note that you can only use AUTO_INCREMENT columns on MEMORY tables as of MySQL 4.1, so if you have an earlier version you should either upgrade or rethink your database schema. </p> 
+    <p> Here are some other ideas you may want to try to speed it up even further: </p> 
+    <ul> 
+     <li>Use a PHP accelerator/optimizer, such as <a href="http://pecl.php.net/apc">APC</a> or <a href="http://eaccelerator.net/">eAccelerator</a>. This should dramatically decrease CPU utilization, since PHP won't have to re-read/parse the PHP script every time.</li> 
+     <li>Use <a href="http://dev.mysql.com/doc/mysql/en/stored-procedures.html">stored procedures</a> to speed up your database queries (MySQL 5.0 or later).</li> 
+     <li>Go one step beyond the MySQL-based session handler and don't use PHP sessions ($_SESSION) at all. Instead, store the session cookie and any session vars you need in the jenChat_Users table. Then you can limit session reads/writes to when you actually need them, and can avoid serialization/unserialization of session data with every request.</li> 
+     <li>Only do periodic database garbage collection (as opposed to every time a message is posted).</li> 
+     <li>Fine-tune Apache and MySQL configuration directives for optimum performance. Google is your friend.</li> 
+     <li>Run it on something better than a P4 1.4GHz machine ;)</li> 
+    </ul> 
+    <h4 id="bandwidth">Bandwidth</h4> 
+    <p> If you follow the suggestions above, your next bottleneck will probably be bandwidth. jenChat is designed to use as little bandwidth as possible; how much you need is directly proportional to the number of concurrent users. You may consider stripping out extraneous markup from the polling responses, though may not make much of a dent, seeing as the number of packets sent/received will not change significantly. </p> 
+    <p> As a baseline, consider that there will be two TCP packets per user per second (polling request and response). On top of that you will also have the packets sent in posting messages to the server. So in just about any scenario, if you anticipate 4 packets (max 512 bytes each) per user per second, you should be able to determine your user/bandwidth limits. Remember that these numbers include both directions, with the outbound packets being the larger ones. So if you are only concerned about outgoing bandwidth, you will be more than covered if you plan on needing 1K per user per second. </p> 
+    <p> If bandwidth is an issue, you could always increase the polling interval, but that would obviously affect the responsiveness. </p> 
+    <h4 id="responsiveness">Responsiveness</h4> 
+    <p> Because jenChat polls the server once a second, you may notice a delay between when you post a message and when you actually see it. It is very easy to modify the code so that it appears instantaneous, just as other chat applications do. The first modification is to append the message to the contents via JavaScript each time you hit send. The second is to alter the SQL query that polls the server to ignore messages from the user requesting them, since they are already being appended to the contents. </p> 
+    <h4 id="ajax">AJAX</h4> 
+    <p> Many people have requested/suggested I rewrite jenChat using <a href="http://en.wikipedia.org/wiki/AJAX">AJAX</a>. While I use <a href="http://developer.apple.com/internet/webcontent/xmlhttpreq.html">XMLHTTPRequest</a> for most of my remote scripting nowadays, I have been reluctant to update jenChat for the following reasons: I want to keep jenChat simple and have it support as many browsers as possible. Changing it to an AJAX-only script would exclude older versions of all currently supported browsers. I could make it use AJAX or IFRAMEs depending on browser support, but that would further complicate the code and tutorial. From a server/bandwidth point of view, AJAX would not make it run any more efficiently; after all, the same amount of data would be transmitted with each request. </p> 
+    <p> However, AJAX does bring some significant benefits to the client. It eliminates the loading/status indicators that get triggered with each reload, and it requires less CPU and memory than an IFRAME. </p> 
+    <h4 id="adblock">AdBlock</h4> 
+    <p> If you use Mozilla and have AdBlock installed, remember that sloppiness in setting up your regular expressions and wildcards can cause unexpected results. jenChat stopped working for me in Firefox one day because I had set up an over-inclusive regexp filter that blocked anything ending with "ad", effectively disabling thread.php. </p> 
+   </div> 
+   <div id="additional"> 
+    <h4>Compatibility</h4> 
+    <ul> 
+     <li>IE 5.0+ (Windows)</li> 
+     <li>IE 5.3+ (Mac)</li> 
+     <li>Mozilla 0.6+ (All)</li> 
+     <li>Opera 7.0+ (All)</li> 
+     <li>Konqueror 3.1+ (All)</li> 
+     <li>Safari (all)</li> 
+    </ul> 
+    <p>If you have tested jenChat on any other browsers/platforms, please let me know if/how it worked.</p> 
+    <p>Mozilla 0.6+ includes Netscape 6+, Phoenix, Firebird, Firefox, and just about any Gecko-based browser.</p> 
+    <h4>Related Pages</h4> 
+    <ul class="links"> 
+     <li><a href="./demo/">jenChat Login</a></li> 
+     <li class="other"><a href="http://developer.apple.com/internet/webcontent/iframe.html">Remote Scripting with IFRAME</a> </li>
+    </ul> 
+   </div> 
+   <div id="navigation"> 
+    <h2>jenseng.com » <span class="section">coding</span></h2> 
+    <ul> 
+     <li><a href="http://jenseng.com/about/" title="jon jensen">about</a></li> 
+     <li><a href="http://jenseng.com" title="aromatic tuberous roots">blog</a></li> 
+     <li><a href="http://code.jenseng.com/" title="experiments in web design" class="selected">coding</a></li> 
+     <li><a href="http://jenseng.com/directory/" title="site map">directory</a></li> 
+     <li><a href="mailto:jon@jenseng.com" title="contact the author">email</a></li> 
+    </ul> 
+   </div> 
+   <div id="legal"> 
+    <p> Copyright © 2003-2006 <a href="http://jenseng.com">jenseng.com</a> | <a href="/legal.html">legal stuff</a> | <a href="http://validator.w3.org/check/referer">XHTML</a> | <a href="http://jigsaw.w3.org/css-validator/">CSS</a> </p> 
+   </div> 
+  </div> 
+  <script id="StatTrack" type="text/javascript" src="http://jenseng.com/stattrack/stattrack.js?siteid=8"></script> 
+  <noscript>
+   <iframe src="http://jenseng.com/stattrack/?siteid=8&amp;js=0" frameborder="0" width="0" height="0" style="top:0;left:0;position:absolute;visibility:hidden;"></iframe>
+  </noscript>   
+ </body>
+</html>

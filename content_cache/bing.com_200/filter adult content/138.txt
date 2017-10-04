@@ -1,0 +1,919 @@
+<!doctype html>
+<html id="XenForo" lang="en-US" dir="LTR" class="Public NoJs LoggedOut Sidebar Responsive" xmlns:fb="http://www.facebook.com/2008/fbml">
+ <head> 
+  <meta charset="utf-8"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <base href="https://www.howtoforge.com"> 
+  <script>
+			var _b = document.getElementsByTagName('base')[0], _bH = "https://www.howtoforge.com/web-filtering-on-squid-proxy";
+			if (_b && _b.href != _bH) _b.href = _bH;
+		</script> 
+  <title>Web Filtering On Squid Proxy</title> 
+  <meta name="keywords" content="security,centos"> 
+  <meta name="description" content="Web Filtering On Squid ProxyThis HOWTO describes how to protect your home / small enterprise network    users from objectionable internet cont... "> 
+  <meta name="og:title" content="Web Filtering On Squid Proxy"> 
+  <meta name="og:description" content="Web Filtering On Squid ProxyThis HOWTO describes how to protect your home / small enterprise network    users from objectionable internet cont... "> 
+  <meta name="og:site_name" content="Howtoforge"> 
+  <meta name="og:type" content="article"> 
+  <meta property="og:image" content="https://www.howtoforge.com/images/teaser/centos.gif"> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:site" content="howtoforgecom"> 
+  <meta name="twitter:creator" content="howtoforgecom"> 
+  <meta name="twitter:title" content="Web Filtering On Squid Proxy"> 
+  <meta name="twitter:description" content="Web Filtering On Squid ProxyThis HOWTO describes how to protect your home / small enterprise network    users from objectionable internet cont... "> 
+  <link rel="alternate" href="https://www.howtoforge.com/web-filtering-on-squid-proxy" hreflang="en"> 
+  <link rel="canonical" href="https://www.howtoforge.com/web-filtering-on-squid-proxy"> 
+  <link rel="amphtml" href="https://www.howtoforge.com/web-filtering-on-squid-proxy/amp/"> 
+  <noscript>
+   <style>.JsOnly, .jsOnly { display: none !important; }</style>
+  </noscript> 
+  <link rel="stylesheet" href="/community/styles/executive/xenfocus/icons/css/font-awesome.min.css"> 
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet" type="text/css"> 
+  <link rel="stylesheet" href="/community/css.php?css=xenforo,form,public&amp;style=3&amp;dir=LTR&amp;d=1420029973"> 
+  <link rel="stylesheet" href="/community/css.php?css=bb_code,bbm_buttons,facebook,google,login_bar,node_category,node_forum,node_list,profile_post_list_simple,sidebar_share_page,twitter,wf_default&amp;style=3&amp;dir=LTR&amp;d=1420029973"> 
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> 
+  <script>if (!window.jQuery) { document.write('<scr'+'ipt type="text/javascript" src="/js/jquery/jquery-1.11.3.min.js"><\/scr'+'ipt>'); }</script> 
+  <script src="/community/js/xenforo/xenforo.js?_v=303ae0ca"></script> 
+  <script src="/community/js/bbm/zloader.js?_v=303ae0ca"></script> 
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet"> 
+  <script type="text/javascript" src="/js/fancybox/jquery.mousewheel-3.0.4.pack.js"></script> 
+  <script type="text/javascript" src="/js/fancybox/jquery.fancybox-1.3.4.pack.js"></script> 
+  <link rel="stylesheet" type="text/css" href="/js/fancybox/jquery.fancybox-1.3.4.css" media="screen"> 
+  <link href="/themes/howtoforge/templates/style.css" rel="stylesheet"> 
+  <link rel="alternate" type="application/rss+xml" title="RSS-Feed für Howtoforge" href="/feed.rss"> 
+  <script src="/js/tinymce_4.1.7/tinymce.min.js"></script> 
+  <script type="text/javascript" src="https://partner.googleadservices.com/gampad/google_service.js">
+</script> 
+  <script type="text/javascript">
+GS_googleAddAdSenseService("ca-pub-3043223216276099");
+GS_googleEnableAllServices();
+</script> 
+  <script language="JavaScript">
+GA_googleAddAttr("Category", "Security");
+GA_googleAddAttr("Category", "Centos");
+</script> 
+  <script type="text/javascript">
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_article_leaderboard_a_728x90");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_article_rectangle_a_300x250");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_article_rectangle_b_300x250");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_article_halfpage_a_300x600");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_article_leaderboard_b_728x90");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_article_halfpage_b_300x600");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_textlink_a_600x50");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_textlink_b_600x50");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_textlink_c_600x50");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_textlink_d_600x50");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_list_sidebar_top");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_list_content_middle");
+GA_googleAddSlot("ca-pub-3043223216276099", "howtoforge_com_list_bottom");
+</script> 
+  <script type="text/javascript">
+GA_googleFetchAds();
+</script> 
+  <script type="text/javascript">
+    window.cookieconsent_options = {"message":"This website uses cookies to ensure you get the best experience on our website","dismiss":"Got it!","learnMore":"More info","link":"https://www.howtoforge.com/community/help/cookies","theme":"dark-bottom"};
+</script> 
+  <script type="text/javascript" src="/js/cookieconsent.latest.min.js"></script> 
+ </head> 
+ <body> 
+  <div id="loginBar"> 
+   <div class="pageWidth"> 
+    <div class="pageContent"> 
+     <h3 id="loginBarHandle"> <label for="LoginControl"><a href="/community/login/" class="concealed noOutline">Log in or Sign up</a></label> </h3> 
+     <span class="helper"></span> 
+    </div> 
+   </div> 
+  </div> 
+  <header> 
+   <div id="header"> 
+    <div id="logoBlock"> 
+     <div class="pageWidth"> 
+      <div class="pageContent"> 
+       <div id="logo">
+        <a href="/"> <span></span> <img src="/images/howtoforge_logo_trans.gif" alt="Howtoforge" style="margin-left:20px;"> </a>
+       </div> 
+       <span class="helper"></span> 
+       <div class="langSwitch"> 
+        <b><img src="/images/gb.png" alt="HowtoForge - Linux Tutorials in English"> English</b> | 
+        <a href="https://www.howtoforge.de/" title="HowtoForge.de - Linux Tutorials auf Deutsch"><img src="/images/de.png" alt="HowtoForge.de - Linux Tutorials auf Deutsch"> Deutsch</a> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+    <div id="navigation" class="pageWidth withSearch"> 
+     <div class="pageContent"> 
+      <nav> 
+       <div class="navTabs"> 
+        <ul class="publicTabs"> 
+         <li class="navTab forums selected"> <a href="/" class="navLink">Tutorials</a> 
+          <div class="tabLinks forumsTabLinks"> 
+           <ul class="secondaryContent blockLinksList"> 
+            <li><a href="/search/">Tutorial search</a></li> 
+           </ul> 
+          </div> </li> 
+         <li class="navTab forums PopupClosed"> <a href="/tutorials/" class="navLink">Tags</a> </li> 
+         <li class="navTab forums PopupClosed"><a href="/community/" class="navLink">Forums</a></li> 
+         <li class="navTab forums PopupClosed"><a href="/linux-commands/" class="navLink">Linux Commands</a></li> 
+         <li class="navTab forums PopupClosed"><a href="/subscription/" class="navLink">Subscribe</a></li> 
+         <li class="navTab forums PopupClosed"><a href="http://www.ispconfig.org" class="navLink">ISPConfig</a></li> 
+         <li class="navTab forums PopupClosed"><a href="http://www.lxer.com" class="navLink">News</a></li> 
+        </ul> 
+       </div> 
+       <span class="helper"></span> 
+      </nav> 
+     </div> 
+    </div> 
+    <div id="searchBar" class="pageWidth"> 
+     <span id="QuickSearchPlaceholder" title=" Search..."> Search</span> 
+     <fieldset id="QuickSearch"> 
+      <form action="/" method="post" class="formPopup"> 
+       <div class="primaryControls"> 
+        <input type="search" name="q" value="" class="textCtrl" placeholder="Search..." results="0" title="Enter your search and hit enter..." id="QuickSearchQuery"> 
+       </div> 
+       <input type="hidden" name="_xfToken" value=""> 
+      </form> 
+     </fieldset> 
+    </div> 
+   </div> 
+  </header> 
+  <div id="content" class="forum_list"> 
+   <div class="pageWidth"> 
+    <div class="pageContent"> 
+     <div class="mainContainer"> 
+      <div class="mainContent"> 
+       <div class="breadBoxTop"> 
+        <nav> 
+         <fieldset class="breadcrumb"> 
+          <span class="crumbs"> <span class="crust homeCrumb" itemscope itemtype="http://data-vocabulary.org/Breadcrumb"> <a href="/" class="crumb" rel="up" itemprop="url"><span itemprop="title">Tutorials</span></a> <span class="arrow"><span></span></span> </span> <span class="crust selectedTabCrumb" itemscope itemtype="http://data-vocabulary.org/Breadcrumb"> <a href="/web-filtering-on-squid-proxy" class="crumb" rel="up" itemprop="url"><span itemprop="title">Web Filtering On Squid Proxy</span></a> <span class="arrow"><span>&gt;</span></span> </span> </span> 
+         </fieldset> 
+        </nav> 
+       </div> 
+       <div id="htfContentPage"> 
+        <div class="bsa-apiads">
+         <a href="https://ispprotect.com/?pk_campaign=htftxt" target="_blank" rel="nofollow">Scan your Web-Server for Malware with ISPProtect now. Get Free Trial.</a>
+        </div> 
+        <div class="contributeEdit" style="float:right; width:450px; max-width:100%;"> 
+         <div id="tocContainer"> 
+          <h3>On this page</h3> 
+          <ol class="toc"> 
+           <li><a href="#web-filtering-on-squid-proxy">Web Filtering On Squid Proxy</a> 
+            <ol> 
+             <li><a href="#set-up-centos-linux-on-proxy-server">Set Up CentOS 6.2 Linux On Proxy Server</a></li> 
+             <li><a href="#setup-squid-on-proxy-server">Setup Squid On Proxy Server</a></li> 
+             <li><a href="#setup-quintolabs-content-security">Setup QuintoLabs Content Security</a></li> 
+             <li><a href="#integrate-squid-and-content-security">Integrate Squid And Content Security</a></li> 
+             <li><a href="#setup-web-ui-of-content-security-with-apache">Setup Web UI Of Content Security With Apache</a></li> 
+             <li><a href="#resume">Resume</a> </li>
+            </ol></li> 
+          </ol> 
+         </div> 
+        </div> 
+        <h2 id="web-filtering-on-squid-proxy">Web Filtering On Squid Proxy</h2> 
+        <p>This HOWTO describes how to protect your home / small enterprise network users from objectionable internet contents with help of HTTP proxy. Our goal is to set up a free Linux based server running Squid and deploy web filtering application on it saving bandwidth, speeding up web access and blocking obsessive and potentially illegal and malicious web files.</p> 
+        <p>In this tutorial I will assume that network environment consists of a SOHO level router that distributes wireless Wi-Fi, several desktop and laptop computers, iPads and some mobile smart phones as shown on the following network diagram.</p> 
+        <p><img src="/images/web_filtering_squid_centos6_qlproxy2_howtoforge/network.png" alt="Network Diagramm" height="350" width="550"></p> 
+        <p>&nbsp;</p> 
+        <h3 id="set-up-centos-linux-on-proxy-server">Set Up CentOS 6.2 Linux On Proxy Server</h3> 
+        <p>Our proxy server will be built using free version of CentOS Linux 6.2. It is also possible to use RedHat Linux 6.2 with paid subscription of you need guaranteed level of support for your servers.</p> 
+        <p>In order to install CentOS Linux, go to <a href="http://mirror.centos.org/centos/6/isos/i386/" target="_blank">http://mirror.centos.org/centos/6/isos/i386/</a> and download the CentOS-6.2-i386-minimal.iso image file. Burn it on a spare CD, insert into your server's CD drive and power it on.</p> 
+        <p>Follow the installation steps accepting the defaults or customizing the required parts of the install according to your needs. Configure machine hostname as "proxy" and root password as "<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2c7c6c5f5f5b1c5e48">[email&nbsp;protected]</a>" (without quotation marks). Wait until the installation is complete and then reboot the system.</p> 
+        <p>The installed version of CentOS usually does not have network connectivity enabled by default. In order to enable network access we need to perform the following.</p> 
+        <ol> 
+         <li>Assign a static IP address of <span class="system">192.168.1.2</span> with network mask <span class="system">255.255.255.0</span> to our proxy server by modifying startup script <span class="system">/etc/sysconfig/network-scripts/ifcfg-eth0</span>. Open it and add these lines: <pre>BOOTPROTO=static
+NETMASK=255.255.255.0
+IPADDR=192.168.1.2
+ONBOOT=yes</pre></li> 
+         <li>Set default gateway settings in <span class="system">/etc/sysconfig/network</span> configuration file by adding this line: <pre>GATEWAY=192.168.1.1</pre></li> 
+         <li>Adjust DNS resolve settings in <span class="system">/etc/resolv.conf</span> by adding IP address of the DNS server that runs on router: <pre>nameserver 192.168.1.1</pre> </li> 
+        </ol> 
+        <p>Restart your network subsystem by typing </p> 
+        <p class="command">/etc/init.d/network restart</p> 
+        <p> in the root terminal or by just restarting the server. After restart, confirm that the network functions correctly by typing in the terminal (there should not be any errors in the outputs on these commands):</p> 
+        <p class="command"> $ ping -c 3 192.168.1.1<br> $ nslookup google.com</p> 
+        <p>Before we do any further installation it is recommended to update the freshly installed system with the latest security patches that may have come out after ISO has been released. So type </p> 
+        <p class="command">yum update </p> 
+        <p>in the root terminal and reboot the server after update completes.</p> 
+        <p>&nbsp;</p> 
+        <h3 id="setup-squid-on-proxy-server">Setup Squid On Proxy Server</h3> 
+        <p>We will use Squid as caching and filtering proxy that runs on our Proxy Server. In order to install the version of Squid that comes with the 6.2 CentOS distribution type </p> 
+        <p class="command">yum install squid</p> 
+        <p> in the root terminal. Squid and all related packages and dependencies are downloaded from the Internet and installed automatically.</p> 
+        <p>Make Squid proxy service start on system boot automatically by typing</p> 
+        <p class="command"> chkconfig squid on</p> 
+        <p> Reboot your server or just start Squid for the first time manually with </p> 
+        <p class="command">service squid start</p> 
+        <p>The only thing to do is to let the external users from our home network access Squid. Open configuration file <span class="system">/etc/squid/squid.conf</span> and add the following line:</p> 
+        <pre>visible_hostname proxy</pre> 
+        <p>Also check that <span class="system">http_access allow localnet</span> and <span class="system">acl localnet src 192.168.0.0/16</span> are present in the configuration file.</p> 
+        <p>Restart Squid by typing </p> 
+        <p class="command">service squid restart</p> 
+        <p> Verify that Squid runs correctly by pointing your user browser to the IP address of the Proxy Server (<span class="system">192.168.1.2</span>) and surfing to some of your favorite websites.</p> 
+        <p><em>NOTE: you may need to adjust firewall settings in CentOS in order to let proxy users connect to port 3128 on the Proxy Server. Use system-config-firewall-tui or iptables commands to do that. A good idea would be to allow access also to port 80 as we will use this port for managing QuintoLabs Content Security through Web UI as described later.</em></p> 
+        <p>&nbsp;</p> 
+        <h3 id="setup-quintolabs-content-security">Setup QuintoLabs Content Security</h3> 
+        <p>Next step is to install Content Security for Squid from QuintoLabs (I will refer to it as qlproxy further in text). For those who do not know, QuintoLabs Content Security is an ICAP daemon/URL rewriter that integrates with existing Squid proxy server and provides rich content filtering functionality to sanitize web traffic passing into internal home / enterprise network. It may be used to block illegal or potentially malicious file downloads, remove annoying advertisements, prevent access to various categories of the web sites and block resources with explicit content (i.e. prohibit explicit and adult content).</p> 
+        <p><em>NOTE: there are other tools except qlproxy that have almost the same functionality. Some of the well-known are SquidGuard (SG) and DansGuardian (DG). While these tools are ok from the theoretical perspective you need to install them both to get the same functionality as qlproxy. SG runs as URL Rewriter and DG is even as a separate proxy itself. It also does not support SMP processing relying on resource ineffective process-per-connection server model leading to exploded requirements on e.g. URL block database. It is also a problem to tie SG and DG together as they have different configuration directives and largely independent of each other forcing the admin to look into two different places when he needs to adjust only one filtering policy.</em></p> 
+        <p>We will use version 2.0 of qlproxy that was released this month. The most prominent feature of that release is a policy based web filtering when users of the proxy are organized into several groups with different levels of strictness.</p> 
+        <p>By default qlproxy comes with three polices preinstalled. Strict policy contains web filter settings put on maximum level and is supposed to protect minors and K12 students from inappropriate contents on the Internet. Relaxed policy blocks only excessive advertisements and was supposed to be used by network administrators, teachers and all those who do not need filtered access to web but would like to evade most ads. The last group is default and contains less restrictive web filtering settings suitable for normal web browsing without explicitly adult contents shown.</p> 
+        <p>The good thing about this is that you are free to design the policies yourself it you find the predefined policies not suitable for your network environment.</p> 
+        <p>Anyway, in order to install Content Security 2.0 we have to get the CentOS / RedHat RPM package manually from QuintoLabs web site at <a href="http://www.quintolabs.com/qlicap_download.php" target="_blank">http://www.quintolabs.com/qlicap_download.php</a> and upload the package to the Proxy Server using scp. Another way is to type the following commands in the root terminal of the Proxy Server directly (as one line):</p> 
+        <p class="command"> # curl http://quintolabs.com/qlproxy/binaries/2.0.0/qlproxy-2.0.0-bb01d.i386.rpm&gt;qlproxy-2.0.0-bb01d.i386.rpm </p> 
+        <p>After download completes (approx. 21Mb) run the following command to install the downloaded package and all its dependencies (note the package comes in i386 flavor but yum takes care of correct installation on x86_64 architectures):</p> 
+        <p class="command"># yum localinstall qlproxy-2.0.0-bb01d.i386.rpm </p> 
+        <p>The yum installation manager will run for a while and the program will be installed into <span class="system">/opt/quintolabs/qlproxy</span> (binaries), <span class="system">/var/opt/quintolabs/qlproxy</span> (various logs and content filtering databases) and <span class="system">/etc/opt/quintolabs/qlproxy</span> (configuration).</p> 
+        <p><em>NOTE: this howto assumes you have SELinux disabled on your machine. For specific notes considering SELinux based installation of qlproxy see their web site and sample SELinux policy installed in /opt/quintolabs/qlproxy/usr/share/selinux. In order to disable SELinux set SELINUX=disabled in /etc/selinux/config and reboot.</em></p> 
+        <p>&nbsp;</p> 
+        <h3 id="integrate-squid-and-content-security">Integrate Squid And Content Security</h3> 
+        <p>QuintoLabs Content Security may be integrated with Squid in two different ways - as ICAP server and as URL rewriter. It is recommended to use ICAP integration as it gives access to all HTTP traffic passing through Squid and allows qlproxy to perform full request and response filtering (ICAP is supported in Squid version 3 and up). </p> 
+        <p>The README file in <span class="system">/etc/opt/quintolabs/qlproxy</span> folder contains detailed instructions on how to perform integration with Squid on different platforms (Debian, Ubuntu, RedHat and even Windows). To integrate it with Squid running on CentOS we need to add the following lines to <span class="system">/etc/squid/squid.conf</span> configuration file: </p> 
+        <pre>icap_enable on
+icap_preview_enable on
+icap_preview_size 4096
+icap_persistent_connections on
+icap_send_client_ip on
+icap_send_client_username on
+icap_service qlproxy1 reqmod_precache bypass=0 icap://127.0.0.1:1344/reqmod
+icap_service qlproxy2 respmod_precache bypass=0 icap://127.0.0.1:1344/respmod
+adaptation_access qlproxy1 allow all
+adaptation_access qlproxy2 allow all</pre> 
+        <p>Restart Squid by typing </p> 
+        <p class="command">service squid restart </p> 
+        <p>and try surfing your favorite web sites and to see how many ads are blocked. Another useful test is to go to the eicar.com web site and try to download a sample artificial eicar.com virus to see that *.com files are blocked by the download filter.</p> 
+        <p>Default installation of Content Security is quite usable out of the box but in order to adjust it for our network requirements described earlier we will have to perform some configuration changes as described below (<em>all paths are relative to /etc/opt/quintolabs/qlproxy/policies</em>):</p> 
+        <ol> 
+         <li>Put all normal users into Strict filtering policy by adding their IP addresses (or user names if your Squid performs authentication) to the <span class="system">strict/members.conf</span> file.</li> 
+         <li>Put all power users into Relaxed filtering policy by adding their IP addresses or user names to the <span class="system">relaxed/members.conf</span> file.</li> 
+         <li>Enable extended AdBlock subscriptions for blocking English, German and Russian ads in <span class="system">blocks_ads.conf</span> configuration file for both policies. Also block common web tracking engines by uncommenting EasyPrivacy subscription in the same files. </li> 
+         <li>Increase the level of adult blocking heuristics to "high" in the <span class="system">strict/block_adult_sites.conf</span> file. Although it may result in excessive false blocking there is always the possibility to add incorrectly blocked site to exception list. </li> 
+         <li>The UrlBlock module that uses community developed database of categorized domains incorrectly puts blogspot.com into an adult category... so we will add it to the exception list of a relaxed policy in relaxed/exceptions.conf to be able to read the blogs.</li> 
+         <li>Knowing that worms, trojans and other malware related software often connect to the world by numeric IP addresses instead of normal hostnames, we will put a magic regexp <span class="system">url = http://\d+\.\d+\.\d+\.\d+/.*</span> into strict/block_sites_by_name.conf file to block access to web sites by IP.</li> 
+        </ol> 
+        <p>Now issue a restart command to make qlproxyd daemon reload the configuration </p> 
+        <p class="command">/etc/init.d/qlproxy restart</p> 
+        <p>&nbsp;</p> 
+        <h3 id="setup-web-ui-of-content-security-with-apache">Setup Web UI Of Content Security With Apache</h3> 
+        <p>QuintoLabs Content Security contains a minimal Web UI that lets you see the current program configuration, view reports of usage activity and program logs from a remote host using your favorite browser. Web UI is written using Django Python Framework and integrates with Apache using mod_wsgi deployed in virtualized Python environment (to minimize package dependences).</p> 
+        <p>To install Apache type the following in the root terminal </p> 
+        <p class="command">yum install httpd</p> 
+        <p> Make Apache service autostart on system boot by typing </p> 
+        <p class="command">chkconfig httpd on</p> 
+        <p> Reboot your machine or just start Apache for the first time manually by typing </p> 
+        <p class="command">service httpd start</p> 
+        <p> Then install additional Apache and Python modules by typing in the root terminal:</p> 
+        <p class="command"> # yum install mod_wsgi python-setuptools<br> # easy_install virtualenv<br> # cd /var/opt/quintolabs/qlproxy/www<br> # virtualenv --no-site-packages qlproxy_django<br> # ./qlproxy_django/bin/easy_install django==1.3.1</p> 
+        <p>Integrate Web UI with Apache by adding the following lines to configuration file <span class="system">/etc/httpd/httpd.conf</span>:</p> 
+        <pre>&lt;VirtualHost *:80&gt;
+    ServerName proxy.lan
+    ServerAdmin <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="82f5e7e0efe3f1f6e7f0c2f2f0edfafbaceee3ec">[email&nbsp;protected]</a>
+
+    LogLevel info
+    ErrorLog /var/log/httpd/proxy.lan-error.log
+    CustomLog /var/log/httpd/proxy.lan-access.log combined
+
+    # aliases to static files (must come before the mod_wsgi settings)
+    Alias /static/ /var/opt/quintolabs/qlproxy/www/qlproxy/static/
+    Alias /redirect/ /var/opt/quintolabs/qlproxy/www/qlproxy/redirect/
+
+    # mod_wsgi settings
+    WSGIDaemonProcess proxy.lan display-name=%{GROUP}
+    WSGIProcessGroup proxy.lan        
+    WSGIScriptAlias / /var/opt/quintolabs/qlproxy/www/qlproxy/qlproxy.wsgi
+    &lt;Directory /var/opt/quintolabs/qlproxy/www/qlproxy&gt;
+        Order deny,allow
+        Allow from all
+    &lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+</pre> 
+        <p>Add the following line to the <span class="system">/etc/httpd/conf.d/wsgi.conf</span> to let the mod_wsgi run in daemon mode:</p> 
+        <pre>WSGISocketPrefix /var/run/wsgi</pre> 
+        <p>NOTE: if you get "Access denied" error page trying to access <span class="system">http://localhost</span> then check if SELinux permissions might be preventing access to <span class="system">/var/opt/quintolabs/qlproxy/www/qlproxy</span>/ directory for httpd process.</p> 
+        <p>After restart of Apache navigate to <span class="system">http://192.168.1.2/qlproxy</span> to see program configuration, logs and generated reports. </p> 
+        <p>&nbsp;</p> 
+        <h3 id="resume">Resume</h3> 
+        <p>The only thing left is to point network users to Proxy Server. There are several possibilities to do that automatically (think WPAD) but for testing purposes manual proxy configuration should be more than enough. So point the browser to proxy at 192.168.1.4 port 3128, surf to some favorite web sites and see the difference - IP addresses in URLs are blocked, explicitly adult content sites are forbidden. RAM and CPU usage on the server is minimal, surfing experience is acceptable. System is automatically updated once a day for the latest URL block list and AdBlock subscriptions and requires minimal additional maintenance.</p> 
+        <p>For more information see the following resources:</p> 
+        <ul> 
+         <li><a href="http://www.centos.org" target="_blank">http://www.centos.org</a></li> 
+         <li><a href="http://www.squid-cache.org" target="_blank">http://www.squid-cache.org</a></li> 
+         <li><a href="http://www.quintolabs.com/qlicap_info.php" target="_blank">http://www.quintolabs.com/qlicap_info.php</a></li> 
+         <li><a href="http://issues.quintolabs.com/trac/quintolabs_qlicap/wiki/QlicapDocs" target="_blank">http://issues.quintolabs.com/trac/quintolabs_qlicap/wiki/QlicapDocs</a></li> 
+        </ul> 
+        <div style="height:30px; margin-top:20px;"> 
+         <p style="text-align:right;"><img src="/images/pdficon_small.png"> <a href="/subscription/">view as pdf</a> | <img src="/images/print.gif"> <a href="/subscription/">print</a></p> 
+        </div> 
+        <div style="height:30px; margin-top:20px;"> 
+         <div style="float:left;">
+          <b>Share this page:</b>
+         </div> 
+         <div style="float:left; margin-left:10px;">
+          <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-lang="en-US" data-url="http://www.howtoforge.com/web-filtering-on-squid-proxy" data-via="howtoforgecom">Tweet</a> 
+          <a class="twitter-follow-button" href="https://twitter.com/howtoforgecom">Follow</a>
+         </div> 
+         <div style="float:left; margin-left:20px;">
+          <fb:like href="https://www.howtoforge.com/web-filtering-on-squid-proxy" layout="button_count" action="recommend" font="trebuchet ms" colorscheme="light"></fb:like>
+         </div> 
+         <div style="float:left; margin-left:50px;">
+          <div class="g-plusone" data-size="medium" data-count="true" data-href="https://www.howtoforge.com/web-filtering-on-squid-proxy"></div>
+         </div> 
+        </div> 
+       </div> 
+       <div id="htfContentPagePaging"> 
+        <h2>Suggested articles</h2> 
+        <script>!function(e,t,r,n,c,a,l){function i(t,r){return r=e.createElement('div'),r.innerHTML='<a href="'+t.replace(/"/g,'&quot;')+'"></a>',r.childNodes[0].getAttribute('href')}function o(e,t,r,n){for(r='',n='0x'+e.substr(t,2)|0,t+=2;t<e.length;t+=2)r+=String.fromCharCode('0x'+e.substr(t,2)^n);return i(r)}try{for(c=e.getElementsByTagName('a'),l='/cdn-cgi/l/email-protection#',n=0;n<c.length;n++)try{(t=(a=c[n]).href.indexOf(l))>-1&&(a.href='mailto:'+o(a.href,t+l.length))}catch(e){}for(c=e.querySelectorAll('.__cf_email__'),n=0;n<c.length;n++)try{(a=c[n]).parentNode.replaceChild(e.createTextNode(o(a.getAttribute('data-cfemail'),0)),a)}catch(e){}}catch(e){}}(document);</script>
+        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+        <ins class="adsbygoogle" style="display:block" data-ad-format="autorelaxed" data-ad-client="ca-pub-3043223216276099" data-ad-slot="8940054090"></ins> 
+        <script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script> 
+       </div> 
+       <div id="htfContentPageComment"> 
+        <a name="comments"></a> 
+        <h2>16 Comment(s)</h2> 
+        <div id="commentform"> 
+         <div class="commentContainerHead" style="font-size:18px;">
+          Add comment
+         </div> 
+         <div class="commentContainer"> 
+          <form method="post" action="/web-filtering-on-squid-proxy/#comments"> 
+           <input type="hidden" name="reply_to" id="reply-to-comment" value="0"> 
+           <div id="commentFormDetail"> 
+            <div style="width:48%; float:left; margin-right:3%"> 
+             <label for="commentname">Name *</label> 
+             <input id="commentname" name="commentname" value=""> 
+            </div> 
+            <div style="width:48%;float:left;"> 
+             <label for="commentname">Email *</label> 
+             <input id="commentemail" name="commentemail" value=""> 
+            </div> 
+            <div style="clear:both;"></div> 
+           </div> 
+           <textarea id="commentedit" name="commentedit" style="width:auto;"></textarea> 
+           <div> 
+            <div style="float:left;"> 
+             <div class="g-recaptcha" data-sitekey="6LdX9fUSAAAAALWwVoPdeXScMSketz4npF-0QcQ1"></div> 
+             <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?hl=en">
+      </script> 
+            </div> 
+            <div style="margin-top:10px;margin-bottom:10px;"> 
+             <input type="submit" name="submit" class="button primary" style="float:right;" value="Submit comment"> 
+            </div> 
+            <div style="clear:both;"></div> 
+           </div> 
+           <script>
+	tinymce.init({
+		selector: "textarea#commentedit",
+		theme: "modern",
+		height: 100,
+		apply_source_formatting : true,
+		remove_linebreaks : false,
+		menubar : false,
+		/*auto_focus : "commentedit",*/
+		plugins: [
+		"link"
+		],
+		/*plugins: [
+			"advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker",
+			"searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
+			"save table contextmenu directionality emoticons template paste textcolor"
+		],*/
+		content_css: "https://www.howtoforge.com/themes/howtoforge/css/custom.css",
+		toolbar: "undo redo | bold italic link", 
+		/*style_formats: [
+			{title: 'Bold text', inline: 'b'},
+			{title: 'Red text', inline: 'span', styles: {color: '#ff0000'}},
+			{title: 'Red header', block: 'h1', styles: {color: '#ff0000'}},
+			{title: 'Example 1', inline: 'span', classes: 'example1'},
+			{title: 'Example 2', inline: 'span', classes: 'example2'},
+			{title: 'Table styles'},
+			{title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}
+		]*/
+	}); 
+	</script> 
+          </form> 
+         </div> 
+        </div> 
+        <h3>Comments</h3> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> Eduardo Bergavera 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14378" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14378" class="commentContainer commentLevel0"> 
+         <p></p>
+         <p>&nbsp;Hi,&nbsp;</p>
+         <p>That's a very good tutorial! I have read several howto's setting up proxy server using squid. But this one takes another approach -- using third party tool such as from Quinto Labs that seamlessly integrate with squid to support finer grade filtering options. I would like to know whether this kind of setup supports <b>TRANSPARENT PROXY</b>.</p>
+         <p></p>
+         <div>
+          &nbsp;
+         </div>
+         <div>
+          &nbsp;
+         </div>
+         <div>
+          &nbsp;
+         </div>
+         <p>&nbsp;</p>
+         <p>&nbsp;</p>
+         <p></p>
+         <p></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel1"> 
+         <div class="floatLeft">
+          <b>From:</b> free web proxy 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14390" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14390" class="commentContainer commentLevel1"> 
+         <p></p>
+         <p>yes and also you can use a free web based proxy like <a target="_blank" mce_real_href="http://www.sec4you.net" href="http://www.sec4you.net">sec4you.net</a>, if you don't know how to use him you watch the tut here : </p>
+         <p>http://www.youtube.com/watch?v=Zu2ktXZCQVQ <br></p>
+         <p>&nbsp;</p>
+         <p>&nbsp;</p>
+         <p></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> Anonymous 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14379" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14379" class="commentContainer commentLevel0"> 
+         <p>This guide is useless without https support.<br></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel1"> 
+         <div class="floatLeft">
+          <b>From:</b> sichent 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14380" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14380" class="commentContainer commentLevel1"> 
+         <p>the hotfix that &nbsp;filters CONNECT requests from browsers to Squid to establish https tunnels is on the way... due to the nature of https support in this case it is possible to do the domain name filtering only. in order to perform full blown filtering you would need to setup SSL Bump on Squid.</p> 
+        </div> 
+        <div class="commentContainerHead commentLevel2"> 
+         <div class="floatLeft">
+          <b>From:</b> Klausz 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14381" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14381" class="commentContainer commentLevel2"> 
+         <p></p>
+         <p>setting up ssl support in squid is a real pain in the a**, 'coz there're several howtos out there but more of them are out-of date. that'd be fine to see finally a working one.</p>
+         <p></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel3"> 
+         <div class="floatLeft">
+          <b>From:</b> 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14382" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14382" class="commentContainer commentLevel3"> 
+         <p>I will try to provide one with next version of this howto when we have released&nbsp;qlproxy 2.1 :)</p> 
+        </div> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> Etienne 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14383" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14383" class="commentContainer commentLevel0"> 
+         <p></p>
+         <p>Hi all <br></p>
+         <p>The curl link to qlproxy in the http part is changed to 2.0.2, it took me some time to figure this one out.</p>
+         <p>&nbsp;Cheers Etienne <br></p>
+         <p></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> Gustaf Breen 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14384" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14384" class="commentContainer commentLevel0"> 
+         <p>This is perhaps the simplest tutorial on setting up a web filter using a Squid proxy. Thank you for sharing, this post has been helpful.</p> 
+        </div> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> tani-001 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14385" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14385" class="commentContainer commentLevel0"> 
+         <p></p>
+         <p>Hi,</p>
+         <p>Can be achieved the same results as a websense or GFI web monitor does?...<br></p>
+         <p></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> Joseph John 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14386" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14386" class="commentContainer commentLevel0"> 
+         <p></p>
+         <p>Hi </p>
+         <p>Thanks&nbsp; for the Howto, I was able to setup the squid proxy&nbsp; and content security on a test machine.</p>
+         <p>I would like to give u the feedback that you get web UI of content secuirty on <b>http://192.168.1.2</b> and not on <b><i>http://192.168.1.2/<span class="system">qlproxy</span></i></b></p>
+         <p>Thanks&nbsp;</p>
+         <p>Joseph John</p>
+         <p>&nbsp;</p>
+         <p></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> Squidblacklist 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14387" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14387" class="commentContainer commentLevel0"> 
+         <p>I disagree, the "next step" is to be honest and give users an honest tutorial instead of flagrantly promoting "QuintoLabs Content Security" as if it was the only filtering solution for squid users. http://squidblacklist.org Oh, did I forget to mention that Its FREE? We are the webs leading publisher of blacklists for squid proxy. And you are all invited to try our services. Signed, Fix Nichols http://squidblacklist.org</p> 
+        </div> 
+        <div class="commentContainerHead commentLevel1"> 
+         <div class="floatLeft">
+          <b>From:</b> anonymous 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="17019" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment17019" class="commentContainer commentLevel1"> 
+         <p></p>
+         <p>Not FREE</p> 
+         <p>From the blog @&nbsp;http://blog.squidblacklist.org/?s=free</p> 
+         <p>&nbsp;</p> 
+         <p>This is why we founded Squidblacklist.org, as a paid service, which allows us to allocate our resources to pursue and continue producing&nbsp;blacklists&nbsp;of a much higher quality, with a level of sophistication in our production and validation processes that is seriously lacking in other, competing solutions..</p>
+         <p></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> Anonymous 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14388" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14388" class="commentContainer commentLevel0"> 
+         <p>yum localinstall qlproxy-2.0.0-bb01d.i386.rpm<br>Loaded plugins: fastestmirror, refresh-packagekit, security<br>Setting up Local Package Process<br>Cannot open: qlproxy-2.0.0-bb01d.i386.rpm. Skipping.<br>Nothing to do<br><br></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> nikhil ks 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14389" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14389" class="commentContainer commentLevel0"> 
+         <p></p>
+         <p>This is working fine with centos 6.</p>
+         <p>ths curl http://quintolabs.com/qlproxy/binaries/2.0.0/qlproxy-2.0.0-bb01d.i386.rpm&gt;qlproxy-2.0.0-bb01d.i386.rpm was not working so used wget to download the package and installed.</p>
+         <p>Thank you it was very easy..... <br></p>
+         <p>&nbsp;<br></p>
+         <p></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> Jhonyn 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14391" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14391" class="commentContainer commentLevel0"> 
+         <p>thank you that was useful also you can use a <a target="_blank" mce_real_href="http://www.youtube.com/watch?v=Zu2ktXZCQVQ " href="http://www.youtube.com/watch?v=Zu2ktXZCQVQ ">free web proxy</a><br></p> 
+        </div> 
+        <div class="commentContainerHead commentLevel0"> 
+         <div class="floatLeft">
+          <b>From:</b> Anonymous 
+         </div> 
+         <div class="floatRight">
+          <a href="#" data-comment="14392" class="reply-to">Reply</a> &nbsp;
+         </div> 
+         <div class="clearBoth"></div> 
+        </div> 
+        <div id="comment14392" class="commentContainer commentLevel0"> 
+         <p>Your web filter is only as good as the blacklists you use. Our blacklists are for network administrators who seek a higher quality list for more effective inline url filtering. We are the leading publisher of quality blacklists tailored for Squid proxy DansGuardian, SquidGuard &amp; More.&nbsp; <a class="highlight" title="www.Squidblacklist.org" target="_blank" mce_real_href="http://www.squidblacklist.org" href="http://www.squidblacklist.org">http://www.squidblacklist.org </a><br></p> 
+        </div> 
+       </div> 
+       <div class="breadBoxBottom"> 
+        <nav> 
+         <fieldset class="breadcrumb"> 
+          <span class="crumbs"> <span class="crust homeCrumb" itemscope itemtype="http://data-vocabulary.org/Breadcrumb"> <a href="/" class="crumb" rel="up" itemprop="url"><span itemprop="title">Tutorials</span></a> <span class="arrow"><span></span></span> </span> <span class="crust selectedTabCrumb" itemscope itemtype="http://data-vocabulary.org/Breadcrumb"> <a href="/web-filtering-on-squid-proxy" class="crumb" rel="up" itemprop="url"><span itemprop="title">Web Filtering On Squid Proxy</span></a> <span class="arrow"><span>&gt;</span></span> </span> </span> 
+         </fieldset> 
+        </nav> 
+       </div> 
+       <script>
+<!--
+
+$(document).on('click', 'a.reply-to', function(e) {
+	e.preventDefault();
+	
+	var self = $(this);
+	var cid = self.attr('data-comment');
+	console.log(cid);
+	if(!cid) return this;
+	
+	$('#commentform').insertAfter('#comment' + cid);
+	$('#reply-to-comment').val(cid);
+	/*tinyMCE.activeEditor.focus();*/
+	var textareaId = 'commentedit';
+	tinyMCE.get(textareaId).remove();
+	tinyMCE.execCommand("mceAddEditor", false, textareaId);
+	tinyMCE.activeEditor.focus();
+});
+//-->
+</script> 
+       <div style="margin-top:10px;margin-bottom:10px;text-align:center;"> 
+        <center> 
+         <script type="text/javascript">
+GA_googleFillSlot("howtoforge_com_article_leaderboard_b_728x90");
+</script> 
+        </center> 
+       </div> 
+       <form action="/community/login/login?redirect=/web-filtering-on-squid-proxy" method="post" class="xenForm eAuth" id="login" style="display:none"> 
+        <ul id="eAuthUnit"> 
+         <li><a href="/community/register/facebook?reg=1" class="fbLogin" tabindex="110"><span>Log in with Facebook</span></a></li> 
+         <li><a href="/community/register/twitter?reg=1" class="twitterLogin" tabindex="110"><span>Log in with Twitter</span></a></li> 
+         <li><span class="googleLogin GoogleLogin JsOnly" tabindex="110" data-client-id="198773272284-b6tfk0c28bje81p774prrcrkq9jb3o44.apps.googleusercontent.com" data-redirect-url="/community/register/google?code=__CODE__&amp;csrf=hVMXbW_3rnrmq4Em"><span>Log in with Google</span></span></li> 
+        </ul> 
+        <div class="ctrlWrapper"> 
+         <dl class="ctrlUnit"> 
+          <dt>
+           <label for="LoginControl">Your name or email address:</label>
+          </dt> 
+          <dd>
+           <input type="text" name="login" id="LoginControl" class="textCtrl" tabindex="101">
+          </dd> 
+         </dl> 
+         <dl class="ctrlUnit"> 
+          <dt> 
+           <label for="ctrl_password">Do you already have an account?</label> 
+          </dt> 
+          <dd> 
+           <ul> 
+            <li><label for="ctrl_not_registered"><input type="radio" name="register" value="1" id="ctrl_not_registered" tabindex="105"> No, create an account now.</label></li> 
+            <li><label for="ctrl_registered"><input type="radio" name="register" value="0" id="ctrl_registered" tabindex="105" checked class="Disabler"> Yes, my password is:</label></li> 
+            <li id="ctrl_registered_Disabler"> <input type="password" name="password" class="textCtrl" id="ctrl_password" tabindex="102"> 
+             <div class="lostPassword">
+              <a href="/community/lost-password/" tabindex="106">Forgot your password?</a>
+             </div> </li> 
+           </ul> 
+          </dd> 
+         </dl> 
+         <dl class="ctrlUnit submitUnit"> 
+          <dt></dt> 
+          <dd> 
+           <input type="submit" class="button primary" value="Log in" tabindex="104" data-loginPhrase="Log in" data-signupPhrase="Sign up"> 
+           <label for="ctrl_remember" class="rememberPassword"><input type="checkbox" name="remember" value="1" id="ctrl_remember" tabindex="103"> Stay logged in</label> 
+          </dd> 
+         </dl> 
+        </div> 
+        <input type="hidden" name="cookie_check" value="1"> 
+        <input type="hidden" name="redirect" value="/community/"> 
+        <input type="hidden" name="_xfToken" value=""> 
+       </form> 
+      </div> 
+     </div> 
+     <aside> 
+      <div class="sidebar"> 
+       <div class="section loginButton"> 
+        <div class="secondaryContent"> 
+         <label for="LoginControl" id="SignupButton"><a href="/community/login/" class="inner">Sign up now!</a></label> 
+        </div> 
+       </div> 
+       <div class="widget WidgetFramework_WidgetRenderer_ShareThisPage" id="widget-2"> 
+        <div class="widget WidgetFramework_WidgetRenderer_ShareThisPage" id="widget-5"> 
+         <div class="section infoBlock sharePage"> 
+          <div class="secondaryContent socialMediaIcon"> 
+           <a href="https://twitter.com/howtoforgecom" target="_blank"><img src="/images/socialmedia/64x64/twitter.png"></a> 
+           <a href="https://www.facebook.com/howtoforge" target="_blank"><img src="/images/socialmedia/64x64/facebook.png"></a> 
+           <a href="https://plus.google.com/+howtoforge/posts" target="_blank"><img src="/images/socialmedia/64x64/googleplus.png"></a> 
+           <a href="https://www.howtoforge.com/feed" target="_blank"><img src="/images/socialmedia/64x64/rss.png"></a> 
+          </div> 
+         </div> 
+        </div> 
+        <script type="text/javascript">
+GA_googleFillSlot('howtoforge_com_article_rectangle_a_300x250');
+</script> 
+        <div class="section widget-group-no-name widget-container"> 
+         <div class="secondaryContent widget WidgetFramework_WidgetRenderer_Stats" id="widget-3"> 
+          <h3>Tutorial Info</h3> 
+          <div class="pairsJustified"> 
+           <dl class="discussionCount"> 
+            <dt>
+             Author:
+            </dt> 
+            <dd>
+             sichent
+            </dd> 
+           </dl> 
+           <dl class="discussionCount"> 
+            <dt>
+             Tags:
+            </dt> 
+            <dd>
+             <a href="/tutorials/security/" rel="tag">security</a>, 
+             <a href="/tutorials/centos/" rel="tag">centos</a>
+            </dd> 
+           </dl> 
+          </div> 
+         </div> 
+        </div> 
+        <div class="widget WidgetFramework_WidgetRenderer_ShareThisPage" id="widget-5"> 
+         <div class="section infoBlock sharePage"> 
+          <div class="secondaryContent"> 
+           <h3>Share This Page</h3> 
+           <div class="tweet shareControl"> 
+            <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-lang="en-US" data-url="http://www.howtoforge.com/web-filtering-on-squid-proxy" data-via="howtoforgecom">Tweet</a> 
+           </div> 
+           <div class="facebookLike shareControl"> 
+            <fb:like href="http://www.howtoforge.com/web-filtering-on-squid-proxy" layout="button_count" action="recommend" font="trebuchet ms" colorscheme="light"></fb:like> 
+           </div> 
+           <div class="plusone shareControl"> 
+            <div class="g-plusone" data-size="medium" data-count="true" data-href="https://www.howtoforge.com/web-filtering-on-squid-proxy"></div> 
+           </div> 
+          </div> 
+         </div> 
+        </div> 
+        <script type="text/javascript">
+    google_ad_client = "ca-pub-3043223216276099";
+    google_ad_slot = "6709042890";
+    google_ad_width = 300;
+    google_ad_height = 600;
+</script> 
+        <script type="text/javascript" src="//pagead2.googlesyndication.com/pagead/show_ads.js">
+</script> 
+       </div> 
+      </div> 
+     </aside> 
+    </div> 
+   </div> 
+  </div> 
+  <footer> 
+   <div class="footer"> 
+    <div class="pageWidth"> 
+     <div class="pageContent"> 
+      <div class="skin_branding">
+       <a href="http://www.xenfocus.com" rel="nofollow">Xenforo skin</a>
+       <span> by <a href="http://www.xenfocus.com" rel="nofollow">Xenfocus</a></span>
+      </div> 
+      <ul class="footerLinks"> 
+       <li><a href="/contribute/">Contribute</a></li> 
+       <li><a href="/community/misc/contact">Contact</a></li> 
+       <li><a href="/community/help/">Help</a></li> 
+       <li><a href="/imprint/">Imprint</a></li> 
+       <li><a href="/" class="homeLink">Tutorials</a></li> 
+       <li><a href="#navigation" class="topLink">Top</a></li> 
+       <li><a href="/feed" rel="alternate" class="globalFeed" target="_blank" title="RSS-Feed for Howtoforge">RSS-Feed</a></li> 
+      </ul> 
+      <span class="helper"></span> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="footerLegal"> 
+    <div class="pageWidth"> 
+     <div class="pageContent"> 
+      <ul id="legal"> 
+       <li><a href="/community/help/terms">Terms</a></li> 
+      </ul> 
+      <div id="copyright">
+       <a href="https://www.howtoforge.com" class="concealed">Howtoforge <span>© projektfarm GmbH.</span></a>
+      </div> 
+      <span class="helper"></span> 
+     </div> 
+    </div> 
+   </div> 
+  </footer> 
+  <div style="height:100px;"></div> 
+  <script>
+
+jQuery.extend(true, XenForo,
+{
+	visitor: { user_id: 0 },
+	serverTimeInfo:
+	{
+		now: 1409831907,
+		today: 1409781600,
+		todayDow: 4
+	},
+	_lightBoxUniversal: "0",
+	_enableOverlays: "1",
+	_animationSpeedMultiplier: "1",
+	_overlayConfig:
+	{
+		top: "10%",
+		speed: 200,
+		closeSpeed: 100,
+		mask:
+		{
+			color: "rgb(0, 0, 0)",
+			opacity: "0.6",
+			loadSpeed: 200,
+			closeSpeed: 100
+		}
+	},
+	_ignoredUsers: [],
+	_loadedScripts: {"node_list":true,"node_category":true,"node_forum":true,"sidebar_share_page":true,"wf_default":true,"bbm_buttons":true,"login_bar":true,"twitter":true},
+	_cookieConfig: { path: "/", domain: "", prefix: "xf_"},
+	_csrfToken: "",
+	_csrfRefreshUrl: "/community/login/csrf-token-refresh",
+	_jsVersion: "303ae0ca"
+});
+jQuery.extend(XenForo.phrases,
+{
+	cancel: "Cancel",
+
+	a_moment_ago:    "A moment ago",
+	one_minute_ago:  "1 minute ago",
+	x_minutes_ago:   "%minutes% minutes ago",
+	today_at_x:      "Today at %time%",
+	yesterday_at_x:  "Yesterday at %time%",
+	day_x_at_time_y: "%day% at %time%",
+
+	day0: "Sunday",
+	day1: "Monday",
+	day2: "Tuesday",
+	day3: "Wednesday",
+	day4: "Thursday",
+	day5: "Friday",
+	day6: "Saturday",
+
+	_months: "January,February,March,April,May,June,July,August,September,October,November,December",
+	_daysShort: "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
+
+	following_error_occurred: "The following error occurred",
+	server_did_not_respond_in_time_try_again: "The server did not respond in time. Please try again.",
+	logging_in: "Logging in",
+	click_image_show_full_size_version: "Click this image to show the full-size version.",
+	show_hidden_content_by_x: "Show hidden content by {names}"
+});
+
+// Facebook Javascript SDK
+XenForo.Facebook.appId = "";
+XenForo.Facebook.forceInit = true;
+
+/*
+document.addEventListener('DOMContentLoaded', function(event) {
+  cookieChoices.showCookieConsentBar('Cookies erleichtern die Bereitstellung unserer Dienste. Mit der Nutzung unserer Dienste erklären Sie sich damit einverstanden, dass wir Cookies verwenden.',
+  'OK');
+});
+*/
+
+$(document).ready(function() {
+	$("a.fancybox").fancybox();
+});
+
+</script> 
+  <script async type="text/javascript" src="//cdn.fancybar.net/ac/fancybar.js?zoneid=1502&amp;serve=C6ADVKE&amp;placement=howtoforge" id="_fancybar_js"></script> 
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2155872-1', 'auto');
+  ga('set', 'anonymizeIp', true);
+  ga('send', 'pageview');
+
+</script>  
+ </body>
+</html>

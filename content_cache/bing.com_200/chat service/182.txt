@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="en-US">
+ <head> 
+  <meta charset="UTF-8"> 
+  <title>Tutorial: Building a Flash socket server with Java in five minutes | Giant Flying Saucer</title> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="stylesheet" type="text/css" media="all" href="http://www.giantflyingsaucer.com/blog/wp-content/themes/twentyten/style.css"> 
+  <link rel="pingback" href="http://www.giantflyingsaucer.com/blog/xmlrpc.php"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="Giant Flying Saucer » Feed" href="http://www.giantflyingsaucer.com/blog/?feed=rss2"> 
+  <link rel="alternate" type="application/rss+xml" title="Giant Flying Saucer » Comments Feed" href="http://www.giantflyingsaucer.com/blog/?feed=comments-rss2"> 
+  <link rel="alternate" type="application/rss+xml" title="Giant Flying Saucer » Tutorial: Building a Flash socket server with Java in five minutes Comments Feed" href="http://www.giantflyingsaucer.com/blog/?feed=rss2&amp;p=205"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/www.giantflyingsaucer.com\/blog\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.8.2"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,56826,8203,55356,56819),0,0),c=j.toDataURL(),b!==c&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55358,56794,8205,9794,65039),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55358,56794,8203,9794,65039),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <!-- This site uses the Google Analytics by MonsterInsights plugin v6.2.0 - Using Analytics tracking - https://www.monsterinsights.com/ --> 
+  <script type="text/javascript" data-cfasync="false">
+	/* Function to detect opted out users */
+	function __gaTrackerIsOptedOut() {
+		return document.cookie.indexOf(disableStr + '=true') > -1;
+	}
+
+	/* Disable tracking if the opt-out cookie exists. */
+	var disableStr = 'ga-disable-UA-9826649-1';
+	if ( __gaTrackerIsOptedOut() ) {
+		window[disableStr] = true;
+	}
+
+	/* Opt-out function */
+	function __gaTrackerOptout() {
+	  document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+	  window[disableStr] = true;
+	}
+
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','__gaTracker');
+
+	__gaTracker('create', 'UA-9826649-1', 'auto');
+	__gaTracker('set', 'forceSSL', true);
+	__gaTracker('send','pageview');
+</script> 
+  <!-- / Google Analytics by MonsterInsights --> 
+  <style type="text/css">img.nothumb{border:0;margin:0 0 0 2px !important;}</style> 
+  <!-- Tweet This v1.8.3 b037 mode alpha --> 
+  <link rel="https://api.w.org/" href="http://www.giantflyingsaucer.com/blog/index.php?rest_route=/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.giantflyingsaucer.com/blog/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.giantflyingsaucer.com/blog/wp-includes/wlwmanifest.xml"> 
+  <link rel="prev" title="Tutorial: Using Flash CS3 to access Amazon's SimpleDB" href="http://www.giantflyingsaucer.com/blog/?p=167"> 
+  <link rel="next" title="Building a Multi-user Chat Server with xSocket, Java, and Flash CS3" href="http://www.giantflyingsaucer.com/blog/?p=224"> 
+  <meta name="generator" content="WordPress 4.8.2"> 
+  <link rel="canonical" href="http://www.giantflyingsaucer.com/blog/?p=205"> 
+  <link rel="shortlink" href="http://giantflyingsaucer.com/blog/?p=http://giantflyingsaucer.com/blog/?p=205"> 
+  <link rel="alternate" type="application/json+oembed" href="http://www.giantflyingsaucer.com/blog/index.php?rest_route=%2Foembed%2F1.0%2Fembed&amp;url=http%3A%2F%2Fwww.giantflyingsaucer.com%2Fblog%2F%3Fp%3D205"> 
+  <link rel="alternate" type="text/xml+oembed" href="http://www.giantflyingsaucer.com/blog/index.php?rest_route=%2Foembed%2F1.0%2Fembed&amp;url=http%3A%2F%2Fwww.giantflyingsaucer.com%2Fblog%2F%3Fp%3D205&amp;format=xml"> 
+  <style type="text/css" id="syntaxhighlighteranchor"></style> 
+ </head> 
+ <body class="post-template-default single single-post postid-205 single-format-standard"> 
+  <div id="wrapper" class="hfeed"> 
+   <div id="header"> 
+    <div id="masthead"> 
+     <div id="branding" role="banner"> 
+      <div id="site-title"> 
+       <span> <a href="http://www.giantflyingsaucer.com/blog/" title="Giant Flying Saucer" rel="home">Giant Flying Saucer</a> </span> 
+      </div> 
+      <div id="site-description">
+       Programming parlour tricks
+      </div> 
+      <img src="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2011/02/gfsbanner1.jpg" width="940" height="198" alt=""> 
+     </div>
+     <!-- #branding --> 
+     <div id="access" role="navigation"> 
+      <div class="skip-link screen-reader-text">
+       <a href="#content" title="Skip to content">Skip to content</a>
+      </div> 
+      <div class="menu">
+       <ul> 
+        <li><a href="http://www.giantflyingsaucer.com/blog/">Home</a></li>
+       </ul>
+      </div> 
+     </div>
+     <!-- #access --> 
+    </div>
+    <!-- #masthead --> 
+   </div>
+   <!-- #header --> 
+   <div id="main"> 
+    <div id="container"> 
+     <div id="content" role="main"> 
+      <div id="nav-above" class="navigation"> 
+       <div class="nav-previous">
+        <a href="http://www.giantflyingsaucer.com/blog/?p=167" rel="prev"><span class="meta-nav">?</span> Tutorial: Using Flash CS3 to access Amazon's SimpleDB</a>
+       </div> 
+       <div class="nav-next">
+        <a href="http://www.giantflyingsaucer.com/blog/?p=224" rel="next">Building a Multi-user Chat Server with xSocket, Java, and Flash CS3 <span class="meta-nav">?</span></a>
+       </div> 
+      </div>
+      <!-- #nav-above --> 
+      <div id="post-205" class="post-205 post type-post status-publish format-standard hentry category-actionscript category-adobe category-flash category-flex category-socket-server"> 
+       <h1 class="entry-title">Tutorial: Building a Flash socket server with Java in five minutes</h1> 
+       <div class="entry-meta"> 
+        <span class="meta-prep meta-prep-author">Posted on</span> 
+        <a href="http://www.giantflyingsaucer.com/blog/?p=205" title="1:40 pm" rel="bookmark"><span class="entry-date">October 23, 2008</span></a> 
+        <span class="meta-sep">by</span> 
+        <span class="author vcard"><a class="url fn n" href="http://www.giantflyingsaucer.com/blog/?author=2" title="View all posts by Chad Lung">Chad Lung</a></span> 
+       </div>
+       <!-- .entry-meta --> 
+       <div class="entry-content"> 
+        <div class="tweetthis" style="text-align:right;">
+         <p> <a href="http://twitter.com/intent/tweet?text=Tutorial%3A+Building+a+Flash+socket+server+with+Java+in+five+minutes+http%3A%2F%2Fis.gd%2FMG3Uyx" onclick="__gaTracker('send', 'event', 'outbound-article', 'http://twitter.com/intent/tweet?text=Tutorial%3A+Building+a+Flash+socket+server+with+Java+in+five+minutes+http%3A%2F%2Fis.gd%2FMG3Uyx', '');" target="_blank" rel="nofollow" class="tt" title="Post to Twitter"><img class="nothumb" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/tweet-this/icons/en/twitter/tt-twitter6.png" alt="Post to Twitter"></a></p>
+        </div>
+        <p>For many people who have used <a href="http://www.adobe.com">Adobe’s</a> <a href="http://www.adobe.com/products/flash/">Flash</a> or <a href="http://www.adobe.com/products/flex/">Flex</a> products long enough they have probably at some point wanted to write a chat program, realtime applications (stock quotes, sports scores, etc.) or perhaps a multi-player online game but maybe the complexity kept you from actually doing that. Never fear, there are many great tools out there now to help you achieve this goal. Today we’ll look at <a href="http://xsocket.sourceforge.net/">xSocket</a> and we’ll build a Flash CS3 application that connects to a socket server, posts some information that will be echoed back, and then we’ll “remotely” shutdown the socket server from our Flash application.</p> 
+        <p><span id="more-205"></span></p> 
+        <p>To complete this tutorial you will need the following:<br> 1. A copy of <a href="http://www.adobe.com/products/flash">Flash CS3/CS4</a> (the trial version will work if you don’t own it).<br> 2. <a href="http://xsocket.sourceforge.net/">xSocket 2.2 (core)</a><br> 3. The <a href="http://java.sun.com/javase/downloads/index.jsp">Java JDK 1.6</a><br> 4. <a href="http://www.netbeans.org">Netbeans 6.1</a></p> 
+        <p>If you want to substitute Eclipse or whatever for Netbeans feel free to do so. Also, if you would rather do this using Flex Builder feel free to do that as well – just remember the tutorial will be based on the above software but it will work just fine using Flex and Eclipse, etc. with the appropriate changes.</p> 
+        <p>Install and configure all the listed software first.</p> 
+        <p>Next, download the <a href="http://xsocket.sourceforge.net/">xSocket 2.2 (core) jar file</a> and save it somewhere like “C:\jars” or wherever you want. Start Netbeans and create a new Java application. From the Netbeans menu choose: File -&gt; New Project and then choose: Java -&gt; Java Application. Press the “Next” button and enter “xSocketServer” for the project’s name. Press the “Finish” button. Now, right-click on the “Libraries” and select the “Add Jar/Folder” and navigate to the place where you saved the xSocket.jar file and click on it.</p> 
+        <p><a href="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xsocket1.jpg"><img src="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xsocket1.jpg" alt="" title="Adding the xSocket Library" width="317" height="382" class="alignnone size-full wp-image-206" srcset="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xsocket1.jpg 317w, http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xsocket1-248x300.jpg 248w, http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xsocket1-124x150.jpg 124w" sizes="(max-width: 317px) 100vw, 317px"></a></p> 
+        <p>Right-click now on the “xsocketserver” package under the “Source Packages” and add a new class. Call the new class “xSocketDataHandler.java”.</p> 
+        <p>Go into the Main.java file and modify it to look like this:</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+
+package xsocketserver;
+
+import org.xsocket.connection.*;
+
+public class Main
+{
+    protected static IServer srv = null;
+
+    public static void main(String[] args)
+    {
+        try
+        {
+            srv = new Server(8090, new xSocketDataHandler());
+            srv.run();
+        }
+        catch(Exception ex)
+        {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    protected static void shutdownServer()
+    {
+        try
+        {
+            srv.close();
+        }
+        catch(Exception ex)
+        {
+            System.out.println(ex.getMessage());
+        }
+    }
+}
+</pre> 
+        <p>All we are doing here is firing up xSocket and telling it to listen on port 8090 on our local machine. We also added a method that can be called to shutdown the xSocket server. We’ll get to that in a moment.</p> 
+        <p>Move into the “xSocketDataHandler.java” file now and modify it to look like this:</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+package xsocketserver;
+
+import java.io.IOException;
+import java.nio.BufferUnderflowException;
+import java.nio.channels.ClosedChannelException;
+import org.xsocket.*;
+import org.xsocket.connection.*;
+
+
+public class xSocketDataHandler implements IDataHandler
+{
+
+    public boolean onData(INonBlockingConnection nbc) throws IOException, BufferUnderflowException, ClosedChannelException, MaxReadSizeExceededException
+    {
+        try
+        {
+            String data = nbc.readStringByDelimiter("\0");
+            nbc.write(data + "\0");
+
+            if(data.equalsIgnoreCase("SHUTDOWN"))
+                Main.shutdownServer();
+        }
+        catch(Exception ex)
+        {
+            System.out.println(ex.getMessage());
+        }
+
+        return true;
+    }
+}
+</pre> 
+        <p>If you’ve read the xSocket tutorial this will look similar. We implement the IDataHandler interface which brings in the onData method where the real fun is. Keep in mind you should also implement IConnectHandler and IIdleTimeoutHandler but for the sake of keeping this tutorial done in five minutes we won’t do that.</p> 
+        <p>We read the data that is handed to us from xSocket and simply return the same data back to the (Flash) client. We also listen to see if “SHUTDOWN” is passed and if so we close down the server. Obviously if you were to build a production socket server you would want to ensure not just anyone could call a remote shutdown on your socket server.</p> 
+        <p>Keep in mind Flash and Flex expect “\0” as their delimiter (always at the end of your transmissions).</p> 
+        <p>Open up Flash and create a new ActionScript 3 project. We won’t be adding any UI to this at all so simply click on the first frame of the timeline and enter the following ActionScript:</p> 
+        <pre class="brush: as3; title: ; notranslate" title="">
+var xmlSocket:XMLSocket = new XMLSocket();
+xmlSocket.connect("127.0.0.1", 8090);
+
+xmlSocket.addEventListener(DataEvent.DATA, onIncomingData);
+
+function onIncomingData(event:DataEvent):void
+{
+    trace("[" + event.type + "] " + event.data);
+}
+
+xmlSocket.send("Hello World");
+xmlSocket.send("SHUTDOWN");
+</pre> 
+        <p>– Keep in mind that its more proper to put your ActionScript code into *.as files (classes) rather than in the timeline, but again for simplicity and speed of our development we just add it to the main timeline.</p> 
+        <p>XMLSocket in Flash is very easy to work with and we’ve done just enough to connect to the xSocket server and send two messages. Two messages will be echoed back, the last message tells the server to shutdown. Start your project in Netbeans first and let it run. Now, if you run the Flash project you should see the following trace output:</p> 
+        <p>[data] Hello World<br> [data] SHUTDOWN</p> 
+        <p>That’s it. As you can see using xSocket it is very powerful, yet very easy to build socket servers for your Flash and Flex projects. xSocket is not limited though to Flash and Flex, it can be used for much more so this is just the tip of the iceberg of the potential for this project.</p> 
+        <p>Download the <a href="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xsocketserver.zip">project files here</a>.</p> 
+        <div class="tweetthis" style="text-align:right;">
+         <p> <a href="http://twitter.com/intent/tweet?text=Tutorial%3A+Building+a+Flash+socket+server+with+Java+in+five+minutes+http%3A%2F%2Fis.gd%2FMG3Uyx" onclick="__gaTracker('send', 'event', 'outbound-article', 'http://twitter.com/intent/tweet?text=Tutorial%3A+Building+a+Flash+socket+server+with+Java+in+five+minutes+http%3A%2F%2Fis.gd%2FMG3Uyx', '');" target="_blank" rel="nofollow" class="tt" title="Post to Twitter"><img class="nothumb" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/tweet-this/icons/en/twitter/tt-twitter6.png" alt="Post to Twitter"></a></p>
+        </div>
+        <div class="code-block code-block-1" style="margin: 8px 0;"> 
+         <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+         <!-- Larger Square 336x280 (not rounded) --> 
+         <ins class="adsbygoogle" style="display:inline-block;width:336px;height:280px" data-ad-client="ca-pub-8291994066409096" data-ad-slot="2126876912"></ins> 
+         <script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        </div> 
+       </div>
+       <!-- .entry-content --> 
+       <div class="entry-utility">
+         This entry was posted in 
+        <a href="http://www.giantflyingsaucer.com/blog/?cat=3" rel="category">ActionScript</a>, 
+        <a href="http://www.giantflyingsaucer.com/blog/?cat=4" rel="category">Adobe</a>, 
+        <a href="http://www.giantflyingsaucer.com/blog/?cat=19" rel="category">Flash</a>, 
+        <a href="http://www.giantflyingsaucer.com/blog/?cat=20" rel="category">Flex</a>, 
+        <a href="http://www.giantflyingsaucer.com/blog/?cat=42" rel="category">Socket Server</a>. Bookmark the 
+        <a href="http://www.giantflyingsaucer.com/blog/?p=205" title="Permalink to Tutorial: Building a Flash socket server with Java in five minutes" rel="bookmark">permalink</a>. 
+       </div>
+       <!-- .entry-utility --> 
+      </div>
+      <!-- #post-## --> 
+      <div id="nav-below" class="navigation"> 
+       <div class="nav-previous">
+        <a href="http://www.giantflyingsaucer.com/blog/?p=167" rel="prev"><span class="meta-nav">?</span> Tutorial: Using Flash CS3 to access Amazon's SimpleDB</a>
+       </div> 
+       <div class="nav-next">
+        <a href="http://www.giantflyingsaucer.com/blog/?p=224" rel="next">Building a Multi-user Chat Server with xSocket, Java, and Flash CS3 <span class="meta-nav">?</span></a>
+       </div> 
+      </div>
+      <!-- #nav-below --> 
+      <div id="comments"> 
+       <h3 id="comments-title">60 Responses to <em>Tutorial: Building a Flash socket server with Java in five minutes</em></h3> 
+       <div class="navigation"> 
+        <div class="nav-previous">
+         <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=1#comments"><span class="meta-nav">?</span> Older Comments</a>
+        </div> 
+        <div class="nav-next"></div> 
+       </div> 
+       <!-- .navigation --> 
+       <ol class="commentlist"> 
+        <li class="comment even thread-even depth-1" id="li-comment-304"> 
+         <div id="comment-304"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=2#comment-304"> November 4, 2010 at 11:29 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@James,</p> 
+           <p>There are code samples for Java clients in the documentation: <a href="http://xsocket.sourceforge.net/core/tutorial/V2/TutorialCore.htm" rel="nofollow">http://xsocket.sourceforge.net/core/tutorial/V2/TutorialCore.htm</a></p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-305"> 
+         <div id="comment-305"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/edf0be6f27738ee7344f767f8e066274?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/edf0be6f27738ee7344f767f8e066274?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://Website" rel="external nofollow" class="url">James</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=2#comment-305"> November 4, 2010 at 6:54 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Oh, that what I thought after search for days. However, more tutorials would be appreciate since not many of us are Java experience but would like the powered of xSocket to intergrated into .Net and Flash.</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-1590"> 
+         <div id="comment-1590"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/ff044211c9f09b944bc2e6dc98cf4db9?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/ff044211c9f09b944bc2e6dc98cf4db9?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://Website" rel="external nofollow" class="url">kevin</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=2#comment-1590"> January 7, 2011 at 7:42 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>can you help us with our game? it’s real time networking..</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-1862"> 
+         <div id="comment-1862"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/6b3be33f56d1e75152198c06b51039c8?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/6b3be33f56d1e75152198c06b51039c8?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://Website" rel="external nofollow" class="url">Brian</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=2#comment-1862"> February 3, 2011 at 9:34 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>DOES not work. Please advise. I have tested this in my Linux, and i get error like this:</p> 
+           <p>Without java:<br> [root@example ~]# nc -l 1020</p> 
+           <p>[root@example ~]# nc -l 8090</p> 
+           <p>With java (less then 1024 gives run fail):<br> Permission denied<br> BUILD SUCCESSFUL (total time: 0 seconds)</p> 
+           <p>With java (greater then 1024 port gives, using your example):<br> run:<br> Feb 3, 2011 3:32:51 PM org.xsocket.connection.Server$LifeCycleHandler onConnected<br> INFO: server listening on 0:0:0:0:0:0:0:0:8090 (xSocket 2.8.15)</p> 
+           <p>channel is closed (read buffer size=0)</p> 
+           <p>channel is closed (read buffer size=0)</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-2526"> 
+         <div id="comment-2526"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/eb7d360f3ec3bdb31177f8cb366c93de?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/eb7d360f3ec3bdb31177f8cb366c93de?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">dEEP</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=2#comment-2526"> March 22, 2011 at 7:46 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>cAN yOU pLEASE HELP for making Chat Server Using Swing And Socket Programming ….<br> My Question is How to accept(Multiple Clients) Requets Using Only One Server<br> ????????? Give Me the Code For that problem and How to Connect Database IN Java and Other Java Frames…..????????????Please Reply Me on MY E-Mail ID Please………………….</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2537"> 
+         <div id="comment-2537"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">janani</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=2#comment-2537"> March 22, 2011 at 11:32 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>me 2 getting the same result what Bryan get while i run in java..<br> 23 Mar, 2011 10:07:42 AM org.xsocket.connection.Server$LifeCycleHandler onConnected<br> INFO: server listening on 0.0.0.0:8090 (xSocket 2.8.15)<br> channel is closed (read buffer size=0)</p> 
+           <p>channel is closed (read buffer size=0)</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-2644"> 
+         <div id="comment-2644"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">Dan</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=2#comment-2644"> March 30, 2011 at 6:21 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@janani and @Bryan Whats your problem? thats the output you should expect! Does your Flash file show the correct trace? i.e.<br> [data]Hello World<br> [data]SHUTDOWN</p> 
+           <p>If so, then it has worked.<br> Change your Main.java from this:<br> srv = new Server(8090, new xSocketDataHandler());<br> to:<br> srv = new Server(“127.0.0.1”, 8090, new xSocketDataHandler());</p> 
+           <p>To stop it listening on 0.0.0.0</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3031"> 
+         <div id="comment-3031"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/78053a41cb191781dc82e048fd7b09fe?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/78053a41cb191781dc82e048fd7b09fe?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Edward Montgomery</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=2#comment-3031"> May 2, 2011 at 1:06 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Excellent. I need a simple way that I control to send data back and forth between Flex and Java. This is the first method I’ve found that is as easy as it should be. Great, simple example! Thanks!</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-3290"> 
+         <div id="comment-3290"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/ce3a217376d9e52e005fec64f29e19e3?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/ce3a217376d9e52e005fec64f29e19e3?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Clyde</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=2#comment-3290"> July 6, 2011 at 6:26 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>How would I make the Java server send things to a client(for example “Hello”), and then AS3 is coded to know if the Java server sent “Hello” so it can react?</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-4142"> 
+         <div id="comment-4142"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/a11a9e443b81bbe35ae788f96828bd90?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/a11a9e443b81bbe35ae788f96828bd90?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Jitechno</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=2#comment-4142"> November 17, 2011 at 5:13 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Chad, is your example working for MacroMedFlash MX? ver 6.0 Trial?<br> Did you check?<br> Because I just assembled all step by step, put action script into 1st frame, alsoa s Button action( I wanrt fire message after click on button) , but I dont see connection to servrer.<br> Also there is a problem to put<br> xmlSocket.addEventListener(DataEvent.DATA, onIncomingData);<br> function onIncomingData(event:DataEvent):void<br> {<br> trace(“[” + event.type + “] ” + event.data);<br> }<br> so I am trying only for this sending part<br> var xmlSocket:XMLSocket = new XMLSocket();<br> xmlSocket.connect(“127.0.0.1”, 8090);<br> xmlSocket.send(“Hello World”);<br> xmlSocket.send(“SHUTDOWN”);</p> 
+           <p>Thanks<br> Ol</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+       </ol> 
+       <div class="navigation"> 
+        <div class="nav-previous">
+         <a href="http://www.giantflyingsaucer.com/blog/?p=205&amp;cpage=1#comments"><span class="meta-nav">?</span> Older Comments</a>
+        </div> 
+        <div class="nav-next"></div> 
+       </div>
+       <!-- .navigation --> 
+       <p class="nocomments">Comments are closed.</p> 
+      </div>
+      <!-- #comments --> 
+     </div>
+     <!-- #content --> 
+    </div>
+    <!-- #container --> 
+    <div id="primary" class="widget-area" role="complementary"> 
+     <ul class="xoxo"> 
+      <li id="text-6" class="widget-container widget_text"> 
+       <div class="textwidget">
+        <p>I’m a software engineer with 15+ years of experience. All opinions are my own.</p> 
+        <p><a href="http://www.linkedin.com/in/chadlung"><img src="http://www.linkedin.com/img/webpromo/btn_myprofile_160x33.png" alt="View Chad Lung's profile on LinkedIn" width="160" height="33" border="0"></a><a href="http://twitter.com/#!/chadlung"><img src="http://www.giantflyingsaucer.com/follow-me-btn.gif"></a></p> 
+        <p><a href="http://www.giantflyingsaucer.com/blog/?feed=rss"><img src="http://www.giantflyingsaucer.com/rss.jpg" width="75px" height="75px"></a><br> Follow via <a href="http://www.giantflyingsaucer.com/blog/?feed=rss">RSS</a> or <a href="http://www.giantflyingsaucer.com/blog/?feed=atom">ATOM</a></p> 
+       </div> </li>
+      <li id="search-4" class="widget-container widget_search"><h3 class="widget-title">Search</h3>
+       <form role="search" method="get" id="searchform" class="searchform" action="http://www.giantflyingsaucer.com/blog/"> 
+        <div> 
+         <label class="screen-reader-text" for="s">Search for:</label> 
+         <input type="text" value="" name="s" id="s"> 
+         <input type="submit" id="searchsubmit" value="Search"> 
+        </div> 
+       </form></li>
+      <li id="text-5" class="widget-container widget_text"> 
+       <div class="textwidget">
+        <script src="http://widgets.twimg.com/j/2/widget.js"></script> 
+        <script>
+new TWTR.Widget({
+  version: 2,
+  type: 'profile',
+  rpp: 4,
+  interval: 6000,
+  width: 210,
+  height: 300,
+  theme: {
+    shell: {
+      background: '#333333',
+      color: '#ffffff'
+    },
+    tweets: {
+      background: '#000000',
+      color: '#ffffff',
+      links: '#4aed05'
+    }
+  },
+  features: {
+    scrollbar: false,
+    loop: false,
+    live: false,
+    hashtags: true,
+    timestamp: true,
+    avatars: false,
+    behavior: 'all'
+  }
+}).render().setUser('chadlung').start();
+</script>
+       </div> </li>
+      <li id="text-7" class="widget-container widget_text"> 
+       <div class="textwidget">
+        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+        <!-- 160x600, created 7/15/09 --> 
+        <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px" data-ad-client="ca-pub-8291994066409096" data-ad-slot="6188798599"></ins> 
+        <script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+       </div> </li>
+      <li id="calendar-4" class="widget-container widget_calendar">
+       <div id="calendar_wrap" class="calendar_wrap">
+        <table id="wp-calendar"> 
+         <caption>
+          October 2017
+         </caption> 
+         <thead> 
+          <tr> 
+           <th scope="col" title="Monday">M</th> 
+           <th scope="col" title="Tuesday">T</th> 
+           <th scope="col" title="Wednesday">W</th> 
+           <th scope="col" title="Thursday">T</th> 
+           <th scope="col" title="Friday">F</th> 
+           <th scope="col" title="Saturday">S</th> 
+           <th scope="col" title="Sunday">S</th> 
+          </tr> 
+         </thead> 
+         <tfoot> 
+          <tr> 
+           <td colspan="3" id="prev"><a href="http://www.giantflyingsaucer.com/blog/?m=201702">« Feb</a></td> 
+           <td class="pad">&nbsp;</td> 
+           <td colspan="3" id="next" class="pad">&nbsp;</td> 
+          </tr> 
+         </tfoot> 
+         <tbody> 
+          <tr> 
+           <td colspan="6" class="pad">&nbsp;</td>
+           <td>1</td> 
+          </tr> 
+          <tr> 
+           <td>2</td>
+           <td id="today">3</td>
+           <td>4</td>
+           <td>5</td>
+           <td>6</td>
+           <td>7</td>
+           <td>8</td> 
+          </tr> 
+          <tr> 
+           <td>9</td>
+           <td>10</td>
+           <td>11</td>
+           <td>12</td>
+           <td>13</td>
+           <td>14</td>
+           <td>15</td> 
+          </tr> 
+          <tr> 
+           <td>16</td>
+           <td>17</td>
+           <td>18</td>
+           <td>19</td>
+           <td>20</td>
+           <td>21</td>
+           <td>22</td> 
+          </tr> 
+          <tr> 
+           <td>23</td>
+           <td>24</td>
+           <td>25</td>
+           <td>26</td>
+           <td>27</td>
+           <td>28</td>
+           <td>29</td> 
+          </tr> 
+          <tr> 
+           <td>30</td>
+           <td>31</td> 
+           <td class="pad" colspan="5">&nbsp;</td> 
+          </tr> 
+         </tbody> 
+        </table>
+       </div></li>
+      <li id="categories-4" class="widget-container widget_categories"><h3 class="widget-title">Categories</h3> 
+       <ul> 
+        <li class="cat-item cat-item-3"><a href="http://www.giantflyingsaucer.com/blog/?cat=3">ActionScript</a> (33) </li> 
+        <li class="cat-item cat-item-4"><a href="http://www.giantflyingsaucer.com/blog/?cat=4">Adobe</a> (18) </li> 
+        <li class="cat-item cat-item-5"><a href="http://www.giantflyingsaucer.com/blog/?cat=5">AIR</a> (3) </li> 
+        <li class="cat-item cat-item-6"><a href="http://www.giantflyingsaucer.com/blog/?cat=6">AJAX</a> (12) </li> 
+        <li class="cat-item cat-item-7"><a href="http://www.giantflyingsaucer.com/blog/?cat=7">Amazon Web Services</a> (4) </li> 
+        <li class="cat-item cat-item-8"><a href="http://www.giantflyingsaucer.com/blog/?cat=8">Android</a> (14) </li> 
+        <li class="cat-item cat-item-63"><a href="http://www.giantflyingsaucer.com/blog/?cat=63">Ansible</a> (1) </li> 
+        <li class="cat-item cat-item-49"><a href="http://www.giantflyingsaucer.com/blog/?cat=49">Apache Abdera</a> (10) </li> 
+        <li class="cat-item cat-item-67"><a href="http://www.giantflyingsaucer.com/blog/?cat=67">Apache Mesos</a> (2) </li> 
+        <li class="cat-item cat-item-9"><a href="http://www.giantflyingsaucer.com/blog/?cat=9">Apache Mina</a> (2) </li> 
+        <li class="cat-item cat-item-52"><a href="http://www.giantflyingsaucer.com/blog/?cat=52">Apache Tomcat</a> (11) </li> 
+        <li class="cat-item cat-item-10"><a href="http://www.giantflyingsaucer.com/blog/?cat=10">App Engine</a> (6) </li> 
+        <li class="cat-item cat-item-12"><a href="http://www.giantflyingsaucer.com/blog/?cat=12">ASP.NET</a> (10) </li> 
+        <li class="cat-item cat-item-53"><a href="http://www.giantflyingsaucer.com/blog/?cat=53">Atom Hopper</a> (15) </li> 
+        <li class="cat-item cat-item-61"><a href="http://www.giantflyingsaucer.com/blog/?cat=61">AtomNuke</a> (3) </li> 
+        <li class="cat-item cat-item-13"><a href="http://www.giantflyingsaucer.com/blog/?cat=13">BlazeDS</a> (1) </li> 
+        <li class="cat-item cat-item-14"><a href="http://www.giantflyingsaucer.com/blog/?cat=14">C#</a> (15) </li> 
+        <li class="cat-item cat-item-48"><a href="http://www.giantflyingsaucer.com/blog/?cat=48">CherryPy</a> (1) </li> 
+        <li class="cat-item cat-item-56"><a href="http://www.giantflyingsaucer.com/blog/?cat=56">CoffeeScript</a> (11) </li> 
+        <li class="cat-item cat-item-15"><a href="http://www.giantflyingsaucer.com/blog/?cat=15">Comet</a> (3) </li> 
+        <li class="cat-item cat-item-46"><a href="http://www.giantflyingsaucer.com/blog/?cat=46">CouchDB</a> (2) </li> 
+        <li class="cat-item cat-item-16"><a href="http://www.giantflyingsaucer.com/blog/?cat=16">Design Patterns</a> (5) </li> 
+        <li class="cat-item cat-item-65"><a href="http://www.giantflyingsaucer.com/blog/?cat=65">Docker</a> (3) </li> 
+        <li class="cat-item cat-item-17"><a href="http://www.giantflyingsaucer.com/blog/?cat=17">Dojo</a> (1) </li> 
+        <li class="cat-item cat-item-18"><a href="http://www.giantflyingsaucer.com/blog/?cat=18">Erlang</a> (1) </li> 
+        <li class="cat-item cat-item-19"><a href="http://www.giantflyingsaucer.com/blog/?cat=19">Flash</a> (25) </li> 
+        <li class="cat-item cat-item-20"><a href="http://www.giantflyingsaucer.com/blog/?cat=20">Flex</a> (31) </li> 
+        <li class="cat-item cat-item-21"><a href="http://www.giantflyingsaucer.com/blog/?cat=21">Go</a> (11) </li> 
+        <li class="cat-item cat-item-22"><a href="http://www.giantflyingsaucer.com/blog/?cat=22">GWT</a> (20) </li> 
+        <li class="cat-item cat-item-23"><a href="http://www.giantflyingsaucer.com/blog/?cat=23">HTML5</a> (26) </li> 
+        <li class="cat-item cat-item-24"><a href="http://www.giantflyingsaucer.com/blog/?cat=24">iPhone</a> (3) </li> 
+        <li class="cat-item cat-item-25"><a href="http://www.giantflyingsaucer.com/blog/?cat=25">Java</a> (75) </li> 
+        <li class="cat-item cat-item-26"><a href="http://www.giantflyingsaucer.com/blog/?cat=26">JavaFX</a> (1) </li> 
+        <li class="cat-item cat-item-27"><a href="http://www.giantflyingsaucer.com/blog/?cat=27">JavaScript</a> (67) </li> 
+        <li class="cat-item cat-item-54"><a href="http://www.giantflyingsaucer.com/blog/?cat=54">JSON Feed Server</a> (1) </li> 
+        <li class="cat-item cat-item-59"><a href="http://www.giantflyingsaucer.com/blog/?cat=59">Luvit</a> (1) </li> 
+        <li class="cat-item cat-item-28"><a href="http://www.giantflyingsaucer.com/blog/?cat=28">Mobile</a> (20) </li> 
+        <li class="cat-item cat-item-29"><a href="http://www.giantflyingsaucer.com/blog/?cat=29">MongoDB</a> (6) </li> 
+        <li class="cat-item cat-item-50"><a href="http://www.giantflyingsaucer.com/blog/?cat=50">Netbeans</a> (22) </li> 
+        <li class="cat-item cat-item-30"><a href="http://www.giantflyingsaucer.com/blog/?cat=30">Node.js</a> (40) </li> 
+        <li class="cat-item cat-item-31"><a href="http://www.giantflyingsaucer.com/blog/?cat=31">Online Games</a> (13) </li> 
+        <li class="cat-item cat-item-32"><a href="http://www.giantflyingsaucer.com/blog/?cat=32">Open Source</a> (149) </li> 
+        <li class="cat-item cat-item-60"><a href="http://www.giantflyingsaucer.com/blog/?cat=60">OpenStack</a> (17) </li> 
+        <li class="cat-item cat-item-33"><a href="http://www.giantflyingsaucer.com/blog/?cat=33">Perl</a> (1) </li> 
+        <li class="cat-item cat-item-34"><a href="http://www.giantflyingsaucer.com/blog/?cat=34">PHP</a> (23) </li> 
+        <li class="cat-item cat-item-35"><a href="http://www.giantflyingsaucer.com/blog/?cat=35">Python</a> (58) </li> 
+        <li class="cat-item cat-item-36"><a href="http://www.giantflyingsaucer.com/blog/?cat=36">Rails</a> (4) </li> 
+        <li class="cat-item cat-item-55"><a href="http://www.giantflyingsaucer.com/blog/?cat=55">Redis</a> (3) </li> 
+        <li class="cat-item cat-item-58"><a href="http://www.giantflyingsaucer.com/blog/?cat=58">Repose</a> (1) </li> 
+        <li class="cat-item cat-item-51"><a href="http://www.giantflyingsaucer.com/blog/?cat=51">REST</a> (10) </li> 
+        <li class="cat-item cat-item-37"><a href="http://www.giantflyingsaucer.com/blog/?cat=37">Reviews</a> (11) </li> 
+        <li class="cat-item cat-item-38"><a href="http://www.giantflyingsaucer.com/blog/?cat=38">Ruby</a> (13) </li> 
+        <li class="cat-item cat-item-64"><a href="http://www.giantflyingsaucer.com/blog/?cat=64">Salt</a> (3) </li> 
+        <li class="cat-item cat-item-40"><a href="http://www.giantflyingsaucer.com/blog/?cat=40">Silverlight</a> (3) </li> 
+        <li class="cat-item cat-item-41"><a href="http://www.giantflyingsaucer.com/blog/?cat=41">Sinatra</a> (3) </li> 
+        <li class="cat-item cat-item-42"><a href="http://www.giantflyingsaucer.com/blog/?cat=42">Socket Server</a> (20) </li> 
+        <li class="cat-item cat-item-62"><a href="http://www.giantflyingsaucer.com/blog/?cat=62">Tornado</a> (3) </li> 
+        <li class="cat-item cat-item-43"><a href="http://www.giantflyingsaucer.com/blog/?cat=43">Ubuntu</a> (45) </li> 
+        <li class="cat-item cat-item-1"><a href="http://www.giantflyingsaucer.com/blog/?cat=1">Uncategorized</a> (5) </li> 
+        <li class="cat-item cat-item-47"><a href="http://www.giantflyingsaucer.com/blog/?cat=47">Union Framework</a> (8) </li> 
+        <li class="cat-item cat-item-44"><a href="http://www.giantflyingsaucer.com/blog/?cat=44">Vaadin</a> (2) </li> 
+        <li class="cat-item cat-item-57"><a href="http://www.giantflyingsaucer.com/blog/?cat=57">Vertx</a> (3) </li> 
+        <li class="cat-item cat-item-45"><a href="http://www.giantflyingsaucer.com/blog/?cat=45">WebORB</a> (3) </li> 
+       </ul> </li> 
+     </ul> 
+    </div>
+    <!-- #primary .widget-area --> 
+   </div>
+   <!-- #main --> 
+   <div id="footer" role="contentinfo"> 
+    <div id="colophon"> 
+     <div id="site-info"> 
+      <a href="http://www.giantflyingsaucer.com/blog/" title="Giant Flying Saucer" rel="home"> Giant Flying Saucer </a> 
+     </div>
+     <!-- #site-info --> 
+     <div id="site-generator"> 
+      <a href="https://wordpress.org/" title="Semantic Personal Publishing Platform">Proudly powered by WordPress.</a> 
+     </div>
+     <!-- #site-generator --> 
+    </div>
+    <!-- #colophon --> 
+   </div>
+   <!-- #footer --> 
+  </div>
+  <!-- #wrapper --> 
+  <script type="text/javascript" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shCore.js?ver=3.0.9b"></script> 
+  <script type="text/javascript" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJava.js?ver=3.0.9b"></script> 
+  <script type="text/javascript" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shBrushAS3.js?ver=3.0.9b"></script> 
+  <script type="text/javascript">
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.getElementsByTagName("head")[0].insertBefore( corecss, document.getElementById("syntaxhighlighteranchor") );
+		var themecssurl = "http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeEclipse.css?ver=3.0.9b";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		//document.getElementById("syntaxhighlighteranchor").appendChild(themecss);
+		document.getElementsByTagName("head")[0].insertBefore( themecss, document.getElementById("syntaxhighlighteranchor") );
+	})();
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = 'Can\'t find brush for: ';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush wasn\'t configured for html-script option: ';
+	SyntaxHighlighter.defaults['auto-links'] = false;
+	SyntaxHighlighter.defaults['gutter'] = false;
+	SyntaxHighlighter.defaults['pad-line-numbers'] = 1;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.defaults['wrap-lines'] = false;
+	SyntaxHighlighter.all();
+</script> 
+  <script type="text/javascript" src="http://www.giantflyingsaucer.com/blog/wp-includes/js/wp-embed.min.js?ver=4.8.2"></script>   
+ </body>
+</html>

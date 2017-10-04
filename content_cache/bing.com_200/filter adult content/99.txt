@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="en">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <link rel="icon" href="//www.ibm.com/favicon.ico"> 
+  <link rel="canonical" href="http://www.ibm.com/developerworks/data/library/cognos/reporting/dashboarding/page531.html"> 
+  <meta name="geo.country" content="ZZ"> 
+  <meta name="dcterms.rights" content="© Copyright&nbsp;IBM Corporation&nbsp;2010"> 
+  <meta name="dcterms.date" content="2010-11-09"> 
+  <meta name="description" content="This document will illustrate how to implement global filters that filter reports in a Multi-page portlet in an IBM Cognos portal page."> 
+  <meta name="keywords" content="cognospp, cognospp reporting, cognospp reporting dashboarding, cognosppreportingall, cognosppreportingdashboarding, cognos, proven practice, bi, tip, technique, global filter, multi-page portlet, portal, cognos portal, dashboard, tttbalca, ddddmca"> 
+  <meta name="robots" content="index,follow"> 
+  <title>IBM Cognos Proven Practices: IBM Cognos BI - Global Filters for a Multi-Page Dashboard</title> 
+  <script> 
+    digitalData = {
+        "page":{
+            "category":{
+                "primaryCategory":"SOFDCBZAZZ"
+            },
+            "pageInfo":{
+                "effectiveDate":"2010-11-09",
+                "language":"en",
+                "publishDate":"2010-11-09",
+                "publisher":"IBM Corporation",
+                "version":"v18",
+                "ibm":{ 
+                    "contentDelivery":"IBM developerWorks template",
+                    "contentProducer":"IBM developerWorks",
+                    "country":"ZZ",
+                    "owner":"developerWorks Content/Raleigh/IBM",
+                    "subject":"SSEP7J,SSEP7J,SSEP7J,SSEP7J,SWQ00",
+                    "type":"CT316",
+                    "topic":"Business intelligence",
+                    "topicId":"703",
+                    "contentArea":"analytics,data",
+                    "contentAreaId":"53,18",
+                    "contentType":"article",
+                    "contentId":"572603",
+                    "brandProduct":"SSEP7J,SSEP7J,SSEP7J,SSEP7J"
+                },
+                "keywords":"cognospp, cognospp reporting, cognospp reporting dashboarding, cognosppreportingall, cognosppreportingdashboarding, cognos, proven practice, bi, tip, technique, global filter, multi-page portlet, portal, cognos portal, dashboard, tttbalca, ddddmca",
+                "description":"This document will illustrate how to implement global filters that filter reports in a Multi-page portlet in an IBM Cognos portal page."
+            }
+        }
+    };
+    window._analytics = {
+        "segment_key":'HU3dbkAG5wE0F1IkRf9S1RexlAqo3jby'
+    };
+</script> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:site" content="@developerworks"> 
+  <meta property="og:title" content="IBM Cognos BI - Global Filters for a Multi-Page Dashboard"> 
+  <meta property="og:description" content="This document will illustrate how to implement global filters that filter reports in a Multi-page portlet in an IBM Cognos portal page."> 
+  <meta property="og:image" content="http://www.ibm.com/developerworks/i/dw-social-201508.png"> 
+  <!-- Segment meta tag --> 
+  <meta name="segment" property="(developerWorks)" productTitle="developerWorks" value="Data and Analytics English (developerWorks)"> 
+  <!-- SITE MON : START (DO NOT DELETE) --> 
+  <!-- developerWorks monitoring token --> 
+  <!-- SITE MON : END (DO NOT DELETE) --> 
+  <!-- HEADER_SCRIPTS_AND_CSS_INCLUDE --> 
+  <!-- <script src="//cdn.optimizely.com/js/5399420604.js"></script> --> 
+  <!-- BEGIN: Use this section to set page specific variables for the Page Tag --> 
+  <script language="JavaScript">var NTPT_PGEXTRA="ibmSkillLevel=3&ibmCmaId=572603&ibmContentAreas=analytics,data";</script> 
+  <!--END --> 
+  <script src="//1.www.s81c.com/common/stats/ida_stats.js"></script> 
+  <link href="//1.www.s81c.com/common/v18/css/www.css" rel="stylesheet"> 
+  <link href="//1.www.s81c.com/common/v18/css/syntaxhighlighter.css" rel="stylesheet"> 
+  <script src="//1.www.s81c.com/common/v18/js/www.js"></script> 
+  <script src="//1.www.s81c.com/common/v18/js/syntaxhighlighter.js"></script> 
+  <link href="//1.www.s81c.com/common/v18/css/tables.css" rel="stylesheet"> 
+  <script src="//1.www.s81c.com/common/v18/js/tables.js"></script> 
+  <!--  Masthead/footer  --> 
+  <link href="//dw1.s81c.com/developerworks/css/dw-mf/v18/dw-mf-v18.css?v=092117" rel="stylesheet"> 
+  <!-- <link href="//dw1.s81c.com/developerworks/css/dw-mf/v18/alt-signedin-ux.css" rel="stylesheet" /> --> 
+  <!--[if lt IE 9]>
+    <link href="//dw1.s81c.com/developerworks/css/dw-mf/v18/dw-mf-ie8fix.css?v=022216" rel="stylesheet" />
+<![endif]--> 
+  <link href="//dw1.s81c.com/developerworks/css/v18/dw-article.css?v=073117" rel="stylesheet"> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-auth-properties.js?v=041017"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-auth.js?v=062717"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/dw-mf/v18/dw-mf.js?v=110316"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-include.js"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-article.js?v=051817"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-auto-links.js?v=091217"></script> 
+  <script src="//www.ibm.com/software/info/js/tactic.js"></script> 
+  <script src="//www.ibm.com/software/info/js/tacticbindlinks.js"></script> 
+  <!-- Segment --> 
+  <script src="//console.ng.bluemix.net/analytics/build/bluemix-analytics.min.js"></script> 
+  <!-- 
+<PageMap>
+    <DataObject type="document">
+        <Attribute name="topic">Business intelligence</Attribute>
+        <Attribute name="topicId">703</Attribute>
+        <Attribute name="contentArea">analytics,data</Attribute>
+        <Attribute name="contentAreaId">53,18</Attribute>
+        <Attribute name="abstract">This document will illustrate how to implement global filters that filter reports in a Multi-page portlet in an IBM Cognos portal page.</Attribute>
+        <Attribute name="pub.date">2010-11-09</Attribute>
+        <Attribute name="contentType">article</Attribute>
+    </DataObject>
+</PageMap>
+--> 
+ </head> 
+ <body id="ibm-com" class="ibm-type dw-js-disabled"> 
+  <div id="ibm-top" class="ibm-landing-page"> 
+   <!-- MASTHEAD_BEGIN --> 
+   <div id="ibm-masthead" role="banner" aria-label="IBM"> 
+    <div id="ibm-mast-options"> 
+     <ul role="toolbar" aria-labelledby="ibm-masthead"> 
+      <li id="ibm-geo" role="presentation"><a href="http://www.ibm.com/planetwide/select/selector.html" role="button" aria-label="United States selected - Choose a country">United States</a></li> 
+     </ul> 
+    </div> 
+    <div id="ibm-universal-nav"> 
+     <nav role="navigation" aria-label="IBM"> 
+      <div id="ibm-home">
+       <a href="http://www.ibm.com/us/en/">IBM®</a>
+      </div> 
+      <ul id="ibm-menu-links" role="toolbar" aria-label="Site map"> 
+       <li><a href="http://www.ibm.com/sitemap/us/en/">Site map</a></li> 
+      </ul> 
+     </nav> 
+     <div id="ibm-search-module" role="search" aria-labelledby="ibm-masthead"> 
+      <form id="ibm-search-form" action="https://www.ibm.com/Search/" method="get"> 
+       <p> <label for="q">IBM</label> <input type="text" maxlength="100" value="" placeholder="Search" name="q" id="q" aria-label="Search developerWorks"> <input type="hidden" value="18" name="v"> <input type="hidden" value="utf" name="en"> <input type="hidden" value="en" name="lang"> <input type="hidden" value="us" name="cc"> <input type="hidden" name="sn" value="dw"> <input type="hidden" name="dws" value="dw"> <input type="hidden" name="hpp" value="20"> <input type="submit" id="ibm-search" class="ibm-btn-search" value="Submit"> </p> 
+      </form> 
+     </div> 
+    </div> 
+   </div>
+   <!-- MASTHEAD_END --> 
+   <!-- LAYOUT --> 
+   <div id="ibm-content-wrapper"> 
+    <!-- LEADSPACE_BEGIN --> 
+    <header role="banner" aria-labelledby="ibm-pagetitle-h1"> 
+     <!-- MASTHEAD_SITENAV_BEGIN --> 
+     <div class="ibm-sitenav-menu-container"> 
+      <div class="ibm-sitenav-menu-name"> 
+       <a href="//www.ibm.com/developerworks/"> <img width="186" height="24" alt="developerWorks®" src="//dw1.s81c.com/developerworks/i/mf/dw-mf-wordmark.svg"> </a> 
+      </div> 
+      <div class="ibm-sitenav-menu-list"> 
+       <ul role="menubar"> 
+        <li class="dw-navpage-learn ibm-haschildlist" role="presentation"> <span role="menuitem"><a href="//www.ibm.com/developerworks/learn/">Learn</a></span> 
+         <ul role="menu" aria-label="Learn" id="dw-mega-learn"> 
+          <li role="presentation"> 
+           <div class="ibm-columns"> 
+            <div class="ibm-col-5-3 dw-mega-main"> 
+             <h2>Learn with our tutorials and training</h2> 
+             <p class="dw-mega-main-p">developerWorks provides tutorials, articles and other technical resources to help you grow your development skills on a wide variety of topics and products. Learn about a specific product or take a course and get certified. So, what do you want to learn about?</p> 
+             <p class="ibm-button-link"> <a href="//www.ibm.com/developerworks/learn/" class="ibm-btn-pri">Choose a topic</a> </p> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured topics</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-mobile.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/mobile">Mobile development</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-bigdata.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/analytics">Big data</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-cognitive.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/cognitive">Cognitive computing</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-cloud.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/cloud">Cloud</a> 
+              </div> 
+             </div> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured destinations</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-swift.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/swift/?lnk=hm">Swift @ IBM</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-open.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/open/?lnk=hm">developerWorks Open</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-arch.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/architecture/?lnk=hm">Architecture center</a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> </li> 
+         </ul> </li> 
+        <li role="presentation" class="dw-navpage-develop ibm-haschildlist"> <span role="menuitem"><a href="//www.ibm.com/developerworks/develop/">Develop</a></span> 
+         <ul role="menu" aria-label="Develop" id="dw-mega-develop"> 
+          <li role="presentation"> 
+           <div class="ibm-columns"> 
+            <div class="ibm-col-5-3 dw-mega-main"> 
+             <h2>Develop with our trials &amp; downloads</h2> 
+             <p class="dw-mega-main-p">Start developing with product trials, free downloads, and IBM Bluemix™ services. Sort by topic or product name and find everything we have to offer.</p> 
+             <p class="ibm-button-link"> <a href="//www.ibm.com/developerworks/develop/" class="ibm-btn-pri">View all downloads &amp; trials</a> </p> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured products</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-bluemix.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/sso/bmregistration">Bluemix</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-websphere.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/downloads/ws/was/">WebSphere Application Server</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-db2express.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/downloads/im/db2express/">DB2 Express C</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-mobile.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//mobilefirstplatform.ibmcloud.com/">MobileFirst Platform Foundation</a> 
+              </div> 
+             </div> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured destinations</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-swift.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/swift/?lnk=hm">Swift @ IBM</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-open.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/open/?lnk=hm">developerWorks Open</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-arch.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/architecture/?lnk=hm">Architecture center</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-api-dest.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/api/">API Explorer</a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> </li> 
+         </ul> </li> 
+        <li role="presentation" class="dw-navpage-connect ibm-haschildlist"> <span role="menuitem"><a href="//www.ibm.com/developerworks/connect/">Connect</a></span> 
+         <ul role="menu" aria-label="Connect" id="dw-mega-connect"> 
+          <li role="presentation"> 
+           <div class="ibm-columns"> 
+            <div class="ibm-col-5-3 dw-mega-main"> 
+             <h2>Find a community and connect</h2> 
+             <p class="dw-mega-main-p">Learn from the experts and share with other developers in one of our dev centers. Ask questions and get answers with dW answers. Search for local events in your area. All in developerWorks communities.</p> 
+             <p class="ibm-button-link"> <a href="//www.ibm.com/developerworks/connect/" class="ibm-btn-pri">View communities</a> </p> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured Developer Centers</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-jazz-dev.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//jazz.net/">Jazz.net</a> 
+              </div> 
+             </div> 
+             <!--<div class="dw-mega-nav-item">
+                                        <div class="dw-mega-nav-img">
+                                            <img width="30" height="30" alt=""
+                                                src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-cloud-dev.png">
+                                        </div>
+                                        <div class="dw-mega-nav-link">
+                                            <a href="//developer.ibm.com/cloud-analytics/">IBM Cloud Analytics DEV</a>
+                                        </div>
+                                    </div>--> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-bluemix-dev.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/bluemix/">Bluemix</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-api-dev.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/api/">API Explorer</a> 
+              </div> 
+             </div> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured destinations</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-swift.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/swift/?lnk=hm">Swift @ IBM</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-open.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/open/?lnk=hm">developerWorks Open</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-arch.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/architecture/?lnk=hm">Architecture center</a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> </li> 
+         </ul> </li> 
+        <!-- dW featured --> 
+        <!-- <li role="presentation" class="dw-navpage-devcenter"><strong>Subheading</strong></li> --> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/cognitive/">Cognitive</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/cloud/">Cloud</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/analytics/">Data</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/iot/">Internet of Things</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/java/">Java</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/">All topics</a></li> 
+       </ul> 
+      </div> 
+     </div> 
+     <!-- MASTHEAD_SITENAV_END --> 
+     <!-- NAVIGATION_TRAIL_BEGIN --> 
+     <div id="ibm-leadspace-head" class="ibm-alternate"> 
+      <div id="ibm-leadspace-body"> 
+       <nav aria-label="Breadcrumb" role="navigation"> 
+        <ul id="dw-navigation-trail" itemscope itemtype="http://schema.org/BreadcrumbList">
+         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="http://www.ibm.com/developerworks/learn/"><span itemprop="name">Learn</span></a>
+          <meta itemprop="position" content="1"></li>
+         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="http://www.ibm.com/developerworks/data/"><span itemprop="name">Information Management</span></a>
+          <meta itemprop="position" content="2"></li>
+        </ul> 
+       </nav> 
+      </div> 
+     </div> 
+     <!-- NAVIGATION_TRAIL_END --> 
+    </header> 
+    <!-- LEADSPACE_END --> 
+    <!-- MAIN_CONTENT_BEGIN --> 
+    <main role="main" aria-labelledby="ibm-pagetitle-h1"> 
+     <div id="ibm-pcon"> 
+      <!-- BEGIN_IBM-CONTENT --> 
+      <div id="ibm-content"> 
+       <!-- BEGIN_IBM-CONTENT-BODY --> 
+       <div id="ibm-content-body"> 
+        <!-- BEGIN_IBM-CONTENT-MAIN --> 
+        <div id="ibm-content-main" class="dw-article"> 
+         <!-- BEGIN_INTERIOR-COLUMNS --> 
+         <div class="ibm-columns dw-article-toc"> 
+          <!-- LEFT_6_2_CONTENT_COLUMN_BEGIN --> 
+          <div id="dw-article-toc-container" class="ibm-col-6-2"> 
+           <div id="dw-article-toc-body"> 
+            <h2>Contents</h2>
+            <div class="ibm-alternate-rule">
+             <hr>
+            </div>
+            <ul role="directory" aria-label="Table of contents" class="ibm-plain-list">
+             <li><a href="#ibm-pagetitle-h1">Introduction</a></li>
+             <li><a href="#N10057">Overview</a></li>
+             <li><a href="#N10061">Create the Reports</a></li>
+             <li><a href="#N1012B">Create and Configure the Detail Portal Pages</a></li>
+             <li><a href="#N1018B">Create the Master Portal Page</a></li>
+             <li><a href="#artdownload">Downloadable resources</a></li>
+             <li><a href="#icomments">Comments</a></li>
+            </ul> 
+           </div> 
+          </div> 
+          <!-- LEFT_6_2_CONTENT_COLUMN_END --> 
+          <!-- CENTER_6_4_CONTENT_COLUMN_BEGIN --> 
+          <div class="ibm-col-6-4"> 
+           <p class="dw-article-series-head">IBM Cognos Proven Practices</p> 
+           <h1 id="ibm-pagetitle-h1" class="ibm-h1">IBM Cognos BI - Global Filters for a Multi-Page Dashboard</h1>
+           <p class="dw-article-subhead">Nature of Document: Tip or Technique; Product(s): IBM Cognos Connection, Report Studio; Area of Interest: Reporting</p> 
+           <!-- Article Top Bar --> 
+           <div class="ibm-columns dw-article-topbar"> 
+            <!-- Author and article info. --> 
+            <div class="ibm-col-6-2 ibm-col-medium-6-4 dw-article-metadata"> 
+             <div class="dw-article-avatar">
+              <img width="42" height="42" src="//dw1.s81c.com/developerworks/i/v18/article/dw-author.png" alt="">
+             </div>
+             <div class="dw-article-authordate">
+              Vijendra Sawant
+              <br>
+              <span class="dw-article-pubdate">Published on November 09, 2010</span>
+             </div> 
+            </div> 
+            <!-- Social --> 
+            <div class="ibm-col-6-2 ibm-col-medium-6-4 ibm-col-small-6-2 dw-article-social"> 
+             <!-- Sharing links --> 
+             <div id="dw-article-share-inline"> 
+              <div class="dw-article-sharelink-inline"> 
+               <div class="ibm-sharethispage"></div> 
+              </div> 
+             </div> 
+             <!-- Number of comments and link to comments --> 
+             <div id="dw-article-cmts"> 
+              <div class="dw-article-cmtslink"> 
+               <a onclick="tocLink('#icomments')" href="#icomments" role="link" tabindex="0" aria-label="Comments"> <img src="//dw1.s81c.com/developerworks/i/v18/article/dw-article-cmt-icon.png" width="29" height="29" alt="Comments"> </a> 
+              </div> 
+              <div class="dw-article-cmtslink"> 
+               <a onclick="tocLink('#icomments')" href="#icomments" role="link" tabindex="0"> 
+                <div id="nCmts"></div> </a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <div id="dw-series-container">
+            <h3 class="ibm-h3" id="dw-series-heading">Content series:</h3>
+            <div data-widget="showhide" data-type="panel" class="ibm-show-hide">
+             <h2 id="dw-series-show-hide">This content is part <span id="dw-series-part">#</span> of <span id="dw-series-total">#</span> in the series: <span id="dw-series-title">IBM Cognos Proven Practices</span></h2>
+             <div class="ibm-container-body" id="dw-series-links">
+              http://www.ibm.com/developerworks/data/library/cognos/cognosprovenpractices.html
+             </div>
+             <div id="dw-not-all-published">
+              Stay tuned for additional content in this series.
+             </div>
+            </div>
+            <div id="dw-series-alt">
+             <h2>This content is part of the series:<span id="dw-series-title-alt">IBM Cognos Proven Practices</span></h2>
+             <p>Stay tuned for additional content in this series.</p>
+            </div>
+           </div> 
+           <!-- Article Body --> 
+           <h3 id="N10045" class="ibm-h3">Purpose</h3>
+           <p>This document will illustrate how to implement global filters that filter reports in a Multi-page portlet in an IBM Cognos portal page. The core documentation covers the steps to achieve a global filter for reports on one page. This document goes beyond the core documentation to show how to apply the technique when multiple pages are involved.</p>
+           <h3 id="N1004B" class="ibm-h3">Applicability</h3>
+           <p>This technique was tested using IBM Cognos 8.4.1 and IBM Cognos 10.1 using the GO Data Warehouse (query) samples package.</p>
+           <h3 id="N10051" class="ibm-h3">Assumptions</h3>
+           <p>This document assumes experience with IBM Cognos Connection and IBM Cognos Report Studio.</p>
+           <h2 id="N10057" class="ibm-h2">Overview</h2>
+           <p>The IBM Cognos Connection User Guide provides an example of how to create inter-activity between reports with respect to having a prompt report control filtering in other independent reports on the same IBM Cognos portal page.</p>
+           <p>For example, on one portal page you can place three Cognos Viewer portlets, each one containing a different report. The first one contains a simple report page that contains a prompt control for Product Lines. The other two reports contain detailed information that include Product Line information and each are filtered on Product Lines. When the prompt value is changed in the first report, the other two reports reflect that change. This is accomplished by using the same parameter name for Product Line in each report and configuring all three portlets to communicate with each other on a common channel.</p>
+           <p>To take this technique one step further and allow prompt controls to affect the filters of reports located on multiple pages of a Multi-page portlet, there is an extra step involved. In order to allow communication between portlets, you must configure a common channel name. The Multi-page portlet does not have this configuration since it is a container intended to point to a location containing objects for display on multiple pages; one page for each object in the target location. These objects include reports, report views, shortcuts to reports, and portal pages. The key to this technique is to place each report in a Cognos Viewer portlet in a separate portal page. Each Cognos Viewer portlet would be configured with a common channel name. Consider these pages the detail pages. Finally, create a master portal page that points to the detail portal pages using a Multi-page portlet. This technique will allow communication between all the Cognos Viewer portlets regardless of which multi-page tab they are on since they are all in the same parent container, the master portal page.</p>
+           <h2 id="N10061" class="ibm-h2">Create the Reports</h2>
+           <p>In order to make this concept clear, we will create a simple folder structure within Public Folders to contain our reports and portal pages. You may, however, choose any organizational structure that suits your needs.</p>
+           <p>In Public Folders, create the following folder structure:</p>
+           <ul class="ibm-bullet-list">
+            <li>Global Filter Dashboard
+             <ul class="ibm-bullet-list">
+              <li>Detail Pages</li>
+              <li>Reports</li>
+             </ul></li>
+           </ul>
+           <h5 id="N10072" class="ibm-h5">IBM Cognos Connection - Public Folders</h5>
+           <img src="page531_images/page531_figure1.gif" class="ibm-downsize" alt="IBM Cognos Connection - Public Folders" height="196" width="288">
+           <p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10075');return false;" href="#N10075">View image at full size</a></p>
+           <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10075">
+            <img alt="IBM Cognos Connection - Public Folders" src="page531_images/page531_figure1.gif" width="288">
+           </div>
+           <p>As stated earlier, this document assumes Report Studio experience and will only provide step-by-step instructions for report design critical to this technique.</p>
+           <p>For this example, create 3 reports all based on the GO Data Warehouse (query) package.</p>
+           <h3 id="N1007E" class="ibm-h3">Create the Prompt Controls Report</h3>
+           <p>The first report will be the prompt controls report which will contain two prompts, one for product lines, and one for years.</p>
+           <ol>
+            <li>Open IBM Cognos Report Studio, create a blank report and drag a Value Prompt onto the page.</li>
+            <li>In the create a new parameter box, type p_Product_Line. <h5 id="N1008A" class="ibm-h5">Prompt Wizard - Value Prompt</h5><img src="page531_images/page531_figure2.gif" class="ibm-downsize" alt="Prompt Wizard - Value Prompt" height="225" width="496"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N1008D');return false;" href="#N1008D">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N1008D">
+              <img alt="Prompt Wizard - Value Prompt" src="page531_images/page531_figure2.gif" width="496">
+             </div></li>
+            <li>Click Next, and then click the ellipsis (...) beside the Package Item box.</li>
+            <li>Navigate to Sales and Marketing (query) &gt; Sales (query) &gt; Product &gt; Codes, select Product line code, and then click OK.</li>
+            <li>Select Make the filter optional, and then click Next.<br> By making the filter optional, you can choose to filter on both filters, only one filter, or choose not to filter at all. This choice will be based on your requirements.</li>
+            <li>Click the ellipsis (...) beside the Values to Display box and browse to Sales and Marketing (query) &gt; Sales (query) &gt; Product, select Product line, and then click OK. <h5 id="N1009D" class="ibm-h5">Prompt Wizard - Value Prompt</h5><img src="page531_images/page531_figure3.gif" class="ibm-downsize" alt="Prompt Wizard - Value Prompt" height="265" width="498"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N100A0');return false;" href="#N100A0">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N100A0">
+              <img alt="Prompt Wizard - Value Prompt" src="page531_images/page531_figure3.gif" width="498">
+             </div><br> Using the Product line code as the “use” value makes the query more efficient, while the “display” value provide user friendly values.</li>
+            <li>Click Finish.</li>
+            <li>Drag another Value Prompt to the page.</li>
+            <li>In the Create a new parameter box, type p_Year.</li>
+            <li>Click Next, and then click the ellipsis (...) beside the Package Item box.</li>
+            <li>Navigate to Sales and Marketing (query) &gt; Sales (query) &gt; Time dimension, select Year, and then click OK.</li>
+            <li>Select Make the filter optional, and then click Next.<br> Since the “use” values and “display” values are the same in this instance, there is no need to configure the Values to display box.</li>
+            <li>Click Finish, and then in the Properties pane for each prompt object, change the Multi-Select property to Yes, ensure the Required property is set to No, and add sorting if required.</li>
+            <li>Add a Prompt Button object to the report, and then in the Property pane, set the Type property to Finish.</li>
+            <li>Organize and label the prompts and prompt button using a Table object and Text objects as shown below. <h5 id="N100BB" class="ibm-h5">Prompt Controls organized into a table</h5><img src="page531_images/page531_figure4.gif" class="ibm-downsize" alt="Prompt Controls organized into a table" height="506" width="218"></li>
+            <li>Go into Query 1 and delete the p_Year filter created by the second prompt added to the report.<br> By default, Report Studio will add the prompt filter to any existing queries. In this case it is not needed since both queries are there to simply display prompt values and not filter any other report queries. The queries to be filtered will be located in other reports.</li>
+            <li>Save the report as Prompt Report in the Reports folder created earlier.</li>
+           </ol>
+           <p><strong>Note</strong>: When using just one single-select prompt, you can choose to use Auto-Submit to filter other reports in a dashboard page. However, when using multiple prompts, as in this example, do not use Auto-Submit since all the reports in the dashboard will be rerun for each prompt selection. This will create unnecessary traffic to the BI report servers and the data source. If you use a prompt button to submit your prompt selections, you can submit several prompt choices at once and only rerun the reports once.</p>
+           <h3 id="N100CD" class="ibm-h3">Create a Report with Filters</h3>
+           <p>This report will be the first report in the dashboard and display, at a high level, product revenue by year.</p>
+           <ol>
+            <li>In IBM Cognos Report Studio, create a new Chart report selecting Pie with 3-D Visual Effect.</li>
+            <li>In the Insertable Objects pane, navigate to Sales and Marketing (query) &gt; Sales (query) and add the following items to the report. 
+             <ul class="ibm-bullet-list">
+              <li>Product line from Products to Series drop zone</li>
+              <li>Year from Time dimension to the Categories drop zone</li>
+              <li>Revenue from Sales fact to the Default measure drop zone</li>
+             </ul> The results appear as shown below. <h5 id="N100E1" class="ibm-h5">Pie Chart report</h5><img src="page531_images/page531_figure5.gif" class="ibm-downsize" alt="Pie Chart report" height="267" width="322"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N100E4');return false;" href="#N100E4">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N100E4">
+              <img alt="Pie Chart report" src="page531_images/page531_figure5.gif" width="322">
+             </div></li>
+            <li>Add any required sorting, and then add the following filters to the query and make them optional as shown below.<br> [Sales (query)].[Product].[Product line code] in ?p_Product_Line?<br> [Sales (query)].[Time dimension].[Year] in ?p_Year? <h5 id="N100F0" class="ibm-h5">Filters dialog</h5><img src="page531_images/page531_figure6.gif" class="ibm-downsize" alt="Filters dialog" height="228" width="566"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N100F3');return false;" href="#N100F3">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N100F3">
+              <img alt="Filters dialog" src="page531_images/page531_figure6.gif" width="566">
+             </div><br> Notice that the parameter names used in the filters here match those in the Prompt Report. These filters are made optional in this case so that upon initial load of the dashboard, all data will be displayed and subsequently filtered. Different requirements may need different filtering strategies.</li>
+            <li>Save the report as Report 1 – Pie Chart in the Reports folder.</li>
+           </ol>
+           <h3 id="N100FB" class="ibm-h3">Create a Second Report with Filters</h3>
+           <p>This report will contain detail data for product revenue in crosstab format.</p>
+           <ol>
+            <li>In report Studio, create a new Crosstab report.</li>
+            <li>In the Insertable Objects pane, navigate to Sales and Marketing (query) &gt; Sales (query) and add the following items to the report. 
+             <ul class="ibm-bullet-list">
+              <li>Product line from Products to Rows</li>
+              <li>Product type nested to the right of Product line on the rows</li>
+              <li>Year from Time dimension on the columns</li>
+              <li>Revenue from Sales fact as the measure</li>
+             </ul> The results appear as shown below. <h5 id="N10111" class="ibm-h5">Crosstab report</h5><img src="page531_images/page531_figure7.gif" class="ibm-downsize" alt="Crosstab report" height="102" width="342"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10114');return false;" href="#N10114">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10114">
+              <img alt="Crosstab report" src="page531_images/page531_figure7.gif" width="342">
+             </div></li>
+            <li>Add any required sorting, and then add the following filters (the same as in Report 1 – Pie Chart) to the query and make them optional as shown below.<br> [Sales (query)].[Product].[Product line code] in ?p_Product_Line?<br> [Sales (query)].[Time dimension].[Year] in ?p_Year? <h5 id="N10120" class="ibm-h5">Filters dialog</h5><img src="page531_images/page531_figure8.gif" class="ibm-downsize" alt="Filters dialog" height="240" width="595"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10123');return false;" href="#N10123">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10123">
+              <img alt="Filters dialog" src="page531_images/page531_figure8.gif" width="595">
+             </div><br> Again, notice that the parameter names used in the filters here match those in the Prompt Report. </li>
+            <li>Save the report as Report 2 – Crosstab in the Reports folder.</li>
+           </ol>
+           <h2 id="N1012B" class="ibm-h2">Create and Configure the Detail Portal Pages</h2>
+           <p>The next step is to contain each report you wish to be displayed in the Multi-page portlet in a Cognos Viewer Portlet in its own portal page. We will create two portal pages, one for each report created earlier.</p>
+           <ul class="ibm-bullet-list">
+            <li>In IBM Cognos Connection, navigate to Public Folders &gt; Global Filter Dashboard &gt; Detail Pages. This is the folder created earlier to organize the detail portal pages.</li>
+            <li>On the toolbar, click New Page as shown below. <h5 id="N10137" class="ibm-h5">New Page toolbar button</h5><img src="page531_images/page531_figure9.gif" class="ibm-downsize" alt="New Page toolbar button" height="63" width="325"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N1013A');return false;" href="#N1013A">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N1013A">
+              <img alt="New Page toolbar button" src="page531_images/page531_figure9.gif" width="325">
+             </div></li>
+            <li>In the Name box, type Report 1 – Pie Chart, and then click Next.</li>
+            <li>In the Set columns and layout page, click the Add link in the lower right hand corner to add a portlet. <h5 id="N10144" class="ibm-h5">New page wizard - Set columns and layout</h5><img src="page531_images/page531_figure10.gif" class="ibm-downsize" alt="New page wizard - Set columns and layout" height="384" width="566"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10147');return false;" href="#N10147">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10147">
+              <img alt="New page wizard - Set columns and layout" src="page531_images/page531_figure10.gif" width="566">
+             </div></li>
+            <li>Click Cognos Content, select Cognos Viewer, and then click the arrow to add the portlet to the Selected entries pane. <h5 id="N1014F" class="ibm-h5">New page wizard - Select portlets</h5><img src="page531_images/page531_figure11.gif" class="ibm-downsize" alt="New page wizard - Select portlets" height="347" width="566"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10152');return false;" href="#N10152">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10152">
+              <img alt="New page wizard - Select portlets" src="page531_images/page531_figure11.gif" width="566">
+             </div></li>
+            <li>Click OK, and then click Finish.</li>
+            <li>Click on the newly created Report 1 – Pie Chart page, and then click the Properties icon in the top right hand corner of the Cognos Viewer portlet. <h5 id="N1015C" class="ibm-h5">Cognos Viewer Portlet - Properties icon</h5><img src="page531_images/page531_figure12.gif" class="ibm-downsize" alt="Cognos Viewer Portlet - Properties icon" height="113" width="566"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N1015F');return false;" href="#N1015F">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N1015F">
+              <img alt="Cognos Viewer Portlet - Properties icon" src="page531_images/page531_figure12.gif" width="566">
+             </div></li>
+            <li>Under Entry, click Select an entry, navigate to Public Folders &gt; Global Filter Dashboard &gt; Reports, select Report 1 – Pie Chart, and then click OK.</li>
+            <li>Under Entry, click the Report Properties link, under Prompt values, click Communicate with other portlets, select Portlets using channel, and then in the box below that setting, type PromptChannel. <h5 id="N10169" class="ibm-h5">Set the properties - Cognos Viewer</h5><img src="page531_images/page531_figure13.gif" class="ibm-downsize" alt="Set the properties - Cognos Viewer" height="412" width="560"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N1016C');return false;" href="#N1016C">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N1016C">
+              <img alt="Set the properties - Cognos Viewer" src="page531_images/page531_figure13.gif" width="560">
+             </div></li>
+            <li>Click OK, and then click OK again.<br> The report appears in the Cognos Viewer portlet within the Report 1 – Pie Chart portal page. <h5 id="N10176" class="ibm-h5">Cognos Viewer displaying report</h5><img src="page531_images/page531_figure14.gif" class="ibm-downsize" alt="Cognos Viewer displaying report" height="396" width="566"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10179');return false;" href="#N10179">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10179">
+              <img alt="Cognos Viewer displaying report" src="page531_images/page531_figure14.gif" width="566">
+             </div></li>
+            <li>Return to the Detail Pages folder and repeat the steps to create a page called Report 2 – Crosstab that displays the Report 2 – Crosstab report.<br> The result will be two detail pages in the folder. <h5 id="N10183" class="ibm-h5">Detail Pages folder</h5><img src="page531_images/page531_figure15.gif" class="ibm-downsize" alt="Detail Pages folder" height="109" width="566"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10186');return false;" href="#N10186">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10186">
+              <img alt="Detail Pages folder" src="page531_images/page531_figure15.gif" width="566">
+             </div></li>
+           </ul>
+           <h2 id="N1018B" class="ibm-h2">Create the Master Portal Page</h2>
+           <p>In this final step, we will create a page which will contain both the Prompt Report and the Multi-page portlet which will display the pie chart and crosstab reports. This page must be created in a separate location from the detail pages. This is because the Multi-page portlet it will contain will point to the Detail Pages folder. If this page was contained in that folder, it would create a circular reference to itself through the Multi-page portlet.</p>
+           <ol>
+            <li>Navigate to Public Folders &gt; Global Filter Dashboard and then create a new page.</li>
+            <li>In the Name box, type Product Revenue Dashboard, and then click Next.</li>
+            <li>Under Number of columns, select 2 columns, and then set the width for the first column to 20% and the second column to 80%.</li>
+            <li>Add a Cognos Viewer to the first column.</li>
+            <li>Under the second column, click Add, click Dashboard, and then select and add the Multi-page portlet to the Selected entries pane. <h5 id="N1019D" class="ibm-h5">New page wizard - Select portlets</h5><img src="page531_images/page531_figure16.gif" class="ibm-downsize" alt="New page wizard - Select portlets" height="146" width="566"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N101A0');return false;" href="#N101A0">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N101A0">
+              <img alt="New page wizard - Select portlets" src="page531_images/page531_figure16.gif" width="566">
+             </div></li>
+            <li>Click OK. <h5 id="N101A8" class="ibm-h5">New page wizard - Set columns and layout</h5><img src="page531_images/page531_figure17.gif" class="ibm-downsize" alt="New page wizard - Set columns and layout" height="443" width="418"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N101AB');return false;" href="#N101AB">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N101AB">
+              <img alt="New page wizard - Set columns and layout" src="page531_images/page531_figure17.gif" width="418">
+             </div></li>
+            <li>Click Finish, and then click the new Product Revenue Dashboard.</li>
+            <li>Click the Properties icon in the Cognos Viewer portlet, under Entry, click Select an entry, and then navigate to Public Folders &gt; Global Filter Dashboard &gt; Reports.</li>
+            <li>Select Prompt Report and then click OK.</li>
+            <li>Under Entry, click Report Properties, under Prompt values, select Communicate with other portlets, select Portlets using channel, and then in the box below, type PromptChannel.</li>
+            <li>Click OK, and then click OK again.</li>
+            <li>Click the Properties icon for the Multi-page portlet.</li>
+            <li>Under Folder, click Select and entry, navigate to Public Folders &gt; Global Filter Dashboard, and then select Detail Pages. <h5 id="N101BF" class="ibm-h5">Multi-page portlet - Select a location dialog</h5><img src="page531_images/page531_figure18.gif" class="ibm-downsize" alt="Multi-page portlet - Select a location dialog" height="233" width="545"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N101C2');return false;" href="#N101C2">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N101C2">
+              <img alt="Multi-page portlet - Select a location dialog" src="page531_images/page531_figure18.gif" width="545">
+             </div></li>
+            <li>Click OK, and then click OK again.<br> The prompt report appears on the left and the pie chart appears in the first tab of the Multi-page portlet on the right. <h5 id="N101CC" class="ibm-h5">Dashboard report</h5><img src="page531_images/page531_figure19.gif" class="ibm-downsize" alt="Dashboard report" height="417" width="566"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N101CF');return false;" href="#N101CF">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N101CF">
+              <img alt="Dashboard report" src="page531_images/page531_figure19.gif" width="566">
+             </div></li>
+            <li>In the prompt, under Select Product Line(s), select Camping Equipment and Mountaineering Equipment, under Select Year(s), select 2007 and 2006, and then click Finish.<br> The pie chart reflects the change in filters. <h5 id="N101D9" class="ibm-h5">Dashboard with global filters applied to pie chart report</h5><img src="page531_images/page531_figure20.gif" class="ibm-downsize" alt="Dashboard with global filters applied to pie chart report" height="422" width="566"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N101DC');return false;" href="#N101DC">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N101DC">
+              <img alt="Dashboard with global filters applied to pie chart report" src="page531_images/page531_figure20.gif" width="566">
+             </div></li>
+            <li>Click the Report 2 – Crosstab tab.<br> The crosstab report also displays the change in filters. <h5 id="N101E6" class="ibm-h5">Dashboard with global filters applied to crosstab report</h5><img src="page531_images/page531_figure21.gif" class="ibm-downsize" alt="Dashboard with global filters applied to crosstab report" height="453" width="566"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N101E9');return false;" href="#N101E9">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N101E9">
+              <img alt="Dashboard with global filters applied to crosstab report" src="page531_images/page531_figure21.gif" width="566">
+             </div></li>
+           </ol>
+           <!--CMA ID: 572603-->
+           <!--Site ID: 1-->
+           <!--XSLT stylesheet used to transform this file: dw-document-html-8.0.xsl--> 
+           <!-- Article Resources --> 
+           <div class="ibm-alternate-rule">
+            <hr>
+           </div>
+           <h4 id="artdownload" class="ibm-h4">Downloadable resources</h4>
+           <ul class="ibm-link-list">
+            <li><a class="ibm-pdf-link" href="page531-pdf.pdf">PDF of this content</a></li>
+           </ul> 
+           <!-- Commenting --> 
+           <!-- INLINE_COMMENTS_BEGIN: --> 
+           <div class="ibm-alternate-rule">
+            <hr>
+           </div> 
+           <div id="dw-article-cmts-top" class="ibm-columns"> 
+            <div class="ibm-col-6-2"> 
+             <h4 id="icomments" class="ibm-h4">Comments</h4> 
+             <div id="dw-article-cmts-login"> 
+              <p><a onclick="window.location=userLinks[0].url;" tabindex="0" role="link">Sign in</a> or <a onclick="window.location=userLinks[1].url;" tabindex="0" role="link">register</a> to add and subscribe to comments.</p> 
+             </div> 
+            </div> 
+            <div class="ibm-col-6-2" id="dw-notify"> 
+             <input type="checkbox" value="1" name="comment_notification" id="comment_notification" disabled> 
+             <label for="comment_notification">Subscribe me to comment notifications</label> 
+            </div> 
+           </div> 
+           <div class="dw-article-cmts-container"> 
+            <div class="ibm-no-print" id="dw-icomments-container"> 
+            </div> 
+           </div> 
+           <!-- INLINE_COMMENTS_END --> 
+           <!-- CENTER_6_4_CONTENT_COLUMN_END --> 
+          </div> 
+         </div> 
+         <!--Rating_Meta_BEGIN-->
+         <div class="metavalue">
+          static.content.url=http://www.ibm.com/developerworks/js/artrating/
+         </div>
+         <div class="metavalue">
+          SITE_ID=1
+         </div>
+         <div class="metavalue">
+          Zone=Big data and analytics, Information Management
+         </div>
+         <div class="metavalue">
+          ArticleID=572603
+         </div>
+         <div class="metavalue">
+          ArticleTitle=IBM Cognos Proven Practices: IBM Cognos BI - Global Filters for a Multi-Page Dashboard
+         </div>
+         <div class="metavalue">
+          publish-date=11092010
+         </div>
+         <script language="javascript" type="text/javascript">document.write('<div class="metavalue">url='+location.href.replace(/</g,  '%3C')+'</div>');</script>
+         <!--Rating_Meta_END--> 
+        </div> 
+        <!-- END_IBM-CONTENT-MAIN --> 
+       </div> 
+       <!-- END_IBM-CONTENT-BODY --> 
+      </div> 
+      <!-- END_IBM-CONTENT --> 
+     </div> 
+     <!-- END_IBM-PCON --> 
+    </main> 
+    <!-- MAIN_CONTENT_END --> 
+    <!-- END_CONTENT-WRAPPER --> 
+   </div> 
+   <!-- FOOTER_BEGIN --> 
+   <footer role="contentinfo" aria-label="IBM developerWorks"> 
+    <div id="dw-footer-module" class="dw-footer-home"> 
+     <section aria-label="Resources" role="contentinfo"> 
+      <div class="ibm-columns"> 
+       <div class="ibm-col-6-1 dw-footer-col-1"> 
+        <ul> 
+         <li class="dw-footer-heading" aria-label="developerWorks">developerWorks</li> 
+         <li><a href="//www.ibm.com/developerworks/aboutdw/">About</a></li> 
+         <li><a href="//www.ibm.com/developerworks/feedback">Help</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/ideas">Submit content</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/secure/report/">Report abuse</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/community/terms/thirdparty/">Third-party notice</a></li> 
+        </ul> 
+        <ul> 
+         <li class="dw-footer-heading" aria-label="Community">Community</li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/rfe/">Product feedback</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/connect/">Developer Centers</a></li> 
+        </ul> 
+        <ul> 
+         <li class="dw-footer-heading dw-follow-us" aria-label="Follow us">Follow us</li> 
+        </ul> 
+        <p class="dw-footer-social"> <a href="//twitter.com/developerWorks"> <img width="28" height="27" alt="Twitter" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-twitter.png"> </a> </p> 
+        <p class="dw-footer-social-right"> <a href="//www.facebook.com/developerworks"> <img width="28" height="27" alt="Facebook" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-facebook.png"> </a> </p> 
+        <br> 
+        <p class="dw-footer-social"> <a href="//www.linkedin.com/groups/IBM-developerWorks-8137234"> <img width="28" height="27" alt="LinkedIn" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-linkedin.png"> </a> </p> 
+        <p class="dw-footer-social-right"> <a href="//www.youtube.com/user/developerworks"> <img width="28" height="27" alt="YouTube" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-youtube.png"> </a> </p> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-2"> 
+        <ul> 
+         <li class="dw-footer-heading" aria-label="Join">Join</li> 
+         <li><a href="//developer.ibm.com/academic/">Faculty</a></li> 
+         <li><a href="//developer.ibm.com/students/">Students</a></li> 
+         <li><a href="//developer.ibm.com/startups/">Startups</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/isv/">Business Partners</a></li> 
+        </ul> 
+        <ul class="dw-footer-lang" aria-label="Select a language"> 
+         <li class="dw-footer-heading">Select a language</li> 
+         <li><a href="//www.ibm.com/developerworks/">English</a></li> 
+         <li><a href="//www.ibm.com/developerworks/cn/" lang="zh">??</a></li> 
+         <li><a href="//www.ibm.com/developerworks/jp/" lang="ja">???</a></li> 
+         <li><a href="//www.ibm.com/developerworks/ru/" lang="ru">???????</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/br/" lang="pt">Português (Brasil)</a></li> 
+         <li><a href="//www.ibm.com/developerworks/ssa/" lang="es">Español</a></li> 
+         <li><a href="//developer.ibm.com/kr/" lang="kr">??</a></li> 
+        </ul> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-3"> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-4"> 
+        <ul class="dw-footer-categories"> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/learn/">Tutorials &amp; training</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/accelerate/">Demos &amp; sample code</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/answers">Q&amp;A forums</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/dwblog/">dW Blog</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/events/">Events</a> </li> 
+        </ul> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-5"> 
+        <ul class="dw-footer-categories"> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/courses/">Courses</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/open/">Open source projects</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/tv/">Videos</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/recipes/">Recipes</a> </li> 
+        </ul> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-6"> 
+        <ul class="dw-footer-categories"> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/develop/">Downloads</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/api/">APIs</a> </li> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/newsletter/">Newsletters</a> </li> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/feeds/">Feeds</a> </li> 
+        </ul> 
+       </div> 
+      </div> 
+     </section> 
+    </div> 
+    <div id="dw-footer" class="ibm-padding-normal ibm-alternate"> 
+     <div class="ibm-columns"> 
+      <div class="ibm-col-1-1"> 
+       <div class="dw-footer-corporate-links"> 
+        <ul> 
+         <li><a href="//www.ibm.com/developerworks/aboutdw/contacts.html">Contact</a></li> 
+         <li><a href="//www.ibm.com/privacy/us/en/">Privacy</a></li> 
+         <li><a href="//www.ibm.com/developerworks/community/terms/use/">Terms of use</a></li> 
+         <li><a href="//www.ibm.com/accessibility/us/en/">Accessibility</a></li> 
+         <li class="ibm-feedbacklink"><a href="#">Feedback</a></li> 
+         <li id="ibm-truste-cp"><a onclick="truste.eu.clickListener();return false;" href="#">Cookie Preferences</a></li> 
+        </ul> 
+       </div> 
+       <div id="ibm-footer-locale-selector"></div> 
+      </div> 
+     </div> 
+    </div> 
+   </footer> 
+   <!-- FOOTER_END --> 
+   <!-- END_IBM-TOP --> 
+  </div> 
+  <!-- SCRIPTS_INCLUDE_BEGIN --> 
+  <!-- Styles --> 
+  <link rel="stylesheet" type="text/css" href="/developerworks/maverick/css/plugin/comments/jquery-comments.css"> 
+  <link rel="stylesheet" href="/developerworks/maverick/fonts/awesome-4.5.0/css/font-awesome.min.css"> 
+  <!-- Libraries --> 
+  <script type="text/javascript" src="/developerworks/maverick/js/plugin/comments/jquery-comments.min.js"></script> 
+  <script type="text/javascript" src="/developerworks/maverick/js/plugin/formatter/moment-with-locales.js"></script> 
+  <script type="text/javascript" src="/developerworks/maverick/js/ContentComments.js"></script> 
+  <script type="text/javascript" src="/developerworks/js/v18/ContentCommentsFormatter.js"></script> 
+  <script type="text/javascript" language="JavaScript">
+
+	IBMCore.common.module.masthead.subscribe("ready", "customjs", setupCommentsPlugin).runAsap(setupCommentsPlugin);
+
+	function setupCommentsPlugin(){
+		//debugger;
+			//alert(userLinks);
+			var commentsInitInfo = {
+				contentId : $("div[class=metavalue]:contains('ArticleID=')").text().split("=")[1],
+				siteId :  $("div[class=metavalue]:contains('SITE_ID=')").text().split("=")[1],
+				pluginDivId : '#dw-icomments-container',
+				notifyElementId : "#comment_notification",
+				loginMessageDivId : "#dw-article-cmts-login",
+				totalCommentsDivId : "#nCmts"
+			};				
+								
+			ContentComments.Setup(commentsInitInfo);
+	}
+</script> 
+  <script type="text/javascript">(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create','UA-41146412-3','auto');ga('require','linkid','linkid.js');var dcdate="2010-11-09";var cmaid="572603";ga('set','dimension1',dcdate);ga('set','dimension2',cmaid);var dw_canonical="http://www.ibm.com/developerworks/data/library/cognos/reporting/dashboarding/page531.html";dw_canonical=dw_canonical.substring(dw_canonical.indexOf(".ibm.com")+8);ga('send','pageview',{'page':dw_canonical,'dimension1':dcdate,'dimension2':cmaid});var trkOBL=function(url,id){id=id.split("-");var cat="v18 article";var act="Bluemix";if(id[2]=="dwpremium")act="Premium";if(id[2]=="dwopen")act="dWOpen";if(id[2]=="devops")act="Devops";act=act+' '+id[3];if(id[4]){var label=id[4];if(label=="btn")label="button";if(label=="txt")label="text link";if(label=="bnr")label="banner";if(label=="tl")label="tile";if(label=="regbar")label="registration bar";if(label=="vp")label="video promotion"}var ab=0;if(id[5]){if(id[5]=="ABa")ab=1;if(id[5]=="ABb")ab=2;if(id[5]=="ABc")ab=3;if(id[5]=="ABd")ab=4;if(id[5]=="ABe")ab=5;if(id[5]=="ABf")ab=6;if(id[5]=="ABg")ab=7;if(id[5]=="ABh")ab=8}ga('send','event',cat,act,label,ab,{'page':dw_canonical,'hitCallback':function(){document.location=url}})}</script>
+  <!-- Piwik --> 
+  <script type="text/javascript">
+    var _paq = _paq || [];
+    _paq.push(["setDomains", ["*.www.ibm.com/developerworks","*.www.ibm.com/developerworks"]]);
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+    var u="//developer.ibm.com/piwik/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    })();
+</script> 
+  <noscript>
+   <p><img src="//developer.ibm.com/piwik/piwik.php?idsite=7" style="border:0;" alt=""></p>
+  </noscript> 
+  <!-- End Piwik Code -->
+  <!-- Hotjar Tracking Code for ibm.com --> 
+  <script>
+    (function(h,o,t,j,a,r){
+    h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+    h._hjSettings={hjid:42920,hjsv:5};
+    a=o.getElementsByTagName('head')[0];
+    r=o.createElement('script');r.async=1;
+    r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+    a.appendChild(r);
+    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+</script> 
+  <!-- SCRIPTS_INCLUDE_END -->   
+ </body>
+</html>

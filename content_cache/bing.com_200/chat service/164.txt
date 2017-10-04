@@ -1,0 +1,1202 @@
+<!doctype html>
+<html lang="en-US">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width"> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.5/css/bootstrap.min.css"> 
+  <link rel="pingback" href="https://blogs.msdn.microsoft.com/brunoterkaly/xmlrpc.php"> 
+  <!--[if lt IE 9]>
+	<script src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/themes/microsoft/js/html5.js"></script>
+	<![endif]--> 
+  <title>Node.js– A chat server written in Node and a client app written in C# – Bruno Terkaly – Developer Evangelist – bterkaly@microsoft.com</title> 
+  <link rel="dns-prefetch" href="//ajax.aspnetcdn.com"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="Bruno Terkaly - Developer Evangelist - bterkaly@microsoft.com » Node.js– A chat server written in Node and a client app written in C# Comments Feed" href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/feed/"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.2.1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.2.1\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/blogs.msdn.microsoft.com\/brunoterkaly\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.7.5"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),!(j.toDataURL().length<3e3)&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57331,65039,8205,55356,57096),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57331,55356,57096),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55357,56425,55356,57341,8205,55357,56507),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55357,56425,55356,57341,55357,56507),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <link rel="stylesheet" id="wds-ratings-css" href="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/plugins/wds-ratings/wds-ratings.css?ver=20161014" type="text/css" media="all"> 
+  <link rel="stylesheet" id="microsoft-parent-style-css" href="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/themes/microsoft/style.css?ver=02092017" type="text/css" media="all"> 
+  <link rel="stylesheet" id="microsoft-child-style-css" href="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/themes/microsoft-msdn/style.css?ver=04152016" type="text/css" media="all"> 
+  <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.1.min.js"></script> 
+  <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.5/bootstrap.min.js"></script> 
+  <script type="text/javascript" src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/themes/microsoft/js/single.js?ver=02092017"></script> 
+  <link rel="https://api.w.org/" href="https://blogs.msdn.microsoft.com/brunoterkaly/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://blogs.msdn.microsoft.com/brunoterkaly/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://blogs.msdn.microsoft.com/brunoterkaly/wp-includes/wlwmanifest.xml"> 
+  <link rel="canonical" href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/"> 
+  <link rel="shortlink" href="https://blogs.msdn.microsoft.com/brunoterkaly/?p=1483"> 
+  <link rel="alternate" type="application/json+oembed" href="https://blogs.msdn.microsoft.com/brunoterkaly/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblogs.msdn.microsoft.com%2Fbrunoterkaly%2F2012%2F02%2F28%2Fnode-js-a-chat-server-written-in-node-and-a-client-app-written-in-c%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="https://blogs.msdn.microsoft.com/brunoterkaly/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblogs.msdn.microsoft.com%2Fbrunoterkaly%2F2012%2F02%2F28%2Fnode-js-a-chat-server-written-in-node-and-a-client-app-written-in-c%2F&amp;format=xml"> 
+  <script>
+		if(window.document.referrer.indexOf('login.live.com') !== -1) {
+			// redefine ga function to prevent referrer data collected by google analytics
+			window.ga = function(){};
+		}
+	</script> 
+ </head>
+ <body class="post-template-default single single-post postid-1483 single-format-standard">
+  <div id="msccBanner" dir="ltr" data-site-name="uhf-MSDNBlogs" data-mscc-version="0.3.6" data-nver="aspnet-2.0.5" data-sver="0.1.2" class="cc-banner" role="alert">
+   <div class="cc-container">
+    <svg class="cc-icon cc-v-center" x="0px" y="0px" viewbox="0 0 44 44" height="30px" fill="none" stroke="currentColor">
+     <circle cx="22" cy="22" r="20" stroke-width="2"></circle>
+     <line x1="22" x2="22" y1="18" y2="33" stroke-width="3"></line>
+     <line x1="22" x2="22" y1="12" y2="15" stroke-width="3"></line>
+    </svg> 
+    <span class="cc-v-center cc-text">This site uses cookies for analytics, personalized content and ads. By continuing to browse this site, you agree to this use.</span> 
+    <a href="https://go.microsoft.com/fwlink/?linkid=845480" aria-label="Learn more about Microsoft’s Cookie Policy" id="msccLearnMore" class="cc-link cc-v-center cc-float-right" data-mscc-ic="false">Learn more</a>
+   </div>
+  </div>
+  <script type="text/javascript">
+jQuery( window ).load( function() {
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    if (typeof mscc === 'undefined' || (!mscc || mscc.hasConsent())) {
+                ga('require', 'linkid');
+                ga('create', 'UA-65691138-1', 'auto');
+                ga('send', 'pageview');
+            }
+} );
+</script> 
+  <!-- Begin Custom CSS -->
+  <style type="text/css" id="wds-custom-css">
+						</style>
+  <!-- End Custom CSS --> 
+  <link rel="shortcut icon" href="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/themes/microsoft-msdn/images/favicon-msdn.png"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="Node.js– A chat server written in Node and a client app written in C#"> 
+  <meta property="og:url" content="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/"> 
+  <meta property="og:site_name" content="Bruno Terkaly - Developer Evangelist - bterkaly@microsoft.com"> 
+  <meta property="og:description" content="A new twist to a boring Chat application Most demos on Node.js illustrate how to create a chat server, but rarely provide the client side of the chat service. That is what this post is about – creating both the server and client side of the equation. Server Node.js Javascript Client .NET C# Node.js –..."> 
+  <meta property="og:image" content="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/2337.0rwqfvaw_3689CF7A.jpg"> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:title" content="Node.js– A chat server written in Node and a client app written in C#"> 
+  <meta name="twitter:url" content="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/"> 
+  <meta name="twitter:description" content="A new twist to a boring Chat application Most demos on Node.js illustrate how to create a chat server, but rarely provide the client side of the chat service. That is what this post is about – creating both the server and client side of the equation. Server Node.js Javascript Client .NET C# Node.js –..."> 
+  <meta name="twitter:image" content="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/2337.0rwqfvaw_3689CF7A.jpg"> 
+  <style type="text/css" id="syntaxhighlighteranchor"></style>   
+  <div id="page" class="site container-fluid"> 
+   <header id="site-header" class="site-header row" role="banner"> 
+    <div id="site-header-global-wrapper" class="site-header-global-wrapper"> 
+     <div id="site-header-global" class="site-header-global"> 
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#site-profile-menu" aria-label="toggle menu" tabindex="0" aria-expanded="false"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button> 
+      <div id="site-logo" class="col-sm-5 row navbar-header"> 
+       <div id="header-microsoft-logo"> 
+        <a id="home-link" href="https://www.microsoft.com/" tabindex="1" aria-label="Microsoft logo"> <img id="header-microsoft-logo-svg" src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/themes/microsoft/images/ms-logo-gray.svg" alt="Microsoft logo"> <span id="brand"> <span id="brand-separator">|</span> <span id="brand-name"></span> </span> </a> 
+       </div> 
+      </div> 
+      <div id="site-header-global-right" class="col-sm-7"> 
+       <div id="site-profile-menu" class="navbar-collapse collapse"> 
+        <div id="search-form-wrapper"> 
+         <form id="search-form" role="search" action="https://social.msdn.microsoft.com/search/en-US" home-url="https://blogs.msdn.microsoft.com/brunoterkaly" autocomplete="off"> 
+          <div class="input-group"> 
+           <input name="rq" value="site:blogs.msdn.microsoft.com/brunoterkaly" type="hidden"> 
+           <input name="rn" value="brunoterkaly" type="hidden"> 
+           <input type="hidden" name="ral" value="1"> 
+           <input type="text" class="form-control" placeholder="Search" name="query" id="srch-term" tabindex="0" aria-label="Search box with search options"> 
+           <div class="input-group-btn"> 
+            <button aria-label="Search" class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button> 
+           </div> 
+          </div> 
+         </form> 
+         <div id="search-option"> 
+          <div class="search-filter" id="search-filter-site" tabindex="0" aria-label="Search MSDN"> 
+           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> 
+           <span class="search-text">Search MSDN</span> 
+          </div> 
+          <div class="search-filter" tabindex="0" aria-label="Search all blogs" id="search-filter-all-blogs"> 
+           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> 
+           <span class="search-text">Search all blogs</span> 
+          </div> 
+          <div class="search-filter selected" tabindex="0" aria-label="Search this blog" id="search-filter-this-blog"> 
+           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span> 
+           <span class="search-text">Search this blog</span> 
+          </div> 
+         </div> 
+        </div> 
+        <div id="me-control"> 
+         <a href="https://blogs.msdn.microsoft.com/wp-login.php?aadsso_action=login">Sign in</a> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+    <div id="site-header-blog-wrapper" class="site-header-blog-wrapper ms-blog-header clear-both"> 
+     <div id="site-header-blog" class="site-header-blog"> 
+      <nav class="navbar navbar-inverse"> 
+       <div id="blog-logo-area" class="navbar-header"> 
+        <div id="blog-logo" data-toggle="collapse" data-target="#blog-menu" tabindex="0" aria-label="blog logo"> 
+         <div id="blog-logo-text"> 
+          <h1 class="site-title ms-blog-title"> <a href="https://blogs.msdn.microsoft.com/brunoterkaly" class="for-desktop"> Bruno Terkaly – Developer Evangelist – bterkaly@microsoft.com </a> <a href="https://blogs.msdn.microsoft.com/brunoterkaly" class="for-mobile"> Bruno Terkaly – Developer Evangelist – bterkaly@microsoft.com </a> </h1> 
+          <p class="site-description ms-blog-description">Making Microsoft developer efforts more effective.</p> 
+         </div> 
+        </div> 
+       </div> 
+      </nav> 
+     </div> 
+    </div> 
+    <div id="site-header-image-wrapper" class="ms-blog-banner"> 
+     <div id="site-header-image"> 
+     </div> 
+    </div> 
+   </header> 
+   <div id="site-content" class="site-content row"> 
+    <div id="primary" class="content-area col-sm-9"> 
+     <div id="single-content" class="div-content"> 
+      <article id="post-1483" class="post-1483 post type-post status-publish format-standard hentry category-uncategorized"> 
+       <header class="entry-header single"> 
+        <h1 class="entry-title">Node.js– A chat server written in Node and a client app written in C#</h1> 
+        <div class="rating-wrap"> 
+         <div id="star-rating-1483" class="wds-ratings" data-rating="0" data-userrating="0" data-postid="1483" data-container="body" data-toggle="tooltip" title="0 user(s) rated"> 
+          <div class="wds-ratings-inner-wrap"> 
+           <div> 
+            <div aria-label="Select 5 star, this article is 0 star rated" tabindex="0" class="wds-ratings-stars wds-ratings-stars-enable-editing" data-stars="5">
+             <span aria-hidden="true" class="star-1"><span>?</span></span>
+             <span aria-hidden="true" class="star-2"><span>?</span></span>
+             <span aria-hidden="true" class="star-3"><span>?</span></span>
+             <span aria-hidden="true" class="star-4"><span>?</span></span>
+             <span aria-hidden="true" class="star-5"><span>?</span></span>
+            </div>
+            <div aria-label="Select 4 star, this article is 0 star rated" tabindex="0" class="wds-ratings-stars wds-ratings-stars-enable-editing" data-stars="4">
+             <span aria-hidden="true" class="star-1"><span>?</span></span>
+             <span aria-hidden="true" class="star-2"><span>?</span></span>
+             <span aria-hidden="true" class="star-3"><span>?</span></span>
+             <span aria-hidden="true" class="star-4"><span>?</span></span>
+            </div>
+            <div aria-label="Select 3 star, this article is 0 star rated" tabindex="0" class="wds-ratings-stars wds-ratings-stars-enable-editing" data-stars="3">
+             <span aria-hidden="true" class="star-1"><span>?</span></span>
+             <span aria-hidden="true" class="star-2"><span>?</span></span>
+             <span aria-hidden="true" class="star-3"><span>?</span></span>
+            </div>
+            <div aria-label="Select 2 star, this article is 0 star rated" tabindex="0" class="wds-ratings-stars wds-ratings-stars-enable-editing" data-stars="2">
+             <span aria-hidden="true" class="star-1"><span>?</span></span>
+             <span aria-hidden="true" class="star-2"><span>?</span></span>
+            </div>
+            <div aria-label="Select 1 star, this article is 0 star rated" tabindex="0" class="wds-ratings-stars wds-ratings-stars-enable-editing" data-stars="1">
+             <span aria-hidden="true" class="star-1"><span>?</span></span>
+            </div> 
+           </div> 
+          </div> 
+         </div> 
+        </div> 
+        <div class="clear-both"></div> 
+        <div class="entry-meta"> 
+         <img alt="avatar of brunoterkaly" src="https://i1.social.s-msft.com/profile/u/avatar.jpg?displayname=BrunoTerkaly&amp;size=extralarge&amp;version=cf11950f-87df-4704-acbe-2bbbe02192fe" class="avatar avatar-22 photo" height="22" width="22">
+         <span class="byline"><span class="author vcard"><a class="url fn n profile-usercard-hover" data-profile-userid="735e2e3dd4af4a4280c913d3eaaf53dc" href="https://social.msdn.microsoft.com/profile/BrunoTerkaly">BrunoTerkaly</a></span></span>
+         <span class="posted-on posted-on-margin"><span class="screen-reader-text"></span><time class="entry-date published updated" datetime="2012-02-28T13:39:58+00:00">February 28, 2012</time></span>
+         <span class="comments-link"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/#comments">6</a></span> 
+         <span class="social-icons-wrap"> 
+          <ul class="social-icons"> 
+           <li>
+            <div class="fb-share-button" data-href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/" data-layout="button_count" data-size="large" data-mobile-iframe="true">
+             <a class="fb-xfbml-parse-ignore" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/&amp;src=sdkpreparse">Share</a>
+            </div></li> 
+           <div id="fb-root" style="display:none"></div> 
+           <li class="social-icon twitter"><a data-social="{&quot;type&quot;:&quot;twitter&quot;, &quot;url&quot;:&quot;https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/&quot;, &quot;text&quot;: &quot;Node.js– A chat server written in Node and a client app written in C#&quot;}" href="#" id="post_tweet_count">0</a></li> 
+           <li class="social-icon linkedin"><a data-social="{&quot;type&quot;:&quot;linkedin&quot;, &quot;url&quot;:&quot;https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/&quot;, &quot;text&quot;: &quot;Node.js– A chat server written in Node and a client app written in C#&quot;}" href="#" id="get_post_linkedin_count">0</a></li> 
+          </ul> </span>
+         <!-- .social-icons-wrap --> 
+         <script type="text/javascript">
+		// Get social counts
+		jQuery( window ).load(function () {
+			jQuery.getScript('https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/themes/microsoft/js/social-counts.js?ver=02092017')
+				.done(function(script,textStatus) {
+					window.msdnsocial.ajax('https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/');
+				});
+		});
+	</script> 
+        </div> 
+        <hr> 
+       </header>
+       <!-- .entry-header --> 
+       <div class="entry-content single"> 
+        <div style="quotes: none; font-size: large; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(0,0,255); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>A new twist to a boring Chat application</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         Most demos on Node.js illustrate how to create a chat server, but rarely provide the client side of the chat service.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         That is what this post is about – creating both the server and client side of the equation.
+        </div> 
+        <table style="font-size: medium; border-top: medium none; font-family: arial, helvetica, sans-serif; border-right: 1px solid; vertical-align: baseline; border-collapse: collapse; border-bottom: 1px solid; color: rgb(0,0,0); text-align: left; margin: 1em 0px; border-left: 1px solid; line-height: 19px"> 
+         <tbody> 
+          <tr style="font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(235,243,255)"> 
+           <td style="font-size: medium; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">Server</td> 
+           <td style="font-size: medium; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">Node.js</td> 
+           <td style="font-size: medium; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">Javascript</td> 
+          </tr> 
+          <tr style="font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(255,255,255)"> 
+           <td style="font-size: medium; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">Client</td> 
+           <td style="font-size: medium; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">.NET</td> 
+           <td style="font-size: medium; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">C#</td> 
+          </tr> 
+         </tbody> 
+        </table> 
+        <div style="quotes: none; font-size: large; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(0,0,255); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Node.js – Chat Application – Server Side</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         This is your traditional Node.js chat application. I’ve commented it pretty heavily. Note the following:
+        </div> 
+        <table style="font-size: small; border-top: medium none; font-family: arial, helvetica, sans-serif; border-right: 1px solid; vertical-align: baseline; border-collapse: collapse; border-bottom: 1px solid; color: rgb(0,0,0); text-align: left; margin: 1em 0px; border-left: 1px solid; line-height: 19px"> 
+         <tbody> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(235,243,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="458">Create a TCP socket listener</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="533">var s = net.Server(function(socket)....</td> 
+          </tr> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(255,255,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="458">Saving the socket connection so we can send message back to the client</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="533">sockets.push(socket)....</td> 
+          </tr> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(235,243,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="458">An event that represents a client sending a text msg to server. 'data' represents the event and msg_sent is the data sent by chat client application.</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="533">socket.on('data', function(msg_sent) {....</td> 
+          </tr> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(255,255,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="458">Don't echo back the message to the sender</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="533">if(sockets[i] == socket) continue;</td> 
+          </tr> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(235,243,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="458">Write message back to listeners (except original sender)</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="533">sockets[i].write(msg_sent); </td> 
+          </tr> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(255,255,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="458">An event when a client disconnects. We need to remove dead sockets from our array.</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="533">socket.on('end', function() {</td> 
+          </tr> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(235,243,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="458">Listening on http://localhost:8000</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px" width="533">s.listen(8000);</td> 
+          </tr> 
+         </tbody> 
+        </table> 
+        <p><strong>Filename = lamechat.js</strong><br> </p>
+        <table cellspacing="0" cellpadding="2" width="697" border="1"> 
+         <tbody> 
+          <tr> 
+           <td valign="top" width="695"> <pre class="code">net = require(<span style="color: maroon">'net'</span>)
+
+<span style="color: rgb(0,100,0)">// Supports multiple client chat application
+
+// Keep a pool of sockets ready for everyone
+// Avoid dead sockets by responding to the 'end' event
+</span><span style="color: blue">var </span>sockets = [];
+
+<span style="color: rgb(0,100,0)">// Create a TCP socket listener
+</span><span style="color: blue">var </span>s = net.Server(<span style="color: blue">function </span>(socket) {
+
+    <span style="color: rgb(0,100,0)">// Add the new client socket connection to the array of
+    // sockets
+    </span>sockets.push(socket);
+
+    <span style="color: rgb(0,100,0)">// 'data' is an event that means that a message was just sent by the 
+    // client application
+    </span>socket.on(<span style="color: maroon">'data'</span>, <span style="color: blue">function </span>(msg_sent) {
+        <span style="color: rgb(0,100,0)">// Loop through all of our sockets and send the data
+        </span><span style="color: blue">for </span>(<span style="color: blue">var </span>i = 0; i &lt; sockets.length; i++) {
+            <span style="color: rgb(0,100,0)">// Don't send the data back to the original sender
+            </span><span style="color: blue">if </span>(sockets[i] == socket) <span style="color: rgb(0,100,0)">// don't send the message to yourself
+                </span><span style="color: blue">continue</span>;
+            <span style="color: rgb(0,100,0)">// Write the msg sent by chat client
+            </span>sockets[i].write(msg_sent);
+        }
+    });
+    <span style="color: rgb(0,100,0)">// Use splice to get rid of the socket that is ending.
+    // The 'end' event means tcp client has disconnected.
+    </span>socket.on(<span style="color: maroon">'end'</span>, <span style="color: blue">function </span>() {
+        <span style="color: blue">var </span>i = sockets.indexOf(socket);
+        sockets.splice(i, 1);
+    });
+
+
+});
+
+s.listen(8000);
+console.log(<span style="color: maroon">'System waiting at http://localhost:8000'</span>);
+
+        </pre> </td> 
+          </tr> 
+         </tbody> 
+        </table> 
+        <div style="quotes: none; font-size: large; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(0,0,255); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Creating Chat Applications in .NET and C#</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         This next section will demonstrate the building of a chat client for the Node.js server.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Create a new Visual Studio Project</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="0rwqfvaw" style="background-image: none; margin: 0px; display: inline" border="0" alt="0rwqfvaw" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/2337.0rwqfvaw_3689CF7A.jpg" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/2337.0rwqfvaw_5F00_3689CF7A.jpg" width="537" height="385">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Project type = Windows Presentation Foundation Application</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="1trjcspd" style="background-image: none; margin: 0px; display: inline" border="0" alt="1trjcspd" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/8524.1trjcspd_34D903A6.jpg" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/8524.1trjcspd_5F00_34D903A6.jpg" width="596" height="364">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Editing MainWindow.xaml</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         Right mouse click on MainWindow.xaml
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="amvh2cko" style="background-image: none; margin: 0px; display: inline" border="0" alt="amvh2cko" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/3733.amvh2cko_651FD85C.jpg" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/3733.amvh2cko_5F00_651FD85C.jpg" width="483" height="564">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Where to add the various controls</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         We are adding textboxes, command buttons.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="xdctzss1" style="background-image: none; margin: 0px; display: inline" border="0" alt="xdctzss1" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/6471.xdctzss1_11C89236.jpg" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/6471.xdctzss1_5F00_11C89236.jpg" width="494" height="395">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>The graphical interface – MainWindow.xaml</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         MainWindow.xaml is where we define our user interface. We have 3 text boxes and 2 buttons.
+        </div> 
+        <table style="font-size: small; border-top: medium none; font-family: arial, helvetica, sans-serif; border-right: 1px solid; vertical-align: baseline; border-collapse: collapse; border-bottom: 1px solid; color: rgb(0,0,0); text-align: left; margin: 1em 0px; border-left: 1px solid; line-height: 19px"> 
+         <tbody> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(235,243,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">txtChatName</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">Allows you to login with an id</td> 
+          </tr> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(255,255,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">txtConversation</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">Where the conversation between chat clients can be seen</td> 
+          </tr> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(235,243,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">txtOutMsg</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">The text message a given chat client wants to send to others</td> 
+          </tr> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(255,255,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">cmdConnect</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">Allows you to login and connect using txtChatName</td> 
+          </tr> 
+          <tr style="font-size: small; font-family: arial, helvetica, sans-serif; vertical-align: baseline; text-align: left; margin: 1em 0px; line-height: 19px; background-color: rgb(235,243,255)"> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">cmdSendMessage</td> 
+           <td style="font-size: small; border-top: rgb(0,0,0) 1px solid; height: 26px; font-family: arial, helvetica, sans-serif; vertical-align: baseline; padding-bottom: 5px; text-align: left; padding-top: 5px; padding-left: 15px; margin: 1em 0px; border-left: rgb(0,0,0) 1px solid; line-height: 19px; padding-right: 15px">Sends your text message that was typed into txtOutMsg</td> 
+          </tr> 
+         </tbody> 
+        </table> 
+        <p><font size="3" face="Arial"></font></p> 
+        <p><strong>Filename = MainWindow.xaml</strong></p> 
+        <table cellspacing="0" cellpadding="2" width="600" border="1"> 
+         <tbody> 
+          <tr> 
+           <td valign="top" width="600"> <pre class="code"><span style="color: blue">&lt;</span><span style="color: rgb(163,21,21)">Window
+  </span><span style="color: red">x</span><span style="color: blue">:</span><span style="color: red">Class</span><span style="color: blue">="NodeJsChatClient.MainWindow"
+  </span><span style="color: red">xmlns</span><span style="color: blue">="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  </span><span style="color: red">xmlns</span><span style="color: blue">:</span><span style="color: red">x</span><span style="color: blue">="http://schemas.microsoft.com/winfx/2006/xaml"
+  </span><span style="color: red">Title</span><span style="color: blue">="Chat Client"
+  </span><span style="color: red">Height</span><span style="color: blue">="350"
+  </span><span style="color: red">Width</span><span style="color: blue">="525"&gt;
+    &lt;</span><span style="color: rgb(163,21,21)">Grid</span><span style="color: blue">&gt;
+</span></pre> <pre class="code"><span style="color: blue"> 
+      &lt;</span><span style="color: rgb(163,21,21)">Button
+      </span><span style="color: red">Content</span><span style="color: blue">="Connect"
+      </span><span style="color: red">Height</span><span style="color: blue">="29"
+      </span><span style="color: red">HorizontalAlignment</span><span style="color: blue">="Left"
+      </span><span style="color: red">Margin</span><span style="color: blue">="12,12,0,0"
+      </span><span style="color: red">Name</span><span style="color: blue">="cmdConnect"
+      </span><span style="color: red">VerticalAlignment</span><span style="color: blue">="Top"
+      </span><span style="color: red">Width</span><span style="color: blue">="144"
+      </span><span style="color: red">Click</span><span style="color: blue">="cmdConnect_Click"/&gt;
+        
+</span></pre> <pre class="code"><span style="color: blue">      &lt;</span><span style="color: rgb(163,21,21)">TextBox
+      </span><span style="color: red">AcceptsReturn</span><span style="color: blue">="True"
+      </span><span style="color: red">Margin</span><span style="color: blue">="14,51,12,93"
+      </span><span style="color: red">Name</span><span style="color: blue">="txtConversation"
+      </span><span style="color: red">Text</span><span style="color: blue">=""
+      </span><span style="color: red">TextWrapping</span><span style="color: blue">="Wrap"
+      </span><span style="color: red">VerticalScrollBarVisibility</span><span style="color: blue">="Visible"/&gt;
+        
+</span></pre> <pre class="code"><span style="color: blue">      &lt;</span><span style="color: rgb(163,21,21)">TextBox
+      </span><span style="color: red">Height</span><span style="color: blue">="33"
+      </span><span style="color: red">HorizontalAlignment</span><span style="color: blue">="Left"
+      </span><span style="color: red">Margin</span><span style="color: blue">="182,12,0,0"
+      </span><span style="color: red">Name</span><span style="color: blue">="txtChatName"
+      </span><span style="color: red">VerticalAlignment</span><span style="color: blue">="Top"
+      </span><span style="color: red">Width</span><span style="color: blue">="148"
+      </span><span style="color: red">Text</span><span style="color: blue">="Bruno"/&gt;
+</span></pre> <pre class="code"><span style="color: blue">        
+      &lt;</span><span style="color: rgb(163,21,21)">TextBox
+      </span><span style="color: red">Height</span><span style="color: blue">="36"
+      </span><span style="color: red">HorizontalAlignment</span><span style="color: blue">="Left"
+      </span><span style="color: red">Margin</span><span style="color: blue">="14,229,0,0"
+      </span><span style="color: red">Name</span><span style="color: blue">="txtOutMsg"
+      </span><span style="color: red">VerticalAlignment</span><span style="color: blue">="Top"
+      </span><span style="color: red">Width</span><span style="color: blue">="477"/&gt;
+</span></pre> <pre class="code"><span style="color: blue">        
+      &lt;</span><span style="color: rgb(163,21,21)">Button
+      </span><span style="color: red">Content</span><span style="color: blue">="Send Message"
+      </span><span style="color: red">Height</span><span style="color: blue">="28"
+      </span><span style="color: red">HorizontalAlignment</span><span style="color: blue">="Left"
+      </span><span style="color: red">Margin</span><span style="color: blue">="12,271,0,0"
+      </span><span style="color: red">Name</span><span style="color: blue">="cmdSendMessage"
+      </span><span style="color: red">VerticalAlignment</span><span style="color: blue">="Top"
+      </span><span style="color: red">Width</span><span style="color: blue">="479"
+      </span><span style="color: red">Click</span><span style="color: blue">="cmdSendMessage_Click"/&gt;
+        
+</span></pre> <pre class="code"><span style="color: blue">    &lt;/</span><span style="color: rgb(163,21,21)">Grid</span><span style="color: blue">&gt;
+&lt;/</span><span style="color: rgb(163,21,21)">Window</span><span style="color: blue">&gt;
+
+</span></pre> </td> 
+          </tr> 
+         </tbody> 
+        </table> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>What the finished interface looks like</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         All the controls have been added.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="sbuqjcby" style="background-image: none; margin: 0px; display: inline" border="0" alt="sbuqjcby" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/2248.sbuqjcby_3032D31F.jpg" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/2248.sbuqjcby_5F00_3032D31F.jpg" width="553" height="352">
+        </div> 
+        <div style="quotes: none; font-size: large; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(0,0,255); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>The code behind – C# – chat client application logic</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         The next section is about writing the client code that connects, sends, and receives text/chat messages.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Proper Using Statements</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         “using” statements are needed to minimize typing in large amounts of code.
+        </div> 
+        <table cellspacing="0" cellpadding="2" width="600" border="1"> 
+         <tbody> 
+          <tr> 
+           <td valign="top" width="600"> <pre class="code"><span style="color: blue">using </span>System.Net.Sockets;
+<span style="color: blue">using </span>System.Threading.Tasks;
+<span style="color: blue">using </span>System.Threading;
+<span style="color: blue">using </span>System.Windows.Threading;
+
+        </pre> </td> 
+          </tr> 
+         </tbody> 
+        </table> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>The final code in MainWindow.xaml.cs</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         This represents all the code needed to complete the C#-based client application.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         Adding the code behind.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="2dyyaddx" style="background-image: none; display: inline" border="0" alt="2dyyaddx" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/2742.2dyyaddx_15F269FB.jpg" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/2742.2dyyaddx_5F00_15F269FB.jpg" width="509" height="355">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>MainWindow.xaml.cs</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         Here is the entire code-behind module. No extra references are needed.
+        </div> 
+        <table cellspacing="0" cellpadding="2" width="600" border="1"> 
+         <tbody> 
+          <tr> 
+           <td valign="top" width="600"> <pre class="code"><span style="color: blue">using </span>System;
+<span style="color: blue">using </span>System.Collections.Generic;
+<span style="color: blue">using </span>System.Linq;
+<span style="color: blue">using </span>System.Text;
+<span style="color: blue">using </span>System.Windows;
+<span style="color: blue">using </span>System.Windows.Controls;
+<span style="color: blue">using </span>System.Windows.Data;
+<span style="color: blue">using </span>System.Windows.Documents;
+<span style="color: blue">using </span>System.Windows.Input;
+<span style="color: blue">using </span>System.Windows.Media;
+<span style="color: blue">using </span>System.Windows.Media.Imaging;
+<span style="color: blue">using </span>System.Windows.Navigation;
+<span style="color: blue">using </span>System.Windows.Shapes;
+
+<span style="color: blue">using </span>System.Net.Sockets;
+<span style="color: blue">using </span>System.Threading.Tasks;
+<span style="color: blue">using </span>System.Threading;
+<span style="color: blue">using </span>System.Windows.Threading;
+
+<span style="color: blue">namespace </span>NodeJsChatClient
+{
+    <span style="color: blue">public partial class </span><span style="color: rgb(43,145,175)">MainWindow </span>: <span style="color: rgb(43,145,175)">Window
+    </span>{
+        <span style="color: green">// Declare member objects
+        // Client for tcp, network stream to read bytes in socket
+        </span><span style="color: rgb(43,145,175)">TcpClient </span>tcpClient = <span style="color: blue">new </span><span style="color: rgb(43,145,175)">TcpClient</span>();
+        <span style="color: rgb(43,145,175)">NetworkStream </span>serverStream = <span style="color: blue">default</span>(<span style="color: rgb(43,145,175)">NetworkStream</span>);
+        <span style="color: blue">string </span>readData = <span style="color: blue">string</span>.Empty;
+        <span style="color: blue">string </span>msg = <span style="color: rgb(163,21,21)">"Conected to Chat Server ..."</span>;
+
+        <span style="color: blue">public </span>MainWindow()
+        {
+            InitializeComponent();
+
+        }
+
+        <span style="color: green">// Purpose:     Connect to node.js application (lamechat.js)
+        // End Result:  node.js app now has a socket open that can send
+        //              messages back to this tcp client application
+        </span><span style="color: blue">private void </span>cmdConnect_Click(<span style="color: blue">object </span>sender, <span style="color: rgb(43,145,175)">RoutedEventArgs </span>e)
+        {
+            AddPrompt();
+            tcpClient.Connect(<span style="color: rgb(163,21,21)">"127.0.0.1"</span>, 8000);
+            serverStream = tcpClient.GetStream();
+
+            <span style="color: blue">byte</span>[] outStream = <span style="color: rgb(43,145,175)">Encoding</span>.ASCII.GetBytes(txtChatName.Text.Trim()
+                                  + <span style="color: rgb(163,21,21)">" is joining"</span>);
+            serverStream.Write(outStream, 0, outStream.Length);
+            serverStream.Flush();
+
+            <span style="color: green">// upload as javascript blob
+            </span><span style="color: rgb(43,145,175)">Task </span>taskOpenEndpoint = <span style="color: rgb(43,145,175)">Task</span>.Factory.StartNew(() =&gt;
+            {
+                <span style="color: blue">while </span>(<span style="color: blue">true</span>)
+                {
+                    <span style="color: green">// Read bytes
+                    </span>serverStream = tcpClient.GetStream();
+                    <span style="color: blue">byte</span>[] message = <span style="color: blue">new byte</span>[4096];
+                    <span style="color: blue">int </span>bytesRead;
+                    bytesRead = 0;
+
+                    <span style="color: blue">try
+                    </span>{
+                        <span style="color: green">// Read up to 4096 bytes
+                        </span>bytesRead = serverStream.Read(message, 0, 4096);
+                    }
+                    <span style="color: blue">catch
+                    </span>{
+                        <span style="color: green">/*a socket error has occured*/
+                    </span>}
+
+                    <span style="color: green">//We have rad the message.
+                    </span><span style="color: rgb(43,145,175)">ASCIIEncoding </span>encoder = <span style="color: blue">new </span><span style="color: rgb(43,145,175)">ASCIIEncoding</span>();
+                    <span style="color: green">// Update main window
+                    </span>AddMessage(encoder.GetString(message, 0, bytesRead));
+                    <span style="color: rgb(43,145,175)">Thread</span>.Sleep(500);
+                }
+            });
+        }
+
+        <span style="color: green">// Purpose:     Updates the window with the newest message received
+        // End Result:  Will display the message received to this tcp based client
+        </span><span style="color: blue">private void </span>AddMessage(<span style="color: blue">string </span>msg)
+        {
+            Dispatcher.BeginInvoke(<span style="color: rgb(43,145,175)">DispatcherPriority</span>.Input, (<span style="color: rgb(43,145,175)">ThreadStart</span>)(
+             () =&gt;
+             {
+                 <span style="color: blue">this</span>.txtConversation.Text += <span style="color: blue">string</span>.Format(
+                          <span style="color: rgb(43,145,175)">Environment</span>.NewLine + <span style="color: rgb(43,145,175)">Environment</span>.NewLine +
+                          <span style="color: rgb(163,21,21)">" &gt;&gt; {0}"</span>, msg);
+
+             }));
+        }
+
+        <span style="color: green">// Purpose:     Adds the " &gt;&gt; " prompt in the text box
+        // End Result:  Shows prompt to user
+        </span><span style="color: blue">private void </span>AddPrompt()
+        {
+            txtConversation.Text = txtConversation.Text + 
+                <span style="color: rgb(43,145,175)">Environment</span>.NewLine + <span style="color: rgb(163,21,21)">" &gt;&gt; " </span>+ msg;
+        }
+
+        <span style="color: green">// Purpose:     Send the text in typed by the user (stored in
+        //              txtOutMsg)
+        // End Result:  Sends text message to node.js (lamechat.js)
+        </span><span style="color: blue">private void </span>cmdSendMessage_Click(<span style="color: blue">object </span>sender, <span style="color: rgb(43,145,175)">RoutedEventArgs </span>e)
+        {
+            <span style="color: blue">byte</span>[] outStream = <span style="color: rgb(43,145,175)">Encoding</span>.ASCII.GetBytes(txtOutMsg.Text);
+            serverStream.Write(outStream, 0, outStream.Length);
+            serverStream.Flush();
+        }
+    }
+
+}
+       </pre> </td> 
+          </tr> 
+         </tbody> 
+        </table> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Let’s build the project</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         Right mouse click to see the “rebuild” command.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="pd2bwa3k" style="background-image: none; margin: 0px; display: inline" border="0" alt="pd2bwa3k" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/6038.pd2bwa3k_539F51B7.jpg" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/6038.pd2bwa3k_5F00_539F51B7.jpg" width="449" height="204">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Should be a clean “recompile”</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         “0” errors.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="image" style="background-image: none; display: inline" border="0" alt="image" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/1643.image_7928CF18.png" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/1643.image_5F00_7928CF18.png" width="635" height="164">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         &nbsp;
+        </div> 
+        <div style="quotes: none; font-size: large; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(0,0,255); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Testing NodeJsChat</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         It is time to test the applications.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Start by running lamechat.js</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         Done at a command prompt.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="image" style="background-image: none; margin: 0px; display: inline" border="0" alt="image" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/8168.image_6BB29645.png" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/8168.image_5F00_6BB29645.png" width="518" height="174">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>Run the executables</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         Start by opening the project folder and navigating to the “bin\debug” folder.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="image" style="background-image: none; margin: 0px; display: inline" border="0" alt="image" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/2451.image_2D8955C7.png" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/2451.image_5F00_2D8955C7.png" width="472" height="519">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>We need at least two client chat applications to test</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         You will simply run NodeJsChatClient.exe twice.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="image" style="background-image: none; margin: 0px; display: inline" border="0" alt="image" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/4540.image_19601371.png" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/4540.image_5F00_19601371.png" width="526" height="357">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>The final test</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         Login to both and then start sending messages.
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="image" style="background-image: none; margin: 0px; display: inline" border="0" alt="image" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/5584.image_7F1FAA4C.png" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/5584.image_5F00_7F1FAA4C.png" width="525" height="706">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <strong>This represents the final step</strong>
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         Now just improve what I did and send it back to me 
+         <img class="wlEmoticon wlEmoticon-smile" alt="Smile" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/3438.wlEmoticon-smile_6F306588.png" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/3438.wlEmoticon_2D00_smile_5F00_6F306588.png">
+        </div> 
+        <div style="quotes: none; font-size: medium; font-family: arial, helvetica, sans-serif; vertical-align: baseline; color: rgb(51,51,51); padding-bottom: 0px; text-align: left; padding-top: 0px; padding-left: 0px; margin: 1em 0px; line-height: 19px; padding-right: 0px">
+         <img title="image" style="background-image: none; margin: 0px; display: inline" border="0" alt="image" src="https://msdnshared.blob.core.windows.net/media/MSDNBlogsFS/prod.evol.blogs.msdn.com/CommunityServer.Blogs.Components.WeblogFiles/00/00/01/13/13/metablogapi/6558.image_4A9ED804.png" original-url="http://blogs.msdn.com/cfs-file.ashx/__key/communityserver-blogs-components-weblogfiles/00-00-01-13-13-metablogapi/6558.image_5F00_4A9ED804.png" width="511" height="411">&nbsp;
+        </div> 
+        <hr> 
+        <table cellspacing="5"> 
+         <tbody> 
+          <tr> 
+           <td> <h2>Download for Azure SDK</h2> <p></p> <p><br><a href="http://www.microsoft.com/click/services/Redirect2.ashx?CR_CC=200060656" target="_blank"><img src="https://brunoblogcontent.blob.core.windows.net/blobcalendarcontent/download.png" width="220"> </a></p></td> 
+          </tr> 
+         </tbody> 
+        </table> 
+       </div>
+       <!-- .entry-content --> 
+       <footer class="entry-footer single"> 
+        <hr> 
+       </footer>
+       <!-- .entry-footer --> 
+      </article>
+      <!-- #post-## --> 
+     </div>
+     <!-- #single-content --> 
+     <div id="comments" class="comments-area"> 
+      <div class="comments-title">
+        Comments (6) 
+      </div> 
+      <div id="respond" class="comment-respond"> 
+       <h3 id="reply-title" class="comment-reply-title"> <small><a rel="nofollow" id="cancel-comment-reply-link" href="/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/#respond" style="display:none;">Cancel reply</a></small></h3> 
+       <form action="https://blogs.msdn.microsoft.com/brunoterkaly/wp-comments-post.php" method="post" id="commentform" class="comment-form"> 
+        <p class="comment-form-comment"><textarea id="comment" name="comment" cols="45" rows="4" aria-required="true"></textarea></p>
+        <p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" aria-required="true" required></p> 
+        <p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="text" value="" size="30" maxlength="100" aria-describedby="email-notes" aria-required="true" required></p> 
+        <p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="text" value="" size="30" maxlength="200"></p> 
+        <p class="form-submit"><input name="submit" type="submit" id="submit" class="submit btn btn-default" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="1483" id="comment_post_ID"> <input type="hidden" name="comment_parent" id="comment_parent" value="0"> </p>
+        <p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="a8a58fe359"></p>
+        <p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="16"></p> 
+       </form> 
+      </div>
+      <!-- #respond --> 
+      <div class="navigation pagination clear-both"> 
+      </div> 
+      <ol class="comment-list"> 
+       <li class="comment even thread-even depth-1" id="comment-3313"> 
+        <div id="div-comment-3313" class="comment-body"> 
+         <div class="comment-author vcard"> 
+          <img alt="" src="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=56&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=112&amp;d=mm&amp;r=g 2x" class="avatar avatar-56 photo" height="56" width="56"> 
+          <cite class="fn">Erik Singh</cite> 
+          <span class="says">says:</span> 
+         </div> 
+         <div class="comment-meta commentmetadata">
+          <a href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/#comment-3313"> May 20, 2014 at 5:27 am</a> 
+         </div> 
+         <p>Hi Bruno,</p> 
+         <p>your tutorial is amazing ?</p> 
+         <p>I have one question about the client side: what is the purpose of that Thread.Sleep(500) at the end of taskOpenEndpoint?</p> 
+         <p>Thank you in advance.</p> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/?replytocom=3313#respond" onclick="return addComment.moveForm( &quot;div-comment-3313&quot;, &quot;3313&quot;, &quot;respond&quot;, &quot;1483&quot; )" aria-label="Reply to Erik Singh">Reply</a>
+         </div> 
+        </div> </li>
+       <!-- #comment-## --> 
+       <li class="comment odd alt thread-odd thread-alt depth-1" id="comment-3413"> 
+        <div id="div-comment-3413" class="comment-body"> 
+         <div class="comment-author vcard"> 
+          <img alt="" src="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=56&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=112&amp;d=mm&amp;r=g 2x" class="avatar avatar-56 photo" height="56" width="56"> 
+          <cite class="fn">Wacdany</cite> 
+          <span class="says">says:</span> 
+         </div> 
+         <div class="comment-meta commentmetadata">
+          <a href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/#comment-3413"> June 16, 2014 at 5:11 am</a> 
+         </div> 
+         <p>Hello Erik,</p> 
+         <p>As you can notice, that piece of code is wrapped in an infinite loop "while(true)".</p> 
+         <p>The idea of that Thread.Sleep is to make sure that the CPU doesn't hit high utilization levels due to just fetching between instructions.</p> 
+         <p>Cheers,</p> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/?replytocom=3413#respond" onclick="return addComment.moveForm( &quot;div-comment-3413&quot;, &quot;3413&quot;, &quot;respond&quot;, &quot;1483&quot; )" aria-label="Reply to Wacdany">Reply</a>
+         </div> 
+        </div> </li>
+       <!-- #comment-## --> 
+       <li class="comment even thread-even depth-1" id="comment-3643"> 
+        <div id="div-comment-3643" class="comment-body"> 
+         <div class="comment-author vcard"> 
+          <img alt="" src="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=56&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=112&amp;d=mm&amp;r=g 2x" class="avatar avatar-56 photo" height="56" width="56"> 
+          <cite class="fn">John Nguyen</cite> 
+          <span class="says">says:</span> 
+         </div> 
+         <div class="comment-meta commentmetadata">
+          <a href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/#comment-3643"> July 2, 2014 at 10:25 pm</a> 
+         </div> 
+         <p>Hello BrunoTerkaly,</p> 
+         <p>your tutorial is helpful, I really like it.</p> 
+         <p>I am a newbie in node.js. </p> 
+         <p>your tutorial can chat between 2 .net app but I try make a application to chat between web and .net app, but I don't know how to do website part.</p> 
+         <p>could you please help me</p> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/?replytocom=3643#respond" onclick="return addComment.moveForm( &quot;div-comment-3643&quot;, &quot;3643&quot;, &quot;respond&quot;, &quot;1483&quot; )" aria-label="Reply to John Nguyen">Reply</a>
+         </div> 
+        </div> </li>
+       <!-- #comment-## --> 
+       <li class="comment odd alt thread-odd thread-alt depth-1" id="comment-3653"> 
+        <div id="div-comment-3653" class="comment-body"> 
+         <div class="comment-author vcard"> 
+          <img alt="" src="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=56&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=112&amp;d=mm&amp;r=g 2x" class="avatar avatar-56 photo" height="56" width="56"> 
+          <cite class="fn">John Nguyen</cite> 
+          <span class="says">says:</span> 
+         </div> 
+         <div class="comment-meta commentmetadata">
+          <a href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/#comment-3653"> July 2, 2014 at 10:52 pm</a> 
+         </div> 
+         <p>Hello BrunoTerkaly,</p> 
+         <p>I mean that I want to make Chat Applications in Html and javascript instead of in .NET and still using node.js server</p> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/?replytocom=3653#respond" onclick="return addComment.moveForm( &quot;div-comment-3653&quot;, &quot;3653&quot;, &quot;respond&quot;, &quot;1483&quot; )" aria-label="Reply to John Nguyen">Reply</a>
+         </div> 
+        </div> </li>
+       <!-- #comment-## --> 
+       <li class="comment even thread-even depth-1" id="comment-4654"> 
+        <div id="div-comment-4654" class="comment-body"> 
+         <div class="comment-author vcard"> 
+          <img alt="" src="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=56&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=112&amp;d=mm&amp;r=g 2x" class="avatar avatar-56 photo" height="56" width="56"> 
+          <cite class="fn">dude</cite> 
+          <span class="says">says:</span> 
+         </div> 
+         <div class="comment-meta commentmetadata">
+          <a href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/#comment-4654"> May 5, 2015 at 1:41 pm</a> 
+         </div> 
+         <p>dude you are amazing!</p> 
+         <p>thanks</p> 
+         <p>lehelmatyus.com</p> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/?replytocom=4654#respond" onclick="return addComment.moveForm( &quot;div-comment-4654&quot;, &quot;4654&quot;, &quot;respond&quot;, &quot;1483&quot; )" aria-label="Reply to dude">Reply</a>
+         </div> 
+        </div> </li>
+       <!-- #comment-## --> 
+       <li class="comment odd alt thread-odd thread-alt depth-1" id="comment-4981"> 
+        <div id="div-comment-4981" class="comment-body"> 
+         <div class="comment-author vcard"> 
+          <img alt="" src="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=56&amp;d=mm&amp;r=g" srcset="https://secure.gravatar.com/avatar/3651e719491c63d4424134d66fe53db9?s=112&amp;d=mm&amp;r=g 2x" class="avatar avatar-56 photo" height="56" width="56"> 
+          <cite class="fn">Achiou</cite> 
+          <span class="says">says:</span> 
+         </div> 
+         <div class="comment-meta commentmetadata">
+          <a href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/#comment-4981"> November 8, 2015 at 12:22 pm</a> 
+         </div> 
+         <p>Thank you for this post,</p> 
+         <p>In fact I have a question regarding this implementation, in the client side you are using a pooling architecture thanks to the while(true) loop asking the node server for new data. My question is the following is there a way to have a persistent connection between a C# client and a node js server with a websocket protocol?</p> 
+         <p>I was looking at a SocketIO4Net project in git Hub that does not work with the last version of socket.io. I could not find a solutation for it.</p> 
+         <p>Is there any solution proposed? or in progress for future?</p> 
+         <p>Thank you for your answer</p> 
+         <p>Achiou</p> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/?replytocom=4981#respond" onclick="return addComment.moveForm( &quot;div-comment-4981&quot;, &quot;4981&quot;, &quot;respond&quot;, &quot;1483&quot; )" aria-label="Reply to Achiou">Reply</a>
+         </div> 
+        </div> </li>
+       <!-- #comment-## --> 
+      </ol>
+      <!-- .comment-list --> 
+      <div class="navigation pagination"> 
+      </div> 
+     </div>
+     <!-- .comments-area --> 
+    </div>
+    <!-- #primary --> 
+    <a class="screen-reader-shortcut" href="#primary" tabindex="1">Skip to main content</a> 
+    <div id="secondary" class="sidebar col-sm-3"> 
+     <div id="sidebar-widget-area" class="sidebar-widget-area" role="complementary"> 
+      <div class="widget sfmsb_widget">
+       <div class="sfmsb-follow-social-buttons sfmsb-under sfmsb-circle 40 sfmsb-horizontal">
+        <h2 class="widget-title">Follow Us</h2>
+        <a title="RSS Feed" aria-label="RSS Feed" target="_blank" href="https://blogs.msdn.microsoft.com/brunoterkaly/feed/"><span class="sfmsb-icon-feed sfmsb-circle" style="color:#ffa500;font-size:40px;" data-color="#ffa500"></span></a>
+        <div class="sfmsb-clearfix"></div>
+       </div>
+      </div>
+      <aside id="msdn-archive-widget-2" class="widget msdn-archive-widget">
+       <h2 class="widget-title">Archives</h2> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2015/12/">December 2015</a>&nbsp;(4)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2015/03/">March 2015</a>&nbsp;(1)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2015/01/">January 2015</a>&nbsp;(2)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2014/11/">November 2014</a>&nbsp;(1)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2014/08/">August 2014</a>&nbsp;(6)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2014/07/">July 2014</a>&nbsp;(10)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2014/06/">June 2014</a>&nbsp;(5)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2014/05/">May 2014</a>&nbsp;(2)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2014/04/">April 2014</a>&nbsp;(2)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2014/03/">March 2014</a>&nbsp;(8)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2015/">All of 2015</a>&nbsp;(7)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2014/">All of 2014</a>&nbsp;(39)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2013/">All of 2013</a>&nbsp;(40)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2012/">All of 2012</a>&nbsp;(75)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2011/">All of 2011</a>&nbsp;(45)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2010/">All of 2010</a>&nbsp;(78)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2009/">All of 2009</a>&nbsp;(116)</li> 
+       <li><a href="https://blogs.msdn.microsoft.com/brunoterkaly/2008/">All of 2008</a>&nbsp;(4)</li> 
+      </aside> 
+     </div> 
+    </div>
+    <!-- #secondary --> 
+   </div>
+   <!-- .site-content --> 
+   <footer id="site-footer" class="site-footer row" role="contentinfo"> 
+    <div id="site-info" class="site-info"> 
+     <div id="footer-text" class="col-sm-4 col-sm-offset-6"> 
+      <span> <a href="https://msdn.microsoft.com/dn529288" data-mscc-ic="false">Privacy &amp; Cookies</a> </span> 
+      <span> <a href="https://msdn.microsoft.com/cc300389" data-mscc-ic="false">Terms of Use</a> </span> 
+      <span> <a href="https://www.microsoft.com/en-us/legal/intellectualproperty/Trademarks/EN-US.aspx" data-mscc-ic="false">Trademarks</a> </span> 
+     </div> 
+     <div id="footer-far" class="col-sm-2"> 
+      <div id="footer-microsoft-logo"> 
+       <a href="https://www.microsoft.com" aria-label="Microsoft Logo"> 
+        <svg id="footer-microsoft-logo-svg" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 347 70.5" enable-background="new 0 0 347 70.5">
+         <g fill="#fff">
+          <path d="M39.5 44.6l-2.8 7.9h-.2c-.5-1.8-1.3-4.5-2.7-7.8l-15-37.7h-14.7v60h9.7v-37c0-2.3 0-5-.1-8.2-.1-1.6-.2-2.9-.3-3.8h.2c.5 2.3 1 4 1.4 5.1l18 43.8h6.8l17.9-44.2c.4-1 .8-3 1.2-4.7h.2c-.2 4.4-.4 8.4-.5 10.8v38.1h10.4v-60h-14.1l-15.4 37.7zM78.8 23.9h10.1v43h-10.1zM83.9 5.7c-1.7 0-3.1.6-4.3 1.7-1.2 1.1-1.8 2.5-1.8 4.2 0 1.6.6 3 1.8 4.1 1.2 1.1 2.6 1.6 4.3 1.6 1.7 0 3.2-.6 4.3-1.6 1.2-1.1 1.8-2.5 1.8-4.1 0-1.6-.6-3-1.8-4.2-1-1.2-2.5-1.7-4.3-1.7M124.7 23.5c-1.9-.4-3.8-.6-5.7-.6-4.6 0-8.8 1-12.3 3s-6.3 4.8-8.1 8.3c-1.9 3.6-2.8 7.7-2.8 12.4 0 4.1.9 7.8 2.7 11.1 1.8 3.3 4.3 5.9 7.6 7.7 3.2 1.8 6.9 2.7 11.1 2.7 4.8 0 8.9-1 12.2-2.9l.1-.1v-9.3l-.4.3c-1.5 1.1-3.2 2-4.9 2.6-1.8.6-3.4.9-4.8.9-4 0-7.2-1.2-9.5-3.7s-3.5-5.9-3.5-10.2c0-4.4 1.2-7.9 3.6-10.5 2.4-2.6 5.6-3.9 9.5-3.9 3.3 0 6.6 1.1 9.6 3.3l.4.3v-9.8l-.1-.1c-1.2-.6-2.8-1.1-4.7-1.5M158 23.2c-2.5 0-4.8.8-6.8 2.4-1.7 1.4-2.9 3.4-3.9 5.8h-.1v-7.4h-10.1v43h10.1v-22c0-3.7.8-6.8 2.5-9.1s3.9-3.5 6.5-3.5c.9 0 1.9.2 3 .4 1.1.3 1.9.6 2.4 1l.4.3v-10.2l-.2-.1c-.8-.4-2.1-.6-3.8-.6M185.5 22.9c-7.1 0-12.7 2.1-16.7 6.2s-6 9.8-6 16.9c0 6.7 2 12.1 5.9 16.1 3.9 3.9 9.2 5.9 15.8 5.9 6.9 0 12.4-2.1 16.4-6.3 4-4.2 6-9.8 6-16.7 0-6.8-1.9-12.3-5.7-16.2-3.7-3.9-9-5.9-15.7-5.9m8 33.1c-1.9 2.4-4.8 3.6-8.5 3.6s-6.6-1.2-8.7-3.7c-2.1-2.4-3.1-5.9-3.1-10.3 0-4.6 1.1-8.1 3.1-10.6 2.1-2.5 5-3.7 8.6-3.7 3.6 0 6.4 1.2 8.4 3.6 2 2.4 3.1 5.9 3.1 10.5s-1 8.2-2.9 10.6M229.3 41.7c-3.2-1.3-5.2-2.3-6.1-3.2-.8-.8-1.2-1.9-1.2-3.3 0-1.2.5-2.3 1.6-3.1 1.1-.8 2.5-1.2 4.4-1.2 1.7 0 3.5.3 5.2.8 1.7.5 3.3 1.2 4.5 2.1l.4.3v-9.4l-.2-.1c-1.2-.5-2.7-.9-4.6-1.3-1.9-.3-3.6-.5-5-.5-4.8 0-8.8 1.2-11.9 3.7-3.1 2.4-4.6 5.7-4.6 9.5 0 2 .3 3.8 1 5.3s1.7 2.9 3.1 4c1.4 1.1 3.4 2.3 6.2 3.5 2.3 1 4.1 1.8 5.2 2.4 1.1.6 1.8 1.3 2.3 1.9.4.6.6 1.4.6 2.4 0 2.9-2.2 4.3-6.6 4.3-1.7 0-3.5-.3-5.6-1-2.1-.7-4-1.7-5.7-2.9l-.4-.3v9.9l.2.1c1.5.7 3.3 1.2 5.4 1.7 2.2.4 4.1.7 5.8.7 5.2 0 9.5-1.2 12.5-3.7 3.1-2.5 4.7-5.7 4.7-9.8 0-2.9-.8-5.4-2.5-7.4-1.8-2-4.7-3.8-8.7-5.4M267.6 22.9c-7.1 0-12.7 2.1-16.7 6.2s-6 9.8-6 16.9c0 6.7 2 12.1 5.9 16.1 3.9 3.9 9.2 5.9 15.8 5.9 6.9 0 12.4-2.1 16.4-6.3 4-4.2 6-9.8 6-16.7 0-6.8-1.9-12.3-5.7-16.2-3.8-3.9-9.1-5.9-15.7-5.9m8 33.1c-1.9 2.4-4.8 3.6-8.5 3.6s-6.6-1.2-8.7-3.7c-2.1-2.4-3.1-5.9-3.1-10.3 0-4.6 1.1-8.1 3.1-10.6 2.1-2.5 5-3.7 8.6-3.7 3.5 0 6.4 1.2 8.4 3.6 2 2.4 3.1 5.9 3.1 10.5s-1 8.2-2.9 10.6" />
+          <path d="M342.9 32.2v-8.2h-10.2v-12.9l-.3.1-9.6 2.9-.2.1v9.7h-15.2v-5.4c0-2.5.6-4.4 1.7-5.7 1.1-1.3 2.7-1.9 4.7-1.9 1.4 0 2.9.3 4.5 1l.4.2v-8.7l-.2-.1c-1.4-.5-3.3-.8-5.7-.8-3 0-5.7.7-8.1 1.9-2.4 1.3-4.2 3.1-5.5 5.5-1.3 2.3-2 5-2 8v6h-7.2v8.2h7.1v34.8h10.2v-34.7h15.2v22.1c0 9.1 4.3 13.7 12.8 13.7 1.4 0 2.9-.2 4.3-.5 1.5-.3 2.6-.7 3.2-1l.1-.1v-8.3l-.4.3c-.6.4-1.2.7-2.1.9-.8.2-1.5.3-2 .3-2 0-3.4-.5-4.4-1.6-.9-1.1-1.4-2.9-1.4-5.5v-20.3h10.3z" />
+         </g>
+        </svg> </a> 
+      </div> 
+      <div id="copyright">
+        © 2017 Microsoft 
+      </div> 
+     </div> 
+    </div>
+    <!-- .site-info --> 
+   </footer>
+   <!-- .site-footer --> 
+  </div>
+  <!-- .site --> 
+  <script type="text/javascript">
+	jQuery(document).ready(function($){
+		$login_link = $( 'a[href*="wp-login.php?"]' );
+				$login_link.on( 'click', function( evt ) {
+			// evt.preventDefault();
+						// console.log( 'cookie-set', '/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/' );
+			$.cookie( 'aadsso-redirect', '/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/', { expires: 1, path: '/' });
+		});
+	});
+	</script> 
+  <script>
+		jQuery(window).load(function () {
+			// Fix Bug #644092:MAS36: Page number
+			jQuery('div.nav-links>a.page-numbers').each(function(){
+				jQuery(this).attr('aria-label', 'Page ' + jQuery(this).html());
+			});
+
+			// Fix Bug #633981:MAS20B:  Talkback: Talkback announces link for Number of Comments as 'Number link'
+			jQuery('span.comments-link>a').each(function () {
+				var num = parseInt(jQuery(this).html());
+				if (isNaN(num)) {
+					return false;
+				}
+				var content = num + (num === 1 ? ' comment' : ' comments');
+				jQuery(this).attr({
+					'aria-label': content,
+					'title': content
+				});
+			});
+
+
+			jQuery('#search-option>div').each(function () {
+				jQuery(this).attr('aria-label',jQuery('span.search-text',this).html());
+			});
+
+			// Fix Bug #671896:MAS40B :Inspect: Header: "Name" property is not descriptive for  "Microsoft | TechNet" link (logo).
+			var currentHost = location.hostname;
+			if (currentHost.indexOf('msdn') !== -1) {
+				jQuery('#home-link').attr('aria-label','Microsoft Developer');
+			} else if (currentHost.indexOf('technet') !== -1) {
+				jQuery('#home-link').attr('aria-label','Microsoft Technet');
+			}
+
+			// Detect High Contrast Mode in non IE/Edge Browsers
+			jQuery('html').css('background-image', 'url("data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==")');
+			if (jQuery('html').css('background-image') === 'none') {
+				jQuery('html').attr('data-high-contrast', 'true');
+			}
+
+			// Fix Bug #670327:MAS40B: Inspect: Header: "Localized control type" property is incorrect for the header elements.
+			// Fix Bug #683788:MAS40B: TalkBack: Header: For menu items in technet link menu bar, expand/collapse pattern available, is not announced by TalkBack 
+			jQuery('#site-navigation>div>ul>li>a').attr('role', 'button').attr('aria-expanded', 'false').click(function () {
+				if (jQuery(this).attr('aria-expanded') === 'true') {
+					jQuery(this).attr('aria-expanded', 'false');
+				} else {
+					jQuery(this).attr('aria-expanded', 'true');
+				}
+			});
+
+		});
+	</script> 
+  <!--ADD WEDCS SCRIPT--> 
+  <div id="_WEDCSInsertedData" style="display: none;"></div> 
+  <script type="text/javascript">
+		jQuery( window ).load(
+			function() {
+				window.varSegmentation = 0;
+				window.varClickTracking = 1;
+				window.varCustomerTracking = 1;
+				window.varAutoFirePV = 1;
+				window.Route = ""; // was 23470 in the windows theme framework
+				window.Ctrl = "";
+
+								var blogPost = {};
+
+								blogPost.permalink = 'https://blogs.msdn.microsoft.com/brunoterkaly/2012/02/28/node-js-a-chat-server-written-in-node-and-a-client-app-written-in-c/';
+				blogPost.title = 'Node.js&ndash; A chat server written in Node and a client app written in C#';
+				blogPost.author = 'BrunoTerkaly';
+				blogPost.post_date = '2012-02-28 13:39:58';
+				blogPost.category = 'Uncategorized';
+				blogPost.tag = '';
+				blogPost.comment_number = '6';
+								window.blogPost = blogPost;
+
+				var wedcs_script = document.createElement('script');
+				wedcs_script.type = 'text/javascript';
+				wedcs_script.async = true;
+				wedcs_script.src = 'https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/mu-plugins/wedcs-script/ms2_blogs.js';
+				if (typeof mscc === 'undefined' || (!mscc || mscc.hasConsent())) {
+					document.getElementsByTagName('body')[0].appendChild(wedcs_script);
+				}
+			});
+	</script> 
+  <!--
+	<script src="//c.microsoft.com/ms.js" type="text/javascript"></script>
+	<noscript><img alt="" width="1" height="1" src="http://c.microsoft.com/trans_pixel.aspx"/></noscript>
+	--> 
+  <script type="text/javascript">
+			jQuery( window ).load(
+				function () {
+					var stylesheet = document.createElement('link');
+					stylesheet.href = 'https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/plugins/simple-follow-me-social-buttons-widget/assets/css/style.css?ver=3.3.3';
+					stylesheet.rel = 'stylesheet';
+					stylesheet.type = 'text/css';
+					document.getElementsByTagName('head')[0].appendChild(stylesheet);
+				});
+		</script> 
+  <script type="text/javascript">
+			jQuery( window ).load(
+				function () {
+					var stylesheet = document.createElement('link');
+					stylesheet.href = 'https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/plugins/simple-follow-me-social-buttons-widget/assets/css/icons.css?ver=3.3.3';
+					stylesheet.rel = 'stylesheet';
+					stylesheet.type = 'text/css';
+					document.getElementsByTagName('head')[0].appendChild(stylesheet);
+				});
+		</script> 
+  <script type="text/javascript">
+			jQuery( window ).load(
+				function () {
+					var script = document.createElement('script');
+					script.src = 'https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/plugins/simple-follow-me-social-buttons-widget/assets/js/front-widget.js?ver=3.3.3';
+					script.type = 'text/javascript';
+					script.async = true;
+					document.getElementsByTagName('body')[0].appendChild(script);
+				});
+		</script> 
+  <span id="page-view-tracking-info" blog-id="58693" post-id="1483"></span> 
+  <script type="text/javascript">
+			// Check for compatibility before IE8
+			if (!Date.now) {
+ 				 Date.now = function() { return new Date().getTime(); };
+			}
+			jQuery( window ).load( function() {
+				jQuery.ajax({
+					url: 'https://blogs.msdn.microsoft.com/brunoterkaly/wp-admin/admin-ajax.php',
+					type: 'get',
+					data: {
+						action: 'track_page_view',
+						track_page_view_post_id: jQuery('#page-view-tracking-info').attr('post-id'),
+						track_page_view_blog_id: jQuery('#page-view-tracking-info').attr('blog-id'),
+						track_page_view_post_url: window.location.href.split('?')[0],
+						timestamp: Date.now()
+						}
+				});
+			});
+		</script> 
+  <script>
+dataLayer = [[]];
+</script> 
+  <!-- Google Tag Manager --> 
+  <noscript>
+   <iframe src="//www.googletagmanager.com/ns.html?id=GTM-PLR87W" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript> 
+  <script>jQuery(window).load(function(){(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&amp;l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-PLR87W')});
+</script> 
+  <!-- End Google Tag Manager --> 
+  <script type="text/javascript">
+		jQuery( window ).load(
+			function(i) {
+				var n = window,
+					t = document,
+					e = n.console,
+					f, u, r, o;
+				typeof e == "undefined" && (f = function() {}, e = {
+					log: f,
+					warn: f,
+					assert: f,
+					clear: f,
+					dir: f,
+					error: f,
+					info: f,
+					profile: f,
+					profileEnd: f
+				}), u = {
+					appendToHead: function(n) {
+						if (t.getElementsByTagName("head").length > 0) t.getElementsByTagName("head")[0].appendChild(n);
+						else throw "bootstrapper: no head element found.";
+					},
+					appendToBody: function(n) {
+						if (t.getElementsByTagName("body").length > 0) t.getElementsByTagName("body")[0].appendChild(n);
+						else throw "bootstrapper: no body element found.";
+					},
+					addStyleElement: function(n) {
+						var i = t.createElement("link");
+						i.setAttribute("href", n), i.setAttribute("rel", "stylesheet"), i.setAttribute("type", "text/css"), u.appendToHead(i)
+					},
+					loadFiles: function(n, t) {
+						if (t !== i && u.recursiveScriptLoad(0, t), n !== i)
+							for (var r = 0, r = 0; r < n.length; r++) u.addStyleElement(n[r])
+					},
+					recursiveScriptLoad: function(n, t) {
+						t[n] && u.addScriptElement(t[n], function() {
+							u.recursiveScriptLoad(n + 1, t)
+						})
+					},
+					isCompatible: function(n, t) {
+						var r, u, i;
+						return (r = n.split("."), u = t.split("."), i = function(n) {
+							return isNaN(n) ? 0 : n
+						}, i(r[0]) > i(u[0]) || i(r[0]) === i(u[0]) && i(r[1]) > i(u[1]) || i(r[0]) === i(u[0]) && i(r[1]) === i(u[1]) && i(r[2]) >= i(u[2])) ? !0 : !1
+					},
+					addScriptElement: function(i, r) {
+						var f, e;
+						f = t.createElement("script"), f.setAttribute("type", "text/javascript"), f.async = true, f.setAttribute("src", i), f.attachEvent ? (e = function() {
+							setTimeout(function() {
+								typeof n.jQuery != "undefined" && r ? r() : e()
+							}, 10)
+						}, e()) : f.onload = r, u.appendToBody(f)
+					},
+					load: function(n, t) {
+						setTimeout(function() {
+							if (typeof n == "undefined") try {
+								u.addScriptElement(t.defaultPath, function() {
+									u.loadFiles(t.cssFiles, t.jsFiles)
+								});
+								return
+							} catch (i) {
+								e.warn("bootstrapper: failed to load default jQuery")
+							} else if (!u.isCompatible(n.fn.jquery, t.minimumVersion)) {
+								e.warn("bootstrapper: jQuery version is too old to load UserCard. Use v1.4.2 or later.");
+								return
+							}
+							u.loadFiles(t.cssFiles, t.jsFiles)
+						}, 0)
+					}
+				}, r = {
+					host: n.location.host,
+					search: "",
+					protocol: "https"
+				}, r.host = "widgets.services.microsoft.com", r.search = "?brand=msdn&lang=en&ver=4.9.0.0", r.protocol = "https:", o = {
+					minimumVersion: "1.1.2",
+					defaultPath: "https://code.jquery.com/jquery-1.4.2.min.js",
+					cssFiles: [r.protocol + "//" + r.host + "/v1/UnifiedBaseballCard.css" + r.search, r.protocol + "//" + r.host + "/v1/usercard.css" + r.search],
+					jsFiles: ["https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js", r.protocol + "//" + r.host + "/v1/jquery.timeago.js" + r.search, r.protocol + "//" + r.host + "/v1/jquery.textfill.js" + r.search, r.protocol + "//" + r.host + "/v1/widgets.js" + r.search]
+				}, typeof n.jQuery == "undefined" ? u.load(i, o) : u.load(n.jQuery, o)
+			}
+		);
+	</script> 
+  <script type="text/javascript" src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/plugins/akismet/_inc/form.js?ver=3.1.11"></script> 
+  <link rel="stylesheet" id="eucookielaw-css-css" href="https://uhf.microsoft.com/mscc/statics/mscc-0.3.6.min.css?ver=4.7.5" type="text/css" media="all"> 
+  <link rel="stylesheet" id="msdn-comment-notification-comment-form-css" href="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/plugins/msdn-comment-notification/msdn-comment-notification-comment-form.css?ver=20161219" type="text/css" media="all"> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var wds_ratings_config = {"ajaxurl":"https:\/\/blogs.msdn.microsoft.com\/brunoterkaly\/wp-admin\/admin-ajax.php","user_id":"0","nonce":"6913b004f0","debug":"","no_auth_alert":"You must be logged in to rate this article.","repeatedly_vote_alert":"You can not vote repeatedly in a short time","allow_anonymous_rating":"","blog_id":"58693","rating_limit_login_user":"1","rating_limit_anonymous":"1","hide_rating_post_ids":""};
+var wds_ratings_config = {"ajaxurl":"https:\/\/blogs.msdn.microsoft.com\/brunoterkaly\/wp-admin\/admin-ajax.php","user_id":"0","nonce":"6913b004f0","debug":"","no_auth_alert":"You must be logged in to rate this article.","repeatedly_vote_alert":"You can not vote repeatedly in a short time","allow_anonymous_rating":"","blog_id":"58693","rating_limit_login_user":"1","rating_limit_anonymous":"1","hide_rating_post_ids":""};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/plugins/wds-ratings/wds-ratings.js?ver=20161014"></script> 
+  <script type="text/javascript" src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1"></script> 
+  <script type="text/javascript" src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/themes/microsoft/js/theme-merged.js?ver=02092017"></script> 
+  <script type="text/javascript" src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-includes/js/wp-embed.min.js?ver=4.7.5"></script> 
+  <script type="text/javascript" src="https://uhf.microsoft.com/mscc/statics/mscc-0.3.6.min.js?ver=4.7.5"></script> 
+  <script type="text/javascript" src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/plugins/eu-cookie-law/eucookielaw-searchbox-script.js?ver=4.7.5"></script> 
+  <script type="text/javascript" src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/plugins/msdn-comment-notification/msdn-comment-notification-comment-form.js?ver=20161219"></script> 
+  <script type="text/javascript" src="https://blogs.msdn.microsoft.com/brunoterkaly/wp-content/themes/microsoft/js/vendor/jquery.cookie.js?ver=11092015"></script>   
+ </body>
+</html>

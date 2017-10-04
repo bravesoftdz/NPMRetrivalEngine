@@ -1,0 +1,765 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <!-- source = page.htm -->
+ <head> 
+  <!--  --> 
+  <script>
+setTimeout(function(){
+
+if ((location.href == 'https://edn.embarcadero.com/') ||
+    (location.href == 'http://edn.embarcadero.com/'))
+  {
+    location.href="https://community.embarcadero.com";
+  }
+} , 5000);   
+</script> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=7"> 
+  <title>Sockets: Basic Client-Server Programming in Java - By Rick Proctor</title> 
+  <meta name="description" content="A Basic Socket Processing How To.  Learn to build a simple socket client, a socket server that handles one connection at a time, and a socket server that can handle mulitple socket connections."> 
+  <link href="http://static.embarcadero.com/styles/jquery-ui.css" rel="stylesheet" type="text/css"> 
+  <link href="http://static.embarcadero.com/styles/edn_nojqui.css" rel="stylesheet" type="text/css"> 
+  <link media="print" href="http://static.embarcadero.com/styles/print.css" rel="stylesheet"> 
+  <script language="JavaScript" type="text/javascript">
+    var ednSSL = false;
+  </script> 
+  <script language="JavaScript" src="http://static.embarcadero.com/javascript/jq.js" type="text/javascript"></script> 
+  <script language="JavaScript" src="http://static.embarcadero.com/javascript/edn_nojq.js" type="text/javascript"></script> 
+  <script language="JavaScript" src="http://static.embarcadero.com/javascript/embtnewtrackc.js" type="text/javascript"></script> 
+  <script language="JavaScript" src="http://static.embarcadero.com/javascript/newstuff.js" type="text/javascript"></script> 
+  <script language="javascript" type="text/javascript">
+function onload_function(){
+	initNav();
+}
+jQuery(window).load(onload_function);
+
+function onresize_function(){
+	reposNav();
+}
+window.onresize = onresize_function;   
+    </script> 
+  <script type="text/javascript">
+searchServiceURL = "http://edn.embarcadero.com/SearchHintsJS.aspx";
+approxHitsText = "Approx hits";
+
+
+	</script> 
+  <link rel="shortcut icon" href="http://static.embarcadero.com/ednfavicon.ico" type="image/x-icon"> 
+  <link title="Embarcadero Search" rel="search" type="application/opensearchdescription+xml" href="http://static.embarcadero.com/javascript/search.xml"> 
+  <link rel="alternate" type="application/atom+xml" href="http://edn.embarcadero.com/article/31995/atom"> 
+  <link rel="alternate" type="application/rss+xml" href="http://edn.embarcadero.com/article/31995/rss"> 
+  <style type="text/css">
+/*#left-col div, #right-col div { width: 42px; }*/
+#center-col { width: 100%; }
+#center-col #logo-area { width: 100%; }
+#CopyrightSection { padding: 15px 42px 0; }
+#CopyrightSection div { width: auto; }
+</style> 
+  <style type="text/css">
+.header_wrapper
+{
+width:980px;
+background-image: url(/images/edn/NewHeader_980x496.jpg);
+background-repeat: no-repeat;
+background-position: center top;
+height: 496px;
+margin-right: auto;
+margin-left: auto;
+padding-top:4px;
+position: relative;
+z-index: 6;
+zoom: expression("1");
+}
+.main_wrapper2_inner_right {
+background-image: url();
+/* background-color: rgba(0, 0, 0, 1); */
+}
+.main_wrapper_inner_left {
+background-image: url();
+/* background-color: rgba(0, 0, 0, 1); */
+}
+</style> 
+ </head> 
+ <body id="body"> 
+  <!-- Google Tag Manager (noscript) --> 
+  <noscript>
+   <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-N7VMSS" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript> 
+  <!-- End Google Tag Manager (noscript) --> 
+  <table border="0" cellpadding="0" cellspacing="0" width="100%">
+   <tbody>
+    <tr>
+     <td> 
+      <div class="main_wrapper"> 
+       <div class="main_wrapper_inner_left"> 
+        <div class="main_wrapper2"> 
+         <div class="main_wrapper2_inner_right"> 
+          <div class="shadow_bg_wrapper"> 
+           <div class="header_wrapper" id="header_wrapper"> 
+            <div id="mininav_bar" class="mininav_wrapper" style="background-color:rgba(0, 0, 0, 0.5);"> 
+             <div style="float: right; height: 18px; line-height: 18px;"> 
+              <form class="search" name="search" method="get" action="http://edn.embarcadero.com/search"> 
+               <input id="searchbox-q" type="text" name="q" class="s" size="18" maxlength="255" value="" autocomplete="off"> 
+               <script language="JavaScript" type="text/javascript">
+					    registerSearchBox("searchbox-q");
+					</script> 
+               <input name="" type="image" src="http://static.embarcadero.com/images/edn/search_btn.gif" align="absmiddle"> 
+               <input type="hidden" name="allsites" value="y"> 
+               <input type="hidden" name="allwords" value="y"> 
+              </form> 
+             </div> 
+             <div style="float: right; height: 18px; line-height: 18px;"> 
+              <a class="login" href="https://members.embarcadero.com/login.aspx?returnurl=http://edn.embarcadero.com/article/31995"> Log On </a> 
+             </div> 
+             <div style="float: right; height: 18px; line-height: 18px;">
+              &nbsp;|&nbsp;
+             </div> 
+             <div class="langselect" style="float: right;"> 
+              <div class="primary-menu" style="background: none; padding: 0;"> 
+               <ul id="langlist" class="langbg"> 
+                <li id="langselected"><a id="langselecteda" href="#">English</a> 
+                 <ul>
+                  <li><a href="http://edn.embarcadero.com/language?clear=yes&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">My default language</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=ar&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Arabic</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=br&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Brazilian Portuguese</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=bg&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Bulgarian</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=hr&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Croatian</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=cs&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Czech</a></li> 
+                  <li class="selected"><a href="http://edn.embarcadero.com/language?code=en&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">English</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=fi&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Finnish</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=fr&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">French</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=de&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">German</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=he&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Hebrew</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=el&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Hellenic (Greek)</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=hu&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Hungarian</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=it&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Italian</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=jp&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Japanese</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=kr&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Korean</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=no&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Norwegian</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=pl&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Polish</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=pt&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Portuguese</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=ru&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Russian</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=cn&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Simplified Chinese</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=es&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Spanish</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=sv&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Swedish</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=tw&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Traditional Chinese</a></li> 
+                  <li><a href="http://edn.embarcadero.com/language?code=tr&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">Turkish</a></li> 
+                 </ul> </li> 
+               </ul> 
+              </div> 
+             </div> 
+             <div style="float: right; height: 18px; line-height: 18px;">
+              |
+             </div> 
+             <div style="float: right;"> 
+              <div class="primary-menu" style="background: none; padding: 0;"> 
+               <ul class="langbg countrylist"> 
+                <li class="countryselected"> 
+                 <!-- <img src="http://static.embarcadero.com://static.embarcadero.com/images/w3/icons-globe.gif" width="22" height="21" alt="" /> --><a class="countryselecteda" href="#">Location</a> 
+                 <ul> 
+                  <li><a href="http://edn.embarcadero.com/country?clear=yes&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995">All Other</a></li> 
+                  <li class="section">Regions</li>
+                  <li><a href="http://edn.embarcadero.com/country?code=ASEAN&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="Brunei Darussalam, Cambodia, Indonesia, Laos, Malaysia, Philippines, Singapore, Thailand, Viet Nam">ASEAN</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=ANZ&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="Australia, New Zealand">Australia/New Zealand</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=BENELUX&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="Belgium, Luxembourg, Netherlands">Benelux</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=DACH&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="Austria, Germany, Switzerland">D-A-CH</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=CHINAHK&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="China, Hong Kong">Greater China</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=LATAM&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="Argentina, Bolivia, Chile, Colombia, Costa Rica, Dominican Republic, Ecuador, El Salvador, Guatemala, Honduras, Mexico, Nicaragua, Panama, Paraguay, Peru, Uruguay, Venezuela">Latin America</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=NORDIC&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="Denmark, Finland, Iceland, Norway, Sweden">Nordic</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=TW&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="">Taiwan</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=UKIR&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="Ireland, United Kingdom">UK and Ireland</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=USCARIB&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="Anguilla, Antigua and Barbuda, Aruba, Bahamas, Barbados, Belize, Bermuda, Cayman Islands, Dominica, Falkland Islands (Malvinas), Grenada, Guadeloupe, Guyana, Haiti, Jamaica, Martinique, Montserrat, Netherlands Antilles, Puerto Rico, Saint Kitts and Nevis, Saint Lucia, Saint Vincent and the Grenadines, St. Barthelemy, Suriname, Trinidad and Tobago, Turks and Caicos Islands, United States, Virgin Islands (British), Virgin Islands (U.S.)">US and Caribbean</a></li>
+                  <li class="section">Countries</li>
+                  <li><a href="http://edn.embarcadero.com/country?code=BR&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="">Brazil</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=CA&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="">Canada</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=FR&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="">France</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=IN&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="">India</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=IT&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="">Italy</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=JP&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="">Japan</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=KR&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="">Korea (South)</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=RU&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="">Russian Federation</a></li>
+                  <li><a href="http://edn.embarcadero.com/country?code=ES&amp;returnurl=http%3a%2f%2fedn.embarcadero.com%2farticle%2f31995" title="">Spain</a></li> 
+                 </ul> </li> 
+               </ul> 
+              </div> 
+             </div> 
+             <div style="float: left; height: 18px; line-height: 18px;"> 
+              <a href="http://www.embarcadero.com" class="site-home">Embarcadero Home</a> 
+             </div> &nbsp; 
+            </div> 
+            <div id="social" style="position:relative; clear:right; float:right; top:10px; width:180px;"> 
+             <div id="sociallinks" style="position:absolute; float:right; top:0px; right:15px; z-index:100;"> 
+              <a href="https://www.youtube.com/user/EmbarcaderoTechNet" title="Embarcadero on YouTube"> <img src="http://static.embarcadero.com/images/w3/Youtube_32x32.png" alt="YouTube" width="32" height="32" border="0"> </a> 
+              <a href="https://twitter.com/EmbarcaderoTech" title="Embarcadero on Twitter"> <img src="http://static.embarcadero.com/images/w3/Twitter_32x32.png" alt="Twitter" width="32" height="32" border="0"> </a> 
+              <a href="https://www.facebook.com/#/pages/Embarcadero-Technologies-Database-Application-Software-Tools/34960937498" title="Embarcadero on Facebook"> <img src="http://static.embarcadero.com/images/w3/FaceBook_32x32.png" alt="Facebook" width="32" height="32" border="0"> </a> 
+              <a href="https://www.linkedin.com/e/vgh/2551723/" title="Embarcadero on Linked In"> <img src="http://static.embarcadero.com/images/w3/Linked-In-icon-32.png" alt="Linked In" width="32" height="32" border="0"> </a> 
+             </div> 
+             <div id="socialtext" style="color:white; position:absolute; float:right; top:30px; z-index:100; right:15px; text-align:right;">
+              Watch, Follow, &amp; 
+              <br>Connect with Us
+             </div> 
+             <div id="addthis" class="addthis_toolbox addthis_default_style" style="position:absolute; float:right; top:60px; right:16px;  text-align:right;"> 
+              <a href="http://www.addthis.com/bookmark.php?v=250&amp;pub=embarcadero" class="addthis_button_compact" style="color:White;" title="Share this Embarcadero web page">Share This</a> 
+             </div> 
+             <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pub=embarcadero"></script> 
+            </div> 
+            <div style="font-size: 200%; background-color:rgba(0, 0, 0, 0.75); text-align: center; border: 3px solid black; color: white; font-weight: bold;"> 
+             <p> Please visit our new home<br> <a href="https://community.embarcadero.com/">community.embarcadero.com</a>. </p> 
+            </div> 
+            <!--
+		    <a href="http://edn.embarcadero.com" class="ednlogo"><img src="http://static.embarcadero.com/images/edn/edn.jpg" alt="Embarcadero Developer Network" /></a>
+        	<a href="http://edn.embarcadero.com" class="mainlogo"><img src="http://static.embarcadero.com/images/edn/header_logo.gif" alt="Embarcadero Developer Network" /></a>
+--> 
+           </div> 
+           <!--
+		<div class="main_nav_wrapper" id="main_nav">
+			<a href="#" id="Communities">Communities</a>
+			<a href="#" id="Articles">Articles</a>
+            <a href="http://blogs.embarcadero.com" id="Blogs">Blogs</a>
+            <a href="#" id="Resources">Resources</a>
+            <a href="#" id="Downloads">Downloads</a>
+            <a href="http://edn.embarcadero.com/help" id="Help">Help</a>
+		</div>
+--> 
+           <div class="content_wrapper_inside"> 
+            <form name="ctl30" method="post" action="/article/31995" id="ctl30"> 
+             <div> 
+              <input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value=""> 
+              <input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value=""> 
+              <input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUKMTg0MDYyNTE1MA9kFgICnwEPZBYEAi8PDxYCHgdWaXNpYmxlaGRkAjkPZBYGZg9kFgJmDw8WAh8AaGRkAgcPZBYCZg8WAh4EVGV4dAWeBjx0YWJsZSB3aWR0aD0iMTAwJSI+DQo8dHI+DQo8dGQgdmFsaWduPSJ0b3AiIHdpZHRoPSIxMDAlIj48ZGl2IGNsYXNzPSJidXR0b24gYnV0dG9uLWltYWdlIGJ1dHRvbi1kbCI+PGEgaHJlZj0iaHR0cDovL3d3dy5lbWJhcmNhZGVyby5jb20vZG93bmxvYWRzP2NpZD03MDFHMDAwMDAwMHRLVHgiIHRpdGxlPSJEb3dubG9hZCBhIGZyZWUgdHJpYWwiPkRvd25sb2FkIFRyaWFsPC9hPjwvZGl2Pg0KICA8ZGl2IHN0eWxlPSJoZWlnaHQ6IDRweDsiPjwvZGl2Pg0KDQo8ZGl2IGNsYXNzPSJidXR0b24gYnV0dG9uLWltYWdlIGJ1dHRvbi1jYXJ0Ij48YSBocmVmPSJodHRwOi8vZWRuLmVtYmFyY2FkZXJvLmNvbS9idXk/bGluaz01LDEwNCIgdGl0bGU9IlB1cmNoYXNlIGEgcHJvZHVjdCByaWdodCBub3ciPkJ1eSBOb3c8L2E+PC9kaXY+DQo8L3RkPg0KPC90cj4NCjx0cj4NCjx0ZCB2YWxpZ249InRvcCIgd2lkdGg9IjEwMCUiPjxwIHN0eWxlPSJ0ZXh0LWFsaWduOiBjZW50ZXIiPjxhIGhyZWY9Imh0dHA6Ly93d3cuZW1iYXJjYWRlcm8uY29tL3Byb2R1Y3RzL3JhZC1zdHVkaW8vZG93bmxvYWRzP2NpZD03MDFHMDAwMDAwMHRLVHgiPjxpbWcgaGVpZ2h0PSIyMjgiIGFsdD0iUkFEIFN0dWRpbyBUcmlhbCIgc3JjPSJodHRwOi8vZWRuLmVtYmFyY2FkZXJvLmNvbS9hcnRpY2xlLzM5NjQwL2ltYWdlcy8zOTY0MC9SQURfU3R1ZGlvX1NlYXR0bGVfQmFubmVyXzE1OXgyMjhweF9DVEFfVHJ5X05vdy5wbmciIHdpZHRoPSIxNTkiIGlkPSJkb2NpbWFnZTEiIC8+PC9hPjwvcD4NCjwvdGQ+DQo8L3RyPg0KPC90YWJsZT4NCmQCDA9kFgJmD2QWAmYPZBYCZg9kFgJmD2QWBAIBDw8WAh8BBaIBPGRpdiBjbGFzcz0idGFnY2xvdWQiPg0KPHNwYW4gY2xhc3M9InRhZyI+PGEgaHJlZj0iaHR0cDovL2Vkbi5lbWJhcmNhZGVyby5jb20vdGFnL2VuLGtra2wiIGNsYXNzPSJ0YWctbWVkaXVtIiB0aXRsZT0iVGFnZ2VkIGJ5IG9uZSB1c2VyIj5ra2tsPC9hPjwvc3Bhbj4NCjwvZGl2Pg0KZGQCAw8PFgIfAGhkFgoCAQ8PFgIfAQUNVGFnIExhbmd1YWdlOmRkAgMPEA8WBh4NRGF0YVRleHRGaWVsZAUETmFtZR4ORGF0YVZhbHVlRmllbGQFDFRlbXBsYXRlQ29kZR4LXyFEYXRhQm91bmRnZBAVGAZBcmFiaWMUQnJhemlsaWFuIFBvcnR1Z3Vlc2UJQnVsZ2FyaWFuCENyb2F0aWFuBUN6ZWNoB0VuZ2xpc2gHRmlubmlzaAZGcmVuY2gGR2VybWFuBkhlYnJldxBIZWxsZW5pYyAoR3JlZWspCUh1bmdhcmlhbgdJdGFsaWFuCEphcGFuZXNlBktvcmVhbglOb3J3ZWdpYW4GUG9saXNoClBvcnR1Z3Vlc2UHUnVzc2lhbhJTaW1wbGlmaWVkIENoaW5lc2UHU3BhbmlzaAdTd2VkaXNoE1RyYWRpdGlvbmFsIENoaW5lc2UHVHVya2lzaBUYAmFyAmJyAmJnAmhyAmNzAmVuAmZpAmZyAmRlAmhlAmVsAmh1Aml0AmpwAmtyAm5vAnBsAnB0AnJ1AmNuAmVzAnN2AnR3AnRyFCsDGGdnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZxYBAgVkAgUPDxYCHwEFBFRhZzpkZAIJDxYEHg1Vc2VDb250ZXh0S2V5Zx4KQ29udGV4dEtleQUCZW5kAgsPDxYCHwEFB0FkZCBUYWdkZGRZWZmYEEjOFFvgj813zoL0YinpkA=="> 
+             </div> 
+             <script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['ctl30'];
+if (!theForm) {
+    theForm = document.ctl30;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script> 
+             <script src="/WebResource.axd?d=Qz9pFl4o1y1XzQHaEPTpwCcohYVeijQ78MiOMYAnbLUSYaRLvhbURJ_1Obb-HoTUj05hIpV2JhtjXJlN8ZtYwmLHjBA1&amp;t=636190549978023765" type="text/javascript"></script> 
+             <script src="/ScriptResource.axd?d=7Qcu8zaS7kidysYmeueIj8vQHiva5Jz8FXdMkahu9LqSpaniRbhv3h-O1aYGLCHwT7V6zYot0LIG76h-WyvURaTh8PhMgx63wi9BS5X3CMYrzA5EcdYPxND0njJXVzMZ_fDblA2&amp;t=633049125920000000" type="text/javascript"></script> 
+             <script src="/ScriptResource.axd?d=x_c5__Xh_ammnydESjxhfdqkan9p9SX68WQD5wrtPtyvWZmQHg7OBRKNrETX_oZPHZNEKyXv_hVgk8cYmmlH-EMCRiqMB3dg1ZBDE9EOFTRaqxf7W_di3MZIT3hXAfbA5dSrkg2&amp;t=633049125920000000" type="text/javascript"></script> 
+             <div> 
+              <input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="2173C2F0"> 
+             </div> 
+             <div class="top"> 
+              <div class="print_btn"> 
+               <ul> 
+                <li class="print"><a href="http://edn.embarcadero.com/print/31995"><span>Printer-friendly</span></a></li> 
+               </ul> 
+              </div> 
+              <div class="breadcrumb"> 
+               <ul> 
+                <li><a href="http://edn.embarcadero.com"><span>EDN</span></a></li> 
+                <li><span>»</span></li> 
+                <li><a href="http://edn.embarcadero.com/jbuilder"><span>JBuilder</span></a></li> 
+                <li><span>»</span></li> 
+                <li><a href="http://edn.embarcadero.com/jbuilder/distcomp"><span>Dist. Computing</span></a></li> 
+               </ul> 
+              </div> 
+             </div> 
+             <div class="content_wrapper_top"> 
+              <table border="0" cellpadding="0" cellspacing="0" width="100%"> 
+               <tbody>
+                <tr> 
+                 <td valign="top" width="99%"> 
+                  <div id="article-div" class="article article-with-rightcol" style="overflow: hidden;"> 
+                   <div style="float: left;"> 
+                    <div id="langfilter" style="display: none;" width="1" nowrap> 
+                     <table id="langfiltertable" nowrap width="24px" style="display: none; white-space: nowrap;"> 
+                      <tbody>
+                       <tr> 
+                        <td><a href="javascript:showLanguage('', 'All');">Show All</a></td> 
+                       </tr> 
+                      </tbody>
+                     </table> 
+                     <img src="http://static.embarcadero.com/images/primary-channel/langfilter.gif" alt="" onClick="showLangFilter();">&nbsp;
+                     <span id="langfiltername">[All]</span> 
+                    </div> 
+                   </div> 
+                   <div id="article-inner-div"> 
+                    <h1 class="title3"> <span id="expand-collapse-all"> <span id="expand-all"><a href="javascript:expandAll();" title="Expand all article sections"></a></span> <span id="collapse-all"><a href="javascript:collapseAll();" title="Collapse all article sections"></a></span> </span> Sockets: Basic Client-Server Programming in Java - By Rick Proctor </h1> 
+                    <p class="author">By: <a href="http://gp.embarcadero.com/authors/edit/3722.aspx">Rick Proctor</a></p> 
+                    <p class="abstract">Abstract: A Basic Socket Processing How To. Learn to build a simple socket client, a socket server that handles one connection at a time, and a socket server that can handle mulitple socket connections.</p> 
+                    <div class="article-content"> 
+                     <script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ctl31', document.getElementById('ctl30'));
+Sys.WebForms.PageRequestManager.getInstance()._updateControls(['tctl41$ctl00$TagsPanel'], [], [], 90);
+//]]>
+</script> 
+                     <span id="ArticleLabel">   <title>Sockets: Basic Client-Server Programming in Java</title> 
+                      <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">   <h2>Introduction</h2> <p>One of the most basic network programming tasks you’ll likely face as a Java programmer is performing socket functions. You may have to create a network client that talks to a server via a socket connection. Or, you may have to create a server that listens for socket connections. Either way, sooner or later you’re going to deal with sockets. What is a socket you ask? Think of a socket as the basic communication interface between networked computers. Sockets allow you the programmer to treat the network connection as you would any other I/O. In Java, sockets are the lowest level of network coding. </p> <p>During the next few paragraphs, we’ll work through some examples of socket programming in Java: a simple client, a simple server that takes one connection at a time, and a server that allows multiple socket connections.</p> <h2>SocketClient: A Simple TCP/IP Socket Client</h2> <p></p><pre class="sourcecode"><code>
+<b>package</b> bdn;
+<font color="#003399"><i>/* The java.net package contains the basics needed for network operations. */</i></font>
+<b>import</b> java.net.*;
+<font color="#003399"><i>/* The java.io package contains the basics needed for IO operations. */</i></font>
+<b>import</b> java.io.*;
+<font color="#003399"><i>/** The SocketClient class is a simple example of a TCP/IP Socket Client. * */</i></font>
+
+<b>public</b> <b>class</b> SocketClient {
+</code></pre><p></p> <p>Let’s start by creating a class called SocketClient. We’ll put this into a package called bdn. The only packages that we’re going to need in this example are java.net and java.io. If you’ve not dealt with the java.net. package before, as it’s name implies, it contains the basic classes and methods you’ll need for network programming (see your JBuilder help files or <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/package-summary.html">http://java.sun.com/j2se/1.5.0/docs/api/java/net/package-summary.html</a> for more information). </p> <p>One of the cool things about java is the consistent use of InputStreams and OutputStreams to read and write I/O, regardless of the device. In other words, you can almost always be assured that if you are reading from any input source, you will use an InputStream...when writing to output sources you'll use an OutputStream. This means reading and writing across a network is almost the same as reading and writing files. For this reason, we need import that java.io package into our program. </p> <h3>Some House Keeping</h3> <p></p><pre class="sourcecode"><code>
+  <b>public</b> <b>static</b> <b>void</b> main(String[] args) {
+    <font color="#003399"><i>/** Define a host server */</i></font>
+    String host = <font color="#9933CC">"localhost"</font>;
+    <font color="#003399"><i>/** Define a port */</i></font>
+    <b>int</b> port = 19999;
+
+    StringBuffer instr = <b>new</b> StringBuffer();
+    String TimeStamp;
+    System.out.println(<font color="#9933CC">"SocketClient initialized"</font>);
+</code></pre><p></p> <p>In order to make a socket connection, you need to know a couple of pieces of information. First you need a host to connect to. In this example we’re going to be running the client(s) and the server on the same machine. We define a String host as <strong>localhost</strong>. </p> <p class="TechNote">Note: we could have used the TCP/IP address <strong>127.0.0.1</strong> instead of <strong>localhost</strong>. </p> <p>The next piece of information we need to know is the TCP/IP port that the program is going to be communicating on. TCP/IP uses ports because it is assumed that servers will be doing more than one network function at a time and ports provide a way to maange this. For example: a server may be serving up web pages (port 80), it may have a FTP (port 21) server, and it may be handling a SMTP mail server (port 25). Ports are assigned by the server. The client needs to know what port to use for a particular service. In the TCP/IP world, each computer with a TCP/IP address has access to 65,535 ports. Keep in mind that ports are not physical devices like a serial, parallel, or USB port. They are an abstraction in the computer’s memory running under the TCP/IP transport layer protocol.</p> <p class="TechNote">Note: Ports 1 – 1023 are reserved for services such as HTTP, FTP, email, and Telnet. </p> <p>Now back to the code. We create an int called <strong>port</strong>. The server we’re going to build later in the article will be listening on port 19999. As a result we initialize <strong>port</strong> to 19999. </p> <p>A couple of other items that we define here are a StringBuffer <strong>instr</strong> to be used for reading our InputStream. We also define a String <strong>TimeStamp</strong> that we’ll use to communicate with the server. Lastly, we System.out.println() a message to let us know the program has begun…this kind of stuff is certainly not necessary, but I’ve found occasionally logging a program status message gives people a peace of mind that a program’s actually doing something.</p> <h3>Requesting a Socket and Establishing a Connection</h3> <p></p><pre class="sourcecode"><code>
+    <b>try</b> {
+      <font color="#003399"><i>/** Obtain an address object of the server */</i></font>
+      InetAddress address = InetAddress.getByName(host);
+      <font color="#003399"><i>/** Establish a socket connetion */</i></font>
+      Socket connection = <b>new</b> Socket(address, port);
+      <font color="#003399"><i>/** Instantiate a BufferedOutputStream object */</i></font>
+</code></pre><p></p> <p>Now we create a try-catch block. This block is needed because the methods of several classes we’re going to reference here throw exceptions. In our example, we’re primarily concerned with IOExceptions, and will specifically capture that one (in real world situations we’d want to deal with this exception more thoroughly). All other exceptions will be captured with a generic Exception. </p> <p class="TechNote">Note: You should spend some time reviewing the various javadocs on the classes and methods you use. There are often specific exceptions that you want to catch and deal with. Example: had we built an applet that allowed a person to enter the servers and ports they wanted to connect to, we would have wanted to deal with UnknownHostException in the event they keyed an invalid host.</p> <p>In order to establish a connection with a server, we must first obtain the server’s 32-bit IP address. We obtain the IP address by invoking the InetAddress.getByName() method. As it describes, we pass this method the name of the host we’re looking to connect to. It returns an InetAddress object address containing the host name/IP address pair (i.e. Using localhost in the getByName() method will return localhost/127.0.0.1 in the InetAddress object).</p> <p>Once we’ve obtained the InetAddress object, we’re ready to establish a socket connection with our server. We create a Socket called <strong>connection</strong> by instantiating a new Socket object with the InetAdress object address and our previously created int <strong>port</strong>. If the server is not responding on the port we’re looking for, we’ll get a “java.netConnectException: Connection refused:..” message.</p> <p>We’ve established our connection. Now we want to write some information to the server. As mentioned previously, Java treats reading and writing sockets is much like reading and writing files. Subsequently we start by establishing an OutputStream object. In general TCP stacks use buffers to improve performance within the network. And, although it’s not necessary, we might as well use BufferedInputStreams and BufferedOutputStreams when reading and writing data across the network. We instantiate a BufferedOutputStream object <strong>bos</strong> by requesting an OutputStream from our socket connection.</p> <h3>Writing to the Socket</h3> <p>&nbsp; </p> <pre class="sourcecode"><code>
+      BufferedOutputStream bos = <b>new</b> BufferedOutputStream(connection.
+          getOutputStream());
+
+      <font color="#003399"><i>/** Instantiate an OutputStreamWriter object with the optional character * encoding. */</i></font>
+      OutputStreamWriter osw = <b>new</b> OutputStreamWriter(bos, <font color="#9933CC">"US-ASCII"</font>);
+</code></pre> <p>We could use the BufferedOutputStream.write() method to write bytes across the socket. I prefer to use OutputStreamWriter objects to write on because I’m usually dealing in multiple platforms and like to control the character encoding. Also, with OutputStreamWriter you can pass objects such as Strings without converting to byte, byte arrays, or int values…ok I’m lazy…so what. </p> <p class="TechNote">Note: If you don’t handle the character encoding and are reading and writing to an IBM mainframe from a Windows platform, you’ll probably end up with garbage because IBM mainframes tend to encode characters as EBCDIC and Windows encodes characters as ASCII.</p> <p>We create an OutputStreamWriter <strong>osw</strong> by instantiating it with our BufferedOutputStream <strong>bos</strong> and optionally the character encoding US-ASCII. </p> <pre class="sourcecode"><code>
+      TimeStamp = <b>new</b> java.util.Date().toString();
+      String process = <font color="#9933CC">"Calling the Socket Server on "</font>+ host + <font color="#9933CC">" port "</font> + port +
+          <font color="#9933CC">" at "</font> + TimeStamp +  (<b>char</b>) 13;
+
+      <font color="#003399"><i>/** Write across the socket connection and flush the buffer */</i></font>
+      osw.write(process);
+      osw.flush();
+</code></pre> <p>&nbsp;</p> <p>As shown above, we’re creating two Strings TimeStamp and process to be written to the server. We call the osw.write() method from our OutputStreamWriter object, passing the String process to it. Please note that we placed a char(13) at the end of process...we’ll use this to let the server know we’re at the end of the data we’re sending. The last item we need to take care of is flushing the buffer. If we don’t do this, then we can’t guarantee that the data will be written across the socket in a timely manner. </p> <h3>Reading from the Socket</h3> <pre class="sourcecode"><code>
+      <font color="#003399"><i>/** Instantiate a BufferedInputStream object for reading /** Instantiate a BufferedInputStream object for reading * incoming socket streams. */</i></font>
+
+      BufferedInputStream bis = <b>new</b> BufferedInputStream(connection.
+          getInputStream());
+      <font color="#003399"><i>/**Instantiate an InputStreamReader with the optional * character encoding. */</i></font>
+
+      InputStreamReader isr = <b>new</b> InputStreamReader(bis, <font color="#9933CC">"US-ASCII"</font>);
+
+      <font color="#003399"><i>/**Read the socket's InputStream and append to a StringBuffer */</i></font>
+      <b>int</b> c;
+      <b>while</b> ( (c = isr.read()) != 13)
+        instr.append( (<b>char</b>) c);
+
+      <font color="#003399"><i>/** Close the socket connection. */</i></font>
+      connection.close();
+      System.out.println(instr);
+     }
+    <b>catch</b> (IOException f) {
+      System.out.println(<font color="#9933CC">"IOException: "</font> + f);
+    }
+    <b>catch</b> (Exception g) {
+      System.out.println(<font color="#9933CC">"Exception: "</font> + g);
+    }
+  }
+}
+</code></pre><p>&nbsp;</p> <p>The last thing we want to do is read the server’s response. As mentioned before, most networks buffer socket traffic to improve performance. For this reason we’re using the BufferedInputStream class. We start by instantiating a BufferInputStream object <strong>bis</strong>, calling the getInputStream() method of our Socket object <strong>connection</strong>. We instantiate an InputStreamReader object<strong> isr</strong>, passing our BufferedInputStream object <strong>bis</strong> and an optional character encoding of US-ASCII. </p> <p>We create an int <strong>c</strong> that will be used for reading bytes from the BufferedInputStream. We create a while…loop reading bytes and stuffing them into a StringBuffer object <strong>instr</strong> until we encounter a char(13), signaling the end of our stream. Once we’ve read the socket, we close the socket and process the information…in this example we’re just going to send it to the console. The last thing we do is create code in our catch block to deal with exceptions.</p> <p>Now that we’ve created the client, what do we do with it? Compiling and running it will give us the following message:</p> <p><img src="/article/images/31995/SocketClient1.jpg" width="667" height="417"><br> Figure 1: SocketClient Running without Server</p> <p>We get this message because we don’t have a server listening on port 19999 and therefore can’t establish a connection with it. </p> <p>Now it’s time to create the server…</p> <h3>SingleSocketServer: A Server That Process One Socket at a Time</h3> <pre class="sourcecode"><code>
+<b>package</b> bdn;
+
+<b>import</b> java.net.*;
+<b>import</b> java.io.*;
+<b>import</b> java.util.*;
+
+<b>public</b> <b>class</b> SingleSocketServer {
+
+ <b>static</b> ServerSocket socket1;
+ <b>protected</b> <b>final</b> <b>static</b> <b>int</b> port = 19999;
+ <b>static</b> Socket connection;
+
+ <b>static</b> <b>boolean</b> first;
+ <b>static</b> StringBuffer process;
+ <b>static</b> String TimeStamp;
+</code></pre> <p>&nbsp;</p> <p>We start by importing the same packages we did with our SocketClient class. We set up a few variables. Of note, this time we’re setting up a ServerSocket object called <strong>socket1</strong>. As its name implies, we use the ServerSocket class to set up a new server. As we’ll see later, ServerSockets can be created to listen on a particular port and accept and deal with incoming sockets. Depending on the type of server we build, we can also process InputStreams and OutputStreams.</p> <pre class="sourcecode"><code>
+  <b>public</b> <b>static</b> <b>void</b> main(String[] args) {
+    <b>try</b>{
+      socket1 = <b>new</b> ServerSocket(port);
+      System.out.println(<font color="#9933CC">"SingleSocketServer Initialized"</font>);
+      <b>int</b> character;
+</code></pre> <p>&nbsp;</p> <p>In the main() method, we start with a try…catch block. Next we instantiate a new ServerSocket object <strong>socket1</strong> using the port value of 19999…the same port that we were looking to connect to with our SocketClient class. Finally, we send a message to the console to let the world know we’re running. </p> <pre class="sourcecode"><code>
+      <b>while</b> (<b>true</b>) {
+        connection = socket1.accept();
+
+        BufferedInputStream is = <b>new</b> BufferedInputStream(connection.getInputStream());
+        InputStreamReader isr = <b>new</b> InputStreamReader(is);
+        process = <b>new</b> StringBuffer();
+        <b>while</b>((character = isr.read()) != 13) {
+          process.append((<b>char</b>)character);
+        }
+        System.out.println(process);
+        <font color="#003399"><i>//need to wait 10 seconds for the app to update database</i></font>
+        <b>try</b> {
+          Thread.sleep(10000);
+        }
+        <b>catch</b> (Exception e){}
+        TimeStamp = <b>new</b> java.util.Date().toString();
+        String returnCode = <font color="#9933CC">"SingleSocketServer repsonded at "</font>+ TimeStamp + (<b>char</b>) 13;
+        BufferedOutputStream os = <b>new</b> BufferedOutputStream(connection.getOutputStream());
+        OutputStreamWriter osw = <b>new</b> OutputStreamWriter(os, <font color="#9933CC">"US-ASCII"</font>);
+        osw.write(returnCode);
+        osw.flush();
+     }
+    }
+    <b>catch</b> (IOException e) {}
+      <b>try</b> {
+        connection.close();
+      }
+      <b>catch</b> (IOException e) {}
+  }
+}
+</code></pre> <p>&nbsp;</p> <p>Since we’re running a server, we can assume that it’s always ready to accept and process socket connections. Using a while(true)…loop helps us accomplish this task. Within this block of code, we start with the ServerSocket <strong>socket1’s</strong> accept() method. The accept() method basically stops the flow of the program and waits for an incoming socket connection. When a client connects, our Socket object <strong>connection</strong> is instantiated. Once this is done, our program continues through the code.</p> <h3>Once a Connection is Made</h3> <p>We start by processing the InputStream coming from our socket. (For details on this see the explanation for InputStreams in the Reading from the Socket section of this article). </p> <p class="TechNote">Note: I’ve thrown a line of code that says Thread.sleep(10000). All I’m doing here is putting the current thread to sleep for 10 seconds. I added this piece of code is purely for the purpose of demonstrating socket connections. It would not be used in a real-world server application.</p> <p>After we’ve processed the information in the incoming socket, we want to return some information, in the form of an OutputStream, back to the client. The process here is the same process we used in the SocketClient class (see the section entitled: Writing to the Socket). Once the OutputStream is written, the server is now ready to accept another socket. </p> <h3>Running The SingleSocketServer and SocketClient Classes Together</h3> <p>Let’s look at what happens when we run SingleSocketServer and SocketClient together. Executing the programs in JBuilder X will look like this:</p> <p><img src="/article/images/31995/SingleSocketServer1.jpg" width="667" height="417"><br> Figure 2: SingleSocketServer After One SocketClient Connection</p> <p><img src="/article/images/31995/SocketClient2.jpg" width="667" height="417"><br> Figure 3: SocketClient After Connecting with SingleSocketServer</p> <p>Notice the results. Figure 2 shows messages for the SingleSocketServer class. From the message, we can see that the SockeClient called the server at 20:36:33. Looking at Figure 3 we see the messages for the SocketClient class. The message tells us that the server responded at 20:36:43...10 seconds later. SocketClient has ended and SocketServer is waiting for another connection. </p> <p>Let’s take the same scenario and add a second instance of SocketClient to the mix (to do this, start SocketClient, and while it’s running start a second instance).</p> <p><img src="/article/images/31995/SingleSocketServer2.jpg" width="667" height="417"><br>Figure 4: SingleSocketServer with Two SocketClient Instances</p> <p><img src="/article/images/31995/SocketClient3.jpg" width="667" height="417"><br>Figure 5: First Instance of SocketClient</p> <p><img src="/article/images/31995/SocketClient4.jpg" width="667" height="417"><br>Figure 6: Second Instance of SocketClient</p> <p>This time look at the results. Figure 4 shows that SingleSocketServer logs two messages, showing the TimeStamp that each instance of SocketClient. Figure 5 shows the first instance of SocketClient we executed. Notice that the time in Figure 5 (20:38:54) is 10 seconds later than the time in the first message in Figure 4 (20:38:44)...as expected</p> <p>Now let’s look at the second instance of SocketClient. From the time in Figure 4 we see that the second instance was launched 5 seconds after the first one. However, looking at the time in Figure 6, we can see that SingleSocketServer didn’t respond to the second instance until 10 seconds after it responded to the first instance of SocketClient…13 seconds later. The reason for this is simple. SingleSocketServer is running in a single thread and each incoming socket connection must be completed before the next one can start. </p> <p>Now, you might be asking, “Why in the world would someone want process only one socket at a time?” Recently I was working on a project where a non-java program had to be launched across a network from a java program. And, only one instance of the non-java program could be running at a time. I used a similar solution to solve that problem. Also, it can be a handy way of keeping multiple instances of the same java program from being launched at the same time. “That’s fine” you say, “but I want my server to accept multiple sockets. How do you do that?” </p> <p>Well, let’s take a look.</p> <h3>MultipleSocketServer: A Server That Handles Multiple Client Connections</h3> <pre class="sourcecode"><code>
+<b>package</b> bdn;
+<b>import</b> java.net.*;
+<b>import</b> java.io.*;
+<b>import</b> java.util.*;
+
+<b>public</b> <b>class</b> MultipleSocketServer <b>implements</b> Runnable {
+
+  <b>private</b> Socket connection;
+  <b>private</b> String TimeStamp;
+  <b>private</b> <b>int</b> ID;
+  <b>public</b> <b>static</b> <b>void</b> main(String[] args) {
+  <b>int</b> port = 19999;
+  <b>int</b> count = 0;
+    <b>try</b>{
+      ServerSocket socket1 = <b>new</b> ServerSocket(port);
+      System.out.println(<font color="#9933CC">"MultipleSocketServer Initialized"</font>);
+      <b>while</b> (<b>true</b>) {
+        Socket connection = socket1.accept();
+        Runnable runnable = <b>new</b> MultipleSocketServer(connection, ++count);
+        Thread thread = <b>new</b> Thread(runnable);
+        thread.start();
+      }
+    }
+    <b>catch</b> (Exception e) {}
+  }
+MultipleSocketServer(Socket s, <b>int</b> i) {
+  <b>this</b>.connection = s;
+  <b>this</b>.ID = i;
+}
+</code></pre> <p>&nbsp;</p> <p>We’re not going to spend much time examining all the code here since we’ve already been through most of it. But, I do want to highlight some things for you. Let’s start with the class statement. We’re introducing a new concept here. This time we’re implementing the Runnable interface. Without diving deep into the details of threads, suffice it to say that a thread represents a single execution of a sequential block of code. </p> <p>In our previous example, the SingleSocketServer class had a while(true) block that started out by accepting an incoming socket connection. After a connection was received, another connection could not happen until the code looped back to the connection = socket1.accept(); statement. This block code represents a single thread…or at least part of a single thread of code. If we want to take this block of code and make it into many threads…allowing for multiple socket connections...we have a couple of options: extending the implementing the Runnable interface or extending the Thread class. How you decide which one to use is entirely up to your needs. The Thread class has a lot of methods to do various things like control thread behavior. The Runnable interface has a single method run() (Thread has this method too). In this example, we’re only concerned with the run() method…we’ll stick with the Runnable interface.</p> <h3>Let’s continue…</h3> <p>Looking through the main() method, we still have to set up our server to allow for connections on Port 19999, there’s still a while(true) block, and we’re still accepting connections. Now comes the difference. After the connection is made, we instantiate a Runnable object <strong>runnable</strong> using a constructor for MultipleSocketServer that has 2 arguments: a Socket object <strong>connection </strong>for the socket that we’ve just accepted, and an int <strong>count</strong>, representing the count of open sockets. The concept here is simple: we create a new socket object for each socket connection, and we keep a count of the number of open connections. Although we’re not going to worry about the number of connections in this example, you could easily use count to limit the number of sockets that could be open at once. </p> <p>Once we’ve instantiated <strong>runnable</strong>, we instantiate a new Thread <strong>thread </strong>by passing <strong>runnable</strong> to the Thread class. We call the start() method of thread and we’re ready go. Invoking the start() method spawns a new thread and invokes the object’s run() method. The actual work within the thread happens within the run() method. Let’s take a quick look at that now.</p> <h3>The run() Method</h3> <pre class="sourcecode"><code>
+<b>public</b> <b>void</b> run() {
+    <b>try</b> {
+      BufferedInputStream is = <b>new</b> BufferedInputStream(connection.getInputStream());
+      InputStreamReader isr = <b>new</b> InputStreamReader(is);
+      <b>int</b> character;
+      StringBuffer process = <b>new</b> StringBuffer();
+      <b>while</b>((character = isr.read()) != 13) {
+        process.append((<b>char</b>)character);
+      }
+      System.out.println(process);
+      <font color="#003399"><i>//need to wait 10 seconds to pretend that we're processing something</i></font>
+      <b>try</b> {
+        Thread.sleep(10000);
+      }
+      <b>catch</b> (Exception e){}
+      TimeStamp = <b>new</b> java.util.Date().toString();
+      String returnCode = <font color="#9933CC">"MultipleSocketServer repsonded at "</font>+ TimeStamp + (<b>char</b>) 13;
+      BufferedOutputStream os = <b>new</b> BufferedOutputStream(connection.getOutputStream());
+      OutputStreamWriter osw = <b>new</b> OutputStreamWriter(os, <font color="#9933CC">"US-ASCII"</font>);
+      osw.write(returnCode);
+      osw.flush();
+    }
+    <b>catch</b> (Exception e) {
+      System.out.println(e);
+    }
+    <b>finally</b> {
+      <b>try</b> {
+        connection.close();
+     }
+      <b>catch</b> (IOException e){}
+    }
+}
+}
+</code></pre> <p>&nbsp;</p> <p>The run() method’s responsibility is to run the block of code that we want threaded. In our example the run() method executes the same block of code we built in the SingleSocketServer class. Once again, we read the BufferedInputStream, pretend to process the information, and write a BufferedOutputStream. At the end of the run() method, the thread dies.</p> <p>Now it’s time to run our MultipleSocketServer. Using the same scenario we did previously. Let’s look at what happens when we run the MultipleSocketServer and two instances of SocketClient.</p> <p><img src="/article/images/31995/MultipleSocketServer1.jpg" width="667" height="417"><br>Figure 7: MultipleSocketServer with Two Instances of SocketClient</p> <p><img src="/article/images/31995/SocketClient5.jpg" width="667" height="417"><br>Figure 8: First Instance of SocketClient</p> <p><img src="/article/images/31995/SocketClient6.jpg" width="667" height="417"><br>Figure 9: Second Instance of SocketClient</p> <p>Looking at the messages in Figure 7 that come from the MultipleSocketServer class, we can see that requests for socket connections were sent by the SocketClient programs within a few seconds of each other. According to the console messages on the first instance of SocketClient in Figure 8, the server responded 10 seconds after the request was sent. Figure 9 shows that the second instance of SocketClient receives a response 10 seconds after it sent the request also, thus allowing us the capability of processing multiple socket connections simultaneously. </p> <h3>Summary</h3> <p>Network programming in Java revolves around sockets. Sockets allow us to communicate between programs across the network. Java’s approach to socket programming allows us to treat socket I/O the same as we do any other I/O…utilizing InputStreams and OutputStreams. Although, the examples presented here are relatively simple, they give you an idea of the power of Java in the Client-Server world. </p> <p>Next time, we’ll move a level up from socket programming and deal with the basics of calling objects across a network using Java’s Remote Method Invocation (RMI) facility.</p> <p></p> 
+                      <hr> <h3>About the Author</h3> <p>Rick Proctor has over 20 years experience in the IT industry. He's developed applications on more platforms than he cares to remember. Since 2001 Rick has been Vice President of Information Technology for Thomas Nelson Publishers, Inc. (NYSE: TNM). Rick can be reached at <a href="mailto:tech_dude@yahoo.com">tech_dude@yahoo.com</a>.</p> <p>The source code for the programs in this article can be found at <a href="http://codecentral.borland.com/codecentral/ccWeb.exe/listing?id=21473">CodeCentral</a>.</p>  </span> 
+                    </div> 
+                   </div> 
+                   <div class="sidebar-dotsilver"> 
+                    <div class="module-container article-comments-container"> 
+                     <div id="secondary-nav-wrapper" class="module article-comments"> 
+                      <div> 
+                       <div class="comments-inner"> 
+                        <table cellspacing="0" cellpadding="0" width="100%" border="0" class="contentpadding"> 
+                         <tbody>
+                          <tr> 
+                           <td valign="middle" align="left" class="horizontal_dotted">
+                            <div></div></td> 
+                          </tr> 
+                         </tbody>
+                        </table> 
+                        <h1><span id="commentsspan" class="sectioncollapse" title="Collapse section"><a href="javascript:hideShowElement('commentsspan', 'commentsdiv')">&nbsp;&nbsp;</a></span><a href="javascript:hideShowElement('commentsspan', 'commentsdiv')">Latest Comments</a> &nbsp;<a id="ctl34_hlViewAllComments" class="view-all" href="http://threads.embarcadero.com/threads/threads.exe/thread?&amp;sysid=1&amp;contentid=31995&amp;title=Sockets: Basic Client-Server Programming in Java - By Rick Proctor"><span>View All</span></a>&nbsp;<a id="ctl34_hlAddNewComment" class="add-new" href="http://threads.embarcadero.com/threads/threads.exe/add?&amp;sysid=1&amp;contentid=31995&amp;title=Sockets: Basic Client-Server Programming in Java - By Rick Proctor"><span>Add New</span></a>&nbsp;<a onmouseover="window.status='RSS Feed';return true;" onmouseout="window.status='';return true;" class="rssbtn" href="http://edn.embarcadero.com/article/31995/rss"><span>RSS</span></a>&nbsp;<a onmouseover="window.status='ATOM Feed';return true;" onmouseout="window.status='';return true;" class="atombtn" href="http://edn.embarcadero.com/article/31995/atom"><span>ATOM</span></a></h1> 
+                        <div class="section" header="Comments" id="commentsdiv">
+                         <em><font size="-2">Move mouse over comment to see the full text<br></font> </em> 
+                        </div> 
+                        <div class="comments-footer">
+                         <div>
+                          <div></div>
+                         </div>
+                        </div> 
+                       </div> 
+                      </div> 
+                     </div> 
+                    </div> 
+                   </div> 
+                  </div> </td> 
+                 <td class="colright-cell" valign="top" width="230"> 
+                  <div class="colright" style="width:230px;"> 
+                   <div class="sidebar-dotsilver sidebar-dotsilver-no-bullets"> 
+                    <div class="module-container article-rating-container"> 
+                     <div id="secondary-nav-wrapper" class="module article-rating"> 
+                      <table border="0" cellspacing="0" cellpadding="0">
+                       <tbody>
+                        <tr class="top">
+                         <td>
+                          <table border="0" cellspacing="0" class="toptable">
+                           <tbody>
+                            <tr>
+                             <td><span id="Module5" class="sectionexpand" title="Expand section"><a href="javascript:hideShowElement('Module5', 'ModuleContent5')">&nbsp;&nbsp;&nbsp;</a></span></td>
+                             <td><h2><a href="javascript:hideShowElement('Module5', 'ModuleContent5')">Rating</a></h2></td>
+                             <td width="100%" style="width: 100%;"> 
+                              <ul class="rating"> 
+                               <li class="r-existing" style="WIDTH: 80px"><a>&nbsp;</a></li> 
+                               <li class="r1"><a href="http://edn.embarcadero.com/article/31995/rate/1" title="rate this as bad">&nbsp;</a></li> 
+                               <li class="r2"><a href="http://edn.embarcadero.com/article/31995/rate/2" title="rate this as poor">&nbsp;</a></li> 
+                               <li class="r3"><a href="http://edn.embarcadero.com/article/31995/rate/3" title="rate this as fair">&nbsp;</a></li> 
+                               <li class="r4"><a href="http://edn.embarcadero.com/article/31995/rate/4" title="rate this as good">&nbsp;</a></li> 
+                               <li class="r5"><a href="http://edn.embarcadero.com/article/31995/rate/5" title="rate this as excellent">&nbsp;</a></li> 
+                              </ul> </td>
+                            </tr>
+                           </tbody>
+                          </table></td>
+                        </tr>
+                       </tbody>
+                      </table>
+                      <div id="ModuleContent5" style="display: none;"> 
+                       <table border="0" cellspacing="0" cellpadding="0"> 
+                        <tbody>
+                         <tr> 
+                          <td colspan="9" align="center" valign="middle"><small><span id="ctl39_lblRatingStatus"></span></small></td> 
+                         </tr> 
+                         <tr id="ctl39_avgRow"> 
+                          <td><img src="https://static.embarcadero.com/images/leftnav/spacer.gif" alt="" border="0" height="20" width="6"></td> 
+                          <td colspan="8">Average rating: <span id="ctl39_lblAverageRating">4.43</span></td> 
+                         </tr> 
+                         <tr> 
+                          <td>&nbsp;</td> 
+                          <td>Votes:</td> 
+                          <td>&nbsp;</td> 
+                          <td align="center"><span id="ctl39_lblRatings1">2</span></td> 
+                          <td align="center"><span id="ctl39_lblRatings2">0</span></td> 
+                          <td align="center"><span id="ctl39_lblRatings3">0</span></td> 
+                          <td align="center"><span id="ctl39_lblRatings4">5</span></td> 
+                          <td align="center"><span id="ctl39_lblRatings5">16</span></td> 
+                          <td>&nbsp;</td> 
+                         </tr> 
+                         <tr> 
+                          <td><img src="https://static.embarcadero.com/images/leftnav/spacer.gif" alt="" border="0" height="20" width="6"></td> 
+                          <td>&nbsp;</td> 
+                          <td><img src="https://static.embarcadero.com/images/leftnav/spacer.gif" alt="" border="0" height="20" width="6"></td> 
+                          <td align="center" width="22"><img id="ctl39_imgBar1" src="/vbar.jpg?v=9&amp;c=%233848a8" alt="2 rated this 1" style="height:50px;width:22px;border-width:0px;"></td> 
+                          <td align="center" width="22"><img id="ctl39_imgBar2" src="/vbar.jpg?v=0&amp;c=%233848a8" alt="0 rated this 2" style="height:50px;width:22px;border-width:0px;"></td> 
+                          <td align="center" width="22"><img id="ctl39_imgBar3" src="/vbar.jpg?v=0&amp;c=%233848a8" alt="0 rated this 3" style="height:50px;width:22px;border-width:0px;"></td> 
+                          <td align="center" width="22"><img id="ctl39_imgBar4" src="/vbar.jpg?v=22&amp;c=%233848a8" alt="5 rated this 4" style="height:50px;width:22px;border-width:0px;"></td> 
+                          <td align="center" width="22"><img id="ctl39_imgBar5" src="/vbar.jpg?v=70&amp;c=%233848a8" alt="16 rated this 5" style="height:50px;width:22px;border-width:0px;"></td> 
+                          <td><img src="https://static.embarcadero.com/images/leftnav/spacer.gif" alt="" border="0" height="20" width="6"></td> 
+                         </tr> 
+                         <tr> 
+                          <td>&nbsp;</td> 
+                          <td>Rating:</td> 
+                          <td>&nbsp;</td> 
+                          <td align="center">1</td> 
+                          <td align="center">2</td> 
+                          <td align="center">3</td> 
+                          <td align="center">4</td> 
+                          <td align="center">5</td> 
+                          <td>&nbsp;</td> 
+                         </tr> 
+                         <tr> 
+                          <td colspan="9" align="center" valign="middle"><small>1=Poor, 5=Excellent</small></td> 
+                         </tr> 
+                        </tbody>
+                       </table> 
+                      </div>
+                     </div> 
+                    </div> 
+                   </div> 
+                   <br style="clear: both"> 
+                   <div class="sidebar-dotsilver"> 
+                    <div class="module-container product-pricing-container"> 
+                     <div id="secondary-nav-wrapper" class="module product-pricing"> 
+                      <table width="100%"> 
+                       <tbody>
+                        <tr> 
+                         <td valign="top" width="100%">
+                          <div class="button button-image button-dl">
+                           <a href="http://www.embarcadero.com/downloads?cid=701G0000000tKTx" title="Download a free trial">Download Trial</a>
+                          </div> 
+                          <div style="height: 4px;"></div> 
+                          <div class="button button-image button-cart">
+                           <a href="http://edn.embarcadero.com/buy?link=5,104" title="Purchase a product right now">Buy Now</a>
+                          </div> </td> 
+                        </tr> 
+                        <tr> 
+                         <td valign="top" width="100%"><p style="text-align: center"><a href="http://www.embarcadero.com/products/rad-studio/downloads?cid=701G0000000tKTx"><img height="228" alt="RAD Studio Trial" src="http://edn.embarcadero.com/article/39640/images/39640/RAD_Studio_Seattle_Banner_159x228px_CTA_Try_Now.png" width="159" id="docimage1"></a></p> </td> 
+                        </tr> 
+                       </tbody>
+                      </table> 
+                     </div> 
+                    </div> 
+                   </div> 
+                   <br style="clear: both"> 
+                   <div class="sidebar-dotsilver sidebar-dotsilver-no-bullets"> 
+                    <div class="module-container article-tags-container"> 
+                     <div id="secondary-nav-wrapper" class="module article-tags"> 
+                      <h2><span class="top">Article Tags</span></h2>
+                      <div id="ctl41_ctl00_TagsPanel"> 
+                       <span id="ctl41_ctl00_TagCloudLabel">
+                        <div class="tagcloud"> 
+                         <span class="tag"><a href="http://edn.embarcadero.com/tag/en,kkkl" class="tag-medium" title="Tagged by one user">kkkl</a></span> 
+                        </div> </span> 
+                      </div> 
+                     </div> 
+                    </div> 
+                   </div> 
+                  </div> </td> 
+                </tr> 
+               </tbody>
+              </table> 
+              <div class="clearblock">
+               <img src="http://static.embarcadero.com/images/leftnav/spacer.gif">
+              </div> 
+              <p><small>Server Response from: ETNASC03</small></p> 
+             </div> 
+             <script type="text/javascript">
+//<![CDATA[
+Sys.Application.initialize();
+//]]>
+</script> 
+            </form> 
+           </div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="footer"> 
+       <div class="footer2"> 
+        <div class="footer_center"> 
+         <div style="float:left;">
+           Copyright© 1994 - 2013 Embarcadero Technologies, Inc. All rights reserved.. &nbsp;&nbsp; 
+          <a href="http://edn.embarcadero.com/sitemap" class="logintxt">Site Map</a> 
+         </div> 
+        </div> 
+       </div> 
+      </div> </td>
+    </tr>
+   </tbody>
+  </table> 
+  <!-- START SUB NAV --> 
+  <div class="subnav_wrapper" id="subnav_wrapper"> 
+   <div id="Communities_subnav" class="subnav"> 
+    <div class="col"> 
+     <h1>Developer Tools</h1> 
+     <div class="col"> 
+      <a href="http://edn.embarcadero.com/blackfish_sql" style="border-top-style:solid;">Blackfish SQL</a> 
+      <a href="http://edn.embarcadero.com/c_builder">C++Builder</a> 
+      <a href="http://edn.embarcadero.com/delphi">Delphi</a> 
+      <a href="http://edn.embarcadero.com/firemonkey">FireMonkey</a> 
+      <a href="http://edn.embarcadero.com/prism">Prism</a> 
+      <a href="http://edn.embarcadero.com/interbase">InterBase</a> 
+      <a href="http://edn.embarcadero.com/jbuilder">JBuilder</a> 
+      <a href="http://edn.embarcadero.com/j_optimizer">J Optimizer</a> 
+      <a href="http://edn.embarcadero.com/html5builder">HTML5 Builder</a> 
+      <a href="http://edn.embarcadero.com/3rdrail">3rdRail &amp; TurboRuby</a> 
+     </div> 
+     <div class="clearblock">
+      <img src="http://static.embarcadero.com/images/leftnav/spacer.gif">
+     </div> 
+    </div> 
+    <div class="col"> 
+     <h1>Database Tools</h1> 
+     <a href="http://edn.embarcadero.com/change_manager" style="border-top-style:solid;">Change Manager</a> 
+     <a href="http://edn.embarcadero.com/dbartisan">DBArtisan</a> 
+     <a href="http://edn.embarcadero.com/db_optimizer">DB Optimizer</a> 
+     <a href="http://edn.embarcadero.com/er_studio">ER/Studio</a> 
+     <a href="http://edn.embarcadero.com/performance_center">Performance Center</a> 
+     <a href="http://edn.embarcadero.com/rapid_sql">Rapid SQL</a> 
+    </div> 
+   </div> 
+   <div id="Articles_subnav" class="subnav"> 
+    <div class="col"> 
+     <a href="http://edn.embarcadero.com/articles" style="border-top-style:solid;">Technical Articles</a> 
+     <a href="http://edn.embarcadero.com/tutorials">Tutorials</a> 
+     <a href="http://edn.embarcadero.com/whitepapers">White Papers</a> 
+     <a href="http://edn.embarcadero.com/press">Press Releases</a> 
+     <a href="http://edn.embarcadero.com/newsletters">Newsletters</a> 
+    </div> 
+   </div> 
+   <div id="Resources_subnav" class="subnav"> 
+    <div class="col"> 
+     <a href="http://gp.embarcadero.com" title="Submit your own articles for publication and (optionally) get paid.">Add Content (GetPublished)</a> 
+     <a href="http://edn.embarcadero.com/audio" title="Listen to Embarcadero's developers and management." style="border-top-style:solid;">Audio</a> 
+     <a href="http://edn.embarcadero.com/tv" title="View product demonstrations &amp; listen to Embarcadero's developers and management.">Audio &amp; Video</a> 
+     <a href="http://edn.embarcadero.com/video" title="Watch presentations and product demonstrations.">Video</a> 
+     <a href="http://qc.embarcadero.com" title="Submit bugs and feature requests. Also known as QualityCentral.">Bugs &amp; Suggestions (QualityCentral)</a> 
+     <a href="https://forums.embarcadero.com" title="Discussion Forums">Discussion Forums</a> 
+     <a href="http://cc.embarcadero.com" title="Examples, code, etc.. Also known as CodeCentral.">Examples (CodeCentral)</a> 
+     <a href="http://edn.embarcadero.com/tag" title="Tags">Tags</a> 
+     <a href="http://tp.embarcadero.com" title="Browse the Embarcadero Technology Partners database.">Technology Partners</a> 
+    </div> 
+   </div> 
+   <div id="Downloads_subnav" class="subnav"> 
+    <div class="col"> 
+     <a href="http://www.embarcadero.com/downloads" style="border-top-style:solid;">Downloads</a> 
+     <a href="https://downloads.embarcadero.com/free">Free Trials</a> 
+     <a href="http://cc.embarcadero.com/myreg">Registered User Downloads</a> 
+     <a href="http://www.embarcadero.com/products/beta-programs">Beta Programs</a> 
+    </div> 
+   </div> 
+   <div id="Help_subnav" class="subnav"> 
+    <div class="col"> 
+     <a href="http://edn.embarcadero.com/help/gp">Add Content (GetPublished)</a> 
+     <a href="http://edn.embarcadero.com/help/articles" style="border-top-style:solid;">Articles</a> 
+     <a href="http://edn.embarcadero.com/help/blogs">Blogs</a> 
+     <a href="http://edn.embarcadero.com/help/qc">Bugs &amp; Suggestions (QualityCentral)</a> 
+     <a href="http://edn.embarcadero.com/help/forums">Discussion Forums</a> 
+     <a href="http://edn.embarcadero.com/help/cc">Examples (CodeCentral)</a> 
+     <a href="http://edn.embarcadero.com/help/members">Member Services</a> 
+     <a href="http://edn.embarcadero.com/help/about">About</a> 
+    </div> 
+   </div> 
+  </div> 
+  <!-- END SUB NAV --> 
+  <script language="JavaScript" type="text/javascript" src="http://static.embarcadero.com/javascript/wz_tooltip.js"></script> 
+  <script language="JavaScript" src="http://static.embarcadero.com/javascript/ga.js" type="text/javascript"></script> 
+  <script language="JavaScript" type="text/javascript"><!--
+showExpandCollapseAll();
+// -->
+    </script> 
+  <script language="JavaScript" type="text/javascript">
+	var SiteTrackingID = "dcsnbidjg10000ws3np996qah_8d3j";
+</script> 
+  <script language="JavaScript" src="http://static.embarcadero.com/javascript/webtrends.js" type="text/javascript"></script> 
+  <script type="text/javascript">
+	var _tag = new WebTrends();
+	_tag.dcsGetId();
+</script> 
+  <script type="text/javascript">
+	_tag.dcsCollect();
+</script> 
+  <noscript> 
+   <div>
+    <img alt="DCSIMG" id="DCSIMG" width="1" height="1" src="http://206.204.120.7/dcsnbidjg10000ws3np996qah_8d3j/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=8.6.1">
+   </div> 
+  </noscript>   
+ </body>
+</html>

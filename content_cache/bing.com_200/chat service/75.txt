@@ -1,0 +1,1868 @@
+<!doctype html>
+<html lang="en-US">
+ <head> 
+  <meta charset="UTF-8"> 
+  <title>Building a Multi-user Chat Server with xSocket, Java, and Flash CS3 | Giant Flying Saucer</title> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="stylesheet" type="text/css" media="all" href="http://www.giantflyingsaucer.com/blog/wp-content/themes/twentyten/style.css"> 
+  <link rel="pingback" href="http://www.giantflyingsaucer.com/blog/xmlrpc.php"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="Giant Flying Saucer » Feed" href="http://www.giantflyingsaucer.com/blog/?feed=rss2"> 
+  <link rel="alternate" type="application/rss+xml" title="Giant Flying Saucer » Comments Feed" href="http://www.giantflyingsaucer.com/blog/?feed=comments-rss2"> 
+  <link rel="alternate" type="application/rss+xml" title="Giant Flying Saucer » Building a Multi-user Chat Server with xSocket, Java, and Flash CS3 Comments Feed" href="http://www.giantflyingsaucer.com/blog/?feed=rss2&amp;p=224"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/www.giantflyingsaucer.com\/blog\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.8.2"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,56826,8203,55356,56819),0,0),c=j.toDataURL(),b!==c&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55358,56794,8205,9794,65039),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55358,56794,8203,9794,65039),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <!-- This site uses the Google Analytics by MonsterInsights plugin v6.2.0 - Using Analytics tracking - https://www.monsterinsights.com/ --> 
+  <script type="text/javascript" data-cfasync="false">
+	/* Function to detect opted out users */
+	function __gaTrackerIsOptedOut() {
+		return document.cookie.indexOf(disableStr + '=true') > -1;
+	}
+
+	/* Disable tracking if the opt-out cookie exists. */
+	var disableStr = 'ga-disable-UA-9826649-1';
+	if ( __gaTrackerIsOptedOut() ) {
+		window[disableStr] = true;
+	}
+
+	/* Opt-out function */
+	function __gaTrackerOptout() {
+	  document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+	  window[disableStr] = true;
+	}
+
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','__gaTracker');
+
+	__gaTracker('create', 'UA-9826649-1', 'auto');
+	__gaTracker('set', 'forceSSL', true);
+	__gaTracker('send','pageview');
+</script> 
+  <!-- / Google Analytics by MonsterInsights --> 
+  <style type="text/css">img.nothumb{border:0;margin:0 0 0 2px !important;}</style> 
+  <!-- Tweet This v1.8.3 b037 mode alpha --> 
+  <link rel="https://api.w.org/" href="http://www.giantflyingsaucer.com/blog/index.php?rest_route=/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.giantflyingsaucer.com/blog/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.giantflyingsaucer.com/blog/wp-includes/wlwmanifest.xml"> 
+  <link rel="prev" title="Tutorial: Building a Flash socket server with Java in five minutes" href="http://www.giantflyingsaucer.com/blog/?p=205"> 
+  <link rel="next" title="Tutorial: Learning Erlang – just the basic basics" href="http://www.giantflyingsaucer.com/blog/?p=251"> 
+  <meta name="generator" content="WordPress 4.8.2"> 
+  <link rel="canonical" href="http://www.giantflyingsaucer.com/blog/?p=224"> 
+  <link rel="shortlink" href="http://giantflyingsaucer.com/blog/?p=http://giantflyingsaucer.com/blog/?p=224"> 
+  <link rel="alternate" type="application/json+oembed" href="http://www.giantflyingsaucer.com/blog/index.php?rest_route=%2Foembed%2F1.0%2Fembed&amp;url=http%3A%2F%2Fwww.giantflyingsaucer.com%2Fblog%2F%3Fp%3D224"> 
+  <link rel="alternate" type="text/xml+oembed" href="http://www.giantflyingsaucer.com/blog/index.php?rest_route=%2Foembed%2F1.0%2Fembed&amp;url=http%3A%2F%2Fwww.giantflyingsaucer.com%2Fblog%2F%3Fp%3D224&amp;format=xml"> 
+  <style type="text/css" id="syntaxhighlighteranchor"></style> 
+ </head> 
+ <body class="post-template-default single single-post postid-224 single-format-standard"> 
+  <div id="wrapper" class="hfeed"> 
+   <div id="header"> 
+    <div id="masthead"> 
+     <div id="branding" role="banner"> 
+      <div id="site-title"> 
+       <span> <a href="http://www.giantflyingsaucer.com/blog/" title="Giant Flying Saucer" rel="home">Giant Flying Saucer</a> </span> 
+      </div> 
+      <div id="site-description">
+       Programming parlour tricks
+      </div> 
+      <img src="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2011/02/gfsbanner1.jpg" width="940" height="198" alt=""> 
+     </div>
+     <!-- #branding --> 
+     <div id="access" role="navigation"> 
+      <div class="skip-link screen-reader-text">
+       <a href="#content" title="Skip to content">Skip to content</a>
+      </div> 
+      <div class="menu">
+       <ul> 
+        <li><a href="http://www.giantflyingsaucer.com/blog/">Home</a></li>
+       </ul>
+      </div> 
+     </div>
+     <!-- #access --> 
+    </div>
+    <!-- #masthead --> 
+   </div>
+   <!-- #header --> 
+   <div id="main"> 
+    <div id="container"> 
+     <div id="content" role="main"> 
+      <div id="nav-above" class="navigation"> 
+       <div class="nav-previous">
+        <a href="http://www.giantflyingsaucer.com/blog/?p=205" rel="prev"><span class="meta-nav">?</span> Tutorial: Building a Flash socket server with Java in five minutes</a>
+       </div> 
+       <div class="nav-next">
+        <a href="http://www.giantflyingsaucer.com/blog/?p=251" rel="next">Tutorial: Learning Erlang – just the basic basics <span class="meta-nav">?</span></a>
+       </div> 
+      </div>
+      <!-- #nav-above --> 
+      <div id="post-224" class="post-224 post type-post status-publish format-standard hentry category-actionscript category-adobe category-flash category-flex category-socket-server"> 
+       <h1 class="entry-title">Building a Multi-user Chat Server with xSocket, Java, and Flash CS3</h1> 
+       <div class="entry-meta"> 
+        <span class="meta-prep meta-prep-author">Posted on</span> 
+        <a href="http://www.giantflyingsaucer.com/blog/?p=224" title="4:38 pm" rel="bookmark"><span class="entry-date">October 24, 2008</span></a> 
+        <span class="meta-sep">by</span> 
+        <span class="author vcard"><a class="url fn n" href="http://www.giantflyingsaucer.com/blog/?author=2" title="View all posts by Chad Lung">Chad Lung</a></span> 
+       </div>
+       <!-- .entry-meta --> 
+       <div class="entry-content"> 
+        <div class="tweetthis" style="text-align:right;">
+         <p> <a href="http://twitter.com/intent/tweet?text=Building+a+Multi-user+Chat+Server+with+xSocket%2C+Java%2C+and+Flash+CS3+http%3A%2F%2Fis.gd%2F4pqzwe" onclick="__gaTracker('send', 'event', 'outbound-article', 'http://twitter.com/intent/tweet?text=Building+a+Multi-user+Chat+Server+with+xSocket%2C+Java%2C+and+Flash+CS3+http%3A%2F%2Fis.gd%2F4pqzwe', '');" target="_blank" rel="nofollow" class="tt" title="Post to Twitter"><img class="nothumb" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/tweet-this/icons/en/twitter/tt-twitter6.png" alt="Post to Twitter"></a></p>
+        </div>
+        <p>If you followed my <a href="http://giantflyingsaucer.com/blog/?p=205">recent tutorial</a> on how to build a socket server for <a href="http://www.adobe.com/products/flash/">Flash CS3</a> using <a href="http://xsocket.sourceforge.net/">xSocket</a> and <a href="http://java.sun.com">Java</a>, then you will be well prepared to go through this exercise to build an actual chat server in which Flash (or <a href="http://www.adobe.com/products/flex/">Flex</a>) clients can connect and chat to each other.</p> 
+        <p><span id="more-224"></span></p> 
+        <p>[ad name=”Google Adsense”]</p> 
+        <p>This will be a simple socket server and things like validation for the most part I’m going to ignore to keep the code short and easy to follow. I’ll also be dropping the ActionScript into the timeline for the sake of speed and simplicity. Like the first socket server I built this one will be able to be to shut down remotely and obviously something like this on a production server would need to be protected rather than wide open as I’ll code it for now.</p> 
+        <p>I used the following to build this:<br> 1. <a href="http://www.netbeans.org/">Netbeans 6.1</a><br> 2. <a href="http://java.sun.com/javase/downloads/index.jsp">Java JDK 1.6</a><br> 3. <a href="http://xsocket.sourceforge.net/">xSocket 2.2 (core)</a><br> 4. <a href="http://www.adobe.com/products/flash">Flash CS3</a> (CS4 should work fine too, you can also use Flex if you wish – just be aware you will need to modify the Flash part to work with Flex instead)</p> 
+        <p>At this point if you haven’t <a href="http://giantflyingsaucer.com/blog/?p=205">walked through the original tutorial</a> on this topic, then please do that now. From here on I’ll assume the original project was working for you and you understood the concepts. To avoid confusion, I’m going to put this into a new project even though some of the code is exactly the same of whats in the original project code.</p> 
+        <p>Open up Netbeans and create a new Java application project and call it “xSocketChatServer”. Go into the “xsocketchatserver” package and a class file called “xSocketDataHandler.java”. A “Main.java” file should already be in the project. Don’t forget to right-click on the “Libraries” and add the reference to the “xSocket-2.2.jar” file.</p> 
+        <p><a href="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat1.jpg"><img src="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat1.jpg" alt="" title="xSocketChatServer Project Layout" width="242" height="246" class="alignnone size-full wp-image-225" srcset="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat1.jpg 242w, http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat1-64x64.jpg 64w, http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat1-147x150.jpg 147w" sizes="(max-width: 242px) 100vw, 242px"></a></p> 
+        <p>The code in Main.java is going to be exactly what it was in the original post:</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+package xsocketchatserver;
+
+
+import org.xsocket.connection.*;
+
+public class Main
+{
+    protected static IServer srv = null;
+
+    public static void main(String[] args)
+    {
+        try
+        {
+            srv = new Server(8090, new xSocketDataHandler());
+            srv.run();
+        }
+        catch(Exception ex)
+        {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    protected static void shutdownServer()
+    {
+        try
+        {
+            srv.close();
+        }
+        catch(Exception ex)
+        {
+            System.out.println(ex.getMessage());
+        }
+    }
+}
+</pre> 
+        <p>That requires no explanation since it is the same as the original code. Lets move onto the “xSocketDataHandler.java” file now.</p> 
+        <p>The first thing you will notice is I’ve implemented the IDataHandler just like before, but I’ve now also implmented the IConnectHandler and IDisconnectHandler. Implementing those two new interfaces will allow us to to know when people connect or disconnect from the server.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+public class xSocketDataHandler implements IDataHandler, IConnectHandler, IDisconnectHandler
+</pre> 
+        <p>Just below that code we have this:</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+private Set&lt;INonBlockingConnection&gt; sessions = Collections.synchronizedSet(new HashSet&lt;INonBlockingConnection&gt;());
+</pre> 
+        <p>Since we are going to have multiple people connected we are going to need a way to talk to all of them when someone sends a message. So when Client A sends a message or connects, we want to loop through all the open connections to send the notifications to Client B, Client C, etc.</p> 
+        <p>Moving on we notice the onData method has changed quite a bit from the original.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+
+public boolean onData(INonBlockingConnection nbc) throws IOException, BufferUnderflowException, ClosedChannelException, MaxReadSizeExceededException
+{
+    try
+    {
+        String data = nbc.readStringByDelimiter("\0");
+        // Expected Message Format:
+        // USERNAME~MESSAGE
+        // ie: JohnDoe~Hello World
+
+        if(data.trim().length() &gt; 0)
+        {
+            System.out.println("Incoming data: " + data);
+
+            if(data.equalsIgnoreCase("&lt;policy-file-request/&gt;"))
+            {
+                nbc.write("&lt;cross-domain-policy&gt;&lt;allow-access-from domain=\"*\" to-ports=\"8090\"/&gt;&lt;/cross-domain-policy&gt;\0");
+                return true;
+            }
+
+            String[] message = data.split("~");
+
+            sendMessageToAll(message[0], message[1]);
+
+            if(message[1].equalsIgnoreCase("SHUTDOWN"))
+                Main.shutdownServer();
+        }
+    }
+    catch(Exception ex)
+    {
+        System.out.println("onData: " + ex.getMessage());
+    }
+
+    return true;
+}
+</pre> 
+        <p>You can see we expect a specific message format: USERNAME|MESSAGE</p> 
+        <p>Ok, before we go any further, we need to remind ourselves the Flash part of this uses the <a href="http://livedocs.adobe.com/flash/9.0/ActionScriptLangRefV3/flash/net/XMLSocket.html">XMLSocket class</a>. We aren’t passing XML are we? The <a href="http://livedocs.adobe.com/flash/9.0/ActionScriptLangRefV3/flash/net/XMLSocket.html">XMLSocket class</a> does not force you to use XML, but you might want to depending on the complexity of your messages. For this simple project though it would be overkill.</p> 
+        <p>Next we check to see if the Flash client is <a href="http://www.adobe.com/devnet/flashplayer/articles/fplayer9_security_04.html">requesting a policy file</a>, and if so, we need to pass one to it. In this case I pass a very open policy file. In a production system this would be set according to your preferences of how open you want it. Flash (and Flex) will always ask for the policy file in this format:</p> 
+        <pre class="brush: xml; title: ; notranslate" title="">
+&lt;policy-file-request/&gt;
+</pre> 
+        <p>Once the policy file is taken care of, when the client sends a message we simply pull apart the incoming data and send it off to the method “sendMessageToAll” to be sent out to everyone connected. Also note that if I was to send the text “SHUTDOWN” from the Flash client the chat socket server would shutdown – as it stands anyone connected could do this. This is nice to have when testing and since I haven’t implemented the java.io.Closeable interface in this project we have no other choice right now other than to do a brute force kill. Keep in mind that xSocket does indeed work just fine with java.io.Closeable.</p> 
+        <p>Lets look at “onConnect” and “onDisconnect”:</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+public boolean onConnect(INonBlockingConnection nbc) throws IOException, BufferUnderflowException, MaxReadSizeExceededException
+{
+    try
+    {
+        synchronized(sessions)
+        {
+            sessions.add(nbc);
+        }
+
+        System.out.println("onConnect");
+    }
+    catch(Exception ex)
+    {
+        System.out.println("onConnect: " + ex.getMessage());
+    }
+
+    return true;
+}
+</pre> 
+        <p>Notice this is where our “sessions” variable comes to life. As clients connect we store their connections into the sessions variable, this way we will know how many people are connected, we can send messages to all of them, some of them, or only one of them as we so choose. For this project we always send the messages to everyone connected.</p> 
+        <p>onDisconnect should then simply remove the “dead” connections:</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+public boolean onDisconnect(INonBlockingConnection nbc) throws IOException
+{
+    try
+    {
+        synchronized(sessions)
+        {
+            sessions.remove(nbc);
+        }
+
+        System.out.println("onDisconnect");
+    }
+    catch(Exception ex)
+    {
+        System.out.println("onDisconnect: " + ex.getMessage());
+    }
+
+    return true;
+}
+</pre> 
+        <p>Finally this takes us to the “sendMessageToAll” method:</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+private void sendMessageToAll(String user, String message)
+{
+    try
+    {
+        synchronized(sessions)
+        {
+            Iterator&lt;INonBlockingConnection&gt; iter = sessions.iterator();
+
+            while(iter.hasNext())
+            {
+                INonBlockingConnection nbConn = (INonBlockingConnection) iter.next();
+
+                if(nbConn.isOpen())
+                    nbConn.write("&lt;b&gt;" + user + "&lt;/b&gt;: " + message + "&lt;br /&gt;\0");
+            }
+        }
+
+        System.out.println("Outgoing data: " + user + ": " + message);
+    }
+    catch(Exception ex)
+    {
+        System.out.println("sendMessageToAll: " + ex.getMessage());
+    }
+}
+</pre> 
+        <p>Here we loop through our sessions variable checking to see if the current iterated session is still “open” and if so, we send the message that was passed in. In this case I do a little HTML formatting since we will be displaying the results in Flash’s TextArea control with the limited HTML rendering it can do.</p> 
+        <p>So the final code then for xSocketDataHandler looks like this:</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+package xsocketchatserver;
+
+import java.io.IOException;
+import java.nio.BufferUnderflowException;
+import java.nio.channels.ClosedChannelException;
+import java.util.*;
+import org.xsocket.*;
+import org.xsocket.connection.*;
+
+
+public class xSocketDataHandler implements IDataHandler, IConnectHandler, IDisconnectHandler
+{
+    private Set&lt;INonBlockingConnection&gt; sessions = Collections.synchronizedSet(new HashSet&lt;INonBlockingConnection&gt;());
+
+    public boolean onData(INonBlockingConnection nbc) throws IOException, BufferUnderflowException, ClosedChannelException, MaxReadSizeExceededException
+    {
+        try
+        {
+            String data = nbc.readStringByDelimiter("\0");
+            // Expected Message Format:
+            // USERNAME~MESSAGE
+            // ie: JohnDoe~Hello World
+
+            if(data.trim().length() &gt; 0)
+            {
+                System.out.println("Incoming data: " + data);
+
+                if(data.equalsIgnoreCase("&lt;policy-file-request/&gt;"))
+                {
+                    nbc.write("&lt;cross-domain-policy&gt;&lt;allow-access-from domain=\"*\" to-ports=\"8090\"/&gt;&lt;/cross-domain-policy&gt;\0");
+                    return true;
+                }
+
+                String[] message = data.split("~");
+
+                sendMessageToAll(message[0], message[1]);
+
+                if(message[1].equalsIgnoreCase("SHUTDOWN"))
+                    Main.shutdownServer();
+            }
+        }
+        catch(Exception ex)
+        {
+            System.out.println("onData: " + ex.getMessage());
+        }
+
+        return true;
+    }
+
+    private void sendMessageToAll(String user, String message)
+    {
+        try
+        {
+            synchronized(sessions)
+            {
+                Iterator&lt;INonBlockingConnection&gt; iter = sessions.iterator();
+
+                while(iter.hasNext())
+                {
+                    INonBlockingConnection nbConn = (INonBlockingConnection) iter.next();
+
+                    if(nbConn.isOpen())
+                        nbConn.write("&lt;b&gt;" + user + "&lt;/b&gt;: " + message + "&lt;br /&gt;\0");
+                }
+            }
+
+            System.out.println("Outgoing data: " + user + ": " + message);
+        }
+        catch(Exception ex)
+        {
+            System.out.println("sendMessageToAll: " + ex.getMessage());
+        }
+    }
+
+    public boolean onConnect(INonBlockingConnection nbc) throws IOException, BufferUnderflowException, MaxReadSizeExceededException
+    {
+        try
+        {
+            synchronized(sessions)
+            {
+                sessions.add(nbc);
+            }
+
+            System.out.println("onConnect");
+        }
+        catch(Exception ex)
+        {
+            System.out.println("onConnect: " + ex.getMessage());
+        }
+
+        return true;
+    }
+
+    public boolean onDisconnect(INonBlockingConnection nbc) throws IOException
+    {
+        try
+        {
+            synchronized(sessions)
+            {
+                sessions.remove(nbc);
+            }
+
+            System.out.println("onDisconnect");
+        }
+        catch(Exception ex)
+        {
+            System.out.println("onDisconnect: " + ex.getMessage());
+        }
+
+        return true;
+    }
+}
+</pre> 
+        <p>Wasting no time we can move onto the Flash client. Open up the Flash IDE and create a new ActionScript 3 project and call it “xSocketChat.fla”. I’m not going to go over constructing the user interface, you can get that from the <a href="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xsocketchatserver.zip">project files</a>. I want to instead focus on the ActionScript part of this. Still, lets take a look first at what the chat UI actually looks like:</p> 
+        <p><a href="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat2.jpg"><img src="http://giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat2-229x300.jpg" alt="" title="Flash Chat Client " width="229" height="300" class="alignnone size-medium wp-image-229" srcset="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat2-229x300.jpg 229w, http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat2-114x150.jpg 114w, http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat2.jpg 454w" sizes="(max-width: 229px) 100vw, 229px"></a></p> 
+        <p>Very simple, and very ugly but more than enough to prove the chat server will work.</p> 
+        <p>Here is the ActionScript:</p> 
+        <pre class="brush: as3; title: ; notranslate" title="">
+errorIndicator_mc.visible = false;
+
+var xmlSocket:XMLSocket = new XMLSocket();
+
+xmlSocket.addEventListener(DataEvent.DATA, onIncomingData);
+xmlSocket.addEventListener(Event.CONNECT , onConnected);
+connect_btn.addEventListener(MouseEvent.CLICK, onConnectClicked);
+send_btn.addEventListener(MouseEvent.CLICK, onSendClicked);
+
+function onConnectClicked(evt:Event)
+{
+	errorIndicator_mc.visible = false;
+
+	if(username_txt.text.length &lt;= 0)
+	{
+		errorIndicator_mc.visible = true;
+		return;
+	}
+
+	xmlSocket.connect("127.0.0.1", 8090);
+}
+
+function onConnected(evt:Event)
+{
+	connect_btn.enabled = false;
+	xmlSocket.send(username_txt.text + "~has connected");
+}
+
+function onSendClicked(evt:Event)
+{
+	if(sendChat_txt.text.length &gt; 0)
+		xmlSocket.send(username_txt.text + "~" + sendChat_txt.text);
+
+	sendChat_txt.text = "";
+}
+
+function onIncomingData(event:DataEvent):void
+{
+	incomingChat_txt.htmlText += event.data;
+}
+</pre> 
+        <p>We use the same XMLSocket class we used in the first tutorial and then we add some event listeners. Two of which relate to the socket, one will listen for incoming data and the other will listen to see if we connect. There are several more listeners we could have used (like listening for an error), but we’ll stick with these to keep our motto of “simple” going. If the user doesn’t supply a username we prompt them to do so with a little pulsing red circle by the username textbox. Other than that I don’t do much other validation. When the user types in a user name and presses the connect button we connect them to the socket server with the address and port it’s listening on which in this case is the localhost address and port 8090.</p> 
+        <p>When they type in some chat text below and hit the send button we send it off to the chat socket server which will turn around and send it back to everyone that is connected including us. This will trigger the “onIncomingData” where we grab the data and use the textarea’s “htmlText” property to display the data. We use htmlText since we know the server formatted it that way for us.</p> 
+        <p>Start running the Netbeans project first and then run two or more of these Flash chat clients and see how it works.</p> 
+        <p><a href="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat3.jpg"><img src="http://giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat3-300x252.jpg" alt="" title="Side-by-side Chat Windows" width="300" height="252" class="alignnone size-medium wp-image-232" srcset="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat3-300x252.jpg 300w, http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat3-150x126.jpg 150w, http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xchat3.jpg 527w" sizes="(max-width: 300px) 100vw, 300px"></a></p> 
+        <p>Something to add now might be a “Disconnect” button. The XMLSocket class has a “close” method you can call.</p> 
+        <p>So there it is, a simple multi-user chat server for your Flash/Flex clients. With a little work this can be turned into a full fledged chat or game server.</p> 
+        <p>Here are the <a href="http://www.giantflyingsaucer.com/blog/wp-content/uploads/2008/10/xsocketchatserver.zip">project files</a>.</p> 
+        <p>[ad name=”Google Adsense”]</p> 
+        <div class="tweetthis" style="text-align:right;">
+         <p> <a href="http://twitter.com/intent/tweet?text=Building+a+Multi-user+Chat+Server+with+xSocket%2C+Java%2C+and+Flash+CS3+http%3A%2F%2Fis.gd%2F4pqzwe" onclick="__gaTracker('send', 'event', 'outbound-article', 'http://twitter.com/intent/tweet?text=Building+a+Multi-user+Chat+Server+with+xSocket%2C+Java%2C+and+Flash+CS3+http%3A%2F%2Fis.gd%2F4pqzwe', '');" target="_blank" rel="nofollow" class="tt" title="Post to Twitter"><img class="nothumb" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/tweet-this/icons/en/twitter/tt-twitter6.png" alt="Post to Twitter"></a></p>
+        </div>
+        <div class="code-block code-block-1" style="margin: 8px 0;"> 
+         <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+         <!-- Larger Square 336x280 (not rounded) --> 
+         <ins class="adsbygoogle" style="display:inline-block;width:336px;height:280px" data-ad-client="ca-pub-8291994066409096" data-ad-slot="2126876912"></ins> 
+         <script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        </div> 
+       </div>
+       <!-- .entry-content --> 
+       <div class="entry-utility">
+         This entry was posted in 
+        <a href="http://www.giantflyingsaucer.com/blog/?cat=3" rel="category">ActionScript</a>, 
+        <a href="http://www.giantflyingsaucer.com/blog/?cat=4" rel="category">Adobe</a>, 
+        <a href="http://www.giantflyingsaucer.com/blog/?cat=19" rel="category">Flash</a>, 
+        <a href="http://www.giantflyingsaucer.com/blog/?cat=20" rel="category">Flex</a>, 
+        <a href="http://www.giantflyingsaucer.com/blog/?cat=42" rel="category">Socket Server</a>. Bookmark the 
+        <a href="http://www.giantflyingsaucer.com/blog/?p=224" title="Permalink to Building a Multi-user Chat Server with xSocket, Java, and Flash CS3" rel="bookmark">permalink</a>. 
+       </div>
+       <!-- .entry-utility --> 
+      </div>
+      <!-- #post-## --> 
+      <div id="nav-below" class="navigation"> 
+       <div class="nav-previous">
+        <a href="http://www.giantflyingsaucer.com/blog/?p=205" rel="prev"><span class="meta-nav">?</span> Tutorial: Building a Flash socket server with Java in five minutes</a>
+       </div> 
+       <div class="nav-next">
+        <a href="http://www.giantflyingsaucer.com/blog/?p=251" rel="next">Tutorial: Learning Erlang – just the basic basics <span class="meta-nav">?</span></a>
+       </div> 
+      </div>
+      <!-- #nav-below --> 
+      <div id="comments"> 
+       <h3 id="comments-title">50 Responses to <em>Building a Multi-user Chat Server with xSocket, Java, and Flash CS3</em></h3> 
+       <ol class="commentlist"> 
+        <li class="post pingback"> <p>Pingback: <a href="http://blog.minidx.com/2008/10/25/1577.html" rel="external nofollow" class="url">??xSocket, Java?Flash CS3??????????????????? | ??Flex??</a></p> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-324"> 
+         <div id="comment-324"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/d4243e030b547ff17b83bb85aac67346?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/d4243e030b547ff17b83bb85aac67346?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Glenn</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-324"> October 31, 2008 at 7:02 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Nice, I’ve been looking for a tutorial like this! Thanks! ?</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-325"> 
+         <div id="comment-325"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/05f936ae0f0c1107be549e0b636609d9?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/05f936ae0f0c1107be549e0b636609d9?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://tundeadeyemi.blogspot.com" rel="external nofollow" class="url">Babatunde Adeyemi</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-325"> January 21, 2009 at 9:00 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>God bless you real good for this tutorial. It really came in handy.</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-326"> 
+         <div id="comment-326"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/a818de17c506892153fb94e2d69faf54?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/a818de17c506892153fb94e2d69faf54?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Sander</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-326"> March 25, 2009 at 4:11 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Thank you for your nice tutorial. I followed everything and it works really great! I have one newbie question though…. it is running on my computer now. How do I put this online? Could you give me some directions?</p> 
+           <p>Kind regards,<br> Sander</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-327"> 
+         <div id="comment-327"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-327"> March 26, 2009 at 4:06 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Sander,</p> 
+           <p>You will need to host with someone like <a href="http://www.linode.com" rel="nofollow">http://www.linode.com</a> or someone with similar services. They will allow you to run the server and usually give you a static ip as well.</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-328"> 
+         <div id="comment-328"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/a818de17c506892153fb94e2d69faf54?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/a818de17c506892153fb94e2d69faf54?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Sander</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-328"> March 26, 2009 at 8:28 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@ chad Thank you for your prompt response! I will look into your suggestions….</p> 
+           <p>Sander</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-329"> 
+         <div id="comment-329"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/077733ca14b7735f9a8b965ccd800491?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/077733ca14b7735f9a8b965ccd800491?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Joe</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-329"> April 18, 2009 at 8:14 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Thanks for the great tutorial!</p> 
+           <p>I’m trying to upload this to my website so I can test it thurver with other people and start using this to make something better like a small game for the sake of learning.</p> 
+           <p>When connecting to the server through the swf that I have uploaded to the internet it requests the policy file, and the server returns it, like it should, but I still recieve a security error (Error #2048: Security sandbox violation: [My swf] cannot load data from [My server]) – This works when ran locally, as it dosnt request the policy file.</p> 
+           <p>I’ve tried changing the policy files to loads of different things from examples i’ve found from googling but now i’m beginning to think that it isn’t the policy that is causing the problem.</p> 
+           <p>Any ideas about how I could fix this problem?</p> 
+           <p>Thanks in advance,<br> Joe</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-330"> 
+         <div id="comment-330"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-330"> April 20, 2009 at 3:36 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Joe,</p> 
+           <p>Take a look here:<br> <a href="http://www.adobe.com/devnet/flashplayer/articles/fplayer9_security_04.html" rel="nofollow">http://www.adobe.com/devnet/flashplayer/articles/fplayer9_security_04.html</a><br> – in particular you will want to turn on the Flash Player’s logging. That will give you a much better idea of where the problem is.</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-331"> 
+         <div id="comment-331"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/92405da61f2417555b1319903ffb3a46?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/92405da61f2417555b1319903ffb3a46?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://blog.bluemagica.com" rel="external nofollow" class="url">blue</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-331"> April 22, 2009 at 11:39 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Thanks, this was great tutorial! Now can you say how to do different rooms and/or how to send data to particular user among several?</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-332"> 
+         <div id="comment-332"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-332"> April 22, 2009 at 1:43 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@blue,</p> 
+           <p>Take a look at GFS Server (my open source project on Google code which is a socket server for Flash/Flex) because it does all that and more.</p> 
+           <p><a href="http://code.google.com/p/gfs-server/" rel="nofollow">http://code.google.com/p/gfs-server/</a></p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-333"> 
+         <div id="comment-333"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/164e5e4fdac74ff3b6fc272c5d54e6fa?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/164e5e4fdac74ff3b6fc272c5d54e6fa?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://don'thaveone" rel="external nofollow" class="url">Cody Cero</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-333"> June 1, 2009 at 6:36 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Ok I have put this tutorial far beyond what it displays here and without using anymore server side coding than whats displayed here. Yeah, I have made a username &amp; password signup &amp; login. A character creation and selection screen. I have made the in chat area as well but it is really well made.</p> 
+           <p>I gave the chat area, viewable by all users and moveable by the user it belongs to. Along with a scrolling floor underneath the player and can move up and down on the sloped surface. I used user.x = providedX + YourGroundX – ProvidedGroundX in order to calculate the users x according the position difference of your ground and his own ground. So that was solved.</p> 
+           <p>So all is cleared up client wise so far (still want to add a bit more though, like I’m almost done with the friends list for example) but the problem is that after I logged in with 6 clients (all on my comp done by me) it started lagging. I could be wrong and it was because I was running too much at once. But I could be right and the server can’t stand that many looped sendings of the whole object I’m sending over the server (compressed and transformed into string).</p> 
+           <p>Can anyone come up with an answer on how to speed up the server?</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-334"> 
+         <div id="comment-334"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://giantflyingsaucer.com/blog" rel="external nofollow" class="url">Chad Lung</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-334"> June 1, 2009 at 11:41 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Cody,</p> 
+           <p>Sounds like something you might want to post on the xSocket mailing list, or try my open source socket server:</p> 
+           <p><a href="http://code.google.com/p/gfs-server/" rel="nofollow">http://code.google.com/p/gfs-server/</a></p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-335"> 
+         <div id="comment-335"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/c36ec55c4504d060142f3bf4bd7510c0?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/c36ec55c4504d060142f3bf4bd7510c0?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://www.lorenzgames.com" rel="external nofollow" class="url">Lorenz</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-335"> June 5, 2009 at 7:02 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Hi, Great tutorial!<br> I am looking at the GFS source code on google.<br> In specific i need the part on how to add or remove rooms to this chat.<br> Can u explain me on what file of the src directory to look?<br> i am kinda lost ?</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-336"> 
+         <div id="comment-336"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/87f046f3195f9d701d3d96bab74219ae?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/87f046f3195f9d701d3d96bab74219ae?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">seangheng</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-336"> July 20, 2009 at 7:45 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>after i got your file, i upload it on my server site, <a href="http://www.seangheng.000space.com/index.html" rel="nofollow">http://www.seangheng.000space.com/index.html</a>, but it doesn’t work and always show text as below:<br> Error #2044: Unhandled SecurityErrorEvent:. text=Error #2048: Security sandbox violation: <a href="http://www.seangheng.000space.com/xSocketChat.swf" rel="nofollow">http://www.seangheng.000space.com/xSocketChat.swf</a> cannot load data from 127.0.0.1:8090.<br> at xSocketChat_fla::MainTimeline/xSocketChat_fla::frame1()</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-337"> 
+         <div id="comment-337"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn"><a href="http://www.domoindal.com" rel="external nofollow" class="url">Michael A. Villar</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-337"> July 22, 2009 at 10:03 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Hi,</p> 
+           <p> I have been trying the code and works fine when I run the code within both IDEs, Eclipse for java and Flash CS4 for the client. Well, if I run the client outside the Flash environment, it doesnt work and the Server doesnt receive any incoming data. Does anyone know the problem? Whats wrong?</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-338"> 
+         <div id="comment-338"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/7e2d3977ee80d1f548e0e4761b6a3694?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/7e2d3977ee80d1f548e0e4761b6a3694?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Rogier</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-338"> October 4, 2009 at 7:32 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Thanks for the tutorial it works like a charm!</p> 
+           <p>But I have a question, can you read out the session list outside a thread?</p> 
+           <p>I am trying to read it with a timer, but it remains empty if I try to read it with the same technique as in the threads…</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-339"> 
+         <div id="comment-339"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/1c681cc899aa2f396cf9035c9e9beb89?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/1c681cc899aa2f396cf9035c9e9beb89?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://google.com" rel="external nofollow" class="url">eric</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-339"> October 16, 2009 at 4:04 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>I was hoping to use this with a game and I got the demo working fine;really well done. I was thinking that I should let all the computers update the server and then send out the data I one batch rather than at one time for efficiency. All the examples I see send back the data immediately. Is this the best way? I tried to create an array with the updated values in my data handler class but it does not seem to hold the values. I also put a timer there and was going to update all clients with the arrays contents. I am not sure if this is related to ho the thread process data or I am doing something wrong. The values come in but when the timer hits the values are different. Any help on how best to do this would be greatly appreciated.<br> Thanks,</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-340"> 
+         <div id="comment-340"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/192c0924a18bbe6d391c24fee48ef786?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/192c0924a18bbe6d391c24fee48ef786?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Seantron</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-340"> November 2, 2009 at 1:07 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Yeah, sorry, but this totally doesn’t work anymore.</p> 
+           <p>Here’s what is going on:</p> 
+           <p>onConnect<br> Incoming data:<br> Cross Domain is written<br> Data Failure: channel is closed</p> 
+           <p>So yeah, that’s of course on a live server. If you run it locally of course it works like a charm because the stupid Policy isn’t even called.</p> 
+           <p>If anyone has gotten this to work on a Live Server, I’d be very interested in what you had to do.</p> 
+           <p>Thanks.</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-341"> 
+         <div id="comment-341"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/192c0924a18bbe6d391c24fee48ef786?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/192c0924a18bbe6d391c24fee48ef786?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Seantron</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-341"> November 2, 2009 at 1:46 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Fixed it guys.</p> 
+           <p>If anyone is interested. I made a secondary server which listens on port 843, and only writes up Policy Files. Then I connect to the one that is on 8090 with no problems at all.</p> 
+           <p>Bam.</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-342"> 
+         <div id="comment-342"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://giantflyingsaucer.com/blog" rel="external nofollow" class="url">Chad Lung</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-342"> November 4, 2009 at 11:38 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Seantron,</p> 
+           <p>Have you turned on the Flash Player Debugging/Logging? I’d try that with your live server before having to send the policy file through port 843 then connecting to 8090.</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-343"> 
+         <div id="comment-343"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/837131d6c8281345dc1eec3b9e2e6c69?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/837131d6c8281345dc1eec3b9e2e6c69?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Prakash</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-343"> December 3, 2009 at 7:47 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Hi,</p> 
+           <p>plz any one help me to solve this. i created a sample application similar to this tutorial(i copied almost this tutorial code). im able to revieve messages from flash’s XMLSocket to java server but im not able to send any data from java to XMLSocket. im getting the below error message in java console.</p> 
+           <p>channel is closed (read buffer size=0)</p> 
+           <p>thanks and regards,<br> Prakash</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-344"> 
+         <div id="comment-344"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/0abddfc26922b20bc35964e23d5f782a?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/0abddfc26922b20bc35964e23d5f782a?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://sebb.dk" rel="external nofollow" class="url">Sebb</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-344"> December 11, 2009 at 11:51 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Hey!</p> 
+           <p>started learning java recently, and have been trying to do a php socket server to no avail, but this is da |33t ro&gt;&lt;0rz!</p> 
+           <p>thx alot</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-345"> 
+         <div id="comment-345"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/7585ade1eab766b3c1c3d6936f6d2c37?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/7585ade1eab766b3c1c3d6936f6d2c37?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://aaronmhathaway.com" rel="external nofollow" class="url">Aaron Hathaway</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-345"> May 28, 2010 at 7:45 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>This tutorial is great! I’ve been wanting to do this for a while now! I have a question though. Right now I have a Linux hosting account through GoDaddy. I want to get this up on the internet somehow. Is it possible with my current setup? And if so, how? All help would be great!</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-346"> 
+         <div id="comment-346"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://giantflyingsaucer.com/blog" rel="external nofollow" class="url">Chad Lung</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-346"> May 29, 2010 at 5:04 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Aaron,</p> 
+           <p>You need something like this on GoDaddy:<br> <a href="http://www.godaddy.com/hosting/virtual-dedicated-server.aspx" rel="nofollow">http://www.godaddy.com/hosting/virtual-dedicated-server.aspx</a></p> 
+           <p>I had mine running on linode.com without any problems (and cheaper than GoDaddy).</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-347"> 
+         <div id="comment-347"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/7585ade1eab766b3c1c3d6936f6d2c37?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/7585ade1eab766b3c1c3d6936f6d2c37?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://aaronmhathaway.com" rel="external nofollow" class="url">Aaron</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-347"> July 6, 2010 at 12:29 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Awesome! I’ve returned to working on this finally! I have been able to get everything working on a remote server with multiple clients (using Dreamhost). I do have a question I was hoping you could help with. What do you recommend for “labeling” each of the connections? An example of what I want to do is if the chatroom has 5 users: UserA…UserE and let’s say UserB sends a message specifically to UserC. Is there a way that Java can check the “label” of the connection as it iterates through the Set of connections? Thanks in advanced for the help!</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-348"> 
+         <div id="comment-348"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/00fbdd20cd9b3f6432060afb34c5675e?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://giantflyingsaucer.com/blog" rel="external nofollow" class="url">Chad Lung</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-348"> July 6, 2010 at 3:35 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Aaron,</p> 
+           <p>I’m not sure I understand your question. You can go through the connections and get details on each.</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="post pingback"> <p>Pingback: <a href="http://ec2-184-73-139-217.compute-1.amazonaws.com/blog/?p=875" rel="external nofollow" class="url">Building a Flash Chat Socket Server with Stackless Python | Giant Flying Saucer</a></p> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-350"> 
+         <div id="comment-350"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/3fe428870d2a66a055a3230d3b6363ab?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/3fe428870d2a66a055a3230d3b6363ab?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Mohammad</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-350"> October 23, 2010 at 5:09 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Right after Flash sends policy-request, it closes the connection to the server. Why is it happening?</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-351"> 
+         <div id="comment-351"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://giantflyingsaucer.com/blog" rel="external nofollow" class="url">Chad Lung</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-351"> October 23, 2010 at 7:10 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Mohammad,</p> 
+           <p>How Flash goes about using the policy file, etc. can be found here:<br> <a href="http://www.adobe.com/devnet/flashplayer/articles/socket_policy_files.html" rel="nofollow">http://www.adobe.com/devnet/flashplayer/articles/socket_policy_files.html</a></p> 
+           <p>The GFS Server I built I actually has it set for me to serve policy files and connect on the same port so that way I don’t need two ports open. In fact when I was running my socket server for about 9+ months I had it open on port 80 so getting through most firewalls was possible. The same thing is possible with xSocket.</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-352"> 
+         <div id="comment-352"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/edf0be6f27738ee7344f767f8e066274?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/edf0be6f27738ee7344f767f8e066274?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://Website" rel="external nofollow" class="url">James</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-352"> November 4, 2010 at 7:19 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>I find my system getting over 50% CPU using your example, what could be the cause? sendMessageToAll or my IBlockingConnection?</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-353"> 
+         <div id="comment-353"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/edf0be6f27738ee7344f767f8e066274?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/edf0be6f27738ee7344f767f8e066274?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://Website" rel="external nofollow" class="url">James</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-353"> November 4, 2010 at 9:35 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Sorry, if I add close() close would help to reduce CPU load but have a problem with Java client after following xSocket tutorial using IBlockConnection:</p> 
+           <p>private void xSocketStream(String notes) {<br> try {<br> IBlockingConnection bc = new BlockingConnection(“127.0.0.1”, 8090);</p> 
+           <p> bc.write(notes + “”);<br> bc.close();<br> } catch (IOException e){}<br> }</p> 
+           <p>the code is in c.java to be sent to the server and my Flex application would get an update. It will stop working after a few update (less than 10 connection) and the c.java will keep sending in milliseconds.</p> 
+           <p>I use your server code which allow to broadcast to all Flex app.</p> 
+           <p>I wonder how to get the current connection remain active?</p> 
+           <p>Please help me to solve, I need it urgently after experiment many messaging engine for weeks.</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-354"> 
+         <div id="comment-354"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/edf0be6f27738ee7344f767f8e066274?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/edf0be6f27738ee7344f767f8e066274?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn"><a href="http://Website" rel="external nofollow" class="url">James</a></cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-354"> November 4, 2010 at 9:36 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>and when I adding flush() before close or before write(), it doesn’t help solve.</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-2558"> 
+         <div id="comment-2558"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">Ramenhotep</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2558"> March 25, 2011 at 12:16 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Fantastic tutorial!</p> 
+           <p>Anyone have a suggestion for why I’d be able to have it connect while testing the .fla file, but not have it connect when running the .swf locally in firefox?</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment byuser comment-author-chad-lung bypostauthor odd alt thread-odd thread-alt depth-1" id="li-comment-2565"> 
+         <div id="comment-2565"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2565"> March 25, 2011 at 2:21 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Ramenhotep,</p> 
+           <p>That is due to security, there are things you must do in order to get it to work in a browser. Here is a start: <a href="http://stackoverflow.com/questions/1987891/flash-not-connecting-via-open-socket-security-issue" rel="nofollow">http://stackoverflow.com/questions/1987891/flash-not-connecting-via-open-socket-security-issue</a></p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment even thread-even depth-1" id="li-comment-2647"> 
+         <div id="comment-2647"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">Dan</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2647"> March 30, 2011 at 8:09 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Hi, very useful tutorial, was just wondering if anyone had any hints or tips on how to use these techniques to create a multiplayer game using sockets.</p> 
+           <p>Do I just send strings of data for example a characters position to the server which then outputs it to the receiving client who then performs functions on this to make the character move??</p> 
+           <p>Any help is appreciated. Thanks</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2665"> 
+         <div id="comment-2665"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">Ramenhotep</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2665"> April 1, 2011 at 6:14 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Thanks Chad!</p> 
+           <p>I got it working internally. What’s the trick to allowing access via the internet for testing purposes? The swf is unable to connect to the server when I give it my computer’s external ip instead of 127.0.0.1. Is it likely a firewall problem? Or is there something more basic that needs to be done in the code?</p> 
+           <p>Thanks!</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment byuser comment-author-chad-lung bypostauthor even thread-even depth-1" id="li-comment-2666"> 
+         <div id="comment-2666"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2666"> April 1, 2011 at 6:52 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Ramenhotep, </p> 
+           <p>See my comment above, you need a policy server and a policy file to enable sockets over the internet with Flash.</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2667"> 
+         <div id="comment-2667"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">Dan</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2667"> April 1, 2011 at 7:26 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@ChadLung<br> Ive got it working using the LocalHost, but connecting to the server over a LAN just doesnt work. Ive read the link you posted, and the solution Dr.Dredel suggests using the cross domain policy, but this policy is already in the socketDatahandler class anyway, so whats the next step??</p> 
+           <p>Thanks</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment byuser comment-author-chad-lung bypostauthor even thread-even depth-1" id="li-comment-2676"> 
+         <div id="comment-2676"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2676"> April 2, 2011 at 11:15 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Dan,</p> 
+           <p>You probably want to turn on the Flash Player’s (Debug version) logging. That should give you some information on what is going wrong.</p> 
+           <p>This is one of the best articles on how to do that: <a href="http://www.adobe.com/devnet/flashplayer/articles/fplayer9_security.html" rel="nofollow">http://www.adobe.com/devnet/flashplayer/articles/fplayer9_security.html</a></p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2685"> 
+         <div id="comment-2685"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">Dan</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2685"> April 3, 2011 at 10:27 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Hi @ChadLung<br> Thanks for the response, ive turned on the flash players debugging and checked the log files, however when I open the client on the localhost it connects to the server but there are no logs! Now when I run the client over the LAN and check the logs on the client computer, I receive the following errors:<br> Error #2044: Unhandled securityError<br> text=Error #2048: Security sandbox violation: file:///C:…….xSocketChat.swf cannot load data from 192.168.1.14:8090<br> Error #2044: Unhandled ioError<br> Ive read the link you sent, and believe me ive spent a lot of time researching policy files on the Internet, I really don’t know where to go next to get the client to connect over a LAN?? Is this a problem you have faced?</p> 
+           <p>Thanks for all the help</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment byuser comment-author-chad-lung bypostauthor even thread-even depth-1" id="li-comment-2686"> 
+         <div id="comment-2686"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2686"> April 3, 2011 at 11:06 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Dan,</p> 
+           <p>I just tried the above code and I haven’t had these security issues your having. I’m using a specified port and then setting the policy file with that port number. Across my LAN it’s working fine. You might want to look at the code in my open source socket server (see link below) since it is made to work across the Internet. It also has sample projects in Flash and Flex.<br> <a href="http://code.google.com/p/gfs-server/" rel="nofollow">http://code.google.com/p/gfs-server/</a></p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2689"> 
+         <div id="comment-2689"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">Dan</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2689"> April 3, 2011 at 2:35 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@ChadLung,<br> Thanks ive got your server installed, but cant get the flash client to run, it has a problem with declaring a new socketManager, says it expects no more than 1 argument, removing the port number solves this, but obviously doesnt allow me to connect. Could this be because I am running Flash CS4?<br> After reading through your java code for your open source project I see you are writing the policyFile to the client differently to how you have in this tutorial, my java knowledge isnt that great so how would I go about specifying a port and then setting the policy file with that port number??<br> Thank you so much for your help, it is extremely appreciated.</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment byuser comment-author-chad-lung bypostauthor even thread-even depth-1" id="li-comment-2696"> 
+         <div id="comment-2696"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2696"> April 4, 2011 at 8:34 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Dan,</p> 
+           <p>You can specify the port number in the policy file, by default I believe it’s 843. Just make the change to the policy file and then start the server. You can also run the project out of Netbeans easily and use the debugger for further information.</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2702"> 
+         <div id="comment-2702"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">Dan</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2702"> April 4, 2011 at 10:56 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Chad<br> Thanks again for the reply, im running Netbeans so can view everything thats going on. Do I need to specify the port for the policy file in the java code or just in the policy file itself?<br> In the actual flash code do I need to add:<br> Security.loadPolicyFile(“xmlsocket://” + “host” + “:” + port);<br> xmlSocket.send();<br> And just an extra thought, would opening the specific port in the firewall help at all?</p> 
+           <p>Thanks</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment byuser comment-author-chad-lung bypostauthor even thread-even depth-1" id="li-comment-2709"> 
+         <div id="comment-2709"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2709"> April 5, 2011 at 9:42 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Dan,</p> 
+           <p>The port in the policy file is what Flash will allow a connection to. Using an “*” means everything, “80, 843, 2222” means those three ports, etc. In the Flash code you don’t need to make a call to Security.loadPolicyFile, that is done automatically by Flash. If you have a firewall turned on, then yes you need to open a port for TCP traffic on the port your using.</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2728"> 
+         <div id="comment-2728"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">Dan</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2728"> April 6, 2011 at 3:59 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Chad<br> Thanks so much, ill get testing on this soon, in the meantime is there any hints or tips you could give to creating a multiplayer game using sockets, using your tutorial ive come up with some basic code for the onData function:<br> XMLSocket.prototype.onData = function(msg) {<br> if (msg == (username_txt.text + “~” + move_right)) {<br> character1._x += 10; } }</p> 
+           <p>This doesn’t work, so I was just wondering if this is in the right direction or not? or if you could point me in the right direction?</p> 
+           <p>Thanks<br> Dan</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment byuser comment-author-chad-lung bypostauthor even thread-even depth-1" id="li-comment-2730"> 
+         <div id="comment-2730"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2730"> April 6, 2011 at 5:34 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Dan,</p> 
+           <p>There should be sample Flash/Flex files with GFS Server you can look at. You would be better off using the game message to pass coordinates than sending a general message out to everyone and then filtering it based on used name.</p> 
+           <p>In the GFSServerEvent.as file look for “INCOMING_GAME_MESSAGE”. You shouldn’t have to hand craft any events for GFS Server, they are all there for making a game.</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-2740"> 
+         <div id="comment-2740"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/?s=40&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo avatar-default" height="40" width="40"> 
+           <cite class="fn">Dan</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2740"> April 7, 2011 at 5:30 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Chad<br> Im not really sure how the “INCOMING_GAME_MESSAGE” actually works, do you think you could try and explain it to me?<br> Sorry for all the questions and problems I really am grateful.</p> 
+           <p>Dan</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment byuser comment-author-chad-lung bypostauthor even thread-even depth-1" id="li-comment-2752"> 
+         <div id="comment-2752"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=40&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/721e88df3b8c9a2e0bbb9d619000f623?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">Chad Lung</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-2752"> April 8, 2011 at 9:18 pm</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>@Dan,</p> 
+           <p>Read over the documentation and take a look at the example projects. The game message is for sending updates like x,y coordinates, etc. – anything game related.</p> 
+           <p>Chad</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-3709"> 
+         <div id="comment-3709"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/cda15456fc1622e0855b351c6f2854de?s=40&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cda15456fc1622e0855b351c6f2854de?s=80&amp;d=mm&amp;r=g 2x" class="avatar avatar-40 photo" height="40" width="40"> 
+           <cite class="fn">iluvAS</cite> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author .vcard --> 
+          <div class="comment-meta commentmetadata">
+           <a href="http://www.giantflyingsaucer.com/blog/?p=224#comment-3709"> October 12, 2011 at 3:49 am</a> 
+          </div>
+          <!-- .comment-meta .commentmetadata --> 
+          <div class="comment-body">
+           <p>Is it possible for java to know what the NBC’s IP address is?</p> 
+          </div> 
+          <div class="reply"> 
+          </div>
+          <!-- .reply --> 
+         </div>
+         <!-- #comment-##  --> </li>
+        <!-- #comment-## --> 
+       </ol> 
+       <p class="nocomments">Comments are closed.</p> 
+      </div>
+      <!-- #comments --> 
+     </div>
+     <!-- #content --> 
+    </div>
+    <!-- #container --> 
+    <div id="primary" class="widget-area" role="complementary"> 
+     <ul class="xoxo"> 
+      <li id="text-6" class="widget-container widget_text"> 
+       <div class="textwidget">
+        <p>I’m a software engineer with 15+ years of experience. All opinions are my own.</p> 
+        <p><a href="http://www.linkedin.com/in/chadlung"><img src="http://www.linkedin.com/img/webpromo/btn_myprofile_160x33.png" alt="View Chad Lung's profile on LinkedIn" width="160" height="33" border="0"></a><a href="http://twitter.com/#!/chadlung"><img src="http://www.giantflyingsaucer.com/follow-me-btn.gif"></a></p> 
+        <p><a href="http://www.giantflyingsaucer.com/blog/?feed=rss"><img src="http://www.giantflyingsaucer.com/rss.jpg" width="75px" height="75px"></a><br> Follow via <a href="http://www.giantflyingsaucer.com/blog/?feed=rss">RSS</a> or <a href="http://www.giantflyingsaucer.com/blog/?feed=atom">ATOM</a></p> 
+       </div> </li>
+      <li id="search-4" class="widget-container widget_search"><h3 class="widget-title">Search</h3>
+       <form role="search" method="get" id="searchform" class="searchform" action="http://www.giantflyingsaucer.com/blog/"> 
+        <div> 
+         <label class="screen-reader-text" for="s">Search for:</label> 
+         <input type="text" value="" name="s" id="s"> 
+         <input type="submit" id="searchsubmit" value="Search"> 
+        </div> 
+       </form></li>
+      <li id="text-5" class="widget-container widget_text"> 
+       <div class="textwidget">
+        <script src="http://widgets.twimg.com/j/2/widget.js"></script> 
+        <script>
+new TWTR.Widget({
+  version: 2,
+  type: 'profile',
+  rpp: 4,
+  interval: 6000,
+  width: 210,
+  height: 300,
+  theme: {
+    shell: {
+      background: '#333333',
+      color: '#ffffff'
+    },
+    tweets: {
+      background: '#000000',
+      color: '#ffffff',
+      links: '#4aed05'
+    }
+  },
+  features: {
+    scrollbar: false,
+    loop: false,
+    live: false,
+    hashtags: true,
+    timestamp: true,
+    avatars: false,
+    behavior: 'all'
+  }
+}).render().setUser('chadlung').start();
+</script>
+       </div> </li>
+      <li id="text-7" class="widget-container widget_text"> 
+       <div class="textwidget">
+        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+        <!-- 160x600, created 7/15/09 --> 
+        <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px" data-ad-client="ca-pub-8291994066409096" data-ad-slot="6188798599"></ins> 
+        <script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+       </div> </li>
+      <li id="calendar-4" class="widget-container widget_calendar">
+       <div id="calendar_wrap" class="calendar_wrap">
+        <table id="wp-calendar"> 
+         <caption>
+          October 2017
+         </caption> 
+         <thead> 
+          <tr> 
+           <th scope="col" title="Monday">M</th> 
+           <th scope="col" title="Tuesday">T</th> 
+           <th scope="col" title="Wednesday">W</th> 
+           <th scope="col" title="Thursday">T</th> 
+           <th scope="col" title="Friday">F</th> 
+           <th scope="col" title="Saturday">S</th> 
+           <th scope="col" title="Sunday">S</th> 
+          </tr> 
+         </thead> 
+         <tfoot> 
+          <tr> 
+           <td colspan="3" id="prev"><a href="http://www.giantflyingsaucer.com/blog/?m=201702">« Feb</a></td> 
+           <td class="pad">&nbsp;</td> 
+           <td colspan="3" id="next" class="pad">&nbsp;</td> 
+          </tr> 
+         </tfoot> 
+         <tbody> 
+          <tr> 
+           <td colspan="6" class="pad">&nbsp;</td>
+           <td>1</td> 
+          </tr> 
+          <tr> 
+           <td>2</td>
+           <td id="today">3</td>
+           <td>4</td>
+           <td>5</td>
+           <td>6</td>
+           <td>7</td>
+           <td>8</td> 
+          </tr> 
+          <tr> 
+           <td>9</td>
+           <td>10</td>
+           <td>11</td>
+           <td>12</td>
+           <td>13</td>
+           <td>14</td>
+           <td>15</td> 
+          </tr> 
+          <tr> 
+           <td>16</td>
+           <td>17</td>
+           <td>18</td>
+           <td>19</td>
+           <td>20</td>
+           <td>21</td>
+           <td>22</td> 
+          </tr> 
+          <tr> 
+           <td>23</td>
+           <td>24</td>
+           <td>25</td>
+           <td>26</td>
+           <td>27</td>
+           <td>28</td>
+           <td>29</td> 
+          </tr> 
+          <tr> 
+           <td>30</td>
+           <td>31</td> 
+           <td class="pad" colspan="5">&nbsp;</td> 
+          </tr> 
+         </tbody> 
+        </table>
+       </div></li>
+      <li id="categories-4" class="widget-container widget_categories"><h3 class="widget-title">Categories</h3> 
+       <ul> 
+        <li class="cat-item cat-item-3"><a href="http://www.giantflyingsaucer.com/blog/?cat=3">ActionScript</a> (33) </li> 
+        <li class="cat-item cat-item-4"><a href="http://www.giantflyingsaucer.com/blog/?cat=4">Adobe</a> (18) </li> 
+        <li class="cat-item cat-item-5"><a href="http://www.giantflyingsaucer.com/blog/?cat=5">AIR</a> (3) </li> 
+        <li class="cat-item cat-item-6"><a href="http://www.giantflyingsaucer.com/blog/?cat=6">AJAX</a> (12) </li> 
+        <li class="cat-item cat-item-7"><a href="http://www.giantflyingsaucer.com/blog/?cat=7">Amazon Web Services</a> (4) </li> 
+        <li class="cat-item cat-item-8"><a href="http://www.giantflyingsaucer.com/blog/?cat=8">Android</a> (14) </li> 
+        <li class="cat-item cat-item-63"><a href="http://www.giantflyingsaucer.com/blog/?cat=63">Ansible</a> (1) </li> 
+        <li class="cat-item cat-item-49"><a href="http://www.giantflyingsaucer.com/blog/?cat=49">Apache Abdera</a> (10) </li> 
+        <li class="cat-item cat-item-67"><a href="http://www.giantflyingsaucer.com/blog/?cat=67">Apache Mesos</a> (2) </li> 
+        <li class="cat-item cat-item-9"><a href="http://www.giantflyingsaucer.com/blog/?cat=9">Apache Mina</a> (2) </li> 
+        <li class="cat-item cat-item-52"><a href="http://www.giantflyingsaucer.com/blog/?cat=52">Apache Tomcat</a> (11) </li> 
+        <li class="cat-item cat-item-10"><a href="http://www.giantflyingsaucer.com/blog/?cat=10">App Engine</a> (6) </li> 
+        <li class="cat-item cat-item-12"><a href="http://www.giantflyingsaucer.com/blog/?cat=12">ASP.NET</a> (10) </li> 
+        <li class="cat-item cat-item-53"><a href="http://www.giantflyingsaucer.com/blog/?cat=53">Atom Hopper</a> (15) </li> 
+        <li class="cat-item cat-item-61"><a href="http://www.giantflyingsaucer.com/blog/?cat=61">AtomNuke</a> (3) </li> 
+        <li class="cat-item cat-item-13"><a href="http://www.giantflyingsaucer.com/blog/?cat=13">BlazeDS</a> (1) </li> 
+        <li class="cat-item cat-item-14"><a href="http://www.giantflyingsaucer.com/blog/?cat=14">C#</a> (15) </li> 
+        <li class="cat-item cat-item-48"><a href="http://www.giantflyingsaucer.com/blog/?cat=48">CherryPy</a> (1) </li> 
+        <li class="cat-item cat-item-56"><a href="http://www.giantflyingsaucer.com/blog/?cat=56">CoffeeScript</a> (11) </li> 
+        <li class="cat-item cat-item-15"><a href="http://www.giantflyingsaucer.com/blog/?cat=15">Comet</a> (3) </li> 
+        <li class="cat-item cat-item-46"><a href="http://www.giantflyingsaucer.com/blog/?cat=46">CouchDB</a> (2) </li> 
+        <li class="cat-item cat-item-16"><a href="http://www.giantflyingsaucer.com/blog/?cat=16">Design Patterns</a> (5) </li> 
+        <li class="cat-item cat-item-65"><a href="http://www.giantflyingsaucer.com/blog/?cat=65">Docker</a> (3) </li> 
+        <li class="cat-item cat-item-17"><a href="http://www.giantflyingsaucer.com/blog/?cat=17">Dojo</a> (1) </li> 
+        <li class="cat-item cat-item-18"><a href="http://www.giantflyingsaucer.com/blog/?cat=18">Erlang</a> (1) </li> 
+        <li class="cat-item cat-item-19"><a href="http://www.giantflyingsaucer.com/blog/?cat=19">Flash</a> (25) </li> 
+        <li class="cat-item cat-item-20"><a href="http://www.giantflyingsaucer.com/blog/?cat=20">Flex</a> (31) </li> 
+        <li class="cat-item cat-item-21"><a href="http://www.giantflyingsaucer.com/blog/?cat=21">Go</a> (11) </li> 
+        <li class="cat-item cat-item-22"><a href="http://www.giantflyingsaucer.com/blog/?cat=22">GWT</a> (20) </li> 
+        <li class="cat-item cat-item-23"><a href="http://www.giantflyingsaucer.com/blog/?cat=23">HTML5</a> (26) </li> 
+        <li class="cat-item cat-item-24"><a href="http://www.giantflyingsaucer.com/blog/?cat=24">iPhone</a> (3) </li> 
+        <li class="cat-item cat-item-25"><a href="http://www.giantflyingsaucer.com/blog/?cat=25">Java</a> (75) </li> 
+        <li class="cat-item cat-item-26"><a href="http://www.giantflyingsaucer.com/blog/?cat=26">JavaFX</a> (1) </li> 
+        <li class="cat-item cat-item-27"><a href="http://www.giantflyingsaucer.com/blog/?cat=27">JavaScript</a> (67) </li> 
+        <li class="cat-item cat-item-54"><a href="http://www.giantflyingsaucer.com/blog/?cat=54">JSON Feed Server</a> (1) </li> 
+        <li class="cat-item cat-item-59"><a href="http://www.giantflyingsaucer.com/blog/?cat=59">Luvit</a> (1) </li> 
+        <li class="cat-item cat-item-28"><a href="http://www.giantflyingsaucer.com/blog/?cat=28">Mobile</a> (20) </li> 
+        <li class="cat-item cat-item-29"><a href="http://www.giantflyingsaucer.com/blog/?cat=29">MongoDB</a> (6) </li> 
+        <li class="cat-item cat-item-50"><a href="http://www.giantflyingsaucer.com/blog/?cat=50">Netbeans</a> (22) </li> 
+        <li class="cat-item cat-item-30"><a href="http://www.giantflyingsaucer.com/blog/?cat=30">Node.js</a> (40) </li> 
+        <li class="cat-item cat-item-31"><a href="http://www.giantflyingsaucer.com/blog/?cat=31">Online Games</a> (13) </li> 
+        <li class="cat-item cat-item-32"><a href="http://www.giantflyingsaucer.com/blog/?cat=32">Open Source</a> (149) </li> 
+        <li class="cat-item cat-item-60"><a href="http://www.giantflyingsaucer.com/blog/?cat=60">OpenStack</a> (17) </li> 
+        <li class="cat-item cat-item-33"><a href="http://www.giantflyingsaucer.com/blog/?cat=33">Perl</a> (1) </li> 
+        <li class="cat-item cat-item-34"><a href="http://www.giantflyingsaucer.com/blog/?cat=34">PHP</a> (23) </li> 
+        <li class="cat-item cat-item-35"><a href="http://www.giantflyingsaucer.com/blog/?cat=35">Python</a> (58) </li> 
+        <li class="cat-item cat-item-36"><a href="http://www.giantflyingsaucer.com/blog/?cat=36">Rails</a> (4) </li> 
+        <li class="cat-item cat-item-55"><a href="http://www.giantflyingsaucer.com/blog/?cat=55">Redis</a> (3) </li> 
+        <li class="cat-item cat-item-58"><a href="http://www.giantflyingsaucer.com/blog/?cat=58">Repose</a> (1) </li> 
+        <li class="cat-item cat-item-51"><a href="http://www.giantflyingsaucer.com/blog/?cat=51">REST</a> (10) </li> 
+        <li class="cat-item cat-item-37"><a href="http://www.giantflyingsaucer.com/blog/?cat=37">Reviews</a> (11) </li> 
+        <li class="cat-item cat-item-38"><a href="http://www.giantflyingsaucer.com/blog/?cat=38">Ruby</a> (13) </li> 
+        <li class="cat-item cat-item-64"><a href="http://www.giantflyingsaucer.com/blog/?cat=64">Salt</a> (3) </li> 
+        <li class="cat-item cat-item-40"><a href="http://www.giantflyingsaucer.com/blog/?cat=40">Silverlight</a> (3) </li> 
+        <li class="cat-item cat-item-41"><a href="http://www.giantflyingsaucer.com/blog/?cat=41">Sinatra</a> (3) </li> 
+        <li class="cat-item cat-item-42"><a href="http://www.giantflyingsaucer.com/blog/?cat=42">Socket Server</a> (20) </li> 
+        <li class="cat-item cat-item-62"><a href="http://www.giantflyingsaucer.com/blog/?cat=62">Tornado</a> (3) </li> 
+        <li class="cat-item cat-item-43"><a href="http://www.giantflyingsaucer.com/blog/?cat=43">Ubuntu</a> (45) </li> 
+        <li class="cat-item cat-item-1"><a href="http://www.giantflyingsaucer.com/blog/?cat=1">Uncategorized</a> (5) </li> 
+        <li class="cat-item cat-item-47"><a href="http://www.giantflyingsaucer.com/blog/?cat=47">Union Framework</a> (8) </li> 
+        <li class="cat-item cat-item-44"><a href="http://www.giantflyingsaucer.com/blog/?cat=44">Vaadin</a> (2) </li> 
+        <li class="cat-item cat-item-57"><a href="http://www.giantflyingsaucer.com/blog/?cat=57">Vertx</a> (3) </li> 
+        <li class="cat-item cat-item-45"><a href="http://www.giantflyingsaucer.com/blog/?cat=45">WebORB</a> (3) </li> 
+       </ul> </li> 
+     </ul> 
+    </div>
+    <!-- #primary .widget-area --> 
+   </div>
+   <!-- #main --> 
+   <div id="footer" role="contentinfo"> 
+    <div id="colophon"> 
+     <div id="site-info"> 
+      <a href="http://www.giantflyingsaucer.com/blog/" title="Giant Flying Saucer" rel="home"> Giant Flying Saucer </a> 
+     </div>
+     <!-- #site-info --> 
+     <div id="site-generator"> 
+      <a href="https://wordpress.org/" title="Semantic Personal Publishing Platform">Proudly powered by WordPress.</a> 
+     </div>
+     <!-- #site-generator --> 
+    </div>
+    <!-- #colophon --> 
+   </div>
+   <!-- #footer --> 
+  </div>
+  <!-- #wrapper --> 
+  <script type="text/javascript" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shCore.js?ver=3.0.9b"></script> 
+  <script type="text/javascript" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJava.js?ver=3.0.9b"></script> 
+  <script type="text/javascript" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shBrushXml.js?ver=3.0.9b"></script> 
+  <script type="text/javascript" src="http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/scripts/shBrushAS3.js?ver=3.0.9b"></script> 
+  <script type="text/javascript">
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.getElementsByTagName("head")[0].insertBefore( corecss, document.getElementById("syntaxhighlighteranchor") );
+		var themecssurl = "http://www.giantflyingsaucer.com/blog/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeEclipse.css?ver=3.0.9b";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		//document.getElementById("syntaxhighlighteranchor").appendChild(themecss);
+		document.getElementsByTagName("head")[0].insertBefore( themecss, document.getElementById("syntaxhighlighteranchor") );
+	})();
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = 'Can\'t find brush for: ';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush wasn\'t configured for html-script option: ';
+	SyntaxHighlighter.defaults['auto-links'] = false;
+	SyntaxHighlighter.defaults['gutter'] = false;
+	SyntaxHighlighter.defaults['pad-line-numbers'] = 1;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.defaults['wrap-lines'] = false;
+	SyntaxHighlighter.all();
+</script> 
+  <script type="text/javascript" src="http://www.giantflyingsaucer.com/blog/wp-includes/js/wp-embed.min.js?ver=4.8.2"></script>   
+ </body>
+</html>

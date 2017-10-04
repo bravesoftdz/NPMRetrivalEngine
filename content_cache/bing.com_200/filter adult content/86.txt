@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+ <head> 
+  <title>Filter modules for Squid</title> 
+  <link rev="made" href="mailto:olaf@bigred.inka.de"> 
+  <meta name="description" content="A patch for Squid that makes it a
+   very flexible, modular filtering proxy. Unlike most Squid add-ons,
+   this filters not only URLs but content as well."> 
+  <meta name="keywords" content="Squid, Proxy, Filter"> 
+  <style type="text/css"><!--
+   BODY { background-color: #f0f5f0; font-family: sans-serif; 
+      padding: 0px 10px; }
+   TD { font-family: sans-serif }
+   H1 { color: #369; padding: 8px 16px; border-bottom: 1px solid #369; }
+   H2 { background-color: #369; color: #f0fff0; 
+      margin: 6px 0px 6px -4px; padding: 4px 16px 4px 4px; }
+   H3,H4,H5,H6 { color: #369; }
+   A:link { color: #399; }
+   A:visited { color: #699; }
+   A:active { color: #999; }
+   SMALL { color: #666; }
+   PRE { border: 1px dotted #666; width: 50%;
+      padding: 4px; margin: 1px 4px 1px -4px; }
+   .red { color: #c00; }
+   .footer { border-top: 1px solid #369; margin-top: 12px; 
+      padding-top: 6px; text-align: right; }
+   --></style> 
+ </head> 
+ <body> 
+  <h1>Filter modules for Squid 3.0</h1> 
+  <small>Version 0.2, October 2008</small> 
+  <ol> 
+   <li><a href="#purpose">Purpose</a> </li>
+   <li><a href="#prereq">Prerequisites</a> </li>
+   <li><a href="#install">Installation</a> </li>
+   <li><a href="#config">Configuration</a> </li>
+   <li><a href="#modules">Available filters</a> </li>
+   <li><a href="#using">Using</a> </li>
+   <li><a href="#intern">Internals</a> </li>
+   <li><a href="#migrate">Migration from 2.x</a> </li>
+   <li><a href="#related">Related projects</a> </li>
+   <li><a href="#bugs">Bugs</a> </li>
+   <li><a href="#getting">Getting this package</a> </li>
+  </ol> 
+  <p>This is a project to build filtering capabilities comparable to those of <a href="http://muffin.doit.org/">Muffin</a> into <a href="http://www.squid-cache.org/">Squid</a>. It consists of a filtering framework and a set of filter modules. Currently available filters: </p>
+  <ul> 
+   <li>URI Redirection. </li>
+   <li>Removal of Javascript and ActiveX. </li>
+   <li>Breaking of GIF animation loops. </li>
+   <li>Detection of 1x1 images. </li>
+  </ul> Special features: 
+  <ul> 
+   <li>Modular, easily extensible by writing new filters. </li>
+   <li>Flexible configuration. Filters are independent from each other. </li>
+   <li>Each filter can be applied depending on an ACL. </li>
+   <li>Client can choose to bypass filters case-by-case. </li>
+  </ul> 
+  <h2><a name="purpose"></a>Purpose</h2> A filtering proxy allows users to remove unwanted stuff from Web pages as they browse them. What "unwanted stuff" is obviously depends on the individual user, but things which are commonly regarded as annoyances include 
+  <ul> 
+   <li>banner ads, </li>
+   <li>user behaviour tracking via cookies, </li>
+   <li>animated pictures, </li>
+   <li>JavaScript, VBScript, ActiveX (dangerous as well as annoying). </li>
+  </ul> Some of those things can be avoided by filtering URIs, which Squid can already do via an external redirect program. Others require a content filter. 
+  <p>Usually, a filtering proxy runs standalone and does nothing but filtering. Users have to configure this proxy in their browsers, and if they use a caching proxy too, chain them after the filter. In situations where the user runs Squid anyway (mostly because of caching for different browsers or a small LAN), it is convenient to build this capability into Squid. </p>
+  <h2><a name="prereq"></a>Prerequisites</h2> This patch is for 
+  <a href="http://www.squid-cache.org/Versions/v3/3.0/">Squid 3.0STABLE9</a>. Developed and tested under Linux 2.6 with glibc 2.2.5 through 2.4.1 and gcc 3.3 through 4.1, but should not be system-specific. 
+  <p>You need the Squid sources, everything for compiling them, GNU patch, autoconf 2.50 and automake 1.6. </p>
+  <h2><a name="install"></a>Installation</h2> 
+  <ol> 
+   <li>Apply the patch: (In the Squid source directory)<pre>
+gzip -cd squid-3.0stable9-filter-0.2.patch.gz | patch -p1
+</pre> </li>
+   <li>Run configure:<pre>
+sh bootstrap.sh
+sh configure (options...) --enable-filters
+</pre> </li>
+   <li>Compile and install Squid as usual. </li>
+  </ol> It is possible to include externally written filter modules with the configure argument 
+  <code>--with-morefilters="/path/to/file.cc /path/to/other.cc.."</code> 
+  <h2><a name="config"></a>Configuration</h2> 
+  <h3>Defining filters</h3> There is a new squid.conf directive:
+  <pre>
+filter_module <em>name</em> [ <em>arguments...</em> ] [ * {allow|deny} <em>acls...</em> ]
+</pre> It tells Squid to define a filter of the given type. The filter modules can take arguments as documented for the individual modules. Arguments are separated with whitespace with the same quoting mechanisms as used elsewhere in squid.conf. A filter type can be specified in more than one filter_module line, in that case several filter instances with different parameters will be created. See below on chaining filters. 
+  <p>Each filter line can optionally take an ACL list. This must start with an asterisk (surrounded by whitespace), followed by either the keyword <code>allow</code> or <code>deny</code>, followed by one or more ACLs defined before the filter line. </p>
+  <p>A filter with no ACL specification is applied to every request. A filter with an ACL specification is applied to each request which is <em>denied</em> by the ACL. In other words: an allowing ACL allows to bypass the filter. </p>
+  <p>There is a new option for the <code>http_port</code> directive: The flag <code>nofilter</code> specifies that requests arriving on this port will <em>not</em> be filtered. Effectively this makes a filtering and a non-filtering proxy running at once, on different ports. </p>
+  <h3>Pattern files</h3> Pattern files are files containing lists of regular expressions (POSIX extended, or 
+  <code>grep -E</code> syntax), one pattern per line, against which the URI is matched. Blank lines and lines starting with a "number sign" are ignored in the usual fashion. Whenever a pattern file is changed, it gets reloaded at the next request automatically, no reconfigure needed. A pattern is marked as case-insensitive by prepending a dash. (To place a real dash at the start of a pattern use a class, like 
+  <code>[-]</code>). Patterns may not contain literal TABs, use 
+  <code>\t</code> instead. 
+  <p>There are two types of pattern files: simple lists and replacement lists. </p>
+  <h4>Simple lists</h4> These are lists of patterns against which stuff is matched. In older releases, "stuff" used to mean request URIs, now this is specific to the individual filters (only the activex filter uses this feature by now). The old allow lists are no longer used, they have been obsoleted by ACLs on filters. 
+  <h4>Replacement lists</h4> A replacement list allows URIs to be replaced by other URIs, in a 
+  <code>sed s///</code>-like fashion. This type of pattern file is used by the redirection filter. Each line in the file consists of two elements separated by (at least) one 
+  <em>TAB</em> character. The first is a pattern, the second a replacement. The replacement may contain 
+  <code>\1, \2... \9</code> references to parenthesized subpatterns; 
+  <code>\0</code> means the whole match and 
+  <code>\*</code> means the complete original URI. The replacement may also contain 
+  <code>\_0, \_1..., \_*</code> references which copy the same subpatterns in modified base64 encoding (see below). 
+  <p> A special replacement can be given as a shortcut for patterns which have no explicit replacement. This default is specified as replacement for the pattern consisting of a single exclamation mark, which should be the first line in the file. Negative match does not work in a replacement list. </p>
+  <h5>Modified base64 encoding</h5> This encoding is base64 with the characters 
+  <code>+ / =</code> (plus, slash, equals) replaced by 
+  <code>- _ .</code> (dash, underscore, dot) respectively. This leads to an URL-safe encoding of request URIs or part thereof (may be useful for script-based redirect result postprocessing). 
+  <h3>Other configuration dependencies</h3> When content filters (see next section) are in use, an appropriate 
+  <code>request_header_replace</code> clause must be set up to filter out the Accept-Encoding and Accept-Ranges request headers.
+  <br> Use this: 
+  <pre>
+request_header_replace Accept-Encoding identity
+request_header_replace Accept-Ranges none
+</pre> See 
+  <a href="#contenc">below</a> for the exact reason. 
+  <h2><a name="modules"></a>Available filters</h2> 
+  <p>Currently there are the following filters: </p>
+  <h3>Filters</h3> Filters fall into one of the following categories: 
+  <ul> 
+   <li>Request filters (redirect), operating on the request URI; </li>
+   <li>Content filters (script, activex, gifanim, bugfinder), operating on the reply body. (Currently there is no request body filter.) </li>
+  </ul> Filters of the same category operate either independently or chainable. Chaining is described below. In any case, all applicable filters are called in exactly the order in which they are specified in the config file. 
+  <h4>redirect</h4> Replaces Squid's external redirect program. Takes one argument, the name of a replacement list file. Performs pattern substitution on the requested URI. As soon as a pattern is found, the search stops, i.e. redirections are not chained within one redirection filter. However, if the module is specified several times (probably with different replacement list files), all of them are called in order, with a later filter operating on the results of an earlier one. If an external redirector is in use, it is called first, before the filters. NOFILTER does apply to this filter but not to external redirectors. 
+  <h4>script</h4> Removes JavaScript (
+  <code>SCRIPT</code> tags, 
+  <code>on...</code> handlers and browser-specific ways of inserting Javascript into tag attributes) from HTML pages. (For also blocking JavaScript files use an ACL against the "application/x-javascript" file type.) 
+  <h4>activex</h4> Removes ActiveX 
+  <code>OBJECT</code> tags from HTML pages. The tags are preserved, only the 
+  <code>classid</code> parameter is replaced by a dummy, so the page will still be processed correctly (as if by a non-ActiveX browser). This filter takes a pattern file as optional argument. This file contains a list of CLSIDs which are allowed through. 
+  <h4>gifanim</h4> Breaks animated GIF pictures to remove the annoying blinking. Takes as argument the allowed number of cycles. If zero, no animation (show only the first picture). If &lt; zero, stop loading animations altogether (client shows broken picture). Default is one, meaning show the whole content but don't blink. 
+  <h4>bugfinder</h4> Identifies GIF and PNG images not bigger than 
+  <em>n</em> by 
+  <em>n</em> pixels. The 
+  <em>n</em> value is given as an argument (defaults to 2). Since these tiny images are often used as "Web bugs", it may be desirable to block them with a redirector. The filter can only log them to cache.log; to effectively block bugs it is necessary to filter the requests for these URIs, i.e. manual processing of the log file is needed. 
+  <p>Each content filter specifies the MIME content type(s) to which it applies (like <code>image/gif</code> for the gifanim module) and ignores all other types. </p>
+  <p>Content filters can be chained. When more than one filter applies to a given MIME content type, every filter operates on the results of its predecessor. </p>
+  <h2><a name="using"></a>Using</h2> On the client side, no additional configuration is necessary. Simply set the patched Squid as your proxy. 
+  <h3>The NOFILTER feature</h3> Users can request that all filters (including the redirection filter, but not the external redirector) are bypassed for a single request. This is done by appending 
+  <code>.<em>X</em>.nofilter</code> to the host name in the URL, where the 
+  <code><em>X</em></code> is replaced by the Squid's visible host name. Example: to get 
+  <code>http://www.example.com/foo/bar</code> unfiltered from a Squid called 
+  <code>squid.cache</code>, use the URI 
+  <code>http://www.example.com.squid.cache.nofilter/foo/bar</code>. 
+  <p>The NOFILTER tag as part of the hostname in the URL implies that correctly written relative links, including images, linked scripts etc. on the same server, will also be unfiltered. Apply the necessary caution. </p>
+  <p>Reason for the inclusion of the Squid's host name is to avoid that web servers add the NOFILTER tag to their junk banner links themselves. This works best when <code>visible_hostname</code>, <code>unique_hostname</code> and the canonical (DNS) host name of the proxy are all different and not too related, because the origin server sees the latter two but not the former. </p>
+  <p>Since ".nofilter" is not a valid top level domain, it can't clash with real host names. </p>
+  <p>Another possible way to bypass filters is to use a non-filtering port, as described above. Requests arriving on that port will always bypass all filters. </p>
+  <h2><a name="intern"></a>Internals</h2> 
+  <h3>Object structure</h3> to be written... 
+  <p>A class diagram (created with <a href="http://argouml.tigris.org">ArgoUML</a>) for the filter classes is here: <a href="http://sites.inka.de/bigred/devel/filter-patch.zargo">http://sites.inka.de/bigred/devel/filter-patch.zargo</a>. </p>
+  <h3>Library modules</h3> 
+  <code>PatFile</code> provides the pattern file facility described above. It is included in the Squid core and described in 
+  <code>PatFile.h</code>. 
+  <h3>Debugging options</h3> The following debugging sections and levels (see the 
+  <code>debug_options</code> directive) are used: 
+  <table border="0" summary="Table showing which debugging sections and
+  levels are used for which purposes in the filter patch"> 
+   <tbody>
+    <tr>
+     <td>Section 92 </td>
+     <td>&nbsp;Filter framework </td>
+    </tr>
+    <tr>
+     <td>Section 93 </td>
+     <td>&nbsp;Filter modules </td>
+    </tr>
+    <tr>
+     <td>Section 94 </td>
+     <td>&nbsp;Library modules (PatFile etc.) </td>
+    </tr>
+    <tr>
+     <td>Level 1&nbsp;&nbsp;&nbsp; </td>
+     <td>&nbsp;Error messages </td>
+    </tr>
+    <tr>
+     <td>Level 3&nbsp;&nbsp;&nbsp; </td>
+     <td>&nbsp;"Filter caught something" messages </td>
+    </tr>
+    <tr>
+     <td>Level 4&nbsp;&nbsp;&nbsp; </td>
+     <td>&nbsp;Initialization/finalization messages </td>
+    </tr>
+    <tr>
+     <td>Level 5&nbsp;&nbsp;&nbsp; </td>
+     <td>&nbsp;Initialization/finalization trace </td>
+    </tr>
+    <tr>
+     <td>Level 8&nbsp;&nbsp;&nbsp; </td>
+     <td>&nbsp;Minor trace </td>
+    </tr>
+    <tr>
+     <td>Level 9&nbsp;&nbsp;&nbsp; </td>
+     <td>&nbsp;Full trace (big!) </td>
+    </tr>
+   </tbody>
+  </table> 
+  <h3><a name="contenc"></a>Content-Encoding</h3> Content filters get the data as delivered by the server. With a non-identity Content-Encoding the filter would operate on the encoded data, which it generally can not process correctly. (It has been confirmed by experience that HTML filters like 
+  <code>script</code> applied to a file with compression encoding can silently deliver corrupted files, but mostly this is caught by the HTML parser not accepting null characters.) 
+  <p>For this reason, the Accept-Encoding headers should always be filtered out with an appropriate <code>header_replace</code> clause. The origin server gets forced to always send unencoded data with <em>Accept-Encoding: identity</em>. Another <code>header_replace</code> which sets the Accept-Ranges header to <em>none</em> causes the client to never try Range requests, which obviously are unfilterable too. </p>
+  <h3>Filters in the data path</h3> (TODO: is this still correct?)
+  <p> The cache stores always unfiltered objects. Content filtering happens in the data path from cache or memory to the client. The filter object is expected to copy the data into a new buffer, so it can do anything with it including insertions and deletions. </p>
+  <p>The only exception to the rule that filtering happens only in the path to the client are those filters which alter the <em>request</em>. This applies to the redirect module. </p>
+  <p>In a cache hierarchy, a filtering cache should only be placed at the bottom, i.e. where only clients directly access it. If another cache sits between the filter and client, that one will cache filtered pages and break the NOFILTER feature. </p>
+  <h2><a name="migrate"></a>Migration from 2.x</h2> To upgrade a configuration from Squid 2.4 or 2.5 plus filter patch, note the following: 
+  <ol> 
+   <li>Filters are no longer loadable modules, instead they are compiled in. A special "htmlfilter" module is no longer needed. </li>
+   <li>The <code>load_module</code> directive has been replaced by <code>filter_module</code> with slightly different syntax. </li>
+   <li>The <code>nofilter_port</code> directive has been replaced by the <code>nofilter</code> option in <code>http_port</code>. </li>
+   <li>The allow lists of the individual filters have been replaced by ACLs applied to the filter. Note that you can get the same effect as with the old allow pattern file like this:<pre>
+acl allow_activex url_regex "/usr/local/squid/etc/allowlist_activex"
+filter_module activex * allow allow_activex
+</pre> The <code>""</code> around the path tell the ACL to read its patterns from a file. The syntax of this file should be compatible with the old allow lists. You have to reconfigure when this file is changed, however. </li>
+   <li>The header filters (cookies) have been obsoleted by <code>header_access</code> clauses (use Cookie and Set-Cookie with ACLs for allow lists). </li>
+   <li>The content type filters (allowtype, rejecttype) have been obsoleted by <code>rep_mime_type</code> ACLs. </li>
+  </ol> 
+  <h2><a name="related"></a>Related projects</h2> This project was mostly inspired by 
+  <a href="http://muffin.doit.org">Muffin</a>, a modular filtering proxy written in Java and distributed under GPL. By now that is the most powerful filter I know of. 
+  <p>The <a href="http://www.junkbusters.com">Junkbusters</a> web page has one of the oldest and best known web filters as well as a very comprehensive <a href="http://www.junkbusters.com/ht/en/links.html">resources list</a> covering most issues from "What is this all about?" to a list of filtering software (by now most of them are either for Windows or for pay or both, which indicates there is a real demand for filtering). </p>
+  <h2><a name="bugs"></a>Bugs</h2> As with any pre-release, this surely contains bugs. In particular I'm not sure if I really avoided memory leaks. If someone finds problems, please tell me. 
+  <h3>Known issues</h3> 
+  <ul> 
+   <li>TBD </li>
+  </ul> 
+  <h2><a name="getting"></a>Getting this package</h2> An up-to-date version of this page can be found at 
+  <a href="http://sites.inka.de/bigred/devel/squid-filter.html">http://sites.inka.de/bigred/devel/squid-filter.html</a>. 
+  <p>The latest release is filter 0.2 for Squid 3.0.STABLE9. Download at <a href="http://sites.inka.de/bigred/devel/squid-3.0stable9-filter-0.2.patch.gz">http://sites.inka.de/bigred/devel/squid-3.0stable9-filter-0.2.patch.gz</a>. </p>
+  <p>For use and distribution of this package, the same terms and conditions as for the Squid package itself (i.e. the GNU General Public License) apply. Note, however, that using a version or installation setup which has the NOFILTER feature removed or restricted in any way is in gross contradiction to the author's intentions, and people who do so should feel guilty of abuse. </p>
+  <h3>Acknowledgements</h3> Development of this version was funded by 
+  <a href="http://www.credativ.de/">credativ GmbH</a>. 
+  <div class="footer"> 
+   <address><a href="mailto:olaf@bigred.inka.de">Olaf Titz</a></address> 
+   <!-- hhmts start --> Last modified: Wed Oct 8 14:48:01 CEST 2008 
+   <!-- hhmts end --> 
+  </div>   
+ </body>
+</html>

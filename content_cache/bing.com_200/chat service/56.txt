@@ -1,0 +1,539 @@
+<!doctype html>
+<!--[if IE 6]><html id="ie6" lang="en-US"> <![endif]-->
+<!--[if IE 7]><html id="ie7" lang="en-US"> <![endif]-->
+<!--[if IE 8]><html id="ie8" lang="en-US"> <![endif]-->
+<!--[if !(IE 6) | !(IE 7) | !(IE 8)  ]><!-->
+<html lang="en-US">
+ <!--<![endif]-->
+ <head>
+  <link rel="stylesheet" type="text/css" href="https://www.howopensource.com/wp-content/cache/minify/78a96.css" media="all">
+  <meta charset="UTF-8">
+  <meta name="verifyownership" content="6835aad73211df1b0c35281cbe22c59e">
+  <title>Java chat example using Server-Sent Events (SSE)</title>
+  <link rel="pingback" href="">
+  <link rel="author" href="https://plus.google.com/112892730388314702696">
+  <!--[if lt IE 9]> <script src="https://www.howopensource.com/wp-content/themes/Divi/js/html5.js" type="text/javascript"></script> <![endif]--> 
+  <script type="text/javascript">document.documentElement.className='js';</script> 
+  <script type="text/javascript">var trackScrolling=true;var trackScrollingPercentage=false;var ScrollingPercentageNumber=25;var stLogInterval=10*1000;var cutOffTime=900;var trackNoEvents=false;var trackNoMaxTime=false;var docTitle='Java Server Sent Events Chat Example (SSE)';</script> 
+  <link rel="author" href="https://plus.google.com/+RadostinRadnev">
+  <meta name="description" content="Java chat example using Server-Sent Events and Introduction to SSE with Java and JavaScript code of real life example.">
+  <meta name="keywords" content="java,server-sent events,sse,example,javascript example,events,server sent events">
+  <link rel="canonical" href="https://www.howopensource.com/2016/01/java-sse-chat-example/">
+  <link rel="alternate" type="application/rss+xml" title="HowOpenSource » Feed" href="https://www.howopensource.com/feed/">
+  <link rel="alternate" type="application/rss+xml" title="HowOpenSource » Comments Feed" href="https://www.howopensource.com/comments/feed/">
+  <link rel="alternate" type="application/rss+xml" title="HowOpenSource » Java Server Sent Events Chat Example (SSE) Comments Feed" href="https://www.howopensource.com/2016/01/java-sse-chat-example/feed/"> 
+  <script type="text/javascript">/*<![CDATA[*/window._wpemojiSettings={"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"https:\/\/www.howopensource.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.2.16"}};!function(a,b,c){function d(a){var c=b.createElement("canvas"),d=c.getContext&&c.getContext("2d");return d&&d.fillText?(d.textBaseline="top",d.font="600 32px Arial","flag"===a?(d.fillText(String.fromCharCode(55356,56812,55356,56807),0,0),c.toDataURL().length>3e3):(d.fillText(String.fromCharCode(55357,56835),0,0),0!==d.getImageData(16,16,1,1).data[0])):!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g;c.supports={simple:d("simple"),flag:d("flag")},c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.simple&&c.supports.flag||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);/*]]>*/</script> 
+  <meta content="Divi v.2.0" name="generator">
+  <style type="text/css">img.wp-smiley,img.emoji{display:inline !important;border:none !important;box-shadow:none !important;height:1em !important;width:1em !important;margin:0 .07em !important;vertical-align:-0.1em !important;background:none !important;padding:0 !important}</style>
+  <style id="crp-style-rounded-thumbs-inline-css" type="text/css">.crp_related a{width:150px;height:150px;text-decoration:none}.crp_related img{max-width:150px;margin:auto}.crp_related .crp_title{width:150px}</style>
+  <link rel="stylesheet" id="divi-fonts-css" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,800italic,400,300,700,800&amp;subset=latin,latin-ext" type="text/css" media="all"> 
+  <script type="text/javascript" src="https://www.howopensource.com/wp-content/cache/minify/6453f.js"></script> 
+  <script type="text/javascript">var lb_l_ret={"width":"400","height":"255","delay":"3000","coc":"0","fb_id":"100184996738614","cooc":"0","display_on_page":"1","display_on_post":"1","display_on_homepage":"1","display_on_archive":"1","show_once":"1"};</script> 
+  <script type="text/javascript" src="https://www.howopensource.com/wp-content/cache/minify/fa977.js"></script> 
+  <link rel="prev" title="How to Start with Raspberry PI" href="https://www.howopensource.com/2015/10/raspberry-pi-how-to-start/">
+  <link rel="next" title="Raspberry Pi SD Card Image is too big for another SD Card" href="https://www.howopensource.com/2016/03/resize-raspberry-sd-card-image/">
+  <meta name="generator" content="WordPress 4.2.16">
+  <link rel="shortlink" href="https://www.howopensource.com/?p=3128">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <style>a{color:#2EA3F2}body{color:#666}.et_pb_counter_amount, .et_pb_featured_table .et_pb_pricing_heading,.et_quote_content,.et_link_content,.et_audio_content{background-color:#2EA3F2}#main-header, #main-header .nav li ul, .et-search-form, #main-header .et_mobile_menu{background-color:#fff}#top-header, #et-secondary-nav li ul{background-color:#2EA3F2}.woocommerce a.button.alt, .woocommerce-page a.button.alt, .woocommerce button.button.alt, .woocommerce-page button.button.alt, .woocommerce input.button.alt, .woocommerce-page input.button.alt, .woocommerce #respond input#submit.alt, .woocommerce-page #respond input#submit.alt, .woocommerce #content input.button.alt, .woocommerce-page #content input.button.alt, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button,.woocommerce-message,.woocommerce-error,.woocommerce-info{background:#2EA3F2 !important}#et_search_icon:hover, .mobile_menu_bar:before, .footer-widget h4, .et-social-icon a:hover, .comment-reply-link, .form-submit input, .et_pb_sum, .et_pb_pricing li a, .et_pb_pricing_table_button, .et_overlay:before, .entry-summary p.price ins, .woocommerce div.product span.price, .woocommerce-page div.product span.price, .woocommerce #content div.product span.price, .woocommerce-page #content div.product span.price, .woocommerce div.product p.price, .woocommerce-page div.product p.price, .woocommerce #content div.product p.price, .woocommerce-page #content div.product p.price, .et_pb_member_social_links a:hover{color:#2EA3F2 !important}.woocommerce .star-rating span:before, .woocommerce-page .star-rating span:before, .et_pb_widget li a:hover, .et_pb_bg_layout_light .et_pb_promo_button, .et_pb_bg_layout_light .et_pb_more_button, .et_pb_filterable_portfolio .et_pb_portfolio_filters li a.active, .et_pb_filterable_portfolio .et_pb_portofolio_pagination ul li a.active, .et_pb_gallery .et_pb_gallery_pagination ul li a.active, .wp-pagenavi span.current, .wp-pagenavi a:hover, .et_pb_contact_submit, .et_pb_bg_layout_light .et_pb_newsletter_button, .nav-single a, .posted_in a{color:#2EA3F2 !important}.et-search-form, .nav li ul, .et_mobile_menu, .footer-widget li:before, .et_pb_pricing li:before,blockquote{border-color:#2EA3F2}#main-footer{background-color:#222}#top-menu a{color:#666}#top-menu li.current-menu-ancestor > a, #top-menu li.current-menu-item > a, .bottom-nav li.current-menu-item>a{color:#2EA3F2}</style>
+  <style type="text/css" id="et-custom-css">#advertisement_label{border:solid 1px #caddea;-webkit-border-radius:10px;-moz-border-radius:10px;border-radius:10px;margin:9px 0px 10px 0px;padding:0px 10px 0px 10px;text-align:center}#advertisement{border-radius:10px;font-style:italic;padding:0px 27px 0px 15px;color:white;background-color:#caddea;text-align:center;margin-bottom:-10px;margin-top:-5px}.category article img{width:150px !important;height:150px !important}.category article img{float:left;margin-right:10px}.archive article img{width:150px !important;height:150px !important}.archive article img{float:left;margin-right:10px}#sidebar .et_pb_widget{margin:0 0 30px 23px}#breadcrumbs{background:#fff;border:1px solid #e5e5e5;-moz-box-shadow:inset 0 0 0 1px #fff;-webkit-box-shadow:inset 0 0 0 1px #fff;box-shadow:inset 0 0 0 1px #fff;position:relative;margin-bottom:27px;color:#b8b8b8;font-size:13px;padding:11px 1px}#breadcrumbs a{display:inline-block;padding:11px 6px 13px 12px;background:#f9f9f9;color:#4c4c4c;text-shadow:1px 1px 0 #fff}#breadcrumbs a:hover{color:#111;text-decoration:none}#breadcrumbs a,span.raquo{float:left;margin:-11px 0}span.raquo{background:url(images/breadcrumbs_arrow_gray.png) no-repeat;display:inline-block;text-indent:-9999px;width:11px;height:38px}#breadcrumbs .breadcrumbs_home{background-image:url(images/breadcrumbs_home.png);background-repeat:no-repeat;background-position:18px 11px;padding-left:40px}span.raquo:last-child{background-image:url(images/breadcrumbs_arrow.png);margin-right:10px}#main-content .container{padding-top:14px}.et_pb_post h2{margin-top:19px}.et_pb_post .entry-content{padding-top:10px}.single .et_pb_post{margin-top:23px}.et_pb_section{padding:10px 0}</style>
+  <script src="//connect.facebook.net/en_EN/sdk.js#xfbml=1&amp;version=v2.7"></script>
+ </head>
+ <body class="single single-post postid-3128 single-format-standard et_fixed_nav windows et_right_sidebar chrome et_includes_sidebar">
+  <div id="page-container"> 
+   <header id="main-header" class="et_nav_text_color_dark">
+    <div class="container clearfix"> 
+     <a href="https://www.howopensource.com/"> <img src="https://www.howopensource.com/wp-content/uploads/2014/07/New_LOGO_HOS_1-300x69.png" alt="HowOpenSource" id="logo"> </a>
+     <div id="et-top-navigation"> 
+      <nav id="top-menu-nav">
+       <ul id="top-menu" class="nav">
+        <li id="menu-item-1313" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1313"><a href="https://www.howopensource.com/category/how-to-install/">How To Install</a></li>
+        <li id="menu-item-1314" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-1314"><a href="https://www.howopensource.com/category/linux/">Linux</a></li>
+        <li id="menu-item-1315" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1315"><a href="https://www.howopensource.com/category/error/">Error</a></li>
+        <li id="menu-item-1316" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1316"><a href="https://www.howopensource.com/category/python/">Python</a></li>
+        <li id="menu-item-1317" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1317"><a href="https://www.howopensource.com/category/todays-wisdom/">Today’s Wisdom</a></li>
+        <li id="menu-item-1318" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1318"><a href="https://www.howopensource.com/category/chrome/">Chrome</a></li>
+        <li id="menu-item-1723" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-1723"><a href="https://www.howopensource.com/category/firefox/">Firefox</a></li>
+        <li id="menu-item-1423" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-1423"><a href="https://www.howopensource.com/category/wordpress/">WordPress</a>
+         <ul class="sub-menu">
+          <li id="menu-item-2372" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2372"><a href="https://www.howopensource.com/category/wordpress/plugins/">Plugins</a></li>
+         </ul></li>
+       </ul> 
+      </nav>
+      <div id="et_top_search"> 
+       <span id="et_search_icon"></span>
+       <form role="search" method="get" class="et-search-form et-hidden" action="https://www.howopensource.com/"> 
+        <input type="search" class="et-search-field" placeholder="Search …" value="" name="s" title="Search for:">
+       </form>
+      </div>
+      <div id="et_mobile_nav_menu"> 
+       <a href="#" class="mobile_nav closed"> <span class="select_page">Select Page</span> <span class="mobile_menu_bar"></span> </a>
+      </div>
+     </div>
+    </div> 
+   </header>
+   <div id="et-main-area">
+    <div id="main-content">
+     <div class="container">
+      <div id="content-area" class="clearfix">
+       <div id="left-area">
+        <div id="breadcrumbs" class="clearfix"> 
+         <a href="https://www.howopensource.com" class="breadcrumbs_home">Home</a> 
+         <span class="raquo">»</span>
+         <a href="https://www.howopensource.com/category/linux/">Linux</a> 
+         <span class="raquo">»</span> Java Server Sent Events Chat Example (SSE)
+        </div> 
+        <article id="post-3128" class="et_pb_post post-3128 post type-post status-publish format-standard has-post-thumbnail hentry category-linux tag-events tag-example tag-java tag-server-sent-events tag-sse">
+         <h1 class="entry-title">Java Server Sent Events Chat Example (SSE)</h1>
+         <p class="post-meta">Updated by <span class="vcard author"><span class="fn"><a href="https://www.howopensource.com/author/administrator/" title="Posts by Administrator" rel="author">Administrator</a></span></span> | <span class="date updated">Jan 21, 2016</span> | <a href="https://www.howopensource.com/category/linux/" rel="category tag">Linux</a> | <span class="comments-number"><a href="https://www.howopensource.com/2016/01/java-sse-chat-example/#respond"><span class="dsq-postid" data-dsqidentifier="3128 http://www.howopensource.com/?p=3128">2 comments</span></a></span></p>
+         <div class="entry-content">
+          <p>After writing article about <a href="https://www.howopensource.com/2014/12/introduction-to-server-sent-events/">Introduction of Server Sent Events</a> with real life <a href="http://demo.howopensource.com/sse/">PHP SSE example</a> I decided to write another article this time about using Server Sent Events in Java and Tomcat. Before to start I strongly recommend you to read first article and look into PHP code, because this time I will not describe how <strong>Server Sent Events</strong> (SSE) works. In short idea is to write simple <strong>Java chat</strong> application. So Java will be used in a back-end with just one Servlet that runs on <a href="http://tomcat.apache.org/">Apache Tomcat</a> or any other Servlet compatible container. Front-end will be using JavaScript and just few lines of HTML and CSS.</p>
+          <p id="advertisement">Advertisements</p>
+          <div id="advertisement_label">
+           <p style="margin-top:15px;"> <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> <ins class="adsbygoogle" style="display:inline-block;width:336px;height:280px" data-ad-client="ca-pub-4642597296198998" data-ad-slot="1109211522"></ins> <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script> </p>
+          </div>
+          <p>As you know or may not know – <strong>SSE</strong> is one way communication from Server to Browser. Clients subscribes to URL to listen to. And when there is something to send server send it. But here comes first problem. Web Chat is a two way communication. Users types something that is send to other users. For out simple purposes this could be achieved using AJAX calls. But let’s start with example step by step and you will get the idea.</p>
+          <p>If you do not want to read article but prefer to see demo and download and study source code – you can skip reading article and do it now – <a target="_blank" href="http://chat.howopensource.com/">Try Demo</a> or <a href="http://demo.howopensource.com/sse/java_sse_chat_example.tar.gz">Download Source Code</a>.</p>
+          <h2>Java Chat Message Class</h2>
+          <p>First of all we need to declare simple Java message class. For our test purposes it will have ID and message text attributes. You can extend it by adding time-stamp and sender ID/name or sender IP address or any other useful information that could be stored in DB and could be useful for users of application.</p>
+          <p id="advertisement">Advertisements</p>
+          <div id="advertisement_label">
+           <p style="margin-top:15px;"> <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> <ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-4642597296198998" data-ad-slot="2585944728"></ins> <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script> </p>
+          </div>
+          <pre style="background: #C7C7B8; overflow: auto;">
+package com.howopensource.demo.chat;
+
+public class Message {
+
+    private long id;
+    private String message;
+
+    public Message(long id, String message) {
+        this.id = id;
+        this.message = message;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+}
+</pre>
+          <h2>Chat Servlet</h2>
+          <p>Next step is to write Java Servlet that will handle requests and send responses to clients. This Servlet will need of few properties. First attribute counter is used to give unique ID’s to Messages. But in real life this will be done in Database. we need to start a Thread inside of Servlet so property <strong>running</strong> is about it. Also we need to store all open connections from browsers in order when new message arrives to send it to all of them. Also we need to store somewhere messages when they arrive. And at the end we need to simple message store to store messages. Note that in real life this could be a Database. But for our demo purposes this is simple in memory storage. And here is the code.</p>
+          <pre style="background: #C7C7B8; overflow: auto;">
+package com.howopensource.demo.chat;
+
+@SuppressWarnings("serial")
+@WebServlet("/chat")
+public class ChatServlet extends HttpServlet {
+
+    private AtomicLong counter = new AtomicLong();
+    private boolean running;
+
+    // Keeps all open connections from browsers
+    private Map
+           <string, asynccontext>
+             asyncContexts = new ConcurrentHashMap
+            <string, asynccontext>
+             (); // Temporary store for messages when arrived private BlockingQueue
+             <message>
+               messageQueue = new LinkedBlockingQueue
+              <message>
+               (); // Keep last messages private List
+               <message>
+                 messageStore = new CopyOnWriteArrayList
+                <message>
+                 (); } 
+                </message>
+               </message>
+              </message>
+             </message>
+            </string,>
+           </string,></pre>
+          <p>Next step is to write an inner Thread that processes and send messages to clients – all open connection from browsers. Here how it looks like. Note that storing messages in this way is not what you want in real scenario. It is here only for demo purposes.</p>
+          <pre style="background: #C7C7B8; overflow: auto;">
+// Thread that waits for new message and then redistribute it
+private Thread notifier = new Thread(new Runnable() {
+
+    @Override
+    public void run() {
+        while (running) {
+            try {
+                // Waits until a message arrives
+                Message message = messageQueue.take();
+
+                // Put a message in a store
+                messageStore.add(message);
+
+                // Keep only last 100 messages
+                if (messageStore.size() &gt; 100) {
+                    messageStore.remove(0);
+                }
+
+                // Sends the message to all the AsyncContext's response
+                for (AsyncContext asyncContext : asyncContexts.values()) {
+                    try {
+                        sendMessage(asyncContext.getResponse().getWriter(), message);
+                    } catch (Exception e) {
+                        // In case of exception remove context from map
+                        asyncContexts.values().remove(asyncContext);
+                    }
+                }
+            } catch (InterruptedException e) {
+                // Log exception, etc.
+            }
+        }
+    }
+});
+</pre>
+          <p>Next step is to write <strong>doGet</strong> method that handles incoming users that want to join the chat. Here is a code. Note that we need to add some Tomcat specific code on line 13 that may be not necessary if you are using other Servlet container. Also first lines check if user arrives for the first time on the page and if it is so then it redirects to given JSP page. This could be done in a different way – with different Servlet or to goes directly to JSP.</p>
+          <p>The next important thing is to set correct HTTP headers. Then we need to check for last message id. If by some reason connection was dropped then browser reconnects automatically with in given time. Which is by default 3 seconds. But we set it in 1 second by this command in code <em>response.getWriter().println(“retry: 1000\n”)</em>. Last part is to start asynchronous context and to override it’s methods – mainly to remove it from the map of open connection when connection is dropped by some reason.</p>
+          <p>Here the code how looks like.</p>
+          <pre style="background: #C7C7B8; overflow: auto;">
+@Override
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    // This is for loading home page when user comes for the first time
+    if (request.getAttribute("index") != null) {
+        request.setAttribute("messages", messageStore);
+        request.getRequestDispatcher("/chat.jsp").forward(request, response);
+        return;
+    }
+
+    // Check that it is SSE request
+    if ("text/event-stream".equals(request.getHeader("Accept"))) {
+
+        // This a Tomcat specific - makes request asynchronous
+        request.setAttribute("org.apache.catalina.ASYNC_SUPPORTED", true);
+
+        // Set header fields
+        response.setContentType("text/event-stream");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("Connection", "keep-alive");
+        response.setCharacterEncoding("UTF-8");
+
+        // Parse Last-Event-ID header field which should contain last event received
+        String lastMsgId = request.getHeader("Last-Event-ID");
+        if ((lastMsgId != null) &amp;&amp; !lastMsgId.trim().isEmpty()) {
+            long lastId = 0;
+            try {
+                lastId = Long.parseLong(lastMsgId);
+            } catch (NumberFormatException e) {
+                // Do nothing as we have default value
+            }
+            if (lastId &gt; 0) {
+                // Send all messages that are not send - e.g. with higher id
+                for (Message message : messageStore) {
+                    if (message.getId() &gt; lastId) {
+                        sendMessage(response.getWriter(), message);
+                    }
+                }
+            }
+        } else {
+            long lastId = 0;
+            try {
+                lastId = messageStore.get(messageStore.size() - 1).getId();
+            } catch (Exception e) {
+                // Do nothing as this just gets the last id
+            }
+            if (lastId &gt; 0) {
+                // Send some ping with the last id. Idea is browser to be informed
+                // which is the last event id. Also tell the browser if connection
+                // fails to reopen it after 1000 milliseconds
+                response.getWriter().println("retry: 1000\n");
+                Message message = new Message(lastId, "Welcome to chat, type message and press Enter to send it.");
+                sendMessage(response.getWriter(), message);
+            }
+        }
+
+        // Generate some unique identifier used to store context in map
+        final String id = UUID.randomUUID().toString();
+
+        // Start asynchronous context and add listeners to remove it in case of errors
+        final AsyncContext ac = request.startAsync();
+        ac.addListener(new AsyncListener() {
+            @Override
+            public void onComplete(AsyncEvent event) throws IOException {
+                asyncContexts.remove(id);
+            }
+            @Override
+            public void onError(AsyncEvent event) throws IOException {
+                asyncContexts.remove(id);
+            }
+            @Override
+            public void onStartAsync(AsyncEvent event) throws IOException {
+                // Do nothing
+            }
+            @Override
+            public void onTimeout(AsyncEvent event) throws IOException {
+                asyncContexts.remove(id);
+            }
+        });
+
+        // Put context in a map
+        asyncContexts.put(id, ac);
+    }
+}
+</pre>
+          <p>Next step is to write a doPost method that handles incoming messages. We said that those messages are send via AJAX calls from browsers. And here is a simple method that handles them. First we set character encoding of request. Note that in real scenario this should happen in some filter. But for simplicity we do not have it. Note that this is very simple and basing processing. You may want to collect and store more info – such as time-stamp, IP address of sender, user name if applicable, etc. Also messages may be saved in Database here.</p>
+          <pre style="background: #C7C7B8; overflow: auto;">
+@Override
+protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    // Sets char encoding - should not be done here, better in filter
+    request.setCharacterEncoding("UTF-8");
+
+    // Gets message from request
+    String message = request.getParameter("msg");
+
+    // Do some verification and save message into DB, etc.
+    if ((message != null) &amp;&amp; !message.trim().isEmpty()) {
+        try {
+            // Save message
+            // db.saveMessage(message);
+
+            // Create new simple message
+            Message msg = new Message(counter.incrementAndGet(), message.trim());
+            // Put message into messageQueue
+            messageQueue.put(msg);
+        } catch (InterruptedException e) {
+            throw new IOException(e);
+        }
+    }
+}
+</pre>
+          <p>And the last is to write a small simple method that sends message to client and to override init and destroy methods.</p>
+          <pre style="background: #C7C7B8; overflow: auto;">
+private void sendMessage(PrintWriter writer, Message message) {
+    writer.print("id: ");
+    writer.println(message.getId());
+    writer.print("data: ");
+    writer.println(message.getMessage());
+    writer.println();
+    writer.flush();
+}
+
+@Override
+public void destroy() {
+    // Stops thread and clears queue and stores
+    running = false;
+    asyncContexts.clear();
+    messageQueue.clear();
+    messageStore.clear();
+}
+
+@Override
+public void init(ServletConfig config) throws ServletException {
+    super.init(config);
+
+    // Load previous messages from DB into messageStore
+    // messageStore.addAll(db.loadMessages(100));
+
+    // Start thread
+    running = true;
+    notifier.start();
+}
+</pre>
+          <h2>JavaScript code to handle SSE</h2>
+          <p>At the end you need to write some JavaScript code that handles this. Here is the code – it is simple and straightforward implementation that just adds the message into one scrolabble DIV element.</p>
+          <pre style="background: #C7C7B8; overflow: auto;">
+// Check that browser supports EventSource 
+if (!!window.EventSource) {
+    // Subscribe to url to listen
+    var source = new EventSource('/chat');
+
+    // Define what to do when server sent new event
+    source.addEventListener("message", function(e) {
+        var el = document.getElementById("chat"); 
+        el.innerHTML += e.data + "lt;br/&amp;&gt;";
+        el.scrollTop += 50;
+    }, false);
+} else {
+    alert("Your browser does not support EventSource!");
+}
+</pre>
+          <h2>AJAX call to send message to server</h2>
+          <p>And here is JavaScript AJAX method that sends message to the server. It is called when user clicks button.</p>
+          <pre style="background: #C7C7B8; overflow: auto;">
+function sendMsg(form) {
+
+    if (form.msg.value.trim() == "") {
+        alert("Empty message!");
+    }
+    
+    // Init http object
+    var http = false;
+    if (typeof ActiveXObject != "undefined") {
+        try {
+            http = new ActiveXObject("Msxml2.XMLHTTP");
+        } catch (ex) {
+            try {
+                http = new ActiveXObject("Microsoft.XMLHTTP");
+            } catch (ex2) {
+                http = false;
+            }
+        }
+    } else if (window.XMLHttpRequest) {
+        try {
+            http = new XMLHttpRequest();
+        } catch (ex) {
+            http = false;
+        }
+    }
+
+    if (!http) {
+        alert("Unable to connect!");
+        return;
+    }
+
+    // Prepare data
+    var parameters = "msg=" + encodeURIComponent(form.msg.value.trim());
+
+    http.onreadystatechange = function () {
+        if (http.readyState == 4 &amp;&amp; http.status == 200) {
+            if (typeof http.responseText != "undefined") {
+                var result = http.responseText;
+                form.msg.value = "";
+            }
+        }
+    };
+
+    http.open("POST", form.action, true);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    http.send(parameters);
+
+    return false;
+}
+</pre>
+          <h2>Show me example</h2>
+          <p>And here is the real demo where you can play, download and study code.</p>
+          <div style="padding: 30px; 0px; text-align: center;"> 
+           <a target="_blank" style="padding: 10px 25px; background: #F1592A; color: white; text-decoration: none; font-size: 20px; border-radius: 5px 5px;" href="http://chat.howopensource.com/">Try Demo</a>&nbsp;&nbsp;&nbsp;&nbsp;
+           <a style="padding: 10px 25px; background: #F1592A; color: white; text-decoration: none; font-size: 20px; border-radius: 5px 5px;" href="http://demo.howopensource.com/sse/java_sse_chat_example.tar.gz">Download Source Code</a>
+          </div>
+          <div class="crp_related ">
+           <h3>Related Posts:</h3>
+           <ul>
+            <li><a href="https://www.howopensource.com/2015/07/unable-to-compile-class-for-jsp-the-type-java-util-mapentry-cannot-be-resolved/"><img src="data:image/gif;base64,R0lGODdhAQABAPAAAP///wAAACwAAAAAAQABAEACAkQBADs=" data-lazy-type="image" data-lazy-src="https://www.howopensource.com/wp-content/uploads/2015/07/the-type-java-util-map-entry-cannot-be-resolved-150x150.png" alt="Unable to compile class for JSP: The type java.util.Map$Entry cannot be resolved" title="Unable to compile class for JSP: The type java.util.Map$Entry cannot be resolved" width="150" height="150" class="lazy lazy-hidden crp_thumb crp_featured">
+              <noscript>
+               <img src="https://www.howopensource.com/wp-content/uploads/2015/07/the-type-java-util-map-entry-cannot-be-resolved-150x150.png" alt="Unable to compile class for JSP: The type java.util.Map$Entry cannot be resolved" title="Unable to compile class for JSP: The type java.util.Map$Entry cannot be resolved" width="150" height="150" class="crp_thumb crp_featured">
+              </noscript><span class="crp_title">Unable to compile class for JSP: The type…</span></a></li>
+            <li><a href="https://www.howopensource.com/2014/12/introduction-to-server-sent-events/"><img src="data:image/gif;base64,R0lGODdhAQABAPAAAP///wAAACwAAAAAAQABAEACAkQBADs=" data-lazy-type="image" data-lazy-src="https://www.howopensource.com/wp-content/uploads/2014/12/server-sent-events-example-150x150.png" alt="Introduction to Server-Sent Events with PHP example" title="Introduction to Server-Sent Events with PHP example" width="150" height="150" class="lazy lazy-hidden crp_thumb crp_featured">
+              <noscript>
+               <img src="https://www.howopensource.com/wp-content/uploads/2014/12/server-sent-events-example-150x150.png" alt="Introduction to Server-Sent Events with PHP example" title="Introduction to Server-Sent Events with PHP example" width="150" height="150" class="crp_thumb crp_featured">
+              </noscript><span class="crp_title">Introduction to Server-Sent Events with PHP example</span></a></li>
+            <li><a href="https://www.howopensource.com/2014/10/connect-to-linux-desktop-from-windows/"><img src="data:image/gif;base64,R0lGODdhAQABAPAAAP///wAAACwAAAAAAQABAEACAkQBADs=" data-lazy-type="image" data-lazy-src="https://www.howopensource.com/wp-content/uploads/2014/10/tight-vnc-linux-desktop-connection-150x150.png" alt="Connect to Linux Desktop from Windows" title="Connect to Linux Desktop from Windows" width="150" height="150" class="lazy lazy-hidden crp_thumb crp_featured">
+              <noscript>
+               <img src="https://www.howopensource.com/wp-content/uploads/2014/10/tight-vnc-linux-desktop-connection-150x150.png" alt="Connect to Linux Desktop from Windows" title="Connect to Linux Desktop from Windows" width="150" height="150" class="crp_thumb crp_featured">
+              </noscript><span class="crp_title">Connect to Linux Desktop from Windows</span></a></li>
+            <li><a href="https://www.howopensource.com/2015/10/raspberry-pi-how-to-start/"><img src="data:image/gif;base64,R0lGODdhAQABAPAAAP///wAAACwAAAAAAQABAEACAkQBADs=" data-lazy-type="image" data-lazy-src="https://www.howopensource.com/wp-content/uploads/2015/10/raspberry-pi-with-plastic-case-150x150.png" alt="How to Start with Raspberry PI" title="How to Start with Raspberry PI" width="150" height="150" class="lazy lazy-hidden crp_thumb crp_featured">
+              <noscript>
+               <img src="https://www.howopensource.com/wp-content/uploads/2015/10/raspberry-pi-with-plastic-case-150x150.png" alt="How to Start with Raspberry PI" title="How to Start with Raspberry PI" width="150" height="150" class="crp_thumb crp_featured">
+              </noscript><span class="crp_title">How to Start with Raspberry PI</span></a></li>
+            <li><a href="https://www.howopensource.com/2016/07/linux-priority-and-nice-command/"><img src="data:image/gif;base64,R0lGODdhAQABAPAAAP///wAAACwAAAAAAQABAEACAkQBADs=" data-lazy-type="image" data-lazy-src="https://www.howopensource.com/wp-content/uploads/2016/07/two-process-different-priority-150x150.png" alt="Linux process priority and how to change it with nice command" title="Linux process priority and how to change it with nice command" width="150" height="150" class="lazy lazy-hidden crp_thumb crp_featured">
+              <noscript>
+               <img src="https://www.howopensource.com/wp-content/uploads/2016/07/two-process-different-priority-150x150.png" alt="Linux process priority and how to change it with nice command" title="Linux process priority and how to change it with nice command" width="150" height="150" class="crp_thumb crp_featured">
+              </noscript><span class="crp_title">Linux process priority and how to change it with nice…</span></a></li>
+            <li><a href="https://www.howopensource.com/2014/12/ubuntu-restart-network/"><img src="data:image/gif;base64,R0lGODdhAQABAPAAAP///wAAACwAAAAAAQABAEACAkQBADs=" data-lazy-type="image" data-lazy-src="https://www.howopensource.com/wp-content/uploads/2014/12/ubuntu-restart-network-150x150.png" alt="How to Restart Network in Ubuntu" title="How to Restart Network in Ubuntu" width="150" height="150" class="lazy lazy-hidden crp_thumb crp_featured">
+              <noscript>
+               <img src="https://www.howopensource.com/wp-content/uploads/2014/12/ubuntu-restart-network-150x150.png" alt="How to Restart Network in Ubuntu" title="How to Restart Network in Ubuntu" width="150" height="150" class="crp_thumb crp_featured">
+              </noscript><span class="crp_title">How to Restart Network in Ubuntu</span></a></li>
+           </ul>
+           <div class="crp_clear"></div>
+          </div>
+          <p></p>
+         </div>
+         <div id="disqus_thread">
+          <div id="dsq-content">
+           <ul id="dsq-comments">
+            <li class="comment even thread-even depth-1" id="dsq-comment-23113">
+             <div id="dsq-comment-header-23113" class="dsq-comment-header"> 
+              <cite id="dsq-cite-23113"> <span id="dsq-author-user-23113">Ande</span> </cite>
+             </div>
+             <div id="dsq-comment-body-23113" class="dsq-comment-body">
+              <div id="dsq-comment-message-23113" class="dsq-comment-message">
+               <p>Hi Sir, Very good explanation.I deployed the above demo code in Tomcat 7 and it is running fine. But when i deploy the same in Web logic 11G (10.3.6.0) it is giving “java.lang.NoSuchMethodError: javax.servlet.http.HttpServletRequest.startAsync()Ljavax/servlet/AsyncContext;”. Weblogic 11G server is servlet2 container. But AsyncContext is available in Servlet3. The problem will be solved If i use Weblogic 12c But i need to make it run in weblogic 11. Any inputs on this ?</p>
+              </div>
+             </div></li>
+            <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-23275">
+             <div id="dsq-comment-header-23275" class="dsq-comment-header"> 
+              <cite id="dsq-cite-23275"> <span id="dsq-author-user-23275">Poomchai Chokpipatporn</span> </cite>
+             </div>
+             <div id="dsq-comment-body-23275" class="dsq-comment-body">
+              <div id="dsq-comment-message-23275" class="dsq-comment-message">
+               <p>Thank you for the source code , it helps me to start studying easily :).<br> I just extract and import to Eclipse then run on server (Tomcat 8.5), done <img src="https://www.howopensource.com/wp-includes/images/smilies/simple-smile.png" alt=":)" class="wp-smiley" style="height: 1em; max-height: 1em;"></p>
+              </div>
+             </div></li>
+           </ul>
+          </div>
+         </div> 
+         <script type="text/javascript">/*<![CDATA[*/var disqus_url='https://www.howopensource.com/2016/01/java-sse-chat-example/';var disqus_identifier='3128 http://www.howopensource.com/?p=3128';var disqus_container_id='disqus_thread';var disqus_shortname='howopensource';var disqus_title="Java Server Sent Events Chat Example (SSE)";var disqus_config_custom=window.disqus_config;var disqus_config=function(){this.language='';this.callbacks.onReady.push(function(){var script=document.createElement('script');script.async=true;script.src='?cf_action=sync_comments&post_id=3128';var firstScript=document.getElementsByTagName('script')[0];firstScript.parentNode.insertBefore(script,firstScript);});if(disqus_config_custom){disqus_config_custom.call(this);}};(function(){var dsq=document.createElement('script');dsq.type='text/javascript';dsq.async=true;dsq.src='//'+disqus_shortname+'.disqus.com/embed.js';(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(dsq);})();/*]]>*/</script> 
+        </article>
+       </div>
+       <div id="sidebar">
+        <div id="text-17" class="et_pb_widget widget_text">
+         <h4 class="widgettitle">Circle Us on Google+</h4>
+         <div class="textwidget">
+          <div class="g-page" data-width="250" data-href="//plus.google.com/108151203181049867089" data-showtagline="false" data-rel="publisher"></div> 
+          <script type="text/javascript">(function(){var po=document.createElement('script');po.type='text/javascript';po.async=true;po.src='https://apis.google.com/js/platform.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(po,s);})();</script>
+         </div>
+        </div>
+        <div id="text-19" class="et_pb_widget widget_text">
+         <h4 class="widgettitle">Advertisement</h4>
+         <div class="textwidget">
+          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+          <ins class="adsbygoogle" style="display:inline-block;width:300px;height:600px" data-ad-client="ca-pub-4642597296198998" data-ad-slot="4062677928"></ins> 
+          <script>(adsbygoogle=window.adsbygoogle||[]).push({});</script> 
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <footer id="main-footer">
+     <div id="et-footer-nav">
+      <div class="container">
+       <ul id="menu-bottom" class="bottom-nav">
+        <li id="menu-item-1829" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1829"><a href="https://www.howopensource.com/">Home</a></li>
+        <li id="menu-item-1828" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1828"><a href="https://www.howopensource.com/about/">About</a></li>
+        <li id="menu-item-1825" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1825"><a href="https://www.howopensource.com/privacy/">Privacy</a></li>
+        <li id="menu-item-3100" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3100"><a href="https://www.howopensource.com/cookie-policy/">Cookie Policy</a></li>
+        <li id="menu-item-1827" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1827"><a href="https://www.howopensource.com/contact/">Contact</a></li>
+       </ul>
+      </div>
+     </div>
+     <div id="footer-bottom">
+      <div class="container clearfix">
+       <p id="footer-info">Designed by <a href="http://www.elegantthemes.com" title="Premium WordPress Themes">Elegant Themes</a> | Powered by <a href="http://www.wordpress.org">WordPress</a></p>
+      </div>
+     </div> 
+    </footer>
+   </div>
+  </div>
+  <div id="cookie-law-info-bar">
+   <span>This website uses cookies to improve your experience. We'll assume you're ok with this, but you can opt-out if you wish.<a href="#" id="cookie_action_close_header" class="medium cli-plugin-button cli-plugin-main-button">OK</a> <a href="https://www.howopensource.com/cookie-policy/" id="CONSTANT_OPEN_URL" target="_blank" class="cli-plugin-main-link">Read More</a></span>
+  </div> 
+  <script type="text/javascript">jQuery(document).ready(function(){cli_show_cookiebar({settings:'{"animate_speed_hide":"500","animate_speed_show":"500","background":"#fff","border":"#444","border_on":true,"button_1_button_colour":"#000","button_1_button_hover":"#000000","button_1_link_colour":"#fff","button_1_as_button":true,"button_2_button_colour":"#333","button_2_button_hover":"#292929","button_2_link_colour":"#444","button_2_as_button":false,"font_family":"inherit","header_fix":false,"notify_animate_hide":true,"notify_animate_show":false,"notify_div_id":"#cookie-law-info-bar","notify_position_horizontal":"right","notify_position_vertical":"bottom","scroll_close":true,"scroll_close_reload":false,"showagain_tab":false,"showagain_background":"#fff","showagain_border":"#000","showagain_div_id":"#cookie-law-info-again","showagain_x_position":"100px","text":"#000","show_once_yn":true,"show_once":"10000"}'});});</script> 
+  <script type="text/javascript">/*<![CDATA[*/var disqus_shortname='howopensource';(function(){var nodes=document.getElementsByTagName('span');for(var i=0,url;i<nodes.length;i++){if(nodes[i].className.indexOf('dsq-postid')!=-1&&nodes[i].parentNode.tagName=='A'){nodes[i].parentNode.setAttribute('data-disqus-identifier',nodes[i].getAttribute('data-dsqidentifier'));url=nodes[i].parentNode.href.split('#',1);if(url.length==1){url=url[0];}
+else{url=url[1];}
+nodes[i].parentNode.href=url+'#disqus_thread';}}
+var s=document.createElement('script');s.async=true;s.type='text/javascript';s.src='//'+disqus_shortname+'.disqus.com/count.js';(document.getElementsByTagName('HEAD')[0]||document.getElementsByTagName('BODY')[0]).appendChild(s);}());/*]]>*/</script> 
+  <div style="display:none">
+   <div id="arvlbdata" style="overflow:visible;width:400px;height:250px;">
+    <div allowtransparency="true" style="overflow:hidden;width:400px;height:250px;" class="fb-page" data-href="https://www.facebook.com/100184996738614" data-width="400" data-height="250" data-small-header="false" data-adapt-container-width="false" data-hide-cover="true" data-show-facepile="true" data-show-posts="false"></div>
+   </div>
+  </div> 
+  <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create','UA-23433439-1','howopensource.com');ga('send','pageview');</script> 
+  <script type="text/javascript">var clicky_site_ids=clicky_site_ids||[];clicky_site_ids.push(15251);(function(){var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src=(document.location.protocol=='https:'?'https://pmetrics.performancing.com/js':'http://pmetrics.performancing.com/js');(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(s);})();</script> 
+  <noscript>
+   <p><img alt="Performancing Metrics" width="1" height="1" src="//pmetrics.performancing.com/15251ns.gif"></p>
+  </noscript>
+  <script type="text/javascript">var qpprFrontData={"linkData":[],"siteURL":"https:\/\/www.howopensource.com","siteURLq":"https:\/\/www.howopensource.com"};</script> 
+  <script type="text/javascript" src="https://www.howopensource.com/wp-content/cache/minify/4ee8e.js"></script> 
+  <script type="text/javascript">var et_custom={"ajaxurl":"https:\/\/www.howopensource.com\/wp-admin\/admin-ajax.php","images_uri":"https:\/\/www.howopensource.com\/wp-content\/themes\/Divi\/images","et_load_nonce":"3ba0045bd2","subscription_failed":"Please, check the fields below to make sure you entered the correct information.","fill":"Fill","field":"field","invalid":"Invalid email","captcha":"Captcha"};</script> 
+  <script type="text/javascript" src="https://www.howopensource.com/wp-content/cache/minify/06120.js"></script> 
+ </body>
+</html>

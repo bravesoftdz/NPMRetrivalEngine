@@ -1,0 +1,1241 @@
+<!doctype html>
+<html class="no-js" lang="en-US.UTF-8" xmlns:og="http://opengraphprotocol.org/schema/" xmlns:fb="http://www.facebook.com/2008/fbml">
+ <head itemscope itemtype="http://schema.org/WebSite">
+  <script src="/cdn-cgi/apps/head/hUODZCloJxwxHyvep2JpLPH-g5k.js"></script>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto+Slab:normal%7CRaleway:500%7CRaleway:700%7CRoboto+Slab:300&amp;subset=latin">
+  <meta charset="UTF-8">
+  <link rel="dns-prefetch" href="//ajax.cloudflare.com">
+  <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="//cloudflare.com">
+  <link rel="dns-prefetch" href="//ajax.googleapis.com">
+  <link rel="dns-prefetch" href="//googleapis.com">
+  <link rel="dns-prefetch" href="//google-analytics.com">
+  <link rel="dns-prefetch" href="//pagead2.googlesyndication.com">
+  <link rel="dns-prefetch" href="//googlesyndication.com">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="applicable-device" content="pc,mobile">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="profile" href="https://gmpg.org/xfn/11">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="prefetch" href="https://helloacm.com">
+  <link rel="prerender" href="https://helloacm.com">
+  <meta itemprop="name" content="Computing &amp; Technology">
+  <meta itemprop="url" content="https://helloacm.com">
+  <meta itemprop="creator accountablePerson" content="Zhihua Lai">
+  <title>Node.js Tutorial - 3 Creating a Chat Server using TCP Sockets | Computing &amp; Technology</title> 
+  <script type="text/javascript">document.documentElement.className = document.documentElement.className.replace( /\bno-js\b/,'js' );</script> 
+  <meta name="description" content="Previous tutorials on node.js could be found here:   We have learned to create a http server by using require('http') and http.createServer(...).listen(port).">
+  <meta name="keywords" content="node.js,tcp/ip,sockets,web server,http,netcat,server sockets,threads,event driven,single threaded,javascript,client/server,event-driven,implementation,programming language,script,tutorial,beginner,client-server,i/o file,internet,network,nodejs,programming languages">
+  <link rel="canonical" href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/">
+  <link rel="alternate" type="application/rss+xml" title="Computing &amp; Technology » Feed" href="https://helloacm.com/feed/">
+  <link rel="alternate" type="application/rss+xml" title="Computing &amp; Technology » Comments Feed" href="https://helloacm.com/comments/feed/">
+  <link rel="alternate" type="application/rss+xml" title="Computing &amp; Technology » Node.js Tutorial – 3 Creating a Chat Server using TCP Sockets Comments Feed" href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/feed/">
+  <meta property="fb:admins" content="zhihua.lai">
+  <meta property="og:title" content="Node.js Tutorial – 3 Creating a Chat Server using TCP Sockets">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/">
+  <meta property="og:site_name" content="Computing &amp; Technology, The Ultimate Computer Technology Blog and The Knowledgebase of Computing">
+  <meta property="og:image" content="https://helloacm.com/wp-content/uploads/2016/04/cplusplus-300x200.png">
+  <link rel="stylesheet" id="bwp-syntax-css" href="https://helloacm.com/wp-content/plugins/better-wordpress-syntax-based-on-geshi/css/bwp-syntax.css" type="text/css" media="all">
+  <link rel="stylesheet" id="bbp-default-css" href="https://helloacm.com/wp-content/plugins/bbpress/templates/default/css/bbpress.css" type="text/css" media="screen">
+  <link rel="stylesheet" id="bcct_style-css" href="https://helloacm.com/wp-content/plugins/better-click-to-tweet/assets/css/styles.css" type="text/css" media="all">
+  <link rel="stylesheet" id="parent-style-css" href="https://helloacm.com/wp-content/themes/mts_schema/style.css" type="text/css" media="all">
+  <link rel="stylesheet" id="child-style-css" href="https://helloacm.com/wp-content/themes/mts-child-theme/style.css" type="text/css" media="all">
+  <link rel="stylesheet" id="schema-stylesheet-css" href="https://helloacm.com/wp-content/themes/mts-child-theme/style.css" type="text/css" media="all">
+  <style id="schema-stylesheet-inline-css" type="text/css">body{background-color:#eee;background-image:url(https://helloacm.com/wp-content/themes/mts_schema/images/nobg.png)}.pace .pace-progress, #mobile-menu-wrapper ul li a:hover, .page-numbers.current, .pagination a:hover, .single .pagination a:hover
+.current{background:#0274BE}.postauthor h5, .single_post a, .textwidget a, .pnavigation2 a, .sidebar.c-4-12 a:hover, footer .widget li a:hover, .sidebar.c-4-12 a:hover, .reply a, .title a:hover, .post-info a:hover, .widget .thecomment, #tabber .inside li a:hover, .readMore a:hover, .fn a, a, a:hover, #secondary-navigation .navigation ul li a:hover, .readMore a, #primary-navigation a:hover, #secondary-navigation .navigation ul .current-menu-item a, .widget .wp_review_tab_widget_content a, .sidebar .wpt_widget_content
+a{color:#0274BE}a#pull, #commentform input#submit, #mtscontact_submit, .mts-subscribe input[type='submit'], .widget_product_search input[type='submit'], #move-to-top:hover, .currenttext, .pagination a:hover, .pagination .nav-previous a:hover, .pagination .nav-next a:hover, #load-posts a:hover, .single .pagination a:hover .currenttext, .single .pagination > .current .currenttext, #tabber ul.tabs li a.selected, .tagcloud a, .navigation ul .sfHover a, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button, .woocommerce .bypostauthor:after, #searchsubmit, .woocommerce nav.woocommerce-pagination ul li span.current, .woocommerce-page nav.woocommerce-pagination ul li span.current, .woocommerce #content nav.woocommerce-pagination ul li span.current, .woocommerce-page #content nav.woocommerce-pagination ul li span.current, .woocommerce nav.woocommerce-pagination ul li a:hover, .woocommerce-page nav.woocommerce-pagination ul li a:hover, .woocommerce #content nav.woocommerce-pagination ul li a:hover, .woocommerce-page #content nav.woocommerce-pagination ul li a:hover, .woocommerce nav.woocommerce-pagination ul li a:focus, .woocommerce-page nav.woocommerce-pagination ul li a:focus, .woocommerce #content nav.woocommerce-pagination ul li a:focus, .woocommerce-page #content nav.woocommerce-pagination ul li a:focus, .woocommerce a.button, .woocommerce-page a.button, .woocommerce button.button, .woocommerce-page button.button, .woocommerce input.button, .woocommerce-page input.button, .woocommerce #respond input#submit, .woocommerce-page #respond input#submit, .woocommerce #content input.button, .woocommerce-page #content input.button, .latestPost-review-wrapper, .latestPost .review-type-circle.latestPost-review-wrapper, #wpmm-megamenu .review-total-only, .sbutton, #searchsubmit, .widget .wpt_widget_content #tags-tab-content ul li a, .widget .review-total-only.large-thumb, #add_payment_method .wc-proceed-to-checkout a.checkout-button, .woocommerce-cart .wc-proceed-to-checkout a.checkout-button, .woocommerce-checkout .wc-proceed-to-checkout a.checkout-button, .woocommerce #respond input#submit.alt:hover, .woocommerce a.button.alt:hover, .woocommerce button.button.alt:hover, .woocommerce input.button.alt:hover, .woocommerce #respond input#submit.alt, .woocommerce a.button.alt, .woocommerce button.button.alt, .woocommerce input.button.alt, .woocommerce-account .woocommerce-MyAccount-navigation li.is-active{background-color:#0274BE;color:#fff!important}.related-posts .title a:hover, .latestPost .title
+a{color:#0274BE}.navigation #wpmm-megamenu .wpmm-pagination
+a{background-color:#0274BE!important}footer{background-color:#222}footer{background-image:url(https://helloacm.com/wp-content/themes/mts_schema/images/nobg.png)}.copyrights{background-color:#fff}.flex-control-thumbs .flex-active{border-top:3px solid #0274BE}.wpmm-megamenu-showing.wpmm-light-scheme{background-color:#0274BE!important}.shareit{top:282px;left:auto;margin:0
+0 0 -135px;width:90px;position:fixed;padding:5px;border:none;border-right:0}.share-item{margin:2px}</style>
+  <link rel="stylesheet" id="responsive-css" href="https://helloacm.com/wp-content/themes/mts_schema/css/responsive.css" type="text/css" media="all">
+  <link rel="stylesheet" id="magnificPopup-css" href="https://helloacm.com/wp-content/themes/mts_schema/css/magnific-popup.css" type="text/css" media="all">
+  <link rel="stylesheet" id="fontawesome-css" href="https://helloacm.com/wp-content/themes/mts_schema/css/font-awesome.min.css" type="text/css" media="all"> 
+  <script type="text/javascript" src="https://helloacm.com/wp-includes/js/jquery/jquery.js"></script> 
+  <script type="text/javascript" src="https://helloacm.com/wp-includes/js/jquery/jquery-migrate.min.js"></script> 
+  <script type="text/javascript" src="https://helloacm.com/wp-content/plugins/gd-star-rating/js/gdsr.js"></script> 
+  <script type="text/javascript" src="https://helloacm.com/wp-content/plugins/better-wordpress-syntax-based-on-geshi/js/bwp-syntax.js"></script> 
+  <script type="text/javascript">/*  */
+var mts_customscript = {"responsive":"1","nav_menu":"both"};
+/*  */</script> 
+  <script type="text/javascript" async src="https://helloacm.com/wp-content/themes/mts_schema/js/customscript.js"></script> 
+  <link rel="https://api.w.org/" href="https://helloacm.com/wp-json/">
+  <link rel="prev" title="Silent Failure of Javascript" href="https://helloacm.com/silent-failure-of-javascript/">
+  <link rel="next" title="Node.js Tutorial – 4 Reading File in node.js" href="https://helloacm.com/node-js-tutorial-4-reading-file-in-node-js/">
+  <link rel="shortlink" href="https://helloacm.com/?p=1936">
+  <link rel="alternate" type="application/json+oembed" href="https://helloacm.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fhelloacm.com%2Fnode-js-tutorial-3-creating-a-chat-server-using-tcp-sockets%2F">
+  <link rel="alternate" type="text/xml+oembed" href="https://helloacm.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fhelloacm.com%2Fnode-js-tutorial-3-creating-a-chat-server-using-tcp-sockets%2F&amp;format=xml"> 
+  <script type="text/javascript">//
+var gdsr_cnst_nonce = "eb862e76b7";
+var gdsr_cnst_ajax = "https://helloacm.com/wp-content/plugins/gd-star-rating/ajax.php";
+var gdsr_cnst_button = 1;
+var gdsr_cnst_cache = 1;
+jQuery(document).ready(function() { jQuery(".comment-reply-link").click(function() { hideshowCmmInt(); }); });
+//</script> 
+  <style type="text/css" media="screen">.starsbar.gdsr-size-12, .starsbar.gdsr-size-12 .gdheight, .starsbar.gdsr-size-12
+a{height:12px}.starsbar.gdsr-size-12
+a.s1{width:12px}.starsbar.gdsr-size-12
+a.s2{width:24px}.starsbar.gdsr-size-12
+a.s3{width:36px}.starsbar.gdsr-size-12
+a.s4{width:48px}.starsbar.gdsr-size-12
+a.s5{width:60px}.starsbar.gdsr-size-12
+a.s6{width:72px}.starsbar.gdsr-size-12
+a.s7{width:84px}.starsbar.gdsr-size-12
+a.s8{width:96px}.starsbar.gdsr-size-12
+a.s9{width:108px}.starsbar.gdsr-size-12
+a.s10{width:120px}.starsbar.gdsr-size-12
+a.s11{width:132px}.starsbar.gdsr-size-12
+a.s12{width:144px}.starsbar.gdsr-size-12
+a.s13{width:156px}.starsbar.gdsr-size-12
+a.s14{width:168px}.starsbar.gdsr-size-12
+a.s15{width:180px}.starsbar.gdsr-size-12
+a.s16{width:192px}.starsbar.gdsr-size-12
+a.s17{width:204px}.starsbar.gdsr-size-12
+a.s18{width:216px}.starsbar.gdsr-size-12
+a.s19{width:228px}.starsbar.gdsr-size-12
+a.s20{width:240px}.starsbar.gdsr-size-16, .starsbar.gdsr-size-16 .gdheight, .starsbar.gdsr-size-16
+a{height:16px}.starsbar.gdsr-size-16
+a.s1{width:16px}.starsbar.gdsr-size-16
+a.s2{width:32px}.starsbar.gdsr-size-16
+a.s3{width:48px}.starsbar.gdsr-size-16
+a.s4{width:64px}.starsbar.gdsr-size-16
+a.s5{width:80px}.starsbar.gdsr-size-16
+a.s6{width:96px}.starsbar.gdsr-size-16
+a.s7{width:112px}.starsbar.gdsr-size-16
+a.s8{width:128px}.starsbar.gdsr-size-16
+a.s9{width:144px}.starsbar.gdsr-size-16
+a.s10{width:160px}.starsbar.gdsr-size-16
+a.s11{width:176px}.starsbar.gdsr-size-16
+a.s12{width:192px}.starsbar.gdsr-size-16
+a.s13{width:208px}.starsbar.gdsr-size-16
+a.s14{width:224px}.starsbar.gdsr-size-16
+a.s15{width:240px}.starsbar.gdsr-size-16
+a.s16{width:256px}.starsbar.gdsr-size-16
+a.s17{width:272px}.starsbar.gdsr-size-16
+a.s18{width:288px}.starsbar.gdsr-size-16
+a.s19{width:304px}.starsbar.gdsr-size-16
+a.s20{width:320px}.starsbar.gdsr-size-20, .starsbar.gdsr-size-20 .gdheight, .starsbar.gdsr-size-20
+a{height:20px}.starsbar.gdsr-size-20
+a.s1{width:20px}.starsbar.gdsr-size-20
+a.s2{width:40px}.starsbar.gdsr-size-20
+a.s3{width:60px}.starsbar.gdsr-size-20
+a.s4{width:80px}.starsbar.gdsr-size-20
+a.s5{width:100px}.starsbar.gdsr-size-20
+a.s6{width:120px}.starsbar.gdsr-size-20
+a.s7{width:140px}.starsbar.gdsr-size-20
+a.s8{width:160px}.starsbar.gdsr-size-20
+a.s9{width:180px}.starsbar.gdsr-size-20
+a.s10{width:200px}.starsbar.gdsr-size-20
+a.s11{width:220px}.starsbar.gdsr-size-20
+a.s12{width:240px}.starsbar.gdsr-size-20
+a.s13{width:260px}.starsbar.gdsr-size-20
+a.s14{width:280px}.starsbar.gdsr-size-20
+a.s15{width:300px}.starsbar.gdsr-size-20
+a.s16{width:320px}.starsbar.gdsr-size-20
+a.s17{width:340px}.starsbar.gdsr-size-20
+a.s18{width:360px}.starsbar.gdsr-size-20
+a.s19{width:380px}.starsbar.gdsr-size-20
+a.s20{width:400px}.starsbar.gdsr-size-24, .starsbar.gdsr-size-24 .gdheight, .starsbar.gdsr-size-24
+a{height:24px}.starsbar.gdsr-size-24
+a.s1{width:24px}.starsbar.gdsr-size-24
+a.s2{width:48px}.starsbar.gdsr-size-24
+a.s3{width:72px}.starsbar.gdsr-size-24
+a.s4{width:96px}.starsbar.gdsr-size-24
+a.s5{width:120px}.starsbar.gdsr-size-24
+a.s6{width:144px}.starsbar.gdsr-size-24
+a.s7{width:168px}.starsbar.gdsr-size-24
+a.s8{width:192px}.starsbar.gdsr-size-24
+a.s9{width:216px}.starsbar.gdsr-size-24
+a.s10{width:240px}.starsbar.gdsr-size-24
+a.s11{width:264px}.starsbar.gdsr-size-24
+a.s12{width:288px}.starsbar.gdsr-size-24
+a.s13{width:312px}.starsbar.gdsr-size-24
+a.s14{width:336px}.starsbar.gdsr-size-24
+a.s15{width:360px}.starsbar.gdsr-size-24
+a.s16{width:384px}.starsbar.gdsr-size-24
+a.s17{width:408px}.starsbar.gdsr-size-24
+a.s18{width:432px}.starsbar.gdsr-size-24
+a.s19{width:456px}.starsbar.gdsr-size-24
+a.s20{width:480px}.starsbar.gdsr-size-30, .starsbar.gdsr-size-30 .gdheight, .starsbar.gdsr-size-30
+a{height:30px}.starsbar.gdsr-size-30
+a.s1{width:30px}.starsbar.gdsr-size-30
+a.s2{width:60px}.starsbar.gdsr-size-30
+a.s3{width:90px}.starsbar.gdsr-size-30
+a.s4{width:120px}.starsbar.gdsr-size-30
+a.s5{width:150px}.starsbar.gdsr-size-30
+a.s6{width:180px}.starsbar.gdsr-size-30
+a.s7{width:210px}.starsbar.gdsr-size-30
+a.s8{width:240px}.starsbar.gdsr-size-30
+a.s9{width:270px}.starsbar.gdsr-size-30
+a.s10{width:300px}.starsbar.gdsr-size-30
+a.s11{width:330px}.starsbar.gdsr-size-30
+a.s12{width:360px}.starsbar.gdsr-size-30
+a.s13{width:390px}.starsbar.gdsr-size-30
+a.s14{width:420px}.starsbar.gdsr-size-30
+a.s15{width:450px}.starsbar.gdsr-size-30
+a.s16{width:480px}.starsbar.gdsr-size-30
+a.s17{width:510px}.starsbar.gdsr-size-30
+a.s18{width:540px}.starsbar.gdsr-size-30
+a.s19{width:570px}.starsbar.gdsr-size-30
+a.s20{width:600px}.starsbar.gdsr-size-46, .starsbar.gdsr-size-46 .gdheight, .starsbar.gdsr-size-46
+a{height:46px}.starsbar.gdsr-size-46
+a.s1{width:46px}.starsbar.gdsr-size-46
+a.s2{width:92px}.starsbar.gdsr-size-46
+a.s3{width:138px}.starsbar.gdsr-size-46
+a.s4{width:184px}.starsbar.gdsr-size-46
+a.s5{width:230px}.starsbar.gdsr-size-46
+a.s6{width:276px}.starsbar.gdsr-size-46
+a.s7{width:322px}.starsbar.gdsr-size-46
+a.s8{width:368px}.starsbar.gdsr-size-46
+a.s9{width:414px}.starsbar.gdsr-size-46
+a.s10{width:460px}.starsbar.gdsr-size-46
+a.s11{width:506px}.starsbar.gdsr-size-46
+a.s12{width:552px}.starsbar.gdsr-size-46
+a.s13{width:598px}.starsbar.gdsr-size-46
+a.s14{width:644px}.starsbar.gdsr-size-46
+a.s15{width:690px}.starsbar.gdsr-size-46
+a.s16{width:736px}.starsbar.gdsr-size-46
+a.s17{width:782px}.starsbar.gdsr-size-46
+a.s18{width:828px}.starsbar.gdsr-size-46
+a.s19{width:874px}.starsbar.gdsr-size-46
+a.s20{width:920px}.ratepost.gdsr-size-12, .ratepost.gdsr-size-12 .starsbar
+.gdouter{width:120px}.ratepost.gdsr-size-16, .ratepost.gdsr-size-16 .starsbar
+.gdouter{width:160px}.ratepost.gdsr-size-20, .ratepost.gdsr-size-20 .starsbar
+.gdouter{width:200px}.ratepost.gdsr-size-24, .ratepost.gdsr-size-24 .starsbar
+.gdouter{width:240px}.ratepost.gdsr-size-30, .ratepost.gdsr-size-30 .starsbar
+.gdouter{width:300px}.ratepost.gdsr-size-46, .ratepost.gdsr-size-46 .starsbar
+.gdouter{width:460px}.rcmmpost.gdsr-size-12, .rcmmpost.gdsr-size-12 .starsbar
+.gdouter{width:120px}.rcmmpost.gdsr-size-16, .rcmmpost.gdsr-size-16 .starsbar
+.gdouter{width:160px}.rcmmpost.gdsr-size-20, .rcmmpost.gdsr-size-20 .starsbar
+.gdouter{width:200px}.rcmmpost.gdsr-size-24, .rcmmpost.gdsr-size-24 .starsbar
+.gdouter{width:240px}.rcmmpost.gdsr-size-30, .rcmmpost.gdsr-size-30 .starsbar
+.gdouter{width:300px}.rcmmpost.gdsr-size-46, .rcmmpost.gdsr-size-46 .starsbar
+.gdouter{width:460px}.rcmmmulti.gdsr-size-12, .rcmmmulti.gdsr-size-12 .starsbar
+.gdouter{width:240px}.rcmmmulti.gdsr-size-16, .rcmmmulti.gdsr-size-16 .starsbar
+.gdouter{width:320px}.rcmmmulti.gdsr-size-20, .rcmmmulti.gdsr-size-20 .starsbar
+.gdouter{width:400px}.rcmmmulti.gdsr-size-24, .rcmmmulti.gdsr-size-24 .starsbar
+.gdouter{width:480px}.rcmmmulti.gdsr-size-30, .rcmmmulti.gdsr-size-30 .starsbar
+.gdouter{width:600px}.rcmmmulti.gdsr-size-46, .rcmmmulti.gdsr-size-46 .starsbar
+.gdouter{width:920px}.ratecmm.gdsr-size-12, .ratecmm.gdsr-size-12 .starsbar
+.gdouter{width:0px}.ratecmm.gdsr-size-16, .ratecmm.gdsr-size-16 .starsbar
+.gdouter{width:0px}.ratecmm.gdsr-size-20, .ratecmm.gdsr-size-20 .starsbar
+.gdouter{width:0px}.ratecmm.gdsr-size-24, .ratecmm.gdsr-size-24 .starsbar
+.gdouter{width:0px}.ratecmm.gdsr-size-30, .ratecmm.gdsr-size-30 .starsbar
+.gdouter{width:0px}.ratecmm.gdsr-size-46, .ratecmm.gdsr-size-46 .starsbar
+.gdouter{width:0px}.reviewcmm.gdsr-size-12, .reviewcmm.gdsr-size-12 .starsbar
+.gdouter{width:60px}.reviewcmm.gdsr-size-16, .reviewcmm.gdsr-size-16 .starsbar
+.gdouter{width:80px}.reviewcmm.gdsr-size-20, .reviewcmm.gdsr-size-20 .starsbar
+.gdouter{width:100px}.reviewcmm.gdsr-size-24, .reviewcmm.gdsr-size-24 .starsbar
+.gdouter{width:120px}.reviewcmm.gdsr-size-30, .reviewcmm.gdsr-size-30 .starsbar
+.gdouter{width:150px}.reviewcmm.gdsr-size-46, .reviewcmm.gdsr-size-46 .starsbar
+.gdouter{width:230px}.gdsr-christmas .starsbar.gdsr-size-12
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars12.png') repeat-x 0px 0px}.gdsr-christmas .starsbar.gdsr-size-12
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars12.png') repeat-x 0px -24px}.gdsr-christmas .starsbar.gdsr-size-12
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars12.png') repeat-x 0px -12px}.gdsr-christmas .starsbar.gdsr-size-12 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars12.png') repeat-x 0px -12px !important}.gdsr-christmas .starsbar.gdsr-size-16
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars16.png') repeat-x 0px 0px}.gdsr-christmas .starsbar.gdsr-size-16
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars16.png') repeat-x 0px -32px}.gdsr-christmas .starsbar.gdsr-size-16
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars16.png') repeat-x 0px -16px}.gdsr-christmas .starsbar.gdsr-size-16 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars16.png') repeat-x 0px -16px !important}.gdsr-christmas .starsbar.gdsr-size-20
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars20.png') repeat-x 0px 0px}.gdsr-christmas .starsbar.gdsr-size-20
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars20.png') repeat-x 0px -40px}.gdsr-christmas .starsbar.gdsr-size-20
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars20.png') repeat-x 0px -20px}.gdsr-christmas .starsbar.gdsr-size-20 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars20.png') repeat-x 0px -20px !important}.gdsr-christmas .starsbar.gdsr-size-24
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars24.png') repeat-x 0px 0px}.gdsr-christmas .starsbar.gdsr-size-24
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars24.png') repeat-x 0px -48px}.gdsr-christmas .starsbar.gdsr-size-24
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars24.png') repeat-x 0px -24px}.gdsr-christmas .starsbar.gdsr-size-24 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars24.png') repeat-x 0px -24px !important}.gdsr-christmas .starsbar.gdsr-size-30
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars30.png') repeat-x 0px 0px}.gdsr-christmas .starsbar.gdsr-size-30
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars30.png') repeat-x 0px -60px}.gdsr-christmas .starsbar.gdsr-size-30
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars30.png') repeat-x 0px -30px}.gdsr-christmas .starsbar.gdsr-size-30 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars30.png') repeat-x 0px -30px !important}.gdsr-christmas .starsbar.gdsr-size-46
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars46.png') repeat-x 0px 0px}.gdsr-christmas .starsbar.gdsr-size-46
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars46.png') repeat-x 0px -92px}.gdsr-christmas .starsbar.gdsr-size-46
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars46.png') repeat-x 0px -46px}.gdsr-christmas .starsbar.gdsr-size-46 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/christmas/stars46.png') repeat-x 0px -46px !important}.gdsr-crystal .starsbar.gdsr-size-12
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars12.png') repeat-x 0px 0px}.gdsr-crystal .starsbar.gdsr-size-12
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars12.png') repeat-x 0px -24px}.gdsr-crystal .starsbar.gdsr-size-12
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars12.png') repeat-x 0px -12px}.gdsr-crystal .starsbar.gdsr-size-12 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars12.png') repeat-x 0px -12px !important}.gdsr-crystal .starsbar.gdsr-size-16
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars16.png') repeat-x 0px 0px}.gdsr-crystal .starsbar.gdsr-size-16
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars16.png') repeat-x 0px -32px}.gdsr-crystal .starsbar.gdsr-size-16
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars16.png') repeat-x 0px -16px}.gdsr-crystal .starsbar.gdsr-size-16 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars16.png') repeat-x 0px -16px !important}.gdsr-crystal .starsbar.gdsr-size-20
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars20.png') repeat-x 0px 0px}.gdsr-crystal .starsbar.gdsr-size-20
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars20.png') repeat-x 0px -40px}.gdsr-crystal .starsbar.gdsr-size-20
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars20.png') repeat-x 0px -20px}.gdsr-crystal .starsbar.gdsr-size-20 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars20.png') repeat-x 0px -20px !important}.gdsr-crystal .starsbar.gdsr-size-24
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars24.png') repeat-x 0px 0px}.gdsr-crystal .starsbar.gdsr-size-24
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars24.png') repeat-x 0px -48px}.gdsr-crystal .starsbar.gdsr-size-24
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars24.png') repeat-x 0px -24px}.gdsr-crystal .starsbar.gdsr-size-24 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars24.png') repeat-x 0px -24px !important}.gdsr-crystal .starsbar.gdsr-size-30
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars30.png') repeat-x 0px 0px}.gdsr-crystal .starsbar.gdsr-size-30
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars30.png') repeat-x 0px -60px}.gdsr-crystal .starsbar.gdsr-size-30
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars30.png') repeat-x 0px -30px}.gdsr-crystal .starsbar.gdsr-size-30 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars30.png') repeat-x 0px -30px !important}.gdsr-crystal .starsbar.gdsr-size-46
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars46.png') repeat-x 0px 0px}.gdsr-crystal .starsbar.gdsr-size-46
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars46.png') repeat-x 0px -92px}.gdsr-crystal .starsbar.gdsr-size-46
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars46.png') repeat-x 0px -46px}.gdsr-crystal .starsbar.gdsr-size-46 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/crystal/stars46.png') repeat-x 0px -46px !important}.gdsr-darkness .starsbar.gdsr-size-12
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars12.png') repeat-x 0px 0px}.gdsr-darkness .starsbar.gdsr-size-12
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars12.png') repeat-x 0px -24px}.gdsr-darkness .starsbar.gdsr-size-12
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars12.png') repeat-x 0px -12px}.gdsr-darkness .starsbar.gdsr-size-12 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars12.png') repeat-x 0px -12px !important}.gdsr-darkness .starsbar.gdsr-size-16
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars16.png') repeat-x 0px 0px}.gdsr-darkness .starsbar.gdsr-size-16
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars16.png') repeat-x 0px -32px}.gdsr-darkness .starsbar.gdsr-size-16
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars16.png') repeat-x 0px -16px}.gdsr-darkness .starsbar.gdsr-size-16 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars16.png') repeat-x 0px -16px !important}.gdsr-darkness .starsbar.gdsr-size-20
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars20.png') repeat-x 0px 0px}.gdsr-darkness .starsbar.gdsr-size-20
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars20.png') repeat-x 0px -40px}.gdsr-darkness .starsbar.gdsr-size-20
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars20.png') repeat-x 0px -20px}.gdsr-darkness .starsbar.gdsr-size-20 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars20.png') repeat-x 0px -20px !important}.gdsr-darkness .starsbar.gdsr-size-24
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars24.png') repeat-x 0px 0px}.gdsr-darkness .starsbar.gdsr-size-24
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars24.png') repeat-x 0px -48px}.gdsr-darkness .starsbar.gdsr-size-24
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars24.png') repeat-x 0px -24px}.gdsr-darkness .starsbar.gdsr-size-24 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars24.png') repeat-x 0px -24px !important}.gdsr-darkness .starsbar.gdsr-size-30
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars30.png') repeat-x 0px 0px}.gdsr-darkness .starsbar.gdsr-size-30
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars30.png') repeat-x 0px -60px}.gdsr-darkness .starsbar.gdsr-size-30
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars30.png') repeat-x 0px -30px}.gdsr-darkness .starsbar.gdsr-size-30 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars30.png') repeat-x 0px -30px !important}.gdsr-darkness .starsbar.gdsr-size-46
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars46.png') repeat-x 0px 0px}.gdsr-darkness .starsbar.gdsr-size-46
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars46.png') repeat-x 0px -92px}.gdsr-darkness .starsbar.gdsr-size-46
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars46.png') repeat-x 0px -46px}.gdsr-darkness .starsbar.gdsr-size-46 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/darkness/stars46.png') repeat-x 0px -46px !important}.gdsr-oxygen .starsbar.gdsr-size-12
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars12.png') repeat-x 0px 0px}.gdsr-oxygen .starsbar.gdsr-size-12
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars12.png') repeat-x 0px -24px}.gdsr-oxygen .starsbar.gdsr-size-12
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars12.png') repeat-x 0px -12px}.gdsr-oxygen .starsbar.gdsr-size-12 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars12.png') repeat-x 0px -12px !important}.gdsr-oxygen .starsbar.gdsr-size-16
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars16.png') repeat-x 0px 0px}.gdsr-oxygen .starsbar.gdsr-size-16
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars16.png') repeat-x 0px -32px}.gdsr-oxygen .starsbar.gdsr-size-16
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars16.png') repeat-x 0px -16px}.gdsr-oxygen .starsbar.gdsr-size-16 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars16.png') repeat-x 0px -16px !important}.gdsr-oxygen .starsbar.gdsr-size-20
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars20.png') repeat-x 0px 0px}.gdsr-oxygen .starsbar.gdsr-size-20
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars20.png') repeat-x 0px -40px}.gdsr-oxygen .starsbar.gdsr-size-20
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars20.png') repeat-x 0px -20px}.gdsr-oxygen .starsbar.gdsr-size-20 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars20.png') repeat-x 0px -20px !important}.gdsr-oxygen .starsbar.gdsr-size-24
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars24.png') repeat-x 0px 0px}.gdsr-oxygen .starsbar.gdsr-size-24
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars24.png') repeat-x 0px -48px}.gdsr-oxygen .starsbar.gdsr-size-24
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars24.png') repeat-x 0px -24px}.gdsr-oxygen .starsbar.gdsr-size-24 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars24.png') repeat-x 0px -24px !important}.gdsr-oxygen .starsbar.gdsr-size-30
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars30.png') repeat-x 0px 0px}.gdsr-oxygen .starsbar.gdsr-size-30
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars30.png') repeat-x 0px -60px}.gdsr-oxygen .starsbar.gdsr-size-30
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars30.png') repeat-x 0px -30px}.gdsr-oxygen .starsbar.gdsr-size-30 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars30.png') repeat-x 0px -30px !important}.gdsr-oxygen .starsbar.gdsr-size-46
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars46.png') repeat-x 0px 0px}.gdsr-oxygen .starsbar.gdsr-size-46
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars46.png') repeat-x 0px -92px}.gdsr-oxygen .starsbar.gdsr-size-46
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars46.png') repeat-x 0px -46px}.gdsr-oxygen .starsbar.gdsr-size-46 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen/stars46.png') repeat-x 0px -46px !important}.gdsr-oxygen_gif .starsbar.gdsr-size-12
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars12.gif') repeat-x 0px 0px}.gdsr-oxygen_gif .starsbar.gdsr-size-12
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars12.gif') repeat-x 0px -24px}.gdsr-oxygen_gif .starsbar.gdsr-size-12
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars12.gif') repeat-x 0px -12px}.gdsr-oxygen_gif .starsbar.gdsr-size-12 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars12.gif') repeat-x 0px -12px !important}.gdsr-oxygen_gif .starsbar.gdsr-size-16
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars16.gif') repeat-x 0px 0px}.gdsr-oxygen_gif .starsbar.gdsr-size-16
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars16.gif') repeat-x 0px -32px}.gdsr-oxygen_gif .starsbar.gdsr-size-16
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars16.gif') repeat-x 0px -16px}.gdsr-oxygen_gif .starsbar.gdsr-size-16 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars16.gif') repeat-x 0px -16px !important}.gdsr-oxygen_gif .starsbar.gdsr-size-20
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars20.gif') repeat-x 0px 0px}.gdsr-oxygen_gif .starsbar.gdsr-size-20
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars20.gif') repeat-x 0px -40px}.gdsr-oxygen_gif .starsbar.gdsr-size-20
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars20.gif') repeat-x 0px -20px}.gdsr-oxygen_gif .starsbar.gdsr-size-20 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars20.gif') repeat-x 0px -20px !important}.gdsr-oxygen_gif .starsbar.gdsr-size-24
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars24.gif') repeat-x 0px 0px}.gdsr-oxygen_gif .starsbar.gdsr-size-24
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars24.gif') repeat-x 0px -48px}.gdsr-oxygen_gif .starsbar.gdsr-size-24
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars24.gif') repeat-x 0px -24px}.gdsr-oxygen_gif .starsbar.gdsr-size-24 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars24.gif') repeat-x 0px -24px !important}.gdsr-oxygen_gif .starsbar.gdsr-size-30
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars30.gif') repeat-x 0px 0px}.gdsr-oxygen_gif .starsbar.gdsr-size-30
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars30.gif') repeat-x 0px -60px}.gdsr-oxygen_gif .starsbar.gdsr-size-30
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars30.gif') repeat-x 0px -30px}.gdsr-oxygen_gif .starsbar.gdsr-size-30 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars30.gif') repeat-x 0px -30px !important}.gdsr-oxygen_gif .starsbar.gdsr-size-46
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars46.gif') repeat-x 0px 0px}.gdsr-oxygen_gif .starsbar.gdsr-size-46
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars46.gif') repeat-x 0px -92px}.gdsr-oxygen_gif .starsbar.gdsr-size-46
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars46.gif') repeat-x 0px -46px}.gdsr-oxygen_gif .starsbar.gdsr-size-46 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/oxygen_gif/stars46.gif') repeat-x 0px -46px !important}.gdsr-plain .starsbar.gdsr-size-12
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars12.png') repeat-x 0px 0px}.gdsr-plain .starsbar.gdsr-size-12
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars12.png') repeat-x 0px -24px}.gdsr-plain .starsbar.gdsr-size-12
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars12.png') repeat-x 0px -12px}.gdsr-plain .starsbar.gdsr-size-12 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars12.png') repeat-x 0px -12px !important}.gdsr-plain .starsbar.gdsr-size-16
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars16.png') repeat-x 0px 0px}.gdsr-plain .starsbar.gdsr-size-16
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars16.png') repeat-x 0px -32px}.gdsr-plain .starsbar.gdsr-size-16
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars16.png') repeat-x 0px -16px}.gdsr-plain .starsbar.gdsr-size-16 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars16.png') repeat-x 0px -16px !important}.gdsr-plain .starsbar.gdsr-size-20
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars20.png') repeat-x 0px 0px}.gdsr-plain .starsbar.gdsr-size-20
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars20.png') repeat-x 0px -40px}.gdsr-plain .starsbar.gdsr-size-20
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars20.png') repeat-x 0px -20px}.gdsr-plain .starsbar.gdsr-size-20 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars20.png') repeat-x 0px -20px !important}.gdsr-plain .starsbar.gdsr-size-24
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars24.png') repeat-x 0px 0px}.gdsr-plain .starsbar.gdsr-size-24
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars24.png') repeat-x 0px -48px}.gdsr-plain .starsbar.gdsr-size-24
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars24.png') repeat-x 0px -24px}.gdsr-plain .starsbar.gdsr-size-24 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars24.png') repeat-x 0px -24px !important}.gdsr-plain .starsbar.gdsr-size-30
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars30.png') repeat-x 0px 0px}.gdsr-plain .starsbar.gdsr-size-30
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars30.png') repeat-x 0px -60px}.gdsr-plain .starsbar.gdsr-size-30
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars30.png') repeat-x 0px -30px}.gdsr-plain .starsbar.gdsr-size-30 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars30.png') repeat-x 0px -30px !important}.gdsr-plain .starsbar.gdsr-size-46
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars46.png') repeat-x 0px 0px}.gdsr-plain .starsbar.gdsr-size-46
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars46.png') repeat-x 0px -92px}.gdsr-plain .starsbar.gdsr-size-46
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars46.png') repeat-x 0px -46px}.gdsr-plain .starsbar.gdsr-size-46 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/plain/stars46.png') repeat-x 0px -46px !important}.gdsr-pumpkin .starsbar.gdsr-size-12
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars12.png') repeat-x 0px 0px}.gdsr-pumpkin .starsbar.gdsr-size-12
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars12.png') repeat-x 0px -24px}.gdsr-pumpkin .starsbar.gdsr-size-12
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars12.png') repeat-x 0px -12px}.gdsr-pumpkin .starsbar.gdsr-size-12 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars12.png') repeat-x 0px -12px !important}.gdsr-pumpkin .starsbar.gdsr-size-16
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars16.png') repeat-x 0px 0px}.gdsr-pumpkin .starsbar.gdsr-size-16
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars16.png') repeat-x 0px -32px}.gdsr-pumpkin .starsbar.gdsr-size-16
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars16.png') repeat-x 0px -16px}.gdsr-pumpkin .starsbar.gdsr-size-16 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars16.png') repeat-x 0px -16px !important}.gdsr-pumpkin .starsbar.gdsr-size-20
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars20.png') repeat-x 0px 0px}.gdsr-pumpkin .starsbar.gdsr-size-20
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars20.png') repeat-x 0px -40px}.gdsr-pumpkin .starsbar.gdsr-size-20
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars20.png') repeat-x 0px -20px}.gdsr-pumpkin .starsbar.gdsr-size-20 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars20.png') repeat-x 0px -20px !important}.gdsr-pumpkin .starsbar.gdsr-size-24
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars24.png') repeat-x 0px 0px}.gdsr-pumpkin .starsbar.gdsr-size-24
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars24.png') repeat-x 0px -48px}.gdsr-pumpkin .starsbar.gdsr-size-24
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars24.png') repeat-x 0px -24px}.gdsr-pumpkin .starsbar.gdsr-size-24 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars24.png') repeat-x 0px -24px !important}.gdsr-pumpkin .starsbar.gdsr-size-30
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars30.png') repeat-x 0px 0px}.gdsr-pumpkin .starsbar.gdsr-size-30
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars30.png') repeat-x 0px -60px}.gdsr-pumpkin .starsbar.gdsr-size-30
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars30.png') repeat-x 0px -30px}.gdsr-pumpkin .starsbar.gdsr-size-30 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars30.png') repeat-x 0px -30px !important}.gdsr-pumpkin .starsbar.gdsr-size-46
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars46.png') repeat-x 0px 0px}.gdsr-pumpkin .starsbar.gdsr-size-46
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars46.png') repeat-x 0px -92px}.gdsr-pumpkin .starsbar.gdsr-size-46
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars46.png') repeat-x 0px -46px}.gdsr-pumpkin .starsbar.gdsr-size-46 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/pumpkin/stars46.png') repeat-x 0px -46px !important}.gdsr-soft .starsbar.gdsr-size-12
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars12.png') repeat-x 0px 0px}.gdsr-soft .starsbar.gdsr-size-12
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars12.png') repeat-x 0px -24px}.gdsr-soft .starsbar.gdsr-size-12
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars12.png') repeat-x 0px -12px}.gdsr-soft .starsbar.gdsr-size-12 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars12.png') repeat-x 0px -12px !important}.gdsr-soft .starsbar.gdsr-size-16
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars16.png') repeat-x 0px 0px}.gdsr-soft .starsbar.gdsr-size-16
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars16.png') repeat-x 0px -32px}.gdsr-soft .starsbar.gdsr-size-16
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars16.png') repeat-x 0px -16px}.gdsr-soft .starsbar.gdsr-size-16 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars16.png') repeat-x 0px -16px !important}.gdsr-soft .starsbar.gdsr-size-20
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars20.png') repeat-x 0px 0px}.gdsr-soft .starsbar.gdsr-size-20
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars20.png') repeat-x 0px -40px}.gdsr-soft .starsbar.gdsr-size-20
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars20.png') repeat-x 0px -20px}.gdsr-soft .starsbar.gdsr-size-20 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars20.png') repeat-x 0px -20px !important}.gdsr-soft .starsbar.gdsr-size-24
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars24.png') repeat-x 0px 0px}.gdsr-soft .starsbar.gdsr-size-24
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars24.png') repeat-x 0px -48px}.gdsr-soft .starsbar.gdsr-size-24
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars24.png') repeat-x 0px -24px}.gdsr-soft .starsbar.gdsr-size-24 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars24.png') repeat-x 0px -24px !important}.gdsr-soft .starsbar.gdsr-size-30
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars30.png') repeat-x 0px 0px}.gdsr-soft .starsbar.gdsr-size-30
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars30.png') repeat-x 0px -60px}.gdsr-soft .starsbar.gdsr-size-30
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars30.png') repeat-x 0px -30px}.gdsr-soft .starsbar.gdsr-size-30 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars30.png') repeat-x 0px -30px !important}.gdsr-soft .starsbar.gdsr-size-46
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars46.png') repeat-x 0px 0px}.gdsr-soft .starsbar.gdsr-size-46
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars46.png') repeat-x 0px -92px}.gdsr-soft .starsbar.gdsr-size-46
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars46.png') repeat-x 0px -46px}.gdsr-soft .starsbar.gdsr-size-46 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/soft/stars46.png') repeat-x 0px -46px !important}.gdsr-starrating .starsbar.gdsr-size-12
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars12.png') repeat-x 0px 0px}.gdsr-starrating .starsbar.gdsr-size-12
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars12.png') repeat-x 0px -24px}.gdsr-starrating .starsbar.gdsr-size-12
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars12.png') repeat-x 0px -12px}.gdsr-starrating .starsbar.gdsr-size-12 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars12.png') repeat-x 0px -12px !important}.gdsr-starrating .starsbar.gdsr-size-16
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars16.png') repeat-x 0px 0px}.gdsr-starrating .starsbar.gdsr-size-16
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars16.png') repeat-x 0px -32px}.gdsr-starrating .starsbar.gdsr-size-16
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars16.png') repeat-x 0px -16px}.gdsr-starrating .starsbar.gdsr-size-16 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars16.png') repeat-x 0px -16px !important}.gdsr-starrating .starsbar.gdsr-size-20
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars20.png') repeat-x 0px 0px}.gdsr-starrating .starsbar.gdsr-size-20
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars20.png') repeat-x 0px -40px}.gdsr-starrating .starsbar.gdsr-size-20
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars20.png') repeat-x 0px -20px}.gdsr-starrating .starsbar.gdsr-size-20 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars20.png') repeat-x 0px -20px !important}.gdsr-starrating .starsbar.gdsr-size-24
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars24.png') repeat-x 0px 0px}.gdsr-starrating .starsbar.gdsr-size-24
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars24.png') repeat-x 0px -48px}.gdsr-starrating .starsbar.gdsr-size-24
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars24.png') repeat-x 0px -24px}.gdsr-starrating .starsbar.gdsr-size-24 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars24.png') repeat-x 0px -24px !important}.gdsr-starrating .starsbar.gdsr-size-30
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars30.png') repeat-x 0px 0px}.gdsr-starrating .starsbar.gdsr-size-30
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars30.png') repeat-x 0px -60px}.gdsr-starrating .starsbar.gdsr-size-30
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars30.png') repeat-x 0px -30px}.gdsr-starrating .starsbar.gdsr-size-30 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars30.png') repeat-x 0px -30px !important}.gdsr-starrating .starsbar.gdsr-size-46
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars46.png') repeat-x 0px 0px}.gdsr-starrating .starsbar.gdsr-size-46
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars46.png') repeat-x 0px -92px}.gdsr-starrating .starsbar.gdsr-size-46
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars46.png') repeat-x 0px -46px}.gdsr-starrating .starsbar.gdsr-size-46 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starrating/stars46.png') repeat-x 0px -46px !important}.gdsr-starscape .starsbar.gdsr-size-12
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars12.png') repeat-x 0px 0px}.gdsr-starscape .starsbar.gdsr-size-12
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars12.png') repeat-x 0px -24px}.gdsr-starscape .starsbar.gdsr-size-12
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars12.png') repeat-x 0px -12px}.gdsr-starscape .starsbar.gdsr-size-12 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars12.png') repeat-x 0px -12px !important}.gdsr-starscape .starsbar.gdsr-size-16
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars16.png') repeat-x 0px 0px}.gdsr-starscape .starsbar.gdsr-size-16
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars16.png') repeat-x 0px -32px}.gdsr-starscape .starsbar.gdsr-size-16
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars16.png') repeat-x 0px -16px}.gdsr-starscape .starsbar.gdsr-size-16 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars16.png') repeat-x 0px -16px !important}.gdsr-starscape .starsbar.gdsr-size-20
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars20.png') repeat-x 0px 0px}.gdsr-starscape .starsbar.gdsr-size-20
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars20.png') repeat-x 0px -40px}.gdsr-starscape .starsbar.gdsr-size-20
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars20.png') repeat-x 0px -20px}.gdsr-starscape .starsbar.gdsr-size-20 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars20.png') repeat-x 0px -20px !important}.gdsr-starscape .starsbar.gdsr-size-24
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars24.png') repeat-x 0px 0px}.gdsr-starscape .starsbar.gdsr-size-24
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars24.png') repeat-x 0px -48px}.gdsr-starscape .starsbar.gdsr-size-24
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars24.png') repeat-x 0px -24px}.gdsr-starscape .starsbar.gdsr-size-24 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars24.png') repeat-x 0px -24px !important}.gdsr-starscape .starsbar.gdsr-size-30
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars30.png') repeat-x 0px 0px}.gdsr-starscape .starsbar.gdsr-size-30
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars30.png') repeat-x 0px -60px}.gdsr-starscape .starsbar.gdsr-size-30
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars30.png') repeat-x 0px -30px}.gdsr-starscape .starsbar.gdsr-size-30 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars30.png') repeat-x 0px -30px !important}.gdsr-starscape .starsbar.gdsr-size-46
+.gdouter{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars46.png') repeat-x 0px 0px}.gdsr-starscape .starsbar.gdsr-size-46
+.gdinner{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars46.png') repeat-x 0px -92px}.gdsr-starscape .starsbar.gdsr-size-46
+.gdcurrent{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars46.png') repeat-x 0px -46px}.gdsr-starscape .starsbar.gdsr-size-46 a:hover{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/stars/starscape/stars46.png') repeat-x 0px -46px !important}.ratepost,.rcmmpost,.ratemulti,.rcmmmulti,.ratecmm,.reviewcmm{position:relative;display:block}.ratepost .starsbar .gdinner, .rcmmpost .starsbar .gdinner, .ratemulti .starsbar .gdinner, .rcmmmulti .starsbar .gdinner, .ratecmm .starsbar .gdinner, .reviewcmm .starsbar
+.gdinner{width:0}.ratepost .starsbar a:active, .rcmmpost .starsbar a:active, .ratemulti .starsbar a:active, .rcmmmulti .starsbar a:active, .ratecmm .starsbar a:active, .reviewcmm .starsbar a:active{text-decoration:none;border:0
+!important}.ratepost .starsbar a:visited, .rcmmpost .starsbar a:visited, .ratemulti .starsbar a:visited, .rcmmmulti .starsbar a:visited, .ratecmm .starsbar a:visited, .reviewcmm .starsbar a:visited{text-decoration:none;border:0
+!important}.ratepost .starsbar a:hover, .rcmmpost .starsbar a:hover, .ratemulti .starsbar a:hover, .rcmmmulti .starsbar a:hover, .ratecmm .starsbar a:hover, .reviewcmm .starsbar a:hover{text-decoration:none;border:0
+!important}.ratepost .starsbar a, .rcmmpost .starsbar a, .ratemulti .starsbar a, .rcmmmulti .starsbar a, .ratecmm .starsbar a, .reviewcmm .starsbar
+a{position:absolute;display:block;left:0;top:0;text-decoration:none;border:0
+!important;cursor:pointer;background:none !important}.gdt-size-12.gdthumbtext{line-height:12px}.gdt-size-12.gdthumb, .gdt-size-12.gdthumb a, .gdt-size-12.gdthumb
+div{width:12px;height:12px}.gdt-size-12.gdthumb.gddw a, .gdt-size-12.gdthumb.gddw
+div{background-position:0px -12px !important}.gdt-size-12.gdthumb.gdup a:hover{background-position:0px -24px}.gdt-size-12.gdthumb.gddw a:hover{background-position:0px -36px !important}.gdt-size-12.gdthumb a.gdt-classical, .gdt-size-12.gdthumb div.gdt-classical{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/classical/thumbs12.png') no-repeat}.gdt-size-12.gdthumb a.gdt-starrating, .gdt-size-12.gdthumb div.gdt-starrating{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating/thumbs12.png') no-repeat}.gdt-size-12.gdthumb a.gdt-starrating_gif, .gdt-size-12.gdthumb div.gdt-starrating_gif{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating_gif/thumbs12.gif') no-repeat}.gdt-size-16.gdthumbtext{line-height:16px}.gdt-size-16.gdthumb, .gdt-size-16.gdthumb a, .gdt-size-16.gdthumb
+div{width:16px;height:16px}.gdt-size-16.gdthumb.gddw a, .gdt-size-16.gdthumb.gddw
+div{background-position:0px -16px !important}.gdt-size-16.gdthumb.gdup a:hover{background-position:0px -32px}.gdt-size-16.gdthumb.gddw a:hover{background-position:0px -48px !important}.gdt-size-16.gdthumb a.gdt-classical, .gdt-size-16.gdthumb div.gdt-classical{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/classical/thumbs16.png') no-repeat}.gdt-size-16.gdthumb a.gdt-starrating, .gdt-size-16.gdthumb div.gdt-starrating{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating/thumbs16.png') no-repeat}.gdt-size-16.gdthumb a.gdt-starrating_gif, .gdt-size-16.gdthumb div.gdt-starrating_gif{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating_gif/thumbs16.gif') no-repeat}.gdt-size-20.gdthumbtext{line-height:20px}.gdt-size-20.gdthumb, .gdt-size-20.gdthumb a, .gdt-size-20.gdthumb
+div{width:20px;height:20px}.gdt-size-20.gdthumb.gddw a, .gdt-size-20.gdthumb.gddw
+div{background-position:0px -20px !important}.gdt-size-20.gdthumb.gdup a:hover{background-position:0px -40px}.gdt-size-20.gdthumb.gddw a:hover{background-position:0px -60px !important}.gdt-size-20.gdthumb a.gdt-classical, .gdt-size-20.gdthumb div.gdt-classical{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/classical/thumbs20.png') no-repeat}.gdt-size-20.gdthumb a.gdt-starrating, .gdt-size-20.gdthumb div.gdt-starrating{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating/thumbs20.png') no-repeat}.gdt-size-20.gdthumb a.gdt-starrating_gif, .gdt-size-20.gdthumb div.gdt-starrating_gif{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating_gif/thumbs20.gif') no-repeat}.gdt-size-24.gdthumbtext{line-height:24px}.gdt-size-24.gdthumb, .gdt-size-24.gdthumb a, .gdt-size-24.gdthumb
+div{width:24px;height:24px}.gdt-size-24.gdthumb.gddw a, .gdt-size-24.gdthumb.gddw
+div{background-position:0px -24px !important}.gdt-size-24.gdthumb.gdup a:hover{background-position:0px -48px}.gdt-size-24.gdthumb.gddw a:hover{background-position:0px -72px !important}.gdt-size-24.gdthumb a.gdt-classical, .gdt-size-24.gdthumb div.gdt-classical{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/classical/thumbs24.png') no-repeat}.gdt-size-24.gdthumb a.gdt-starrating, .gdt-size-24.gdthumb div.gdt-starrating{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating/thumbs24.png') no-repeat}.gdt-size-24.gdthumb a.gdt-starrating_gif, .gdt-size-24.gdthumb div.gdt-starrating_gif{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating_gif/thumbs24.gif') no-repeat}.gdt-size-32.gdthumbtext{line-height:32px}.gdt-size-32.gdthumb, .gdt-size-32.gdthumb a, .gdt-size-32.gdthumb
+div{width:32px;height:32px}.gdt-size-32.gdthumb.gddw a, .gdt-size-32.gdthumb.gddw
+div{background-position:0px -32px !important}.gdt-size-32.gdthumb.gdup a:hover{background-position:0px -64px}.gdt-size-32.gdthumb.gddw a:hover{background-position:0px -96px !important}.gdt-size-32.gdthumb a.gdt-classical, .gdt-size-32.gdthumb div.gdt-classical{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/classical/thumbs32.png') no-repeat}.gdt-size-32.gdthumb a.gdt-starrating, .gdt-size-32.gdthumb div.gdt-starrating{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating/thumbs32.png') no-repeat}.gdt-size-32.gdthumb a.gdt-starrating_gif, .gdt-size-32.gdthumb div.gdt-starrating_gif{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating_gif/thumbs32.gif') no-repeat}.gdt-size-40.gdthumbtext{line-height:40px}.gdt-size-40.gdthumb, .gdt-size-40.gdthumb a, .gdt-size-40.gdthumb
+div{width:40px;height:40px}.gdt-size-40.gdthumb.gddw a, .gdt-size-40.gdthumb.gddw
+div{background-position:0px -40px !important}.gdt-size-40.gdthumb.gdup a:hover{background-position:0px -80px}.gdt-size-40.gdthumb.gddw a:hover{background-position:0px -120px !important}.gdt-size-40.gdthumb a.gdt-classical, .gdt-size-40.gdthumb div.gdt-classical{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/classical/thumbs40.png') no-repeat}.gdt-size-40.gdthumb a.gdt-starrating, .gdt-size-40.gdthumb div.gdt-starrating{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating/thumbs40.png') no-repeat}.gdt-size-40.gdthumb a.gdt-starrating_gif, .gdt-size-40.gdthumb div.gdt-starrating_gif{background:url('https://helloacm.com/wp-content/plugins/gd-star-rating/thumbs/starrating_gif/thumbs40.gif') no-repeat}.gdthumb
+a{border:0
+none !important;cursor:pointer;display:block;left:0;position:absolute;text-decoration:none;top:0}.rtexthumb
+.gdthumbtext{float:none}.gdthumbtext{float:left;font-size:12px}.gdthumb{position:relative;float:left}.gdthumb.gdup
+a{background-position:0px 0px}.thumblock
+.ratingloader{float:left}.ratemulti .starsbar
+.gdcurrent{width:0;top:0;position:absolute}.starsbar
+.gdinner{padding:0}.ratingblock
+td{vertical-align:middle}.raterclear{clear:both}.raterleft{float:left}.raterright{float:right}.voted{color:#999}.inactive{color:#999}.thanks{color:#36AA3D}.static{color:#5D3126}.rater{top:0}.ratingtextmulti{float:left}.ratingbutton{float:right;padding:1px
+6px}.ratingbutton.gdinactive{border:1px
+solid #9c5f5f;background-color:#e9e4d4}.ratingbutton.gdactive{border:1px
+solid black;background-color:#f1ede5;cursor:pointer}.ratingbutton
+a{line-height:14px;text-decoration:none !important}.ratingbutton.gdactive{cursor:pointer}.ratingbutton.gdactive
+a{color:#ad1b1b;cursor:pointer}.ratingbutton.gdinactive
+a{color:gray;cursor:default}.gdmultitable{padding:3px;margin:3px;border:1px
+solid #999}.gdtblbottom
+td{padding-top:4px}.gdtblbottom{margin-top:2px;background-color:#fffcf4}.mtrow{background-color:#fffcf4}.mtrow
+td.mtstars{text-align:right}.mtrow.alternate{background-color:#f7f4ea}.gdtblmuravg{background-color:#fffcf4}.gdtblmuravg
+td{border-top:2px solid #dcdcdc;text-align:center}.gdmultitable
+td{vertical-align:middle;padding:2px
+4px;color:black}.ratingblock,.thumblock{margin-bottom:4px;margin-top:4px;font-size:12px}.ratingstarsinline{float:left}.ratingtext{padding-bottom:2px;margin-bottom:2px;margin-top:0px}.ratingmulti
+img{border:0;padding:0;margin:0}.gdouter{text-align:left}.ratingblockarticle{font-size:1em}.ratingblockcomment{font-size:0.8em}.ratingloaderarticle,.ratingloadercomment{font-size:12px;text-align:center;vertical-align:middle}.cmminthide{display:none}.loader{margin-left:auto;margin-right:auto;text-align:left}.loader.flower{background:url(https://helloacm.com/wp-content/plugins/gd-star-rating/gfx/loader/flower.gif) no-repeat left;padding-left:18px}.loader.flower.width{width:16px}.loader.width{padding-left:0px}.loader.arrows.thumb,.loader.flower.thumb,.loader.circle.thumb,.loader.broken.thumb,.loader.radar.thumb,.loader.triangles.thumb,.loader.snake.thumb,.loader.snakebig.thumb,.loader.brokenbig.thumb{background-position:center !important;padding-left:0px !important}.trw-title{text-align:center;font-size:16px;font-family:"Century Gothic",Arial,Helvetica,sans-serif}.trw-rating{font-size:44px;font-family:"Century Gothic",Arial,Helvetica,sans-serif;font-weight:bold;text-align:center}.trw-footer{text-align:center;font-size:11px;font-family:"Century Gothic",Geneva,Arial,Helvetica,sans-serif}.gdsrcacheloader{border-top:1px solid gray;border-bottom:1px solid gray;margin:3px;padding:3px}.gdsrclsmall{background:url(https://helloacm.com/wp-content/plugins/gd-star-rating/gfx/load_small.png) no-repeat left;padding-left:28px;width:120px}.gdsrclbig{background:url(https://helloacm.com/wp-content/plugins/gd-star-rating/gfx/load_big.png) no-repeat left;padding-left:46px;width:160px}.gdsrclsmall
+strong{font-size:14px}.gdsrclsmall
+em{font-size:11px}.gdsrclbig
+strong{font-size:17px}.gdsrclbig
+em{font-size:14px}</style>
+  <!--[if IE]><style type="text/css">.ratemulti .starsbar
+.gdcurrent{-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";filter:alpha(opacity=70)}</style><![endif]-->
+  <style type="text/css">#logo
+a{font-family:'Roboto Slab';font-weight:normal;font-size:32px;color:#222;text-transform:uppercase}.primary-navigation
+a{font-family:'Raleway';font-weight:500;font-size:13px;color:#777}.secondary-navigation
+a{font-family:'Raleway';font-weight:700;font-size:16px;color:#fff;text-transform:uppercase}.latestPost .title
+a{font-family:'Roboto Slab';font-weight:300;font-size:38px;color:#0274be}.single-title{font-family:'Roboto Slab';font-weight:300;font-size:38px;color:#222}body{font-family:'Raleway';font-weight:500;font-size:16px;color:#444}#sidebars .widget
+h3{font-family:'Roboto Slab';font-weight:normal;font-size:20px;color:#222;text-transform:uppercase}#sidebars
+.widget{font-family:'Raleway';font-weight:500;font-size:16px;color:#444}.footer-widgets
+h3{font-family:'Roboto Slab';font-weight:normal;font-size:18px;color:#fff;text-transform:uppercase}.f-widget a, footer .wpt_widget_content a, footer .wp_review_tab_widget_content a, footer .wpt_tab_widget_content a, footer .widget .wp_review_tab_widget_content
+a{font-family:'Raleway';font-weight:500;font-size:16px;color:#999}.footer-widgets, .f-widget .top-posts .comment_num, footer .meta, footer .twitter_time, footer .widget .wpt_widget_content .wpt-postmeta, footer .widget .wpt_comment_content, footer .widget .wpt_excerpt, footer .wp_review_tab_widget_content .wp-review-tab-postmeta, footer .advanced-recent-posts p, footer .popular-posts p, footer .category-posts
+p{font-family:'Raleway';font-weight:500;font-size:16px;color:#777}#copyright-note, #copyright-note
+a{font-family:'Raleway';font-weight:500;font-size:14px;color:#7e7d7d}h1{font-family:'Roboto Slab';font-weight:normal;font-size:28px;color:#222}h2{font-family:'Roboto Slab';font-weight:normal;font-size:24px;color:#222}h3{font-family:'Roboto Slab';font-weight:normal;font-size:22px;color:#222}h4{font-family:'Roboto Slab';font-weight:normal;font-size:20px;color:#222}h5{font-family:'Roboto Slab';font-weight:normal;font-size:18px;color:#222}h6{font-family:'Roboto Slab';font-weight:normal;font-size:16px;color:#222}</style>
+  <link rel="amphtml" href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/amp/">
+ </head>
+ <body id="blog" class="post-template-default single single-post postid-1936 single-format-standard main" itemscope itemtype="http://schema.org/WebPage">
+  <div class="main-container"> 
+   <header id="site-header" class="main-header logo_in_nav_header" role="banner" itemscope itemtype="http://schema.org/WPHeader">
+    <div id="primary-nav">
+     <div class="container">
+      <div id="primary-navigation" class="primary-navigation" role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement"> 
+       <nav class="navigation clearfix">
+        <ul id="menu-primarymenu" class="menu clearfix">
+         <li id="menu-item-4845" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-4845"><a title="How to Add Search Function to A Blog?" href="https://helloacm.com/how-to-add-search-function-to-a-blog/"><i class="fa fa-search"></i> Search</a></li>
+         <li id="menu-item-3812" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3812"><a title="Application Programming Interface" href="https://helloacm.com/list-of-apis/"><i class="fa fa-rocket"></i> API</a></li>
+         <li id="menu-item-3814" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3814"><a title="Software Engineering Jobs" href="https://helloacm.com/software-engineering-jobs-uk/"><i class="fa fa-code-fork"></i> Software Engineering Jobs</a></li>
+         <li id="menu-item-4385" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4385"><a title="Adsense Earnings Report" href="https://helloacm.com/forums/topic-tag/adsense-earning-report/">Adsense Earnings Report</a></li>
+        </ul>
+        <div class="header-social-icons"> 
+         <a href="https://helloacm.com/out/facebookpage" class="header-facebook" target="_blank"><span class="fa fa-facebook"></span></a> 
+         <a href="https://helloacm.com/out/twitter" class="header-twitter" target="_blank"><span class="fa fa-twitter"></span></a> 
+         <a href="https://helloacm.com/out/helloacm" class="header-rss" target="_blank"><span class="fa fa-rss"></span></a>
+        </div> 
+       </nav>
+      </div>
+     </div>
+    </div>
+    <div id="header">
+     <div class="container">
+      <div class="logo-wrap">
+       <h2 id="logo" class="text-logo" itemprop="headline"> <a href="https://helloacm.com">Computing &amp; Technology</a></h2>
+      </div>
+      <div id="secondary-navigation" class="secondary-navigation" role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement"> 
+       <a href="#" id="pull" class="toggle-mobile-menu">Menu</a> 
+       <nav class="navigation clearfix mobile-menu-wrapper">
+        <ul id="menu-home" class="menu clearfix">
+         <li id="menu-item-2635" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2635"><a title="Archives of Pages/Posts" href="https://helloacm.com/archives-of-pagesposts/"><i class="fa fa-archive"></i> Archive</a>
+          <ul class="sub-menu">
+           <li id="menu-item-212" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-212"><a title="About This Blog" href="https://helloacm.com/about/"><i class="fa fa-history"></i> About This Blog</a></li>
+           <li id="menu-item-2619" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2619"><a title="Source Code &amp; Binaries" href="https://helloacm.com/coding-exercise-source-codes-and-binaries/"><i class="fa fa-code"></i> Source Code &amp; Binaries</a></li>
+           <li id="menu-item-3026" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3026"><a title="Tweets History" href="https://helloacm.com/tweets-history/">Tweets History</a></li>
+           <li id="menu-item-4859" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4859"><a title="List of Comments" href="https://helloacm.com/list-of-comments/">List of Comments</a></li>
+           <li id="menu-item-4350" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4350"><a title="Is VBScript Dead?" href="https://isvbscriptdead.com"><i class="fa fa-subscript"></i> Is VBScript Dead?</a></li>
+           <li id="menu-item-2647" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2647"><a title="Domain History / Traffic / Milestones" href="https://helloacm.com/milestones/">Domains</a></li>
+           <li id="menu-item-2542" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2542"><a title="Popular Articles/Posts" href="https://helloacm.com/top/"><i class="fa fa-rocket"></i> Hot Articles</a></li>
+          </ul></li>
+         <li id="menu-item-1570" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1570"><a title="Coding for High Quality" href="https://helloacm.com/?s=coding"><i class="fa fa-bolt"></i> Coding</a>
+          <ul class="sub-menu">
+           <li id="menu-item-2274" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2274"><a title="Python" href="https://helloacm.com/category/python/">Python</a></li>
+           <li id="menu-item-2275" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2275"><a title="C/C++" href="https://helloacm.com/category/c-c/">C / C++</a></li>
+           <li id="menu-item-2277" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2277"><a title="Object Pascal &amp; Delphi" href="https://helloacm.com/category/delphi/">Delphi</a></li>
+           <li id="menu-item-2278" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2278"><a title="C Sharp (C#)" href="https://helloacm.com/category/c/">C Sharp</a></li>
+           <li id="menu-item-2280" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-2280"><a title="Javascript/JScript" href="https://helloacm.com/category/javascript/">Javascript</a></li>
+           <li id="menu-item-2281" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2281"><a title="PHP" href="https://helloacm.com/category/php/">Php</a></li>
+           <li id="menu-item-2565" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2565"><a title="MySQL database, SQL tables" href="https://helloacm.com/?s=database">Database</a></li>
+           <li id="menu-item-3046" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3046"><a href="https://helloacm.com/?s=wordpress">WordPress</a></li>
+           <li id="menu-item-4126" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4126"><a title="Machine Learning, Data Mining, Big Data" href="https://helloacm.com/?s=machine+learning">Machine Learning</a></li>
+           <li id="menu-item-2285" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-2285"><a title="Javascript Server/Node.js" href="https://helloacm.com/category/nodejs/">Node.js</a></li>
+           <li id="menu-item-2336" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2336"><a title="SQL Database" href="https://helloacm.com/?s=sql">SQL</a></li>
+           <li id="menu-item-4304" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-4304"><a title="Dynamic Programming" href="https://helloacm.com/category/dynamic-programming/">Dynamic Programming (DP)</a></li>
+          </ul></li>
+         <li id="menu-item-4609" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-4609"><a title="Linux" href="https://helloacm.com/?s=Linux"><i class="fa fa-linux"></i> Linux</a>
+          <ul class="sub-menu">
+           <li id="menu-item-4610" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4610"><a title="List of Online Tools" href="https://helloacm.com/tools/"><i class="fa fa-scissors"></i> List of Online Tools</a></li>
+           <li id="menu-item-2545" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2545"><a title="Convert VBS/JS/HTA to EXE (32 and 64 bit)" href="https://helloacm.com/script32-a-freeware-to-convert-your-vbscriptjscript-to-executables/">Script32</a></li>
+           <li id="menu-item-2488" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2488"><a title="Processing Examples" href="https://helloacm.com/processing/">Processing Examples</a></li>
+           <li id="menu-item-2465" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2465"><a title="Raspberry PI (Linux)" href="https://helloacm.com/category/raspberry-pi/">Raspberry PI</a></li>
+           <li id="menu-item-2376" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2376"><a title="Animation Programs" href="https://helloacm.com/?s=animation">Animation</a></li>
+           <li id="menu-item-2534" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-2534"><a title="List of Software (Freeware)" href="https://steakovercooked.com/Software.Home"><i class="fa fa-code"></i> List of Software (Freeware)</a></li>
+          </ul></li>
+         <li id="menu-item-4014" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-4014"><a title="List of Forums" href="https://helloacm.com/forums/"><i class="fa fa-forumbee"></i> Forum</a>
+          <ul class="sub-menu">
+           <li id="menu-item-4009" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4009"><a title="Forum – New Users / Login" href="https://helloacm.com/forum-new-users/">Forum – New Users / Login</a></li>
+           <li id="menu-item-4008" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4008"><a title="Forum – Loss Password / Login" href="https://helloacm.com/forum-loss-password/">Forum – Loss Password / Login</a></li>
+           <li id="menu-item-4012" class="menu-item menu-item-type-post_type menu-item-object-forum menu-item-4012"><a title="SEO, Wordpress, Coding for the Web" href="https://helloacm.com/forums/forum/seo-wordpress-coding-for-the-web/"><i class="fa fa-laptop"></i> SEO, WordPress, Coding for the Web</a></li>
+           <li id="menu-item-4013" class="menu-item menu-item-type-post_type menu-item-object-forum menu-item-4013"><a title="Data Structure &amp; Algorithms" href="https://helloacm.com/forums/forum/data-structure-algorithms/"><i class="fa fa-bug"></i> Data Structure &amp; Algorithms</a></li>
+           <li id="menu-item-4011" class="menu-item menu-item-type-post_type menu-item-object-forum menu-item-4011"><a title="Shell Scripting &amp; Database" href="https://helloacm.com/forums/forum/shell-scripting-database/"><i class="fa fa-database"></i> Shell Scripting &amp; Database</a></li>
+           <li id="menu-item-4080" class="menu-item menu-item-type-post_type menu-item-object-forum menu-item-4080"><a title="Programming Languages" href="https://helloacm.com/forums/forum/programming-languages/"><i class="fa fa-apple"></i> Programming Languages</a></li>
+           <li id="menu-item-4010" class="menu-item menu-item-type-post_type menu-item-object-forum menu-item-4010"><a title="How-Tos and Everything Else *" href="https://helloacm.com/forums/forum/everything-else/">How-Tos and Everything Else *</a></li>
+          </ul></li>
+         <li id="menu-item-5272" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5272"><a title="Software Engineering Jobs" href="https://helloacm.com/software-engineering-jobs-uk/"><i class="fa fa-code-fork"></i> Jobs (SE)</a></li>
+        </ul> 
+       </nav>
+      </div>
+     </div>
+    </div> 
+   </header>
+   <div id="page" class="single"> 
+    <article class="article">
+     <div id="content_box">
+      <div id="post-1936" class="g post post-1936 type-post status-publish format-standard hentry category-beginner category-client-server category-http category-io-file category-implementation category-internet category-javascript category-network category-nodejs category-programming-languages category-sockets category-tcpip tag-clientserver tag-event-driven tag-http-2 tag-implementation tag-javascript tag-netcat tag-node-js tag-programming-language tag-script tag-server-sockets tag-single-threaded tag-sockets tag-tcpip-2 tag-threads tag-tutorial tag-web-server">
+       <div class="breadcrumb" xmlns:v="http://rdf.data-vocabulary.org/#">
+        <div>
+         <i class="fa fa-home"></i>
+        </div>
+        <div typeof="v:Breadcrumb" class="root">
+         <a rel="v:url" property="v:title" href="https://helloacm.com">Home</a>
+        </div>
+        <div>
+         <i class="fa fa-caret-right"></i>
+        </div>
+        <div typeof="v:Breadcrumb">
+         <a href="https://helloacm.com/category/beginner/" rel="v:url" property="v:title">beginner</a>
+        </div>
+        <div>
+         <i class="fa fa-caret-right"></i>
+        </div>
+        <div>
+         <span>Node.js Tutorial – 3 Creating a Chat Server using TCP Sockets</span>
+        </div>
+       </div>
+       <div class="tags">
+        <span class="tagtext">Tags:</span>
+        <a href="https://helloacm.com/tag/clientserver/" rel="tag">Client/Server</a>, 
+        <a href="https://helloacm.com/tag/event-driven/" rel="tag">event-driven</a>, 
+        <a href="https://helloacm.com/tag/http-2/" rel="tag">HTTP</a>, 
+        <a href="https://helloacm.com/tag/implementation/" rel="tag">implementation</a>, 
+        <a href="https://helloacm.com/tag/javascript/" rel="tag">javascript</a>, 
+        <a href="https://helloacm.com/tag/netcat/" rel="tag">netcat</a>, 
+        <a href="https://helloacm.com/tag/node-js/" rel="tag">node.js</a>, 
+        <a href="https://helloacm.com/tag/programming-language/" rel="tag">programming language</a>, 
+        <a href="https://helloacm.com/tag/script/" rel="tag">script</a>, 
+        <a href="https://helloacm.com/tag/server-sockets/" rel="tag">server sockets</a>, 
+        <a href="https://helloacm.com/tag/single-threaded/" rel="tag">single threaded</a>, 
+        <a href="https://helloacm.com/tag/sockets/" rel="tag">sockets</a>, 
+        <a href="https://helloacm.com/tag/tcpip-2/" rel="tag">TCP/IP</a>, 
+        <a href="https://helloacm.com/tag/threads/" rel="tag">threads</a>, 
+        <a href="https://helloacm.com/tag/tutorial/" rel="tag">tutorial</a>, 
+        <a href="https://helloacm.com/tag/web-server/" rel="tag">web server</a>
+       </div>
+       <div class="single_post"> 
+        <header>
+         <h1 class="title single-title entry-title">Node.js Tutorial – 3 Creating a Chat Server using TCP Sockets</h1>
+         <div class="post-info"> 
+          <span class="thetime date updated"><i class="fa fa-calendar"></i> <span>February 9, 2013</span></span> 
+          <span class="thecomment"><i class="fa fa-comments"></i> <a href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/#comments" itemprop="interactionCount">4 Comments</a></span> 
+          <span class="thecategory"><i class="fa fa-tags"></i> <a href="https://helloacm.com/category/beginner/" title="View all posts in beginner">beginner</a>, <a href="https://helloacm.com/category/client-server/" title="View all posts in client-server">client-server</a>, <a href="https://helloacm.com/category/http/" title="View all posts in http">http</a>, <a href="https://helloacm.com/category/io-file/" title="View all posts in I/O File">I/O File</a>, <a href="https://helloacm.com/category/implementation/" title="View all posts in implementation">implementation</a>, <a href="https://helloacm.com/category/internet/" title="View all posts in internet">internet</a>, <a href="https://helloacm.com/category/javascript/" title="View all posts in javascript">javascript</a>, <a href="https://helloacm.com/category/network/" title="View all posts in network">network</a>, <a href="https://helloacm.com/category/nodejs/" title="View all posts in nodejs">nodejs</a>, <a href="https://helloacm.com/category/programming-languages/" title="View all posts in programming languages">programming languages</a>, <a href="https://helloacm.com/category/sockets/" title="View all posts in sockets">sockets</a>, <a href="https://helloacm.com/category/tcpip/" title="View all posts in tcp/ip">tcp/ip</a></span>
+         </div> 
+        </header>
+        <div class="post-single-content box mark-links entry-content">
+         <div class="thecontent">
+          <div id="fb-root"></div> 
+          <script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v2.6&appId=857807644244147";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script> 
+          <div class="fb-like" data-href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>The Permanent URL is: 
+          <a href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/">Node.js Tutorial – 3 Creating a Chat Server using TCP Sockets</a> 
+          <a href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/amp/">(<b>AMP Version</b>)</a>
+          <br>
+          <br> 
+          <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+          <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5311181282559050" data-ad-slot="6537345052" data-ad-format="auto"></ins> 
+          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+          <br>
+          <div class="wp_content">
+           <p>Previous tutorials on&nbsp;<em>node.js&nbsp;</em>could be found here: [<a title="node.js tutorial" href="https://helloacm.com/node-js-tutorial-1/">1</a>] [<a title="node.js tutorial, http server" href="https://helloacm.com/node-js-tutorial-2/">2</a>]</p>
+           <p>We have learned to create a http server by using&nbsp;<em>require(‘http’)&nbsp;</em>and&nbsp;<em>http.createServer(…).listen(port).&nbsp;</em>The&nbsp;<em>node.js&nbsp;</em>is based on Javascript and event-driven model, which means that the events happen later (asynchronous). For example,&nbsp;<em>node.js&nbsp;</em>is single threaded, non-blocking. Every statement returns and carries on to the next statement. The events are like, when data is ready, when sockets are connected. The events are specified but may occur later. &nbsp;This is highly-efficient and make&nbsp;<em>node.js&nbsp;</em>capable of handling thousands of requests at the same time without blocking.</p>
+           <p>The socket programming is usually seen in client/server&nbsp;architecture. The socket is the channel of the communication between any two programs (which can be on the same machine or distributed system). The socket contains a IP address and a port number (which should be unique, no two processes can use the same port on the same physical address space). The sockets can be written data to or read from.</p>
+           <p>In <em>node.js,&nbsp;</em>creating a server socket is easy. It needs to include the package <em>net.&nbsp;</em>The similar syntax/functions as <em>http&nbsp;</em>server are used. The following is a simple TCP server socket that implements a easy chat server. When the server is created, it listens to port&nbsp;<em>8080,</em> which can of course be specified. The clients can join the server, in this case, we use ‘<a title="netcat google search, download, utility" href="https://www.google.co.uk/search?hl=en-us&amp;tbo=d&amp;site=&amp;source=hp&amp;q=netcat+download&amp;oq=netcat+download&amp;gs_l=hp.3...487.2849.0.2953.15.15.0.0.0.0.65.560.15.15.0...0.0...1c.1.2.hp.phgGp7Bs1Gs&amp;biw=1600&amp;bih=757&amp;cad=cbv&amp;sei=gaQVUdvrK4KS0QW49IDgAQ" target="_blank"><em>netcat</em></a>‘ command line utility (you could pick&nbsp;<em>telnet</em>). When each client is connected, the server logs the message. When the client types a message (ended with ‘\n’), the message is broadcasted to all other joined-clients except itself.</p>
+           <p>A global array list&nbsp;<em>sockets&nbsp;</em>is used to keep the list of connected clients. When each client socket is&nbsp;established,&nbsp;&nbsp;the socket is simply pushed to the array. When the client is about to close (destroy, disconnected), the socket will be deleted from the list.</p>
+           <p>We use&nbsp;<em>sys&nbsp;</em>package to print the message to the console, similar to&nbsp;<em>console.log&nbsp;</em>but shorter with&nbsp;<em>sys.puts.</em></p>
+           <p>The source code written in&nbsp;<em>node.js&nbsp;</em>is given below.</p>
+           <div class="bwp-syntax-block clearfix">
+            <div class="bwp-syntax-toolbar">
+             <div class="bwp-syntax-control">
+              <a href="javascript:;" class="bwp-syntax-source-switch" title="View Source Code"></a>
+             </div>
+            </div>
+            <div class="bwp-syntax-wrapper clearfix bwp-syntax-simple">
+             <table class="java">
+              <tbody>
+               <tr class="li1">
+                <td class="ln"><pre class="de1">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+</pre></td>
+                <td class="de1"><pre class="de1"><span class="co1">// https://helloacm.com</span>
+<span class="co1">// 09-Feb-2013</span>
+&nbsp;
+var sys <span class="sy0">=</span> require<span class="br0">(</span><span class="st0">'sys'</span><span class="br0">)</span><span class="sy0">;</span>
+var net <span class="sy0">=</span> require<span class="br0">(</span><span class="st0">'net'</span><span class="br0">)</span><span class="sy0">;</span>
+var sockets <span class="sy0">=</span> <span class="br0">[</span><span class="br0">]</span><span class="sy0">;</span>
+&nbsp;
+var svr <span class="sy0">=</span> net.<span class="me1">createServer</span><span class="br0">(</span>function<span class="br0">(</span>sock<span class="br0">)</span> <span class="br0">{</span>
+&nbsp; &nbsp; sys.<span class="me1">puts</span><span class="br0">(</span><span class="st0">'Connected: '</span> <span class="sy0">+</span> sock.<span class="me1">remoteAddress</span> <span class="sy0">+</span> <span class="st0">':'</span> <span class="sy0">+</span> sock.<span class="me1">remotePort</span><span class="br0">)</span><span class="sy0">;</span> 
+&nbsp; &nbsp; sock.<span class="me1">write</span><span class="br0">(</span><span class="st0">'Hello '</span> <span class="sy0">+</span> sock.<span class="me1">remoteAddress</span> <span class="sy0">+</span> <span class="st0">':'</span> <span class="sy0">+</span> sock.<span class="me1">remotePort</span> <span class="sy0">+</span> <span class="st0">'<span class="es0">\n</span>'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp; &nbsp; sockets.<span class="me1">push</span><span class="br0">(</span>sock<span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+&nbsp; &nbsp; sock.<span class="me1">on</span><span class="br0">(</span><span class="st0">'data'</span>, function<span class="br0">(</span>data<span class="br0">)</span> <span class="br0">{</span> &nbsp;<span class="co1">// client writes message</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">(</span>data <span class="sy0">==</span> <span class="st0">'exit<span class="es0">\n</span>'</span><span class="br0">)</span> <span class="br0">{</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sys.<span class="me1">puts</span><span class="br0">(</span><span class="st0">'exit command received: '</span> <span class="sy0">+</span> sock.<span class="me1">remoteAddress</span> <span class="sy0">+</span> <span class="st0">':'</span> <span class="sy0">+</span> sock.<span class="me1">remotePort</span> <span class="sy0">+</span> <span class="st0">'<span class="es0">\n</span>'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sock.<span class="me1">destroy</span><span class="br0">(</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; var idx <span class="sy0">=</span> sockets.<span class="me1">indexOf</span><span class="br0">(</span>sock<span class="br0">)</span><span class="sy0">;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">(</span>idx <span class="sy0">!=</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">)</span> <span class="br0">{</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; delete sockets<span class="br0">[</span>idx<span class="br0">]</span><span class="sy0">;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">}</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">return</span><span class="sy0">;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">}</span>
+&nbsp; &nbsp; &nbsp; &nbsp; var len <span class="sy0">=</span> sockets.<span class="me1">length</span><span class="sy0">;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">for</span> <span class="br0">(</span>var i <span class="sy0">=</span> <span class="nu0">0</span><span class="sy0">;</span> i <span class="sy0">&lt;</span> len<span class="sy0">;</span> i <span class="sy0">++</span><span class="br0">)</span> <span class="br0">{</span> <span class="co1">// broad cast</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">(</span>sockets<span class="br0">[</span>i<span class="br0">]</span> <span class="sy0">!=</span> sock<span class="br0">)</span> <span class="br0">{</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">(</span>sockets<span class="br0">[</span>i<span class="br0">]</span><span class="br0">)</span> <span class="br0">{</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; sockets<span class="br0">[</span>i<span class="br0">]</span>.<span class="me1">write</span><span class="br0">(</span>sock.<span class="me1">remoteAddress</span> <span class="sy0">+</span> <span class="st0">':'</span> <span class="sy0">+</span> sock.<span class="me1">remotePort</span> <span class="sy0">+</span> <span class="st0">':'</span> <span class="sy0">+</span> data<span class="br0">)</span><span class="sy0">;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">}</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">}</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">}</span>
+&nbsp; &nbsp; <span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+&nbsp; &nbsp; sock.<span class="me1">on</span><span class="br0">(</span><span class="st0">'end'</span>, function<span class="br0">(</span><span class="br0">)</span> <span class="br0">{</span> <span class="co1">// client disconnects</span>
+&nbsp; &nbsp; &nbsp; &nbsp; sys.<span class="me1">puts</span><span class="br0">(</span><span class="st0">'Disconnected: '</span> <span class="sy0">+</span> data <span class="sy0">+</span> data.<span class="me1">remoteAddress</span> <span class="sy0">+</span> <span class="st0">':'</span> <span class="sy0">+</span> data.<span class="me1">remotePort</span> <span class="sy0">+</span> <span class="st0">'<span class="es0">\n</span>'</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; var idx <span class="sy0">=</span> sockets.<span class="me1">indexOf</span><span class="br0">(</span>sock<span class="br0">)</span><span class="sy0">;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="kw1">if</span> <span class="br0">(</span>idx <span class="sy0">!=</span> <span class="sy0">-</span><span class="nu0">1</span><span class="br0">)</span> <span class="br0">{</span>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; delete sockets<span class="br0">[</span>idx<span class="br0">]</span><span class="sy0">;</span>
+&nbsp; &nbsp; &nbsp; &nbsp; <span class="br0">}</span>
+&nbsp; &nbsp; <span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span>
+<span class="br0">}</span><span class="br0">)</span><span class="sy0">;</span>
+&nbsp;
+var svraddr <span class="sy0">=</span> <span class="st0">'127.0.0.1'</span><span class="sy0">;</span>
+var svrport <span class="sy0">=</span> <span class="nu0">8080</span><span class="sy0">;</span>
+&nbsp;
+svr.<span class="me1">listen</span><span class="br0">(</span>svrport, svraddr<span class="br0">)</span><span class="sy0">;</span>
+sys.<span class="me1">puts</span><span class="br0">(</span><span class="st0">'Server Created at '</span> <span class="sy0">+</span> svraddr <span class="sy0">+</span> <span class="st0">':'</span> <span class="sy0">+</span> svrport <span class="sy0">+</span> <span class="st0">'<span class="es0">\n</span>'</span><span class="br0">)</span><span class="sy0">;</span></pre></td>
+               </tr>
+              </tbody>
+             </table>
+            </div>
+            <div class="bwp-syntax-source">
+             <pre class="no-parse">// https://helloacm.com
+// 09-Feb-2013
+
+var sys = require('sys');
+var net = require('net');
+var sockets = [];
+
+var svr = net.createServer(function(sock) {
+	sys.puts('Connected: ' + sock.remoteAddress + ':' + sock.remotePort); 
+	sock.write('Hello ' + sock.remoteAddress + ':' + sock.remotePort + '\n');
+	sockets.push(sock);
+
+	sock.on('data', function(data) {  // client writes message
+		if (data == 'exit\n') {
+			sys.puts('exit command received: ' + sock.remoteAddress + ':' + sock.remotePort + '\n');
+			sock.destroy();
+			var idx = sockets.indexOf(sock);
+			if (idx != -1) {
+				delete sockets[idx];
+			}
+			return;
+		}
+		var len = sockets.length;
+		for (var i = 0; i &lt; len; i ++) { // broad cast
+			if (sockets[i] != sock) {
+				if (sockets[i]) {
+					sockets[i].write(sock.remoteAddress + ':' + sock.remotePort + ':' + data);
+				}
+			}
+		}
+	});
+
+	sock.on('end', function() { // client disconnects
+		sys.puts('Disconnected: ' + data + data.remoteAddress + ':' + data.remotePort + '\n');
+		var idx = sockets.indexOf(sock);
+		if (idx != -1) {
+			delete sockets[idx];
+		}
+	});
+});
+
+var svraddr = '127.0.0.1';
+var svrport = 8080;
+
+svr.listen(svrport, svraddr);
+sys.puts('Server Created at ' + svraddr + ':' + svrport + '\n');</pre>
+            </div>
+           </div>
+           <p>The server checks if the message from the clients are ‘exit’, if yes, the server will terminate the socket by using socket.<em>destroy()&nbsp;</em>method.</p>
+           <p>The sample usages are given below, first is the server side.</p>
+           <p><img title="node.js TCP, sockets, programming, web, chat server TCP/IP server side" alt="node.js TCP, sockets, programming, web, chat server TCP/IP server side" src="https://helloacm.com/wp-images/acm/2013/nodejs-chat1.jpg"><br> The following shows three clients joining on the same machine (handy example) but using different ports.<br> <img title="node.js TCP, sockets, programming, client, web, chat server TCP/IP server side" alt="node.js TCP, client, sockets, programming, web, chat server TCP/IP server side" src="https://helloacm.com/wp-images/acm/2013/nodejs-chat2.jpg"><br> <img title="node.js TCP, sockets, programming, client, web, chat server TCP/IP server side" alt="node.js TCP, client, sockets, programming, web, chat server TCP/IP server side" src="https://helloacm.com/wp-images/acm/2013/nodejs-chat3.jpg"><br> <img title="node.js TCP, sockets, programming, client, web, chat server TCP/IP server side" alt="node.js TCP, client, sockets, programming, web, chat server TCP/IP server side" src="https://helloacm.com/wp-images/acm/2013/nodejs-chat4.jpg"></p>
+           <p>In the future, the example will be given on creating the client socket using <em>node.js</em>, here we just simply use the third party tools, e.g. <em>netcat</em>.</p>
+           <p>–EOF (<a title="The Ultimate Computing &amp; Technology Blog" href="https://helloacm.com">The Ultimate Computing &amp; Technology Blog</a>) —</p>
+           <div class="gdsrcacheloader gdsrclsmall" id="gdsrc_asr.1936.0.2.1360373550.10.0.24.3.4.0">
+            <strong>GD Star Rating</strong>
+            <br>
+            <em>loading...</em>
+           </div>
+           <div class="fb-like" data-href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>The Permanent URL is: 
+           <a href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/">Node.js Tutorial – 3 Creating a Chat Server using TCP Sockets</a> 
+           <a href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/amp/">(<b>AMP Version</b>)</a>
+           <br>
+           <br> 
+           <font color="gray">930 words</font>
+           <br> - Support my work via Donations (Thanks):
+           <ul>
+            <li><a rel="nofollow" target="_blank" href="https://helloacm.com/out/paypal"><img src="https://helloacm.com/images/paypal.gif" alt="paypal"></a></li>
+            <li>
+             <div style="word-wrap:break-word">
+              bitcoin: 
+              <b><a href="https://helloacm.com/out/bitcoin" rel="nofollow" target="_blank">1J88t5UAgKBHhMgzkyH9bpY5mPdCYAe5XQ</a></b>
+             </div></li>
+           </ul> 
+           <b>Last Post</b>: 
+           <a title="Silent Failure of Javascript" href="https://helloacm.com/silent-failure-of-javascript/">Silent Failure of Javascript</a> 
+           <br>
+           <b>Next Post</b>: 
+           <a title="Node.js Tutorial - 4 Reading File in node.js" href="https://helloacm.com/node-js-tutorial-4-reading-file-in-node-js/">Node.js Tutorial - 4 Reading File in node.js</a> 
+           <br> 
+           <br>
+          </div>
+          <div> 
+           <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+           <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5311181282559050" data-ad-slot="2062530655" data-ad-format="autorelaxed"></ins> 
+           <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> 
+          </div>
+          <div> 
+           <script>var sharedropdown_english = true;
+var sharedropdown_rss = "/out/helloacm";</script> 
+           <div id="sharedropdown"></div>
+           <div id="sharedropdown_qr"></div>
+           <script src="https://helloacm.com/js/addthis.js" async></script> 
+          </div>
+          <div class="addthis_toolbox addthis_default_style addthis_32x32_style"> 
+           <a class="addthis_button_facebook"></a> 
+           <a class="addthis_button_twitter"></a> 
+           <a class="addthis_button_linkedin"></a> 
+           <a class="addthis_button_google_plusone_share"></a> 
+           <a class="addthis_button_reddit"></a> 
+           <a class="addthis_button_email"></a>
+          </div> 
+          <script type="text/javascript">jQuery(document).ready(function($) {
+                $.post('https://helloacm.com/wp-admin/admin-ajax.php', {action: 'mts_view_count', id: '1936'});
+            });</script>
+          <div class="crp_related ">
+           <h3>Related Posts:</h3>
+           <ul>
+            <li><a href="https://helloacm.com/model-view-controller-explained-in-c/"><span class="crp_title">Model-View-Controller Explained in C++</span></a></li>
+            <li><a href="https://helloacm.com/multi-processes-experiments-when-can-windows-utilize-all-the-cores/"><span class="crp_title">Multi-Processes Experiments – When Can Windows Utilize All the Cores?</span></a></li>
+            <li><a href="https://helloacm.com/the-machine-learning-case-study-how-to-predict-weight-over-heightgender-using-linear-regression/"><span class="crp_title">The Machine Learning Case Study – How to Predict Weight over Height/Gender using Linear Regression?</span></a></li>
+            <li><a href="https://helloacm.com/understanding-tail-recursion-visual-studio-c-assembly-view/"><span class="crp_title">Understanding Tail Recursion – Visual Studio C++ – Assembly View</span></a></li>
+            <li><a href="https://helloacm.com/integer-performance-comparisons-of-delphi-win32-win64-and-linux64-for-singlemultithreading-counting-prime-number/"><span class="crp_title">Integer Performance Comparisons of Delphi Win32, Win64 and Linux64 for Single/Multithreading Counting Prime Number</span></a></li>
+            <li><a href="https://helloacm.com/simple-parallel-for-implementation-at-delphi-2007-without-generics-and-anonymous-methods/"><span class="crp_title">Simple Parallel.For Implementation at Delphi 2007 without Generics and Anonymous Methods</span></a></li>
+           </ul>
+           <div class="crp_clear"></div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div id="comments">
+       <h4 class="total-comments">4 Comments</h4>
+       <ol class="commentlist">
+        <div class="navigation">
+         <div class="alignleft"></div>
+         <div class="alignright"></div>
+        </div>
+        <li class="comment even thread-even depth-1" id="li-comment-43249">
+         <div id="comment-43249" itemscope itemtype="http://schema.org/UserComments">
+          <div class="comment-author vcard"> 
+           <img alt="" src="https://helloacm.com/avatar/59748582ce635cd109e86c6e994c4b3c.jpg" srcset="https://secure.gravatar.com/avatar/59748582ce635cd109e86c6e994c4b3c?s=160&amp;d=blank&amp;r=g 2x" class="avatar avatar-80 photo" height="80" width="80"> 
+           <span class="fn" itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Roman</span></span> 
+           <span class="comment-meta"> </span>
+          </div>
+          <div class="commentmetadata">
+           <div class="commenttext" itemprop="commentText">
+            <p>And how can i do the same in LiveCode?</p>
+           </div>
+           <div class="reply"> 
+            <a rel="nofollow" class="comment-reply-link" href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/?replytocom=43249#respond" onclick="return addComment.moveForm( &quot;comment-43249&quot;, &quot;43249&quot;, &quot;respond&quot;, &quot;1936&quot; )" aria-label="Reply to Roman">Reply</a>
+           </div>
+          </div>
+         </div></li>
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-43125">
+         <div id="comment-43125" itemscope itemtype="http://schema.org/UserComments">
+          <div class="comment-author vcard"> 
+           <img alt="" src="https://helloacm.com/avatar/078e187e9ebb06a5943370409a29cd58.jpg" srcset="https://secure.gravatar.com/avatar/078e187e9ebb06a5943370409a29cd58?s=160&amp;d=blank&amp;r=g 2x" class="avatar avatar-80 photo" height="80" width="80"> 
+           <span class="fn" itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="http://www.deepak.com.np" rel="external nofollow" class="url">deepak koirala</a></span></span> 
+           <span class="comment-meta"> </span>
+          </div>
+          <div class="commentmetadata">
+           <div class="commenttext" itemprop="commentText">
+            <p>Perfect example. Thank you very much.</p>
+           </div>
+           <div class="reply"> 
+            <a rel="nofollow" class="comment-reply-link" href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/?replytocom=43125#respond" onclick="return addComment.moveForm( &quot;comment-43125&quot;, &quot;43125&quot;, &quot;respond&quot;, &quot;1936&quot; )" aria-label="Reply to deepak koirala">Reply</a>
+           </div>
+          </div>
+         </div></li>
+        <li class="comment even thread-even depth-1" id="li-comment-39822">
+         <div id="comment-39822" itemscope itemtype="http://schema.org/UserComments">
+          <div class="comment-author vcard"> 
+           <img alt="" src="https://helloacm.com/avatar/ac9b5a7e0e8faf0ffc9d175910bb1dc5.jpg" srcset="https://secure.gravatar.com/avatar/ac9b5a7e0e8faf0ffc9d175910bb1dc5?s=160&amp;d=blank&amp;r=g 2x" class="avatar avatar-80 photo" height="80" width="80"> 
+           <span class="fn" itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Luke</span></span> 
+           <span class="comment-meta"> </span>
+          </div>
+          <div class="commentmetadata">
+           <div class="commenttext" itemprop="commentText">
+            <p>This looks way too awesome. I just implemented this server and client in C for one of my classes and it was absolutely awful. I am just getting into socket programming and I think I may try this tutorial!</p>
+           </div>
+           <div class="reply"> 
+            <a rel="nofollow" class="comment-reply-link" href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/?replytocom=39822#respond" onclick="return addComment.moveForm( &quot;comment-39822&quot;, &quot;39822&quot;, &quot;respond&quot;, &quot;1936&quot; )" aria-label="Reply to Luke">Reply</a>
+           </div>
+          </div>
+         </div></li>
+        <li class="comment odd alt thread-odd thread-alt depth-1" id="li-comment-39694">
+         <div id="comment-39694" itemscope itemtype="http://schema.org/UserComments">
+          <div class="comment-author vcard"> 
+           <img alt="" src="https://helloacm.com/avatar/.jpg" srcset="https://secure.gravatar.com/avatar/?s=160&amp;d=blank&amp;r=g 2x" class="avatar avatar-80 photo avatar-default" height="80" width="80"> 
+           <span class="fn" itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name">CD</span></span> 
+           <span class="comment-meta"> </span>
+          </div>
+          <div class="commentmetadata">
+           <div class="commenttext" itemprop="commentText">
+            <p>Create TCP server in Nodejs</p>
+           </div>
+           <div class="reply"> 
+            <a rel="nofollow" class="comment-reply-link" href="https://helloacm.com/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/?replytocom=39694#respond" onclick="return addComment.moveForm( &quot;comment-39694&quot;, &quot;39694&quot;, &quot;respond&quot;, &quot;1936&quot; )" aria-label="Reply to CD">Reply</a>
+           </div>
+          </div>
+         </div></li>
+        <div class="navigation">
+         <div class="alignleft"></div>
+         <div class="alignright"></div>
+        </div>
+       </ol>
+      </div>
+      <div id="commentsAdd">
+       <div id="respond" class="box m-t-6">
+        <div id="respond" class="comment-respond">
+         <h3 id="reply-title" class="comment-reply-title"></h3>
+         <h4><span>Leave a Reply</span></h4> 
+         <small><a rel="nofollow" id="cancel-comment-reply-link" href="/node-js-tutorial-3-creating-a-chat-server-using-tcp-sockets/#respond" style="display:none;">Cancel reply</a></small>
+         <form action="https://helloacm.com/wp-comments-post.php" method="post" id="commentform" class="comment-form">
+          <p class="comment-form-comment"><textarea onfocus="if(!this._s==true){var _i=document.createElement('input');_i.setAttribute('type','hidden');_i.setAttribute('name','ssc_key_e13d83466f7aed44');_i.setAttribute('value','d660d141cdc6a931');var _p=this.parentNode;_p.insertBefore(_i,this);this._s=true;}" id="comment" name="comment" cols="45" rows="8" aria-required="true" placeholder="Comment Text*"></textarea></p>
+          <p class="comment-form-author"><input id="author" name="author" type="text" placeholder="Name*" value="" size="30"></p>
+          <p class="comment-form-email"><input id="email" name="email" type="text" placeholder="Email*" value="" size="30"></p>
+          <p class="comment-form-url"><input id="url" name="url" type="text" placeholder="Website" value="" size="30"></p> 
+          <input type="hidden" id="leonax-magic" name="leonax-magic" value="0"> 
+          <script type="text/javascript">jQuery(function() {
+            jQuery("#comment").on("keyup", function() {
+              jQuery("#leonax-magic").val("1548482");
+            });
+          })</script> 
+          <p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="1936" id="comment_post_ID"> <input type="hidden" name="comment_parent" id="comment_parent" value="0"></p>
+          <p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="df05254468"></p>
+          <p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="128"></p>
+          <style>.ssc_notice_e13d83466f7aed44
+strong{display:none}.ssc_notice_e13d83466f7aed44:after{content:'\2018\0064\0036\0036\0030\0064\0031\0034\0031\0063\0064\0063\0036\0061\0039\0033\0031\0065\0031\0033\0064\0038\0033\0034\0036\0036\0066\0037\0061\0065\0064\0034\0034\2019';font-weight:bold}</style>
+          <noscript>
+           <p class="ssc_notice_e13d83466f7aed44">Notice: It seems you have Javascript disabled in your Browser. In order to submit a comment to this post, please write this code along with your comment: <strong aria-hidden="true">dc0116e6941d3da6e4a644386fd7d3c1</strong></p>
+          </noscript>
+         </form>
+        </div>
+       </div>
+      </div>
+     </div> 
+    </article> 
+    <aside id="sidebar" class="sidebar c-4-12 mts-sidebar-sidebar" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
+     <div id="text-14" class="widget widget_text">
+      <div class="textwidget">
+       <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> 
+       <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-5311181282559050" data-ad-slot="3088452657" data-ad-format="auto"></ins> 
+       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+     </div>
+     <div id="text-18" class="widget widget_text">
+      <div class="textwidget">
+       <a href="/out/vultr2" rel="nofollow" target="_blank"><img src="/ads/vultr.png" alt="Vultr VPS $2.5"><br><b> <font color="red">Free $10 credit</font></b> when you sign up with Vultr Cloud VPS (4 Months Giveaway!) </a> 
+       <br> 
+       <a href="/out/linode" rel="nofollow" target="_blank"><b><font color="red"> Free $20 credit</font></b> when you sign up with Linode Cloud VPS (4 Months Giveaway!) - (Promotional Code: <b>podcastinit2017</b>) </a>
+      </div>
+     </div>
+     <div id="text-16" class="widget widget_text">
+      <h3 class="widget-title">Ads Slot</h3>
+      <div class="textwidget">
+       <style>.dingyue{background:#ffc;padding:40px
+0 0 0;text-align:center;overflow:hidden}.dingyue
+a{color:#f00!important}.dingyue:hover{background:#000;color:#fff;transition:all .25s linear;-webkit-transition:all .25s linear}</style>
+       <div class="dingyue">
+        <p style="font-size: 60px;">Your Ads</p>
+        <p style="padding-top: 10px;"><a href="/out/email" target="_blank" rel="nofollow">{ 100GBP monthly }</a></p>
+       </div>
+      </div>
+     </div>
+     <div id="mts_popular_posts_widget-2" class="widget widget_mts_popular_posts_widget horizontal-small">
+      <h3 class="widget-title">Popular Posts</h3>
+      <ul class="popular-posts">
+       <li class="post-box horizontal-small horizontal-container no-thumb">
+        <div class="horizontal-container-inner">
+         <div class="post-data">
+          <div class="post-data-container">
+           <div class="post-title"> 
+            <a href="https://helloacm.com/cc-coding-exercise-convert-a-number-to-hexadecimal/" title="C/C++ Coding Exercise – Convert a Number to Hexadecimal?">C/C++ Coding Exercise – Convert a Number to&nbsp;…</a>
+           </div>
+           <div class="post-info"> 
+            <span class="thecomment">15 <span class="comm">Comments</span></span>
+           </div>
+          </div>
+         </div>
+        </div></li>
+       <li class="post-box horizontal-small horizontal-container no-thumb">
+        <div class="horizontal-container-inner">
+         <div class="post-data">
+          <div class="post-data-container">
+           <div class="post-title"> 
+            <a href="https://helloacm.com/when-xx-evaluates-to-false-in-cc/" title="When x==x Evaluates to FALSE in C/C++?">When x==x Evaluates to FALSE in C/C++?</a>
+           </div>
+           <div class="post-info"> 
+            <span class="thecomment">9 <span class="comm">Comments</span></span>
+           </div>
+          </div>
+         </div>
+        </div></li>
+       <li class="post-box horizontal-small horizontal-container no-thumb">
+        <div class="horizontal-container-inner">
+         <div class="post-data">
+          <div class="post-data-container">
+           <div class="post-title"> 
+            <a href="https://helloacm.com/how-to-monetize-chrome-extension-by-injecting-ads-in-the-browser/" title="How to Monetize Chrome Extension by Injecting Ads in the Browser?">How to Monetize Chrome Extension by Injecting Ads&nbsp;…</a>
+           </div>
+           <div class="post-info"> 
+            <span class="thecomment">3 <span class="comm">Comments</span></span>
+           </div>
+          </div>
+         </div>
+        </div></li>
+       <li class="post-box horizontal-small horizontal-container no-thumb">
+        <div class="horizontal-container-inner">
+         <div class="post-data">
+          <div class="post-data-container">
+           <div class="post-title"> 
+            <a href="https://helloacm.com/how-to-link-static-library-in-cc-using-gcc-compiler/" title="How to Link Static Library in C/C++ using GCC compiler?">How to Link Static Library in C/C++ using&nbsp;…</a>
+           </div>
+           <div class="post-info"> 
+            <span class="thecomment">2 <span class="comm">Comments</span></span>
+           </div>
+          </div>
+         </div>
+        </div></li>
+       <li class="post-box horizontal-small horizontal-container no-thumb">
+        <div class="horizontal-container-inner">
+         <div class="post-data">
+          <div class="post-data-container">
+           <div class="post-title"> 
+            <a href="https://helloacm.com/how-to-download-tumblr-video-with-php-script-chrome-extensions-online-tool/" title="How to Download Tumblr Videos?">How to Download Tumblr Videos?</a>
+           </div>
+           <div class="post-info"> 
+            <span class="thecomment">2 <span class="comm">Comments</span></span>
+           </div>
+          </div>
+         </div>
+        </div></li>
+       <li class="post-box horizontal-small horizontal-container no-thumb">
+        <div class="horizontal-container-inner">
+         <div class="post-data">
+          <div class="post-data-container">
+           <div class="post-title"> 
+            <a href="https://helloacm.com/ppap-in-cpp-and-javascript-for-beginner/" title="PPAP in C++ and Javascript for Beginner">PPAP in C++ and Javascript for Beginner</a>
+           </div>
+           <div class="post-info"> 
+            <span class="thecomment">2 <span class="comm">Comments</span></span>
+           </div>
+          </div>
+         </div>
+        </div></li>
+      </ul>
+     </div>
+     <div id="rss-2" class="widget widget_rss">
+      <h3 class="widget-title"><a class="rsswidget" href="https://codingforspeed.com/feed/"><img class="rss-widget-icon" style="border:0" width="14" height="14" src="https://helloacm.com/wp-includes/images/rss.png" alt="RSS"></a> <a class="rsswidget" href="https://codingforspeed.com/">Coding For Speed</a></h3>
+      <ul>
+       <li><a class="rsswidget" href="https://codingforspeed.com/integer-performance-comparison-for-c-c-delphi/">Integer Performance Comparison for C++, C#, Delphi</a></li>
+       <li><a class="rsswidget" href="https://codingforspeed.com/performance-comparison-between-php7-0-11-and-php5-6-23-on-two-vps/">Performance Comparison between PHP7.0.11 and PHP5.6.23 on Two VPS</a></li>
+       <li><a class="rsswidget" href="https://codingforspeed.com/which-is-faster-vbscript-or-jscript-on-wsh-a-performance-comparison-using-sieve-of-eratosthenes/">Which is Faster? VBScript or JScript on WSH – A Performance Comparison using Sieve of Eratosthenes</a></li>
+      </ul>
+     </div>
+     <div id="text-17" class="widget widget_text">
+      <div class="textwidget">
+       This domain is hosted proudly on 
+       <a href="/out/quickhost" title="QuickHostUK VPS" target="_blank">QuickHostUK</a> &amp; 
+       <a href="/out/namesilo" target="_blank" title="Namesilo Domain Registration">Namesilo Domain</a> 
+       <a href="/out/vultr2" rel="nofollow" target="_blank"><img src="/ads/vultr.png" alt="Vultr VPS $2.5"><br><b> <font color="red">Free $10 credit</font></b> when you sign up with Vultr Cloud VPS (4 Months Giveaway!) </a> 
+       <br> 
+       <a href="/out/linode" rel="nofollow" target="_blank"><b><font color="red"> Free $20 credit</font></b> when you sign up with Linode Cloud VPS (4 Months Giveaway!) - (Promotional Code: <b>podcastinit2017</b>) </a>
+      </div>
+     </div> 
+    </aside>
+   </div> 
+   <footer id="site-footer" role="contentinfo" itemscope itemtype="http://schema.org/WPFooter">
+    <div class="footer-widgets first-footer-widgets widgets-num-3">
+     <div class="container">
+      <div class="f-widget f-widget-1">
+       <div id="bbp_forums_widget-2" class="widget widget_display_forums">
+        <h3 class="widget-title">Forums</h3>
+        <ul>
+         <li><a class="bbp-forum-title" href="https://helloacm.com/forums/forum/data-structure-algorithms/">Data Structure &amp; Algorithms</a></li>
+         <li><a class="bbp-forum-title" href="https://helloacm.com/forums/forum/everything-else/">How-Tos and Everything Else *</a></li>
+         <li><a class="bbp-forum-title" href="https://helloacm.com/forums/forum/programming-languages/">Programming Languages</a></li>
+         <li><a class="bbp-forum-title" href="https://helloacm.com/forums/forum/seo-wordpress-coding-for-the-web/">SEO, WordPress, Coding for the Web</a></li>
+         <li><a class="bbp-forum-title" href="https://helloacm.com/forums/forum/shell-scripting-database/">Shell Scripting &amp; Database</a></li>
+        </ul>
+       </div>
+       <div id="mts_widget_recent_tweets-2" class="widget widget_mts_widget_recent_tweets">
+        <h3 class="widget-title">Follow us on Twitter!</h3>
+        <div class="mts_recent_tweets tweets">
+         <ul>
+          <li><span>How to Compute the Power of Arbitrary Base without Loops in C/C++? <a href="https://t.co/gZbt6Vipsm" title="https://t.co/gZbt6Vipsm" target="_blank">https://t.co/gZbt6Vipsm</a></span><br><a class="twitter_time" target="_blank" href="https://twitter.com/doctorzlai/statuses/915170320595738624">7 hours ago</a></li>
+          <li><span>Processing Demo - Simple Dots <a href="https://t.co/bM8UTl1Jh3" title="https://t.co/bM8UTl1Jh3" target="_blank">https://t.co/bM8UTl1Jh3</a></span><br><a class="twitter_time" target="_blank" href="https://twitter.com/doctorzlai/statuses/915020834732953601">17 hours ago</a></li>
+          <li><span>Make Lots of Directories with SMD.bat using Windows Batch <a href="https://t.co/uvQHtiiZpG" title="https://t.co/uvQHtiiZpG" target="_blank">https://t.co/uvQHtiiZpG</a></span><br><a class="twitter_time" target="_blank" href="https://twitter.com/doctorzlai/statuses/914807930872098816">yesterday</a></li>
+          <li><span>Ahmdal's Law <a href="https://t.co/CxfCzsgzvb" title="https://t.co/CxfCzsgzvb" target="_blank">https://t.co/CxfCzsgzvb</a></span><br><a class="twitter_time" target="_blank" href="https://twitter.com/doctorzlai/statuses/914461146580766720">2 days ago</a></li>
+          <li><span>Mono-Develop from Linux <a href="https://t.co/fZhmFiSU7J" title="https://t.co/fZhmFiSU7J" target="_blank">https://t.co/fZhmFiSU7J</a></span><br><a class="twitter_time" target="_blank" href="https://twitter.com/doctorzlai/statuses/914445541500686337">2 days ago</a></li>
+         </ul>
+        </div>
+       </div>
+      </div>
+      <div class="f-widget f-widget-2">
+       <div id="bbp_topics_widget-2" class="widget widget_display_topics">
+        <h3 class="widget-title">Recent Topics</h3>
+        <ul>
+         <li> <a class="bbp-forum-title" href="https://helloacm.com/forums/topic/adsense-earning-report-nov2016/">Adsense Earning Report Nov/2016</a></li>
+         <li> <a class="bbp-forum-title" href="https://helloacm.com/forums/topic/adsense-earning-report-october2016/">Adsense Earning Report October/2016</a></li>
+         <li> <a class="bbp-forum-title" href="https://helloacm.com/forums/topic/adsense-earning-report-sept2016/">Adsense Earning Report Sept/2016</a></li>
+         <li> <a class="bbp-forum-title" href="https://helloacm.com/forums/topic/adsense-earning-report-aug2016/">Adsense Earning Report Aug/2016</a></li>
+         <li> <a class="bbp-forum-title" href="https://helloacm.com/forums/topic/adsense-earning-report-july2016/">Adsense Earning Report July/2016</a></li>
+         <li> <a class="bbp-forum-title" href="https://helloacm.com/forums/topic/adsense-earning-report-june2016/">Adsense Earning Report June/2016</a></li>
+        </ul>
+       </div>
+       <div id="facebook-like-widget-2" class="widget facebook_like">
+        <h3 class="widget-title">Find us on Facebook</h3>
+        <div class="fb-page" data-href="https://www.facebook.com/ACMer2013/" data-width="292" data-hide-cover="false" data-show-facepile="true" data-show-posts="false"></div>
+       </div>
+      </div>
+      <div class="f-widget last f-widget-3">
+       <div id="tag_cloud-2" class="widget widget_tag_cloud">
+        <h3 class="widget-title">Tag Cloud</h3>
+        <div class="tagcloud">
+         <a href="https://helloacm.com/tag/8-bit/" class="tag-cloud-link tag-link-2513 tag-link-position-1" style="font-size: 8pt;" aria-label="8 bit (21 items)">8 bit</a> 
+         <a href="https://helloacm.com/tag/6502/" class="tag-cloud-link tag-link-2508 tag-link-position-2" style="font-size: 8.2276422764228pt;" aria-label="6502 (22 items)">6502</a> 
+         <a href="https://helloacm.com/tag/acm/" class="tag-cloud-link tag-link-21 tag-link-position-3" style="font-size: 18.016260162602pt;" aria-label="acm (165 items)">acm</a> 
+         <a href="https://helloacm.com/tag/algorithm/" class="tag-cloud-link tag-link-24 tag-link-position-4" style="font-size: 19.268292682927pt;" aria-label="algorithm (215 items)">algorithm</a> 
+         <a href="https://helloacm.com/tag/batch/" class="tag-cloud-link tag-link-34 tag-link-position-5" style="font-size: 9.2520325203252pt;" aria-label="batch (27 items)">batch</a> 
+         <a href="https://helloacm.com/tag/bruteforce/" class="tag-cloud-link tag-link-181 tag-link-position-6" style="font-size: 10.048780487805pt;" aria-label="bruteforce (32 items)">bruteforce</a> 
+         <a href="https://helloacm.com/tag/c-2/" class="tag-cloud-link tag-link-72 tag-link-position-7" style="font-size: 10.276422764228pt;" aria-label="C# (34 items)">C#</a> 
+         <a href="https://helloacm.com/tag/c-coding-exercise/" class="tag-cloud-link tag-link-1067 tag-link-position-8" style="font-size: 14.60162601626pt;" aria-label="C++ coding exercise (83 items)">C++ coding exercise</a> 
+         <a href="https://helloacm.com/tag/cc/" class="tag-cloud-link tag-link-239 tag-link-position-9" style="font-size: 14.60162601626pt;" aria-label="C/C++ (82 items)">C/C++</a> 
+         <a href="https://helloacm.com/tag/code/" class="tag-cloud-link tag-link-2494 tag-link-position-10" style="font-size: 13.80487804878pt;" aria-label="code (70 items)">code</a> 
+         <a href="https://helloacm.com/tag/code-library/" class="tag-cloud-link tag-link-2502 tag-link-position-11" style="font-size: 8.2276422764228pt;" aria-label="code library (22 items)">code library</a> 
+         <a href="https://helloacm.com/tag/coding/" class="tag-cloud-link tag-link-289 tag-link-position-12" style="font-size: 8.2276422764228pt;" aria-label="coding (22 items)">coding</a> 
+         <a href="https://helloacm.com/tag/coding-exercise/" class="tag-cloud-link tag-link-409 tag-link-position-13" style="font-size: 14.487804878049pt;" aria-label="coding exercise (81 items)">coding exercise</a> 
+         <a href="https://helloacm.com/tag/compiler/" class="tag-cloud-link tag-link-2470 tag-link-position-14" style="font-size: 9.3658536585366pt;" aria-label="compiler (28 items)">compiler</a> 
+         <a href="https://helloacm.com/tag/data-structure/" class="tag-cloud-link tag-link-2443 tag-link-position-15" style="font-size: 10.617886178862pt;" aria-label="data structure (36 items)">data structure</a> 
+         <a href="https://helloacm.com/tag/delphi/" class="tag-cloud-link tag-link-2450 tag-link-position-16" style="font-size: 10.50406504065pt;" aria-label="delphi (35 items)">delphi</a> 
+         <a href="https://helloacm.com/tag/dynamic-programming/" class="tag-cloud-link tag-link-2483 tag-link-position-17" style="font-size: 8.6829268292683pt;" aria-label="dynamic programming (24 items)">dynamic programming</a> 
+         <a href="https://helloacm.com/tag/hardware/" class="tag-cloud-link tag-link-2511 tag-link-position-18" style="font-size: 10.959349593496pt;" aria-label="hardware (39 items)">hardware</a> 
+         <a href="https://helloacm.com/tag/html/" class="tag-cloud-link tag-link-113 tag-link-position-19" style="font-size: 9.9349593495935pt;" aria-label="HTML (31 items)">HTML</a> 
+         <a href="https://helloacm.com/tag/implementation/" class="tag-cloud-link tag-link-2440 tag-link-position-20" style="font-size: 22pt;" aria-label="implementation (370 items)">implementation</a> 
+         <a href="https://helloacm.com/tag/javascript/" class="tag-cloud-link tag-link-2454 tag-link-position-21" style="font-size: 11.642276422764pt;" aria-label="javascript (45 items)">javascript</a> 
+         <a href="https://helloacm.com/tag/jscript/" class="tag-cloud-link tag-link-70 tag-link-position-22" style="font-size: 9.7073170731707pt;" aria-label="jscript (30 items)">jscript</a> 
+         <a href="https://helloacm.com/tag/leetcode/" class="tag-cloud-link tag-link-597 tag-link-position-23" style="font-size: 12.780487804878pt;" aria-label="leetcode (57 items)">leetcode</a> 
+         <a href="https://helloacm.com/tag/leetcode-online-judge/" class="tag-cloud-link tag-link-2516 tag-link-position-24" style="font-size: 9.3658536585366pt;" aria-label="leetcode online judge (28 items)">leetcode online judge</a> 
+         <a href="https://helloacm.com/tag/linux/" class="tag-cloud-link tag-link-2459 tag-link-position-25" style="font-size: 9.5934959349593pt;" aria-label="linux (29 items)">linux</a> 
+         <a href="https://helloacm.com/tag/math/" class="tag-cloud-link tag-link-2438 tag-link-position-26" style="font-size: 18.243902439024pt;" aria-label="math (171 items)">math</a> 
+         <a href="https://helloacm.com/tag/number-theory/" class="tag-cloud-link tag-link-62 tag-link-position-27" style="font-size: 10.162601626016pt;" aria-label="number theory (33 items)">number theory</a> 
+         <a href="https://helloacm.com/tag/object-pascal/" class="tag-cloud-link tag-link-2451 tag-link-position-28" style="font-size: 8.4552845528455pt;" aria-label="object pascal (23 items)">object pascal</a> 
+         <a href="https://helloacm.com/tag/online-judge/" class="tag-cloud-link tag-link-241 tag-link-position-29" style="font-size: 10.50406504065pt;" aria-label="online judge (35 items)">online judge</a> 
+         <a href="https://helloacm.com/tag/online-judges/" class="tag-cloud-link tag-link-22 tag-link-position-30" style="font-size: 11.642276422764pt;" aria-label="online judges (45 items)">online judges</a> 
+         <a href="https://helloacm.com/tag/performance-comparison/" class="tag-cloud-link tag-link-40 tag-link-position-31" style="font-size: 9.7073170731707pt;" aria-label="performance comparison (30 items)">performance comparison</a> 
+         <a href="https://helloacm.com/tag/php/" class="tag-cloud-link tag-link-2439 tag-link-position-32" style="font-size: 13.121951219512pt;" aria-label="php (61 items)">php</a> 
+         <a href="https://helloacm.com/tag/programming/" class="tag-cloud-link tag-link-207 tag-link-position-33" style="font-size: 14.715447154472pt;" aria-label="programming (85 items)">programming</a> 
+         <a href="https://helloacm.com/tag/programming-language/" class="tag-cloud-link tag-link-20 tag-link-position-34" style="font-size: 22pt;" aria-label="programming language (373 items)">programming language</a> 
+         <a href="https://helloacm.com/tag/python/" class="tag-cloud-link tag-link-2437 tag-link-position-35" style="font-size: 16.764227642276pt;" aria-label="python (127 items)">python</a> 
+         <a href="https://helloacm.com/tag/recursion/" class="tag-cloud-link tag-link-169 tag-link-position-36" style="font-size: 9.0243902439024pt;" aria-label="recursion (26 items)">recursion</a> 
+         <a href="https://helloacm.com/tag/script/" class="tag-cloud-link tag-link-31 tag-link-position-37" style="font-size: 14.829268292683pt;" aria-label="script (86 items)">script</a> 
+         <a href="https://helloacm.com/tag/shell/" class="tag-cloud-link tag-link-30 tag-link-position-38" style="font-size: 11.414634146341pt;" aria-label="shell (43 items)">shell</a> 
+         <a href="https://helloacm.com/tag/string-algorithm/" class="tag-cloud-link tag-link-125 tag-link-position-39" style="font-size: 9.9349593495935pt;" aria-label="string algorithm (31 items)">string algorithm</a> 
+         <a href="https://helloacm.com/tag/tutorial/" class="tag-cloud-link tag-link-25 tag-link-position-40" style="font-size: 22pt;" aria-label="tutorial (371 items)">tutorial</a> 
+         <a href="https://helloacm.com/tag/vbscript/" class="tag-cloud-link tag-link-2455 tag-link-position-41" style="font-size: 11.756097560976pt;" aria-label="vbscript (46 items)">vbscript</a> 
+         <a href="https://helloacm.com/tag/vps/" class="tag-cloud-link tag-link-734 tag-link-position-42" style="font-size: 8.4552845528455pt;" aria-label="vps (23 items)">vps</a> 
+         <a href="https://helloacm.com/tag/website/" class="tag-cloud-link tag-link-114 tag-link-position-43" style="font-size: 12.894308943089pt;" aria-label="website (58 items)">website</a> 
+         <a href="https://helloacm.com/tag/wordpress/" class="tag-cloud-link tag-link-2514 tag-link-position-44" style="font-size: 9.5934959349593pt;" aria-label="wordpress (29 items)">wordpress</a> 
+         <a href="https://helloacm.com/tag/wsh/" class="tag-cloud-link tag-link-219 tag-link-position-45" style="font-size: 9.0243902439024pt;" aria-label="wsh (26 items)">wsh</a>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="copyrights">
+     <div class="container">
+      <div class="row" id="copyright-note"> 
+       <span><a href=" https://helloacm.com/" title=" The Ultimate Computer Technology Blog - The Knowledgebase of Computing">Computing &amp; Technology</a> Copyright © 2017.</span>
+       <div class="to-top">
+        This Wordpress Theme is 
+        <b><a target="_blank" rel="nofollow" href="/out/theme"><u><i>Schema</i></u></a></b>
+        <br>
+        <a target="_blank" title="Donate me thanks" href="/out/paypal" rel="nofollow"><b><u>Donate me</u></b></a> and I'll send you the schema theme 
+        <br>so it is a lot cheaper for you - win win situation!&nbsp;
+       </div>
+      </div>All rights Reserved © 2014~ 2017 | Uptime 
+      <b>1967</b> Days, 
+      <a href="https://helloacm.com/archives-of-pagesposts/" title="Index of Posts and Pages"><b>1218</b> Posts and <b>12</b> Pages</a>, 
+      <b>496</b> comments 
+      <br> Highly Recommended: 
+      <a rel="nofollow" href="/out/tcb" target="_blank">TopCashBack UK</a> | 
+      <a rel="nofollow" href="/out/quidco" target="_blank">Quidco CashBack UK</a> | 
+      <a href="/out/vultr2" rel="nofollow" target="_blank"><b>$2.5 Vultr Cloud VPS</b></a> | 
+      <a rel="nofollow" href="/out/linode" target="_blank"><b>$5 Linode Cloud VPS</b></a> | 
+      <a href="/out/plusnet" rel="nofollow" target="_blank">PlusNet Fibre</a> | 
+      <a href="/out/quickhost" rel="nofollow" target="_blank">QuickHostUK</a> | 
+      <a href="/out/namesilo" rel="nofollow" target="_blank">Namesilo Domain</a> | 
+      <a href="https://justyy.com/watch-tv-online/en/" target="_blank">Watch TV Online (Video Streaming)</a> | 
+      <a target="_blank" href="https://weibomiaopai.com/download-video-parser.php">Weibo &amp; Miaopai Video Parser</a>
+      <br> Follow me: 
+      <a target="_blank" href="/out/googleplus" rel="nofollow">Google+</a> | 
+      <a target="_blank" href="/out/facebook" rel="nofollow">Facebook</a> | 
+      <a target="_blank" href="/out/twitter" rel="nofollow">Twitter</a> | 
+      <a target="_blank" href="https://github.com/DoctorLai/MyLinks/blob/master/README.md">Sites @ Github</a>
+     </div>
+    </div> 
+   </footer>
+  </div> 
+  <script type="text/javascript" src="https://helloacm.com/wp-content/plugins/bbpress/templates/default/js/editor.js"></script> 
+  <script type="text/javascript" src="https://helloacm.com/wp-includes/js/comment-reply.min.js"></script> 
+  <script type="text/javascript" async src="https://helloacm.com/wp-content/themes/mts_schema/js/jquery.magnific-popup.min.js"></script> 
+  <script type="text/javascript" src="https://helloacm.com/wp-includes/js/wp-embed.min.js"></script> 
+  <script type="text/javascript" src="https://helloacm.com/wp-content/plugins/akismet/_inc/form.js"></script> 
+  <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5467b12e6a3d6a76" async></script>  
+ </body>
+</html>

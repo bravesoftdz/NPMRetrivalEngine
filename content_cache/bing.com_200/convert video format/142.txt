@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head> 
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+  <title>Apache Tika – Supported Document Formats</title> 
+  <style type="text/css" media="all">
+      @import url("../css/site.css");
+    </style> 
+  <link rel="icon" type="image/png" href="../tikaNoText16.png"> 
+  <script type="text/javascript">
+      function selectProvider(form) {
+        provider = form.elements['searchProvider'].value;
+        if (provider == "any") {
+          if (Math.random() > 0.5) {
+            provider = "lucid";
+          } else {
+            provider = "sl";
+          }
+        }
+        if (provider == "lucid") {
+          form.action = "http://find.searchhub.org/p:tika";
+        } else if (provider == "sl") {
+          form.action = "http://search-lucene.com/tika";
+        }
+        days = 90;
+        date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toGMTString();
+        document.cookie = "searchProvider=" + provider + expires + "; path=/";
+      }
+      function initProvider() {
+        if (document.cookie.length>0) {
+          cStart=document.cookie.indexOf("searchProvider=");
+          if (cStart!=-1) {
+            cStart=cStart + "searchProvider=".length;
+            cEnd=document.cookie.indexOf(";", cStart);
+            if (cEnd==-1) {
+              cEnd=document.cookie.length;
+            }
+            provider = unescape(document.cookie.substring(cStart,cEnd));
+            document.forms['searchform'].elements['searchProvider'].value = provider;
+          }
+        }
+        document.forms['searchform'].elements['q'].focus();
+      }
+    </script> 
+ </head> 
+ <body onload="initProvider();"> 
+  <div id="body"> 
+   <div id="banner"> 
+    <a href="http://tika.apache.org" id="bannerLeft" title="Apache Tika"><img src="http://tika.apache.org/tika.png" alt="Apache Tika" width="292" height="100"></a> 
+    <a href="http://www.apache.org/" id="bannerRight" title="The Apache Software Foundation"><img src="http://tika.apache.org/asf-logo.gif" alt="The Apache Software Foundation" width="387" height="100"></a> 
+   </div> 
+   <div id="content"> 
+    <!-- Licensed to the Apache Software Foundation (ASF) under one or more -->
+    <!-- contributor license agreements.  See the NOTICE file distributed with -->
+    <!-- this work for additional information regarding copyright ownership. -->
+    <!-- The ASF licenses this file to You under the Apache License, Version 2.0 -->
+    <!-- (the "License"); you may not use this file except in compliance with -->
+    <!-- the License.  You may obtain a copy of the License at -->
+    <!--  -->
+    <!-- http://www.apache.org/licenses/LICENSE-2.0 -->
+    <!--  -->
+    <!-- Unless required by applicable law or agreed to in writing, software -->
+    <!-- distributed under the License is distributed on an "AS IS" BASIS, -->
+    <!-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. -->
+    <!-- See the License for the specific language governing permissions and -->
+    <!-- limitations under the License. -->
+    <div class="section"> 
+     <h2><a name="Supported_Document_Formats"></a>Supported Document Formats</h2> 
+     <p>This page lists all the document formats supported by Apache Tika 1.4. Follow the links to the various parser class javadocs for more detailed information about each document format and how it is parsed by Tika.</p> 
+     <ul> 
+      <li><a href="#Supported_Document_Formats">Supported Document Formats</a> 
+       <ul> 
+        <li><a href="#HyperText_Markup_Language">HyperText Markup Language</a></li> 
+        <li><a href="#XML_and_derived_formats">XML and derived formats</a></li> 
+        <li><a href="#Microsoft_Office_document_formats">Microsoft Office document formats</a></li> 
+        <li><a href="#OpenDocument_Format">OpenDocument Format</a></li> 
+        <li><a href="#Portable_Document_Format">Portable Document Format</a></li> 
+        <li><a href="#Electronic_Publication_Format">Electronic Publication Format</a></li> 
+        <li><a href="#Rich_Text_Format">Rich Text Format</a></li> 
+        <li><a href="#Compression_and_packaging_formats">Compression and packaging formats</a></li> 
+        <li><a href="#Text_formats">Text formats</a></li> 
+        <li><a href="#Audio_formats">Audio formats</a></li> 
+        <li><a href="#Image_formats">Image formats</a></li> 
+        <li><a href="#Video_formats">Video formats</a></li> 
+        <li><a href="#Java_class_files_and_archives">Java class files and archives</a></li> 
+        <li><a href="#The_mbox_format">The mbox format</a></li>
+       </ul></li>
+     </ul> 
+     <div class="section"> 
+      <h3><a name="HyperText_Markup_Language">HyperText Markup Language</a></h3> 
+      <p>The HyperText Markup Language (HTML) is the lingua franca of the web. Tika uses the <a class="externalLink" href="http://home.ccil.org/~cowan/XML/tagsoup/">TagSoup</a> library to support virtually any kind of HTML found on the web. The output from the <a href="./api/org/apache/tika/parser/html/HtmlParser.html">HtmlParser</a> class is guaranteed to be well-formed and valid XHTML, and various heuristics are used to prevent things like inline scripts from cluttering the extracted text content.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="XML_and_derived_formats">XML and derived formats</a></h3> 
+      <p>The Extensible Markup Language (XML) format is a generic format that can be used for all kinds of content. Tika has custom parsers for some widely used XML vocabularies like XHTML, OOXML and ODF, but the default <a href="./api/org/apache/tika/parser/xml/DcXMLParser.html">DcXMLParser</a> class simply extracts the text content of the document and ignores any XML structure. The only exception to this rule are Dublin Core metadata elements that are used for the document metadata.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="Microsoft_Office_document_formats">Microsoft Office document formats</a></h3> 
+      <p>Microsoft Office and some related applications produce documents in the generic OLE 2 Compound Document and Office Open XML (OOXML) formats. The older OLE 2 format was introduced in Microsoft Office version 97 and was the default format until Office version 2007 and the new XML-based OOXML format. The <a href="./api/org/apache/tika/parser/microsoft/OfficeParser.html">OfficeParser</a> and <a href="./api/org/apache/tika/parser/microsoft/ooxml/OOXMLParser.html">OOXMLParser</a> classes use <a class="externalLink" href="http://poi.apache.org/">Apache POI</a> libraries to support text and metadata extraction from both OLE2 and OOXML documents.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="OpenDocument_Format">OpenDocument Format</a></h3> 
+      <p>The OpenDocument format (ODF) is used most notably as the default format of the OpenOffice.org office suite. The <a href="./api/org/apache/tika/parser/odf/OpenDocumentParser.html">OpenDocumentParser</a> class supports this format and the earlier OpenOffice 1.0 format on which ODF is based.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="Portable_Document_Format">Portable Document Format</a></h3> 
+      <p>The <a href="./api/org/apache/tika/parser/pdf/PDFParser.html">PDFParser</a> class parsers Portable Document Format (PDF) documents using the <a class="externalLink" href="http://pdfbox.apache.org/">Apache PDFBox</a> library.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="Electronic_Publication_Format">Electronic Publication Format</a></h3> 
+      <p>The <a href="./api/org/apache/tika/parser/epub/EpubParser.html">EpubParser</a> class supports the Electronic Publication Format (EPUB) used for many digital books.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="Rich_Text_Format">Rich Text Format</a></h3> 
+      <p>The <a href="./api/org/apache/tika/parser/rtf/RTFParser.html">RTFParser</a> class uses the standard javax.swing.text.rtf feature to extract text content from Rich Text Format (RTF) documents.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="Compression_and_packaging_formats">Compression and packaging formats</a></h3> 
+      <p>Tika uses the <a class="externalLink" href="http://commons.apache.org/compress/">Commons Compress</a> library to support various compression and packaging formats. The <a href="./api/org/apache/tika/parser/pkg/PackageParser.html">PackageParser</a> class and its subclasses first parse the top level compression or packaging format and then pass the unpacked document streams to a second parsing stage using the parser instance specified in the parse context.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="Text_formats">Text formats</a></h3> 
+      <p>Extracting text content from plain text files seems like a simple task until you start thinking of all the possible character encodings. The <a href="./api/org/apache/tika/parser/txt/TXTParser.html">TXTParser</a> class uses encoding detection code from the <a class="externalLink" href="http://site.icu-project.org/">ICU</a> project to automatically detect the character encoding of a text document.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="Audio_formats">Audio formats</a></h3> 
+      <p>Tika can detect several common audio formats and extract metadata from them. Even text extraction is supported for some audio files that contain lyrics or other textual content. The <a href="./api/org/apache/tika/parser/audio/AudioParser.html">AudioParser</a> and <a href="./api/org/apache/tika/parser/audio/MidiParser.html">MidiParser</a> classes use standard javax.sound features to process simple audio formats, and the <a href="./api/org/apache/tika/parser/mp3/Mp3Parser.html">Mp3Parser</a> class adds support for the widely used MP3 format.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="Image_formats">Image formats</a></h3> 
+      <p>The <a href="./api/org/apache/tika/parser/image/ImageParser.html">ImageParser</a> class uses the standard javax.imageio feature to extract simple metadata from image formats supported by the Java platform. More complex image metadata is available through the <a href="./api/org/apache/tika/parser/jpeg/JpegParser.html">JpegParser</a> class that uses the metadata-extractor library to supports Exif metadata extraction from Jpeg images.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="Video_formats">Video formats</a></h3> 
+      <p>Currently Tika only supports the Flash video format using a simple parsing algorithm implemented in the <a href="./api/org/apache/tika/parser/flv/FLVParser">FLVParser</a> class.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="Java_class_files_and_archives">Java class files and archives</a></h3> 
+      <p>The <a href="./api/org/apache/tika/parser/asm/ClassParser">ClassParser</a> class extracts class names and method signatures from Java class files, and the <a href="./api/org/apache/tika/parser/pkg/ZipParser.html">ZipParser</a> class supports also jar archives.</p>
+     </div> 
+     <div class="section"> 
+      <h3><a name="The_mbox_format">The mbox format</a></h3> 
+      <p>The <a href="./api/org/apache/tika/parser/mbox/MboxParser.html">MboxParser</a> can extract email messages from the mbox format used by many email archives and Unix-style mailboxes.</p>
+     </div>
+    </div> 
+   </div> 
+   <div id="sidebar"> 
+    <div id="navigation"> 
+     <h5>Apache Tika</h5> 
+     <ul> 
+      <li class="none"> <a href="../index.html">Introduction</a> </li> 
+      <li class="none"> <a href="../download.html">Download</a> </li> 
+      <li class="none"> <a href="../contribute.html">Contribute</a> </li> 
+      <li class="none"> <a href="../mail-lists.html">Mailing Lists</a> </li> 
+      <li class="none"> <a href="http://wiki.apache.org/tika/" class="externalLink">Tika Wiki</a> </li> 
+      <li class="none"> <a href="https://issues.apache.org/jira/browse/TIKA" class="externalLink">Issue Tracker</a> </li> 
+     </ul> 
+     <h5>Documentation</h5> 
+     <ul> 
+      <li class="expanded"> <a href="../1.16/index.html">Apache Tika 1.16</a> 
+       <ul> 
+        <li class="none"> <a href="../1.16/gettingstarted.html">Getting Started</a> </li> 
+        <li class="none"> <a href="../1.16/formats.html">Supported Formats</a> </li> 
+        <li class="none"> <a href="../1.16/parser.html">Parser API</a> </li> 
+        <li class="none"> <a href="../1.16/parser_guide.html">Parser 5min Quick Start Guide</a> </li> 
+        <li class="none"> <a href="../1.16/detection.html">Content and Language Detection</a> </li> 
+        <li class="none"> <a href="../1.16/configuring.html">Configuring Tika</a> </li> 
+        <li class="none"> <a href="../1.16/examples.html">Usage Examples</a> </li> 
+        <li class="none"> <a href="../1.16/api/">API Documentation</a> </li> 
+        <li class="none"> <a href="../1.16/miredot/">REST API Documentation (Miredot)</a> </li> 
+       </ul> </li> 
+      <li class="collapsed"> <a href="../1.15/index.html">Apache Tika 1.15</a> </li> 
+      <li class="collapsed"> <a href="../1.14/index.html">Apache Tika 1.14</a> </li> 
+      <li class="collapsed"> <a href="../1.13/index.html">Apache Tika 1.13</a> </li> 
+      <li class="collapsed"> <a href="../1.12/index.html">Apache Tika 1.12</a> </li> 
+      <li class="collapsed"> <a href="../1.11/index.html">Apache Tika 1.11</a> </li> 
+      <li class="collapsed"> <a href="../1.10/index.html">Apache Tika 1.10</a> </li> 
+     </ul> 
+     <h5>The Apache Software Foundation</h5> 
+     <ul> 
+      <li class="none"> <a href="http://www.apache.org/foundation/" class="externalLink">About</a> </li> 
+      <li class="none"> <a href="http://www.apache.org/licenses/" class="externalLink">License</a> </li> 
+      <li class="none"> <a href="http://www.apache.org/security/" class="externalLink">Security</a> </li> 
+      <li class="none"> <a href="http://www.apache.org/foundation/sponsorship.html" class="externalLink">Sponsorship</a> </li> 
+      <li class="none"> <a href="http://www.apache.org/foundation/thanks.html" class="externalLink">Thanks</a> </li> 
+     </ul> 
+     <div id="search"> 
+      <h5>Search with Apache Solr</h5> 
+      <form action="http://search.lucidimagination.com/p:tika" method="get" id="searchform"> 
+       <input type="text" id="query" name="q"> 
+       <select name="searchProvider" id="searchProvider"> <option value="any">provider</option> <option value="lucid">Lucid Find</option> <option value="sl">Search-Lucene</option> </select> 
+       <input type="submit" id="submit" value="Search" name="Search" onclick="selectProvider(this.form)"> 
+      </form> 
+     </div> 
+     <div id="bookpromo"> 
+      <h5>Books about Tika</h5> 
+      <p> <a href="http://manning.com/mattmann/" title="Tika in Action"><img src="../mattmann_cover150.jpg" width="150" height="186"></a> </p> 
+     </div> 
+    </div> 
+   </div> 
+   <div id="footer"> 
+    <p> Copyright © 2017 <a href="http://www.apache.org/">The Apache Software Foundation</a>. Site powered by <a href="http://maven.apache.org/">Apache Maven</a>. Search powered by <a href="http://www.lucidimagination.com">Lucid Imagination</a> and <a href="http://sematext.com">Sematext</a>. <br> Apache Tika, Tika, Apache, the Apache feather logo, and the Apache Tika project logo are trademarks of The Apache Software Foundation. </p> 
+   </div> 
+  </div>   
+ </body>
+</html>

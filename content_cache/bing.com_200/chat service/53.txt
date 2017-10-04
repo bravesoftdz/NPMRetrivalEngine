@@ -1,0 +1,960 @@
+<!doctype html>
+<html lang="en">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="pingback" href="https://linuxjunkies.wordpress.com/xmlrpc.php"> 
+  <title>A Simple Chat Server in Java using threads Part 1 – LinuxJunkies</title> 
+  <link rel="dns-prefetch" href="//s2.wp.com"> 
+  <link rel="dns-prefetch" href="//s1.wp.com"> 
+  <link rel="dns-prefetch" href="//s0.wp.com"> 
+  <link rel="dns-prefetch" href="//fonts.googleapis.com"> 
+  <link rel="dns-prefetch" href="//s.pubmine.com"> 
+  <link rel="dns-prefetch" href="//x.bidswitch.net"> 
+  <link rel="dns-prefetch" href="//static.criteo.net"> 
+  <link rel="dns-prefetch" href="//ib.adnxs.com"> 
+  <link rel="dns-prefetch" href="//aax.amazon-adsystem.com"> 
+  <link rel="dns-prefetch" href="//bidder.criteo.com"> 
+  <link rel="dns-prefetch" href="//cas.criteo.com"> 
+  <link rel="dns-prefetch" href="//gum.criteo.com"> 
+  <link rel="dns-prefetch" href="//ads.pubmatic.com"> 
+  <link rel="dns-prefetch" href="//gads.pubmatic.com"> 
+  <link rel="dns-prefetch" href="//tpc.googlesyndication.com"> 
+  <link rel="dns-prefetch" href="//ad.doubleclick.net"> 
+  <link rel="dns-prefetch" href="//googleads.g.doubleclick.net"> 
+  <link rel="dns-prefetch" href="//www.googletagservices.com"> 
+  <link rel="dns-prefetch" href="//cdn.switchadhub.com"> 
+  <link rel="dns-prefetch" href="//delivery.g.switchadhub.com"> 
+  <link rel="dns-prefetch" href="//delivery.swid.switchadhub.com"> 
+  <link rel="alternate" type="application/rss+xml" title="LinuxJunkies » Feed" href="https://linuxjunkies.wordpress.com/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="LinuxJunkies » Comments Feed" href="https://linuxjunkies.wordpress.com/comments/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="LinuxJunkies » A Simple Chat Server in Java using threads Part&nbsp;1 Comments Feed" href="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/feed/"> 
+  <script type="text/javascript">
+		/* <![CDATA[ */
+		function addLoadEvent(func) {
+			var oldonload = window.onload;
+			if (typeof window.onload != 'function') {
+				window.onload = func;
+			} else {
+				window.onload = function () {
+					oldonload();
+					func();
+				}
+			}
+		}
+		/* ]]> */
+	</script> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/72x72\/","ext":".png","svgUrl":"https:\/\/s0.wp.com\/wp-content\/mu-plugins\/wpcom-smileys\/twemoji\/2\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/s0.wp.com\/wp-includes\/js\/wp-emoji-release.min.js?m=1505864856h&ver=4.8.2"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,56826,8203,55356,56819),0,0),c=j.toDataURL(),b!==c&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55358,56794,8205,9794,65039),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55358,56794,8203,9794,65039),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <link rel="stylesheet" id="all-css-0-1" href="https://s1.wp.com/_static/??-eJx9kOsKwjAMhV/IGsTh5Yf4LG0XZjVpQ9Mx9vZ2ighe+ifkJOfLoYVJjE+xYCzAoxEahxAVJvGJjXIgnD/U2quu4DdG4YYKVyxi/c081JfdURreOSn3tlcYKDlLrdMZyRbsjSQtH6qF+ZSxzllsWRyMfbBIyNXWwlh2L2ppL/U5zZjnDzknGVVNrRxGNuVSg5rcgBFzqIs/7Rf7PAkyOuAQY5pAy0y4+M582nSH/Xa36Y7d9Q53QrIY" type="text/css" media="all"> 
+  <link rel="stylesheet" id="minnow-opensans-css" href="https://fonts.googleapis.com/css?family=Open+Sans%3A300%2C400%2C700%2C700italic%2C400italic%2C300italic%7COpen+Sans+Condensed%3A700%2C700italic&amp;subset=latin%2Clatin-ext" type="text/css" media="all"> 
+  <link rel="stylesheet" id="all-css-2-1" href="https://s1.wp.com/_static/??-eJyNjNEKwjAMRX/IGqqC+iB+y1ZjjbRJWTKKf291CNvL8O0cck+gFheEDdnAHphRoYw9ZGKWCsQB1F4JXS1B8jaobmBW5NGVNEZihUq3iKZgUlwRbfQN/0lUAnXJUZssZYoJWGw6/mDta0RxSUJnJLwQd08dDWvpgH2S2DBCW830E13zxR/Ox93J+71/vgF6unS+" type="text/css" media="all"> 
+  <link rel="stylesheet" id="print-css-3-1" href="https://s0.wp.com/wp-content/mu-plugins/global-print/global-print.css?m=1465851035h" type="text/css" media="print"> 
+  <link rel="stylesheet" id="all-css-4-1" href="https://s2.wp.com/_static/??-eJx9i9EKwjAMRX/IGoVN54P4LVnp2kialCbD3xcfRGTi0z0XzoFHC1HFkzjUNTReM4kBRieVGfuH9tFsB7/1puZhYaQOVrCT5Pf+q0wjIQfWrN9nE3lJNRmUATLrjPwSbvV6HC6H83Qap/H+BMWZScE=" type="text/css" media="all"> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var related_posts_js_options = {"post_heading":"h4"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://s1.wp.com/_static/??-eJyFj90KwjAMhV/IrAw6xQvxWWoXS2r/bNoNfXo70At1KARCTr4cTsScgIJ2dUQWttW1Yr49W2d5I34B4MlkVbDzFF6wjqFgKAvr44kcQmXMyjStGZ3jCpciF4/MDVrZvkeiMBHOfzGLJSl9gYxM9y9XXyG5aiiwyOjaAyMsGT6mdnX0h17uh36Qcre1DyuucHk="></script> 
+  <link rel="stylesheet" id="all-css-0-2" href="https://s1.wp.com/wp-content/mu-plugins/highlander-comments/style.css?m=1377793621h" type="text/css" media="all"> 
+  <!--[if lt IE 8]>
+<link rel='stylesheet' id='highlander-comments-ie7-css'  href='https://s1.wp.com/wp-content/mu-plugins/highlander-comments/style-ie7.css?m=1351637563h&#038;ver=20110606' type='text/css' media='all' />
+<![endif]--> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://linuxjunkies.wordpress.com/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://s1.wp.com/wp-includes/wlwmanifest.xml"> 
+  <link rel="prev" title="Data Structures using Java Part 11: Java Interfaces, Java Packages, Building packages, Compiling packing, Using&nbsp;packages" href="https://linuxjunkies.wordpress.com/2010/12/05/data-structures-using-java-part-11/"> 
+  <link rel="next" title="The entire Chat Application in its&nbsp;glory!" href="https://linuxjunkies.wordpress.com/2011/03/10/the-entire-chat-application-in-its-glory/"> 
+  <meta name="generator" content="WordPress.com"> 
+  <link rel="canonical" href="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/"> 
+  <link rel="shortlink" href="http://wp.me/pBZJ3-3o"> 
+  <link rel="alternate" type="application/json+oembed" href="https://public-api.wordpress.com/oembed/?format=json&amp;url=https%3A%2F%2Flinuxjunkies.wordpress.com%2F2011%2F03%2F10%2Fa-simple-chat-server-in-java-using-threads-part-1%2F&amp;for=wpcom-auto-discovery">
+  <link rel="alternate" type="application/xml+oembed" href="https://public-api.wordpress.com/oembed/?format=xml&amp;url=https%3A%2F%2Flinuxjunkies.wordpress.com%2F2011%2F03%2F10%2Fa-simple-chat-server-in-java-using-threads-part-1%2F&amp;for=wpcom-auto-discovery"> 
+  <!-- Jetpack Open Graph Tags --> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="A Simple Chat Server in Java using threads Part 1"> 
+  <meta property="og:url" content="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/"> 
+  <meta property="og:description" content="The Client ——— The client side first. We import the necessary stuff&nbsp; needed for this program. The java.net.* contains all the necessary packages for the networking part. The swing…"> 
+  <meta property="article:published_time" content="2011-03-10T06:32:06+00:00"> 
+  <meta property="article:modified_time" content="2011-03-10T06:50:38+00:00"> 
+  <meta property="og:site_name" content="LinuxJunkies"> 
+  <meta property="og:image" content="https://linuxjunkies.files.wordpress.com/2011/03/client1.jpg"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta name="twitter:site" content="@wordpressdotcom"> 
+  <meta name="twitter:text:title" content="A Simple Chat Server in Java using threads Part&nbsp;1"> 
+  <meta name="twitter:image" content="https://linuxjunkies.files.wordpress.com/2011/03/client1.jpg?w=240"> 
+  <meta name="twitter:card" content="summary"> 
+  <meta property="fb:app_id" content="249643311490"> 
+  <meta property="article:publisher" content="https://www.facebook.com/WordPresscom"> 
+  <link rel="shortcut icon" type="image/x-icon" href="https://s2.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48"> 
+  <link rel="icon" type="image/x-icon" href="https://s2.wp.com/i/favicon.ico" sizes="16x16 24x24 32x32 48x48"> 
+  <link rel="apple-touch-icon-precomposed" href="https://s0.wp.com/i/webclip.png"> 
+  <link rel="openid.server" href="https://linuxjunkies.wordpress.com/?openidserver=1"> 
+  <link rel="openid.delegate" href="https://linuxjunkies.wordpress.com/"> 
+  <link rel="search" type="application/opensearchdescription+xml" href="https://linuxjunkies.wordpress.com/osd.xml" title="LinuxJunkies"> 
+  <link rel="search" type="application/opensearchdescription+xml" href="https://s1.wp.com/opensearch.xml" title="WordPress.com"> 
+  <meta name="application-name" content="LinuxJunkies">
+  <meta name="msapplication-window" content="width=device-width;height=device-height">
+  <meta name="msapplication-tooltip" content="Musings, Rants, Gotchas and HowTos.">
+  <meta name="msapplication-task" content="name=Subscribe;action-uri=https://linuxjunkies.wordpress.com/feed/;icon-uri=https://s2.wp.com/i/favicon.ico">
+  <meta name="msapplication-task" content="name=Sign up for a free blog;action-uri=http://wordpress.com/signup/;icon-uri=https://s2.wp.com/i/favicon.ico">
+  <meta name="msapplication-task" content="name=WordPress.com Support;action-uri=http://support.wordpress.com/;icon-uri=https://s2.wp.com/i/favicon.ico">
+  <meta name="msapplication-task" content="name=WordPress.com Forums;action-uri=http://forums.wordpress.com/;icon-uri=https://s2.wp.com/i/favicon.ico">
+  <meta name="title" content="A Simple Chat Server in Java using threads Part&nbsp;1 | LinuxJunkies on WordPress.com"> 
+  <meta name="description" content="The Client --------- The client side first. We import the necessary stuff&nbsp; needed for this program. The java.net.* contains all the necessary packages for the networking part. The swing and awt packages are for the GUI. The JTextArea will be used to display all the chat proceedings in real time. The objective of this program…"> 
+  <script type="text/javascript">
+		var __ATA_PP = { pt: 1, ht: 0, tn: 'minnow', amp: false };
+		</script> 
+  <script type="text/javascript" src="//s.pubmine.com/head.js"></script> 
+  <script type="text/javascript" src="https://static.criteo.net/js/ld/publishertag.js"></script>
+  <link rel="amphtml" href="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/amp/">
+  <style type="text/css" id="syntaxhighlighteranchor"></style> 
+  <script type="text/javascript">
+	window.google_analytics_uacct = "UA-52447-2";
+</script> 
+  <script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-52447-2']);
+	_gaq.push(['_setDomainName', 'wordpress.com']);
+	_gaq.push(['_initData']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+	})();
+</script> 
+ </head> 
+ <body class="post-template-default single single-post postid-210 single-format-standard mp6 customizer-styles-applied widgets-hidden highlander-enabled highlander-light"> 
+  <div id="page" class="hfeed site"> 
+   <a class="skip-link screen-reader-text" href="#content">Skip to content</a> 
+   <header id="masthead" class="site-header" role="banner"> 
+    <div class="site-branding"> 
+     <h1 class="site-title"><a href="https://linuxjunkies.wordpress.com/" rel="home">LinuxJunkies</a></h1> 
+     <h2 class="site-description">Musings, Rants, Gotchas and HowTos.</h2> 
+    </div> 
+    <button class="menu-toggle" title="Sidebar"><span class="screen-reader-text">Sidebar</span></button> 
+    <div class="slide-menu"> 
+     <div id="secondary" class="widget-area clear" role="complementary"> 
+      <aside id="search-3" class="widget widget_search">
+       <form role="search" method="get" class="search-form" action="https://linuxjunkies.wordpress.com/"> 
+        <label> <span class="screen-reader-text">Search for:</span> <input type="search" class="search-field" placeholder="Search …" value="" name="s"> </label> 
+        <input type="submit" class="search-submit" value="Search"> 
+       </form>
+      </aside>
+      <aside id="top-posts-2" class="widget widget_top-posts">
+       <h1 class="widget-title">Top Posts &amp; Pages</h1>
+       <ul> 
+        <li> <a href="https://linuxjunkies.wordpress.com/2011/11/21/a-hdfsclient-for-hadoop-using-the-native-java-api-a-tutorial/" class="bump-view" data-bump-view="tp"> A HDFSClient for Hadoop using the native JAVA API, a tutorial </a> </li> 
+        <li> <a href="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/" class="bump-view" data-bump-view="tp"> A Simple Chat Server in Java using threads Part 1 </a> </li> 
+        <li> <a href="https://linuxjunkies.wordpress.com/2011/12/03/hbase-administration-using-the-java-api-using-code-examples/" class="bump-view" data-bump-view="tp"> HBase administration using the Java API, using code examples </a> </li> 
+       </ul>
+      </aside>
+      <aside id="blog-stats-2" class="widget widget_blog-stats">
+       <h1 class="widget-title">Blog Stats</h1> 
+       <ul> 
+        <li>58,966 hits</li> 
+       </ul> 
+      </aside> 
+      <aside id="recent-posts-3" class="widget widget_recent_entries"> 
+       <h1 class="widget-title">Recent Posts</h1> 
+       <ul> 
+        <li> <a href="https://linuxjunkies.wordpress.com/2014/12/31/packt-tech-books-for-5/">Packt Tech books for&nbsp;5$</a> </li> 
+        <li> <a href="https://linuxjunkies.wordpress.com/2013/03/08/code-man-right-now/">Code man! Right&nbsp;now!</a> </li> 
+        <li> <a href="https://linuxjunkies.wordpress.com/2012/11/04/design-pattern-strategy/">Design Pattern: Strategy</a> </li> 
+        <li> <a href="https://linuxjunkies.wordpress.com/2012/09/14/why-is-it-a-good-idea-to-graduate/">Why is it a good idea to&nbsp;Graduate?</a> </li> 
+        <li> <a href="https://linuxjunkies.wordpress.com/2012/09/14/what-certification-i-mean-does-certifications-even-hold-any-value/">What certification, I mean does certifications even hold any&nbsp;value?</a> </li> 
+        <li> <a href="https://linuxjunkies.wordpress.com/2012/02/04/linked-lists-in-java/">Linked Lists in&nbsp;Java</a> </li> 
+       </ul> 
+      </aside> 
+      <aside id="categories-2" class="widget widget_categories">
+       <h1 class="widget-title">Categories</h1> 
+       <ul> 
+        <li class="cat-item cat-item-2674"><a href="https://linuxjunkies.wordpress.com/category/scripting/bash/" title="Shell scripting">Bash</a> (3) </li> 
+        <li class="cat-item cat-item-37687"><a href="https://linuxjunkies.wordpress.com/category/programming/data-structures/">Data Structures</a> (14) </li> 
+        <li class="cat-item cat-item-4884"><a href="https://linuxjunkies.wordpress.com/category/programming/design-patterns/">Design Patterns</a> (1) </li> 
+        <li class="cat-item cat-item-7168"><a href="https://linuxjunkies.wordpress.com/category/programming/gui/">GUI</a> (3) </li> 
+        <li class="cat-item cat-item-3251196"><a href="https://linuxjunkies.wordpress.com/category/hadoop/" title="All about Hadoop and its ecosystem!">Hadoop</a> (1) </li> 
+        <li class="cat-item cat-item-12595670"><a href="https://linuxjunkies.wordpress.com/category/hadoop/hbase/" title="All about HBase!">HBase</a> (1) </li> 
+        <li class="cat-item cat-item-12413600"><a href="https://linuxjunkies.wordpress.com/category/hadoop/hdfs/" title="About HDFS and more.">HDFS</a> (1) </li> 
+        <li class="cat-item cat-item-1017"><a href="https://linuxjunkies.wordpress.com/category/programming/java/" title="All about Java">Java</a> (16) </li> 
+        <li class="cat-item cat-item-610"><a href="https://linuxjunkies.wordpress.com/category/linux/" title="All about Linux">Linux</a> (3) </li> 
+        <li class="cat-item cat-item-7426"><a href="https://linuxjunkies.wordpress.com/category/networking/" title="All about Networking">Networking</a> (3) </li> 
+        <li class="cat-item cat-item-196"><a href="https://linuxjunkies.wordpress.com/category/programming/" title="Programming is fun!">Programming</a> (4) </li> 
+        <li class="cat-item cat-item-2378"><a href="https://linuxjunkies.wordpress.com/category/thought/">Thought</a> (3) </li> 
+        <li class="cat-item cat-item-1"><a href="https://linuxjunkies.wordpress.com/category/uncategorized/">Uncategorized</a> (1) </li> 
+       </ul> 
+      </aside>
+      <aside id="wp_tag_cloud-2" class="widget wp_widget_tag_cloud">
+       <h1 class="widget-title"></h1>
+       <div style="overflow:hidden">
+        <a href="https://linuxjunkies.wordpress.com/tag/abstract-class/" class="tag-cloud-link tag-link-1533199 tag-link-position-1" style="font-size: 8pt;" aria-label="Abstract Class (1 item)">Abstract Class</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/abstract-data-type/" class="tag-cloud-link tag-link-27390982 tag-link-position-2" style="font-size: 10.571428571429pt;" aria-label="Abstract Data Type (2 items)">Abstract Data Type</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/adt/" class="tag-cloud-link tag-link-268559 tag-link-position-3" style="font-size: 8pt;" aria-label="ADT (1 item)">ADT</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/array-of-objects/" class="tag-cloud-link tag-link-46262042 tag-link-position-4" style="font-size: 8pt;" aria-label="Array of objects (1 item)">Array of objects</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/arrays/" class="tag-cloud-link tag-link-584090 tag-link-position-5" style="font-size: 8pt;" aria-label="Arrays (1 item)">Arrays</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/binary-search/" class="tag-cloud-link tag-link-675912 tag-link-position-6" style="font-size: 8pt;" aria-label="Binary Search (1 item)">Binary Search</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/break/" class="tag-cloud-link tag-link-78891 tag-link-position-7" style="font-size: 8pt;" aria-label="break (1 item)">break</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/bufferedreader/" class="tag-cloud-link tag-link-2349069 tag-link-position-8" style="font-size: 10.571428571429pt;" aria-label="BufferedReader (2 items)">BufferedReader</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/chat/" class="tag-cloud-link tag-link-4870 tag-link-position-9" style="font-size: 10.571428571429pt;" aria-label="Chat (2 items)">Chat</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/circularly-linked-doubly-linked/" class="tag-cloud-link tag-link-46754011 tag-link-position-10" style="font-size: 8pt;" aria-label="Circularly linked doubly linked (1 item)">Circularly linked doubly linked</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/class/" class="tag-cloud-link tag-link-6376 tag-link-position-11" style="font-size: 8pt;" aria-label="Class (1 item)">Class</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/client/" class="tag-cloud-link tag-link-124397 tag-link-position-12" style="font-size: 10.571428571429pt;" aria-label="Client (2 items)">Client</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/commands/" class="tag-cloud-link tag-link-319 tag-link-position-13" style="font-size: 12.285714285714pt;" aria-label="Commands (3 items)">Commands</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/conditionals/" class="tag-cloud-link tag-link-1191585 tag-link-position-14" style="font-size: 8pt;" aria-label="Conditionals (1 item)">Conditionals</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/construc/" class="tag-cloud-link tag-link-4897182 tag-link-position-15" style="font-size: 8pt;" aria-label="Construc (1 item)">Construc</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/constructor/" class="tag-cloud-link tag-link-12182 tag-link-position-16" style="font-size: 8pt;" aria-label="Constructor (1 item)">Constructor</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/continue/" class="tag-cloud-link tag-link-831836 tag-link-position-17" style="font-size: 8pt;" aria-label="continue (1 item)">continue</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/data/" class="tag-cloud-link tag-link-22379 tag-link-position-18" style="font-size: 8pt;" aria-label="Data (1 item)">Data</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/data-structures/" class="tag-cloud-link tag-link-37687 tag-link-position-19" style="font-size: 19.142857142857pt;" aria-label="Data Structures (11 items)">Data Structures</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/degree-of-equality/" class="tag-cloud-link tag-link-47037956 tag-link-position-20" style="font-size: 8pt;" aria-label="Degree of equality (1 item)">Degree of equality</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/do/" class="tag-cloud-link tag-link-17211 tag-link-position-21" style="font-size: 8pt;" aria-label="do (1 item)">do</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/doubly-linked-list/" class="tag-cloud-link tag-link-14860586 tag-link-position-22" style="font-size: 8pt;" aria-label="Doubly Linked List (1 item)">Doubly Linked List</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/dynamic-method-lookup/" class="tag-cloud-link tag-link-47223906 tag-link-position-23" style="font-size: 8pt;" aria-label="Dynamic method lookup (1 item)">Dynamic method lookup</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/equals/" class="tag-cloud-link tag-link-220607 tag-link-position-24" style="font-size: 8pt;" aria-label="equals (1 item)">equals</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/final/" class="tag-cloud-link tag-link-11355 tag-link-position-25" style="font-size: 8pt;" aria-label="final (1 item)">final</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/function-parameters/" class="tag-cloud-link tag-link-24805759 tag-link-position-26" style="font-size: 8pt;" aria-label="Function parameters (1 item)">Function parameters</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/gui/" class="tag-cloud-link tag-link-7168 tag-link-position-27" style="font-size: 10.571428571429pt;" aria-label="GUI (2 items)">GUI</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/hadoop/" class="tag-cloud-link tag-link-3251196 tag-link-position-28" style="font-size: 10.571428571429pt;" aria-label="Hadoop (2 items)">Hadoop</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/hdfs/" class="tag-cloud-link tag-link-12413600 tag-link-position-29" style="font-size: 10.571428571429pt;" aria-label="HDFS (2 items)">HDFS</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/heap/" class="tag-cloud-link tag-link-290308 tag-link-position-30" style="font-size: 8pt;" aria-label="Heap (1 item)">Heap</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/io/" class="tag-cloud-link tag-link-47237 tag-link-position-31" style="font-size: 8pt;" aria-label="I/O (1 item)">I/O</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/inheritence/" class="tag-cloud-link tag-link-1173656 tag-link-position-32" style="font-size: 8pt;" aria-label="Inheritence (1 item)">Inheritence</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/initialisers/" class="tag-cloud-link tag-link-46262041 tag-link-position-33" style="font-size: 8pt;" aria-label="Initialisers (1 item)">Initialisers</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/inputstream/" class="tag-cloud-link tag-link-6611322 tag-link-position-34" style="font-size: 8pt;" aria-label="InputStream (1 item)">InputStream</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/inputstreamreader/" class="tag-cloud-link tag-link-28941669 tag-link-position-35" style="font-size: 12.285714285714pt;" aria-label="InputStreamReader (3 items)">InputStreamReader</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/interfaces/" class="tag-cloud-link tag-link-5037 tag-link-position-36" style="font-size: 10.571428571429pt;" aria-label="Interfaces (2 items)">Interfaces</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/invarient/" class="tag-cloud-link tag-link-46754010 tag-link-position-37" style="font-size: 8pt;" aria-label="Invarient (1 item)">Invarient</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/java/" class="tag-cloud-link tag-link-1017 tag-link-position-38" style="font-size: 22pt;" aria-label="Java (18 items)">Java</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/java-lang/" class="tag-cloud-link tag-link-2341376 tag-link-position-39" style="font-size: 8pt;" aria-label="java.lang (1 item)">java.lang</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/java-net/" class="tag-cloud-link tag-link-494781 tag-link-position-40" style="font-size: 10.571428571429pt;" aria-label="java.net.* (2 items)">java.net.*</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/lifetime/" class="tag-cloud-link tag-link-313604 tag-link-position-41" style="font-size: 8pt;" aria-label="Lifetime (1 item)">Lifetime</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/linked-list/" class="tag-cloud-link tag-link-361344 tag-link-position-42" style="font-size: 12.285714285714pt;" aria-label="Linked List (3 items)">Linked List</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/linux/" class="tag-cloud-link tag-link-610 tag-link-position-43" style="font-size: 12.285714285714pt;" aria-label="Linux (3 items)">Linux</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/lists/" class="tag-cloud-link tag-link-1832 tag-link-position-44" style="font-size: 8pt;" aria-label="Lists (1 item)">Lists</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/loop-bounds/" class="tag-cloud-link tag-link-46213659 tag-link-position-45" style="font-size: 8pt;" aria-label="Loop bounds (1 item)">Loop bounds</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/loops/" class="tag-cloud-link tag-link-806317 tag-link-position-46" style="font-size: 8pt;" aria-label="Loops (1 item)">Loops</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/method-overriding/" class="tag-cloud-link tag-link-28492721 tag-link-position-47" style="font-size: 8pt;" aria-label="Method overriding (1 item)">Method overriding</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/multidimensional-arrays/" class="tag-cloud-link tag-link-1849979 tag-link-position-48" style="font-size: 8pt;" aria-label="Multidimensional arrays (1 item)">Multidimensional arrays</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/networking/" class="tag-cloud-link tag-link-7426 tag-link-position-49" style="font-size: 12.285714285714pt;" aria-label="Networking (3 items)">Networking</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/packages/" class="tag-cloud-link tag-link-65759 tag-link-position-50" style="font-size: 8pt;" aria-label="Packages (1 item)">Packages</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/parameter-passing/" class="tag-cloud-link tag-link-9810699 tag-link-position-51" style="font-size: 8pt;" aria-label="Parameter passing (1 item)">Parameter passing</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/pascals-triangle/" class="tag-cloud-link tag-link-7070015 tag-link-position-52" style="font-size: 8pt;" aria-label="Pascals Triangle (1 item)">Pascals Triangle</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/phd/" class="tag-cloud-link tag-link-2585 tag-link-position-53" style="font-size: 8pt;" aria-label="PhD (1 item)">PhD</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/ports/" class="tag-cloud-link tag-link-93097 tag-link-position-54" style="font-size: 10.571428571429pt;" aria-label="Ports (2 items)">Ports</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/printstacktrace/" class="tag-cloud-link tag-link-5585837 tag-link-position-55" style="font-size: 10.571428571429pt;" aria-label="printStackTrace (2 items)">printStackTrace</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/private/" class="tag-cloud-link tag-link-19 tag-link-position-56" style="font-size: 8pt;" aria-label="private (1 item)">private</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/programming/" class="tag-cloud-link tag-link-196 tag-link-position-57" style="font-size: 13.714285714286pt;" aria-label="Programming (4 items)">Programming</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/protected-keyword/" class="tag-cloud-link tag-link-875801 tag-link-position-58" style="font-size: 8pt;" aria-label="protected keyword (1 item)">protected keyword</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/recursion/" class="tag-cloud-link tag-link-426624 tag-link-position-59" style="font-size: 10.571428571429pt;" aria-label="Recursion (2 items)">Recursion</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/return/" class="tag-cloud-link tag-link-57098 tag-link-position-60" style="font-size: 8pt;" aria-label="return (1 item)">return</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/scope/" class="tag-cloud-link tag-link-15710 tag-link-position-61" style="font-size: 8pt;" aria-label="Scope (1 item)">Scope</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/sentinel/" class="tag-cloud-link tag-link-143462 tag-link-position-62" style="font-size: 8pt;" aria-label="sentinel (1 item)">sentinel</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/server/" class="tag-cloud-link tag-link-18568 tag-link-position-63" style="font-size: 10.571428571429pt;" aria-label="Server (2 items)">Server</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/shell/" class="tag-cloud-link tag-link-43912 tag-link-position-64" style="font-size: 12.285714285714pt;" aria-label="Shell (3 items)">Shell</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/sockets/" class="tag-cloud-link tag-link-12931 tag-link-position-65" style="font-size: 10.571428571429pt;" aria-label="Sockets (2 items)">Sockets</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/stack/" class="tag-cloud-link tag-link-251553 tag-link-position-66" style="font-size: 8pt;" aria-label="Stack (1 item)">Stack</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/static/" class="tag-cloud-link tag-link-50318 tag-link-position-67" style="font-size: 8pt;" aria-label="static (1 item)">static</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/strings/" class="tag-cloud-link tag-link-176356 tag-link-position-68" style="font-size: 8pt;" aria-label="Strings (1 item)">Strings</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/swing/" class="tag-cloud-link tag-link-8688 tag-link-position-69" style="font-size: 8pt;" aria-label="Swing (1 item)">Swing</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/switch/" class="tag-cloud-link tag-link-21233 tag-link-position-70" style="font-size: 8pt;" aria-label="switch (1 item)">switch</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/testing/" class="tag-cloud-link tag-link-12 tag-link-position-71" style="font-size: 8pt;" aria-label="Testing (1 item)">Testing</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/this/" class="tag-cloud-link tag-link-2471 tag-link-position-72" style="font-size: 8pt;" aria-label="this (1 item)">this</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/thread-dumpstack/" class="tag-cloud-link tag-link-46800461 tag-link-position-73" style="font-size: 8pt;" aria-label="Thread.dumpstack (1 item)">Thread.dumpstack</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/tut/" class="tag-cloud-link tag-link-147639 tag-link-position-74" style="font-size: 8pt;" aria-label="Tut (1 item)">Tut</a> 
+        <a href="https://linuxjunkies.wordpress.com/tag/tutorial/" class="tag-cloud-link tag-link-2932 tag-link-position-75" style="font-size: 18pt;" aria-label="Tutorial (9 items)">Tutorial</a>
+       </div>
+      </aside>
+      <aside id="linkcat-1356" class="widget widget_links">
+       <h1 class="widget-title">Blogroll</h1> 
+       <ul class="xoxo blogroll"> 
+        <li><a href="http://www.micahcarrick.com/">Micahcarric</a></li> 
+        <li><a href="http://zetcode.com/" title="Tutorials for programmers">ZetCode</a></li> 
+        <li><a href="http://www.herongyang.com/" title="Tutorials for programmers">Herongyang</a></li> 
+        <li><a href="http://tutorials.jenkov.com/" title="Well explained and to the point tuts!" target="_blank">Jenkov</a></li> 
+        <li><a href="http://www.catonmat.net/" title="This is a must!" target="_blank">CatonMat</a></li> 
+       </ul> 
+      </aside> 
+      <aside id="blog_subscription-3" class="widget widget_blog_subscription">
+       <h1 class="widget-title"><label for="subscribe-field">Email Subscription</label></h1> 
+       <form action="https://subscribe.wordpress.com" method="post" accept-charset="utf-8" id="subscribe-blog"> 
+        <p>Enter your email address to subscribe to this blog and receive notifications of new posts by email.</p> 
+        <p>Join 15 other followers</p> 
+        <p><input type="text" name="email" style="width: 95%; padding: 1px 2px" placeholder="Enter your email address" value="" id="subscribe-field"></p> 
+        <p> <input type="hidden" name="action" value="subscribe"> <input type="hidden" name="blog_id" value="9055413"> <input type="hidden" name="source" value="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/"> <input type="hidden" name="sub-type" value="widget"> <input type="hidden" name="redirect_fragment" value="blog_subscription-3"> <input type="hidden" id="_wpnonce" name="_wpnonce" value="c9de86f64a"> <input type="submit" value="Sign me up!"> </p> 
+       </form> 
+      </aside>
+     </div>
+     <!-- #secondary --> 
+    </div> 
+   </header>
+   <!-- #masthead --> 
+   <div id="content" class="site-content"> 
+    <div id="primary" class="content-area"> 
+     <main id="main" class="site-main" role="main"> 
+      <article id="post-210" class="post-210 post type-post status-publish format-standard hentry category-gui category-java category-networking tag-bufferedread tag-client tag-inputstreamreader tag-java tag-jscrollpane tag-jtextarea tag-networking tag-ports tag-printstacktrace tag-printwriter tag-programmig tag-runnable tag-server tag-sockets tag-threads"> 
+       <header class="entry-header"> 
+        <h1 class="entry-title">A Simple Chat Server in Java using threads Part&nbsp;1</h1> 
+        <div class="entry-meta"> 
+         <span class="posted-on"><a href="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/" rel="bookmark"><time class="entry-date published" datetime="2011-03-10T06:32:06+00:00">March 10, 2011</time><time class="updated" datetime="2011-03-10T06:50:38+00:00">March 10, 2011</time></a></span>
+         <span class="byline"> <span class="author vcard"><a class="url fn n" href="https://linuxjunkies.wordpress.com/author/nitinpkumar/">NPK</a></span></span>
+         <span class="tags-links"><a href="https://linuxjunkies.wordpress.com/tag/bufferedread/" rel="tag">BufferedRead</a>, <a href="https://linuxjunkies.wordpress.com/tag/client/" rel="tag">Client</a>, <a href="https://linuxjunkies.wordpress.com/tag/inputstreamreader/" rel="tag">InputStreamReader</a>, <a href="https://linuxjunkies.wordpress.com/tag/java/" rel="tag">Java</a>, <a href="https://linuxjunkies.wordpress.com/tag/jscrollpane/" rel="tag">JScrollPane</a>, <a href="https://linuxjunkies.wordpress.com/tag/jtextarea/" rel="tag">JTextArea</a>, <a href="https://linuxjunkies.wordpress.com/tag/networking/" rel="tag">Networking</a>, <a href="https://linuxjunkies.wordpress.com/tag/ports/" rel="tag">Ports</a>, <a href="https://linuxjunkies.wordpress.com/tag/printstacktrace/" rel="tag">printStackTrace</a>, <a href="https://linuxjunkies.wordpress.com/tag/printwriter/" rel="tag">PrintWriter</a>, <a href="https://linuxjunkies.wordpress.com/tag/programmig/" rel="tag">Programmig</a>, <a href="https://linuxjunkies.wordpress.com/tag/runnable/" rel="tag">Runnable</a>, <a href="https://linuxjunkies.wordpress.com/tag/server/" rel="tag">Server</a>, <a href="https://linuxjunkies.wordpress.com/tag/sockets/" rel="tag">Sockets</a>, <a href="https://linuxjunkies.wordpress.com/tag/threads/" rel="tag">Threads</a></span> 
+        </div>
+        <!-- .entry-meta --> 
+       </header>
+       <!-- .entry-header --> 
+       <div class="entry-content"> 
+        <div class="pd-rating" id="pd_rating_holder_3357950_post_210"></div>
+        <br>
+        <p>The Client<br> ———</p> 
+        <p><a href="https://linuxjunkies.files.wordpress.com/2011/03/client1.jpg"><img data-attachment-id="219" data-permalink="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/client-2/" data-orig-file="https://linuxjunkies.files.wordpress.com/2011/03/client1.jpg?w=660" data-orig-size="401,395" data-comments-opened="1" data-image-meta="{&quot;aperture&quot;:&quot;0&quot;,&quot;credit&quot;:&quot;&quot;,&quot;camera&quot;:&quot;&quot;,&quot;caption&quot;:&quot;&quot;,&quot;created_timestamp&quot;:&quot;0&quot;,&quot;copyright&quot;:&quot;&quot;,&quot;focal_length&quot;:&quot;0&quot;,&quot;iso&quot;:&quot;0&quot;,&quot;shutter_speed&quot;:&quot;0&quot;,&quot;title&quot;:&quot;&quot;}" data-image-title="client" data-image-description="" data-medium-file="https://linuxjunkies.files.wordpress.com/2011/03/client1.jpg?w=660?w=300" data-large-file="https://linuxjunkies.files.wordpress.com/2011/03/client1.jpg?w=660?w=401" src="https://linuxjunkies.files.wordpress.com/2011/03/client1.jpg?w=660" alt="" title="client" class="aligncenter size-full wp-image-219" srcset="https://linuxjunkies.files.wordpress.com/2011/03/client1.jpg 401w, https://linuxjunkies.files.wordpress.com/2011/03/client1.jpg?w=150 150w, https://linuxjunkies.files.wordpress.com/2011/03/client1.jpg?w=300 300w" sizes="(max-width: 401px) 100vw, 401px"></a></p> 
+        <p>The client side first. We import the necessary stuff&nbsp; needed for this program. The java.net.* contains all<br> the necessary packages for the networking part. The swing and awt packages are for the GUI.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+import java.io.*;
+import java.util.*;
+import javax.swing.*;
+import java.net.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class Client {
+</pre> 
+        <p>The JTextArea will be used to display all the chat proceedings in real time. The objective of this program is to have mutiple clients connect to a server and receive the information passed to them in real time. We make use of threads in this case.</p> 
+        <p>JTextField is used for passing the chat comments.<br> JButton is ofcourse used for sending the message.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+JTextArea incoming;
+JTextField outgoing;
+JButton sendbutton;
+</pre> 
+        <p>BufferedReader is used to buffer the inputstream from another source.<br> We use the PrintWriter to print to the socket. It is similar to using the system println function.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+BufferedReader reader;
+PrintWriter writer;
+</pre> 
+        <p>Sockets<br> ——–<br> Sockets form the important part of this program. Simply put, it is an IP addreass with a port number. Now, port numbers vary from about 0 to 65535. It should be noted that the port numbers from 0 to 1023 are reserved and should not, unless for a reason, be used. In this example we will be using the port number 5000 to connect to the server.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+Socket sock;
+</pre> 
+        <p>The function go()<br> —————–<br> This is the first method to be called. This does the following:<br> 1. Sets up a GUI environment like I mentioned in previous posts.<br> 2. Calls the setUpNetworking() function which will be explained later. Basically, it sets up the networking environment.<br> 3. Most importantly, we start the threads, which I will explain.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+public void go(){
+JFrame frame = new JFrame("Client");
+JPanel mainpanel = new JPanel();
+
+incoming = new JTextArea(15,50);
+incoming.setLineWrap(true);
+incoming.setWrapStyleWord(true);
+incoming.setEditable(false);
+
+JScrollPane qScroller = new JScrollPane(incoming);
+qScroller.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+qScroller.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+outgoing = new JTextField(20);
+sendbutton = new JButton("Send");
+
+sendbutton.addActionListener(new SendButtonListener());
+
+mainpanel.add(qScroller);
+mainpanel.add(outgoing);
+mainpanel.add(sendbutton);
+
+setUpNetworking();
+</pre> 
+        <p>Now what this&nbsp; does is set up a mainpanel which is JPanel. On it we add a JTextArea, which itself is added onto a JScrollPane as seen from the code. The different paramenters of this are set accordingly. The JButton is added and ofcourse, the ActionListener() for the button.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+Thread readerThread = new Thread(new IncomingReader());
+readerThread.start();
+</pre> 
+        <p>This is how a thread is created. Here we pass a new object of the class IncomingReader which implements the Runnable class, which I will explain in a moment.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+frame.getContentPane().add(BorderLayout.CENTER, mainpanel);
+frame.setSize(400, 400);
+frame.setVisible(true);
+</pre> 
+        <p>}</p> 
+        <p>These are just basic frame housekeeping stuff.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+public static void main(String[] args){
+Client client = new Client();
+client.go();
+}
+</pre> 
+        <p>The program begins here ofcourse. An object of the type client is created and the go() function is called.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+private void setUpNetworking(){
+
+try{
+
+sock = new Socket("127.0.0.1", 5000);
+</pre> 
+        <p>This step creates a socket at the address “127.0.0.1” which is the localhost, ie, the same computer. And we select arbitary socket number of 5000. This number is known to the server.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+InputStreamReader streamReader = new InputStreamReader(sock.getInputStream());
+</pre> 
+        <p>The InputStreamReader reads the bytes of data coming from the socket inputstream.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+reader = new BufferedReader(streamReader);
+</pre> 
+        <p>This is then passed on to the BufferedReader object.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+writer = new PrintWriter(sock.getOutputStream());
+</pre> 
+        <p>The PrintWriter object is finally responsible for putting the message onto the output stream.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+System.out.println("Networking established!!");
+
+}catch(IOException e){
+e.printStackTrace();
+}
+}
+</pre> 
+        <p>Before I mention about the networking function, I will explain the concept of the try — catch block of code. Now, while running a code block, exceptions are bound to happen. If we know in advance, that a particular error is likely to happen at a place, we can place it in a try block. So what happens is that if any error occurs in this part will be caught by the catch() statement and then the housekeeping stuff inside the catch block executes. The whole idea of this is to make the program stop gracefully in case of an error.<br> We make the exception object print out the StackTrace in this case.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+public class SendButtonListener implements ActionListener{
+
+public void actionPerformed(ActionEvent e){
+try{
+writer.println(outgoing.getText());
+writer.flush();
+</pre> 
+        <p>We push the content typed into the JTextField into the outputstream of the socket using the writer and<br> clear the buffer after every step.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+}catch(Exception ex){
+ex.printStackTrace();
+}
+
+outgoing.setText("");
+outgoing.requestFocus();
+}
+}
+</pre> 
+        <p>Once you send the message, you clear the JTextField and then give the focus back to the JTextfield so that the user can type in agagin.</p> 
+        <p>This is the ActionListener for the JButton Send.</p> 
+        <pre class="brush: java; title: ; notranslate" title="">
+public class IncomingReader implements Runnable{
+
+public void run(){
+String message;
+try{
+while((message = reader.readLine()) != null){
+System.out.println("read" + message);
+incoming.append(message + "\n");
+
+}
+}catch(Exception e){
+  e.printStackTrace();
+  }
+ }
+ }
+}
+</pre> 
+        <p>This is an important part of the program. This class is passed into the thread as an object. This class implements the Runnable interface. Now, each time a thread is created, this class is called. For each Client object created, new copies or threads of execution of this same program is spawned from the existing main thread, which is the only case in a sequential program and they run independently of each other till they complete or the mother thread stops.</p> 
+        <p>Here what we do is to read from the BufferedReader as and when it is not empty and then post in onto the console as well as onto the JTextField using the append function.</p> 
+        <style type="text/css">
+			div.wpmrec2x{max-width:610px;}
+			div.wpmrec2x div.u > div{float:left;margin-right:10px;}
+			div.wpmrec2x div.u > div:nth-child(3n){margin-right:0px;}
+			</style> 
+        <div class="wpcnt"> 
+         <div class="wpa wpmrec wpmrec2x"> 
+          <span class="wpa-about">Advertisements</span> 
+          <div class="u"> 
+           <script type="text/javascript" id="s26942">
+						(function(g,$){if("undefined"!=typeof g.__ATA){
+							g.__ATA.initAd({collapseEmpty:'after', sectionId:26942, width:300, height:250});
+							g.__ATA.initAd({collapseEmpty:'after', sectionId:114160, width:300, height:250});
+						}})(window,jQuery);
+					</script> 
+          </div> 
+          <div id="crt-838971867" style="width:300px;height:250px;"></div> 
+          <script type="text/javascript">
+		var o = document.getElementById('crt-838971867');
+		if ("undefined"!=typeof Criteo) {
+			var p = o.parentNode;
+			p.style.setProperty('display', 'inline-block', 'important');
+			o.style.setProperty('display', 'block', 'important');
+			Criteo.DisplayAcceptableAdIfAdblocked({zoneid:388248,containerid:"crt-838971867",collapseContainerIfNotAdblocked:true,"callifnotadblocked": function () {var o = document.getElementById('crt-838971867'); o.style.setProperty('display','none','important');o.style.setProperty('visbility','hidden','important'); } });
+		} else {
+			o.style.setProperty('display', 'none', 'important');
+			o.style.setProperty('visibility', 'hidden', 'important');
+		}
+		</script> 
+          <div id="crt-2079557468" style="width:300px;height:250px;"></div> 
+          <script type="text/javascript">
+		var o = document.getElementById('crt-2079557468');
+		if ("undefined"!=typeof Criteo) {
+			var p = o.parentNode;
+			p.style.setProperty('display', 'inline-block', 'important');
+			o.style.setProperty('display', 'block', 'important');
+			Criteo.DisplayAcceptableAdIfAdblocked({zoneid:837497,containerid:"crt-2079557468",collapseContainerIfNotAdblocked:true,"callifnotadblocked": function () {var o = document.getElementById('crt-2079557468'); o.style.setProperty('display','none','important');o.style.setProperty('visbility','hidden','important'); } });
+		} else {
+			o.style.setProperty('display', 'none', 'important');
+			o.style.setProperty('visibility', 'hidden', 'important');
+		}
+		</script> 
+         </div> 
+        </div>
+        <div id="jp-post-flair" class="sharedaddy sd-rating-enabled sd-like-enabled sd-sharing-enabled">
+         <div class="sharedaddy sd-sharing-enabled">
+          <div class="robots-nocontent sd-block sd-social sd-social-icon-text sd-sharing">
+           <h3 class="sd-title">Share this:</h3>
+           <div class="sd-content">
+            <ul>
+             <li class="share-print"><a rel="nofollow" data-shared="" class="share-print sd-button share-icon" href="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/#print" target="_blank" title="Click to print"><span>Print</span></a></li>
+             <li class="share-email"><a rel="nofollow" data-shared="" class="share-email sd-button share-icon" href="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/?share=email" target="_blank" title="Click to email"><span>Email</span></a></li>
+             <li class="share-facebook"><a rel="nofollow" data-shared="sharing-facebook-210" class="share-facebook sd-button share-icon" href="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/?share=facebook" target="_blank" title="Share on Facebook"><span>Facebook</span></a></li>
+             <li class="share-twitter"><a rel="nofollow" data-shared="sharing-twitter-210" class="share-twitter sd-button share-icon" href="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/?share=twitter" target="_blank" title="Click to share on Twitter"><span>Twitter</span></a></li>
+             <li class="share-end"></li>
+            </ul>
+           </div>
+          </div>
+         </div>
+         <div class="sharedaddy sd-block sd-like jetpack-likes-widget-wrapper jetpack-likes-widget-unloaded" id="like-post-wrapper-9055413-210-59d3d4869bd90" data-src="//widgets.wp.com/likes/#blog_id=9055413&amp;post_id=210&amp;origin=linuxjunkies.wordpress.com&amp;obj_id=9055413-210-59d3d4869bd90" data-name="like-post-frame-9055413-210-59d3d4869bd90">
+          <h3 class="sd-title">Like this:</h3>
+          <div class="likes-widget-placeholder post-likes-widget-placeholder" style="height: 55px;">
+           <span class="button"><span>Like</span></span> 
+           <span class="loading">Loading...</span>
+          </div>
+          <span class="sd-text-color"></span>
+          <a class="sd-link-color"></a>
+         </div> 
+         <div id="jp-relatedposts" class="jp-relatedposts"> 
+          <h3 class="jp-relatedposts-headline"><em>Related</em></h3> 
+         </div>
+        </div> 
+       </div>
+       <!-- .entry-content --> 
+       <div class="entry-format"> 
+        <a href="https://linuxjunkies.wordpress.com/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/"><span class="screen-reader-text">A Simple Chat Server in Java using threads Part&nbsp;1</span></a> 
+       </div> 
+      </article>
+      <!-- #post-## --> 
+      <nav class="navigation post-navigation" role="navigation"> 
+       <h1 class="screen-reader-text">Post navigation</h1> 
+       <div class="nav-links"> 
+        <div class="nav-previous">
+         <a href="https://linuxjunkies.wordpress.com/2010/12/05/data-structures-using-java-part-11/" rel="prev"><span class="meta-nav">?</span>&nbsp;Data Structures using Java Part 11: Java Interfaces, Java Packages, Building packages, Compiling packing, Using&nbsp;packages</a>
+        </div>
+        <div class="nav-next">
+         <a href="https://linuxjunkies.wordpress.com/2011/03/10/the-entire-chat-application-in-its-glory/" rel="next">The entire Chat Application in its&nbsp;glory!&nbsp;<span class="meta-nav">?</span></a>
+        </div> 
+       </div>
+       <!-- .nav-links --> 
+      </nav>
+      <!-- .navigation --> 
+      <div id="comments" class="comments-area"> 
+       <div id="respond" class="comment-respond"> 
+        <h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/#respond" style="display:none;">Cancel reply</a></small></h3> 
+        <form action="https://linuxjunkies.wordpress.com/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate> 
+         <input type="hidden" id="highlander_comment_nonce" name="highlander_comment_nonce" value="1108b94dbf">
+         <input type="hidden" name="_wp_http_referer" value="/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/"> 
+         <input type="hidden" name="hc_post_as" id="hc_post_as" value="guest"> 
+         <div class="comment-form-field comment-textarea"> 
+          <label for="comment">Enter your comment here...</label> 
+          <div id="comment-form-comment">
+           <textarea id="comment" name="comment" title="Enter your comment here..."></textarea>
+          </div> 
+         </div> 
+         <div id="comment-form-identity"> 
+          <div id="comment-form-nascar"> 
+           <p>Fill in your details below or click an icon to log in:</p> 
+           <ul> 
+            <li class="selected" style="display:none;"> <a href="#comment-form-guest" id="postas-guest" title="Guest"> <span></span> </a> </li> 
+            <li> <a href="#comment-form-load-service:WordPress.com" id="postas-wordpress" title="WordPress.com"> <span></span> </a> </li> 
+            <li> <a href="#comment-form-load-service:Twitter" id="postas-twitter" title="Twitter"> <span></span> </a> </li> 
+            <li> <a href="#comment-form-load-service:Facebook" id="postas-facebook" title="Facebook"> <span></span> </a> </li> 
+            <li> <iframe id="googleplus-sign-in" name="googleplus-sign-in" src="https://public-api.wordpress.com/connect/?googleplus-sign-in=https%3A%2F%2Flinuxjunkies.wordpress.com" width="24" height="24" scrolling="no" allowtransparency="true" seamless frameborder="0"></iframe> </li> 
+           </ul> 
+          </div> 
+          <div id="comment-form-guest" class="comment-form-service selected"> 
+           <div class="comment-form-padder"> 
+            <div class="comment-form-avatar"> 
+             <a href="https://gravatar.com/site/signup/" target="_blank"> <img src="https://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=25&amp;d=&amp;forcedefault=y&amp;r=G" alt="Gravatar" width="25" class="no-grav"> </a> 
+            </div> 
+            <div class="comment-form-fields"> 
+             <div class="comment-form-field comment-form-email"> 
+              <label for="email">Email <span class="required">(required)</span> <span class="nopublish">(Address never made public)</span></label> 
+              <div class="comment-form-input">
+               <input id="email" name="email" type="email" value="">
+              </div> 
+             </div> 
+             <div class="comment-form-field comment-form-author"> 
+              <label for="author">Name <span class="required">(required)</span></label> 
+              <div class="comment-form-input">
+               <input id="author" name="author" type="text" value="">
+              </div> 
+             </div> 
+             <div class="comment-form-field comment-form-url"> 
+              <label for="url">Website</label> 
+              <div class="comment-form-input">
+               <input id="url" name="url" type="url" value="">
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+          </div> 
+          <div id="comment-form-wordpress" class="comment-form-service"> 
+           <div class="comment-form-padder"> 
+            <div class="comment-form-avatar"> 
+             <img src="https://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=25&amp;d=&amp;forcedefault=y&amp;r=G" alt="WordPress.com Logo" width="25" class="no-grav"> 
+            </div> 
+            <div class="comment-form-fields"> 
+             <input type="hidden" name="wp_avatar" id="wordpress-avatar" class="comment-meta-wordpress" value=""> 
+             <input type="hidden" name="wp_user_id" id="wordpress-user_id" class="comment-meta-wordpress" value=""> 
+             <input type="hidden" name="wp_access_token" id="wordpress-access_token" class="comment-meta-wordpress" value=""> 
+             <p class="comment-form-posting-as pa-wordpress"><strong></strong> You are commenting using your WordPress.com account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'wordpress' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p> 
+            </div> 
+           </div> 
+          </div> 
+          <div id="comment-form-twitter" class="comment-form-service"> 
+           <div class="comment-form-padder"> 
+            <div class="comment-form-avatar"> 
+             <img src="https://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=25&amp;d=&amp;forcedefault=y&amp;r=G" alt="Twitter picture" width="25" class="no-grav"> 
+            </div> 
+            <div class="comment-form-fields"> 
+             <input type="hidden" name="twitter_avatar" id="twitter-avatar" class="comment-meta-twitter" value=""> 
+             <input type="hidden" name="twitter_user_id" id="twitter-user_id" class="comment-meta-twitter" value=""> 
+             <input type="hidden" name="twitter_access_token" id="twitter-access_token" class="comment-meta-twitter" value=""> 
+             <p class="comment-form-posting-as pa-twitter"><strong></strong> You are commenting using your Twitter account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'twitter' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p> 
+            </div> 
+           </div> 
+          </div> 
+          <div id="comment-form-facebook" class="comment-form-service"> 
+           <div class="comment-form-padder"> 
+            <div class="comment-form-avatar"> 
+             <img src="https://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=25&amp;d=&amp;forcedefault=y&amp;r=G" alt="Facebook photo" width="25" class="no-grav"> 
+            </div> 
+            <div class="comment-form-fields"> 
+             <input type="hidden" name="fb_avatar" id="facebook-avatar" class="comment-meta-facebook" value=""> 
+             <input type="hidden" name="fb_user_id" id="facebook-user_id" class="comment-meta-facebook" value=""> 
+             <input type="hidden" name="fb_access_token" id="facebook-access_token" class="comment-meta-facebook" value=""> 
+             <p class="comment-form-posting-as pa-facebook"><strong></strong> You are commenting using your Facebook account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'facebook' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p> 
+            </div> 
+           </div> 
+          </div> 
+          <div id="comment-form-googleplus" class="comment-form-service"> 
+           <div class="comment-form-padder"> 
+            <div class="comment-form-avatar"> 
+             <img src="https://1.gravatar.com/avatar/ad516503a11cd5ca435acc9bb6523536?s=25&amp;d=&amp;forcedefault=y&amp;r=G" alt="Google+ photo" width="25" class="no-grav"> 
+            </div> 
+            <div class="comment-form-fields"> 
+             <input type="hidden" name="googleplus_avatar" id="googleplus-avatar" class="comment-meta-googleplus" value=""> 
+             <input type="hidden" name="googleplus_user_id" id="googleplus-user_id" class="comment-meta-googleplus" value=""> 
+             <input type="hidden" name="googleplus_access_token" id="googleplus-access_token" class="comment-meta-googleplus" value=""> 
+             <p class="comment-form-posting-as pa-googleplus"><strong></strong> You are commenting using your Google+ account. <span class="comment-form-log-out">(&nbsp;<a href="javascript:HighlanderComments.doExternalLogout( 'googleplus' );">Log&nbsp;Out</a>&nbsp;/&nbsp;<a href="#" onclick="javascript:HighlanderComments.switchAccount();return false;">Change</a>&nbsp;)</span></p> 
+            </div> 
+           </div> 
+          </div> 
+          <div id="comment-form-load-service" class="comment-form-service"> 
+           <div class="comment-form-posting-as-cancel">
+            <a href="javascript:HighlanderComments.cancelExternalWindow();">Cancel</a>
+           </div> 
+           <p>Connecting to %s</p> 
+          </div> 
+         </div> 
+         <script type="text/javascript">
+var highlander_expando_javascript = function(){
+	var input = document.createElement( 'input' ),
+	    comment = jQuery( '#comment' );
+
+	if ( 'placeholder' in input ) {
+		comment.attr( 'placeholder', jQuery( '.comment-textarea label' ).remove().text() );
+	}
+
+	// Expando Mode: start small, then auto-resize on first click + text length
+	jQuery( '#comment-form-identity' ).hide();
+	jQuery( '#comment-form-subscribe' ).hide();
+	jQuery( '#commentform .form-submit' ).hide();
+
+	comment.css( { 'height':'10px' } ).one( 'focus', function() {
+		var timer = setInterval( HighlanderComments.resizeCallback, 10 )
+		jQuery( this ).animate( { 'height': HighlanderComments.initialHeight } ).delay( 100 ).queue( function(n) { clearInterval( timer ); HighlanderComments.resizeCallback(); n(); } );
+		jQuery( '#comment-form-identity' ).slideDown();
+		jQuery( '#comment-form-subscribe' ).slideDown();
+		jQuery( '#commentform .form-submit' ).slideDown();
+	});
+}
+jQuery(document).ready( highlander_expando_javascript );
+</script> 
+         <div id="comment-form-subscribe"> 
+          <p class="comment-subscription-form"><input type="checkbox" name="subscribe" id="subscribe" value="subscribe" style="width: auto;"> <label class="subscribe-label" id="subscribe-label" for="subscribe" style="display: inline;">Notify me of new comments via email.</label></p>
+          <p class="post-subscription-form"><input type="checkbox" name="subscribe_blog" id="subscribe_blog" value="subscribe" style="width: auto;"> <label class="subscribe-label" id="subscribe-blog-label" for="subscribe_blog" style="display: inline;">Notify me of new posts via email.</label></p>
+         </div> 
+         <p class="form-submit"><input name="submit" type="submit" id="comment-submit" class="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="210" id="comment_post_ID"> <input type="hidden" name="comment_parent" id="comment_parent" value="0"> </p>
+         <p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="b1488fb308"></p> 
+         <input type="hidden" name="genseq" value="1507054726"> 
+         <p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="65"></p> 
+        </form> 
+       </div>
+       <!-- #respond --> 
+       <div style="clear: both"></div> 
+      </div>
+      <!-- #comments --> 
+     </main>
+     <!-- #main --> 
+    </div>
+    <!-- #primary --> 
+   </div>
+   <!-- #content --> 
+   <footer id="colophon" class="site-footer" role="contentinfo"> 
+    <div class="site-info"> 
+     <a href="https://wordpress.com/?ref=footer_blog">Blog at WordPress.com.</a> 
+    </div>
+    <!-- .site-info --> 
+   </footer>
+   <!-- #colophon --> 
+  </div>
+  <!-- #page --> 
+  <!--  --> 
+  <script type="text/javascript" src="//0.gravatar.com/js/gprofiles.js?ver=201740y"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://s1.wp.com/wp-content/mu-plugins/gravatar-hovercards/wpgroho.js?m=1380573781h"></script> 
+  <script>
+		//initialize and attach hovercards to all gravatars
+		jQuery( document ).ready( function( $ ) {
+
+			if (typeof Gravatar === "undefined"){
+				return;
+			}
+
+			if ( typeof Gravatar.init !== "function" ) {
+				return;
+			}			
+
+			Gravatar.profile_cb = function( hash, id ) {
+				WPGroHo.syncProfileData( hash, id );
+			};
+			Gravatar.my_hash = WPGroHo.my_hash;
+			Gravatar.init( 'body', '#wp-admin-bar-my-account' );
+		});
+	</script> 
+  <div style="display:none"> 
+  </div> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var HighlanderComments = {"loggingInText":"Logging In\u2026","submittingText":"Posting Comment\u2026","postCommentText":"Post Comment","connectingToText":"Connecting to %s","commentingAsText":"%1$s: You are commenting using your %2$s account.","logoutText":"Log Out","loginText":"Log In","connectURL":"https:\/\/linuxjunkies.wordpress.com\/public.api\/connect\/?action=request","logoutURL":"https:\/\/linuxjunkies.wordpress.com\/wp-login.php?action=logout&_wpnonce=49b7d1126c","homeURL":"https:\/\/linuxjunkies.wordpress.com\/","postID":"210","gravDefault":"gravatar_default","enterACommentError":"Please enter a comment","enterEmailError":"Please enter your email address here","invalidEmailError":"Invalid email address","enterAuthorError":"Please enter your name here","gravatarFromEmail":"This picture will show whenever you leave a comment. Click to customize it.","logInToExternalAccount":"Log in to use details from one of these accounts.","change":"Change","changeAccount":"Change Account","comment_registration":"","userIsLoggedIn":"","isJetpack":"0","text_direction":"ltr"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://s2.wp.com/_static/??/wp-content/js/jquery/jquery.autoresize.js,/wp-content/mu-plugins/highlander-comments/script.js?m=1479964158j"></script> 
+  <div id="carousel-reblog-box"> 
+   <form action="#" name="carousel-reblog"> 
+    <textarea id="carousel-reblog-content" name="carousel-reblog-content" placeholder="Add your thoughts here... (optional)"></textarea> 
+    <label for="carousel-reblog-to-blog-id" id="carousel-reblog-lblogid">Post to</label> 
+    <select name="carousel-reblog-to-blog-id" id="carousel-reblog-to-blog-id"> </select> 
+    <div class="submit"> 
+     <span class="canceltext"><a href="#" class="cancel">Cancel</a></span> 
+     <input type="submit" name="carousel-reblog-submit" class="button" id="carousel-reblog-submit" value="Reblog Post"> 
+     <input type="hidden" id="carousel-reblog-blog-id" value="9055413"> 
+     <input type="hidden" id="carousel-reblog-blog-url" value="https://linuxjunkies.wordpress.com"> 
+     <input type="hidden" id="carousel-reblog-blog-title" value="LinuxJunkies"> 
+     <input type="hidden" id="carousel-reblog-post-url" value=""> 
+     <input type="hidden" id="carousel-reblog-post-title" value=""> 
+    </div> 
+    <input type="hidden" id="_wpnonce" name="_wpnonce" value="a108bdcde1">
+    <input type="hidden" name="_wp_http_referer" value="/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/"> 
+   </form> 
+   <div class="arrow"></div> 
+  </div> 
+  <script type="text/javascript" charset="UTF-8" id="polldaddyRatings"><!--//--><![CDATA[//><!--
+PDRTJS_settings_3357950_post_210={"id":3357950,"unique_id":"wp-post-210","title":"A%20Simple%20Chat%20Server%20in%20Java%20using%20threads%20Part%26nbsp%3B1","permalink":"https:\/\/linuxjunkies.wordpress.com\/2011\/03\/10\/a-simple-chat-server-in-java-using-threads-part-1\/","item_id":"_post_210"}; if ( typeof PDRTJS_RATING !== 'undefined' ){if ( typeof PDRTJS_3357950_post_210 == 'undefined' ){PDRTJS_3357950_post_210 = new PDRTJS_RATING( PDRTJS_settings_3357950_post_210 );}}
+//--><!]]></script>
+  <script type="text/javascript" charset="UTF-8" src="https://polldaddy.com/js/rating/rating.js"></script> 
+  <script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/linuxjunkies.wordpress.com\/2011\/03\/10\/a-simple-chat-server-in-java-using-threads-part-1\/":210};
+	</script> 
+  <div id="sharing_email" style="display: none;"> 
+   <form action="/2011/03/10/a-simple-chat-server-in-java-using-threads-part-1/" method="post"> 
+    <label for="target_email">Send to Email Address</label> 
+    <input type="email" name="target_email" id="target_email" value=""> 
+    <label for="source_name">Your Name</label> 
+    <input type="text" name="source_name" id="source_name" value=""> 
+    <label for="source_email">Your Email Address</label> 
+    <input type="email" name="source_email" id="source_email" value=""> 
+    <input type="text" id="jetpack-source_f_name" name="source_f_name" class="input" value="" size="25" autocomplete="off"> 
+    <script> document.getElementById('jetpack-source_f_name').value = ''; </script> 
+    <div class="recaptcha" id="sharing_recaptcha"></div>
+    <input type="hidden" name="recaptcha_public_key" id="recaptcha_public_key" value="6LcYW8MSAAAAADBAuEH9yaPcF7lWh11Iq62ZKtoo"> 
+    <img style="float: right; display: none" class="loading" src="https://s2.wp.com/wp-content/mu-plugins/post-flair/sharing/images/loading.gif" alt="loading" width="16" height="16"> 
+    <input type="submit" value="Send Email" class="sharing_send"> 
+    <a rel="nofollow" href="#cancel" class="sharing_cancel">Cancel</a> 
+    <div class="errors errors-1" style="display: none;">
+      Post was not sent - check your email addresses! 
+    </div> 
+    <div class="errors errors-2" style="display: none;">
+      Email check failed, please try again 
+    </div> 
+    <div class="errors errors-3" style="display: none;">
+      Sorry, your blog cannot share posts by email. 
+    </div> 
+   </form> 
+  </div> 
+  <script type="text/javascript">
+			var windowOpen;
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-facebook' ).on( 'click', function() {
+				if ( 'undefined' !== typeof windowOpen ){ // If there's another sharing window open, close it.
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery(this).attr( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+				return false;
+			});
+		});
+		</script> 
+  <script type="text/javascript">
+			var windowOpen;
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-twitter' ).on( 'click', function() {
+				if ( 'undefined' !== typeof windowOpen ){ // If there's another sharing window open, close it.
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery(this).attr( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+				return false;
+			});
+		});
+		</script> 
+  <script type="text/javascript" src="https://s0.wp.com/_static/??-eJzTLy/QTc7PK0nNK9EvyClNz8wr1i+uzCtJrMjITM/IAeKS1CJMEWP94uSizIISoOIM5/yiVL2sYh19yo1yKiotzvBKLEsEmmefa2toYmRkbGJkaGySBQDQrj/5"></script> 
+  <script type="text/javascript">
+	(function(){
+		var corecss = document.createElement('link');
+		var themecss = document.createElement('link');
+		var corecssurl = "https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0.9b";
+		if ( corecss.setAttribute ) {
+				corecss.setAttribute( "rel", "stylesheet" );
+				corecss.setAttribute( "type", "text/css" );
+				corecss.setAttribute( "href", corecssurl );
+		} else {
+				corecss.rel = "stylesheet";
+				corecss.href = corecssurl;
+		}
+		document.getElementsByTagName("head")[0].insertBefore( corecss, document.getElementById("syntaxhighlighteranchor") );
+		var themecssurl = "https://s0.wp.com/wp-content/plugins/syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?m=1363304414h&amp;ver=3.0.9b";
+		if ( themecss.setAttribute ) {
+				themecss.setAttribute( "rel", "stylesheet" );
+				themecss.setAttribute( "type", "text/css" );
+				themecss.setAttribute( "href", themecssurl );
+		} else {
+				themecss.rel = "stylesheet";
+				themecss.href = themecssurl;
+		}
+		//document.getElementById("syntaxhighlighteranchor").appendChild(themecss);
+		document.getElementsByTagName("head")[0].insertBefore( themecss, document.getElementById("syntaxhighlighteranchor") );
+	})();
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = 'Can\'t find brush for: ';
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = 'Brush wasn\'t configured for html-script option: ';
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['toolbar'] = false;
+	SyntaxHighlighter.all();
+
+// Infinite scroll support
+jQuery( function( $ ) {
+	$( document.body ).on( 'post-load', function() {
+		SyntaxHighlighter.highlight();
+	} );
+} );
+</script> 
+  <link rel="stylesheet" id="all-css-0-3" href="https://s1.wp.com/wp-content/mu-plugins/carousel/jetpack-carousel.css?m=1481571546h" type="text/css" media="all"> 
+  <!--[if lte IE 8]>
+<link rel='stylesheet' id='jetpack-carousel-ie8fix-css'  href='https://s1.wp.com/wp-content/mu-plugins/carousel/jetpack-carousel-ie8fix.css?m=1412618825h&#038;ver=20121024' type='text/css' media='all' />
+<![endif]--> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var actionbardata = {"siteID":"9055413","siteName":"LinuxJunkies","siteURL":"http:\/\/linuxjunkies.wordpress.com","icon":"<img alt='' src='https:\/\/s1.wp.com\/i\/logo\/wpcom-gray-white.png' class='avatar avatar-50' height='50' width='50' \/>","canManageOptions":"","canCustomizeSite":"","isFollowing":"","themeSlug":"pub\/minnow","signupURL":"https:\/\/wordpress.com\/start\/","loginURL":"https:\/\/linuxjunkies.wordpress.com\/wp-login.php?redirect_to=https%3A%2F%2Flinuxjunkies.wordpress.com%2F2011%2F03%2F10%2Fa-simple-chat-server-in-java-using-threads-part-1%2F","themeURL":"https:\/\/wordpress.com\/theme\/minnow\/","xhrURL":"https:\/\/linuxjunkies.wordpress.com\/wp-admin\/admin-ajax.php","nonce":"c71ad1571e","isSingular":"1","isFolded":"","isLoggedIn":"","isMobile":"","subscribeNonce":"<input type=\"hidden\" id=\"_wpnonce\" name=\"_wpnonce\" value=\"c9de86f64a\" \/>","referer":"https:\/\/linuxjunkies.wordpress.com\/2011\/03\/10\/a-simple-chat-server-in-java-using-threads-part-1\/","canFollow":"1","feedID":"950876","statusMessage":"","customizeLink":"https:\/\/linuxjunkies.wordpress.com\/wp-admin\/customize.php?url=https%3A%2F%2Flinuxjunkies.wordpress.com%2F2011%2F03%2F10%2Fa-simple-chat-server-in-java-using-threads-part-1%2F","postID":"210","shortlink":"http:\/\/wp.me\/pBZJ3-3o","canEditPost":"","editLink":"https:\/\/wordpress.com\/post\/linuxjunkies.wordpress.com\/210","statsLink":"https:\/\/wordpress.com\/stats\/post\/210\/linuxjunkies.wordpress.com","i18n":{"view":"View site","follow":"Follow","following":"Following","edit":"Edit","login":"Log in","signup":"Sign up","customize":"Customize","report":"Report this content","themeInfo":"Get theme: Minnow","shortlink":"Copy shortlink","copied":"Copied","followedText":"New posts from this site will now appear in your <a href=\"https:\/\/wordpress.com\/\">Reader<\/a>","foldBar":"Collapse this bar","unfoldBar":"Expand this bar","editSubs":"Manage subscriptions","viewReader":"View site in Reader","viewReadPost":"View post in Reader","subscribe":"Sign me up","enterEmail":"Enter your email address","followers":"","alreadyUser":"Already have a WordPress.com account? <a href=\"https:\/\/linuxjunkies.wordpress.com\/wp-login.php?redirect_to=https%3A%2F%2Flinuxjunkies.wordpress.com%2F2011%2F03%2F10%2Fa-simple-chat-server-in-java-using-threads-part-1%2F\">Log in now.<\/a>","stats":"Stats"}};
+/* ]]> */
+</script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var jetpackCarouselStrings = {"widths":[370,700,1000,1200,1400,2000],"is_logged_in":"","lang":"en","ajaxurl":"https:\/\/linuxjunkies.wordpress.com\/wp-admin\/admin-ajax.php","nonce":"f3ca80e632","display_exif":"1","display_geo":"1","single_image_gallery":"1","single_image_gallery_media_file":"","background_color":"black","comment":"Comment","post_comment":"Post Comment","write_comment":"Write a Comment...","loading_comments":"Loading Comments...","download_original":"View full size <span class=\"photo-size\">{0}<span class=\"photo-size-times\">\u00d7<\/span>{1}<\/span>","no_comment_text":"Please be sure to submit some text with your comment.","no_comment_email":"Please provide an email address to comment.","no_comment_author":"Please provide your name to comment.","comment_post_error":"Sorry, but there was an error posting your comment. Please try again later.","comment_approved":"Your comment was approved.","comment_unapproved":"Your comment is in moderation.","camera":"Camera","aperture":"Aperture","shutter_speed":"Shutter Speed","focal_length":"Focal Length","comment_registration":"0","require_name_email":"1","login_url":"https:\/\/linuxjunkies.wordpress.com\/wp-login.php?redirect_to=https%3A%2F%2Flinuxjunkies.wordpress.com%2F2011%2F03%2F10%2Fa-simple-chat-server-in-java-using-threads-part-1%2F","blog_id":"9055413","local_comments_commenting_as":"<fieldset><label for=\"email\">Email (Required)<\/label> <input type=\"text\" name=\"email\" class=\"jp-carousel-comment-form-field jp-carousel-comment-form-text-field\" id=\"jp-carousel-comment-form-email-field\" \/><\/fieldset><fieldset><label for=\"author\">Name (Required)<\/label> <input type=\"text\" name=\"author\" class=\"jp-carousel-comment-form-field jp-carousel-comment-form-text-field\" id=\"jp-carousel-comment-form-author-field\" \/><\/fieldset><fieldset><label for=\"url\">Website<\/label> <input type=\"text\" name=\"url\" class=\"jp-carousel-comment-form-field jp-carousel-comment-form-text-field\" id=\"jp-carousel-comment-form-url-field\" \/><\/fieldset>","reblog":"Reblog","reblogged":"Reblogged","reblog_add_thoughts":"Add your thoughts here... (optional)","reblogging":"Reblogging...","post_reblog":"Post Reblog","stats_query_args":"blog=9055413&v=wpcom&tz=0&user_id=0&subd=linuxjunkies","is_public":"1","reblog_enabled":""};
+/* ]]> */
+</script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://s0.wp.com/_static/??-eJyNkN1uwyAMhV9oxGmn/dxMe5SJEicxAcMwpOvbj2hrFk1V1Csf2Z+PD8A5KhM4I2ewAh3OZDB+NVYeYDPyRUVXBmIBRxMKfBYsOGruHKb/cB7RVySWE3hiDufF+UfdhbKeadCZAt+Fy0RROeJJ9cEUUT2t8YmNK13dqJgJ3lcPlTC6S1PXd96ouzpXJ53Aa8mYqlJhxpRoMVt7ew5myb84rOpWKIl/ObZ9W/83XX5Ls6Vu3DI6hSLowGKO2kzq2tjLN5F4zOqxaeGjXoY+JL/DxyBZ9U5TAhl1Ih6utS69+7fDU3t8fj28HFv7DT8T3i4="></script> 
+  <script type="text/javascript">
+// <![CDATA[
+(function() {
+try{
+  if ( window.external &&'msIsSiteMode' in window.external) {
+    if (window.external.msIsSiteMode()) {
+      var jl = document.createElement('script');
+      jl.type='text/javascript';
+      jl.async=true;
+      jl.src='/wp-content/plugins/ie-sitemode/custom-jumplist.php';
+      var s = document.getElementsByTagName('script')[0];
+      s.parentNode.insertBefore(jl, s);
+    }
+  }
+}catch(e){}
+})();
+// ]]>
+</script> 
+  <iframe src="https://widgets.wp.com/likes/master.html?ver=20170206#ver=20170206" scrolling="no" id="likes-master" name="likes-master" style="display:none;"></iframe> 
+  <div id="likes-other-gravatars">
+   <div class="likes-text">
+    <span>%d</span> bloggers like this:
+   </div>
+   <ul class="wpl-avatars sd-like-gravatars"></ul>
+  </div> 
+  <script src="//stats.wp.com/w.js?56" type="text/javascript" async defer></script> 
+  <script type="text/javascript">
+_tkq = window._tkq || [];
+_stq = window._stq || [];
+_tkq.push(['storeContext', {'blog_id':'9055413','blog_tz':'0','user_lang':'en','blog_lang':'en','user_id':'0'}]);
+_stq.push(['view', {'blog':'9055413','v':'wpcom','tz':'0','user_id':'0','post':'210','subd':'linuxjunkies'}]);
+_stq.push(['extra', {'crypt':'UE5XaGUuOTlwaD85flAmcm1mcmZsaDhkV11YdWFnNncxc1tjZG9XVXhRVnolXz01bj9hWHNXd1k/Y3FPQVZyVjZ8d3Y9OHVRSXxzUC1ofD81JWNbbUk0Jml8dkIwRC1qVTYlekE1a0hGTk51eVN2LWdaY3NncTg9T0Y1LWw4MFB+NHNyK1l0Q1lyNVFJZERbdjI4Y0ZKfCw2VFg5QWZ3dS8vd05TeUR2ZllORnx2JllRRTNrQTIzSC9VM2V5YyZfc1BPUEJHOFpxc2hkS0I4L1ByZmFnWE5ha2sxdE1ZS3dvR35rLGhMR3NRa2NiMElUYkN4LVE9UyxOTVtHY2oscTljK25ZaDMmNFs9Sz9wc0U2b1dLNm9IdWZFU18sc18uLGh6PXU='}]);
+_stq.push([ 'clickTrackerInit', '9055413', '210' ]);
+	</script> 
+  <noscript>
+   <img src="https://pixel.wp.com/b.gif?v=noscript" style="height:0px;width:0px;overflow:hidden" alt="">
+  </noscript> 
+  <script>
+if ( 'object' === typeof wpcom_mobile_user_agent_info ) {
+
+	wpcom_mobile_user_agent_info.init();
+	var mobileStatsQueryString = "";
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedPlatformName )
+		mobileStatsQueryString += "&x_" + 'mobile_platforms' + '=' + wpcom_mobile_user_agent_info.matchedPlatformName;
+	
+	if( false !== wpcom_mobile_user_agent_info.matchedUserAgentName )
+		mobileStatsQueryString += "&x_" + 'mobile_devices' + '=' + wpcom_mobile_user_agent_info.matchedUserAgentName;
+	
+	if( wpcom_mobile_user_agent_info.isIPad() )
+		mobileStatsQueryString += "&x_" + 'ipad_views' + '=' + 'views';
+
+	if( "" != mobileStatsQueryString ) {
+		new Image().src = document.location.protocol + '//pixel.wp.com/g.gif?v=wpcom-no-pv' + mobileStatsQueryString + '&baba=' + Math.random();
+	}
+	
+}
+</script>   
+ </body>
+</html>

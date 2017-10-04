@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+ <head> 
+  <script type="text/javascript">
+      document.documentElement.className += " js"
+    </script> 
+  <meta charset="utf-8"> 
+  <!-- Le HTML5 shim, for IE6-8 support of HTML elements --> 
+  <!--[if lt IE 9]>
+      <script src="/assets/scripts/html5.js"></script>
+    <![endif]--> 
+  <!-- Le styles --> 
+  <link rel="stylesheet" href="/commonassets/css/bootstrap.css"> 
+  <!-- Le fav and touch icons --> 
+  <link rel="shortcut icon" href="/favicon.ico"> 
+  <title>
+Convert Java to EXE - Why, When, When Not and How
+</title> 
+  <meta name="description" content="Choose the best tool for transforming your Java apps into native executables. Learn about the alternative ways to simplify Java application deployment."> 
+  <meta name="keywords" content="Java, native, EXE, DLL, Windows, Linux, OS X, executable, binary, compiler, launcher, wrapper, installer, deployment, Java Web Start, JWS, JNLP"> 
+  <link rel="alternate" href="/de/articles/java-in-exe-dateien.html" hreflang="de"> 
+  <link rel="alternate" href="/fr/articles/java-en-exe.html" hreflang="fr"> 
+  <style type="text/css">
+.insert-title {
+  width: 100%;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid black;
+  text-align: center;
+  font-weight: bold;
+}
+</style> 
+  <script type="text/javascript">
+
+      var _gaq = _gaq || [];
+      var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+      _gaq.push(['_require', 'inpage_linkid', pluginUrl]);      
+      _gaq.push(['_setAccount', 'UA-764396-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+
+    </script> 
+ </head> 
+ <body> 
+  <div class="topbar"> 
+   <div class="fill"> 
+    <div class="container"> 
+     <a class="brand" href="/resources.html">Excelsior Library</a> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="container"> 
+   <div class="content"> 
+    <header> 
+     <h1>Convert Java to EXE — Why, When, When Not and How</h1> 
+     <p>By Dmitry LESKOV <a target="_blank" href="http://www.linkedin.com/in/dmitryleskov"><img src="/images/linkedin-button-20x15.gif" width="20" height="15" alt="LinkedIn" style="vertical-align:middle"></a> </p> 
+    </header> 
+    <article> 
+     <section id="meta" class="row"> 
+      <div class="span7 offset1">
+        Last update: 15-Oct-2015 
+      </div> 
+      <div class="span7" style="text-align: right"> 
+       <small>This article is also available in: <a lang="de" href="/de/articles/java-in-exe-dateien.html">Deutsch</a> and <a lang="fr" href="/fr/articles/java-en-exe.html">Français</a> </small> 
+      </div> 
+     </section> 
+     <section id="intro" class="row"> 
+      <div class="span10 offset1"> 
+       <div class="alert-message warning">
+         If you are sure you need a 
+        <b>real</b> EXE, go straight to 
+        <a href="#aot"><b>AOT Compilers</b></a>. 
+       </div> 
+       <p> "How do I make an .EXE file from my Java application?", "Need help converting jar to exe", "Is it possible to create a Windows executable using Java?" — these and similar questions are among the most popular topics on Java developer forums. Should you start such a topic today, you are likely to encounter the following three types of replies: </p> 
+       <ul> 
+        <li>"You cannot"</li> 
+        <li>"You should not, because that would kill the very purpose of Java"</li> 
+        <li>"You can do that with third party software X and Y"</li> 
+       </ul> 
+       <p> The truth is that there exist two completely different approaches to the creation of native executables from Java applications, addressing different sets of problems. Moreover, under certain conditions some of those problems may be solved without making an EXE. So the most correct way to reply to such a post would be a request for more information, namely what is the goal of conversion to EXE. And the most frequent answer would be </p> 
+      </div> 
+      <div class="span4"> 
+       <div class="alert-message block-message info"> 
+        <p class="insert-title">CONTENTS</p> 
+        <p><a href="#intro">Introduction</a></p> 
+        <p><a href="#simple">Simplify Java Application Deployment</a></p> 
+        <p><a href="#exejar">Executable Jars</a></p> 
+        <p><a href="#webstart">Java Web Start</a></p> 
+        <p><a href="#launch">Custom Java Launchers And&nbsp;Wrappers</a></p> 
+        <p><a href="#setup">Java-Aware Setup Authoring Tools</a></p> 
+        <p><a href="#aot">Ahead-Of-Time Compilers</a></p> 
+        <p><b>Bonus Features:</b></p> 
+        <p><a href="#gcjvsjet">AOT Compilers Comparison</a></p> 
+        <p><a href="#alternative">Alternative Approaches</a></p> 
+        <p><a href="#links">Further Reading</a></p> 
+       </div> 
+      </div> 
+     </section> 
+     <section id="simple"> 
+      <div class="page-header"> 
+       <h1>Simplify Java Application Deployment</h1> 
+      </div> 
+      <div class="row"> 
+       <div class="span10 offset1"> 
+        <p> Java compiles to platform-independent bytecode (.class files), which is not directly supported by PC hardware. So a Java program needs a Java Runtime Environment (JRE) to run, which would either interpret the bytecode instructions or compile them to native code on the fly. This in turn means that the author of that program has to ensure somehow that a proper version of the JRE is present on each end user system. </p> 
+        <p> In a general case you may not expect that your end users will know what a JRE is, how to check its version, and how to download and install it. This is especially true for consumer applications, such as games or multimedia. And those who already have a JRE installed may not like the idea of installing a different version, because it may break their existing Java applications and favorite applets. </p> 
+        <p> Then, even if you can make sure that the right version of the JRE is properly installed on all enduser systems, which is quite possible in a classroom or enterprise environment, the command line required to launch your Java application can be quite long: </p> 
+        <pre>java -Xmx200m -cp whatever.jar -Dsome.property MyApp</pre> 
+        <p> Yes, you may put that line into a batch file and call it <code>runme.bat</code>, but it looks so much easier to give your program to a friend, teacher or colleague as a single file that can be run by a double-click. Or, even better, enable it to be installed and uninstalled in a native manner without affecting other applications. </p> 
+        <p> So it comes as no surprise that the primary motivation for seeking a way to convert a Java application into an EXE file is to make its deployment and use simpler and safer for an average user, that is, a Windows user. What used to surprise newbie Java developers is that the JDK up to and including version 7 did not offer such functionality. In fact, all you could make with JDK tools back in the early years of Java were </p> 
+       </div> 
+       <div class="span4"> 
+        <p><small> If this article looks like too much read, check out its companion resource: <a href="/articles/best-jar-to-exe-conversion-tools-free-commercial.html">Best Jar to EXE Conversion Tools</a> </small></p> 
+       </div> 
+      </div> 
+     </section> 
+     <section id="exejar"> 
+      <div class="page-header"> 
+       <h1>Executable Jars</h1> 
+      </div> 
+      <div class="row"> 
+       <div class="span10 offset1"> 
+        <p> You can make your Java application runnable via a double-click by packaging it into a so called <i>executable jar</i>. You do that by specifying the main class of your application, any extra jar files it may require and so on in the jar's <i>manifest file</i> </p> 
+        <pre>Main-Class: MyAppMain
+Class-Path: mylib.jar
+</pre> 
+        <p> Then you use the <code>jar</code> utility from the Java SDK to package your classes and resource files, specifying the <code>m</code> option and the name of your manifest file: </p> 
+        <pre>jar cvfm MyApp.jar MyApp.mf *.class *.gif</pre> 
+        <p> This will result in the creation of <code>MyApp.jar</code>. Now, if you type </p> 
+        <pre>java -jar MyApp.jar</pre> 
+        <p> the Java launcher will read the manifest from <code>MyApp.jar</code> and invoke the <code>main</code> method from the class <code>MyAppMain</code>. Moreover, if you double-click that jar file on a system that has JRE installed, the java launcher will be invoked automatically. </p> 
+        <p> <b>Note:</b> Jar files are associated with the <code>javaw</code> launcher on Windows, which does not open a console on startup. If your application needs a console, write a batch file which would start it using the <code>java</code> launcher. </p>
+        <p> If your application consists of more than one jar file, there is an open source tool called <a href="http://one-jar.sourceforge.net/" target="_blank">One-JAR</a> that claims to correctly <a href="http://one-jar.sourceforge.net/" target="_blank">repackage multiple jars into one</a>. </p> 
+        <p> The major problem with executable jars is compatibility. The default JRE may be of an older version than is required by your application or may not have the necessary Java Optional Packages (previously known as Standard Extensions) installed. For instance, if your app uses any of the latest and greatest JDK&nbsp;8 features, it will not work on JRE&nbsp;7 or any prior version. </p> 
+        <p> Fortunately, back in the day Sun Microsystems had created a Java application deployment technology that eliminates this compatibility problem and adds some nice features. It has been part of the Java platform since version 1.4 and is called </p>
+       </div> 
+       <div class="span4"> 
+        <div class="alert-message block-message info"> 
+         <p class="insert-title">Executable Jars</p> 
+         <dl> 
+          <dt>
+           Pros
+          </dt> 
+          <dd> 
+           <p>No need to use any third-party tools</p> 
+           <p>Single distribution for all Java-enabled platforms</p> 
+          </dd> 
+          <dt>
+           Cons
+          </dt> 
+          <dd> 
+           <p>Application will not start on systems that do not have a JRE (properly) installed</p> 
+           <p>Application will not work if it uses APIs absent in the default JRE</p> 
+           <p>Need to teach users that jar files are clickable</p> 
+          </dd> 
+          <dt>
+           Resources
+          </dt> 
+          <dd> 
+           <a target="_blank" href="http://docs.oracle.com/javase/8/docs/technotes/guides/jar/jar.html">JAR File Specification</a> 
+          </dd> 
+          <dt>
+           Tools
+          </dt> 
+          <dd> 
+           <a target="_blank" title="Jar repackager, open source" href="http://one-jar.sourceforge.net/">One-JAR</a>
+           <br> 
+           <a target="_blank" title="Jar (re)packager and shrinker, open source" href="http://autojar.sourceforge.net/">Autojar</a>
+           <br> 
+           <a target="_blank" title="Single-jar deployment plug-in for Eclipse, open source" href="http://fjep.sourceforge.net/">Fat Jar</a>
+           <br> 
+           <a target="_blank" title="Executable jar maker, freeware" href="http://www.syncedit.com/software/javalauncher/index.html">Java Launcher</a> 
+          </dd> 
+         </dl> 
+        </div> 
+       </div> 
+      </div> 
+     </section> 
+     <section id="webstart"> 
+      <div class="page-header"> 
+       <h1>Java Web Start</h1> 
+      </div> 
+      <div class="row"> 
+       <div class="span10 offset1"> 
+        <p> <b><a target="_blank" href="http://docs.oracle.com/javase/8/docs/technotes/guides/jweb/index.html">Java Web Start (JWS)</a></b> and the underlying <b>Java Network Launch Protocol (JNLP)</b> enable Java application delivery from a standard Web server. The end user initiates application installation by clicking on an URL. If the Java Web Start engine is not present on the system, the user is prompted to download and install it. Once Java Web Start is in place, clicking on the same URL will initiate the application download and installation procedures. It may involve download and installation of the required version of the JRE and Optional Packages. Upon their successful completion, the application is launched. The application will be cached on the user's system so next time the user clicks on the same URL, the JWS engine will launch the local copy of the application from the cache, if it detects that the computer is offline or the application was not updated on the Web site. </p> 
+        <p> Another important feature of JWS is its ability to run your application in a <i>sandbox</i> - a restricted container based on Java security architecture. But, unlike an applet, your application can gain access to local system resources like the filesystem, printer and system clipboard using the JNLP API even if it comes from an untrusted environment, after prompting the user for confirmation. </p> 
+        <p> Java Web Start is included in the normal Oracle JRE (not in the Server JRE), with plugins for popular browsers, though some browser configuration tweaks may be required. Starting from version 8, the Oracle JDK includes the <a target="_blank" href="http://docs.oracle.com/javase/8/docs/technotes/guides/deploy/packager.html">Java Packager</a> tool, which can in particular prepare Java applications for deployment via Java Web Start. There are also third-party implementations of the JNLP protocol, some of them also include tools that assist you in the creation and maintenance of JNLP packages. </p> 
+        <p> That was the bright side. Now, what is not so good about JNLP? First off, for seamless operation both the browser and the Web server that hosts the JNLP-enabled application must support <code>application/x-java-jnlp-file</code> MIME type. Some hosting providers do not support it. Moreover, versioning and incremental updates require additional support from the Web server, which has to be implemented using servlets, cgi-bin scripts, etc. </p> 
+        <p> On the client side, a major browser would be configured to recognize the above MIME type during installation of the JWS engine, but users of less popular browsers, such as Opera, may have to do that manually. </p> 
+        <p> JNLP-enabling an application may involve minor changes in its code and (re)packaging it into a set of jar files. </p> 
+        <p> Before J2SE 5.0, JWS had very little to offer in terms of desktop integration - all it could do was create a desktop icon and/or a Start Menu entry for the application. On Windows, the application will not show up in Add/Remove Programs, so end users would have to run the Java Web Start application manager in order to remove your application. </p> 
+        <p> Finally, JWS user interface needs polishing. Many users complained about ugly windows with incomprehensible messages. </p> 
+        <p> To sum it up, JWS can be a viable option in a controlled environment, such as corporate intranet, but it is not ready for the consumer market, where you may be better off using </p> 
+       </div> 
+       <div class="span4"> 
+        <div class="alert-message block-message info"> 
+         <p class="insert-title">Java Web Start</p> 
+         <dl> 
+          <dt>
+           Pros
+          </dt> 
+          <dd> 
+           <p>Available for all major desktop platforms</p> 
+           <p>Single distribution for all JWS-enabled platforms</p> 
+           <p>Code-signing and sandboxing</p> 
+           <p>Versioning and incremental updates</p> 
+           <p>Automatic installation of JREs and optional packages</p> 
+           <p>Use of third-party tools is optional</p> 
+          </dd> 
+          <dt>
+           Cons
+          </dt> 
+          <dd> 
+           <p>Internet connectivity required if JWS, JRE, and/or an Optional Package is not present on the system</p> 
+           <p>Support for jnlp MIME type required on both Web server and browser</p> 
+           <p>Limited desktop integration capabilities</p> 
+          </dd> 
+          <dt>
+           Resources
+          </dt> 
+          <dd> 
+           <p> <a target="_blank" title="Covers both applets and JNLP" href="http://docs.oracle.com/javase/8/docs/technotes/guides/jweb/index.html">Java Rich Internet Applications Guide</a> </p> 
+           <p> <a target="_blank" href="http://www.oracle.com/technetwork/articles/javase/index-135962.html">Deploying Software with JNLP and Java™ Web Start</a> </p> 
+           <p> <a target="_blank" title="Lots of information with many links" href="http://mindprod.com/jgloss/javawebstart.html">Java Web Start</a><br>(Roedy Green's Java Glossary) </p> 
+           <a target="_blank" title="Information, tools, links. Looks outdated though" href="http://lopica.sourceforge.net/">Lopica - All Things Web Start</a> 
+          </dd> 
+          <dt>
+           Tools
+          </dt> 
+          <dd> 
+           <a target="_blank" title="Included in the Oracle JDK since version 8, can generate JNLP and HTML" href="http://docs.oracle.com/javase/8/docs/technotes/guides/deploy/packager.html">Java Packager</a> 
+           <span class="label notice">Updated</span>
+           <br> 
+           <a target="_blank" title="Interesting open source network application manager, now in alpha" href="http://xito.sourceforge.net/projects/appmanager/index.php">Xito Application Manager</a>
+           <br> 
+           <a target="_blank" title="PHP, license unclear" href="http://www.digitalgemstones.com/code/tools/jnlp.php">Automatic JNLP Generator</a> 
+          </dd> 
+         </dl> 
+        </div> 
+       </div> 
+      </div> 
+     </section> 
+     <section id="launch"> 
+      <div class="page-header"> 
+       <h1>Custom Java Launchers And Wrappers</h1> 
+      </div> 
+      <div class="row"> 
+       <div class="span10 offset1"> 
+        <p> When a Java program is invoked using one of the methods discussed above (batch file, executable jar, or Java Web Start/JNLP), the operating system runs a Java launcher from the JRE. The Windows version of the JRE has separate launchers for command-line and GUI apps, called <code>java.exe</code> and <code>javaw.exe</code> respectively. </p> 
+        <p> As a result, all running Java applications have the same Taskbar/Alt-Tab icons and appear in the Windows Task Manager as either <code>java.exe</code> or <code>javaw.exe</code>. If you have two or more Java apps running, you have no means to distinguish between multiple instances of the standard Java launcher in the Task Manager. </p> 
+        <p> In fact, those launchers are just small native programs that load the Java Virtual Machine from a DLL/shared library and then feed your program to that JVM using the Invocation API. That API is part of the <a target="_blank" href="http://download.oracle.com/javase/6/docs/technotes/guides/jni/">Java Native Interface (JNI)</a>, so it is standardized, and it is also very simple. This makes it relatively easy to write your own launcher with a unique name and icon. What it has to do is find a suitable JRE on the end user's system (unless you bundle the JRE with your application), load and initialize the JVM, and run your application on it. </p> 
+        <p> If you do not have the right tools, skills, or time to develop a custom launcher for your Java application, there are quite a few third-party Java launcher generators listed in the Tools section of the frame. (It is the most frequently updated section of this article — it seems to me that Java developers just LOVE to reinvent this particular wheel.) Some of them provide additional features such as instant splash screen, stdout and stderr redirection, and so on, the most notable being <i>wrapping</i>. </p> 
+        <p> A Java wrapper is essentially a custom Java launcher that is also a self-extracting archive containing all the application's classes, jars and auxiliary files. The wrapper unpacks those files on startup and removes on termination. This way, your application is distributed as a single executable. </p> 
+        <p> A wrapper normally looks up the JRE upon startup. If the JRE is not present or its version does not match the application's compatibility requirements, some wrappers may install the JRE (if you have included it when wrapping your application) and/or download and install the required version of the JRE. </p> 
+        <p> The most sophisticated wrappers may also setup file associations and create shortcuts on first run. But if you need something more complex, such as support for automatic updates or uniform cross-platform deployment, have a look at </p> 
+       </div> 
+       <div class="span4"> 
+        <div class="alert-message block-message info"> 
+         <p class="insert-title">Launchers and Wrappers</p> 
+         <dl> 
+          <dt>
+           Pros
+          </dt> 
+          <dd> 
+           <p>JRE version check</p> 
+           <p>JRE download or bundling</p> 
+           <p>Unique process name and icon</p> 
+           <p>No end-user training</p> 
+          </dd> 
+          <dt>
+           Cons
+          </dt> 
+          <dd> 
+           <p>Platform specific</p> 
+           <p>Desktop integration capabilities absent or very limited</p> 
+          </dd> 
+          <dt>
+           Resources
+          </dt> 
+          <dd> 
+           <p><a target="_blank" href="http://docs.oracle.com/javase/8/docs/technotes/guides/jni/">JNI Specification and&nbsp;FAQ</a></p> 
+          </dd> 
+          <dt>
+           Tools (Commercial)
+          </dt> 
+          <dd> 
+           <p> <a target="_blank" title="Commercial with free trial" href="http://www.regexlab.com/en/jar2exe/">Jar2Exe</a><br> <a target="_blank" title="Commercial with free trial" href="http://www.dobysoft.com/products/nativej/">NativeJ</a><br> <a target="_blank" title="Shareware" href="http://www.duckware.com/jexepack/">JExePack</a><br> <a target="_blank" title="Shareware" href="http://www.magi-au.com/download/">Jlaunch</a><br> </p> 
+          </dd> 
+          <dt>
+           Tools (Free)
+          </dt> 
+          <dd> 
+           <p> <a target="_blank" title="Included in the Oracle JDK since version 8" href="http://docs.oracle.com/javase/8/docs/technotes/guides/deploy/packager.html">Java Packager</a> <span class="label notice">Updated</span><br> <a target="_blank" title="Open source (Apache)" href="https://github.com/libgdx/packr">Packr</a><br> <a target="_blank" title="Open source (MIT)" href="https://github.com/XBigTK13X/conyay">conyay</a><br> <a target="_blank" title="Open source" href="https://github.com/joshmarinacci/AppBundler">AppBundler Ant Task</a><br> <a target="_blank" title="Open source (GPL)" href="http://jsmooth.sourceforge.net">JSmooth</a><br> <a target="_blank" title="Open source (LGPL)" href="http://launch4j.sourceforge.net/">Launch4j</a><br> <a target="_blank" title="Open source (GPL), not updated since Sep 2003" href="http://jstart32.sourceforge.net/">jstart32</a><br> <a target="_blank" title="Freeware" href="http://www.sureshotsoftware.com/exej/">exeJ</a><br> <a target="_blank" title="Freeware" href="http://www.syncedit.com/software/javalauncher/index.html">Java Launcher</a><br> </p> 
+          </dd> 
+         </dl> 
+        </div> 
+       </div> 
+      </div> 
+     </section> 
+     <section id="setup"> 
+      <div class="page-header"> 
+       <h1>Java-Aware Setup Authoring Tools</h1> 
+      </div> 
+      <div class="row"> 
+       <div class="span10 offset1"> 
+        <p> If all you need is install a private copy of the JRE alongside your application and create shortcuts that run your application on that JRE, you may use any setup generator. However, using a Java-aware tool may give you the following benefits: </p> 
+        <ul> 
+         <li>Install-time JRE detection and download</li> 
+         <li>Generation of <a href="#launch">native launchers</a></li> 
+         <li>User-editable JVM parameter files</li> 
+         <li>Redirection of stderr and stdout for saving logs and exception stack traces.</li> 
+         <li>Registration of Java applications as Windows services and Unix daemons</li> 
+        </ul> 
+        <p> This category is the most diversified in terms of tool pricing and functionality. The differences are explained below by example. </p> 
+        <p> <em>Windows-centric</em> tools, such as <a target="_blank" href="http://www.advancedinstaller.com/java.html">Advanced Installer for Java</a> enable you to build MSI (Windows Installer) packages. </p> 
+        <p> <em>Multi-platform</em> tools can generate native installers for multiple platforms — Windows, OS X, Linux, as well as RPMs and tarballs. Again, the <a target="_blank" href="http://docs.oracle.com/javase/8/docs/technotes/guides/deploy/packager.html">Java Packager</a> tool included in the current Oracle JDK is capable of producing EXE and MSI installers for Windows, Apple OS X Disk Image files (DMG), and RPM and DEB packages for Linux. However, for the generation of EXE and MSI installers it relies on free third-party tools — Inno Setup and WiX. <a target="_blank" href="http://www.ej-technologies.com/products/install4j/overview.html">install4j</a> is a more versatile, all-in-one commercial tool. </p> 
+        <p> There exist also Java-based setup authoring tools enabling you to create <em>cross-platform installations</em>, Those installations are essentially <a href="#exejars">executable jars</a> with platform-specific logic selected at run time. <a target="_blank" href="http://www.flexerasoftware.com/products/installanywhere.htm">InstallAnywhere</a> is perhaps the most well known tool of this type, but if its pricing is beyond your budget, consider the free-with-restrictions <a target="_blank" href="http://jwrapper.com/">JWrapper</a>, which can do both native and cross-platform installers, or the open source <a target="_blank" href="http://izpack.org/">IzPack</a>. </p> 
+        <p> </p>
+        <p> Finally, there is One Tool to Rule Them All - <a target="_blank" href="http://www.installshield.com/">InstallShield</a>, which can create both <em>Windows desktop (MSI)</em> and <em>cross-platform</em> installations, plus <em>server</em> and <em>mobile</em> ones, for any type of application and for a multitude of platforms. And yes, it does support JRE lookup and bundling, native launchers, and so on. </p> 
+        <p> For straightforward installations, however, InstallShield is an overkill. Also note that InstallAnywhere and InstallShield are aimed at the enterprise developer and are priced accordingly. </p> 
+        <p> All the above solutions do not change the fundamental principle mentioned in the first section of this article. Whether you make an executable jar or create a sophisticated installer, your Java program is still deployed as platform-independent bytecode. In the early days of Java, the only way to execute a Java program on a common PC hardware was to interpret that bytecode. Today, any decent Java implementation includes a Just-In-Time (JIT) compiler that compiles frequently executed methods to native code. So it sounds quite natural to take one step further and compile the entire application down to native code <em>before</em> it is deployed. Such tools exist and they are called </p> 
+       </div> 
+       <div class="span4"> 
+        <div class="alert-message block-message info"> 
+         <p class="insert-title">Setup Authoring Tools</p> 
+         <dl> 
+          <dt>
+           Pros
+          </dt> 
+          <dd> 
+           <p>Complete desktop integration</p> 
+           <p>Can be platform-specific or cross-platform</p> 
+           <p>Localization support</p> 
+           <p>Flexibility</p> 
+          </dd> 
+          <dt>
+           Cons
+          </dt> 
+          <dd> 
+           <p>Requires third-party tools which may be too pricey and/or complex</p> 
+          </dd> 
+          <dt>
+           Resources
+          </dt> 
+          <dd> 
+           <a target="_blank" title="Independent resource on desktop management" href="http://www.appdeploy.com/">AppDeploy.com</a> 
+          </dd> 
+          <dt>
+           Tools (Commercial):
+          </dt> 
+          <dd> 
+           <p> <a target="_blank" title="Commercial with free trial" href="http://www.advancedinstaller.com/java.html">Advanced Installer for&nbsp;Java</a><br> <a target="_blank" title="Commercial with free trial" href="http://www.ej-technologies.com/products/install4j/overview.html">install4j</a><br> <a target="_blank" title="Commercial with free trial" href="http://www.flexerasoftware.com/products/installanywhere.htm">InstallAnywhere</a><br> <a target="_blank" title="Commercial with free trial" href="http://www.installshield.com/">InstallShield</a><br> <a target="_blank" title="Commercial with free trial" href="http://www.denova.com/jexpress/">JExpress</a><br> <a target="_blank" title="Free for non-commercial use" href="http://jwrapper.com/">JWrapper</a> </p> 
+          </dd> 
+          <dt>
+           Tools (Free):
+          </dt> 
+          <dd> 
+           <p> <a target="_blank" title="Included in the Oracle JDK since version 8, can create EXE, MSI, DMG, RPM, and DEB packages" href="http://docs.oracle.com/javase/8/docs/technotes/guides/deploy/packager.html">Java Packager</a> <span class="label notice">Updated</span><br> <a target="_blank" title="Open source (Apache license)" href="http://izpack.org/">IzPack</a><br> <a target="_blank" title="Public domain script for NSIS" href="http://www.filehoo.com/download-Jelude.aspx">jelude</a> (NSIS script) </p> 
+          </dd> 
+         </dl> 
+        </div> 
+       </div> 
+      </div> 
+     </section> 
+     <section id="aot"> 
+      <div class="page-header"> 
+       <h1>Ahead-Of-Time Compilers</h1> 
+      </div> 
+      <div class="row"> 
+       <div class="span10 offset1"> 
+        <p> AOT compilers are known also as "static compilers" and "native code compilers". The latter term is the most used and, as it often happens, the least correct from the technical standpoint, because JIT compilers also produce native code. </p> 
+        <p> An Ahead-Of-Time (AOT) compiler takes as input your jars and class files and produces a conventional native executable for the target platform, such as Windows EXE or Linux ELF binary. Just like any other technical solution, this has its advantages and drawbacks. </p> 
+        <h2>Advantages</h2> 
+        <ul> 
+         <li> <p> <b>Performance.</b> A JIT compiler works at application's runtime and shares CPU and memory resources with the application that it compiles and possibly other applications. An AOT compiler runs on the developer's system with no resource or compilation time constraints. Therefore it can potentially use more powerful resource-intensive optimizations, yielding better code. </p> <p> This advantage is <a href="https://www.excelsiorjet.com/embedded/#benefits">amplified</a> if you application will be deployed to embedded systems or low-end desktop PCs, where the JIT compilers simply may not have enough resources to work. </p></li> 
+         <li> <p> <b>Intellectual Property Protection.</b> Java bytecode is very easy to decompile - just <a target="_blank" href="http://www.google.com/search?q=download+java+decompiler">google for "download java decompiler"</a> and you will get your source code back in 5 minutes. Yes, you may <a href="/articles/java-obfuscators.html">obfuscate</a> the names of public classes and methods that are <em>not</em> accessed via reflection or JNI, but excessive control flow obfuscation can render your bytecode unverifiable on future JVMs and <a href="/articles/java-obfuscators.html#performance">hinders the JIT compiler's ability to performm optimizations</a>. Finally, <a target="_blank" href="http://www.javaworld.com/javaworld/javaqa/2003-05/01-qa-0509-jcrypt.html">encrypting your Java bytecode does not protect it at all</a> regardless of the encryption algorithm you use. </p> <p> In contrast, native code produced by an <em>optimizing</em> AOT Java compiler is about as hard to reverse engineer as if you had coded the original program in C++. Needless to say, there is no performance loss. If you are concerned about protecting your intellectual property, have a closer look at native compilation. </p> </li> 
+         <li> <p> <b>User Perception.</b> Java client applications often suffer from the so called <em>warm-up cycle syndrome</em>. Starting up a Java application involves bytecode interpretation, profiling and JIT-compilation. So Java programs tend to start much longer than their native counterparts and the initial response time of a complex GUI element, such as a grid or a tree view, is much worse than after it has been used several times, which are the two major reasons for Java still being perceived as slow by many users. </p> <p> A native executable runs directly on hardware, without the interpret-profile-compile overhead, so it may start faster and immediately demonstrates the best response times. </p> </li> 
+         <li> <p> <b>Native deployment.</b> Even the most sophisticated <a href="#setup">Java-aware setup tools</a> have to generate native launchers for better desktop integration, and those launchers may also need to download and install the JRE. </p> <p> Executables produced by an AOT Java compiler do not depend on the JRE and can be deployed using any setup authoring tool available for the target platform. Moreover, AOT compilers may come with specifically tailored setup generators that create compact, professional installers. </p> </li> 
+        </ul> 
+        <h2>Drawbacks</h2> 
+        <ul> 
+         <li> <p> <b>Dynamic applications.</b> Classes that the application loads dynamically at run time may be unavailable to the application developer. These can be third-party plug-ins, dynamic proxies and other classes generated at runtime and so on. So the runtime system has to include a Java bytecode interpreter and/or a JIT compiler. </p> <p> Moreover, in the general case only classes that are loaded by either system or application classloader may be precompiled to native code. So applications that use custom classloaders may only be partially precompiled, unless the AOT compiler and runtime are aware of those specific classloaders' behavior. For instance, <a href="/protect-eclipse-rcp-applications.html">Eclipse RCP applications may be fully compiled</a> despite all but a few hundred startup classes being loaded by OSGi classloaders. It is also possible to compile <a href="/protect-java-web-applications.html">Web applications running on Apache Tomcat</a>. </p> </li> 
+         <li> <b>Hardware-specific optimizations.</b> A JIT compiler has a potential advantage over AOT compilers in that it can select code generation patterns according to the actual hardware on which the application is executing. For instance, it may use the latest SSE instruction set to speedup floating point calculations. An AOT compiler must either produce code for the lowest common denominator or apply versioning to the most CPU-intensive methods, which may result in code size increase. </li> 
+        </ul> 
+        <h2>Misconceptions</h2> 
+        <p> Java bytecode had been originally designed for compactness, so it has a much higher level than a typical CPU instruction set and takes less space than the equivalent machine code for a real-world general purpose processor, such as Intel x86. But Java class files contain not only code. The amount of symbolic information in Java class files has grown dramatically over the years due to the development of numerous APIs and their package structure. So now there is not much difference in disk footprint between the original and AOT-compiled forms of an application, and the download size can be even <a target="_blank" href="https://www.excelsiorjet.com/solutions/java-download-size">smaller than the size of the JRE.</a> </p> 
+        <p> There is also a common misconception that AOT compilation kills Java portability. This is not the case, because the source code need not be changed, so you can always deploy your application as bytecode to a platform for which you do not have an AOT compiler. (That would of course blow the benefit of IP protection away.) </p> 
+        <h2>Tools</h2> 
+        <p> There used to be half a dozen AOT Java compilers on the market in the year 2000, but the only two that have survived are <a target="_blank" href="https://www.excelsiorjet.com">Excelsior&nbsp;JET</a> and <a target="_blank" href="http://gcc.gnu.org/java/">GCJ (GNU Compiler for Java)</a>. You will find a <a href="#gcjvsjet">side-by-side comparison</a> of these products in the Bonus Features section below. </p> 
+        <p> <b>Update 07-Jul-2014:</b> <a target="_blank" href="http://robovm.org/">RoboVM</a> is an interesting new open-source project that enables you to compile Java code down to native iOS executables. However, it uses the Android standard library, not Java SE, so you only get portability between iOS and Android. </p> 
+        <p> If you are in the embedded field, check out <a target="_blank" href="http://www.aonix.com/perc.html">Aonix PERC</a>, which targets J2ME CDC and also has limited support for J2SE 1.3. </p> 
+        <p> <strong>This concludes the main part of the article. I update it regularly, so if you have any comments or know of any resource/tool URLs which I should have added, please <a href="mailto:dleskov@excelsior-usa.com?subject=Java-to-EXE%20article">send them to me</a>.</strong> </p> 
+        <p> <strong> Please also do not hesitate to <a href="mailto:dleskov@excelsior-usa.com?subject=Java%20help">contact me</a> if you need help in optimizing, protecting and/or deploying your Java applications.</strong> </p> 
+       </div> 
+       <div class="span4"> 
+        <div class="alert-message block-message info"> 
+         <p class="insert-title">AOT Compilers</p> 
+         <dl> 
+          <dt>
+           Pros
+          </dt> 
+          <dd> 
+           <p>Performance increase</p> 
+           <p>IP protection</p> 
+           <p>Better user perception</p> 
+           <p class="last">Native deployment</p> 
+          </dd> 
+          <dt>
+           Cons
+          </dt> 
+          <dd> 
+           <p class="last">Limited applicability</p> 
+          </dd> 
+          <dt>
+           Misconceptions
+          </dt> 
+          <dd> 
+           <p>Disk footprint increase</p> 
+           <p class="last">Portability loss</p> 
+          </dd> 
+          <dt>
+           Resources
+          </dt> 
+          <dd> 
+           <p> <a href="http://linux.sys-con.com/story/46901.htm" target="_blank">Improving Swing Performance: JIT vs AOT Compilation</a> </p> 
+           <p class="last"> <a title="Why Java obfuscation schemes based on byte-code encryption won't work" href="http://www.javaworld.com/javaworld/javaqa/2003-05/01-qa-0509-jcrypt.html" target="_blank">Cracking Java byte-code encryption</a> </p> 
+          </dd> 
+          <dt>
+           Tools
+          </dt> 
+          <dd> 
+           <a target="_blank" title="Commercial with free trial" href="https://www.excelsiorjet.com">Excelsior JET</a>
+           <br> 
+           <a target="_blank" title="Open source (GPL)" href="http://gcc.gnu.org/java/">GCJ</a>
+           <br> 
+           <a target="_blank" title="Open source (mixed)" href="http://robovm.org/">RoboVM</a> (iOS) 
+           <span class="label notice">New</span>
+           <br> 
+           <a target="_blank" title="Commercial with free trial, supports J2ME CDC and partially J2SE 1.3" href="http://www.aonix.com/perc.html">Aonix PERC</a> 
+          </dd> 
+         </dl> 
+        </div> 
+       </div> 
+      </div> 
+     </section> 
+     <section id="gcjvsjet"> 
+      <div class="page-header"> 
+       <h1>Bonus: AOT Compilers Comparison</h1> 
+      </div> 
+      <div class="alert-message"> 
+       <strong>Disclaimer:</strong> I work for the company that makes Excelsior&nbsp;JET, so 
+       <a href="#alternative">skip this section</a> if you believe it is going to be a shameless plug. 
+      </div> 
+      <div class="row"> 
+       <div class="span10 offset1"> 
+        <h2>Target platforms</h2> 
+        <p> As of July 2014, the official <a target="_blank" href="http://gcc.gnu.org/java/status.html">GCJ Status page</a> lists 15 supported targets, from "bare metal" ARM and XScale to IBM s390x mainframes. <b>Some of the targets, most notably Windows, are not fully supported, though.</b> </p> 
+        <p> Excelsior JET supports Windows and Linux on 32?bit x86, and Windows, OS&nbsp;X, and Linux on 64?bit x86. The 32?bit Windows version has been on the market since the year 2000, the Linux one joined it in 2004, so both are quite mature by now. The 64?bit versions, released in 2013-2014, are catching up. </p> 
+        <h2>Standard compliance</h2> 
+        <p> GCJ has not passed the Oracle's official Java Compatibility Kit (JCK) test suite and is quite far from even attempting to do that. The major reason is that the GCJ runtime library, libgcj, is an open source clean-room implementation of the core Java API classes, and thus was way behind Sun developments even before the Oracle takeover. At the moment GCJ may only compile graphical applications built using third-party AWT-independent GUI toolkits, such as <a href="http://eclipsewiki.editme.com/SWT">SWT</a>. </p> 
+        <p><small> libgcj is being slowly merged with <a href="http://www.classpath.org/">GNU Classpath</a>. The <a target="_blank" href="http://sab39.netreach.com/Software/Japitools/Results/45/">unofficial compatibility testing results for GNU Classpath</a> claim that it includes most, but not all of the JDK 1.4 API features as of Sep 2007 (the last time the tests were run.) Note however that the data used to back that claim is <b>not</b> being produced by running the JCK, so they can only confirm <i>availability</i>, not <i>compatibility</i> of the respective APIs. </small> </p> 
+        <p> Excelsior is a <a target="_blank" href="http://www.oracle.com/technetwork/java/javase/overview/licensees-jsp-136136.html">Java Authorized Licensee</a>, and its product uses the licensed Oracle's implementations of the Java&nbsp;SE API. Excelsior JET has passed the JCK and is <a href="https://www.excelsiorjet.com/evaluate#compliance">certified Java&nbsp;SE&nbsp;8 Compatible</a> on various versions of Windows, OS&nbsp;X, and Linux. </p> 
+        <h2>Dynamic class loading</h2> 
+        <p> Both products support dynamic class loading. The GCJ runtime runs dynamically loaded classes on an interpreter, whereas the Excelsior JET runtime features a JIT compiler. </p> 
+        <h2>Deployment facilities</h2> 
+        <p> GCJ is just a compiler; you are responsible for choosing a third-party deployment tool and setting it up for packaging of the executables GCJ produces. </p> 
+        <p> Excelsior JET includes a toolkit that enables you to create <a target="_blank" href="https://www.excelsiorjet.com/solutions/java-download-size">compact</a> Windows and Linux installers, or integrate easily with third-party setup generators. You may also compile your Java applications into Windows services. </p> 
+        <h2>Price</h2> 
+        <p> GCJ and libgcj are open source (GPL) and therefore can be freely downloaded, modified and distributed. Note that 'libgcc exception' applies to libgcj, so linking with it does not by itself cause your program to fall under the GPL. </p> 
+        <p> <a href="https://www.excelsiorjet.com/buy">Commercial use Excelsior JET licenses</a> start from&nbsp;$1,500 per&nbsp;developer, with substantial <a href="https://www.excelsiorjet.com/micro">discounts</a> available to early stage startups and other very small companies. </p> 
+        <p> Authors of freely downloadable non-commercial Java programs can <a href="https://www.excelsiorjet.com/free">apply for a free license</a>. </p> 
+        <p> Deployment to general purpose desktops and servers is royalty-free, but runtime fees apply if you deploy your application to <a href="https://www.excelsiorjet.com/embedded">embedded systems</a> <em>or</em> bundle it with devices that provide dedicated functionality. </p> 
+       </div> 
+      </div> 
+     </section> 
+     <section id="alternative"> 
+      <div class="page-header"> 
+       <h1>Bonus: Alternative Approaches</h1> 
+      </div> 
+      <div class="row"> 
+       <div class="span10 offset1"> 
+        <p> Mr. Andrew Fedoniouk has pointed my attention to his past project called <a href="http://www.terrainformatica.com/index.php/?p=11" target="_blank">J-SMILE</a> that aimed at enabling the creation of Java GUI apps that would run without any JRE. It was essentially a combination of the <a href="http://waba.sourceforge.net/" target="_blank">Waba VM</a> and a small GUI API, which could be packaged together with your application class files into a sub-one-megabyte executable. </p> 
+        <p> If you know of any other interesting attempts to get rid of the JRE, please <a href="mailto:dleskov@excelsior-usa.com?subject=Java-to-EXE%20article">send them to me</a>. </p> 
+       </div> 
+      </div> 
+     </section> 
+     <section id="links"> 
+      <div class="page-header"> 
+       <h1>Further Reading</h1> 
+      </div> 
+      <div class="row"> 
+       <div class="span10 offset1"> 
+        <dl> 
+         <dt>
+          <a class="bold" target="_blank" href="https://www.excelsior-usa.com/blog/excelsior-jet/java-app-as-a-single-exe/">Java App As A Single EXE</a>
+         </dt> 
+         <dd>
+           In this blog post, I show how you can, using just a couple of free tools, package your Java app as a single EXE requiring no installation. Optionally, add Excelsior JET to the mix to reduce your app's disk footprint, improve its startup time, and protect your code against reverse engineering. 
+         </dd> 
+         <dt>
+          <a class="bold" target="_blank" href="http://web.archive.org/web/20100813090938/http://javazing.com/2007/04/05/creating-a-distribution-package-of-your-java-application/">Creating a Distribution Package of Your Java Application</a>
+         </dt> 
+         <dd>
+           A practical guide to double-wrapping a Java application into a native Windows launcher and installer using ANT, NSIS, ProGuard, and Launch4j, all free tools. 
+          <b>Note:</b> The original Web site is 410 Gone, the link points to the most recent snapshot available from the Internet Wayback Machine. 
+         </dd> 
+        </dl> 
+       </div> 
+      </div> 
+     </section> 
+    </article> 
+    <div class="row"> 
+     <div class="offset1 span10"> 
+      <div class="alert-message block-message info"> 
+       <p><b>Was the above article useful? If yes, we have more content for you!</b></p> 
+       <p> Check out other articles written by Excelsior staff members: </p> 
+       <ul> 
+        <li><a href="/articles/java-obfuscators.html"><b>Protect Your Java Code - Through Obfuscators And Beyond</b></a></li> 
+        <li>Cat in the Cloud: Apache Tomcat in Amazon EC2. <a class="bold" href="/articles/tomcat-amazon-ec2-basic.html">Part I</a>, <a class="bold" href="/articles/tomcat-amazon-ec2-java-stack.html">Part II</a>, <a class="bold" href="/articles/tomcat-amazon-ec2-advanced.html">Part III</a>. </li> 
+        <li><a href="/articles/localization.html"><b>Unbearable Lightness of Localizing Java Applications</b></a></li> 
+       </ul> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <!-- /content --> 
+  </div> 
+  <footer> 
+   <div class="row"> 
+    <div class="span4"> 
+     <p><strong>Excelsior</strong></p> 
+     <p> <a id="link-home-footer" href="/">Home</a><br> <a id="link-company-footer" href="/company.html">Company</a><br> <a id="link-products-footer" href="/#products">Products</a><br> <a id="link-services-footer" href="/services/">Services</a><br> <a id="link-resources-footer" href="/resources.html">Resources</a><br> <a id="link-blog-footer" href="/blog">Blog</a><br> <a id="link-contact-footer" href="/#contact">Contact</a><br> </p> 
+    </div> 
+    <div class="span4"> 
+     <p><strong>Excelsior JET</strong></p> 
+     <p> <a id="link-jet-home-footer" href="http://www.excelsiorjet.com">Home</a><br> <a id="link-jet-eval-footer" href="http://www.excelsiorjet.com/evaluate">Evaluate</a><br> <a id="link-jet-tut-footer" href="http://www.excelsiorjet.com/tutorials">Tutorials</a><br> <a id="link-jet-cs-footer" href="http://www.excelsiorjet.com/case-studies">Case Studies</a><br> <a id="link-jet-buy-footer" href="http://www.excelsiorjet.com/buy">Pricing</a><br> <a id="link-jet-free-footer" href="http://www.excelsiorjet.com/free">Free licenses</a> </p> 
+    </div> 
+    <div class="span4"> 
+     <img alt="Excelsior logo" src="/commonassets/images/Excelsior-logo-engraved.png" width="220" height="91"> 
+    </div> 
+    <div class="span4"> 
+     <address> <strong>Excelsior LLC</strong><br> 6 Lavrenteva Ave.<br> Novosibirsk 630090 Russia<br> <abbr title="Phone">P:</abbr> +7 383 330 5508 <a href="mailto:info@excelsior-usa.com">info@excelsior-usa.com</a> </address> 
+    </div> 
+   </div> 
+   <p id="copyright">© 1999–2016 <a href="http://www.excelsior-usa.com">Excelsior LLC</a>.</p> 
+  </footer> 
+  <script src="/commonassets/scripts/common.js"></script>   
+ </body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head> 
+  <title>PHP. Bitcoin to Ukrainian Hrivna price ticker - php</title> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+  <meta Name="keywords" Content="php - PHP. Bitcoin to Ukrainian Hrivna price ticker php"> 
+  <meta Name="description" Content="php - PHP. Bitcoin to Ukrainian Hrivna price ticker php"> 
+  <base href="http://php.wekeepcoding.com:80/"> 
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+  <link href="css/style.css" type="text/css" rel="stylesheet"> 
+ </head> 
+ <body> 
+  <div id="page_wrapper"> 
+   <!--banner------------------------------------------------------> 
+   <div id="header_wrapper"> 
+    <div id="header"> 
+     <h1>Keep <font color="#FFDF8C">Coding</font></h1> 
+     <h2>php, oracle, xcode, visual-studio, qt.</h2> 
+    </div> 
+   </div> 
+   <!--banner------------------------------------------------------> 
+   <div style="height: 5px;"></div> 
+   <!--content-----------------------------------------------------> 
+   <div id="content">
+    <div id="contentbody"> 
+     <h3>php</h3> 
+     <div class="featurebox_center"> 
+     </div> 
+     <br> 
+     <h4>PHP. Bitcoin to Ukrainian Hrivna price ticker</h4> 
+     <div style="margin-left:1px;margin-right:1px;margin-top:40px;float:left;"> 
+      <script type="text/javascript">
+    google_ad_client = "ca-pub-4875541507549899";
+    google_ad_slot = "2101133563";
+    google_ad_width = 300;
+    google_ad_height = 600;
+</script> 
+      <!-- crawl top 300 600 --> 
+      <script type="text/javascript" src="//pagead2.googlesyndication.com/pagead/show_ads.js">
+</script> 
+     </div> 
+     <br> 
+     <div class="featurebox_center_content"> 
+      <pre style="white-space: pre-wrap;word-wrap: break-word;">I am trying to create a real time tiker of the price of bitcoin from the BTC-E.com exchange in Ukrainian currency. The end result is to put the price on my simple html website.
+The exchange does not provide the price in hrivna (UAH), so i have to convert from BTC to USD to UAH.
+So far i have managed to put the price in USD, using the api provided by BTC-E
+https://btc-e.com/api/2/btc_usd/ticker
+this is the php file i have created
+&lt;?php
+header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
+header('Pragma: no-cache'); // HTTP 1.0.
+header('Expires: 0'); // Proxies.
+$data = file_get_contents("https://btc-e.com/api/2/btc_usd/ticker");
+$data = json_decode($data, true);
+$spot_last = $data['ticker']['last'];
+echo $spot_last;
+?&gt;
+and this is the code i put in index.html
+&lt;script&gt;
+var auto_refresh = setInterval(
+function()
+{$('.btce_price').load('ticker.php');}, 1000);
+&lt;/script&gt;
+In order to have USD to UAH conversion i would like to use the commercial rate from one of the banks.
+https://api.privatbank.ua/p24api/pubinfo?exchange&amp;coursid=5
+whis returns the following
+&lt;exchangerates&gt;
+&lt;row&gt;
+&lt;exchangerate ccy="RUR" base_ccy="UAH" buy="0.25000" sale="0.28000"/&gt;
+&lt;/row&gt;
+&lt;row&gt;
+&lt;exchangerate ccy="EUR" base_ccy="UAH" buy="13.30000" sale="14.30000"/&gt;
+&lt;/row&gt;
+&lt;row&gt;
+&lt;exchangerate ccy="USD" base_ccy="UAH" buy="9.60000" sale="10.10000"/&gt;
+&lt;/row&gt;
+&lt;/exchangerates&gt;
+so i have the other php file to output the buy rate that i need
+$xml = simplexml_load_file("https://api.privatbank.ua/p24api/pubinfo?exchange&amp;coursid=5");
+$m = $xml-&gt;xpath('//exchangerate[#ccy="USD"]');
+$exrate = (string)$m[0]['buy'];
+echo $exrate;
+Now back to the question. How divide the output of the first file buy the second? and then display the result in my index.html
+Thx!!!
+</pre> 
+     </div> 
+     <br> 
+     <div class="featurebox_center_content"> 
+      <pre style="white-space: pre-wrap;word-wrap: break-word;">
+Hmm, instead of dividing the values - i would multiply them.
+Actually: 1 BTC = 633 USD and 633 USD =~ 6000 UAH.
+So i would calculate: $uah = $spot_last * $exrate;
+Example
+&lt;?php
+header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
+header('Pragma: no-cache'); // HTTP 1.0.
+header('Expires: 0'); // Proxies.
+// get BTC
+$data = file_get_contents("https://btc-e.com/api/2/btc_usd/ticker");
+$data = json_decode($data, true);
+$spot_last = $data['ticker']['last'];
+echo '1 BTC is worth ' . $spot_last . ' USD. &lt;br&gt;';
+// get CURRENCIES
+$xml = simplexml_load_file("https://api.privatbank.ua/p24api/pubinfo?exchange&amp;coursid=5");
+$m = $xml-&gt;xpath('//exchangerate[#ccy="USD"]');
+$exrate = (string)$m[0]['buy'];
+echo '1 USD is worth '. $exrate .' UAH. &lt;br&gt;';
+$uah = $spot_last * $exrate;
+echo 'Result: 1 BTC ~ ' . $uah . ' UAH. &lt;br&gt;';
+For usage as ticker, delete all echos statements, they are just for demonstration and insert just echo $uah;
+Output
+1 BTC is worth 624.928 USD.
+1 USD is worth 9.60000 UAH.
+1 BTC ~ 5999.3088 UAH.
+Comparison Calc
+see http://preev.com/btc/uah
+By the way: it's pretty awesome that Privatbank provides such an API.</pre> 
+     </div> 
+     <br> 
+     <div class="featurebox_center_content" style="padding:0px;padding-left:10px"> 
+      <script type="text/javascript">
+    google_ad_client = "ca-pub-4875541507549899";
+    google_ad_slot = "5054599966";
+    google_ad_width = 728;
+    google_ad_height = 90;
+</script> 
+      <!-- crawl bottom 728 90 --> 
+      <script type="text/javascript" src="//pagead2.googlesyndication.com/pagead/show_ads.js">
+</script> 
+     </div> 
+     <!--content-----------------------------------------------------> 
+     <!--related-----------------------------------------------------> 
+     <div class="featurebox_center"> 
+      <a href="" onclick="window.history.go(-1)">Previous Page</a> | 
+      <a href="/category/1005/php" title="php"> php </a> | 
+      <a href="">HOME</a> 
+     </div> 
+     <br> 
+     <h3>Related Links</h3> 
+     <p> <a href="/article/13561420/Wordpress+regionalization+content" title="Wordpress regionalization content"> Wordpress regionalization content </a><br> <a href="/article/13561424/How+to+execute+php+in+onclick+button+%5bduplicate%5d" title="How to execute php in onclick button [duplicate]"> How to execute php in onclick button [duplicate] </a><br> <a href="/article/13561431/shell_exec+empty+response+for+nslookup+query" title="shell_exec empty response for nslookup query"> shell_exec empty response for nslookup query </a><br> <a href="/article/13561440/How+can+I+insert+data+to+a+table+which+has+a+foreign+key%2c+from+a+table+which+has+a+primary+key+auto-increment%3f" title="How can I insert data to a table which has a foreign key, from a table which has a primary key auto-increment?"> How can I insert data to a table which has a foreign key, from a table which has a primary key auto-increment? </a><br> <a href="/article/13561449/Why+do+I+have+to+run+%e2%80%9ccomposer+dump-autoload%e2%80%9d+command+to+make+migration+work+in+laravel" title="Why do I have to run “composer dump-autoload” command to make migration work in laravel"> Why do I have to run “composer dump-autoload” command to make migration work in laravel </a><br> <a href="/article/13561459/Fetch+rows+from+database+table+android" title="Fetch rows from database table android"> Fetch rows from database table android </a><br> <a href="/article/13561462/how+do+i+create+html+table+like+on+the+picture" title="how do i create html table like on the picture"> how do i create html table like on the picture </a><br> <a href="/article/13561486/Opencart+Display+subcategories" title="Opencart Display subcategories"> Opencart Display subcategories </a><br> <a href="/article/13561489/How+to+draw+dotted+line+or+line+in+google+map+in+asp.net+based+on+latitude+and+longitude%3f" title="How to draw dotted line or line in google map in asp.net based on latitude and longitude?"> How to draw dotted line or line in google map in asp.net based on latitude and longitude? </a><br> <a href="/article/13561509/Change+the+array+structure+in+php" title="Change the array structure in php"> Change the array structure in php </a><br> <a href="/article/13561514/Why+this+php+regular+expression+program+crash" title="Why this php regular expression program crash"> Why this php regular expression program crash </a><br> <a href="/article/13561526/Woocommerce+redirect+after+add-to-cart+error" title="Woocommerce redirect after add-to-cart error"> Woocommerce redirect after add-to-cart error </a><br> <a href="/article/13561530/Redirect+to+different+pages+based+on+previous+page+in+Laravel" title="Redirect to different pages based on previous page in Laravel"> Redirect to different pages based on previous page in Laravel </a><br> <a href="/article/13561531/How+can+i+instantiate+a+class+which+needs+access+to+it's+'instantiators'+methods%3f" title="How can i instantiate a class which needs access to it's 'instantiators' methods?"> How can i instantiate a class which needs access to it's 'instantiators' methods? </a><br> <a href="/article/13561546/Strip+double+qoutes+only+from+the+numbers+JS" title="Strip double qoutes only from the numbers JS"> Strip double qoutes only from the numbers JS </a><br> <a href="/article/13561547/Why+PhpStorm+doesn't+show+my+class%3f" title="Why PhpStorm doesn't show my class?"> Why PhpStorm doesn't show my class? </a><br> </p> 
+    </div>
+   </div> 
+   <!--related-----------------------------------------------------> 
+   <!--left------------------------------------------------------> 
+   <div id="left_side"> 
+    <h3>Categories</h3> 
+    <p> <a href="/category/0/HOME" title="HOME">HOME</a><br><a href="/category/1012/qt" title="qt">qt</a><br><a href="/category/1216/webview" title="webview">webview</a><br><a href="/category/1412/svn" title="svn">svn</a><br><a href="/category/1549/tomcat" title="tomcat">tomcat</a><br><a href="/category/1650/windows-8.1" title="windows-8.1">windows-8.1</a><br><a href="/category/1699/clearcase" title="clearcase">clearcase</a><br><a href="/category/2255/message-queue" title="message-queue">message-queue</a><br><a href="/category/2549/apk" title="apk">apk</a><br><a href="/category/2705/tabs" title="tabs">tabs</a><br><a href="/category/2999/greasemonkey" title="greasemonkey">greasemonkey</a><br><a href="/category/3455/firebase-dynamic-links" title="firebase-dynamic-links">firebase-dynamic-links</a><br><a href="/category/3649/telegraf" title="telegraf">telegraf</a><br><a href="/category/3850/mutation-testing" title="mutation-testing">mutation-testing</a><br><a href="/category/3912/swarm" title="swarm">swarm</a><br><a href="/category/3962/azure-graph-api" title="azure-graph-api">azure-graph-api</a><br><a href="/category/4099/scrape" title="scrape">scrape</a><br><a href="/category/4116/match" title="match">match</a><br><a href="/category/4166/lapack" title="lapack">lapack</a><br><a href="/category/4299/sap-fiori" title="sap-fiori">sap-fiori</a><br><a href="/category/4949/texas-instruments" title="texas-instruments">texas-instruments</a><br><a href="/category/5000/async-await" title="async-await">async-await</a><br><a href="/category/5149/pinterest" title="pinterest">pinterest</a><br><a href="/category/5205/vertica" title="vertica">vertica</a><br><a href="/category/5605/cpu-usage" title="cpu-usage">cpu-usage</a><br><a href="/category/5662/deepfreeze" title="deepfreeze">deepfreeze</a><br><a href="/category/5950/spring-ldap" title="spring-ldap">spring-ldap</a><br><a href="/category/6105/neo4j.rb" title="neo4j.rb">neo4j.rb</a><br><a href="/category/6149/el" title="el">el</a><br><a href="/category/7150/openbravo" title="openbravo">openbravo</a><br><a href="/category/7350/ccavenue" title="ccavenue">ccavenue</a><br><a href="/category/7562/tsung" title="tsung">tsung</a><br><a href="/category/7955/toad" title="toad">toad</a><br><a href="/category/8112/steam-web-api" title="steam-web-api">steam-web-api</a><br><a href="/category/8499/om-next" title="om-next">om-next</a><br><a href="/category/8605/counting" title="counting">counting</a><br><a href="/category/9100/formsauthenticationticket" title="formsauthenticationticket">formsauthenticationticket</a><br><a href="/category/9366/uivisualeffectview" title="uivisualeffectview">uivisualeffectview</a><br><a href="/category/9455/strapi" title="strapi">strapi</a><br><a href="/category/9616/extbase" title="extbase">extbase</a><br><a href="/category/10005/resampling" title="resampling">resampling</a><br><a href="/category/10355/contactless-smartcard" title="contactless-smartcard">contactless-smartcard</a><br><a href="/category/10362/google-prediction" title="google-prediction">google-prediction</a><br><a href="/category/10366/elasticsearch-aggregation" title="elasticsearch-aggregation">elasticsearch-aggregation</a><br><a href="/category/10400/spooler" title="spooler">spooler</a><br><a href="/category/10462/expandablelistview" title="expandablelistview">expandablelistview</a><br><a href="/category/11112/roracle" title="roracle">roracle</a><br><a href="/category/11199/supertest" title="supertest">supertest</a><br><a href="/category/11416/sharpdx" title="sharpdx">sharpdx</a><br><a href="/category/11816/algebra" title="algebra">algebra</a><br><a href="/category/11966/stateless-session-bean" title="stateless-session-bean">stateless-session-bean</a><br><a href="/category/12100/dblink" title="dblink">dblink</a><br><a href="/category/12305/mpmovieplayercontroller" title="mpmovieplayercontroller">mpmovieplayercontroller</a><br><a href="/category/12505/d3v4" title="d3v4">d3v4</a><br><a href="/category/12599/pbx" title="pbx">pbx</a><br><a href="/category/12605/annotatorjs" title="annotatorjs">annotatorjs</a><br><a href="/category/13162/dmarc" title="dmarc">dmarc</a><br><a href="/category/13499/cdo.message" title="cdo.message">cdo.message</a><br><a href="/category/13912/adjacency-list" title="adjacency-list">adjacency-list</a><br><a href="/category/14166/accessibilityservice" title="accessibilityservice">accessibilityservice</a><br><a href="/category/14766/miniconda" title="miniconda">miniconda</a><br><a href="/category/14855/stack-smash" title="stack-smash">stack-smash</a><br><a href="/category/15062/http.client" title="http.client">http.client</a><br><a href="/category/15616/sequence-sql" title="sequence-sql">sequence-sql</a><br><a href="/category/15949/clarion" title="clarion">clarion</a><br><a href="/category/15999/whitespace-language" title="whitespace-language">whitespace-language</a><br><a href="/category/16000/shoes" title="shoes">shoes</a><br><a href="/category/16055/azure-xplat-cli" title="azure-xplat-cli">azure-xplat-cli</a><br><a href="/category/16099/shell-extensions" title="shell-extensions">shell-extensions</a><br><a href="/category/16299/ssmtp" title="ssmtp">ssmtp</a><br><a href="/category/16350/fiware-bosun" title="fiware-bosun">fiware-bosun</a><br><a href="/category/16405/pass-by-value" title="pass-by-value">pass-by-value</a><br><a href="/category/16655/string.format" title="string.format">string.format</a><br><a href="/category/16705/password-recovery" title="password-recovery">password-recovery</a><br><a href="/category/16816/iodocs" title="iodocs">iodocs</a><br><a href="/category/17062/storing-data" title="storing-data">storing-data</a><br><a href="/category/17250/xcode6.3.1" title="xcode6.3.1">xcode6.3.1</a><br><a href="/category/17716/bittorrent-sync" title="bittorrent-sync">bittorrent-sync</a><br><a href="/category/17855/xmi" title="xmi">xmi</a><br><a href="/category/18099/typesafe-stack" title="typesafe-stack">typesafe-stack</a><br><a href="/category/18255/smips" title="smips">smips</a><br><a href="/category/18605/iirf" title="iirf">iirf</a><br><a href="/category/19016/flv" title="flv">flv</a><br><a href="/category/19055/eager-loading" title="eager-loading">eager-loading</a><br><a href="/category/19199/days" title="days">days</a><br><a href="/category/20216/kobold2d" title="kobold2d">kobold2d</a><br><a href="/category/20255/firebird1.5" title="firebird1.5">firebird1.5</a><br><a href="/category/20499/kolite" title="kolite">kolite</a><br><a href="/category/20549/memory-pool" title="memory-pool">memory-pool</a><br><a href="/category/20562/multidrop-bus" title="multidrop-bus">multidrop-bus</a><br><a href="/category/20655/dynamic-c" title="dynamic-c">dynamic-c</a><br><a href="/category/20766/motodev-studio" title="motodev-studio">motodev-studio</a><br><a href="/category/20849/server-variables" title="server-variables">server-variables</a><br><a href="/category/21055/canonicalization" title="canonicalization">canonicalization</a><br><a href="/category/21300/3des" title="3des">3des</a><br><a href="/category/21662/resharper-5.1" title="resharper-5.1">resharper-5.1</a><br><a href="/category/21805/ixmldomdocument" title="ixmldomdocument">ixmldomdocument</a><br><a href="/category/22055/rawcontacts" title="rawcontacts">rawcontacts</a><br><a href="/category/22300/downcasting" title="downcasting">downcasting</a><br><a href="/category/22305/xap" title="xap">xap</a><br><a href="/category/22355/tso" title="tso">tso</a><br><a href="/category/22399/autobench" title="autobench">autobench</a><br><a href="/category/22666/community-server" title="community-server">community-server</a><br> </p> 
+   </div> 
+   <!--left------------------------------------------------------> 
+   <!--right------------------------------------------------------> 
+   <div id="right_side"> 
+    <br>
+    <br> 
+    <script type="text/javascript">
+    google_ad_client = "ca-pub-4875541507549899";
+    google_ad_slot = "8147667162";
+    google_ad_width = 160;
+    google_ad_height = 600;
+</script> 
+    <!-- crawl right 160 600 --> 
+    <script type="text/javascript" src="//pagead2.googlesyndication.com/pagead/show_ads.js">
+</script> 
+    <br>
+    <br> 
+    <a href="http://www.mobileapps-dev.com/" target="_blank">Mobile Apps Dev</a> 
+    <br> 
+    <a href="http://www.databaseusers.com/" target="_blank">Database Users</a> 
+    <br> 
+    <a href="http://javascript.wekeepcoding.com/" target="_blank">javascript</a> 
+    <br> 
+    <a href="http://java.wekeepcoding.com/" target="_blank">java</a> 
+    <br> 
+    <a href="http://csharp.wekeepcoding.com/" target="_blank">csharp</a> 
+    <br> 
+    <a href="http://php.wekeepcoding.com/" target="_blank">php</a> 
+    <br> 
+    <a href="http://android.wekeepcoding.com/" target="_blank">android</a> 
+    <br> 
+   </div> 
+   <!--right------------------------------------------------------> 
+   <!--footer-----------------------------------------------------> 
+   <div id="footer">
+     Copyright @ 2017 www.wekeepcoding.com , All Rights Reserved 
+   </div> 
+   <!--footer-----------------------------------------------------> 
+  </div>   
+ </body>
+</html>

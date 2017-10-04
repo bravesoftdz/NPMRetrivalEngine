@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <title>Simple PHP Shopping Cart</title> 
+  <meta name="description" content="In this tutorial, we are going to see a simple PHP example for creating a shopping cart application. This shopping cart application is purposely kept simple and as minimal as possible. You can download this and quickly customize it for your needs. In this example, we are displaying a&nbsp;list of products from the&nbsp;database. For each […]"> 
+  <meta name="keywords" content="Simple PHP Shopping Cart"> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <meta name="robots" content="index,follow"> 
+  <link rel="next" href="http://phppot.com/demo/simple-php-shopping-cart/"> 
+  <link rel="shortcut icon" href="http://phppot.com/favicon.ico" type="image/x-icon"> 
+  <link rel="stylesheet" id="solandra-style-css" href="http://phppot.com/wp-content/themes/solandra/papers_17072017.css" type="text/css" media="all"> 
+  <link rel="canonical" href="http://phppot.com/php/simple-php-shopping-cart/"> 
+  <script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-40067115-1']);
+  _gaq.push(['_setDomainName', 'phppot.com']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+ </head> 
+ <body onload="prettyPrint()"> 
+  <div id="site_header">
+   <div class="content">
+    <a href="/" title="PhpPot Home"><img id="site-logo" src="http://phppot.com/wp-content/themes/solandra/images/phppot.png" alt="PhpPot Home"></a> 
+    <div class="search-container"> 
+     <form method="get" action="/" class="search-form"> 
+      <input name="s" class="search" placeholder="Search PHP Pot" title="Search PhpPot" autocomplete="off"> 
+      <button type="submit" title="Search PhpPot" id="search-button"> <img src="http://phppot.com/wp-content/themes/solandra/images/search.png" alt="Search"></button> 
+     </form> 
+    </div> 
+    <div class="header-link-container"> 
+     <a class="header-link" style="float:none;" href="/demo/">Demo &amp; Download</a> 
+     <a id="header-contact-navigation" href="/contact/">Contact</a> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="content">
+   <div id="menu-icon">
+    <a href="#tutorial-menu" title="Tutorial Menu"><img src="http://phppot.com/wp-content/themes/solandra/images/tutorial-menu.png" alt="Tutorial Menu"></a>
+   </div>
+   <div id="tutorial-body">
+    <div id="tutorial"> 
+     <h1>Simple PHP Shopping Cart</h1> 
+     <div class="share"> 
+      <ul> 
+       <li><a href="https://www.facebook.com/sharer/sharer.php?u=http://phppot.com/php/simple-php-shopping-cart/"><img src="http://phppot.com/wp-content/themes/solandra/images/facebook-social.png" title="Share on Facebook"></a></li> 
+       <li><a href="https://twitter.com/intent/tweet?original_referer=http://phppot.com&amp;source=tweetbutton&amp;text=Simple PHP Shopping Cart;url=http://phppot.com/php/simple-php-shopping-cart/&amp;via=phppot"><img src="http://phppot.com/wp-content/themes/solandra/images/twitter-social.png" title="Share on Twitter"></a></li> 
+       <li><a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://phppot.com/php/simple-php-shopping-cart/&amp;media=Simple PHP Shopping Cart"><img src="http://phppot.com/wp-content/themes/solandra/images/linkedin-social.png" title="Share on Linkedin"></a></li> 
+       <li><a href="mailto:?Subject=Sharing%20you%20about%20Simple PHP Shopping Cart&amp;Body=This %20is%20interesting %20to%20learn.%20Just%20check%20out%20http://phppot.com/php/simple-php-shopping-cart/"><img src="http://phppot.com/wp-content/themes/solandra/images/email-social.png" title="Share on Email"></a></li> 
+      </ul> 
+     </div> 
+     <p>In this tutorial, we are going to see a simple PHP example for creating a shopping cart application. This shopping cart application is purposely kept simple and as minimal as possible. You can download this and quickly customize it for your needs. In this example, we are displaying a&nbsp;list of products from the&nbsp;database. For each product, we can select product quantity and add to cart. The cart items are stored in the session. The cart can be emptied by removing the items from the&nbsp;session.</p> 
+     <p><img class="alignnone size-full wp-image-4091" title="php-shopping-cart" src="http://phppot.com/wp-content/uploads/2014/10/phpshoppingcart.png" alt="php-shopping-cart" width="582" height="585" srcset="http://phppot.com/wp-content/uploads/2014/10/phpshoppingcart.png 582w, http://phppot.com/wp-content/uploads/2014/10/phpshoppingcart-150x150.png 150w, http://phppot.com/wp-content/uploads/2014/10/phpshoppingcart-298x300.png 298w" sizes="(max-width: 582px) 100vw, 582px"></p> 
+     <p><a class="demo" href="/demo/simple-php-shopping-cart/">View Demo</a></p> 
+     <h2>Adding Products&nbsp; to Shopping Cart</h2> 
+     <p>First, we need to&nbsp;create our product catalog page by listing products from the&nbsp;database. The following code retrieves the&nbsp;list of products from the database and displays them in a grid view. Each product has the ‘Add to cart’ option to place it into&nbsp;the cart.</p> 
+     <pre class="prettyprint lang-php">&lt;?php
+$product_array = $db_handle-&gt;runQuery("SELECT * FROM tblproduct ORDER BY id ASC");
+if (!empty($product_array)) { 
+foreach($product_array as $key=&gt;$value){
+?&gt;
+&lt;div class="product-item"&gt;
+	&lt;form method="post" action="index.php?action=add&amp;code=&lt;?php echo $product_array[$key]["code"]; ?&gt;"&gt;
+	&lt;div class="product-image"&gt;&lt;img src="&lt;?php echo $product_array[$key]["image"]; ?&gt;"&gt;&lt;/div&gt;
+	&lt;div&gt;&lt;strong&gt;&lt;?php echo $product_array[$key]["name"]; ?&gt;&lt;/strong&gt;&lt;/div&gt;
+	&lt;div class="product-price"&gt;&lt;?php echo "$".$product_array[$key]["price"]; ?&gt;&lt;/div&gt;
+	&lt;div&gt;&lt;input type="text" name="quantity" value="1" size="2" /&gt;&lt;input type="submit" value="Add to cart" class="btnAddAction" /&gt;&lt;/div&gt;
+	&lt;/form&gt;
+&lt;/div&gt;
+&lt;?php }} ?&gt;</pre> 
+     <p>On clicking the ‘Add to cart’ button, we add the selected product id and its quantity into a shopping cart. We are using PHP SESSION to store the cart items. The following code shows a switch case used for adding products to the cart. If we add the&nbsp;same product multiple times in a cart then the cart item&nbsp;quantity&nbsp;will be incremented.</p> 
+     <pre class="prettyprint lang-php">case "add":
+	if(!empty($_POST["quantity"])) {
+		$productByCode = $db_handle-&gt;runQuery("SELECT * FROM tblproduct WHERE code='" . $_GET["code"] . "'");
+		$itemArray = array($productByCode[0]["code"]=&gt;array('name'=&gt;$productByCode[0]["name"], 'code'=&gt;$productByCode[0]["code"], 'quantity'=&gt;$_POST["quantity"], 'price'=&gt;$productByCode[0]["price"]));
+		
+		if(!empty($_SESSION["cart_item"])) {
+			if(in_array($productByCode[0]["code"],array_keys($_SESSION["cart_item"]))) {
+				foreach($_SESSION["cart_item"] as $k =&gt; $v) {
+						if($productByCode[0]["code"] == $k) {
+							if(empty($_SESSION["cart_item"][$k]["quantity"])) {
+								$_SESSION["cart_item"][$k]["quantity"] = 0;
+							}
+							$_SESSION["cart_item"][$k]["quantity"] += $_POST["quantity"];
+						}
+				}
+			} else {
+				$_SESSION["cart_item"] = array_merge($_SESSION["cart_item"],$itemArray);
+			}
+		} else {
+			$_SESSION["cart_item"] = $itemArray;
+		}
+	}
+break;</pre> 
+     <h2>Removing or Clearing Cart Item</h2> 
+     <p>In this example, we allow users to remove each item from the cart by using the ‘Remove Item’ link in each row. Also, we let the users&nbsp;clear the whole cart by using ‘Empty Cart’ option. On clicking ‘Remove Item’, we call remove action with the reference of the item code to clear the particular item of the cart session. We use PHP unset() to clear the cart session. The following code shows the switch cases used to perform ‘Remove Item’ and ‘Empty Cart’ actions.</p> 
+     <pre class="prettyprint lang-php">case "remove":
+	if(!empty($_SESSION["cart_item"])) {
+		foreach($_SESSION["cart_item"] as $k =&gt; $v) {
+			if($_GET["code"] == $k)	unset($_SESSION["cart_item"][$k]);				
+			if(empty($_SESSION["cart_item"])) unset($_SESSION["cart_item"]);
+		}
+	}
+break;
+case "empty":
+	unset($_SESSION["cart_item"]);
+break;</pre> 
+     <p>Import the following SQL script for creating a product table and load your own data to show in your catalog&nbsp;page.</p> 
+     <pre class="prettyprint lang-php">CREATE TABLE IF NOT EXISTS `tblproduct` (
+  `id` int(8) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `code` varchar(255) NOT NULL,
+  `image` text NOT NULL,
+  `price` double(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `product_code` (`code`)
+)</pre> 
+     <p><a class="demo" href="/demo/simple-php-shopping-cart/">View Demo</a><a class="download" href="/demo/simple-php-shopping-cart/simple-php-shopping-cart.zip">Download</a></p> 
+     <p>This PHP code tutorial was published on October 26, 2014.</p> 
+     <div class="share"> 
+      <ul> 
+       <li><a href="https://www.facebook.com/sharer/sharer.php?u=http://phppot.com/php/simple-php-shopping-cart/"><img src="http://phppot.com/wp-content/themes/solandra/images/facebook-social.png" title="Share on Facebook"></a></li> 
+       <li><a href="https://twitter.com/intent/tweet?original_referer=http://phppot.com&amp;source=tweetbutton&amp;text=Simple PHP Shopping Cart;url=http://phppot.com/php/simple-php-shopping-cart/&amp;via=phppot"><img src="http://phppot.com/wp-content/themes/solandra/images/twitter-social.png" title="Share on Twitter"></a></li> 
+       <li><a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http://phppot.com/php/simple-php-shopping-cart/&amp;media=Simple PHP Shopping Cart"><img src="http://phppot.com/wp-content/themes/solandra/images/linkedin-social.png" title="Share on Linkedin"></a></li> 
+       <li><a href="mailto:?Subject=Sharing%20you%20about%20Simple PHP Shopping Cart&amp;Body=This %20is%20interesting %20to%20learn.%20Just%20check%20out%20http://phppot.com/php/simple-php-shopping-cart/"><img src="http://phppot.com/wp-content/themes/solandra/images/email-social.png" title="Share on Email"></a></li> 
+      </ul> 
+     </div> 
+     <div id="tutorial-navigation"> 
+      <div id="previous-tutorial">
+       <div class="navigation-label">
+        Previous:
+       </div>
+       <a href="http://phppot.com/php/php-csv-file-export-using-fputcsv/" rel="prev">PHP CSV File Export Using fputcsv()</a>
+      </div>
+      <div id="next-tutorial">
+       <div class="navigation-label">
+        Next:
+       </div>
+       <a href="http://phppot.com/jquery/floating-contact-form-using-jquery-ajax/" rel="next">Floating Contact Form using jQuery AJAX</a>
+      </div> 
+     </div> 
+     <p><a href="#top" class="top">? Back to Top</a></p> 
+    </div> 
+    <div id="tutorial-menu"> 
+     <ul class="main-menu">
+      <li class="cat-item cat-item-72"><a href="http://phppot.com/category/php/">PHP</a>
+       <ul class="sub-menu">
+        <li class="cat-item cat-item-59"><a href="http://phppot.com/category/php/php-introduction/">PHP Introduction</a></li>
+        <li class="cat-item cat-item-26"><a href="http://phppot.com/category/php/php-basics/">PHP Basics</a></li>
+        <li class="cat-item cat-item-79"><a href="http://phppot.com/category/php/php-shopping-cart/">PHP Shopping Cart</a>
+         <ul class="post-list">
+          <li class="current-post">Simple PHP Shopping Cart</li>
+          <li><a class="post-menu" href="http://phppot.com/php/php-shopping-cart-with-jquery-ajax/">PHP Shopping Cart with jQuery AJAX</a></li>
+          <li><a class="post-menu" href="http://phppot.com/php/ajax-cart-edit-in-php-shopping-cart/">AJAX Cart Edit in PHP Shopping Cart</a></li>
+          <li><a class="post-menu" href="http://phppot.com/php/shopping-cart-with-multi-tab-wizard-using-jquery-ajax/">Shopping Cart with Multi-Tab Wizard using jQuery AJAX</a></li>
+          <li><a class="post-menu" href="http://phppot.com/php/php-shopping-cart-by-jquery-drag-and-drop/">PHP Shopping Cart by jQuery Drag and Drop</a></li>
+          <li><a class="post-menu" href="http://phppot.com/php/responsive-php-shopping-cart/">Responsive PHP Shopping Cart</a></li>
+         </ul></li>
+        <li class="cat-item cat-item-57"><a href="http://phppot.com/category/php/types-variables-operators/">Types, Variables &amp; Operators</a></li>
+        <li class="cat-item cat-item-58"><a href="http://phppot.com/category/php/php-strings/">PHP Strings</a></li>
+        <li class="cat-item cat-item-22"><a href="http://phppot.com/category/php/php-arrays/">PHP Arrays</a></li>
+        <li class="cat-item cat-item-61"><a href="http://phppot.com/category/php/php-functions/">PHP Functions</a></li>
+        <li class="cat-item cat-item-35"><a href="http://phppot.com/category/php/php-oops/">PHP OOPS</a></li>
+        <li class="cat-item cat-item-31"><a href="http://phppot.com/category/php/php-forms/">PHP Forms</a></li>
+        <li class="cat-item cat-item-78"><a href="http://phppot.com/category/php/advanced/">Advanced</a></li>
+        <li class="cat-item cat-item-90"><a href="http://phppot.com/category/php/php-ajax/">PHP AJAX</a></li>
+        <li class="cat-item cat-item-89"><a href="http://phppot.com/category/php/restful-api/">RESTful API</a></li>
+        <li class="cat-item cat-item-15"><a href="http://phppot.com/category/php/php-databases/">PHP Databases</a></li>
+        <li class="cat-item cat-item-23"><a href="http://phppot.com/category/php/php-sessions-and-cookies/">PHP Sessions and Cookies</a></li>
+        <li class="cat-item cat-item-51"><a href="http://phppot.com/category/php/error-exception-handling/">Error and Exception Handling</a></li>
+        <li class="cat-item cat-item-36"><a href="http://phppot.com/category/php/files-and-directories/">Files and Directories</a></li>
+        <li class="cat-item cat-item-45"><a href="http://phppot.com/category/php/php-date-time/">PHP Date Time</a></li>
+        <li class="cat-item cat-item-12"><a href="http://phppot.com/category/php/php-graphics/">PHP Graphics</a></li>
+        <li class="cat-item cat-item-24"><a href="http://phppot.com/category/php/php-xml/">PHP XML</a></li>
+        <li class="cat-item cat-item-62"><a href="http://phppot.com/category/php/php-code-samples/">PHP Code Samples</a></li>
+        <li class="cat-item cat-item-88"><a href="http://phppot.com/category/php/php-freelancer/">PHP Freelancer</a></li>
+       </ul></li>
+      <li class="cat-item cat-item-73"><a href="http://phppot.com/category/jquery/">jQuery</a></li>
+      <li class="cat-item cat-item-74"><a href="http://phppot.com/category/wordpress/">Wordpress</a></li>
+      <li class="cat-item cat-item-75"><a href="http://phppot.com/category/mysql/">MySQL</a></li>
+      <li class="cat-item cat-item-76"><a href="http://phppot.com/category/css/">CSS</a></li>
+     </ul>
+    </div> 
+   </div> 
+   <div id="sidebar"> 
+    <div id="aboutcntnt">
+     <div id="photo">
+      <img src="http://phppot.com/wp-content/themes/solandra/images/Vincy.jpg" alt="Vincy" width="100" height="100" title="Vincy">
+     </div>
+     <div id="aboutdesc">
+      <p>Hello! I am Vincy, a PHP Developer and PHP Pot is my programming blog. I'm fond of developing modern web applications.</p> 
+      <p>I accept paid work. Let's start working on your dream project.</p>
+     </div>
+     <div id="contactMe">
+      <a href="mailto:vincy@phppot.com" title="Contact Me">vincy@phppot.com</a>
+     </div>
+    </div> 
+    <div class="hiadcomponent">
+     <div class="heading">
+      Free Email Updates
+     </div> 
+     <div> 
+      <form action="http://feedburner.google.com/fb/a/mailverify" method="post" target="popupwindow" onsubmit="window.open('http://feedburner.google.com/fb/a/mailverify?uri=phppot', 'popupwindow', 'scrollbars=yes,width=550,height=520');return true"> 
+       <p> <input placeholder="Enter your email here" type="text" class="feedb-email" name="email"> <input type="hidden" value="phppot" name="uri"> <input type="hidden" name="loc" value="en_US"> <input type="submit" value="Subscribe" class="subscribe"></p>
+      </form> 
+     </div> 
+     <div> 
+     </div> 
+    </div> 
+    <div id="recommended"> 
+     <div class="heading">
+      Recommended Code
+     </div> 
+     <ul> 
+      <li><a href="http://phppot.com/php/php-restful-web-service/">PHP RESTful Web Service</a> 
+       <div class="recommended-taxonomy">
+        under 
+        <a href="http://phppot.com/category/php/restful-api/">RESTful API</a>
+       </div></li> 
+      <li><a href="http://phppot.com/jquery/highcharts-compare-data-using-column-chart/">Highcharts - Compare Data using Column Chart</a> 
+       <div class="recommended-taxonomy">
+        under 
+        <a href="http://phppot.com/category/jquery/jquery-tutorials/">jQuery Tutorials</a>
+       </div> </li> 
+      <li><a href="http://phppot.com/php/ajax-pagination-with-php/">AJAX Pagination with PHP</a> 
+       <div class="recommended-taxonomy">
+        under 
+        <a href="http://phppot.com/category/php/php-ajax/">PHP AJAX</a>
+       </div> </li> 
+      <li><a href="http://phppot.com/php/simple-php-shopping-cart/">Simple PHP Shopping Cart</a> 
+       <div class="recommended-taxonomy">
+        under 
+        <a href="http://phppot.com/category/php/php-shopping-cart/">PHP Shopping Cart</a>
+       </div></li> 
+      <li><a href="http://phppot.com/jquery/jquery-ajax-inline-crud-with-php/">jQuery AJAX Inline CRUD with PHP</a> 
+       <div class="recommended-taxonomy">
+        under 
+        <a href="http://phppot.com/category/jquery/jquery-ajax-crud/">jQuery AJAX CRUD</a>
+       </div> </li> 
+     </ul> 
+    </div> 
+   </div>
+  </div> 
+  <div id="footer-contact-note"> 
+   <div class="footer-contact-banner-title">
+    Let's get to work.
+   </div> 
+   <div id="footer-photo"> 
+    <img src="http://phppot.com/wp-content/themes/solandra/images/Vincy.jpg" alt="Vincy" width="100" height="100" title="Vincy"> 
+   </div> 
+   <div id="footer-intro">
+    I love the web and passionate in software development. I have been programming non-stop for a decade. I provide application development, enhancement, and problem-solving services.
+   </div> 
+   <div id="footer-button-container"> 
+    <a id="footer-contact-navigation" href="/contact/">Contact Me</a> 
+   </div> 
+  </div> 
+  <div id="footer"> 
+   <ul id="footer-menu"> 
+    <li class="cat-item cat-item-2"><a href="http://phppot.com/category/php/">PHP</a></li> 
+    <li class="cat-item cat-item-8"><a href="http://phppot.com/category/jquery/">jQuery</a></li> 
+    <li class="cat-item cat-item-4"><a href="http://phppot.com/category/mysql/">MySQL</a></li> 
+    <li class="cat-item cat-item-3"><a href="http://phppot.com/category/wordpress/">Wordpress</a></li> 
+    <li class="cat-item cat-item-10"><a href="http://phppot.com/category/css/">CSS</a></li> 
+   </ul> 
+   <div class="follow"> 
+    <a class="linkedin" href="https://www.linkedin.com/in/vincya/
+" title="LinkedIn" target="_blank"><img src="http://phppot.com/wp-content/themes/solandra/images/linkedin.png" alt="LinkedIn"></a>
+    <a href="https://plus.google.com/100835954832081019478/posts" title="Google Plus"><img src="http://phppot.com/wp-content/themes/solandra/images/googleplus.png" alt="Google Plus"></a>
+    <a class="facebook" href="https://www.facebook.com/pages/phppotcom/1428212654057945" title="Facebook" target="_blank"><img src="http://phppot.com/wp-content/themes/solandra/images/facebook.png" alt="Facebook"></a>
+    <a class="twitter" href="https://twitter.com/phppot" title="Twitter" target="_blank"><img src="http://phppot.com/wp-content/themes/solandra/images/twitter.png" alt="Twitter"></a>
+    <a class="feed" href="/feed/" title="Feed"><img src="http://phppot.com/wp-content/themes/solandra/images/feed.png" alt="Feed"></a> 
+   </div> 
+   <div id="footer-bottom"> 
+    <p> © 2017 <a href="/" title="PhpPot Home">phppot.com</a>. The design and content are copyrighted to Vincy and may not be reproduced in any form. </p> 
+   </div> 
+  </div> 
+  <script type="text/javascript" src="http://phppot.com/wp-includes/js/wp-embed.min.js?ver=4.8.2"></script> 
+  <script src="http://phppot.com/wp-content/themes/solandra/prettify.js"></script> 
+ </body>
+</html>

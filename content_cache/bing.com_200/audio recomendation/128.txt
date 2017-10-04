@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- code.jsp -->
+<html>
+ <head> 
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+  <title>sun.audio: AudioStream.java</title> 
+ </head> 
+ <body style="padding:0 0 0 0;margin:0 0 0 0"> 
+  <div style="width:100%;background-color:#ddeeff;border:1px solid #ccddee;margin:0 0 0 0;padding:2px 2px 2px 2px"> 
+   <div style="float:right">
+    <a href="http://del.icio.us/post" onclick="window.open('http://del.icio.us/post?v=4&amp;noui&amp;jump=close&amp;url='+encodeURIComponent(location.href)+'&amp;title='+encodeURIComponent(document.title), 'delicious','toolbar=no,width=700,height=400'); return false;"><img src="http://images.del.icio.us/static/img/delicious.small.gif" border="0"> Save This Page</a>
+   </div> 
+   <a href="/">Home</a> » 
+   <a href="/projects/openjdk-7-code.html">openjdk-7</a> » sun » 
+   <a href="/docs/api/sun/audio/package-index.html">audio</a> » [
+   <a href="/docs/api/sun/audio/AudioStream.html">javadoc</a> | source] 
+  </div> 
+  <pre>
+<a name="1">    1 &nbsp; /*
+    2 &nbsp;  * Copyright (c) 1999, 2002, Oracle and/or its affiliates. All rights reserved.
+    3 &nbsp;  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+    4 &nbsp;  *
+    5 &nbsp;  * This code is free software; you can redistribute it and/or modify it
+    6 &nbsp;  * under the terms of the GNU General Public License version 2 only, as
+    7 &nbsp;  * published by the Free Software Foundation.  Oracle designates this
+    8 &nbsp;  * particular file as subject to the "Classpath" exception as provided
+    9 &nbsp;  * by Oracle in the LICENSE file that accompanied this code.
+   10 &nbsp;  *
+</a><a name="11">   11 &nbsp;  * This code is distributed in the hope that it will be useful, but WITHOUT
+   12 &nbsp;  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+   13 &nbsp;  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+   14 &nbsp;  * version 2 for more details (a copy is included in the LICENSE file that
+   15 &nbsp;  * accompanied this code).
+   16 &nbsp;  *
+   17 &nbsp;  * You should have received a copy of the GNU General Public License version
+   18 &nbsp;  * 2 along with this work; if not, write to the Free Software Foundation,
+   19 &nbsp;  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+   20 &nbsp;  *
+</a><a name="21">   21 &nbsp;  * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+   22 &nbsp;  * or visit www.oracle.com if you need additional information or have any
+   23 &nbsp;  * questions.
+   24 &nbsp;  */
+   25 &nbsp; 
+   26 &nbsp; <span class="kw">package</span> </a><a href="/docs/api/sun/audio/package-index.html">sun.audio</a>;
+   27 &nbsp; 
+   28 &nbsp; <span class="kw">import</span> <a href="/docs/api/java/io/InputStream.html">java.io.InputStream</a>;
+   29 &nbsp; <span class="kw">import</span> <a href="/docs/api/java/io/DataInputStream.html">java.io.DataInputStream</a>;
+   30 &nbsp; <span class="kw">import</span> <a href="/docs/api/java/io/FilterInputStream.html">java.io.FilterInputStream</a>;
+<a name="31">   31 &nbsp; <span class="kw">import</span> </a><a href="/docs/api/java/io/ByteArrayInputStream.html">java.io.ByteArrayInputStream</a>;
+   32 &nbsp; <span class="kw">import</span> <a href="/docs/api/java/io/BufferedInputStream.html">java.io.BufferedInputStream</a>;
+   33 &nbsp; <span class="kw">import</span> <a href="/docs/api/java/io/IOException.html">java.io.IOException</a>;
+   34 &nbsp; 
+   35 &nbsp; <span class="kw">import</span> <a href="/docs/api/javax/sound/sampled/package-index.html">javax.sound.sampled</a>;
+   36 &nbsp; <span class="kw">import</span> <a href="/docs/api/javax/sound/midi/package-index.html">javax.sound.midi</a>;
+   37 &nbsp; 
+   38 &nbsp; /**
+   39 &nbsp;  * Convert an InputStream to an AudioStream.
+   40 &nbsp;  *
+<a name="41">   41 &nbsp;  */
+   42 &nbsp; 
+   43 &nbsp; 
+   44 &nbsp; public class AudioStream extends FilterInputStream {
+   45 &nbsp; 
+   46 &nbsp;     // AudioContainerInputStream acis;
+   47 &nbsp;     protected AudioInputStream ais = null;
+   48 &nbsp;     protected AudioFormat format = null;
+   49 &nbsp;     protected MidiFileFormat midiformat = null;
+   50 &nbsp;     protected InputStream stream = null;
+</a><a name="51">   51 &nbsp; 
+   52 &nbsp; 
+   53 &nbsp;     /*
+   54 &nbsp;      * create the AudioStream; if we survive without throwing
+   55 &nbsp;      * an exception, we should now have some subclass of
+   56 &nbsp;      * ACIS with all the header info already read
+   57 &nbsp;      */
+   58 &nbsp; 
+   59 &nbsp;     public AudioStream(InputStream in) throws IOException {
+   60 &nbsp; 
+</a><a name="61">   61 &nbsp;         super(in);
+   62 &nbsp; 
+   63 &nbsp;         stream = in;
+   64 &nbsp; 
+   65 &nbsp;         if( in.markSupported() == false ) {
+   66 &nbsp; 
+   67 &nbsp;             stream = new BufferedInputStream( in, 1024 );
+   68 &nbsp;         }
+   69 &nbsp; 
+   70 &nbsp;         try {
+</a><a name="71">   71 &nbsp;             ais = AudioSystem.getAudioInputStream( stream );
+   72 &nbsp;             format = ais.getFormat();
+   73 &nbsp;             this.in = ais;
+   74 &nbsp; 
+   75 &nbsp;         } catch (UnsupportedAudioFileException e ) {
+   76 &nbsp; 
+   77 &nbsp;             // not an audio file, see if it's midi...
+   78 &nbsp;             try {
+   79 &nbsp;                 midiformat = MidiSystem.getMidiFileFormat( stream );
+   80 &nbsp; 
+</a><a name="81">   81 &nbsp;             } catch (InvalidMidiDataException e1) {
+   82 &nbsp;                 throw new IOException("could not create audio stream from input stream");
+   83 &nbsp;             }
+   84 &nbsp;         }
+   85 &nbsp;     }
+   86 &nbsp; 
+   87 &nbsp; 
+   88 &nbsp; 
+   89 &nbsp; 
+   90 &nbsp;     /**
+</a><a name="91">   91 &nbsp;      * A blocking read.
+   92 &nbsp;      */
+   93 &nbsp;     /*    public int read(byte buf[], int pos, int len) throws IOException {
+   94 &nbsp; 
+   95 &nbsp;           return(acis.readFully(buf, pos, len));
+   96 &nbsp;           }
+   97 &nbsp;     */
+   98 &nbsp; 
+   99 &nbsp;     /**
+  100 &nbsp;      * Get the data.
+</a><a name="101">  101 &nbsp;      */
+  102 &nbsp;     public AudioData getData() throws IOException {
+  103 &nbsp;         int length = getLength();
+  104 &nbsp; 
+  105 &nbsp;         //limit the memory to 1M, so too large au file won't load
+  106 &nbsp;         if (length &lt; 1024*1024) {
+  107 &nbsp;             byte [] buffer = new byte[length];
+  108 &nbsp;             try {
+  109 &nbsp;                 ais.read(buffer, 0, length);
+  110 &nbsp;             } catch (IOException ex) {
+</a><a name="111">  111 &nbsp;                 throw new IOException("Could not create AudioData Object");
+  112 &nbsp;             }
+  113 &nbsp;             return new AudioData(format, buffer);
+  114 &nbsp;         }
+  115 &nbsp; 
+  116 &nbsp;         /*              acis.setData();
+  117 &nbsp; 
+  118 &nbsp;                         if (acis.stream instanceof ByteArrayInputStream) {
+  119 &nbsp;                         Format[] format = acis.getFormat();
+  120 &nbsp;                         byte[] bytes = acis.getBytes();
+</a><a name="121">  121 &nbsp;                         if (bytes == null)
+  122 &nbsp;                         throw new IOException("could not create AudioData object: no data received");
+  123 &nbsp;                         return new AudioData((AudioFormat)format[0], bytes);
+  124 &nbsp;                         }
+  125 &nbsp;         */
+  126 &nbsp; 
+  127 &nbsp;         throw new IOException("could not create AudioData object");
+  128 &nbsp;     }
+  129 &nbsp; 
+  130 &nbsp; 
+</a><a name="131">  131 &nbsp;     public int getLength() {
+  132 &nbsp; 
+  133 &nbsp;         if( ais != null &amp;&amp; format != null ) {
+  134 &nbsp;             return (int) (ais.getFrameLength() *
+  135 &nbsp;                           ais.getFormat().getFrameSize() );
+  136 &nbsp; 
+  137 &nbsp;         } else if ( midiformat != null ) {
+  138 &nbsp;             return (int) midiformat.getByteLength();
+  139 &nbsp; 
+  140 &nbsp;         } else {
+</a><a name="141">  141 &nbsp;             return -1;
+  142 &nbsp;         }
+  143 &nbsp;     }
+  144 &nbsp; }
+
+</a></pre>
+  <a name="141"> </a>
+  <div style="width:100%;background-color:#ddeeff;border:1px solid #ccddee;margin:0 0 0 0;padding:2px 2px 2px 2px">
+   <a name="141"> 
+    <div style="float:right">
+     <a href="http://del.icio.us/post" onclick="window.open('http://del.icio.us/post?v=4&amp;noui&amp;jump=close&amp;url='+encodeURIComponent(location.href)+'&amp;title='+encodeURIComponent(document.title), 'delicious','toolbar=no,width=700,height=400'); return false;"><img src="http://images.del.icio.us/static/img/delicious.small.gif" border="0"> Save This Page</a>
+    </div></a> 
+   <a href="/">Home</a> » 
+   <a href="/projects/openjdk-7-code.html">openjdk-7</a> » sun » 
+   <a href="/docs/api/sun/audio/package-index.html">audio</a> » [
+   <a href="/docs/api/sun/audio/AudioStream.html">javadoc</a> | source] 
+  </div> 
+  <script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script> 
+  <script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-138120-1");
+pageTracker._trackPageview();
+</script>   
+  <!-- end -->
+ </body>
+</html>
