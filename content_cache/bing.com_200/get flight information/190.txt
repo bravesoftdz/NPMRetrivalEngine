@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head> 
+  <title>
+  Java Practices -&gt; Use javadoc liberally
+ </title> 
+  <link rel="stylesheet" type="text/css" href="../stylesheet9.css" media="all"> 
+  <link rel="shortcut icon" href="/images/favicon.ico;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673" type="image/vnd.microsoft.icon"> 
+  <meta name="description" content="Concise presentations of java programming practices, tasks, and conventions, amply illustrated with syntax highlighted code examples."> 
+  <meta name="keywords" content="signature,spec,specification,javadoc,java,java programming,java practices,java idiom,java style,java design patterns,java coding conventions,"> 
+ </head> 
+ <body> 
+  <div class="menu-bar"> 
+   <a href="/home/HomeAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673" title="Table of Contents">Home</a> | 
+   <a href="/vote/VoteSummaryAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673" title="View Poll Results">Poll</a> | 
+   <b><a href="/source/SourceAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673" title="Grab Source Code">Source Code</a></b>
+   <img class="no-margin" SRC="../images/goldstar.gif" ALT=""> | 
+   <a href="https://ca.linkedin.com/in/johnohanley" title="Hire me"> <b>Hire Me</b></a> | 
+   <a href="http://www.web4j.com/Java_Web_Application_Framework_Overview.jsp?From=1" title="Free Download - Java Web Application Framework"><b>WEB4J</b></a> | 
+   <a href="http://www.formula4j.com/" title="Math expression parser"><b>Formula4J</b></a> | 
+   <a href="http://www.amazon.com/exec/obidos/ASIN/0321356683/ref=nosim/javapractices-20"><b>Effective Java</b></a> | 
+   <a href="/references/ReferencesAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673" title="References">Links</a> 
+   <form action="/search/SearchAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673" method="get" class="search-form"> 
+    <input type="text" name="SearchTerms" value="" size="12" maxlength="50" class="search"> 
+    <input type="submit" value="Search"> 
+   </form> 
+  </div> 
+  <p> </p>
+  <p class="display-messages"> </p> 
+  <div class="main-layout"> 
+   <div class="page-title">
+    Use javadoc liberally
+   </div> 
+   <div class="main-body"> 
+    <br>
+    <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/javadoc/index.html">Javadoc</a> is a great tool, and should be used with feelings of unbridled joy ;). 
+    <p><span class="highlight">A method header combined with its associated javadoc form the specification, or <a href="Topic194.cjp">contract</a>, of a method.</span> If the caller fulfills the stated requirements, then the method undertakes to fulfill its stated promises. </p>
+    <p>Using Javadoc acknowledges that there are <em>two</em> distinct questions a reader can ask about code: </p>
+    <ul> 
+     <li><em>what is this supposed to do?</em> (answered only by the javadoc and method header) </li>
+     <li><em>how does it try to do it?</em> (answered only by the implementation) </li>
+    </ul> 
+    <p>If javadoc is written correctly, then: </p>
+    <ul> 
+     <li>one can understand exactly what services are offered by a method ("<em>what is this supposed this do?</em>"), without having to look at its implementation ("<em>how does it try to do it?</em>"). Reading an implementation usually takes a lot more effort than reading javdoc.</li> 
+     <li>the implementation can be checked for correctness versus the specification. That is, some bugs can be found just by <em>reading</em> the code, as opposed to <em>executing</em> it.</li> 
+    </ul> Oracle has published this 
+    <a href="http://www.oracle.com/technetwork/java/javase/documentation/index-137868.html">style guide</a> for writing javadoc comments. 
+    <p>Note that: </p>
+    <ul> 
+     <li>if you wish to provide high level descriptions, then you may use the file names <tt>overview.html</tt> (a conventional name) and <tt><a href="http://docs.oracle.com/javase/6/docs/technotes/tools/windows/javadoc.html#packagecomment">package-info.java</a></tt> to do so (see below).</li> 
+     <li>javadoc is "inherited" - javadoc written for an interface method or an abstract method is automatically associated with corresponding concrete implementations</li> 
+     <li>it's a common error to put the class level javadoc comment at the very start of a source file, before the <tt>import</tt> statements. This is an error, since it must appear just above the class header.</li> 
+    </ul> 
+    <a href="http://docs.oracle.com/javase/1.4.2/docs/tooldocs/windows/javadoc.html">Javadoc 1.4</a> has added many features, including: 
+    <ul> 
+     <li> the <tt>-tag</tt> option allows user-defined custom tags. This feature can be used to implement common items such as <tt>@to.do</tt>, <tt>@is.Mutable</tt>, or <tt>@no.Nulls</tt>. (Oracle recommends placing a period somewhere in the custom tag, to avoid potential future conflicts with tags defined by Oracle.)</li> 
+     <li> the <tt>-linksource</tt> option generates an HTML version of your source code, and links the javadoc to the source. (The source is presented without any syntax highlighting, but this remains a very nice feature.)</li> 
+     <li> there is finer-grained control over how javadoc is inherited. The <tt>{@inheritDoc}</tt> tag is useful here (warning: this is broken in JDK 1.4.0)</li> 
+    </ul> 
+    <a href="http://docs.oracle.com/javase/1.5.0/docs/guide/javadoc/whatsnew-1.5.0.html">Javadoc 1.5</a> has these notable additions : 
+    <ul> 
+     <li> support for new language features, such as generics and annotations</li> 
+     <li> the @literal and @code tags for ensuring text is not treated as markup</li> 
+    </ul> 
+    <p><b>Example</b>: <br> </p>
+    <pre>
+
+<span class="comment">/*
+* This comment is NOT a class level javadoc comment.
+* Such comments appear just above the class declaration, not at the 
+* start of the file. 
+*/</span>
+
+<span class="keyword">import</span> java.math.BigDecimal;
+
+<span class="comment">/**
+* Guitar Model Object.
+* 
+* &lt;P&gt;Various attributes of guitars, and related behaviour.
+*  
+* &lt;P&gt;Note that {@link BigDecimal} is used to model the price - not double or float. 
+* See {@link #Guitar(String, BigDecimal, Integer)} for more information.
+*  
+* @author Les Paul
+* @version 2.0
+*/</span>
+<span class="keyword">final</span> <span class="keyword">class</span> Guitar {
+  
+  <span class="comment">/**
+  * Constructor.
+  * 
+  * @param aName (required) brand name of the guitar. Must have content. Length 
+  * must be in range &lt;tt&gt;1..50&lt;/tt&gt;. 
+  * @param aPrice (optional) purchase price of the guitar.
+  * @param aNumStrings (required) number of strings on the guitar. Can take 
+  * values 6 or 12.
+  */</span>
+  Guitar(String aName, BigDecimal aPrice, Integer aNumStrings){
+    <span class="comment">//...elided
+</span>  }
+
+  <span class="comment">//There is a one-line form of javadoc comment, useful for shorter text :
+</span>  
+  <span class="comment">/** Return name passed to the constructor.  */</span>
+  String getName(){
+    <span class="keyword">return</span> <span class="keyword">null</span>;
+  }
+  
+  <span class="comment">/** Return price passed to the constructor.   */</span>
+  BigDecimal getPrice(){
+    <span class="keyword">return</span> <span class="keyword">null</span>;
+  }
+  
+  <span class="comment">/** Value - {@value}, key for storing the current guitar of interest in the session.*/</span>
+  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY = <span class="literal">"guitar"</span>;
+  
+  <span class="comment">/** 
+  * Play the guitar.
+  * 
+  * This method makes no guarantees as to how &lt;em&gt;well&lt;/em&gt; the song is played.
+  * @param aSongTitle must have content, and must have trimmed length greater than 2.
+  */</span>
+  <span class="keyword">void</span> play(String aSongTitle){
+    <span class="comment">//..elided
+</span>  }
+  
+  <span class="comment">/**
+  * Apply standard tuning to the guitar.
+  * 
+  * @return &lt;tt&gt;true&lt;/tt&gt; only if the guitar has been properly tuned.
+  */</span>
+  <span class="keyword">boolean</span> tune(){
+    <span class="keyword">return</span> <span class="keyword">true</span>;
+  }
+
+  <span class="comment">/**
+  * Destroy the guitar while on stage.
+  * 
+  * @deprecated Not good for the environment.
+  */</span>
+  <span class="keyword">void</span> lightOnFireAndSmashLikeAWildman(){
+    <span class="comment">//..elided
+</span>  }
+  
+  <span class="comment">//...other methods elided
+</span>}
+ 
+</pre> 
+    <br> 
+    <b>Prefer <tt>package-info.java</tt> to <tt>package.html</tt></b> 
+    <p>Originally, an HTML file named <tt>package.html</tt> was used to specify <a href="http://docs.oracle.com/javase/6/docs/technotes/tools/windows/javadoc.html#packagecomment">package level comments</a>. That style is still available, but it's likely better to use <a href="http://docs.oracle.com/javase/specs/jls/se7/html/jls-7.html#jls-7.4.1"><tt>package-info.java</tt></a> instead: </p>
+    <ul> 
+     <li>it's shorter, since no boilerplate HTML is needed </li>
+     <li>the leading '*' on each line can be discarded, making it easy to paste in existing HTML </li>
+     <li><tt>package-info.java</tt> is the only place to <em>annotate</em> a package, if needed </li>
+    </ul> The 
+    <tt>package-info.java</tt> file is unusual since it doesn't contain a class. Indeed, the name 
+    <tt>package-info</tt> is not a valid class name. Here is a simple example of its contents: 
+    <pre>/** Edit the roles attached to a user. */
+package hirondelle.fish.access.role;</pre> Here is an example including an annotation for the package: 
+    <pre>/** Edit the settings attached to a user. */
+@Unpublished
+package hirondelle.fish.access.user;</pre> Here is a final example without the leading '*' on every line: 
+    <pre>/**
+Maintain a list of Members in the Fish and Chips Club.
+An Active Member will be part of the RSVP list. When a Member 
+is inactive, they will not appear on the RSVP listing.
+@author B. P. Hennessey
+@version 1.0
+*/
+package hirondelle.fish.main.member;</pre> 
+    <br> 
+    <br> 
+   </div> 
+   <div class="topic-section">
+    See Also :
+   </div> 
+   <div class="main-body"> 
+    <a href="/topic/TopicAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673?Id=48">Document thread safety</a> 
+    <br> 
+    <a href="/topic/TopicAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673?Id=74">Construct classes from the outside in</a> 
+    <br> 
+    <a href="/topic/TopicAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673?Id=194">Design by Contract</a> 
+    <br> 
+    <a href="/topic/TopicAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673?Id=227">Avoid basic style errors</a> 
+    <br> 
+   </div> 
+   <div class="topic-section">
+    Would you use this technique?
+   </div> 
+   <div class="main-body"> 
+    <form action="/vote/AddVoteAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673" method="post">
+      Yes
+     <input type="radio" name="Choice" value="Y"> &nbsp;&nbsp;No
+     <input type="radio" name="Choice" value="N"> &nbsp;&nbsp;Undecided
+     <input type="radio" name="Choice" value="?"> &nbsp;&nbsp;
+     <input type="submit" value="Vote"> 
+     <input type="hidden" name="Operation" value="Apply"> 
+     <input type="hidden" name="TopicId" value="60"> 
+    </form> 
+   </div> 
+   <div style="height:10.0em;"></div> 
+  </div> 
+  <div align="center" class="legalese">
+    © 2017 Hirondelle Systems | 
+   <a href="/source/SourceAction.do;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673"><b>Source Code</b></a>
+   <img class="no-margin" SRC="/images/goldstar.gif" ALT=""> | 
+   <a href="mailto:webmaster@javapractices.com">Contact</a> | 
+   <a href="http://creativecommons.org/licenses/by-nc-sa/1.0/">License</a> | 
+   <a href="/apps/cjp.rss;jsessionid=70DE40DCE7E1A8F2BE09A920A1746673">RSS</a> 
+   <!-- ukey="2AC36CD2" --> 
+   <!-- ckey="16DF3D87" --> 
+   <br> Individual code snippets can be used under this 
+   <a href="../LICENSE.txt">BSD license</a> - Last updated on September 21, 2013.
+   <br> Over 2,000,000 unique IPs last year - 
+   <span title="Java Practices 2.6.5, Mon May 16 00:00:00 EDT 2011">Built with</span> 
+   <a href="http://www.web4j.com">WEB4J</a>.
+   <br> - In Memoriam : Bill Dirani - 
+  </div> 
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2633428-1', 'auto');
+  ga('send', 'pageview');
+
+</script>   
+ </body>
+</html>

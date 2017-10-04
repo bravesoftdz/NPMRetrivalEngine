@@ -1,0 +1,1841 @@
+<!doctype html>
+<html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+ <head>
+  <link rel="canonical" href="https://msdn.microsoft.com/en-us/library/hh441569.aspx"> 
+  <title>Creating Windows Runtime Components in C++</title> 
+  <meta name="DCS.dcsuri" content="/en-us/library/hh441569(d=default,l=en-us,v=vs.140).aspx"> 
+  <meta name="NormalizedUrl" content="https://msdn.microsoft.com/en-us/library/hh441569(d=default,l=en-us,v=vs.140).aspx"> 
+  <meta name="ms.normalizedurl" content="https://msdn.microsoft.com/en-us/library/hh441569(d=default,l=en-us,v=vs.140).aspx"> 
+  <meta name="DCS.appliesToProduct" content=""> 
+  <meta name="DCS.appliesToTechnology" content=""> 
+  <meta name="DCS.appliesToVersion" content=""> 
+  <meta name="ms.prod" content="windows-client-threshold"> 
+  <meta name="ms.service" content=""> 
+  <meta name="ms.devlang" content="cpp"> 
+  <meta name="ms.topic" content="article"> 
+  <meta name="VotingContextUrl" content="https://msdn.microsoft.com/en-us/library/hh441569(d=default,l=en-us,v=vs.140).aspx"> 
+  <meta name="MN" content="FB361398-11:44:09 AM"> 
+  <meta name="Search.ShortId" content="hh441569"> 
+  <meta name="ms.shortidmsdn" content="hh441569"> 
+  <meta name="ms.locale" content="en-us"> 
+  <meta name="ms.prodver" content="VS.140"> 
+  <meta name="ms.contentlang" content="EN"> 
+  <meta name="ms.lang" content="EN"> 
+  <meta name="ms.loc" content="US"> 
+  <meta name="ms.sitever" content="2017.09.29.3"> 
+  <meta name="ms.assetid" content="5b7251e6-4271-4f13-af80-c1cf5b1489bf"> 
+  <meta name="ms.auth" content="0"> 
+  <meta name="ms.custom" content=""> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <script type="text/javascript" data-do-not-move="true">
+        //<![CDATA[
+        var AmbientContext = null;
+
+        (function(){
+            var root = (function(){return this;}).call(null);
+
+            var GetCookie = function(name){
+                var cookies = root.document.cookie ? root.document.cookie.split('; ') : [];
+                for (var i = 0; i < cookies.length; i++) {
+                    var pos = cookies[i].indexOf('=');
+                    if (name === root.decodeURIComponent(cookies[i].slice(0, pos)))
+                    {
+                        var cookie = cookies[i].slice(pos + 1).replace(/\+/g, ' ');
+                        cookie = root.decodeURIComponent(cookie);
+                        return cookie;
+                    }
+                }
+            };
+
+            var JsonDeserialize = function(content) {
+                return root.JSON && root.JSON.parse ? root.JSON.parse(content) : (new Function('return (' + content + ')'))();
+            };
+
+            try {
+                AmbientContext = GetCookie('AmbientContext');
+                AmbientContext = AmbientContext && JsonDeserialize(AmbientContext);
+            } catch(ex) {
+            } finally {
+                AmbientContext = AmbientContext || null;
+            }
+        })();
+        //]]>
+    </script> 
+  <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.1.min.js" data-do-not-move="true" data-provides="jQuery"></script> 
+  <link rel="stylesheet" type="text/css" href="https://uhf.microsoft.com/mscc/statics/mscc-0.3.6.min.css">
+  <link rel="stylesheet" type="text/css" href="https://i-msdn.sec.s-msft.com/Combined.css?resources=0:ImageSprite,0:TopicResponsive,0:TopicResponsive.MediaQueries,1:CodeSnippet,1:ProgrammingSelector,1:ExpandableCollapsibleArea,0:CommunityContent,1:TopicNotInScope,1:FeedViewerBasic,1:ImageSprite,2:Header,2:HeaderFooterSprite,2:Header.MediaQueries,3:Banner.MediaQueries,0:Breadcrumbs,0:Breadcrumbs.MediaQueries,0:ResponsiveToc,0:ResponsiveToc.MediaQueries,0:LibraryMemberFilter,2:Footer,2:Footer.MediaQueries,4:StandardRating,5:LinkList,0:BaseResponsive,6:MsdnResponsive,0:Tables.MediaQueries;/Areas/Library/Content:0,/Areas/Epx/Content/Css:1,/Areas/Centers/Themes/StandardDevCenter/Content:2,/Areas/Epx/Shared/Content:3,/Areas/Global/Content:4,/Areas/Epx/Themes/Base/Content:5,/Areas/Library/Themes/Msdn/Content:6&amp;amp;v=DDD1A2DAE878408650C0553AB40839AB">
+ </head> 
+ <body class="library Chrome"> 
+  <div id="page"> 
+   <link type="text/css" rel="stylesheet"> 
+   <input type="hidden" id="isHeaderBleeding" value="true"> 
+   <div id="ux-header" dir="ltr" class="ltr msdn" ms.pgarea="header"> 
+    <div id="ux-banner"> 
+     <div id="msccBanner" dir="ltr" data-site-name="msdn.microsoft.com" data-mscc-version="0.3.6" data-nver="aspnet-2.0.6" data-sver="0.1.2" class="cc-banner" role="alert">
+      <div class="cc-container">
+       <svg class="cc-icon cc-v-center" x="0px" y="0px" viewbox="0 0 44 44" height="30px" fill="none" stroke="currentColor">
+        <circle cx="22" cy="22" r="20" stroke-width="2"></circle>
+        <line x1="22" x2="22" y1="18" y2="33" stroke-width="3"></line>
+        <line x1="22" x2="22" y1="12" y2="15" stroke-width="3"></line>
+       </svg> 
+       <span class="cc-v-center cc-text">This site uses cookies for analytics, personalized content and ads. By continuing to browse this site, you agree to this use.</span> 
+       <a href="https://go.microsoft.com/fwlink/?linkid=845480" aria-label="Learn more about Microsoft’s Cookie Policy" id="msccLearnMore" class="cc-link cc-v-center cc-float-right" data-mscc-ic="false">Learn more</a>
+      </div>
+     </div> 
+    </div> 
+    <header> 
+     <span id="singleCol"></span> 
+     <span id="doubleCol"></span> 
+     <span id="isMobile"></span> 
+     <div> 
+      <div class="row topRow" role="banner"> 
+       <div class="top"> 
+        <div class="left"> 
+         <a class="msdnLogoImg" href="https://msdn.microsoft.com/en-us" title="MSDN home" ms.cmpgrp="mslogo"> 
+          <div class="clip70x15"> 
+           <img alt="Microsoft Logo" id="msft-logo" class="msft-logo" src="https://i-msdn.sec.s-msft.com/Areas/Centers/Themes/StandardDevCenter/Content/HeaderFooterSprite.png?v=636422593544160354"> 
+          </div> </a> 
+         <div class="GrayPipeDiv clip1x18"> 
+          <img alt="Gray Pipe" class="GrayPipe" src="https://i-msdn.sec.s-msft.com/Areas/Centers/Themes/StandardDevCenter/Content/HeaderFooterSprite.png?v=636422593544160354"> 
+         </div> 
+         <a class="DevCenterFullNameNonMegaBlade" href="https://msdn.microsoft.com/en-us">Developer Network</a> 
+         <a class="DevCenterFullName" href="https://msdn.microsoft.com/en-us">Developer Network</a> 
+         <a class="DevCenterShortName" href="https://msdn.microsoft.com/en-us">Developer</a> 
+        </div> 
+        <div class="right" ms.cmpgrp="aux nav"> 
+         <div id="signIn" aria-label="Profile button"> 
+          <div class="profileImage"></div> 
+          <a class="scarabLink" href="https://login.live.com/login.srf?wa=wsignin1.0&amp;rpsnv=13&amp;ct=1507056249&amp;rver=6.7.6640.0&amp;wp=mcmbi&amp;wlcxt=msdn%24msdn%24msdn&amp;wreply=https%3a%2f%2fmsdn.microsoft.com%2fen-us%2flibrary%2fhh441569.aspx&amp;lc=1033&amp;id=254354&amp;mkt=en-us">Sign in</a>
+         </div> 
+         <div class="auxNav"> 
+          <div> 
+           <div data-fragmentname="Subscriptions" id="Fragment_Subscriptions" xmlns="http://www.w3.org/1999/xhtml"> 
+            <a href="https://my.visualstudio.com/?wt.mc_id=o~msft~msdn~nav~subscriber&amp;campaign=o~msft~msdn~nav~subscriber" id="Subscriptions_2153_1" xmlns="http://www.w3.org/1999/xhtml"> <p xmlns="">Subscriber portal</p> </a> 
+           </div> 
+           <div data-fragmentname="GetTools" id="Fragment_GetTools" xmlns="http://www.w3.org/1999/xhtml"> 
+            <a href="https://www.visualstudio.com/free-developer-offers/" id="GetTools_2153_3" xmlns="http://www.w3.org/1999/xhtml">Get tools</a> 
+           </div> 
+          </div> 
+          <div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="row middleRow"> 
+       <div class="expandTop"> 
+        <div class="left"></div> 
+        <div class="right"></div> 
+       </div> 
+      </div> 
+     </div> 
+     <div id="buttomRowWrapper" class="bg_default"> 
+      <div class="row buttomRow bg_default"> 
+       <div class="bottom"> 
+        <div class="left" role="navigation" aria-label="header toc" ms.cmpgrp="main nav"> 
+         <a id="grip" class="menu-icon" href="javascript:void(0)" role="button" aria-label="navigation menu" data-mscc-ic="false"></a> 
+         <div id="drawer"> 
+          <div class="toc"> 
+           <nav> 
+            <ul class="navL1"> 
+             <li class="inactive toggle"> <a href="javascript:void(0)" role="button" aria-expanded="false" data-mscc-ic="false">Downloads</a> 
+              <ul class="navL2"> 
+               <li class="inactive"> <a href="https://www.visualstudio.com/downloads/download-visual-studio-vs" role="link" title="Visual Studio">Visual Studio</a> </li> 
+               <li class="inactive"> <a href="https://msdn.microsoft.com/microsoft-sdks-msdn" role="link" title="SDKs">SDKs</a> </li> 
+               <li class="inactive toggle"> <a href="javascript:void(0)" title="Trial software" role="button" aria-expanded="false" data-mscc-ic="false">Trial software</a> 
+                <ul class="navL3"> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/evalcenter" title="Free downloads" role="link">Free downloads</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/officeevaluationresources" title="Office resources" role="link">Office resources</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/sharepoint2013resources" title="SharePoint Server 2013 resources" role="link">SharePoint Server 2013 resources</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/sqlserver2014expressresources" title="SQL Server 2014 Express resources" role="link">SQL Server 2014 Express resources</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/windowsserver2012r2resources" title="Windows Server 2012 resources" role="link">Windows Server 2012 resources</a> </li> 
+                </ul> </li> 
+              </ul> </li> 
+             <li class="inactive toggle"> <a href="javascript:void(0)" role="button" aria-expanded="false" data-mscc-ic="false">Programs</a> 
+              <ul class="navL2"> 
+               <li class="inactive toggle"> <a href="javascript:void(0)" title="Subscriptions" role="button" aria-expanded="false" data-mscc-ic="false">Subscriptions</a> 
+                <ul class="navL3"> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/msdn-subscriptions-overview" title="Overview" role="link">Overview</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/msdn-subscriptions-administration" title="Administrators" role="link">Administrators</a> </li> 
+                </ul> </li> 
+               <li class="inactive toggle"> <a href="javascript:void(0)" title="Students" role="button" aria-expanded="false" data-mscc-ic="false">Students</a> 
+                <ul class="navL3"> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/imagine/imagine-home" title="Microsoft Imagine" role="link">Microsoft Imagine</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/microsoftstudentpartners" title="Microsoft Student Partners" role="link">Microsoft Student Partners</a> </li> 
+                </ul> </li> 
+               <li class="inactive"> <a href="https://msdn.microsoft.com/applicationbuilder" role="link" title="ISV">ISV</a> </li> 
+               <li class="inactive"> <a href="https://www.microsoft.com/bizspark" role="link" title="Startups">Startups</a> </li> 
+               <li class="inactive"> <a href="https://events.microsoft.com/" role="link" title="Events">Events</a> </li> 
+              </ul> </li> 
+             <li class="inactive toggle"> <a href="javascript:void(0)" role="button" aria-expanded="false" data-mscc-ic="false">Community</a> 
+              <ul class="navL2"> 
+               <li class="inactive"> <a href="https://msdn.microsoft.com/magazine/dd767791" role="link" title="Magazine">Magazine</a> </li> 
+               <li class="inactive"> <a href="https://social.msdn.microsoft.com/forums/" role="link" title="Forums">Forums</a> </li> 
+               <li class="inactive"> <a href="https://blogs.msdn.microsoft.com/" role="link" title="Blogs">Blogs</a> </li> 
+               <li class="inactive"> <a href="https://channel9.msdn.com/" role="link" title="Channel 9">Channel 9</a> </li> 
+              </ul> </li> 
+             <li class="inactive current toggle"> <a href="javascript:void(0)" role="button" aria-expanded="false" data-mscc-ic="false">Documentation</a> 
+              <ul class="navL2"> 
+               <li class="inactive current"> <a href="https://msdn.microsoft.com/library" role="link" title="APIs and reference">APIs and reference</a> </li> 
+               <li class="inactive"> <a href="https://msdn.microsoft.com/developer-centers-msdn" role="link" title="Dev centers">Dev centers</a> </li> 
+               <li class="inactive"> <a href="https://code.msdn.microsoft.com/" role="link" title="Samples">Samples</a> </li> 
+               <li class="inactive"> <a href="https://msdn.microsoft.com/mt703209" role="link" title="Retired content">Retired content</a> </li> 
+              </ul> </li> 
+            </ul> 
+           </nav> 
+          </div> 
+         </div> 
+        </div> 
+        <div class="right" ms.title="search" role="search"> 
+         <div data-fragmentname="SearchBox" id="Fragment_SearchBox" xmlns="http://www.w3.org/1999/xhtml"> 
+          <div class="SearchBox"> 
+           <form id="HeaderSearchForm" name="HeaderSearchForm" method="get"> 
+            <button id="FakeHeaderSearchButton" value="Search" type="submit" class="header-search-button" role="button" aria-label="search finder"> 
+             <div id="search-finder-div" class="clip16x20"> 
+              <img alt="search finder" id="search-finder" class="search-finder" src="https://i-msdn.sec.s-msft.com/Areas/Centers/Themes/StandardDevCenter/Content/HeaderFooterSprite.png?v=636422593544160354"> 
+             </div> </button> 
+            <button id="HeaderSearchButton" style="display:none"></button> 
+            <div id="searchSplitter"></div> 
+            <div id="searchCloseIconDiv" class="clip16x20" tabindex="0"> 
+             <img alt="search clear" id="searchCloseIcon" class="search-clear-x" src="https://i-msdn.sec.s-msft.com/Areas/Centers/Themes/StandardDevCenter/Content/HeaderFooterSprite.png?v=636422593544160354"> 
+            </div> 
+            <div id="searchTextContainer" style="width: 0;"> 
+             <input id="HeaderSearchTextBox" name="query" type="text" aria-label="search edit textbox" maxlength="200" onfocus="Epx.Controls.SearchBox.watermarkFocus(event, this.title)" onblur="Epx.Controls.SearchBox.watermarkBlur(event, this.title)"> 
+            </div> 
+           </form> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </header> 
+   </div> 
+   <div id="jumpInfo" style="display: none">
+    We’re sorry. The content you requested has been removed. You’ll be auto redirected in 1 second.
+   </div> 
+   <link type="text/css" rel="stylesheet"> 
+   <link type="text/css" rel="stylesheet"> 
+   <div id="breadcrumbs" ms.pgarea="body" ms.cmpgrp="breadcrumbs"> 
+    <div id="breadcrumbDesktop" class="breadCrumb"> 
+    </div> 
+    <div id="breadcrumbDropDownMenu"></div> 
+    <div id="breadcrumbTablet" class="breadCrumb"> 
+     <span class="breadcrumbDropSmall"><a id="tocDropDownButton" href="#" title="MSDN Library"><span>MSDN Library</span></a></span> 
+    </div> 
+    <div id="tocDropDownMenu"></div> 
+    <div id="breadcrumbMobile" class="breadCrumb"> 
+     <span class="breadcrumbDropSmall"><a id="tocPopupButton" href="#" title="MSDN Library"><span>MSDN Library</span></a></span> 
+    </div> 
+   </div> 
+   <div id="tocPopupMenu"> 
+    <div id="tocPopMenuClose" class="tocCloseLarge"></div> 
+    <div id="tocTitle">
+     MSDN Library
+    </div> 
+   </div> 
+   <div id="body" ms.pgarea="body" class=""> 
+    <span id="tabletView_large"></span> 
+    <span id="tabletView_small"></span> 
+    <span id="mobileView"></span> 
+    <div id="leftNav" ms.cmpgrp="left toc" role="navigation" aria-label="left toc"> 
+     <div id="tocnav" class="ArchiveV2"> 
+      <div class="tocunselected"> 
+       <div id="tocExpandArea"> 
+        <span class="toc_empty"></span> 
+        <span id="tocExpandButton"><a href="javascript:void(0)" aria-label="expand sibling toc" role="button"></a></span> 
+       </div> 
+       <div id="tocExpand"></div> 
+      </div> 
+      <div class="tocselected"></div> 
+      <div class="tocunselected"> 
+       <div class="toclevel current" data-toclevel="1"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/ms123401.aspx" id="ms310241_MSDN.10_en-us" mtpsaliasid="" mtpsassetid="5DDC0A78-6B2C-43E3-9C56-55F45C0DFFA5_MSDN.10_en-us" mtpsshortid="ms123401_MSDN.10_en-us" title="MSDN Library">MSDN Library</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/cc295789.aspx" id="cc295789_Expression.10_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Design Tools">Design Tools</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/aa187916.aspx" id="aa187916_MSDN.10_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Development Tools and Languages">Development Tools and Languages</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/ms376734.aspx" id="ms376734_MSDN.10_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Mobile and Embedded Development">Mobile and Embedded Development</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/ff361664(v=vs.110).aspx" id="aa139615_MSDN.10_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title=".NET Development">.NET Development</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/fp161347.aspx" id="bb665965_office.12_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Office development">Office development</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/ee702802.aspx" id="ee702802_MSDN.10_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Online Services">Online Services</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/dd208104.aspx" id="cc203350_PROT.20_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Open Specifications">Open Specifications</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/ff921345.aspx" id="ff653621_PandP.10_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="patterns &amp; practices">patterns &amp; practices</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/aa155072.aspx" id="aa155072_MSDN.10_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Servers and Enterprise Development">Servers and Enterprise Development</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/hh323806(v=office.14).aspx" id="jj127411_office.14_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Speech Technologies">Speech Technologies</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/aa155073.aspx" id="aa155073_MSDN.10_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Web Development">Web Development</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="2"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/ee663300(v=vs.85).aspx" id="aa139672_MSDN.10_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Windows Desktop App Development">Windows Desktop App Development</a> 
+       </div> 
+      </div> 
+      <a id="tocMenuToggler" href="javascript:void(0)" role="button"> <span id="tocMenuTogglerIcon" class="tocMenuCollapse" role="button" aria-expanded="true" aria-label="Table of contents menu"></span> 
+       <div id="tocMenuTogglerLabel">
+        TOC
+       </div> </a> 
+     </div> 
+     <div style="display:none"> 
+      <div id="CollapseLocalizeString">
+       Collapse the table of content
+      </div> 
+      <div id="ExpandLocalizeString">
+       Expand the table of content
+      </div> 
+     </div> 
+     <div> 
+      <a id="isd_archiveControlResponsive" style="display:none;" href="javascript:void(0)" role="button" aria-label="Hide Archived Versions" data-include-archive="Show Archived Versions" data-exclude-archive="Hide Archived Versions"> </a> 
+      <div id="isd_archiveInstrument" style="display:none">
+       This documentation is archived and is not being maintained.
+      </div> 
+     </div> 
+    </div> 
+    <div id="content" class="content" ms.cmpgrp="content body" role="main"> 
+     <div class="topicNotInScope" id="topicNotInScope"> 
+      <div class="topicNotInScopeDisclaimer" id="topicNotInScopeDisclaimer"> 
+       <div class="topicNotInScopeImageContainer clip16x16"> 
+        <img class="topicNotInScopeInformationImage" src="https://i-msdn.sec.s-msft.com/Areas/Epx/Content/Images/ImageSprite.png?v=636422593604786198" alt="Information"> 
+       </div> 
+       <div class="topicNotInScopeSwitchCollectionContainer"> 
+        <a class="topicNotInScopeSwitchCollection" id="topicNotInScopeSwitchCollection" href="#" onclick="TopicNotInScope_ShowPicker();return false;"> Switch </a> 
+        <div class="topicNotInScopeImageContainer2 clip11x6"> 
+         <img class="topicNotInScopeDropdownImage" id="topicNotInScopeDropdownImage" src="https://i-msdn.sec.s-msft.com/Areas/Epx/Content/Images/ImageSprite.png?v=636422593604786198" alt="Switch" onclick="TopicNotInScope_ShowPicker()"> 
+        </div> 
+        <ul id="topicNotInScopeCollectionPicker" class="topicNotInScopeCollectionPicker"> 
+         <li class="topicNotInScopeCollectionPickerItem"> <a href="https://msdn.microsoft.com/en-us/library/windows/apps/hh441569.aspx" title="Windows Store apps">Windows Store apps</a> </li> 
+         <li class="topicNotInScopeCollectionPickerItem"> <a href="https://msdn.microsoft.com/en-us/library/windows/apps/xaml/hh441569.aspx" title="Windows Store apps (XAML)">Windows Store apps (XAML)</a> </li> 
+        </ul> 
+       </div> 
+       <div class="topicNotInScopeDisclaimerText">
+        The topic you requested is included in another documentation set. For convenience, it's displayed below. Choose Switch to see the topic in its original location.
+       </div> 
+       <div class="Clear"></div> 
+      </div> 
+     </div> 
+     <div id="archiveDisclaimerText" style="display:none">
+      This documentation is archived and is not being maintained.
+     </div> 
+     <div xmlns="http://www.w3.org/1999/xhtml"> 
+      <div class="topic"> 
+       <h1 class="title">Creating Windows Runtime Components in C++</h1> 
+       <div id="mainSection"> 
+        <div id="mainBody">
+         &nbsp;
+         <div class="introduction">
+          <p>This article shows how to use C++ to create a Windows Runtime component, which is a DLL that's callable from a Windows 8.x Store app that's built by using JavaScript—or C#, Visual Basic, or C++. Here are several reasons for building such a component:</p>
+          <ul class="unordered">
+           <li><p>To get the performance advantage of C++ in complex or computationally intensive operations.</p></li>
+           <li><p>To reuse code that's already written and tested.</p></li>
+          </ul>
+          <p>When you build a solution that contains a JavaScript or .NET project, and a Windows Runtime component project, the JavaScript project files and the compiled DLL are merged into one package, which you can debug locally in the simulator or remotely on a tethered device. You can also distribute just the component project as an Extension SDK. For more information, see <a href="https://msdn.microsoft.com/en-us/library/hh768146.aspx">Creating a Software Development Kit</a>.</p>
+          <p>In general, when you code your C++ component, use the regular C++ library and built-in types, except at the abstract binary interface (ABI) boundary where you are passing data to and from code in another .winmd package. There, use Windows Runtime types and the special syntax that Visual C++ supports for creating and manipulating those types. In addition, in your Visual C++ code, use types such as <strong>delegate</strong> and <strong>event</strong> to implement events that can be fired from your component and handled in JavaScript, Visual Basic, or C#. For more information about the new Visual C++ syntax, see <a href="https://msdn.microsoft.com/en-us/library/hh699871.aspx">Visual C++ Language Reference (C++/CX)</a>.</p>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Casing and naming rules</span></a>
+            <div id="Anchor_0" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_0" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p><span class="label">JavaScript</span></p>
+            <p>JavaScript is case-sensitive. Therefore, you must follow these casing conventions:</p>
+            <ul class="unordered">
+             <li><p>When you reference C++ namespaces and classes, use the same casing that's used on the C++ side. </p></li>
+             <li><p>When you call methods, use camel casing even if the method name is capitalized on the C++ side. For example, a C++ method <strong>GetDate()</strong> must be called from JavaScript as <strong>getDate()</strong>.</p></li>
+             <li><p>An activatable class name and namespace name can't contain UNICODE characters.</p></li>
+            </ul>
+            <p><span class="label">.NET</span></p>
+            <p>The .NET languages follow their normal casing rules.</p>
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Instantiating the object</span></a>
+            <div id="Anchor_1" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_1" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p>Only Windows Runtime types can be passed across the ABI boundary. The compiler will raise an error if the component has a type like <strong>std::wstring</strong> as a return type or parameter in a public method. The Visual C++ component extensions (C++/CX) built-in types include the usual scalars such as <strong>int</strong> and <strong>double</strong>, and also their typedef equivalents <strong>int32</strong>, <strong>float64</strong>, and so on.For more information, see <a href="https://msdn.microsoft.com/en-us/library/hh755822.aspx">Type System (C++/CX)</a>.</p>
+            <p><span class="label">C++</span></p> 
+            <div id="code-snippet-1" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>C++</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_770ec9aa-9389-4525-86a2-5fb2ecfe907c');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_770ec9aa-9389-4525-86a2-5fb2ecfe907c" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+<span style="color:Green;">// ref class definition in C++</span>
+<span style="color:Blue;">public</span> <span style="color:Blue;">ref class</span> SampleRefClass <span style="color:Blue;">sealed</span>
+{
+    <span style="color:Green;">// Class members...</span>
+
+    <span style="color:Green;">// #include &lt;valarray&gt;</span>
+<span style="color:Blue;">public</span>:
+    <span style="color:Blue;">double</span> LogCalc(<span style="color:Blue;">double</span> input)
+    {
+        <span style="color:Green;">// Use C++ standard library as usual.</span>
+        <span style="color:Blue;">return</span> std::log(input); 
+    }
+
+};
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+            <p><span class="label">JavaScript</span></p> 
+            <div id="code-snippet-2" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>JavaScript</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_16299301-f036-4e70-87c7-c015f7beaca6');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_16299301-f036-4e70-87c7-c015f7beaca6" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+<span style="color:Green;">//Instantiation in JavaScript (requires "Add reference &gt; Project reference")</span>
+<span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.SampleRefClass();
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+            <p><span class="label">.NET</span></p> 
+            <div id="code-snippet-3" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>C#</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_4dfeed97-609c-44ff-b06d-8cd989b47802');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_4dfeed97-609c-44ff-b06d-8cd989b47802" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+<span style="color:Green;">//Call a method and display result in a XAML TextBlock</span>
+<span style="color:Blue;">var</span> num = nativeObject.LogCalc(21.5);
+ResultText.Text = num.ToString();
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">C++ built-in types, library types, and Windows Runtime types</span></a>
+            <div id="Anchor_2" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_2" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p>An activatable class (also known as a ref class) is one that can be instantiated from another language such as JavaScript, C# or Visual Basic. To be consumable from another language, a component must contain at least one activatable class. </p>
+            <p>A Windows Runtime component can contain multiple public activatable classes as well as additional classes that are known only internally to the component. Apply the [<strong>WebHostHidden</strong>] attribute to C++ types that are not intended to be visible to JavaScript. </p>
+            <p>All public classes must reside in the same root namespace which has the same name as the component metadata file. For example, a class that's named A.B.C.MyClass can be instantiated only if it's defined in a metadata file that's named A.winmd or A.B.winmd or A.B.C.winmd. The name of the DLL is not required to match the .winmd file name.</p>
+            <p>Client code creates an instance of the component by using the <strong>new</strong> (<strong>New</strong> in Visual Basic) keyword just as for any class.</p>
+            <p>An activatable class must be declared as <span class="code">public ref class sealed</span>. The <strong>ref</strong> class keyword tells the compiler to create the class as a Windows Runtime compatible type, and the <strong>sealed</strong> keyword specifies that the class cannot be inherited. The Windows Runtime does not currently support a generalized inheritance model; a limited inheritance model supports creation of custom XAML controls. For more information, see <a href="https://msdn.microsoft.com/en-us/library/hh699870.aspx">Ref classes and structs (C++/CX)</a>.</p>
+            <p>For C++, all the numeric primitives are defined in the default namespace. The <span class="unresolvedLink">(NOTINBUILD) Platform Namespace</span> contains C++ classes that are specific to the Windows Runtime type system. These include <a href="https://msdn.microsoft.com/en-us/library/hh755812.aspx">Platform::String Class</a> and <a href="https://msdn.microsoft.com/en-us/library/hh748265.aspx">Platform::Object Class</a>. The concrete collection types such as <a href="https://msdn.microsoft.com/en-us/library/hh441508.aspx">Platform::Collections::Map Class</a> and <a href="https://msdn.microsoft.com/en-us/library/hh441570.aspx">Platform::Collections::Vector Class</a> are defined in the <a href="https://msdn.microsoft.com/en-us/library/hh710418.aspx">Platform::Collections Namespace</a>. The public interfaces that these types implement are defined in <a href="https://msdn.microsoft.com/en-us/library/hh441496.aspx">Windows::Foundation::Collections Namespace (C++/CX)</a>. It is these interface types that are consumed by JavaScript, C# and Visual Basic. For more information, see <a href="https://msdn.microsoft.com/en-us/library/hh755822.aspx">Type System (C++/CX)</a>. </p>
+           </div>
+           <div>
+            <h3 class="LW_CollapsibleArea_TitleDiv">
+             <div>
+              <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Method that returns a value of built-in type</span></a>
+              <div class="LW_CollapsibleArea_HrDiv">
+               <hr class="LW_CollapsibleArea_Hr">
+              </div>
+             </div></h3>
+            <div class="sectionblock">
+             <div class="section">
+              <p><span class="label">C++</span></p> 
+              <div id="code-snippet-4" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C++</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_003ee724-8bb2-44aa-b3f9-651c93f0444b');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_003ee724-8bb2-44aa-b3f9-651c93f0444b" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+    <span style="color:Green;">// #include &lt;valarray&gt;</span>
+<span style="color:Blue;">public</span>:
+    <span style="color:Blue;">double</span> LogCalc(<span style="color:Blue;">double</span> input)
+    {
+        <span style="color:Green;">// Use C++ standard library as usual.</span>
+        <span style="color:Blue;">return</span> std::log(input); 
+    }
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p><span class="label">JavaScript</span></p> 
+              <div id="code-snippet-5" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>JavaScript</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_9170b68b-0474-42e4-8b1d-42976bd4d105');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_9170b68b-0474-42e4-8b1d-42976bd4d105" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Green;">//Call a method</span>
+<span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.SampleRefClass;
+<span style="color:Blue;">var</span> num = nativeObject.logCalc(21.5);
+document.getElementById(<span style="color:#A31515;">'P2'</span>).innerHTML = num;
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+             </div>
+            </div>
+           </div>
+           <div>
+            <h3 class="LW_CollapsibleArea_TitleDiv">
+             <div>
+              <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Method that returns a custom value struct</span></a>
+              <div class="LW_CollapsibleArea_HrDiv">
+               <hr class="LW_CollapsibleArea_Hr">
+              </div>
+             </div></h3>
+            <div class="sectionblock">
+             <div class="section">
+              <p>A <strong>value struct</strong> is a plain old data object that can contain fields which are public by default. A <strong>value struct</strong> is passed by value. </p>
+              <p><span class="label">C++</span></p> 
+              <div id="code-snippet-6" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C++</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_3a8055b6-30d7-4aa7-9114-08882073a89a');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_3a8055b6-30d7-4aa7-9114-08882073a89a" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Blue;">namespace</span> CppComponent
+{
+    <span style="color:Green;">// Custom struct</span>
+    <span style="color:Blue;">public</span> <span style="color:Blue;">value</span> <span style="color:Blue;">struct</span> PlayerData
+    {
+        Platform::String^ Name;
+        <span style="color:Blue;">int</span> Number;
+        <span style="color:Blue;">double</span> ScoringAverage;
+    };
+
+    <span style="color:Blue;">public</span> <span style="color:Blue;">ref class</span> Player <span style="color:Blue;">sealed</span>
+    {
+    <span style="color:Blue;">private</span>:
+        PlayerData m_player;
+    <span style="color:Blue;">public</span>:
+        <span style="color:Blue;">property</span> PlayerData PlayerStats 
+        {
+            PlayerData get(){ <span style="color:Blue;">return</span> m_player; }
+            <span style="color:Blue;">void</span> set(PlayerData data) {m_player = data;}
+        }
+    };
+}
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p><span class="label">JavaScript</span></p>
+              <p>To pass user-defined value structs across the ABI, define a JavaScript object that has the same members as the value struct that's defined in C++. You can then pass that object as an argument to a C++ method so that the object is implicitly converted to the C++ type. </p> 
+              <div id="code-snippet-7" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>JavaScript</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_b9978cdd-d398-48f7-bb4a-9c1184457cf7');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_b9978cdd-d398-48f7-bb4a-9c1184457cf7" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Green;">// Get and set the value struct</span>
+<span style="color:Blue;">function</span> GetAndSetPlayerData() {
+    <span style="color:Green;">// Create an object to pass to C++</span>
+    <span style="color:Blue;">var</span> myData =
+        { name: <span style="color:#A31515;">"Bob Homer"</span>, number: 12, scoringAverage: .357 };
+    <span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.Player();
+    nativeObject.playerStats = myData;
+
+    <span style="color:Green;">// Retrieve C++ value struct into new JavaScript object</span>
+    <span style="color:Blue;">var</span> myData2 = nativeObject.playerStats;
+    document.getElementById(<span style="color:#A31515;">'P3'</span>).innerHTML = myData.name + <span style="color:#A31515;">" , "</span> + myData.number + <span style="color:#A31515;">" , "</span> + myData.scoringAverage.toPrecision(3);
+}
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p>Another approach is to define a class that implements <strong>IPropertySet</strong> (not shown).</p>
+              <p><span class="label">C#</span></p>
+              <p>In the .NET languages, you just create a variable of the type that's defined in the C++ component.</p> 
+              <div id="code-snippet-8" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C#</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_1a0c0dbf-3b24-4ddc-950a-228588461fff');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_1a0c0dbf-3b24-4ddc-950a-228588461fff" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Blue;">private</span> <span style="color:Blue;">void</span> GetAndSetPlayerData()
+{
+    <span style="color:Green;">// Create a ref class</span>
+    <span style="color:Blue;">var</span> player = <span style="color:Blue;">new</span> CppComponent.Player();
+
+    <span style="color:Green;">// Create a variable of a value struct</span>
+    <span style="color:Green;">// type that is defined in C++</span>
+    CppComponent.PlayerData myPlayer;
+    myPlayer.Name = <span style="color:#A31515;">"Babe Ruth"</span>;
+    myPlayer.Number = 12;
+    myPlayer.ScoringAverage = .398;
+
+    <span style="color:Green;">// Set the property</span>
+    player.PlayerStats = myPlayer;
+
+    <span style="color:Green;">// Get the property and store it in a new variable</span>
+    CppComponent.PlayerData myPlayer2 = player.PlayerStats;
+    ResultText.Text += myPlayer.Name + <span style="color:#A31515;">" , "</span> + myPlayer.Number.ToString() +
+        <span style="color:#A31515;">" , "</span> + myPlayer.ScoringAverage.ToString();
+}
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+             </div>
+            </div>
+           </div>
+           <div>
+            <h3 class="LW_CollapsibleArea_TitleDiv">
+             <div>
+              <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Overloaded methods</span></a>
+              <div class="LW_CollapsibleArea_HrDiv">
+               <hr class="LW_CollapsibleArea_Hr">
+              </div>
+             </div></h3>
+            <div class="sectionblock">
+             <div class="section">
+              <p>A C++ public ref class can contain overloaded methods, but JavaScript has limited ability to differentiate overloaded methods. For example, it can tell the difference between these signatures: </p> 
+              <div id="code-snippet-9" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C++</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_325ec83e-e42f-4cce-95c4-a0774bf8a016');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_325ec83e-e42f-4cce-95c4-a0774bf8a016" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Blue;">public</span> <span style="color:Blue;">ref class</span> NumberClass <span style="color:Blue;">sealed</span> 
+{
+<span style="color:Blue;">public</span>:
+    <span style="color:Blue;">int</span> GetNumber(<span style="color:Blue;">int</span> i);
+    <span style="color:Blue;">int</span> GetNumber(<span style="color:Blue;">int</span> i, Platform::String^ str);
+    <span style="color:Blue;">double</span> GetNumber(<span style="color:Blue;">int</span> i, MyData^ d);
+};
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p>But it can’t tell the difference between these:</p> 
+              <div id="code-snippet-10" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C++</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_2029f831-1d04-456d-bade-1e54ce0485c3');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_2029f831-1d04-456d-bade-1e54ce0485c3" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Blue;">int</span> GetNumber(<span style="color:Blue;">int</span> i);
+<span style="color:Blue;">double</span> GetNumber(<span style="color:Blue;">double</span> d);
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p>In ambiguous cases, you can ensure that JavaScript always calls a specific overload by applying the <strong>Windows::Foundation::Metadata::DefaultOverload</strong> attribute to the method signature in the header file. </p>
+              <p>This JavaScript always calls the attributed overload:</p> 
+              <div id="code-snippet-11" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>JavaScript</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_d26715e0-e8e1-4618-aec3-867bba418700');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_d26715e0-e8e1-4618-aec3-867bba418700" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.NumberClass();
+<span style="color:Blue;">var</span> num = nativeObject.getNumber(9);
+document.getElementById(<span style="color:#A31515;">'P4'</span>).innerHTML = num;
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p><span class="label">.NET</span></p>
+              <p>The .NET languages recognize overloads in a C++ ref class just as in any .NET Framework class.</p>
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">DateTime</span></a>
+            <div id="Anchor_3" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_3" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p>In the Windows Runtime, a <strong>Windows::Foundation::DateTime</strong> object is just a 64-bit signed integer that represents the number of 100-nanosecond intervals either before or after January 1, 1601. There are no methods on a <strong>Windows:Foundation::DateTime</strong> object. Instead, each language projects the DateTime in the way that is native to that language: the <strong>Date</strong> object in JavaScript and the <strong>System.DateTime</strong> and <strong>System.DateTimeOffset</strong> types in the .NET Framework. </p>
+            <p><span class="label">C++</span></p> 
+            <div id="code-snippet-12" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>C++</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_fd1d64ca-4ebd-4d99-8903-a08f809d0f1e');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_fd1d64ca-4ebd-4d99-8903-a08f809d0f1e" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+<span style="color:Blue;">public</span>  <span style="color:Blue;">ref class</span> MyDateClass <span style="color:Blue;">sealed</span>
+{
+<span style="color:Blue;">public</span>:
+    <span style="color:Blue;">property</span> Windows::Foundation::DateTime TimeStamp;
+    <span style="color:Blue;">void</span> SetTime(Windows::Foundation::DateTime dt)
+    {
+        <span style="color:Blue;">auto</span> cal = ref <span style="color:Blue;">new</span> Windows::Globalization::Calendar();
+        cal-&gt;SetDateTime(dt);
+        TimeStamp = cal-&gt;GetDateTime(); <span style="color:Green;">// or TimeStamp = dt;</span>
+    }
+};
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+            <p><span class="label">JavaScript</span></p>
+            <p>When you pass a <strong>DateTime</strong> value from C++ to JavaScript, JavaScript accepts it as a <strong>Date</strong> object and displays it by default as a long-form date string.</p> 
+            <div id="code-snippet-13" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>JavaScript</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_d8e660bb-ee55-416e-a2e4-0f9898720f8a');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_d8e660bb-ee55-416e-a2e4-0f9898720f8a" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+<span style="color:Blue;">function</span> SetAndGetDate() {
+    <span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.MyDateClass();
+
+    <span style="color:Blue;">var</span> myDate = <span style="color:Blue;">new</span> Date(1956, 4, 21);
+    nativeObject.setTime(myDate);
+
+    <span style="color:Blue;">var</span> myDate2 = nativeObject.timeStamp;
+
+    <span style="color:Green;">//prints long form date string</span>
+    document.getElementById(<span style="color:#A31515;">'P5'</span>).innerHTML = myDate2;
+
+}
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+            <p><span class="label">.NET</span></p>
+            <p>When a .NET language passes a <strong>System.DateTime</strong> to a C++ component, the method accepts it as a <strong>Windows::Foundation::DateTime</strong>. When the component passes a <strong>Windows::Foundation::DateTime</strong> to a .NET Framework method, the Framework method accepts it as a <strong>DateTimeOffset</strong>.</p> 
+            <div id="code-snippet-14" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>C#</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_db8c569d-2b41-42aa-9df8-d081f3f9ab90');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_db8c569d-2b41-42aa-9df8-d081f3f9ab90" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+<span style="color:Blue;">private</span> <span style="color:Blue;">void</span> DateTimeExample()
+{
+    <span style="color:Green;">// Pass a System.DateTime to a C++ method</span>
+    <span style="color:Green;">// that takes a Windows::Foundation::DateTime</span>
+    DateTime dt = DateTime.Now;
+    <span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.MyDateClass();
+    nativeObject.SetTime(dt);
+
+    <span style="color:Green;">// Retrieve a Windows::Foundation::DateTime as a</span>
+    <span style="color:Green;">// System.DateTimeOffset</span>
+    DateTimeOffset myDate = nativeObject.TimeStamp;
+
+    <span style="color:Green;">// Print the long-form date string</span>
+    ResultText.Text += myDate.ToString();
+}
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Collections and arrays</span></a>
+            <div id="Anchor_4" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_4" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p>Collections are always passed across the ABI boundary as handles to Windows Runtime types such as <strong>Windows::Foundation::Collections::IVector^</strong> and <strong>Windows::Foundation::Collections::IMap^</strong>. For example, if you return a handle to a <strong>Platform::Collections::Map</strong>, it implicitly converts to a <strong>Windows::Foundation::Collections::IMap^</strong>. The collection interfaces are defined in a namespace that's separate from the C++ classes that provide the concrete implementations. JavaScript and .NET languages consume the interfaces. For more information, see <a href="https://msdn.microsoft.com/en-us/library/hh700103.aspx">Collections (C++/CX)</a> and <a href="https://msdn.microsoft.com/en-us/library/hh700131.aspx">Array and WriteOnlyArray (C++/CX)</a>.</p>
+           </div>
+           <div>
+            <h3 class="LW_CollapsibleArea_TitleDiv">
+             <div>
+              <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Passing IVector</span></a>
+              <div class="LW_CollapsibleArea_HrDiv">
+               <hr class="LW_CollapsibleArea_Hr">
+              </div>
+             </div></h3>
+            <div class="sectionblock">
+             <div class="section">
+              <p><span class="label">C++</span></p> 
+              <div id="code-snippet-15" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C++</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_34be293d-2377-4c7e-926b-3bbed8e6aeb8');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_34be293d-2377-4c7e-926b-3bbed8e6aeb8" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Green;">// Windows::Foundation::Collections::IVector across the ABI.</span>
+<span style="color:Green;">//#include &lt;algorithm&gt;</span>
+<span style="color:Green;">//#include &lt;collection.h&gt;</span>
+Windows::Foundation::Collections::IVector&lt;<span style="color:Blue;">int</span>&gt;^ SortVector(Windows::Foundation::Collections::IVector&lt;<span style="color:Blue;">int</span>&gt;^ vec)
+{
+    std::sort(begin(vec), end(vec));
+    <span style="color:Blue;">return</span> vec;
+}
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p><span class="label">JavaScript</span></p> 
+              <div id="code-snippet-16" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>JavaScript</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_b808c9a5-15bd-4e96-805a-901670acc8ed');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_b808c9a5-15bd-4e96-805a-901670acc8ed" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+
+<span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.CollectionExample();
+<span style="color:Green;">// Call the method to sort an integer array</span>
+<span style="color:Blue;">var</span> inVector = [14, 12, 45, 89, 23];
+<span style="color:Blue;">var</span> outVector = nativeObject.sortVector(inVector);
+<span style="color:Blue;">var</span> result = <span style="color:#A31515;">"Sorted vector to array:"</span>;
+<span style="color:Blue;">for</span> (<span style="color:Blue;">var</span> i = 0; i &lt; outVector.length; i++)
+{
+    outVector[i];
+    result += outVector[i].toString() + <span style="color:#A31515;">","</span>;
+}
+document.getElementById(<span style="color:#A31515;">'P6'</span>).innerHTML = result;
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p><span class="label">.NET</span></p>
+              <p>The .NET languages see <strong>IVector&lt;T&gt;</strong> as <strong>IList&lt;T&gt;</strong>.</p> 
+              <div id="code-snippet-17" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C#</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_8ad8c86c-ec30-4c0f-afe6-512e04acf44b');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_8ad8c86c-ec30-4c0f-afe6-512e04acf44b" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Blue;">private</span> <span style="color:Blue;">void</span> SortListItems()
+{
+    IList&lt;<span style="color:Blue;">int</span>&gt; myList = <span style="color:Blue;">new</span> List&lt;<span style="color:Blue;">int</span>&gt;();
+    myList.Add(5);
+    myList.Add(9);
+    myList.Add(17);
+    myList.Add(2);
+
+    <span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.CollectionExample();
+    IList&lt;<span style="color:Blue;">int</span>&gt; mySortedList = nativeObject.SortVector(myList);
+
+    <span style="color:Blue;">foreach</span> (<span style="color:Blue;">var</span> item <span style="color:Blue;">in</span> mySortedList)
+    {
+        ResultText.Text += <span style="color:#A31515;">" "</span> + item.ToString();
+    }
+}
+
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+             </div>
+            </div>
+           </div>
+           <div>
+            <h3 class="LW_CollapsibleArea_TitleDiv">
+             <div>
+              <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Passing IMap</span></a>
+              <div class="LW_CollapsibleArea_HrDiv">
+               <hr class="LW_CollapsibleArea_Hr">
+              </div>
+             </div></h3>
+            <div class="sectionblock">
+             <div class="section">
+              <p><span class="label">C++</span></p> 
+              <div id="code-snippet-18" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C++</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_b2e81889-5c4f-4175-ba5e-a57e649b2dc3');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_b2e81889-5c4f-4175-ba5e-a57e649b2dc3" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Green;">// #include &lt;map&gt;</span>
+<span style="color:Green;">//#include &lt;collection.h&gt;</span>
+Windows::Foundation::Collections::IMap&lt;<span style="color:Blue;">int</span>, Platform::String^&gt; ^GetMap(<span style="color:Blue;">void</span>)
+{    
+    Windows::Foundation::Collections::IMap&lt;<span style="color:Blue;">int</span>, Platform::String^&gt; ^ret = 
+        ref <span style="color:Blue;">new</span> Platform::Collections::Map&lt;<span style="color:Blue;">int</span>, Platform::String^&gt;;
+    ret-&gt;Insert(1, <span style="color:#A31515;">"One "</span>);
+    ret-&gt;Insert(2, <span style="color:#A31515;">"Two "</span>);
+    ret-&gt;Insert(3, <span style="color:#A31515;">"Three "</span>);
+    ret-&gt;Insert(4, <span style="color:#A31515;">"Four "</span>);
+    ret-&gt;Insert(5, <span style="color:#A31515;">"Five "</span>);
+    <span style="color:Blue;">return</span> ret;
+}
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p><span class="label">JavaScript</span></p> 
+              <div id="code-snippet-19" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>JavaScript</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_4c2bec54-4e1e-4bbc-9f11-d9c81aabb514');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_4c2bec54-4e1e-4bbc-9f11-d9c81aabb514" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Green;">// Call the method to get the map</span>
+<span style="color:Blue;">var</span> outputMap = nativeObject.getMap();
+<span style="color:Blue;">var</span> mStr = <span style="color:#A31515;">"Map result:"</span> + outputMap.lookup(1) + outputMap.lookup(2)
+    + outputMap.lookup(3) + outputMap.lookup(4) + outputMap.lookup(5);
+document.getElementById(<span style="color:#A31515;">'P7'</span>).innerHTML = mStr;
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p><span class="label">.NET</span></p>
+              <p>The .NET languages see <strong>IMap</strong> as <strong>IDictionary&lt;K,V&gt;</strong>.</p> 
+              <div id="code-snippet-20" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C#</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_bd516723-2a55-4188-96a9-632938a4e475');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_bd516723-2a55-4188-96a9-632938a4e475" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Blue;">private</span> <span style="color:Blue;">void</span> GetDictionary()
+{
+    <span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.CollectionExample();
+    IDictionary&lt;<span style="color:Blue;">int</span>, <span style="color:Blue;">string</span>&gt; d = nativeObject.GetMap();
+    ResultText.Text += d[2].ToString();
+}
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Properties</span></a>
+            <div id="Anchor_5" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_5" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p>A public ref class in Visual C++ component extensions exposes public data members as properties, by using the <strong>property</strong> keyword. The concept is identical to .NET Framework properties. A trivial property resembles a data member because its functionality is implicit. A non-trivial property has explicit get and set accessors and a named private variable that's the "backing store" for the value. In this example, the private member <strong>variable _propertyAValue</strong> is the backing store for <strong>PropertyA</strong>. A property can fire an event when its value changes, and a client app can register to receive that event.</p>
+            <p><span class="label">C++</span></p> 
+            <div id="code-snippet-21" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>C++</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_88fd0d24-57be-4402-83d9-7912b595f0e9');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_88fd0d24-57be-4402-83d9-7912b595f0e9" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+
+<span style="color:Green;">//Properties</span>
+<span style="color:Blue;">public</span> <span style="color:Blue;">delegate</span> <span style="color:Blue;">void</span> PropertyChangedHandler(Platform::Object^ sender, <span style="color:Blue;">int</span> arg);
+<span style="color:Blue;">public</span> <span style="color:Blue;">ref class</span> PropertyExample  <span style="color:Blue;">sealed</span>
+{
+<span style="color:Blue;">public</span>:
+    PropertyExample(){}
+
+    <span style="color:Green;">// Event that is fired when PropertyA changes</span>
+    <span style="color:Blue;">event</span> PropertyChangedHandler^ PropertyChangedEvent;
+
+    <span style="color:Green;">// Property that has custom setter/getter</span>
+    <span style="color:Blue;">property</span> <span style="color:Blue;">int</span> PropertyA
+    {
+        <span style="color:Blue;">int</span> get() { <span style="color:Blue;">return</span> m_propertyAValue; }
+        <span style="color:Blue;">void</span> set(<span style="color:Blue;">int</span> propertyAValue) 
+        {
+            <span style="color:Blue;">if</span> (propertyAValue != m_propertyAValue)
+            {
+                m_propertyAValue = propertyAValue;
+                <span style="color:Green;">// Fire event. (See event example below.)</span>
+                PropertyChangedEvent(<span style="color:Blue;">this</span>, propertyAValue);
+            }
+        }
+    }
+
+    <span style="color:Green;">// Trivial get/set property that has a compiler-generated backing store.</span>
+    <span style="color:Blue;">property</span> Platform::String^ PropertyB;
+
+<span style="color:Blue;">private</span>:
+    <span style="color:Green;">// Backing store for propertyA.</span>
+    <span style="color:Blue;">int</span> m_propertyAValue;
+};
+
+
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+            <p><span class="label">JavaScript</span></p> 
+            <div id="code-snippet-22" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>JavaScript</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_a46c2116-e8da-430d-bc22-6843453624f6');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_a46c2116-e8da-430d-bc22-6843453624f6" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+<span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.PropertyExample();
+<span style="color:Blue;">var</span> propValue = nativeObject.propertyA;
+document.getElementById(<span style="color:#A31515;">'P8'</span>).innerHTML = propValue;
+
+<span style="color:Green;">//Set the string property</span>
+nativeObject.propertyB = <span style="color:#A31515;">"What is the meaning of the universe?"</span>;
+document.getElementById(<span style="color:#A31515;">'P9'</span>).innerHTML += nativeObject.propertyB;
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+            <p><span class="label">.NET</span></p>
+            <p>The .NET languages access properties on a native C++ object just as they would on a .NET Framework object.</p> 
+            <div id="code-snippet-23" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>C#</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_62a2668d-adb1-4fc3-bdf2-4bf02a585c3c');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_62a2668d-adb1-4fc3-bdf2-4bf02a585c3c" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+<span style="color:Blue;">private</span> <span style="color:Blue;">void</span> GetAProperty()
+{
+    <span style="color:Green;">// Get the value of the integer property</span>
+    <span style="color:Green;">// Instantiate the C++ object</span>
+    <span style="color:Blue;">var</span> obj = <span style="color:Blue;">new</span> CppComponent.PropertyExample();
+
+    <span style="color:Green;">// Get an integer property</span>
+    <span style="color:Blue;">var</span> propValue = obj.PropertyA;
+    ResultText.Text += propValue.ToString();
+
+    <span style="color:Green;">// Set a string property</span>
+    obj.PropertyB = <span style="color:#A31515;">" What is the meaning of the universe?"</span>;
+    ResultText.Text += obj.PropertyB;
+
+}
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Delegates and events</span></a>
+            <div id="Anchor_6" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_6" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p>A <strong>delegate</strong> is a Windows Runtime type that represents a function object. You can use delegates in connection with events, callbacks, and asynchronous method calls to specify an action to be performed later. Like a function object, the delegate provides type-safety by enabling the compiler to verify the return type and parameter types of the function. The declaration of a delegate resembles a function signature, the implementation resembles a class definition, and the invocation resembles a function invocation. </p>
+           </div>
+           <div>
+            <h3 class="LW_CollapsibleArea_TitleDiv">
+             <div>
+              <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Adding an event listener</span></a>
+              <div class="LW_CollapsibleArea_HrDiv">
+               <hr class="LW_CollapsibleArea_Hr">
+              </div>
+             </div></h3>
+            <div class="sectionblock">
+             <div class="section">
+              <p>You can use the <strong>event</strong> keyword to declare a public member of a specified delegate type. Client code subscribes to the event by using the standard mechanisms that are provided in the particular language.</p>
+              <p><span class="label">C++</span></p> 
+              <div id="code-snippet-24" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C++</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_ff1204bd-e592-495c-a46d-a877ef341abf');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_ff1204bd-e592-495c-a46d-a877ef341abf" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Blue;">public</span>:
+    <span style="color:Blue;">event</span> SomeHandler^ someEvent;
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p>This example uses the same C++ code as for the previous properties section.</p>
+              <p><span class="label">JavaScript</span></p> 
+              <div id="code-snippet-25" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>JavaScript</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_107ac8c2-0409-4b93-a612-43ec12616655');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_107ac8c2-0409-4b93-a612-43ec12616655" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Blue;">function</span> Button_Click() {
+    <span style="color:Blue;">var</span> nativeObj = <span style="color:Blue;">new</span> CppComponent.PropertyExample();
+    <span style="color:Green;">// Define an event handler method</span>
+    <span style="color:Blue;">var</span> singlecasthandler = <span style="color:Blue;">function</span> (ev) {
+        document.getElementById(<span style="color:#A31515;">'P10'</span>).innerHTML = <span style="color:#A31515;">"The button was clicked and the value is "</span> + ev;
+    };
+
+    <span style="color:Green;">// Subscribe to the event</span>
+    nativeObj.onpropertychangedevent = singlecasthandler;
+
+    <span style="color:Green;">// Set the value of the property and fire the event</span>
+    <span style="color:Blue;">var</span> propValue = 21;
+    nativeObj.propertyA = 2 * propValue;
+
+}
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p><span class="label">.NET</span></p>
+              <p>In the .NET languages, subscribing to an event in a C++ component is the same as subscribing to an event in a .NET Framework class:</p> 
+              <div id="code-snippet-26" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C#</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_f270aabe-a9b4-411e-b800-9975b94eb871');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_f270aabe-a9b4-411e-b800-9975b94eb871" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Green;">//Subscribe to event and call method that causes it to be fired.</span>
+<span style="color:Blue;">private</span> <span style="color:Blue;">void</span> TestMethod()
+{
+    <span style="color:Blue;">var</span> objWithEvent = <span style="color:Blue;">new</span> CppComponent.PropertyExample();
+    objWithEvent.PropertyChangedEvent += objWithEvent_PropertyChangedEvent;
+
+    objWithEvent.PropertyA = 42;
+}
+
+<span style="color:Green;">//Event handler method</span>
+<span style="color:Blue;">private</span> <span style="color:Blue;">void</span> objWithEvent_PropertyChangedEvent(<span style="color:Blue;">object</span> __param0, <span style="color:Blue;">int</span> __param1)
+{
+    ResultText.Text = <span style="color:#A31515;">"the event was fired and the result is "</span> +
+         __param1.ToString();
+}
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+             </div>
+            </div>
+           </div>
+           <div>
+            <h3 class="LW_CollapsibleArea_TitleDiv">
+             <div>
+              <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Adding multiple event listeners for one event</span></a>
+              <div class="LW_CollapsibleArea_HrDiv">
+               <hr class="LW_CollapsibleArea_Hr">
+              </div>
+             </div></h3>
+            <div class="sectionblock">
+             <div class="section">
+              <p> JavaScript has an <strong>addEventListener</strong> method that enables multiple handlers to subscribe to a single event. </p>
+              <p><span class="label">C++</span></p> 
+              <div id="code-snippet-27" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>C++</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_3b7bff40-09c2-433b-8d67-67c1ab485e7e');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_3b7bff40-09c2-433b-8d67-67c1ab485e7e" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Blue;">public</span> <span style="color:Blue;">delegate</span> <span style="color:Blue;">void</span> SomeHandler(Platform::String^ str);
+
+<span style="color:Blue;">public</span> <span style="color:Blue;">ref class</span> LangSample <span style="color:Blue;">sealed</span>
+{
+<span style="color:Blue;">public</span>:
+    <span style="color:Blue;">event</span> SomeHandler^ someEvent;
+    <span style="color:Blue;">property</span> Platform::String^ PropertyA;
+
+    <span style="color:Green;">// Method that fires an event</span>
+    <span style="color:Blue;">void</span> FireEvent(Platform::String^ str)
+    {
+        someEvent(Platform::String::Concat(str, PropertyA-&gt;ToString()));
+    }
+    <span style="color:Green;">//...</span>
+};
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p><span class="label">JavaScript</span></p> 
+              <div id="code-snippet-28" class="codeSnippetContainer" xmlns=""> 
+               <div class="codeSnippetContainerTabs"> 
+                <div class="codeSnippetContainerTabSingle" dir="ltr">
+                 <a>JavaScript</a>
+                </div> 
+               </div> 
+               <div class="codeSnippetContainerCodeContainer"> 
+                <div class="codeSnippetToolBar"> 
+                 <div class="codeSnippetToolBarText"> 
+                  <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_908aff4e-1f62-4bc0-9d83-9bcbfbabe50d');" ms.cmptyp="CodeSnippet">Copy</a> 
+                 </div> 
+                </div> 
+                <div id="CodeSnippetContainerCode_908aff4e-1f62-4bc0-9d83-9bcbfbabe50d" class="codeSnippetContainerCode" dir="ltr"> 
+                 <div style="color:Black;">
+                  <pre>
+<span style="color:Green;">// Add two event handlers</span>
+<span style="color:Blue;">var</span> multicast1 = <span style="color:Blue;">function</span> (ev) {
+    document.getElementById(<span style="color:#A31515;">'P11'</span>).innerHTML = <span style="color:#A31515;">"Handler 1: "</span> + ev.target;
+};
+<span style="color:Blue;">var</span> multicast2 = <span style="color:Blue;">function</span> (ev) {
+    document.getElementById(<span style="color:#A31515;">'P12'</span>).innerHTML = <span style="color:#A31515;">"Handler 2: "</span> + ev.target;
+};
+
+<span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.LangSample();
+<span style="color:Green;">//Subscribe to the same event</span>
+nativeObject.addEventListener(<span style="color:#A31515;">"someevent"</span>, multicast1);
+nativeObject.addEventListener(<span style="color:#A31515;">"someevent"</span>, multicast2);
+
+nativeObject.propertyA = <span style="color:#A31515;">"42"</span>;
+
+<span style="color:Green;">// This method should fire an event</span>
+nativeObject.fireEvent(<span style="color:#A31515;">"The answer is "</span>);
+</pre>
+                 </div> 
+                </div> 
+               </div> 
+              </div> 
+              <p><span class="label">.NET</span></p>
+              <p>In C#, any number of event handlers can subscribe to the event by using the += operator as shown in the previous example.</p>
+             </div>
+            </div>
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Enums</span></a>
+            <div id="Anchor_7" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_7" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p>A Windows Runtime enum in C++ is declared by using <strong>public class enum</strong>; it resembles a scoped enum in standard C++. </p>
+            <p><span class="label">C++</span></p> 
+            <div id="code-snippet-29" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>C++</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_3c0e0fe7-212d-4d97-a11c-d9638bb5e0b2');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_3c0e0fe7-212d-4d97-a11c-d9638bb5e0b2" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+<span style="color:Blue;">public</span> <span style="color:Blue;">enum</span> <span style="color:Blue;">class</span> Direction {North, South, East, West};
+
+<span style="color:Blue;">public</span> <span style="color:Blue;">ref class</span> EnumExampleClass <span style="color:Blue;">sealed</span>
+{
+<span style="color:Blue;">public</span>:
+    <span style="color:Blue;">property</span> Direction CurrentDirection
+    {
+        Direction  get(){<span style="color:Blue;">return</span> m_direction; }
+    }
+
+<span style="color:Blue;">private</span>:
+    Direction m_direction;
+};
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+            <p><span class="label">JavaScript</span></p>
+            <p>Enum values are passed between C++ and JavaScript as integers. You can optionally declare a JavaScript object that contains the same named values as the C++ enum and use it as follows.</p> 
+            <div id="code-snippet-30" class="codeSnippetContainer" xmlns=""> 
+             <div class="codeSnippetContainerTabs"> 
+              <div class="codeSnippetContainerTabSingle" dir="ltr">
+               <a>JavaScript</a>
+              </div> 
+             </div> 
+             <div class="codeSnippetContainerCodeContainer"> 
+              <div class="codeSnippetToolBar"> 
+               <div class="codeSnippetToolBarText"> 
+                <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_94bce5c6-3d14-4b54-8090-77ac719cf83e');" ms.cmptyp="CodeSnippet">Copy</a> 
+               </div> 
+              </div> 
+              <div id="CodeSnippetContainerCode_94bce5c6-3d14-4b54-8090-77ac719cf83e" class="codeSnippetContainerCode" dir="ltr"> 
+               <div style="color:Black;">
+                <pre>
+<span style="color:Blue;">var</span> Direction = { 0: <span style="color:#A31515;">"North"</span>, 1: <span style="color:#A31515;">"South"</span>, 2: <span style="color:#A31515;">"East"</span>, 3: <span style="color:#A31515;">"West"</span> };
+<span style="color:Green;">//. . .</span>
+
+<span style="color:Blue;">var</span> nativeObject = <span style="color:Blue;">new</span> CppComponent.EnumExampleClass();
+<span style="color:Blue;">var</span> curDirection = nativeObject.currentDirection;
+document.getElementById(<span style="color:#A31515;">'P13'</span>).innerHTML =
+Direction[curDirection];
+</pre>
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+            <p><span class="label">.NET</span></p>
+            <p>Both C# and Visual Basic have language support for enums. These languages see a C++ public enum class just as they would see a .NET Framework enum.</p>
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Asynchronous methods</span></a>
+            <div id="Anchor_8" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_8" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p>To consume asynchronous methods that are exposed by other Windows Runtime objects, use the <a href="https://msdn.microsoft.com/en-us/library/hh750113.aspx">task Class (Concurrency Runtime)</a> For more information, see <a href="https://msdn.microsoft.com/en-us/library/dd492427.aspx">Task Parallelism (Concurrency Runtime)</a>. </p>
+            <p>To implement asynchronous methods in C++, use the <a href="https://msdn.microsoft.com/en-us/library/hh750102.aspx">create_async</a> function that's defined in ppltasks.h. For more information, see <a href="https://msdn.microsoft.com/en-us/library/hh750082.aspx">Creating Asynchronous Operations in C++ for Windows Store Apps</a>. For an example, see <a href="https://msdn.microsoft.com/en-us/library/hh755833.aspx">Walkthrough: Creating a basic Windows Runtime component in C++ and calling it from JavaScript or C#</a>. The .NET languages consume C++ asynchronous methods just as they would any asynchronous method that's defined in the .NET Framework. </p>
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Exceptions</span></a>
+            <div id="Anchor_9" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_9" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p>You can throw any exception type that's defined by the Windows Runtime. You cannot derive custom types from any Windows Runtime exception type. However, you can throw <strong>COMException</strong> and provide a custom <strong>HRESULT</strong> that can be accessed by the code that catches the exception. There's no way to specify a custom Message in a <strong>COMException</strong>.</p>
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Debugging tips</span></a>
+            <div id="Anchor_10" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_10" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <div class="section">
+            <p>When you debug a JavaScript solution that has a component DLL, you can set the debugger to enable either stepping through script, or stepping through native code in the component, but not both at the same time. To change the setting, select the JavaScript project node in <strong>Solution Explorer</strong> and then choose <strong>Properties</strong>, <strong>Debugging</strong>, <strong>Debugger Type</strong>.</p>
+            <p>Be sure to select appropriate capabilities in the package designer. For example, if you are attempting to open an image file in the user's Pictures library by using the Windows Runtime APIs, be sure to select the <strong>Pictures Library</strong> check box in the <strong>Capabilities</strong> pane of the manifest designer.</p>
+            <p>If your JavaScript code doesn't seem to be recognizing the public properties or methods in the component, make sure that in JavaScript you are using camel casing. For example, the <strong>LogCalc</strong> C++ method must be referenced as <strong>logCalc</strong> in JavaScript.</p>
+            <p>If you remove a C++ Windows Runtime component project from a solution, you must also manually remove the project reference from the JavaScript project. Failure to do so prevents subsequent debug or build operations. If necessary, you can then add an assembly reference to the DLL.</p>
+           </div>
+          </div>
+         </div>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">See Also</span></a>
+            <div id="Anchor_11" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh441569.aspx#Anchor_11" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <p><a href="https://msdn.microsoft.com/en-us/library/hh755833.aspx">Walkthrough: Creating a basic Windows Runtime component in C++ and calling it from JavaScript or C#</a><br><a href="https://msdn.microsoft.com/en-us/library/hh699893.aspx">Developing Bing Maps Trip Optimizer, a Windows Store app in JavaScript and C++</a><br></p>
+          </div>
+         </div>
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="libraryMemberFilter"> 
+      <div class="filterContainer"> 
+       <span>Show:</span> 
+       <label> <input type="checkbox" class="libraryFilterInherited" checked value="Inherit">Inherited </label> 
+       <label> <input type="checkbox" class="libraryFilterProtected" checked value="Protected">Protected </label> 
+      </div> 
+     </div> 
+     <input type="hidden" id="libraryMemberFilterEmptyWarning" value="There are no members available with your current filter settings."> 
+    </div> 
+    <div id="rightNavigationMenu" ms.cmpgrp="right nav"> 
+     <div id="mobileButtons"> 
+      <div id="navigationButtons"> 
+       <a id="isd_print" href="https://msdn.microsoft.com/en-us/library/hh441569(d=printer).aspx" rel="nofollow"><ins class="print"></ins>Print </a> 
+       <a id="isd_printABook" href="/en-us/library/export/help/?returnurl=%2fen-us%2flibrary%2fhh441569.aspx"> <ins class="export"></ins>Export (<span class="count">0</span>) </a> 
+      </div> 
+     </div> 
+     <div id="navMain"> 
+      <div id="closeNavigation"> 
+       <a class="tocCloseSmall" id="closeButton"></a> 
+      </div> 
+      <div id="navigationButtons"> 
+       <a id="isd_print" href="https://msdn.microsoft.com/en-us/library/hh441569(d=printer).aspx" rel="nofollow"><ins class="print"></ins>Print </a> 
+       <a id="isdShare" href="#" role="button" aria-expanded="false"> <ins class="share"></ins>Share </a> 
+       <div id="socials" style="display: none"> 
+        <a class="isdFacebook" href="#" aria-label="Share on Facebook"> <ins class="facebook"></ins> </a> 
+        <a class="isdTwitter" href="#" aria-label="Share on Twitter"> <ins class="twitter"></ins> </a> 
+        <a class="isdGooglePlus" href="#" aria-label="Share on Google+"> <ins class="googlePlus"></ins> </a> 
+       </div> 
+      </div> 
+      <div id="indoc_toc" style="display: none" ms.cmpgrp="indoc toc"> 
+       <div id="indoc_title">
+        IN THIS ARTICLE
+       </div> 
+       <ul id="indoc_toclist"></ul> 
+      </div> 
+     </div> 
+    </div> 
+    <div id="rightNavigationMenuThumbnail" class="rightNavigationMenuThumbnail"> 
+    </div> 
+   </div> 
+   <div class="clear"></div> 
+   <input name="__RequestVerificationToken" type="hidden" value="YPkJQPw505JCuZCu9FRr6D9tBUQLhseqADbrYYV8FDRsC4FoQ3_3GAEBv8Ceu_BPGEZzChiLuw-LsPvSUC7WiZ6uhTM1"> 
+   <input id="ratingValueSubmitUrl" type="hidden" value="https://msdn.microsoft.com/en-us/library/feedback/rate/hh441569.aspx"> 
+   <input id="ratingAdditionalSubmitUrl" type="hidden" value="https://msdn.microsoft.com/en-us/library/feedback/additional/hh441569.aspx"> 
+   <input id="isTopicRated" type="hidden" value="false"> 
+   <div id="lib-footer"> 
+    <link type="text/css" rel="stylesheet"> 
+    <div id="ux-footer" class="" style="" dir="ltr" ms.pgarea="footer"> 
+     <div id="standardRatingBefore" class="clear stdr-container-before"></div> 
+     <div id="standardRating" class="stdr-container" ms.pgarea="body"> 
+      <div class="stdr-close"></div> 
+      <div class="stdr-vote stdr-content"> 
+       <div class="stdr-content"> 
+        <span class="stdr-votetitle">Is this page helpful?</span> 
+        <button class="stdr-yes" aria-label="Yes, this page was helpful">Yes</button> 
+        <button class="stdr-no" aria-label="No, this page was not helpful">No</button> 
+        <input id="s_ratingValue" type="hidden" value=""> 
+       </div> 
+      </div> 
+      <div class="stdr-feedback" style="display: none"> 
+       <div class="stdr-form"> 
+        <div class="stdr-fieldtitle">
+         Additional feedback?
+        </div> 
+        <textarea class="stdr-detail" rows="6" maxlength="1500"></textarea> 
+        <div> 
+         <span class="stdr-count"><span class="stdr-charcnt">1500</span> characters remaining</span> 
+         <div class="stdr-buttons"> 
+          <button class="stdr-provide" aria-label="Submit my additional feedback">Submit</button> 
+          <button class="stdr-skip" aria-label="Skip additional feedback">Skip this</button> 
+         </div> 
+        </div> 
+        <div class="clear"></div> 
+       </div> 
+      </div> 
+      <div class="stdr-thanks" style="display: none"> 
+       <div class="stdr-content"> 
+        <span class="stdr-thankyou">Thank you!</span> 
+        <span class="stdr-appreciate">We appreciate your feedback.</span> 
+       </div> 
+      </div> 
+      <div id="contentFeedbackQAContainer" style="display: none;"></div> 
+     </div> 
+     <div id="standardRatingPlaceholder" style="display: none"></div> 
+     <footer class="top" role="navigation" aria-label="footer"> 
+      <div data-fragmentname="LeftLinks" id="Fragment_LeftLinks" xmlns="http://www.w3.org/1999/xhtml"> 
+       <div class="linkList"> 
+        <h4 class="linkListTitle">Dev centers</h4> 
+        <ul class="links"> 
+         <li> <a href="https://developer.microsoft.com/en-us/windows" id="LeftLinks_2148_1" class="windowsBlue" xmlns="http://www.w3.org/1999/xhtml">Windows</a> </li> 
+         <li> <a href="https://dev.office.com/" id="LeftLinks_2148_3" class="office" xmlns="http://www.w3.org/1999/xhtml">Office</a> </li> 
+         <li> <a href="https://www.visualstudio.com/" id="LeftLinks_2148_4" class="visualStudio" xmlns="http://www.w3.org/1999/xhtml">Visual Studio</a> </li> 
+         <li> <a href="https://docs.microsoft.com/en-us/azure/" target="_blank" id="LeftLinks_2148_12" xmlns="http://www.w3.org/1999/xhtml">Microsoft Azure</a> </li> 
+         <li> <a href="https://msdn.microsoft.com/developer-centers-msdn" id="LeftLinks_2148_5" xmlns="http://www.w3.org/1999/xhtml">More...</a> </li> 
+        </ul> 
+       </div> 
+      </div> 
+      <div id="rightLinks"> 
+       <div data-fragmentname="CenterLinks1" id="Fragment_CenterLinks1" xmlns="http://www.w3.org/1999/xhtml"> 
+        <div class="linkList"> 
+         <h4 class="linkListTitle">Learning resources</h4> 
+         <ul class="links"> 
+          <li> <a href="https://mva.microsoft.com/" id="CenterLinks1_2151_4" xmlns="http://www.w3.org/1999/xhtml">Microsoft Virtual Academy</a> </li> 
+          <li> <a href="https://channel9.msdn.com/" id="CenterLinks1_2151_5" xmlns="http://www.w3.org/1999/xhtml">Channel 9</a> </li> 
+          <li> <a href="https://msdn.microsoft.com/magazine/" id="CenterLinks1_2151_7" xmlns="http://www.w3.org/1999/xhtml">MSDN Magazine</a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+       <div data-fragmentname="CenterLinks2" id="Fragment_CenterLinks2" xmlns="http://www.w3.org/1999/xhtml"> 
+        <div class="linkList"> 
+         <h4 class="linkListTitle">Community</h4> 
+         <ul class="links"> 
+          <li> <a href="https://social.msdn.microsoft.com/forums/en-us/home" id="CenterLinks2_2151_8" xmlns="http://www.w3.org/1999/xhtml">Forums</a> </li> 
+          <li> <a href="https://blogs.msdn.microsoft.com/developer-tools/" id="CenterLinks2_2151_9" xmlns="http://www.w3.org/1999/xhtml">Blogs</a> </li> 
+          <li> <a href="https://www.codeplex.com/" id="CenterLinks2_2151_10" xmlns="http://www.w3.org/1999/xhtml">Codeplex</a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+       <div data-fragmentname="CenterLinks3" id="Fragment_CenterLinks3" xmlns="http://www.w3.org/1999/xhtml"> 
+        <div class="linkList"> 
+         <h4 class="linkListTitle">Support</h4> 
+         <ul class="links"> 
+          <li> <a href="https://msdn.microsoft.com/hh361695" id="CenterLinks3_2151_11" xmlns="http://www.w3.org/1999/xhtml">Self support</a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+       <div data-fragmentname="CenterLinks4" id="Fragment_CenterLinks4" xmlns="http://www.w3.org/1999/xhtml"> 
+        <div class="linkList"> 
+         <h4 class="linkListTitle">Programs</h4> 
+         <ul class="links"> 
+          <li> <a href="https://bizspark.microsoft.com/Startups/Index" id="CenterLinks4_2151_13" xmlns="http://www.w3.org/1999/xhtml">BizSpark (for startups)</a> </li> 
+          <li> <a href="https://imagine.microsoft.com/en-us" id="CenterLinks4_2151_22" xmlns="http://www.w3.org/1999/xhtml">Microsoft Imagine (for students)</a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+      </div> 
+     </footer> 
+     <footer class="bottom" role="contentinfo"> 
+      <span class="localeContainer"> 
+       <form class="selectLocale" id="selectLocaleForm" action="https://msdn.microsoft.com/en-us/selectlocale-dmc"> 
+        <input type="hidden" name="fromPage" value="https%3a%2f%2fmsdn.microsoft.com%2fen-us%2flibrary%2fhh441569.aspx"> 
+        <a href="#" onclick="$('#selectLocaleForm').submit();return false;" title="Change your language">United States (English)</a> 
+       </form> </span> 
+      <div data-fragmentname="BottomLinks" id="Fragment_BottomLinks" xmlns="http://www.w3.org/1999/xhtml"> 
+       <div class="linkList"> 
+        <ul class="links horizontal"> 
+         <li> <a href="https://msdn.microsoft.com/en-us/flashnewsletter" id="BottomLinks_2148_7" xmlns="http://www.w3.org/1999/xhtml">Newsletter</a> </li> 
+         <li> <a href="https://msdn.microsoft.com/en-us/dn529288" id="BottomLinks_2148_8" xmlns="http://www.w3.org/1999/xhtml">Privacy &amp; cookies</a> </li> 
+         <li> <a href="https://msdn.microsoft.com/en-us/cc300389" id="BottomLinks_2148_9" xmlns="http://www.w3.org/1999/xhtml">Terms of use</a> </li> 
+         <li> <a href="https://www.microsoft.com/en-us/legal/intellectualproperty/Trademarks/" id="BottomLinks_2148_10" xmlns="http://www.w3.org/1999/xhtml">Trademarks</a> </li> 
+        </ul> 
+       </div> 
+      </div> 
+      <span class="logoLegal"> <span class="logoSpan clip67x13" role="img" tabindex="0" aria-label="microsoft logo"> <img alt="logo" class="logo" src="https://i-msdn.sec.s-msft.com/Areas/Centers/Themes/StandardDevCenter/Content/HeaderFooterSprite.png?v=636422593544160354"> </span> <span class="copyright">© 2017 Microsoft</span> </span> 
+     </footer> 
+    </div> 
+   </div> 
+   <div class="footerPrintView"> 
+    <div class="footerCopyrightPrintView">
+     © 2017 Microsoft
+    </div> 
+   </div> 
+   <input id="tocPaddingPerLevel" type="hidden" value="17"> 
+   <input id="MtpsDevice" type="hidden" value="Default"> Third party scripts and code linked to or referenced from this website are licensed to you by the parties that own such code, not by Microsoft. See ASP.NET Ajax CDN Terms of Use – http://www.asp.net/ajaxlibrary/CDN.ashx. WebTrends view model not available or IncludeLegacyWebTrendsScriptInGlobal feature flag is off 
+   <div id="globalRequestVerification"> 
+    <input name="__RequestVerificationToken" type="hidden" value="I5rR-KHnLKJBRtUjvD2Uu_O0v-LE5EMR3f_jfh-qtfgNSS4VNZDQqr5fsSFCk7dX5bRHINp0Qjkjan6EH7x6LIcBxak1"> 
+   </div> 
+  </div> 
+  <script type="text/javascript" class="mtps-injected">
+/*<![CDATA[*/
+(function(window,document){"use strict";function preload(scripts){for(var result=[],script,e,i=0;i<scripts.length;i++)script=scripts[i],script.hasOwnProperty("url")&&(e=document.createElement("script"),e.src=script.url,script.throwaway=e),result.push(script);return result}function inject(scripts,index){var script,elem;if(index>=scripts.length){delete mtps.injectScripts;return}script=scripts[index];elem=document.createElement("script");elem.className="mtps-injected";elem.async=!1;var isLoaded=!1,timeoutId=0,injectNextFnName="",injectNext=elem.onerror=function(){isLoaded||(isLoaded=!0,inject(scripts,index+1),window.clearTimeout(timeoutId),elem.onload=elem.onerror=elem.onreadystatechange=null,injectNextFnName&&delete mtps[injectNextFnName],elem.removeEventListener&&elem.removeEventListener("load",injectNext,!1))};elem.addEventListener?elem.addEventListener("load",injectNext,!1):elem.readyState==="uninitialized"?elem.onreadystatechange=function(){(this.readyState==="loaded"||this.readyState==="complete")&&injectNext()}:elem.onload=injectNext;script.hasOwnProperty("url")?(timeoutId=window.setTimeout(injectNext,12e4),elem.src=script.url):(injectNextFnName="_injectNextScript_"+index,mtps[injectNextFnName]=injectNext,timeoutId=window.setTimeout(injectNext,2e3),elem.text="try {\n"+script.txt+"\n} finally { MTPS."+injectNextFnName+" && MTPS."+injectNextFnName+"(); }");parent.appendChild(elem)}var mtps=window.MTPS||(window.MTPS={}),parent=document.getElementsByTagName("head")[0];mtps.injectScripts=function(scripts){inject(preload(scripts),0)}})(window,document);
+MTPS.injectScripts([
+	{ txt: "/**/\r\n(window.MTPS || (window.MTPS = {})).cdnDomains || (window.MTPS.cdnDomains = { \r\n\t\"image\": \"https://i-msdn.sec.s-msft.com\", \r\n\t\"js\": \"https://i2-msdn.sec.s-msft.com\", \r\n\t\"css\": \"https://i-msdn.sec.s-msft.com\", \r\n\t\"ttf\": \"https://i-msdn.sec.s-msft.com\"\r\n});\r\n/**/" },
+	{ txt: "//\n\n        window.appInsightsId = \u00275eb1b2eb-c47a-497a-a7ac-a1c230b2882f\u0027;\n        //" },
+	{ url: "https://i2-msdn.sec.s-msft.com/Combined.js?resources=0:Utilities,1:Layout,2:Header,3:Breadcrumbs,4:LibraryRightNavigationMenu,4:PrintExportButton,5:StandardRating,2:Footer,0:Topic,3:ResponsiveSupport,6:JSLLRecord,0:ABTestControl;/Areas/Epx/Content/Scripts:0,/Areas/Epx/Themes/Base/Content:1,/Areas/Centers/Themes/StandardDevCenter/Content:2,/Areas/Library/Content:3,/Areas/Library/Themes/Base/Content:4,/Areas/Global/Content:5,/Areas/Centers/Themes/Base/Content:6\u0026amp;hashKey=5BCC6179B3A366032BFF561B6ACBF9DE\u0026amp;v=57BD0B044AB791C645301D2F0EBAAA18" },
+	{ url: "https://uhf.microsoft.com/mscc/statics/mscc-0.3.6.min.js" },
+	{ url: "https://i2-msdn.sec.s-msft.com/Areas/Epx/Themes/Base/Content/SearchBox.js" },
+	{ url: "https://i1.services.social.microsoft.com/search/Widgets/SearchBox.jss?boxid=HeaderSearchTextBox\u0026btnid=HeaderSearchButton\u0026minimumTermLength=2\u0026pgArea=header\u0026brand=Msdn\u0026loc=en-us\u0026focusOnInit=false\u0026emptyWatermark=true\u0026searchButtonTooltip=Search MSDN" },
+	{ url: "https://i2-msdn.sec.s-msft.com/Combined.js?resources=0:JumpRedirect,1:CmpgrpForHeader,1:ResponsiveToc;/Areas/Epx/Themes/Base/Content:0,/Areas/Library/Content:1\u0026amp;hashKey=27CB08B1B0C7422F93D5325C9A4B4479\u0026amp;v=57BD0B044AB791C645301D2F0EBAAA18" },
+	{ txt: "MTPS = window.MTPS || {}; MTPS.LocalizedStrings = window.MTPS.LocalizedStrings || {}; MTPS.LocalizedStrings.ExpandButtonTooltip = \u0027Expand\u0027; MTPS.LocalizedStrings.CollapseButtonTooltip = \u0027Collapse\u0027; MTPS.LocalizedStrings.EnhancedExpandTooltip = \u0027Click to expand. Double-click to expand all.\u0027; MTPS.LocalizedStrings.EnhancedCollapseTooltip = \u0027Click to collapse. Double-click to collapse all.\u0027; MTPS.LocalizedStrings.ExpandAllButtonTooltip = \u0027Expand All\u0027; MTPS.LocalizedStrings.CollapseAllButtonTooltip = \u0027Collapse All\u0027;" },
+	{ txt: "MTPS = window.MTPS || {}; MTPS.LocalizedStrings = window.MTPS.LocalizedStrings || {}; MTPS.LocalizedStrings.ExpandButtonTooltip = \u0027Expand\u0027; MTPS.LocalizedStrings.CollapseButtonTooltip = \u0027Collapse\u0027; MTPS.LocalizedStrings.EnhancedExpandTooltip = \u0027Click to expand. Double-click to expand all.\u0027; MTPS.LocalizedStrings.EnhancedCollapseTooltip = \u0027Click to collapse. Double-click to collapse all.\u0027; MTPS.LocalizedStrings.ExpandAllButtonTooltip = \u0027Expand All\u0027; MTPS.LocalizedStrings.CollapseAllButtonTooltip = \u0027Collapse All\u0027;" },
+	{ url: "https://i2-msdn.sec.s-msft.com/Combined.js?resources=0:LibraryMemberFilter,1:Toc_Fixed,1:CodeSnippet,1:TopicNotInScope,1:VersionSelector,1:SurveyBroker;/Areas/Library/Content:0,/Areas/Epx/Content/Scripts:1\u0026amp;hashKey=D8D1FFAA6CA68460B7EFA5923975CA44\u0026amp;v=57BD0B044AB791C645301D2F0EBAAA18" },
+	{ txt: "$(document).ready(function() {\n        try {\n            var token = $(\"#globalRequestVerification input[name=\u0027__RequestVerificationToken\u0027]\").clone();\n            $(\"#siteFeedbackForm\").append(token);\n        } catch(err) {\n            \n        }\n    });" }
+]);
+
+/*]]>*/
+</script>  
+ </body>
+</html>

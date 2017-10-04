@@ -1,0 +1,147 @@
+<!doctype html>
+<html manifest="airline/ai/PROD.appcache">
+ <head> 
+  <meta charset="utf-8"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=1"> 
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"> 
+  <meta name="apple-mobile-web-app-capable" content="yes"> 
+  <meta name="mobile-web-app-capable" content="yes"> 
+  <link rel="stylesheet" href="airline/ai/css/preloader.css"> 
+  <link id="airline-favicon" rel="shortcut icon" href="airline/ai/images/favicon.ico" type="image/x-icon"> 
+  <title>AImobile</title> 
+  <meta name="apple-itunes-app" content="app-id=932302964"> 
+  <meta name="google-play-app" content="app-id=com.bets.airindia.ui"> 
+  <link rel="apple-touch-icon" href=""> 
+  <link rel="android-touch-icon" href=""> 
+ </head> 
+ <body class="preloader_background"> 
+  <div id="global-message"></div> 
+  <div id="loadpage" class="overlay" style="display: none"></div> 
+  <div id="preloader"> 
+   <div id="greeting"> 
+    <div id="logo"></div> 
+    <div class="progress"> 
+     <div id="progressBar" class="progress-bar"></div> 
+    </div> 
+   </div> 
+  </div> 
+  <div class="content-wrapper"> 
+   <div data-role="page" data-url="tmp"></div> 
+  </div> 
+  <script>
+    var jsRoot = "./";
+
+    var isBootInitialized = false;
+    function startApp() {
+        if (isBootInitialized) {
+            return;
+        }
+
+        isBootInitialized = true;
+        var script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = jsRoot + "js/boot.js";
+        script.async = true;
+        document.body.appendChild(script);
+    }
+
+    function increaseProgress() {
+        step++;
+        progress = step/total * 100;
+        progressBar.style.width = progress + "%";
+    }
+
+    var progressBar = document.getElementById("progressBar");
+    var progress = 0;
+    var total = 4;
+    var step = 0;
+
+    var lang;
+    var urlLang = /^\?.*lang=(\w+)&?.*$/.exec(window.location.search);
+    if (urlLang && urlLang[1] && urlLang[1] !== "null") {
+        lang = urlLang[1].toLowerCase();
+    }
+    if (!lang) {
+        try {
+            lang = localStorage.getItem("lang");
+        } catch(e) {}
+    }
+
+    window._lang = lang || "en";
+
+    if(window._lang == 'ar') {
+        document.body.parentElement.setAttribute('dir', 'rtl');
+        document.body.classList.add('rtl');
+    }
+
+    window._airline = "ai";
+    window._iTravelWeb = false;
+    window.isDEV = false;
+    window._env = "PROD";
+
+    var require = {
+        waitSeconds: 300,
+        baseUrl: jsRoot,
+        "i18n": {
+            airline: "ai",
+            defaultLocale: "en",
+            locale: window._lang
+        }
+    };
+    
+
+    window._isOnLoadCalled = false;
+    window.onload = function () {
+        window._isOnLoadCalled = true;
+    };
+
+    if (window.applicationCache) {
+        var appCacheTimeout = setTimeout(startApp, 3000);
+
+        window.applicationCache.onchecking = function() {
+            clearTimeout(appCacheTimeout);
+        };
+        window.applicationCache.onnoupdate = startApp;
+        window.applicationCache.oncached = startApp;
+        window.applicationCache.onobsolet = startApp;
+        window.applicationCache.onerror = startApp;
+
+        window.applicationCache.onupdateready = function() {
+            try {
+                window.applicationCache.swapCache();
+            } catch(err) {}
+
+            startApp();
+        };
+    } else {
+        startApp();
+    }
+</script> 
+  <script>
+    increaseProgress();
+</script> 
+  <noscript> 
+   <style type="text/css">
+        .content-wrapper {
+            display:none;
+        }
+        .white {
+            color: #fff;
+        }
+        #noscriptmsg {
+            position: absolute;
+            top: 2%;
+            left: 2%;
+        }
+    </style> 
+   <div id="noscriptmsg" class="white"> 
+    <h1>You don't have JavaScript enabled</h1> 
+    <h2>Please enable JavaScript in your browser and reload the page.</h2> 
+   </div> 
+  </noscript> 
+  <script>
+    increaseProgress();
+</script>  
+ </body>
+</html>
