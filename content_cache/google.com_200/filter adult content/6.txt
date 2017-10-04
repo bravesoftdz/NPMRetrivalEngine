@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="client-nojs">
+ <head> 
+  <meta charset="UTF-8"> 
+  <title>Setting up Transparent Content Filter on Gateway with Privoxy - Alpine Linux</title> 
+  <script>document.documentElement.className = document.documentElement.className.replace( /(^|\s)client-nojs(\s|$)/, "$1client-js$2" );</script> 
+  <script>window.RLQ = window.RLQ || []; window.RLQ.push( function () {
+mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":!1,"wgNamespaceNumber":0,"wgPageName":"Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy","wgTitle":"Setting up Transparent Content Filter on Gateway with Privoxy","wgCurRevisionId":13921,"wgRevisionId":13921,"wgArticleId":2487,"wgIsArticle":!0,"wgIsRedirect":!1,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Software","Proxy Server","Security"],"wgBreakFrames":!1,"wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgMonthNamesShort":["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"wgRelevantPageName":"Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy","wgRelevantArticleId":2487,
+"wgIsProbablyEditable":!1,"wgRestrictionEdit":[],"wgRestrictionMove":[],"wgWikiEditorEnabledModules":{"toolbar":!1,"dialogs":!1,"preview":!1,"publish":!1}});mw.loader.implement("user.options",function($,jQuery){mw.user.options.set({"variant":"en"});});mw.loader.implement("user.tokens",function($,jQuery){mw.user.tokens.set({"editToken":"+\\","patrolToken":"+\\","watchToken":"+\\"});});mw.loader.load(["mediawiki.page.startup","mediawiki.legacy.wikibits","skins.vector.js"]);
+} );</script> 
+  <link rel="stylesheet" href="/w/load.php?debug=false&amp;lang=en&amp;modules=mediawiki.legacy.commonPrint%2Cshared%7Cmediawiki.sectionAnchor%7Cmediawiki.skinning.interface%7Cskins.vector.styles&amp;only=styles&amp;skin=vector"> 
+  <meta name="ResourceLoaderDynamicStyles" content=""> 
+  <link rel="stylesheet" href="/w/load.php?debug=false&amp;lang=en&amp;modules=site&amp;only=styles&amp;skin=vector"> 
+  <style>a:lang(ar),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}</style> 
+  <script async src="/w/load.php?debug=false&amp;lang=en&amp;modules=startup&amp;only=scripts&amp;skin=vector"></script> 
+  <meta name="generator" content="MediaWiki 1.26.2"> 
+  <link rel="shortcut icon" href="/w/resources/assets/favicon.png"> 
+  <link rel="search" type="application/opensearchdescription+xml" href="/w/opensearch_desc.php" title="Alpine Linux (en)"> 
+  <link rel="EditURI" type="application/rsd+xml" href="https://wiki.alpinelinux.org/w/api.php?action=rsd"> 
+  <link rel="copyright" href="/wiki/MediaWiki:Copyright"> 
+  <link rel="alternate" type="application/atom+xml" title="Alpine Linux Atom feed" href="/w/index.php?title=Special:RecentChanges&amp;feed=atom"> 
+  <!--[if lt IE 7]><style type="text/css">body{behavior:url("/w/skins/Vector/csshover.min.htc")}</style><![endif]--> 
+ </head> 
+ <body class="mediawiki ltr sitedir-ltr ns-0 ns-subject page-Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy skin-vector action-view"> 
+  <div id="mw-page-base" class="noprint"></div> 
+  <div id="mw-head-base" class="noprint"></div> 
+  <div id="content" class="mw-body" role="main"> 
+   <a id="top"></a> 
+   <div class="mw-indicators"> 
+   </div> 
+   <h1 id="firstHeading" class="firstHeading" lang="en">Setting up Transparent Content Filter on Gateway with Privoxy</h1> 
+   <div id="bodyContent" class="mw-body-content"> 
+    <div id="siteSub">
+     From Alpine Linux
+    </div> 
+    <div id="contentSub"></div> 
+    <div id="jump-to-nav" class="mw-jump">
+      Jump to: 
+     <a href="#mw-head">navigation</a>, 
+     <a href="#p-search">search</a> 
+    </div> 
+    <div id="mw-content-text" lang="en" dir="ltr" class="mw-content-ltr">
+     <p>These instructions set up a transparent web content filter on the gateway, using privoxy. By default Privoxy contains a crude parental-controls filter that can filter many pornographic sites. Its not perfect, but nothing is. </p>
+     <p>This is significantly lighter weight than squid+dansguardian or squid+squark; and may be suitable for a small home network. </p>
+     <p><br> </p> 
+     <h2><span class="mw-headline" id="Install_Privoxy">Install Privoxy</span></h2> 
+     <ul>
+      <li> Install privoxy</li>
+     </ul> 
+     <p style="background-color:#eeeeee; border:1px dashed #bbbbbb; line-height:1.1em; padding:1em; font-family:monospace, Courier; font-size:10pt; white-space:pre; overflow:auto;">apk add privoxy</p> 
+     <ul>
+      <li> Edit the /etc/privoxy/config file, and edit the listen-address:</li>
+     </ul> 
+     <pre>
+listen-address &nbsp;:8080 
+
+# We will be doing intercepting proxying
+accept-intercepted-requests 1 
+</pre> 
+     <ul>
+      <li> Edit /etc/privoxy/default.filter. The default "sex" rule matches lots of javascript, like "trendsexplorer".<br>Search for "parental", and change the line regarding "sex" to:</li>
+     </ul> 
+     <pre>
+s%^.*(?&lt;!middle)(?&lt;!sus)(?&lt;!es)sexy.*$%&lt;html&gt;&lt;head&gt;&lt;title&gt;Blocked&lt;/title&gt;&lt;/head&gt;&lt;body&gt;\
+&lt;h3&gt;Blocked by Privoxy's crude-parental filter due to possible adult content.&lt;/h3&gt;&lt;/body&gt;&lt;/html&gt;%is
+</pre> 
+     <p>This is going to loosen the rules a bit, but should still block most stuff. </p> 
+     <ul>
+      <li> Edit /etc/privoxy/user.action file, and add the following to the end</li>
+     </ul> 
+     <pre>
+# Content filter everything
+{+filter{crude-parental}}                      
+/.*
+                                                                             
+# Anything here gets whitelisted
+{-filter{crude-parental}}                                                    
+wiki.alpinelinux.org
+</pre> 
+     <ul>
+      <li> If you do not want to advertise you are using privoxy, edit /etc/privoxy/default.filter, search for the <b>parental-crude</b> filter, and change the text as you like.</li> 
+      <li> Start privoxy</li>
+     </ul> 
+     <p style="background-color:#eeeeee; border:1px dashed #bbbbbb; line-height:1.1em; padding:1em; font-family:monospace, Courier; font-size:10pt; white-space:pre; overflow:auto;">/etc/init.d/privoxy</p> 
+     <ul>
+      <li> add privoxy to the startup scripts</li>
+     </ul> 
+     <p style="background-color:#eeeeee; border:1px dashed #bbbbbb; line-height:1.1em; padding:1em; font-family:monospace, Courier; font-size:10pt; white-space:pre; overflow:auto;">rc-update add privoxy</p> 
+     <ul>
+      <li> To test, set your browser to use 192.168.1.1:8080 as the proxy, and enter "<a rel="nofollow" class="external free" href="http://config.privoxy.org">http://config.privoxy.org</a>" - you should go to the privoxy page. </li> 
+      <li> Unset your browser's proxy settings.</li>
+     </ul> 
+     <h2><span class="mw-headline" id="Set_up_Transparent_Proxy_Redirection">Set up Transparent Proxy Redirection</span></h2> 
+     <ul>
+      <li> Add awall</li>
+     </ul> 
+     <p style="background-color:#eeeeee; border:1px dashed #bbbbbb; line-height:1.1em; padding:1em; font-family:monospace, Courier; font-size:10pt; white-space:pre; overflow:auto;">apk add awall</p> 
+     <ul>
+      <li> Create /etc/awall/optional/home-firewall.json - Change the interfaces in the zones as appropriate:</li>
+     </ul> 
+     <pre>
+{
+"description":  "Home Firewall",
+
+"zone": {
+        "inet"&nbsp;: { "iface"&nbsp;: "eth1" },
+        "loc" &nbsp;: { "iface"&nbsp;: "eth0" }
+        },
+
+"policy": [
+        { "in": "_fw", "action": "accept" },
+        { "in": "loc", "out": "inet", "action": "accept" },
+        { "in": "loc", "out": "_fw", "action": "accept" }
+        ],
+
+"snat": [
+        { "out": "inet" }
+        ],
+
+"dnat": [
+        { "in": "loc", "service": "http", "to-port": 8080 }
+        ]
+}
+</pre> 
+     <ul>
+      <li> Enable the firewall</li>
+     </ul> 
+     <p style="background-color:#eeeeee; border:1px dashed #bbbbbb; line-height:1.1em; padding:1em; font-family:monospace, Courier; font-size:10pt; white-space:pre; overflow:auto;">awall enable home-firewall </p> 
+     <ul>
+      <li> Activate it</li>
+     </ul> 
+     <p style="background-color:#eeeeee; border:1px dashed #bbbbbb; line-height:1.1em; padding:1em; font-family:monospace, Courier; font-size:10pt; white-space:pre; overflow:auto;">awall activate</p> 
+     <ul>
+      <li> Surf, again, you can still use <a rel="nofollow" class="external free" href="http://config.privoxy.org">http://config.privoxy.org</a> to verify the intercepting proxy is working</li>
+     </ul> 
+     <!-- 
+NewPP limit report
+Cached time: 20171003114321
+Cache expiry: 86400
+Dynamic content: false
+CPU time usage: 0.037 seconds
+Real time usage: 0.037 seconds
+Preprocessor visited node count: 74/1000000
+Preprocessor generated node count: 226/1000000
+Post?expand include size: 1189/2097152 bytes
+Template argument size: 109/2097152 bytes
+Highest expansion depth: 2/40
+Expensive parser function count: 0/100
+--> 
+     <!-- 
+Transclusion expansion time report (%,ms,calls,template)
+100.00%   11.294      1 - -total
+ 52.00%    5.873      6 - Template:Cmd
+--> 
+     <!-- Saved in parser cache with key wikidb:pcache:idhash:2487-0!*!*!!*!*!* and timestamp 20171003114321 and revision id 13921
+ --> 
+    </div> 
+    <div class="printfooter">
+      Retrieved from "
+     <a dir="ltr" href="https://wiki.alpinelinux.org/w/index.php?title=Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy&amp;oldid=13921">https://wiki.alpinelinux.org/w/index.php?title=Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy&amp;oldid=13921</a>" 
+    </div> 
+    <div id="catlinks" class="catlinks">
+     <div id="mw-normal-catlinks" class="mw-normal-catlinks">
+      <a href="/wiki/Special:Categories" title="Special:Categories">Categories</a>: 
+      <ul>
+       <li><a href="/wiki/Category:Software" title="Category:Software">Software</a></li>
+       <li><a href="/wiki/Category:Proxy_Server" title="Category:Proxy Server">Proxy Server</a></li>
+       <li><a href="/wiki/Category:Security" title="Category:Security">Security</a></li>
+      </ul>
+     </div>
+    </div> 
+    <div class="visualClear"></div> 
+   </div> 
+  </div> 
+  <div id="mw-navigation"> 
+   <h2>Navigation menu</h2> 
+   <div id="mw-head"> 
+    <div id="p-personal" role="navigation" class="" aria-labelledby="p-personal-label"> 
+     <h3 id="p-personal-label">Personal tools</h3> 
+     <ul> 
+      <li id="pt-createaccount"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Setting+up+Transparent+Content+Filter+on+Gateway+with+Privoxy&amp;type=signup" title="You are encouraged to create an account and log in; however, it is not mandatory">Create account</a></li>
+      <li id="pt-login"><a href="/w/index.php?title=Special:UserLogin&amp;returnto=Setting+up+Transparent+Content+Filter+on+Gateway+with+Privoxy" title="You are encouraged to log in; however, it is not mandatory [o]" accesskey="o">Log in</a></li> 
+     </ul> 
+    </div> 
+    <div id="left-navigation"> 
+     <div id="p-namespaces" role="navigation" class="vectorTabs" aria-labelledby="p-namespaces-label"> 
+      <h3 id="p-namespaces-label">Namespaces</h3> 
+      <ul> 
+       <li id="ca-nstab-main" class="selected"><span><a href="/wiki/Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy" title="View the content page [c]" accesskey="c">Page</a></span></li> 
+       <li id="ca-talk" class="new"><span><a href="/w/index.php?title=Talk:Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy&amp;action=edit&amp;redlink=1" title="Discussion about the content page [t]" accesskey="t" rel="discussion">Discussion</a></span></li> 
+      </ul> 
+     </div> 
+     <div id="p-variants" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-variants-label"> 
+      <h3 id="p-variants-label"> <span>Variants</span><a href="#"></a> </h3> 
+      <div class="menu"> 
+       <ul> 
+       </ul> 
+      </div> 
+     </div> 
+    </div> 
+    <div id="right-navigation"> 
+     <div id="p-views" role="navigation" class="vectorTabs" aria-labelledby="p-views-label"> 
+      <h3 id="p-views-label">Views</h3> 
+      <ul> 
+       <li id="ca-view" class="selected"><span><a href="/wiki/Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy">Read</a></span></li> 
+       <li id="ca-viewsource"><span><a href="/w/index.php?title=Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy&amp;action=edit" title="This page is protected.
+You can view its source [e]" accesskey="e">View source</a></span></li> 
+       <li id="ca-history" class="collapsible"><span><a href="/w/index.php?title=Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy&amp;action=history" title="Past revisions of this page [h]" accesskey="h">View history</a></span></li> 
+      </ul> 
+     </div> 
+     <div id="p-cactions" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-cactions-label"> 
+      <h3 id="p-cactions-label"><span>More</span><a href="#"></a></h3> 
+      <div class="menu"> 
+       <ul> 
+       </ul> 
+      </div> 
+     </div> 
+     <div id="p-search" role="search"> 
+      <h3> <label for="searchInput">Search</label> </h3> 
+      <form action="/w/index.php" id="searchform"> 
+       <div id="simpleSearch"> 
+        <input type="search" name="search" placeholder="Search" title="Search Alpine Linux [f]" accesskey="f" id="searchInput">
+        <input type="hidden" value="Special:Search" name="title">
+        <input type="submit" name="fulltext" value="Search" title="Search the pages for this text" id="mw-searchButton" class="searchButton mw-fallbackSearchButton">
+        <input type="submit" name="go" value="Go" title="Go to a page with this exact name if it exists" id="searchButton" class="searchButton"> 
+       </div> 
+      </form> 
+     </div> 
+    </div> 
+   </div> 
+   <div id="mw-panel"> 
+    <div id="p-logo" role="banner">
+     <a class="mw-wiki-logo" href="/wiki/Main_Page" title="Visit the main page"></a>
+    </div> 
+    <div class="portal" role="navigation" id="p-Welcome" aria-labelledby="p-Welcome-label"> 
+     <h3 id="p-Welcome-label">Welcome</h3> 
+     <div class="body"> 
+      <ul> 
+       <li id="n-Installation"><a href="/wiki/Installation">Installation</a></li>
+       <li id="n-FAQ"><a href="/wiki/FAQ">FAQ</a></li>
+       <li id="n-Tutorials-and-Howtos"><a href="/wiki/Tutorials_and_Howtos">Tutorials and Howtos</a></li>
+       <li id="n-Contribute"><a href="/wiki/Contribute">Contribute</a></li>
+       <li id="n-Developer-Documentation"><a href="/wiki/Developer_Documentation">Developer Documentation</a></li>
+       <li id="n-Glossary"><a href="/wiki/Glossary">Glossary</a></li> 
+      </ul> 
+     </div> 
+    </div> 
+    <div class="portal" role="navigation" id="p-Services" aria-labelledby="p-Services-label"> 
+     <h3 id="p-Services-label">Services</h3> 
+     <div class="body"> 
+      <ul> 
+       <li id="n-Main-Site"><a href="https://alpinelinux.org" rel="nofollow">Main Site</a></li>
+       <li id="n-Git-Repositories"><a href="https://git.alpinelinux.org" rel="nofollow">Git Repositories</a></li>
+       <li id="n-Bug-Tracker"><a href="https://bugs.alpinelinux.org/projects/alpine/issues" rel="nofollow">Bug Tracker</a></li>
+       <li id="n-Forums"><a href="https://forum.alpinelinux.org/forum" rel="nofollow">Forums</a></li>
+       <li id="n-Mailing-Lists"><a href="/wiki/Alpine_Linux:Mailing_lists">Mailing Lists</a></li>
+       <li id="n-IRC-Channels"><a href="/wiki/IRC">IRC Channels</a></li>
+       <li id="n-Downloads"><a href="https://alpinelinux.org/downloads" rel="nofollow">Downloads</a></li>
+       <li id="n-Package-Database"><a href="https://pkgs.alpinelinux.org/packages" rel="nofollow">Package Database</a></li> 
+      </ul> 
+     </div> 
+    </div> 
+    <div class="portal" role="navigation" id="p-Wiki" aria-labelledby="p-Wiki-label"> 
+     <h3 id="p-Wiki-label">Wiki</h3> 
+     <div class="body"> 
+      <ul> 
+       <li id="n-Recent-Changes"><a href="/wiki/Special:RecentChanges">Recent Changes</a></li>
+       <li id="n-Site-Index"><a href="/wiki/Special:PrefixIndex">Site Index</a></li>
+       <li id="n-Categories"><a href="/wiki/Special:Categories">Categories</a></li>
+       <li id="n-Help"><a href="/wiki/Category:Wiki">Help</a></li>
+       <li id="n-Maintenance"><a href="/wiki/Alpine_Linux:Wiki_maintenance">Maintenance</a></li> 
+      </ul> 
+     </div> 
+    </div> 
+    <div class="portal" role="navigation" id="p-tb" aria-labelledby="p-tb-label"> 
+     <h3 id="p-tb-label">Toolbox</h3> 
+     <div class="body"> 
+      <ul> 
+       <li id="t-whatlinkshere"><a href="/wiki/Special:WhatLinksHere/Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy" title="A list of all wiki pages that link here [j]" accesskey="j">What links here</a></li>
+       <li id="t-recentchangeslinked"><a href="/wiki/Special:RecentChangesLinked/Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy" title="Recent changes in pages linked from this page [k]" accesskey="k">Related changes</a></li>
+       <li id="t-specialpages"><a href="/wiki/Special:SpecialPages" title="A list of all special pages [q]" accesskey="q">Special pages</a></li>
+       <li id="t-print"><a href="/w/index.php?title=Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy&amp;printable=yes" rel="alternate" title="Printable version of this page [p]" accesskey="p">Printable version</a></li>
+       <li id="t-permalink"><a href="/w/index.php?title=Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy&amp;oldid=13921" title="Permanent link to this revision of the page">Permanent link</a></li>
+       <li id="t-info"><a href="/w/index.php?title=Setting_up_Transparent_Content_Filter_on_Gateway_with_Privoxy&amp;action=info" title="More information about this page">Page information</a></li> 
+      </ul> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <div id="footer" role="contentinfo"> 
+   <ul id="footer-info"> 
+    <li id="footer-info-lastmod"> This page was last modified on 21 September 2017, at 02:52.</li> 
+    <li id="footer-info-copyright">
+     <div align="right">
+      <div id="footer-inner"> 
+       <p><a href="Privacy_Policy#Copyright">© Copyright 2008-2017 Alpine Linux Development Team</a> all rights reserved </p>
+      </div>
+     </div></li> 
+   </ul> 
+   <ul id="footer-places"> 
+    <li id="footer-places-privacy"><a href="/wiki/Alpine_Linux:Privacy_policy" title="Alpine Linux:Privacy policy">Privacy policy</a></li> 
+    <li id="footer-places-about"><a href="/wiki/Alpine_Linux:About" title="Alpine Linux:About">About</a></li> 
+    <li id="footer-places-disclaimer"><a href="/wiki/Alpine_Linux:General_disclaimer" title="Alpine Linux:General disclaimer">Disclaimers</a></li> 
+   </ul> 
+   <ul id="footer-icons" class="noprint"> 
+    <li id="footer-poweredbyico"> <a href="//www.mediawiki.org/"><img src="/w/resources/assets/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" srcset="/w/resources/assets/poweredby_mediawiki_132x47.png 1.5x, /w/resources/assets/poweredby_mediawiki_176x62.png 2x" width="88" height="31"></a> </li> 
+   </ul> 
+   <div style="clear:both"></div> 
+  </div> 
+  <script>window.RLQ = window.RLQ || []; window.RLQ.push( function () {
+mw.loader.state({"user":"ready","user.groups":"ready"});mw.loader.load(["mediawiki.action.view.postEdit","site","mediawiki.user","mediawiki.page.ready","mediawiki.searchSuggest"]);
+} );</script>
+  <script>window.RLQ = window.RLQ || []; window.RLQ.push( function () {
+mw.config.set({"wgBackendResponseTime":479});
+} );</script>   
+ </body>
+</html>

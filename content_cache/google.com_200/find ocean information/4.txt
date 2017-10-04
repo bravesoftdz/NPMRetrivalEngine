@@ -1,0 +1,854 @@
+<!doctype html>
+<!-- Copyright (c) 2017 Cameron Beccario. For a free version of this project, see https://github.com/cambecc/earth -->
+<html lang="en" prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+ <head> 
+  <meta charset="utf-8"> 
+  <title>about earth :: a global map of wind, weather, and ocean conditions</title> 
+  <script type="application/ld+json">{
+      "@context": "http://schema.org",
+      "@type": "Map",
+      "name": "earth",
+      "description": "Implementation details behind 'earth', an animated map of current wind, weather, ocean, and pollution conditions.",
+      "author": {
+        "@type": "Person",
+        "name": "Cameron Beccario"
+      },
+      "url": "https://earth.nullschool.net/about.html",
+      "sameAs": [
+        "https://www.facebook.com/EarthWindMap",
+        "https://twitter.com/cambecc"
+      ],
+      "image": "https://earth.nullschool.net/sample.png"
+    }</script> 
+  <meta name="description" content="Implementation details behind 'earth', an animated map of current wind, weather, ocean, and pollution conditions."> 
+  <meta property="og:type" content="website"> 
+  <meta property="og:title" content="about earth :: a global map of wind, weather, and ocean conditions"> 
+  <meta property="og:description" content="Implementation details behind 'earth', an animated map of current wind, weather, ocean, and pollution conditions."> 
+  <meta property="og:url" content="https://earth.nullschool.net/about.html"> 
+  <meta property="og:image" content="https://earth.nullschool.net/sample.png"> 
+  <meta property="fb:admins" content="510217216"> 
+  <meta name="format-detection" content="telephone=no"> 
+  <link rel="shortcut icon" href="/favicon.ico?v2"> 
+  <!-- $LANG$ --> 
+  <link rel="canonical" href="https://earth.nullschool.net/about.html"> 
+  <link rel="alternate" hreflang="en" href="https://earth.nullschool.net/about.html"> 
+  <link rel="alternate" hreflang="cs" href="https://earth.nullschool.net/cs/about.html"> 
+  <link rel="alternate" hreflang="fr" href="https://earth.nullschool.net/fr/about.html"> 
+  <link rel="alternate" hreflang="ja" href="https://earth.nullschool.net/jp/about.html"> 
+  <link rel="alternate" hreflang="pt" href="https://earth.nullschool.net/pt/about.html"> 
+  <link rel="alternate" hreflang="ru" href="https://earth.nullschool.net/ru/about.html"> 
+  <link rel="alternate" hreflang="zh-CN" href="https://earth.nullschool.net/zh-cn/about.html"> 
+  <link rel="alternate" hreflang="x-default" href="https://earth.nullschool.net/about.html"> 
+  <style>
+/**************************************************************************************************
+ * At-Rules
+ **************************************************************************************************/
+
+@font-face {
+    font-family: mplus-2p-light-sub;
+    src: url("/styles/mplus-2p-light-sub.woff2?v2") format("woff2"),
+         url("/styles/mplus-2p-light-sub.woff?v2") format("woff");
+}
+
+@font-face {
+    font-family: NotoSansCJKsc-Light-sub;
+    src: url("/styles/NotoSansCJKsc-Light-sub.woff2?v2") format("woff2"),
+         url("/styles/NotoSansCJKsc-Light-sub.woff?v2") format("woff");
+}
+
+@font-face {
+    font-family: fontawesome-sub;
+    src: url("/styles/fontawesome-sub.woff2?v2") format("woff2"),
+         url("/styles/fontawesome-sub.woff?v2") format("woff");
+}
+
+/**************************************************************************************************
+ * Styling Reset
+ **************************************************************************************************/
+
+html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, svg, canvas {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 1em;
+    font-weight: normal;
+    /*font: 1em mplus-2p-light-sub,Helvetica,arial,freesans,clean,sans-serif;*/
+    -webkit-font-smoothing: subpixel-antialiased; /* safari disables subpixel antialiasing for some reason */
+}
+
+[lang="zh-CN"] {
+    font-family: NotoSansCJKsc-Light-sub,mplus-2p-light-sub,Helvetica,arial,freesans,clean,sans-serif;
+}
+
+/* $LANG$ */
+[lang="en"], [lang="cs"], [lang="fr"], [lang="ja"], [lang="pt"], [lang="ru"] {
+    font-family: mplus-2p-light-sub,Helvetica,arial,freesans,clean,sans-serif;
+}
+
+.lang-link {  /* use system font for lang list to avoid downloading all the fonts */
+    font-family: sans-serif;
+    font-weight: 300;
+}
+
+@media (max-width: 825px), (max-height: 700px) {
+    html, body, div, span, td, h1, h2, h3, h4, h5, h6, p, a, svg, canvas {
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 500px), (max-height: 500px) {
+    html, body, div, span, td, h1, h2, h3, h4, h5, h6, p, a, svg, canvas {
+        font-size: 0.67em;
+    }
+}
+
+/**************************************************************************************************
+ * Page Styling
+ **************************************************************************************************/
+
+body {
+    color: #eeeeee;
+    background: #000005;
+}
+
+#earth h1 {
+    display: inline;
+}
+
+svg {
+    overflow: hidden;  /* Do not let IE draw outside the bounds of the svg element. */
+}
+
+a, .text-button {
+    color: #888888;
+}
+
+.text-button.highlighted, a.highlighted {
+    color: #e2b42e;
+}
+
+.text-button.disabled {
+    color: #444444;
+}
+
+a:hover, a:focus, .no-touch .text-button:hover, .no-touch .text-button:focus, .text-button:active {
+    color: #ffffff;
+    cursor: pointer;
+    transition: color 125ms ease-in;
+    -webkit-transition: color 125ms ease-in;
+}
+
+a.invisible, p.invisible, span.invisible, #sponsor.invisible, #notice.invisible, #details.invisible, #tara-stats.invisible {
+    display: none;
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+#warn {
+    font-size: 2.0em;
+    position: absolute;
+    top: 10%;
+    left: 2%;
+}
+
+#display {
+    cursor: default;
+}
+
+#map, #animation, #fastoverlay, #overlay, #foreground, #annotation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    will-change: transform;
+}
+
+#sponsor, #notice {
+    position: absolute;
+    text-align: right;
+    background-color: rgba(0, 0, 5, 0.6);
+    border-radius: 0.5rem/0.5rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    font-size: 1.0rem;
+}
+
+#tara-stats {
+    position: absolute;
+    text-align: left;
+    background-color: rgba(0, 0, 5, 0.6);
+    border-radius: 0.5rem/0.5rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    font-size: 1.5rem;
+}
+
+#settings-wrap {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    position: absolute;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    pointer-events: none;
+}
+
+#settings-wrap.invisible {
+    display: none;
+}
+
+#settings {
+    font-size: 1.5rem;
+    text-align: left;
+    background-color: rgba(0, 0, 5, 0.8);
+    border-radius: 0.5rem/0.5rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    pointer-events: all;
+}
+
+#settings ul {
+    -moz-column-count: 2;
+    -webkit-column-count: 2;
+    column-count: 2;
+    list-style: none;
+    padding: 1em;
+    margin: 0;
+}
+
+#sponsor, #tara-stats {
+    bottom: 3%;
+    right: 2%;
+}
+
+#notice {
+    top: 3%;
+    right: 2%;
+}
+
+#settings-hide {
+    float: right;
+    padding-left: 1em;
+}
+
+#location-close, #sponsor-hide, #notice-hide {
+    padding: 0 0.5em;
+}
+
+#sponsor:hover #sponsor-hide, #notice:hover #notice-hide {
+    display: inline;
+}
+
+#sponsor a, #notice a {
+    text-decoration: none;
+}
+
+#details {
+    position: absolute;
+    bottom: 3%;
+    left: 2%;
+    pointer-events: none;  /* This div is just a container--do not let it interfere with operation of the map. */
+}
+
+#earth {
+    font-size: 2.4rem;
+}
+
+#status, #location p, #menu {
+    font-size: 1.75rem;
+}
+
+#status, #location, #earth {
+    background-color: rgba(0, 0, 5, 0.6);
+    border-radius: 0.5rem/0.5rem;
+    display: table;
+    margin-top: 1rem;
+    padding: 0 1rem 0 1rem;
+    pointer-events: all;
+}
+
+#menu {
+    background-color: rgba(5, 10, 30, 0.85);
+    border-radius: 0.5rem/0.5rem;
+    overflow: hidden;
+    pointer-events: all;
+
+    margin-top: 1rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    opacity: 1;
+    max-height: 34rem;
+    transition: opacity 250ms ease, max-height 250ms ease, margin-top 250ms ease;
+    -webkit-transition: opacity 250ms ease, max-height 250ms ease, margin-top 250ms ease;
+}
+
+#menu.invisible {
+    margin-top: 0;
+    padding: 0 1rem 0 1rem;
+    opacity: 0;
+    max-height: 0;
+    transition: opacity 250ms ease, max-height 250ms ease, margin-top 250ms ease;
+    -webkit-transition: opacity 250ms ease, max-height 250ms ease, margin-top 250ms ease;
+}
+
+#progress, #hd {
+    padding-left: 1rem;
+}
+
+#nav-now {
+    padding-right: 1rem;
+}
+
+#nav-backward, #nav-backward-more, #nav-forward, #nav-forward-more, #option-show-grid, #animate-start {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (max-width: 825px), (max-height: 700px) {
+    /* this is a hack to ensure the menu isn't too wide on my iphone */
+    #nav-backward, #nav-backward-more, #nav-forward, #nav-forward-more, #option-show-grid {
+        padding-left: 0.70rem;
+        padding-right: 0.70rem;
+    }
+}
+
+#show-location {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+#lang, #settings-show {
+    float: right;
+}
+
+.icon {
+    display: inline-block;
+    padding-left: 0.5em;
+    text-decoration: none;
+    font: normal normal normal 14px/1 fontawesome-sub;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.lang-link, .internal-link {
+    text-decoration: none;  /* can do something like: a[href^="http"] */
+}
+
+sup, sub {
+    font-size: 75%;
+    line-height: 1;
+}
+
+/**************************************************************************************************
+ * SVG Element Styling
+ **************************************************************************************************/
+
+.location-mark {
+    stroke: #3aff3a;
+    stroke-width: 2.5;
+    fill: none;
+}
+
+.tara-route {
+    stroke-opacity: 0.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
+.tara-plan {
+    stroke: #cccccc;
+    stroke-width: 1.5;
+}
+
+.tara-plan-border {
+    stroke: #474747;
+    stroke-width: 3.75;
+}
+
+.tara-track {
+    stroke: #f17a2e;
+    stroke-width: 1.75;
+    stroke-opacity: 1;
+}
+
+.tara-track-border {
+    stroke: #48240f;
+    stroke-width: 5.25;
+}
+
+.tara-loc {
+    stroke: #48240f;
+    stroke-width: 1;
+    fill: #f17a2e;
+}
+
+.argo-recent, .argo-operational, .argo-planned, .argo-dead {
+    stroke: #000000;
+    stroke-width: 1;
+}
+
+.argo-recent {
+    fill: #fffc00;
+}
+
+.argo-operational {
+    fill: #74ff6a;
+}
+
+.argo-planned {
+    fill: #fc00ff;
+}
+
+.argo-dead {
+    fill: #ff1700;
+}
+
+/**************************************************************************************************
+ * About Page
+ **************************************************************************************************/
+
+#about {
+    font-size: 1.5rem;
+}
+
+#about h1 {
+    font-size: 2.4rem;
+    text-align: center;
+    padding-top: 2rem;
+}
+
+#about div {
+    clear: both;
+}
+
+#about .blurb {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+#about p.text {
+    padding-top: 2rem;
+    width: 80%;
+    margin: auto;
+}
+
+#about .blurb img {
+    padding-top: 2rem;
+}
+
+#about img {
+    display: block;
+    margin: auto;
+}
+
+#about:first-child {
+    padding-top: 3rem;
+}
+
+#cover {
+    border: 1px solid #eeeeee;
+}
+
+#about .licensing {
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+}
+
+#print {
+    padding: 0 0 30px 0;
+}
+
+#about .center {
+    text-align: center;
+}
+
+#about .pad {
+    visibility: hidden;
+}
+
+#closing {
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+}
+
+#about table {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+#about td {
+    vertical-align: top;
+}
+
+#about td.l {
+    width: 50%;
+    text-align: right;
+    padding: 0 0.5em 0 0;
+    border-right: 2px solid #eee;
+}
+
+#about td.lh {
+    width: 40%;
+    text-align: right;
+    padding: 0 0.5em 0 0;
+    border-right: 2px solid #eee;
+}
+
+#about td.r {
+    padding: 0 2em 0 0.5em;
+}
+
+#about p.xlate span {
+    padding: 0 1em 0 1em;
+    white-space: nowrap;
+}
+
+    </style> 
+  <script>
+    window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+    ga('create', 'UA-44235933-2', 'auto');
+    ga('send', 'pageview');
+    </script> 
+  <script async src="https://www.google-analytics.com/analytics.js"></script> 
+ </head> 
+ <body> 
+  <div id="about"> 
+   <div> 
+    <a href="./" class="internal-link"><img id="cover" src="/sample.jpg" alt="earth banner image"></a> 
+   </div> 
+   <h1 lang="en"><a href="./" class="internal-link">earth</a></h1> 
+   <div class="blurb"> 
+    <p class="center">a visualization of global weather conditions<br>forecast by supercomputers<br>updated every three hours</p> 
+    <p class="center">&nbsp;</p> 
+    <p class="center">ocean surface current estimates<br>updated every five days</p> 
+    <p class="center">&nbsp;</p> 
+    <p class="center">ocean surface temperatures and<br>anomaly from daily average (1981-2011)<br>updated daily</p> 
+    <p class="center">&nbsp;</p> 
+    <p class="center">ocean waves<br>updated every three hours</p> 
+   </div> 
+   <div class="artwork"> 
+    <p class="center"> <a href="http://memory.org/point.b/earth.html"> <img id="print" src="/artwork.jpg" alt="artwork"> purchase artwork from Point.B Studio to help support this site </a> </p> 
+   </div> 
+   <div class="licensing"> 
+    <p class="center">licensing</p> 
+    <p class="center"> contact inquiries@nullschool.net for licensing or other questions </p> 
+   </div> 
+   <table> 
+    <tbody>
+     <tr> 
+      <td class="l">Community</td> 
+      <td class="r"><a href="https://www.facebook.com/EarthWindMap">Facebook Page</a></td> 
+     </tr> 
+     <tr> 
+      <td class="l">Author</td> 
+      <td class="r">Cameron Beccario <a href="https://twitter.com/cambecc">@cambecc</a></td> 
+     </tr> 
+     <tr> 
+      <td class="l">Free Version of Source</td> 
+      <td class="r"><a href="https://github.com/cambecc/earth">github.com/cambecc/earth</a></td> 
+     </tr> 
+     <tr> 
+      <td class="l">Modules</td> 
+      <td class="r"> <a href="https://d3js.org">D3.js</a><br> <a href="http://backbonejs.org">backbone.js</a><br> <a href="https://github.com/cujojs/when">when.js</a><br> <a href="https://nodejs.org">node.js</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="l">Weather Data</td> 
+      <td class="r"> GFS (Global Forecast System)<br> <a href="http://www.emc.ncep.noaa.gov">EMC / NCEP / NWS / NOAA</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="l">Ocean Currents Data</td> 
+      <td class="r"> OSCAR<br> <a href="http://www.esr.org/oscar_index.html">Earth &amp; Space Research</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="l">Sea Surface Temperature</td> 
+      <td class="r"> RTGSST (Real Time Global Sea Surface Temperature)<br> <a href="http://polar.ncep.noaa.gov">MMAB / EMC / NCEP / NWS / NOAA</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="l">Ocean Waves</td> 
+      <td class="r"> WAVEWATCH III<br> <a href="http://polar.ncep.noaa.gov/waves">MMAB / EMC / NCEP / NWS / NOAA</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="l">Aerosols and Chemistry</td> 
+      <td class="r"> GEOS-5 (Goddard Earth Observing System)<br> <a href="http://gmao.gsfc.nasa.gov">GMAO / NASA</a><br> CAMS (Copernicus Atmosphere Monitoring System)<br> <a href="https://atmosphere.copernicus.eu/">Copernicus / European Commission + ECMWF</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="l">GRIB/NetCDF Decoder</td> 
+      <td class="r"><a href="https://github.com/Unidata/thredds">UCAR/Unidata THREDDS</a></td> 
+     </tr> 
+     <tr> 
+      <td class="l">Geographic Data</td> 
+      <td class="r"><a href="http://www.naturalearthdata.com">Natural Earth</a></td> 
+     </tr> 
+     <tr> 
+      <td class="l">Hosting</td> 
+      <td class="r"> <a href="https://www.cloudflare.com">CloudFlare</a><br> <a href="https://aws.amazon.com/s3">Amazon S3</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="l">Fonts</td> 
+      <td class="r"> <a href="http://mplus-fonts.sourceforge.jp">M+ FONTS</a><br> <a href="https://www.google.com/get/noto/">Google Noto Fonts</a><br> <a href="http://fontawesome.io">Font Awesome</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="l">Translation Management</td> 
+      <td class="r"> <a href="https://www.oneskyapp.com/">OneSky</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="l">Color Scales</td> 
+      <td class="r"> <a href="https://github.com/gka/chroma.js">chroma.js</a><br> <a href="http://colorbrewer2.org">ColorBrewer2.org</a><br> <a href="http://www.cs.utah.edu/~gk/papers/vis02/FaceLumin.pdf">Kindlmann Linear Luminance</a><br> <a href="https://mycarta.wordpress.com">MYCARTA</a><br> <a href="http://www.mrao.cam.ac.uk/~dag/CUBEHELIX">Dave Green's cubehelix</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="l">Waterman Butterfly</td> 
+      <td class="r"><a href="http://watermanpolyhedron.com">watermanpolyhedron.com</a></td> 
+     </tr> 
+     <tr> 
+      <td class="l">Prototype</td> 
+      <td class="r"><a lang="ja" href="https://air.nullschool.net">????</a></td> 
+     </tr> 
+     <tr> 
+      <td class="l">Inspiration</td> 
+      <td class="r"><a href="http://hint.fm/wind">HINT.FM wind map</a></td> 
+     </tr> 
+    </tbody>
+   </table> 
+   <div class="blurb"> 
+    <p class="center">atmospheric pressure corresponds roughly to altitude<br>several pressure layers are meteorologically interesting<br>they show data assuming the earth is completely smooth<br>note: 1 hectopascal (hPa) = 1 millibar (mb)</p> 
+   </div> 
+   <table> 
+    <tbody>
+     <tr> 
+      <td class="l">1000 hPa</td> 
+      <td class="r"><span class="pad">00,</span>~100 m, near sea level conditions</td> 
+     </tr> 
+     <tr> 
+      <td class="l">850 hPa</td> 
+      <td class="r"><span class="pad">0</span>~1,500 m, <a href="https://en.wikipedia.org/wiki/Planetary_boundary_layer">planetary boundary</a>, low</td> 
+     </tr> 
+     <tr> 
+      <td class="l">700 hPa</td> 
+      <td class="r"><span class="pad">0</span>~3,500 m, <a href="https://en.wikipedia.org/wiki/Planetary_boundary_layer">planetary boundary</a>, high</td> 
+     </tr> 
+     <tr> 
+      <td class="l">500 hPa</td> 
+      <td class="r"><span class="pad">0</span>~5,000 m, <a href="https://en.wikipedia.org/wiki/Vorticity">vorticity</a></td> 
+     </tr> 
+     <tr> 
+      <td class="l">250 hPa</td> 
+      <td class="r">~10,500 m, <a href="https://en.wikipedia.org/wiki/Jet_stream">jet stream</a></td> 
+     </tr> 
+     <tr> 
+      <td class="l">70 hPa</td> 
+      <td class="r">~17,500 m, <a href="https://en.wikipedia.org/wiki/Stratosphere">stratosphere</a></td> 
+     </tr> 
+     <tr> 
+      <td class="l">10 hPa</td> 
+      <td class="r">~26,500 m, even more stratosphere</td> 
+     </tr> 
+    </tbody>
+   </table> 
+   <div class="blurb"> 
+    <p class="center">the "Surface" layer represents conditions at ground or water level<br>this layer follows the contours of mountains, valleys, etc.</p> 
+    <p class="center">&nbsp;</p> 
+    <p class="center">overlays show another dimension of data using color<br>some overlays are valid at a specific height<br>while others are valid for the entire thickness of the atmosphere</p> 
+   </div> 
+   <table> 
+    <tbody>
+     <tr> 
+      <td class="lh">Wind</td> 
+      <td class="r">wind speed at specified height</td> 
+     </tr> 
+     <tr> 
+      <td class="lh">Temp</td> 
+      <td class="r">temperature at specified height</td> 
+     </tr> 
+     <tr> 
+      <td class="lh">RH</td> 
+      <td class="r">relative humidity at specified height</td> 
+     </tr> 
+     <tr> 
+      <td class="lh">WPD</td> 
+      <td class="r"> <a href="http://educypedia.karadimov.info/library/Lesson1_windenergycalc.pdf">Instantaneous Wind Power Density</a><br> measure of power available in the wind: ½?v<sup>3</sup>, where ? is air density and v is wind velocity </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">TPW</td> 
+      <td class="r"> <a href="https://en.wikipedia.org/wiki/Precipitable_water">Total Precipitable Water</a><br> total amount of water in a column of air stretching from ground to space </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">TCW</td> 
+      <td class="r"> Total Cloud Water<br> total amount of water in clouds in a column of air from ground to space </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">3HPA</td> 
+      <td class="r"> 3-hour Precipitation Accumulation<br> amount of precipitation over the next three hours </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">CAPE</td> 
+      <td class="r"> <a href="https://en.wikipedia.org/wiki/Convective_available_potential_energy">Convective Available Potential Energy</a> from Surface<br> indicates the buoyancy of air, a measure of atmospheric instability and predictor of severe weather </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">MSLP</td> 
+      <td class="r"> <a href="https://en.wikipedia.org/wiki/Atmospheric_pressure#Mean_sea_level_pressure">Mean Sea Level Pressure</a><br> air pressure reduced to sea level </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">MI</td> 
+      <td class="r"> Misery Index<br> perceived air temperature as combination of <a href="https://en.wikipedia.org/wiki/Heat_index">heat index</a> and <a href="https://en.wikipedia.org/wiki/Wind_chill">wind chill</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">SST</td> 
+      <td class="r"> <a href="https://en.wikipedia.org/wiki/Sea_surface_temperature">Sea Surface Temperature</a><br> temperature of the ocean surface </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">SSTA</td> 
+      <td class="r"> <a href="https://en.wikipedia.org/wiki/Sea_surface_temperature">Sea Surface Temperature Anomaly</a><br> difference in ocean temperature from daily average during years 1981-2011 </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">HTSGW</td> 
+      <td class="r"> <a href="#waves" class="internal-link">Significant Wave Height</a><br> roughly equal to mean wave height as estimated by a "trained observer" </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">COsc</td> 
+      <td class="r"> Carbon Monoxide Surface Concentration<br> the fraction of <a href="https://en.wikipedia.org/wiki/Carbon_monoxide">carbon monoxide</a> present in air at the earth's surface </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">CO<sub>2</sub>sc</td> 
+      <td class="r"> Carbon Dioxide Surface Concentration<br> the fraction of <a href="https://en.wikipedia.org/wiki/Carbon_dioxide">carbon dioxide</a> present in air at the earth's surface </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">SO<sub>2</sub>sm</td> 
+      <td class="r"> Sulfur Dioxide Surface Mass<br> amount of <a href="https://en.wikipedia.org/wiki/Sulfur_dioxide">sulfur dioxide</a> in the air near the earth's surface </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">DUex</td> 
+      <td class="r"> Dust Extinction<br> the <a href="#aot" class="internal-link">aerosol optical thickness</a> (AOT) of light at 550 nm due to <a href="https://en.wikipedia.org/wiki/Dust">dust</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">SO<sub>4</sub>ex</td> 
+      <td class="r"> Sulfate Extinction<br> the <a href="#aot" class="internal-link">aerosol optical thickness</a> (AOT) of light at 550 nm due to <a href="https://en.wikipedia.org/wiki/Sulfate">sulfate</a> </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">PM<sub>1</sub></td> 
+      <td class="r"> Particulate Matter &lt; 1 µm<br> mass of <a href="https://en.wikipedia.org/wiki/Particulates">atmospheric particles</a> with a diameter less than 1 micron </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">PM<sub>2.5</sub></td> 
+      <td class="r"> Particulate Matter &lt; 2.5 µm<br> mass of <a href="https://en.wikipedia.org/wiki/Particulates">atmospheric particles</a> with a diameter less than 2.5 microns </td> 
+     </tr> 
+     <tr> 
+      <td class="lh">PM<sub>10</sub></td> 
+      <td class="r"> Particulate Matter &lt; 10 µm<br> mass of <a href="https://en.wikipedia.org/wiki/Particulates">atmospheric particles</a> with a diameter less than 10 microns </td> 
+     </tr> 
+    </tbody>
+   </table> 
+   <div class="blurb" id="waves"> 
+    <p class="center text">about ocean waves</p> 
+    <p class="center text"><a href="https://en.wikipedia.org/wiki/Significant_wave_height">Significant Wave Height</a> is the average height of the highest 1/3 of waves at a particular point in the ocean. There's a <a href="http://www.vos.noaa.gov/MWL/apr_06/waves.shtml">great writeup here</a> describing what this means.</p> 
+    <p class="center text"><a href="https://en.wikipedia.org/wiki/Frequency">Peak Wave Period</a> is the (inverse) frequency of the most energetic waves passing through a particular point, whether wind generated or swells. Certainly, there are many more groups of waves moving through an area, each in different directions, but trying to show them all rapidly becomes complex. Instead, we show the one wave group contributing the most energy. This has the effect, though, of creating "boundaries" between regions of ocean where the #1 wave group suddenly switches to second place. Often these boundaries represent swell fronts, but other times they are just artifacts of the ranking mechanism.</p> 
+   </div> 
+   <div class="blurb" id="co2"> 
+    <p class="center text">about CO<sub>2</sub> concentrations<br>for dates earlier than 2017-01-24 04:30 UTC</p> 
+    <p class="center text">While implementing the visualization of CO<sub>2</sub> surface concentration, I noticed the <a href="http://gmao.gsfc.nasa.gov/GEOS/">NASA GEOS-5 model</a> reports a global mean concentration that differs significantly from widely reported numbers. For example, from the run at 2015-11-23 00:00 UTC, the global mean is only 368 ppmv whereas CO<sub>2</sub> observatories <a href="http://www.esrl.noaa.gov/gmd/ccgg/trends/weekly.html">report concentrations closer to 400 ppmv</a>. GEOS-5 was constructed in the 2000s, so perhaps the model does not account for accumulation of atmospheric CO<sub>2</sub> over time? This is simply speculation. I am just not certain.</p> 
+    <p class="center text">To bring the GEOS-5 results closer to contemporary numbers, I have added a uniform offset of +32 ppmv, increasing the global mean to 400 ppmv. This is not scientifically valid, but it does allow the visualization to become illustrative of the discussion occurring today around atmospheric CO<sub>2</sub>. Without question, I would welcome a more rigorous approach or an explanation why the GEOS-5 model produces the data that it does.</p> 
+    <p class="center text">From 2017-01-24 04:30 UTC, this adjustment is no longer necessary because GEOS-5 appears to have been upgraded.</p> 
+   </div> 
+   <div class="blurb" id="geos-disclaimer"> 
+    <p class="center text">disclaimer</p> 
+    <p class="center text">GEOS-5 data (covering all Chem and Particulates layers) comes with the following <a href="http://gmao.gsfc.nasa.gov/GMAO_products/wx_analysis-prediction_products.php">disclaimer</a>: <i>Forecasts using the GEOS system are experimental and are produced for research purposes only. Use of these forecasts for purposes other than research is not recommended.</i></p> 
+   </div> 
+   <div class="blurb" id="aot"> 
+    <p class="center text">about aerosols and extinction</p> 
+    <p class="center text">An <a href="https://en.wikipedia.org/wiki/Aerosol">aerosol</a> is air containing particles. Common particles are dust, smoke, soot, and water droplets (clouds). These particles affect sunlight primarily through absorption and scattering, which combine to reduce the amount of light reaching the ground. This loss of light as it passes through the atmosphere is called <a href="http://www-rohan.sdsu.edu/~aty/explain/extinction/extintro.html">extinction</a>.</p> 
+    <p class="center text">One common measure of extinction is <a href="https://en.wikipedia.org/wiki/Optical_depth">aerosol optical thickness</a> (AOT), which is (the log of) the ratio between the power of incoming light and the power of transmitted light. This helps us understand how "thick" the air is with particulates.</p> 
+   </div> 
+   <div class="blurb" id="shortcuts"> 
+    <p class="center text">keyboard shortcuts</p> 
+   </div> 
+   <table> 
+    <tbody>
+     <tr> 
+      <td class="l">e</td> 
+      <td class="r">show the menu</td> 
+     </tr> 
+     <tr> 
+      <td class="l">escape</td> 
+      <td class="r">close dialog/menu</td> 
+     </tr> 
+     <tr> 
+      <td class="l">k</td> 
+      <td class="r">go forward one time step</td> 
+     </tr> 
+     <tr> 
+      <td class="l">shift-k</td> 
+      <td class="r">go forward several time steps</td> 
+     </tr> 
+     <tr> 
+      <td class="l">j</td> 
+      <td class="r">go backward one time step</td> 
+     </tr> 
+     <tr> 
+      <td class="l">shift-j</td> 
+      <td class="r">go backward several time steps</td> 
+     </tr> 
+     <tr> 
+      <td class="l">n</td> 
+      <td class="r">go to now (the most recent data)</td> 
+     </tr> 
+     <tr> 
+      <td class="l">i</td> 
+      <td class="r">go up one pressure level</td> 
+     </tr> 
+     <tr> 
+      <td class="l">shift-i</td> 
+      <td class="r">go up to the stratosphere</td> 
+     </tr> 
+     <tr> 
+      <td class="l">m</td> 
+      <td class="r">go down one pressure level</td> 
+     </tr> 
+     <tr> 
+      <td class="l">shift-m</td> 
+      <td class="r">go down to the surface</td> 
+     </tr> 
+     <tr> 
+      <td class="l">g</td> 
+      <td class="r">toggle the grid on/off</td> 
+     </tr> 
+     <tr> 
+      <td class="l">p</td> 
+      <td class="r">toggle the animation on/off</td> 
+     </tr> 
+     <tr> 
+      <td class="l">shift-h</td> 
+      <td class="r">enable/disable high definition mode</td> 
+     </tr> 
+    </tbody>
+   </table> 
+   <div class="blurb"> 
+    <p class="center text">translators</p> 
+    <p class="center text xlate"> <span>1599763839</span> <span>2451158917</span> <span>afropolakwot</span> <span>agagey</span> <span>Aleksander</span> <span>Alexander Kirilov</span> <span>Alexey Dmitriev</span> <span>Alexey Korsakov</span> <span>AlexOrlovets</span> <span>Anderson Porto</span> <span>Andrea de Franco</span> <span>Andrey Bagmanov</span> <span>Antonpek</span> <span>arquerogonza</span> <span>Artur Wisniewski</span> <span>ashawesoman</span> <span>ashvin.j.sherathiya</span> <span>astrostrong</span> <span>asveruz</span> <span>atom</span> <span>benji.poirier</span> <span>bgij</span> <span>bidulem3</span> <span>Birg3r</span> <span>Bohuslav Šín</span> <span>Bram Versteeve</span> <span>Bryan</span> <span>carina.bringedal</span> <span>carlofrc</span> <span>Ching-ping Yu</span> <span>Christian Leroux</span> <span>contact</span> <span>cuxcoll</span> <span>Daniel Bartsch</span> <span>Daniel Isak Marinosson</span> <span>Daniel Rakoczy</span> <span>danielruiz1636</span> <span>Darlite</span> <span>Denat250</span> <span>deus.05</span> <span>dlo.daniel</span> <span>Dominic Douglas</span> <span>dsantosgtm</span> <span>egarpunov</span> <span>elier.pila</span> <span>Eric Kim</span> <span>essaii32</span> <span>estefilippini</span> <span>fantasy_lcl</span> <span>Felipe Faria</span> <span>FranklinZhang</span> <span>Frederik T. de Ridder</span> <span>georg.loesel</span> <span>gherlainfo</span> <span>Gian Centeno</span> <span>gporter.seadog</span> <span>graceang</span> <span>grol2901</span> <span>holgersson</span> <span>Ignacio Sanz</span> <span>InfoSecOne</span> <span>Ji?í Batelka</span> <span>Joao Correia</span> <span>jocelot</span> <span>Jomari Joseph Barrera</span> <span>Jonathan Yang</span> <span>juanpaexpedite</span> <span>kjetil.hoiby</span> <span>ku5an2901</span> <span>laurapaccini</span> <span>leandro1212</span> <span>lretamal</span> <span>Luboš Motl</span> <span>marcello.carreira</span> <span>Mark</span> <span>markeletona</span> <span>Markus Schley</span> <span>Martine Bolzinger</span> <span>mavilesilva</span> <span>melfi</span> <span>Melissa Ortiz Massó</span> <span>Meow Wang</span> <span>mgb</span> <span>mikami_1966.1118</span> <span>mikele.fit95</span> <span>Miquel Bayo Moreno</span> <span>MirageF1AZ</span> <span>Miroslaw Lisiak</span> <span>m_strugale</span> <span>nando</span> <span>nunolava1998</span> <span>Olivier</span> <span>OLS-RU</span> <span>O?uzhan Ar?</span> <span>Paul Bachem</span> <span>Pawe? Kowalczyk</span> <span>pdobrev</span> <span>Personim Intaned</span> <span>Philippe Jabet</span> <span>Plamen Dobrev</span> <span>ProffLex</span> <span>P_A_N_D_A_M_A_N</span> <span>Rafael Nonato Bassora</span> <span>rajeshgodvani</span> <span>RaskiPL</span> <span>Riccardo Monfardini</span> <span>robertrosalex</span> <span>Roger Helman</span> <span>Roller978</span> <span>rosariainpo</span> <span>santiago.giraldoc</span> <span>sapan021</span> <span>sarogrom</span> <span>september43</span> <span>silverhaze030</span> <span>Simone Dragoni</span> <span>siudzin98</span> <span>sombrasbaul</span> <span>Somil Thesia</span> <span>Stephen Flynn</span> <span>Steven</span> <span>Sunny Miu</span> <span>Thomas Middelveld</span> <span>Thorsten Schleicher</span> <span>tigormal</span> <span>tigra200sx</span> <span>torstenleibrich</span> <span>ultordima</span> <span>Vasily Tarasenko</span> <span>vhc1967</span> <span>Víctor Velarde</span> <span>wasted</span> <span>webfreelance</span> <span>wtlovergirl</span> <span>xesmedic</span> <span>xorpid</span> <span>xsqz</span> <span>yaawwad</span> <span>Yauhen Bahashou</span> <span>Youngmin Jeon</span> <span>Yukun Chen</span> <span>Zulus</span> <span>??</span> <span>?verlord</span> <span>????????? ?????</span> <span>???????? ??????</span> </p> 
+   </div> 
+   <div class="blurb"> 
+    <a href="http://www.naturalearthdata.com"><img src="/natural-earth.jpg"></a> 
+    <a href="https://www.cloudflare.com"><img src="/cf.jpg"></a> 
+   </div> 
+   <div class="blurb"> 
+    <p class="center text">The GEOS-5 data used on this site have been provided by the Global Modeling and Assimilation Office (GMAO) at NASA Goddard Space Flight Center through the online data portal in the NASA Center for Climate Simulation</p> 
+   </div> 
+   <div class="blurb"> 
+    <p class="center text"> Generated using Copernicus Atmosphere Monitoring Service Information 2017. Neither the European Commission nor ECMWF is responsible for any use that may be made of this information. </p> 
+   </div> 
+   <div id="closing"> 
+    <p class="center">weather and ocean data are generated from numerical models</p> 
+    <p class="center"> <a href="./" class="internal-link">earth.nullschool.net</a> implies no guarantee of accuracy </p> 
+    <p class="center">Copyright (c) 2017 Cameron Beccario</p> 
+   </div> 
+  </div>   
+ </body>
+</html>

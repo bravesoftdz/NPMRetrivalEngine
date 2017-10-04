@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+ <head> 
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"> 
+  <title>How one developer just broke Node, Babel and thousands of projects in 11 lines of JavaScript • The Register    </title> 
+  <meta property="og:title" content="How one developer just broke Node, Babel and thousands of projects in 11 lines of JavaScript"> 
+  <meta property="og:image" content="https://regmedia.co.uk/2016/03/23/jenga_tower.jpg?x=1200&amp;y=794"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:url" content="https://www.theregister.co.uk/2016/03/23/npm_left_pad_chaos/"> 
+  <meta property="og:description" content="Code pulled from NPM – which everyone was using"> 
+  <meta name="twitter:card" content="summary_large_image"> 
+  <meta name="twitter:site" content="@TheRegister"> 
+  <meta name="news_keywords" content="Javascript"> 
+  <link rel="canonical" href="https://www.theregister.co.uk/2016/03/23/npm_left_pad_chaos/">
+  <link rel="alternate" media="only screen and (max-width: 640px)" href="https://m.theregister.co.uk/2016/03/23/npm_left_pad_chaos/">
+  <link rel="amphtml" href="https://www.theregister.co.uk/AMP/2016/03/23/npm_left_pad_chaos/"> 
+  <script>
+        var RegArticle={id:175724,pf:0,af:0,bms:0,cat:'news',ec:[],kw:[['javascript','Javascript'],['npm','Npm']],short_url:'http://reg.cx/2kkN',cp:0,noads:[],author:'Chris Williams',vid:0}
+    </script> 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Arimo:400%7CArimo:700"> 
+  <link rel="stylesheet" type="text/css" href="/css_picker/webkit/2de7cdda04b6e97819f84c070657cef1f1f15517/design.css"> 
+  <style>
+        #sec-software, #m-sec-software
+,
+        #sub-sec-none a {
+          font-weight: bold;
+        }
+    </style> 
+  <link rel="alternate" type="application/atom+xml" href="/headlines.atom" title="The Register: whole site"> 
+  <link rel="alternate" type="application/atom+xml" href="/software/headlines.atom" title="The Register: Software section"> 
+  <script src="/design_picker/700219bfd245f14705e592f50be72f37f63b472d/javascript/_.js"></script> 
+  <script src="//www.googletagservices.com/tag/js/gpt.js"></script> 
+  <script src="https://nir.regmedia.co.uk/?g=c&amp;g=sa&amp;s=c/soft.front"></script> 
+  <script>
+        Reg__adct = 's-sync';
+        init_gpt('reg_software/front');
+    </script> 
+  <link rel="SHORTCUT ICON" type="image/x-icon" href="/favicon.ico"> 
+  <link rel="search" href="https://search.theregister.co.uk/"> 
+  <link rel="search" type="application/opensearchdescription+xml" title="El Reg Search" href="/Design/page/search.osd"> 
+  <link rel="apple-touch-icon" href="/Design/graphics/icons/vulture_black_60_trans.png"> 
+ </head> 
+ <body data-pagetype="Story" data-pagenum="0"> 
+  <div id="page"> 
+   <div id="topbar" class="alt_colour dcl"> 
+    <div class="login"></div> 
+    <ul> 
+     <li><a href="http://www.mcubed.london/" target="_blank" title="Minds Mastering Machines - The ML and AI Conference">M³</a></li> 
+     <li><a href="http://www.continuouslifecycle.london" target="_blank" title="Continuous Lifecycle London 2017">CLL</a></li> 
+     <li><a href="https://whitepapers.theregister.co.uk/events/list" title="Webcasts and Events from The Register">Events</a></li> 
+     <li><a href="https://whitepapers.theregister.co.uk/" title="Whitepapers and tech resources from The Register">Whitepapers</a></li> 
+     <li><a href="http://www.nextplatform.com/" title="High-end computing in-depth">The Next Platform</a></li> 
+    </ul> 
+   </div> 
+   <div id="ad-kite" class="adu"> 
+    <script>
+            show_gpt('ad-kite');
+        </script> 
+   </div> 
+   <div id="masthead"> 
+    <a href="https://www.theregister.co.uk/" id="logo"> <img src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icons/reg_logo.svg" width="330" height="63" alt="The Register® — Biting the hand that feeds IT"> </a> 
+    <div id="follow_btns_top"> 
+     <a class="tweet_link" href="https://twitter.com/intent/user?screen_name=theregister" title="Follow us on twitter" target="_blank"> <img width="18" height="18" alt="Twitter" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/twitter.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/twitter.svg"> </a> 
+     <a href="https://www.facebook.com/VultureCentral" title="Like us on Facebook" target="_blank" class="fbook"> <img width="18" height="18" alt="Facebook" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/facebook.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/facebook.svg"> </a> 
+     <a href="https://google.com/+theregister" title="Follow us on Google+" target="_blank" class="gplus"> <img width="18" height="18" alt="G+" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/google_plus.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/google_plus.svg"> </a> 
+     <a href="https://www.linkedin.com/company/the-register" title="Follow us on LinkedIn" target="_blank" class="linkin"> <img width="18" height="18" alt="LinkedIn" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/linkedin.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/linkedin.svg"> </a> 
+    </div> 
+   </div> 
+   <div id="site_nav" class="static"> 
+    <nav id="top_nav" class="dcl"> 
+     <a href="https://www.theregister.co.uk/" class="nav_vulture" data-name="Home"> <img width="21" height="17" alt="Home" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/vulture.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/vulture.svg" class="black_vulture"> <img width="21" height="17" alt="Home" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/vulture_white.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/vulture_white.svg" class="white_vulture"> </a> 
+     <a href="/data_centre/" id="sec-data-centre" data-nav=".data_cent_nav" data-name="Data_centre"> Data Centre </a> 
+     <a href="/software/" id="sec-software" data-nav=".software_nav" data-name="Software"> Software </a> 
+     <a href="/security/" id="sec-security" data-nav=".sec_nav" data-name="Security"> Security </a> 
+     <a href="/transformation/" id="sec-transformation" data-nav=".trans_nav" data-name="Transformation"> Transformation </a> 
+     <a href="/devops/" id="sec-devops" data-nav=".devops_nav" data-name="DevOps"> DevOps </a> 
+     <a href="/business/" id="sec-business" data-nav=".bus_nav" data-name="Business"> Business </a> 
+     <a href="/personal_tech/" id="sec-personal_tech" data-nav=".pers_nav" data-name="Personal Tech"> Personal Tech </a> 
+     <a href="/science/" id="sec-science" data-nav=".sci_nav" data-name="Science"> Science </a> 
+     <a href="/emergent_tech/" id="sec-emergent-tech" data-nav=".emer_nav" data-name="Emergent Tech"> Emergent Tech </a> 
+     <a href="/bootnotes/" id="sec-bootnotes" data-nav=".bootnotes_nav" data-name="Bootnotes"> Bootnotes </a> 
+     <a href="https://search.theregister.co.uk/" class="nav_search" data-name="Search"> <img class="black_search_icon" width="18" height="18" alt="search" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icons/search.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icons/search.svg"> </a> 
+    </nav> 
+    <form id="search_form" action="https://search.theregister.co.uk/" method="GET"> 
+     <input type="text" name="q" id="q" placeholder="Search site"> 
+     <img class="white_search_icon" width="18" height="18" alt="search" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icons/search_white.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icons/search_white.svg"> 
+    </form> 
+    <div id="nav_pop"> 
+     <div class="data_cent_nav"> 
+      <ul class="sub_nav alt_colour dcl"> 
+       <li id="sub-sec-servers" data-name="Servers"> <a href="/data_centre/servers/" title="Enterprise server news, analysis and opinion"> Servers </a> </li> 
+       <li id="sub-sec-hpc" data-name="HPC"> <a href="/data_centre/hpc/" title="High Performance Computing news, analysis and opinion"> HPC </a> </li> 
+       <li id="sub-sec-cloud" data-name="Cloud"> <a href="/data_centre/cloud/" title="Cloud news, analysis and opinion"> Cloud </a> </li> 
+       <li id="sub-sec-storage" data-name="Storage"> <a href="/data_centre/storage/" title="Enterprise Storage news, analysis and opinion"> Storage </a> </li> 
+       <li id="sub-sec-networks" data-name="Networks"> <a href="/data_centre/networks/" title="Networks news, analysis and opinion"> Networks </a> </li> 
+       <li id="sub-sec-virtualization" data-name="Virtualisation"> <a href="/data_centre/virtualization/" title="Virtualization news, analysis and opinion"> Virtualization </a> </li> 
+       <li id="sub-sec-bofh" data-name="Bofh"> <a href="/data_centre/bofh/" title="BOFH"> BOFH </a> </li> 
+      </ul> 
+      <div class="story_row"> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/actifio_sky_platform_v8/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2016/05/18/shutterstock_crops.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Actifio launches v8 of Sky Platform, extends dedupe to cloud crowd</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/selfprocessing_flashbased_object_storage_drive_clusters/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/10/02/thinker.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Is this the real life? Is this just fantasy? Self-processing flash drives, we'll need more capacity</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/cloud_burn_out_pt_two/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/09/29/terror.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Nailing a cloud project without killing Bob boils down to not being a tool</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/komprise_supports_colder_public_cloud_tiers_for_older_data/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/10/02/athabasca_glacier.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Hierarchical Storage Management is back. And this time it's cloudy</h5> </a> 
+      </div> 
+     </div> 
+     <div class="software_nav"> 
+      <div class="sub_nav"></div> 
+      <div class="story_row"> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/flakiness_and_microsoft/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2014/09/18/nadella_axe.jpg?x=198&amp;y=131&amp;crop=1"> <h5>The axeman strikes again: Microsoft has real commitment issues</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/java_ee_goes_eclipse_now_what/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/10/02/hearttree.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Introducing EE4J – Java EE's fling with the Eclipse Foundation</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/oracle_openworld_ai_cloud_chatbots_blockchain_as_a_service/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/08/03/oracle_coke_bottle.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Blockchain, AI, chatbots, cloud … Oracle bingo!</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/linux_kernel_long_term_support_extended_from_two_to_six_years/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/10/03/linux_lts_support_roadmap.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Linux kernel long term support extended from two to six years</h5> </a> 
+      </div> 
+     </div> 
+     <div class="sec_nav"> 
+      <div class="sub_nav"></div> 
+      <div class="story_row"> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/mh370_atsb_final_report/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/10/03/mh370_ryan_fletcher_shutterstock.jpg?x=198&amp;y=131&amp;crop=1"> <h5>MH370 final report: Aussies still don’t know where it crashed or why</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/sonicwall_product_revamp/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2015/01/14/flame_laptop.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Un-Delled SonicWall beefs up firewall to wrestle ransomware</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/october_android_patches/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2016/06/06/android-patch.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Patch your Android, peeps, it has up to 14 nasty flaws to flog</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/equifax_ceo_richard_smith_congressional_testimony/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/10/02/epic_fail_sign_shutterstock.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Equifax couldn't find or patch vulnerable Struts implementations</h5> </a> 
+      </div> 
+     </div> 
+     <div class="trans_nav"> 
+      <div class="sub_nav"></div> 
+      <div class="story_row"> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/09/14/hmrc_appoints_ex_microsoft_veep_as_new_cio/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/02/06/hmrc_photo_via_shutterstock.jpg?x=198&amp;y=131&amp;crop=1"> <h5>HMRC scoops up Microsoft veep for CIO role</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/09/05/transform_to_a_hybrid_infrastructure/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2015/07/03/ocean_648.jpg?x=198&amp;y=131&amp;crop=1"> <h5>So you're already in the cloud but need to come back down to Earth</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/09/04/look_outside_to_enhance_your_data/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2016/08/08/shutterstock_cat_peek.jpg?x=198&amp;y=131&amp;crop=1"> <h5>A big ask for any nerd, but going outside (your usual data sets) can be good for you</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/09/01/data_drive_efficiency/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2016/02/19/matrix.jpg?x=198&amp;y=131&amp;crop=1"> <h5>So much data, so little time: How to not flip your wig processing it</h5> </a> 
+      </div> 
+     </div> 
+     <div class="devops_nav"> 
+      <div class="sub_nav"></div> 
+      <div class="story_row"> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/09/30/cloudflare_workers_carry_code_to_the_network_edge/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/02/07/chairman_mao_shutterstock_editorial_only.jpg?x=198&amp;y=131&amp;crop=1"> <h5>JS code at the network edge. Oh, you're still here and not running, screaming? Read on</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/09/29/kubernetes_next_version/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/03/22/kubernetes_orchestration.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Cluster coordinator Kubernetes claims crisp care clip</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/09/27/yahoo_vespa_open_source/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2016/02/12/scooter_photo_christian_mueller_shutterstock_dot_com.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Yahoo! search! results!, recommendations!, ad! flinging! code! is! now! open! source!</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/09/26/facebook_license_surgery_on_react/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2015/10/09/doctor.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Facebook performs successful license surgery on React, GraphQL</h5> </a> 
+      </div> 
+     </div> 
+     <div class="bus_nav"> 
+      <ul class="sub_nav alt_colour dcl"> 
+       <li id="sub-sec-policy" data-name="Policy"> <a href="/business/policy/" title="Policy News, analysis and opinion"> Policy </a> </li> 
+       <li id="sub-sec-channel" data-name="The Channel"> <a href="/business/channel/" title="The Channel news, analysis and opinion"> The Channel </a> </li> 
+      </ul> 
+      <div class="story_row"> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/tv_licensing_petition_debate_parliament/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2015/09/07/tony_hall_bbc.jpg?x=198&amp;y=131&amp;crop=1"> <h5>BBC Telly Tax petition given new Parliament debate date</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/amber_rudd_still_does_not_understand_encryption/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2016/07/14/amber_rudd_photograph_by_department_of_energy_and_climate_change.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Home Sec Amber Rudd: 'Yeah, I don't understand encryption. So what?'</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/anao_report_on_telstra_uso_performance/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2016/07/10/telstra_shutterstock.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Audit office finds Telstra's universal services were good politics, bad deals</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/vcs_sue_us_govt/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2016/12/02/donald_trump_thumbs_up_photo_via_shutterstock.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Tech VCs sue Uncle Sam over President Trump's immigration chill</h5> </a> 
+      </div> 
+     </div> 
+     <div class="pers_nav"> 
+      <div class="sub_nav"></div> 
+      <div class="story_row"> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/commodore_64_mini_revival/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/10/03/c64_mini.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Commodore 64 makes a half-sized comeback</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/microsoft_retiring_groove/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2016/03/02/broken_record_image_via_shutterstock.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Microsoft may have its groove back but it's binned 'Groove'</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/roku_update/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/10/02/roku-ultra.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Roku tweaks Apple's nose with telly-friendly vid-streaming boxes</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/china_cools_on_apples_iphones/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/03/02/revolutionary_chinese_panda_shutterstock.jpg?x=198&amp;y=131&amp;crop=1"> <h5>China cools on Apple's high-priced iBling</h5> </a> 
+      </div> 
+     </div> 
+     <div class="sci_nav"> 
+      <ul class="sub_nav alt_colour dcl"> 
+       <li id="sub-sec-geek" data-name="Geeks_guide"> <a href="/science/geeks_guide/"> Geek's Guide </a> </li> 
+      </ul> 
+      <div class="story_row"> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/forget_the_simulated_universe_say_boffins/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2016/07/20/shutterstock_schrodinger_cat.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Forget the 'simulated universe', say boffins, no simulator could hit the required scale</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/warm_ponds_hypothesis_for_life_formation/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2015/01/22/earth_orbit_teaser.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Life began after meteorites splashed into warm ponds of water, say astronomers</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/astroboffins_have_found_organohalogens_in_space_for_the_first_time/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2015/06/23/comet_67p_churyumov_gerasimenko.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Bad news! Astroboffins find the stuff of life in space for the first time</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/nobel_prize_goes_to_circadian_rhythms/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2015/05/13/ceres_earth_moon_size_comparison.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Nobel Prize for boffins who figured out why you feel like crap after long-haul flights</h5> </a> 
+      </div> 
+     </div> 
+     <div class="emer_nav"> 
+      <ul class="sub_nav alt_colour dcl"> 
+       <li id="sub-sec-artificial-intelligence" data-name="Artificial Intelligence"> <a href="/emergent_tech/artificial_intelligence/" title="Artificial Intelligence"> Artificial Intelligence </a> </li> 
+       <li id="sub-sec-internet-of-things" data-name="Internet of Things"> <a href="/emergent_tech/internet_of_things/" title="Internet of Things"> Internet of Things </a> </li> 
+      </ul> 
+      <div class="story_row"> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/rio_tinto_autonomous_train_test/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/10/02/rio_tinto_mine_train.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Thomas the Tank Engine lobotomised by fat (remote) controller</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/smart_doorbell_company_ring_security_market/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/10/02/ring-security.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Smart burglar alarms: Look who just tossed their hat into the ring ... It's, er, Ring</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/six_weeks_later_drone_biz_dji_deploys_control_app_flight_mode/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/07/13/blocked.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Six weeks later, drone biz DJI deploys control app 'flight mode'</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/09/29/congress_and_our_selfdriving_future/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/09/29/tarmac.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Tarmac for America's self-driving car future is being laid right now</h5> </a> 
+      </div> 
+     </div> 
+     <div class="bootnotes_nav"> 
+      <ul class="sub_nav alt_colour dcl"> 
+       <li id="sub-sec-stob" data-name="Verity_stob"> <a href="/bootnotes/stob/" title="Verity Stob"> Verity Stob </a> </li> 
+      </ul> 
+      <div class="story_row"> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/03/ubuntu_wiki_taken_over_by_computers4christians/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2015/02/12/shutterstock_1542932_god_likes.gif?x=198&amp;y=131&amp;crop=1"> <h5>Computers4Christians miraculously appears on Ubuntu wiki</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/google_sueball_search_results_nixed/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/04/12/refuse.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Man with 74 convictions refused permission to fling sueball at Google</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/pumpkin_bumpkins_battle_800kg_monstrosity_wins/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2015/11/03/pumpkin_image_via_shutterstock.jpg?x=198&amp;y=131&amp;crop=1"> <h5>Pumpkin bumpkins battle, 800kg monstrosity wins</h5> </a> 
+       <a class="story_link" href="https://www.theregister.co.uk/2017/10/02/nadellas_launch_of_hit_refresh/"> <img src="https://regmedia.co.uk/2016/04/14/dl.gif" alt="" width="198" height="131" data-delay_url="https://regmedia.co.uk/2017/04/27/satya_nadella_shutterstock.jpg?x=198&amp;y=131&amp;crop=1"> <h5>We went to Nadella's launch of Hit Refresh so you didn't have to</h5> </a> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div id="site_nav_mobile" class="static"> 
+    <img id="mobile_menu_toggle" width="22" height="20" alt="Menu" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/burger_menu.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/burger_menu.svg"> 
+    <nav id="top_nav_mobile" class="dcl"> 
+     <form id="search_form_mobile" action="https://search.theregister.co.uk/" method="GET"> 
+      <img class="white_search_icon" width="18" height="18" alt="search" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icons/search.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icons/search.svg"> 
+      <input type="text" name="q" id="mobile_q" placeholder="Search site"> 
+     </form> 
+     <a href="/data_centre/" id="m-sec-data-centre" data-nav=".data_cent_nav" data-name="Data_centre"> Data Centre </a> 
+     <a href="/software/" id="m-sec-software" data-nav=".software_nav" data-name="Software"> Software </a> 
+     <a href="/security/" id="m-sec-security" data-nav=".sec_nav" data-name="Security"> Security </a> 
+     <a href="/transformation/" id="m-sec-transformation" data-nav=".trans_nav" data-name="Transformation"> Transformation </a> 
+     <a href="/devops/" id="m-sec-devops" data-nav=".devops_nav" data-name="DevOps"> DevOps </a> 
+     <a href="/business/" id="m-sec-business" data-nav=".bus_nav" data-name="Business"> Business </a> 
+     <a href="/personal_tech/" id="m-sec-personal_tech" data-nav=".pers_nav" data-name="Personal Tech"> Personal Tech </a> 
+     <a href="/science/" id="m-sec-science" data-nav=".sci_nav" data-name="Science"> Science </a> 
+     <a href="/emergent_tech/" id="m-sec-emergent-tech" data-nav=".emer_nav" data-name="Emergent Tech"> Emergent Tech </a> 
+     <a href="/bootnotes/" id="m-sec-bootnotes" data-nav=".bootnotes_nav" data-name="Bootnotes"> Bootnotes </a> 
+    </nav> 
+   </div> 
+   <div id="page_overlay_side"></div> 
+   <div id="ad-condor" class="adu"> 
+    <script>
+            show_gpt('ad-condor');
+        </script> 
+    <noscript> 
+     <a href="https://pubads.g.doubleclick.net/gampad/jump?iu=/6978/reg_software/front&amp;sz=728x90%7C970x90%7C970x250&amp;tile=2&amp;c=22WdOGOMCoyKkAAHJ2-uQAAABv&amp;t=ct%3Dns%26unitnum%3D2%26unitname%3Dwww_top_leader%26pos%3Dtop%26test%3D0" target="_blank"> <img src="https://pubads.g.doubleclick.net/gampad/ad?iu=/6978/reg_software/front&amp;sz=728x90%7C970x90%7C970x250&amp;tile=2&amp;c=22WdOGOMCoyKkAAHJ2-uQAAABv&amp;t=ct%3Dns%26unitnum%3D2%26unitname%3Dwww_top_leader%26pos%3Dtop%26test%3D0" alt=""> </a> 
+    </noscript> 
+   </div> 
+   <div id="main-col"> 
+    <div id="crumb_trail"> 
+     <a href="/software/" class="dcl sub_sec"> <h4>Software</h4> </a> 
+    </div> 
+    <div id="article" data-cat="news"> 
+     <div class="article_head"> 
+      <h1>How one developer just broke Node, Babel and thousands of projects in 11 lines of JavaScript</h1> 
+      <h2>Code pulled from NPM – which everyone was using</h2> 
+      <div class="byline_and_share"> 
+       <div class="byline">
+         By 
+        <a href="/Author/2400" title="Read more by this author" class="alt_colour dcl">Chris Williams, US editor</a> 
+        <span class="dateline"> 23&nbsp;Mar&nbsp;2016&nbsp;at&nbsp;01:24 </span> 
+        <script>tweet_btn()</script> 
+       </div> 
+       <div class="comments_share"> 
+        <a href="https://forums.theregister.co.uk/forum/1/2016/03/23/npm_left_pad_chaos/" class="reg_comments"> <span class="count">167</span> <img width="17" height="15" src="/design_picker/bc467c9a005fca2157c82bbdff2756c09f5c64d5/graphics/icon/rect_comment_bubble.png" srcset="/design_picker/bc467c9a005fca2157c82bbdff2756c09f5c64d5/graphics/icon/rect_comment_bubble.svg" alt="Reg comments"> </a> 
+        <a href="#" class="share_toggle">SHARE <span>?</span></a> 
+       </div> 
+      </div> 
+      <div class="social_btns alt_colour dcl"> 
+       <a href="https://www.reddit.com/submit?url=https://www.theregister.co.uk/2016/03/23/npm_left_pad_chaos/&amp;title=How%20one%20developer%20just%20broke%20Node%2C%20Babel%20and%20thousands%20of%20projects%20in%2011%20lines%20of%20JavaScript" target="_blank" class="reddit_btn"> 
+        <div class="circ"> 
+         <img width="18" height="18" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/reddit.svg" alt="reddit"> 
+        </div> </a> 
+       <a href="https://twitter.com/share?text=How%20one%20developer%20just%20broke%20Node%2C%20Babel%20and%20thousands%20of%20projects%20in%2011%20lines%20of%20JavaScript&amp;url=https://www.theregister.co.uk/2016/03/23/npm_left_pad_chaos/&amp;via=theregister" class="twit"> 
+        <div class="circ"> 
+         <img width="18" height="18" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/twitter.svg" alt="Twitter"> 
+        </div> </a> 
+       <div class="faceb"> 
+        <div class="circ"> 
+         <img width="18" height="18" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/facebook.svg" alt="Facebook"> 
+        </div> 
+       </div> 
+       <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://www.theregister.co.uk/2016/03/23/npm_left_pad_chaos/&amp;title=How%20one%20developer%20just%20broke%20Node%2C%20Babel%20and%20thousands%20of%20projects%20in%2011%20lines%20of%20JavaScript&amp;summary=Code%20pulled%20from%20NPM%20%E2%80%93%20which%20everyone%20was%20using" class="linkedin_social"> 
+        <div class="circ"> 
+         <img width="18" height="18" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/linkedin_alt.svg" alt="linkedin"> 
+        </div> </a> 
+      </div> 
+      <img src="https://regmedia.co.uk/2016/03/23/jenga_tower.jpg?x=442&amp;y=293&amp;crop=1" alt="" width="442" height="293" class="article_img"> 
+      <div class="img_caption">
+       Careful, careful ... Don't fumble this like the JS world (Credit: 
+       <a href="https://www.flickr.com/photos/zunami/3160114349">Claus Rebler</a>)
+      </div> 
+     </div> 
+     <div id="body"> 
+      <p><strong class="trailer">Updated</strong> Programmers were left staring at broken builds and failed installations on Tuesday after someone toppled the Jenga tower of JavaScript.</p> 
+      <p>A couple of hours ago, Azer Koçulu unpublished more than 250 of his modules from <a target="_blank" href="https://www.npmjs.com/">NPM</a>, which is a popular package manager used by JavaScript projects to install dependencies.</p> 
+      <p>Koçulu yanked his source code because, we're told, one of the modules was called Kik and that apparently <a target="_blank" href="https://medium.com/@azerbike/i-ve-just-liberated-my-modules-9045c06be67c#.rrf4u36oh">attracted the attention of lawyers</a> representing the instant-messaging <a target="_blank" href="http://www.kik.com/">app</a> of the same name.</p> 
+      <p>According to Koçulu, Kik's briefs told him to rename the module, he refused, so the lawyers went to NPM's admins claiming brand infringement. When NPM took Kik away from the developer, he was furious and unpublished <i>all</i> of his NPM-managed modules. "This situation made me realize that NPM is someone’s private land where corporate is more powerful than the people, and I do open source because Power To The People," Koçulu blogged.</p> 
+      <p>Unfortunately, one of those dependencies was <tt><a target="_blank" href="https://github.com/azer/left-pad/blob/master/index.js">left-pad</a></tt>. The code is below. It pads out the lefthand-side of strings with zeroes or spaces. And thousands of projects including Node and Babel relied on it.</p> 
+      <p>With left-pad removed from NPM, these applications and widely used bits of open-source infrastructure were unable to obtain the dependency, and thus fell over during development and deployment. Thousands, worldwide. Left-pad was fetched 2,486,696 downloads in just the last month, according to NPM. It was that popular.</p> 
+      <pre>
+module.exports = leftpad;
+
+function leftpad (str, len, ch) {
+  str = String(str);
+
+  var i = -1;
+
+  if (!ch &amp;&amp; ch !== 0) ch = ' ';
+
+  len = len - str.length;
+
+  while (++i &lt; len) {
+    str = ch + str;
+  }
+
+  return str;
+}
+</pre> 
+      <p>You can witness some of the fallout <a target="_blank" href="https://github.com/azer/left-pad/issues/4">here</a>, <a target="_blank" href="https://news.ycombinator.com/item?id=11340510">here</a>, <a target="_blank" href="https://www.reddit.com/r/programming/comments/4bjss2/an_11_line_npm_package_called_leftpad_with_only/">here</a> and <a target="_blank" href="https://twitter.com/search?f=tweets&amp;vertical=default&amp;q=left-pad%20npm&amp;src=typd">here</a>.</p> 
+      <p>To fix the internet, Laurie Voss, CTO and cofounder of NPM, took the "<a target="_blank" href="https://twitter.com/seldo/status/712414400808755200">unprecedented</a>" step of restoring the unpublished left-pad 0.0.3 that apps required. Normally, when a particular version is unpublished, it's gone and cannot be restored. Now NPM has forcibly resurrected that particular version to keep everyone's stuff building and running as expected.</p> 
+      <p>"Un-un-publishing is an unprecedented action that we're taking given the severity and widespread nature of breakage, and isn't done lightly," Voss explained about an hour ago.</p> 
+      <p>"This action puts the wider interests of the community of NPM users at odds with the wishes of one author; we picked the needs of the many. This whole situation sucks. We will be carefully considering the issues raised by and publishing a post-mortem later.</p> 
+      <p>"In the meantime, several thousand open source projects have been repaired, and I'm sleeping fine tonight."</p> 
+      <p>A new maintainer, who stepped forward to look after <a target="_blank" href="https://www.npmjs.com/package/left-pad">left-pad</a> on NPM, requested the restoration of version 0.0.3. Meanwhile, Oakland-based Koçulu has hosted his work on <a target="_blank" href="https://github.com/azer">GitHub</a>. If your code still won't build after the left-pad revival, try running <tt>npm cache clear</tt> to catch up with the changes.</p> 
+      <p>And that's how JavaScript app development works in 2016. ®</p> 
+      <h3>Updated to add at 1138 PT (1838 UTC) on March 23</h3> 
+      <p>A spokesperson for Kik has been in touch to point us toward <a target="_blank" href="https://medium.com/@mproberts/a-discussion-about-the-breaking-of-the-internet-3d4d2a83aa4d#.ld8o5zqz7">a blog post</a> by Mike Roberts, the head of messenger at Kik, setting out its side of the story. It was published about 30 minutes ago.</p> 
+      <p>Essentially, the instant-messaging biz says it was going to publish some open-source code including an NPM module also named Kik. That collided with Koçulu's Kik module, which is why the developer was asked to rename his software. As we know, Koçulu refused, and that led to Tuesday's cluster-fsck.</p> 
+      <p>Referring to the emails sent by Kik's lawyer to Koçulu, Roberts said: "The wording we used here was not perfect. We’re sorry for creating any impression that this was anything more than a polite request to use the Kik package name on NPM for an open source project we have been working on that fits the name."</p> 
+      <p class="wptl btm"> <span>Sponsored: </span> <a href="http://go.theregister.com/tl/1741/shttp://forms.theregister.co.uk/studies/s201705/?td=tl">The Joy and Pain of Buying IT - Have Your Say</a> </p> 
+     </div> 
+     <div id="article_body_btm"> 
+      <div id="tips_or_corrections"> 
+       <a href="mailto:corrections@theregister.co.uk?subject=%5Bcorrection%5D%20How%20one%20developer%20just%20broke%20Node%2C%20Babel%20and%20thousands%20of%20projects%20in%2011%20lines%20of%20JavaScript&amp;body=re:%20http%3A%2F%2Fwww.theregister.co.uk/2016/03/23/npm_left_pad_chaos/" title="Spotted an error or have a tip? Let us know."> Tips and corrections </a> 
+      </div> 
+      <div class="comments large"> 
+       <a class="reg_btn count" title="View comments on this article" href="https://forums.theregister.co.uk/forum/1/2016/03/23/npm_left_pad_chaos/"> <span>167</span> Comments </a> 
+      </div> 
+     </div> 
+    </div> 
+    <div id="tags"> 
+     <ul> 
+      <li> <strong>MORE</strong> </li> 
+      <li> <a href="/Tag/javascript">Javascript</a> </li> 
+     </ul> 
+    </div> 
+    <div class="social_btns bot_article alt_colour dcl"> 
+     <a href="https://www.reddit.com/submit?url=https://www.theregister.co.uk/2016/03/23/npm_left_pad_chaos/&amp;title=How%20one%20developer%20just%20broke%20Node%2C%20Babel%20and%20thousands%20of%20projects%20in%2011%20lines%20of%20JavaScript" target="_blank" class="reddit_btn"> 
+      <div class="circ"> 
+       <img width="18" height="18" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/reddit.svg" alt="reddit"> 
+      </div> </a> 
+     <a href="https://twitter.com/share?text=How%20one%20developer%20just%20broke%20Node%2C%20Babel%20and%20thousands%20of%20projects%20in%2011%20lines%20of%20JavaScript&amp;url=https://www.theregister.co.uk/2016/03/23/npm_left_pad_chaos/&amp;via=theregister" class="twit"> 
+      <div class="circ"> 
+       <img width="18" height="18" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/twitter.svg" alt="Twitter"> 
+      </div> </a> 
+     <div class="faceb"> 
+      <div class="circ"> 
+       <img width="18" height="18" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/facebook.svg" alt="Facebook"> 
+      </div> 
+     </div> 
+     <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https://www.theregister.co.uk/2016/03/23/npm_left_pad_chaos/&amp;title=How%20one%20developer%20just%20broke%20Node%2C%20Babel%20and%20thousands%20of%20projects%20in%2011%20lines%20of%20JavaScript&amp;summary=Code%20pulled%20from%20NPM%20%E2%80%93%20which%20everyone%20was%20using" class="linkedin_social"> 
+      <div class="circ"> 
+       <img width="18" height="18" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/linkedin_alt.svg" alt="linkedin"> 
+      </div> </a> 
+    </div> 
+    <script type="application/javascript">show_article_signup_ml()</script> 
+   </div> 
+   <div id="right-col"> 
+    <div id="ad-eagle" class="adu"> 
+     <script>
+                            show_gpt('ad-eagle');
+                        </script> 
+     <noscript> 
+      <a href="https://pubads.g.doubleclick.net/gampad/jump?iu=/6978/reg_software/front&amp;sz=300x250%7C300x600%7C300x1050&amp;tile=3&amp;c=33WdOGOMCoyKkAAHJ2-uQAAABv&amp;t=ct%3Dns%26unitnum%3D3%26unitname%3Dwww_top_mpu%26pos%3Dtop%26test%3D0" target="_blank"> <img src="https://pubads.g.doubleclick.net/gampad/ad?iu=/6978/reg_software/front&amp;sz=300x250%7C300x600%7C300x1050&amp;tile=3&amp;c=33WdOGOMCoyKkAAHJ2-uQAAABv&amp;t=ct%3Dns%26unitnum%3D3%26unitname%3Dwww_top_mpu%26pos%3Dtop%26test%3D0" alt=""> </a> 
+     </noscript> 
+    </div> 
+    <div id="hot"> 
+     <h3>Most read</h3> 
+     <ol> 
+      <li> <a href="https://www.theregister.co.uk/2017/10/02/falling_out_of_love_with_byod/"> <img src="https://regmedia.co.uk/2015/07/08/hipster_with_laptop_photo_via_shutterstock.jpg?x=88&amp;y=58&amp;crop=1" alt="Hipster with laptop photo via Shutterstock" width="88" height="58"> <h4>BYOD might be a hipster honeypot but it's rarely worth the extra hassle </h4> </a> </li> 
+      <li> <a href="https://www.theregister.co.uk/2017/10/02/dnsmasq_flaws/"> <img src="https://regmedia.co.uk/2017/06/29/shutterstock_dns.jpg?x=88&amp;y=58&amp;crop=1" alt="" width="88" height="58"> <h4>Dnsmasq and the seven flaws: Patch these nasty remote-control holes </h4> </a> </li> 
+      <li> <a href="https://www.theregister.co.uk/2017/10/02/lottery_ddos/"> <img src="https://regmedia.co.uk/2015/07/22/lottery.jpg?x=88&amp;y=58&amp;crop=1" alt="lottery" width="88" height="58"> <h4>UK lotto players quids in: Website knocked offline by DDoS attack </h4> </a> </li> 
+      <li> <a href="https://www.theregister.co.uk/2017/10/02/hpe_handed_over_source_code_for_pentagon_security_system_to_russia/"> <img src="https://regmedia.co.uk/2017/05/09/putin_shutterstock.jpg?x=88&amp;y=58&amp;crop=1" alt="Putin" width="88" height="58"> <h4>HPE coughed up source code for Pentagon's IT defenses to ... Russia </h4> </a> </li> 
+      <li> <a href="https://www.theregister.co.uk/2017/10/02/nadellas_launch_of_hit_refresh/"> <img src="https://regmedia.co.uk/2017/04/27/satya_nadella_shutterstock.jpg?x=88&amp;y=58&amp;crop=1" alt="Satya Nadella" width="88" height="58"> <h4>We went to Nadella's launch of Hit Refresh so you didn't have to </h4> </a> </li> 
+     </ol> 
+    </div> 
+    <div id="ad-falcon" class="adu"> 
+     <script>
+                show_gpt('ad-falcon');
+            </script> 
+     <noscript> 
+      <a href="https://pubads.g.doubleclick.net/gampad/jump?iu=/6978/reg_software/front&amp;sz=300x100%7C300x250&amp;tile=4&amp;c=44WdOGOMCoyKkAAHJ2-uQAAABv&amp;t=ct%3Dns%26unitnum%3D4%26unitname%3Dwww_mid_mpu%26pos%3Dmid%26test%3D0" target="_blank"> <img src="https://pubads.g.doubleclick.net/gampad/ad?iu=/6978/reg_software/front&amp;sz=300x100%7C300x250&amp;tile=4&amp;c=44WdOGOMCoyKkAAHJ2-uQAAABv&amp;t=ct%3Dns%26unitnum%3D426unitname%3Dwww_mid_mpu%26pos%3Dmid%26test%3D0" alt=""> </a> 
+     </noscript> 
+    </div> 
+   </div>
+   <hr id="story_section_break"> 
+   <div id="boot"> 
+    <div id="ad-hawk" class="adu"> 
+     <script>show_gpt('ad-hawk');</script> 
+     <noscript> 
+      <a href="https://pubads.g.doubleclick.net/gampad/jump?iu=/6978/reg_software/front&amp;sz=728x90%7C970x90&amp;tile=6&amp;c=66WdOGOMCoyKkAAHJ2-uQAAABv&amp;t=ct%3Dns%26unitnum%3D6%26unitname%3Dwww_btm_leader%26pos%3Dbtm%26test%3D0" target="_blank"> <img src="https://pubads.g.doubleclick.net/gampad/ad?iu=/6978/reg_software/front&amp;sz=728x90%7C970x90&amp;tile=6&amp;c=66WdOGOMCoyKkAAHJ2-uQAAABv&amp;t=ct%3Dns%26unitnum%3D6%26unitname%3Dwww_btm_leader%26pos%3Dbtm%26test%3D0" alt=""> </a> 
+     </noscript> 
+    </div> 
+   </div> 
+   <div id="story-bot-col"> 
+    <div id="read_more_on" class="deploy_aux"> 
+     <h3>More from The Register</h3> 
+     <div class="stories">
+      <div class="story"> 
+       <a href="/2017/09/26/allen_wirfs_brock_interview/"> 
+        <div class="story_grid_img"> 
+         <img src="https://regmedia.co.uk/2017/09/04/specs_and_code_photo_via_shutterstock.jpg?x=198&amp;y=131&amp;crop=1" alt="Specs and code photo via Shutterstock" width="198" height="131"> 
+        </div> 
+        <div class="title_standfirst"> 
+         <h4>The power JavaScript: 'Gandalf of JS' Wirfs-Brock on ECMAscript 2017</h4> 
+         <div class="standfirst">
+           Looking to the AI future 
+         </div> 
+        </div> </a> 
+      </div>
+      <div class="story"> 
+       <a href="/2016/10/11/yahoo_email_lock_in/"> 
+        <div class="story_grid_img"> 
+         <img src="https://regmedia.co.uk/2016/10/12/swimming_ducks.jpg?x=198&amp;y=131&amp;crop=1" alt="" width="198" height="131"> 
+        </div> 
+        <div class="title_standfirst"> 
+         <h4>Yahoo<i>!</i> halts<i>!</i> email<i>!</i> forwarding<i>!</i> to<i>!</i> outside<i>!</i> email<i>!</i> addresses<i>!</i></h4> 
+         <div class="standfirst">
+           It looks like lock-in, swims like lock-in and quacks like lock-in … this could be lock-in! 
+         </div> 
+        </div> </a> 
+      </div>
+      <div class="story"> 
+       <a href="/2017/03/23/yahoo_tensorflow_on_spark/"> 
+        <div class="story_grid_img"> 
+         <img src="https://regmedia.co.uk/2017/03/22/robots_in_love_image_via_shutterstock.jpg?x=198&amp;y=131&amp;crop=1" alt="Robots in love image via Shutterstock" width="198" height="131"> 
+        </div> 
+        <div class="title_standfirst"> 
+         <h4>Yahoo<i>!</i>'s big, fat clustered Google Machine Learning wedding</h4> 
+         <div class="standfirst"> 
+          <span class="trailer">Analysis</span> Yahoo
+          <i>!</i> open-source code fling builds a better Google, again 
+         </div> 
+        </div> </a> 
+      </div>
+      <div class="story"> 
+       <a href="/2017/08/16/azure_stack_operator/"> 
+        <div class="story_grid_img"> 
+         <img src="https://regmedia.co.uk/2017/08/15/microsoft_cloud_jobs.jpg?x=198&amp;y=131&amp;crop=1" alt="Microsoft&amp;#39;s view of the cloud workforce" width="198" height="131"> 
+        </div> 
+        <div class="title_standfirst"> 
+         <h4>Azure Stack will need special sysadmins, says Microsoft</h4> 
+         <div class="standfirst">
+           'Operator' to wrangle on-prem cloud, with paid course coming soon, natch 
+         </div> 
+        </div> </a> 
+      </div>
+      <div class="story"> 
+       <a href="/2017/03/08/cia_hacking_tool_dump_vuln_disclosure_debate/"> 
+        <div class="story_grid_img"> 
+         <img src="https://regmedia.co.uk/2017/03/07/shutterstock_cyber_spy_hacker.jpg?x=198&amp;y=131&amp;crop=1" alt="" width="198" height="131"> 
+        </div> 
+        <div class="title_standfirst"> 
+         <h4>CIA hacking dossier leak reignites debate over vulnerability disclosure</h4> 
+         <div class="standfirst">
+           Spy agencies more interested in stockpiling bugs than closing the gaps 
+         </div> 
+        </div> </a> 
+      </div>
+      <div class="story"> 
+       <a href="/2016/11/17/microsofts_development_platform_today/"> 
+        <div class="story_grid_img"> 
+         <img src="https://regmedia.co.uk/2016/11/17/anydev.jpg?x=198&amp;y=131&amp;crop=1" alt="Microsoft&amp;#39;s Scott Guthrie addresses Connect: any developer, any app, any platform" width="198" height="131"> 
+        </div> 
+        <div class="title_standfirst"> 
+         <h4>Microsoft's development platform today: What you need to know</h4> 
+         <div class="standfirst"> 
+          <span class="trailer">Connect 2016</span> Connect shows direction for .NET, cloud and mobile efforts 
+         </div> 
+        </div> </a> 
+      </div>
+      <div class="story"> 
+       <a href="/2017/08/07/microsoft_form_10_k_fy_2017/"> 
+        <div class="story_grid_img"> 
+         <img src="https://regmedia.co.uk/2015/09/17/microsoft_nutella.jpg?x=198&amp;y=131&amp;crop=1" alt="microsoft nutella" width="198" height="131"> 
+        </div> 
+        <div class="title_standfirst"> 
+         <h4>Microsoft dumps mobility from its Vision</h4> 
+         <div class="standfirst">
+           Goodbye 'mobile-first and cloud-first world', hello 'intelligent edge infused with AI' 
+         </div> 
+        </div> </a> 
+      </div>
+      <div class="story"> 
+       <a href="/2017/09/05/uk_engineering_software_firm_dies_for_550_million/"> 
+        <div class="story_grid_img"> 
+         <img src="https://regmedia.co.uk/2017/01/10/shutterstock_cherry_bakewell.jpg?x=198&amp;y=131&amp;crop=1" alt="Cherry bakewell... thick white icing, maraschino cherry. A lot of people probably eat it without a problem or even consider it tasty. Photo by shutterstock" width="198" height="131"> 
+        </div> 
+        <div class="title_standfirst"> 
+         <h4>UK engineering software firm swallowed in £3bn merger with France's Schneider Electric</h4> 
+         <div class="standfirst">
+           Reverse takeover: Cambridge techies to keep London listing 
+         </div> 
+        </div> </a> 
+      </div> 
+     </div> 
+    </div> 
+    <div id="whitepapers"> 
+     <h3> <a href="http://whitepapers.theregister.co.uk/" class="dcl">Whitepapers</a> </h3> 
+     <a class="story" href="http://whitepapers.theregister.co.uk/paper/view/5922/brand-protection-and-customer-communications?td=s-uu"> <img src="/design_picker/4ee431b84ac2d23c13376f753522acd7ecbb9b47/graphics/icon/whitepaper_book.png" alt="PDF Icon" width="55" height="55"> <h4>Brand Protection and Customer Communications</h4> 
+      <div class="standfirst">
+        Brand protection, brand management, and system contributions should be key considerations for businesses that are considering changing or upgrading their CCM systems. 
+      </div> </a> 
+     <a class="story" href="http://whitepapers.theregister.co.uk/paper/view/5995/evolution-the-data-economy-report-2017-global-edition?td=s-uu"> <img src="/design_picker/4ee431b84ac2d23c13376f753522acd7ecbb9b47/graphics/icon/whitepaper_book.png" alt="PDF Icon" width="55" height="55"> <h4>Evolution: The Data Economy Report, 2017 Global Edition</h4> 
+      <div class="standfirst">
+        Industry insights on how organisations are balancing infrastructure and applications for digital business. 
+      </div> </a> 
+     <a class="story" href="http://whitepapers.theregister.co.uk/paper/view/5709/gdpr-centralise-unstructured-data-governance-across-on-premises-and-cloud?td=s-uu"> <img src="/design_picker/4ee431b84ac2d23c13376f753522acd7ecbb9b47/graphics/icon/whitepaper_book.png" alt="PDF Icon" width="55" height="55"> <h4>GDPR: Centralise Unstructured Data Governance across On-Premises and Cloud</h4> 
+      <div class="standfirst">
+        Balancing the desire for consolidation and centralised management with the need to meet the 2018 deadline and solve the immediate GDPR-related operational challenges 
+      </div> </a> 
+     <a class="story" href="http://whitepapers.theregister.co.uk/paper/view/5923/scaling-customer-communications?td=s-uu"> <img src="/design_picker/4ee431b84ac2d23c13376f753522acd7ecbb9b47/graphics/icon/whitepaper_book.png" alt="PDF Icon" width="55" height="55"> <h4>Scaling Customer Communications</h4> 
+      <div class="standfirst">
+        Do CCM offerings need to change in response to the new generation of consumers? 
+      </div> </a> 
+    </div>
+    <div id="sponlinks"> 
+     <h3>Sponsored links</h3> 
+     <ul> 
+      <li><a href="https://account.theregister.co.uk/register/?product=thereg_daily_newsletter"><strong>Get The Register's Headlines in your inbox daily - quick signup!</strong></a></li> 
+     </ul> 
+    </div> 
+    <div id="ad-owl" class="adu"> 
+     <script>
+                show_gpt('ad-owl');
+            </script> 
+     <noscript> 
+      <a href="https://pubads.g.doubleclick.net/gampad/jump?iu=/6978/reg_software/front&amp;sz=300x250&amp;tile=5&amp;c=55WdOGOMCoyKkAAHJ2-uQAAABv&amp;t=ct%3Dns%26unitnum%3D5%26unitname%3Dwww_btm_mpu%26pos%3Dbtm%26test%3D0" target="_blank"> <img src="https://pubads.g.doubleclick.net/gampad/ad?iu=/6978/reg_software/front&amp;sz=300x250&amp;tile=5&amp;c=55WdOGOMCoyKkAAHJ2-uQAAABv&amp;t=ct%3Dns%26unitnum%3D5%26unitname%3Dwww_btm_mpu%26pos%3Dbtm%26test%3D0" alt=""> </a> 
+     </noscript> 
+    </div> 
+   </div> 
+   <script>facebook_sdk();</script> 
+   <div id="footer">
+    <div class="foot_wrapper"> 
+     <div class="left_block"> 
+      <div class="foot_list alt_colour dcl"> 
+       <h4>About us<img width="7" alt="" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/footer_mob_nav_arrow_black.svg" class="expand_arrow"></h4> 
+       <ul> 
+        <li><a href="https://www.theregister.co.uk/Profile/about_the_register/">Who we are</a></li> 
+        <li><a href="https://www.theregister.co.uk/about/company/website/">Under the hood</a></li> 
+        <li><a href="https://www.theregister.co.uk/about/company/contact/">Contact us</a></li> 
+        <li><a target="_blank" href="https://situationpublishing.com/home/contact-us/">Advertise with us</a></li> 
+       </ul> 
+      </div> 
+      <div class="foot_list more_us alt_colour dcl"> 
+       <h4>More content<img width="7" alt="" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/footer_mob_nav_arrow_black.svg" class="expand_arrow"></h4> 
+       <ul> 
+        <li><a href="https://www.theregister.co.uk/Week/">Week’s headlines</a></li> 
+        <li><a href="https://www.theregister.co.uk/Popular/">Top 20 stories</a></li> 
+        <li><a href="https://account.theregister.co.uk/alert/?create=1">Alerts</a></li> 
+        <li><a href="https://whitepapers.theregister.co.uk/">Whitepapers</a></li> 
+       </ul> 
+      </div> 
+      <div class="foot_list what_else alt_colour dcl"> 
+       <h4>Situation Publishing<img width="7" alt="" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/footer_mob_nav_arrow_black.svg" class="expand_arrow"></h4> 
+       <ul> 
+        <li><a href="http://www.nextplatform.com/">The Next Platform</a></li> 
+        <li><a href="http://www.continuouslifecycle.london/">Continuous Lifecycle London</a></li> 
+        <li><a href="http://www.mcubed.london/">M-cubed</a></li> 
+        <li><a href="https://whitepapers.theregister.co.uk/events/list">Webinars</a></li> 
+       </ul> 
+      </div> 
+      <span class="foot_delim"></span> 
+      <div class="reg_foot"> 
+       <a href="http://situationpublishing.com/" id="sitpub_logo"> <img width="132" height="51" alt="Situation Publishing" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/sitpub_footer.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/sitpub_footer.svg"> </a> 
+       <p class="foot_desc"><strong>The Register</strong> - Independent news and views for the tech community. Part of Situation Publishing</p> 
+      </div> 
+     </div> 
+     <div class="right_block"> 
+      <div class="newsletter_signup alt_colour dcl"> 
+       <h4>Sign up to our Newsletters</h4> 
+       <p>Join our daily or weekly newsletters, subscribe to a specific section or set <a href="https://account.theregister.co.uk/alert/?create=1">News alerts</a></p> 
+       <a class="subscribe_newsletter_button" href="https://account.theregister.co.uk/register/?product=thereg_daily_newsletter">Subscribe<img width="7" alt="" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/footer_mob_nav_arrow_white.svg"></a> 
+      </div> 
+      <div class="social alt_colour dcl"> 
+       <div id="follow_btns"> 
+        <a id="follow_us_twitter" href="https://twitter.com/intent/user?screen_name=theregister" title="Follow us on twitter" target="_blank" class="twit"> 
+         <div class="circ"> 
+          <img width="18" height="18" alt="Twitter" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/twitter.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/twitter.svg"> 
+         </div> </a> 
+        <a href="https://www.facebook.com/VultureCentral" title="Like us on Facebook" target="_blank" class="fbook"> 
+         <div class="circ"> 
+          <img width="18" height="18" alt="Facebook" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/facebook.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/facebook.svg"> 
+         </div> </a> 
+        <a href="https://www.linkedin.com/company/the-register" title="Follow us on LinkedIn" target="_blank" class="linkin"> 
+         <div class="circ"> 
+          <img width="18" height="18" alt="LinkedIn" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/linkedin_white.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/linkedin_white.svg"> 
+         </div> </a> 
+        <a href="https://www.theregister.co.uk/Design/page/feeds.html" title="Follow our RSS" target="_blank" class="rss_feed"> 
+         <div class="circ"> 
+          <img width="18" height="18" alt="feeds" src="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/rss.png" srcset="/design_picker/c00f80f04b0eaf0123d821f6c9488fc1cb55fd0a/graphics/icon/rss.svg"> 
+         </div> </a> 
+       </div> 
+      </div> 
+     </div> 
+     <noscript>
+      <img src="/Design/graphics/std/transparent_pixel.png" alt="no-js">
+     </noscript> 
+    </div>
+   </div> 
+   <div id="foot_btm"> 
+    <p>Biting the hand that feeds IT © 1998–2017 </p> 
+    <div class="foot_btm_links"> 
+     <a href="https://www.theregister.co.uk/Profile/cookies/">Cookies</a> 
+     <a href="https://www.theregister.co.uk/about/company/privacy/">Privacy</a> 
+     <a href="https://www.theregister.co.uk/Profile/terms_and_conditions_of_use/">Ts&amp;Cs</a> 
+    </div> 
+   </div> 
+   <div id="end_scripts"> 
+    <script>
+            googletag.cmd.push(function() { 
+                var abt1 = '<img style="position:absolute" src="https://go.theregister.co.uk/k/abt_';
+                var abt2 = '" width=1 height=1 alt="">';
+                var ch = 0;
+                $('.adu').each(function(i) {
+                    ch += $(this).height();
+                });
+                if (ch == 0 && !ad_free()) {
+                    $("#footer").append($(abt1 + 'b' + abt2));
+                } else {
+                    $("#footer").append($(abt1 + 'a' + abt2));
+                }
+            });
+        </script> 
+    <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-33330076-1', 'theregister.co.uk', { 'allowLinker': true });
+            ga('require', 'linker');
+            ga('linker:autoLink', ['channelregister.co.uk']);
+            ga('require', 'displayfeatures');
+            ga('set', 'dimension2', (typeof RegArticle != 'undefined') ? RegArticle.author : '');
+            ga('set', 'dimension3', (typeof RegSection != 'undefined') ? RegSection : '');
+            ga('set', 'dimension4', (typeof RegArticle != 'undefined' ? (RegArticle.pf ? 'p' : (RegArticle.cp ? 'c' : 'a')) : 'i'));
+            ga('set', 'dimension5', (typeof RegArticle != 'undefined') ? RegArticle.cat : '');
+            ga('set', 'dimension6', (typeof RegArticle != 'undefined') ? RegArticle.ads : '');
+            ga('send', 'pageview');
+        </script> 
+    <script>
+            (function() {
+            var d=document,h=d.getElementsByTagName('head')[0],s=d.createElement('script');
+            s.type='text/javascript';
+            s.async=true;
+            s.src='https://s.dpmsrv.com/dpm_812ed4562d3211363a7b813aa9cd2cf042b63bb2.min.js';
+            h.appendChild(s);
+            })();
+        </script> 
+    <script>
+        $(function() { set_bucket_group(515) });
+    </script> 
+    <div id="fb-root"></div> 
+   </div> 
+  </div>   
+ </body>
+</html>
