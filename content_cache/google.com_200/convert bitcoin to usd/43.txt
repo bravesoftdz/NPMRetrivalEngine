@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en" ng-app="blocktrail.explorer" prefix="og: http://ogp.me/ns#">
+ <head> 
+  <meta charset="utf-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <meta name="fragment" content="!"> 
+  <link rel="icon" href="https://static1.blocktrail.com/static/vbc0a06e9de/img/favicon.ico" type="image/x-icon"> 
+  <link rel="shortcut icon" href="https://static0.blocktrail.com/static/vbc0a06e9de/img/favicon.ico" type="image/x-icon"> 
+  <meta name="author" content="BLOCKTRAIL"> 
+  <title ng-bind="'BLOCKTRAIL | ' + (meta.title || '')">BLOCKTRAIL | Bitcoin API and Block Explorer</title> 
+  <meta name="description" bt-attr-content="{{ meta.description || '' }}"> 
+  <meta name="keywords" bt-attr-content="{{ meta.keywords.concat(meta.default_keywords).unique().clean().join(', ') }}"> 
+  <link rel="canonical" ng-href="{{ meta.canonical }}"> 
+  <meta name="prerender-status-code" content="{{ meta.statusCode }}"> 
+  <meta property="og:title" content="BLOCKTRAIL | Bitcoin API and Block Explorer" bt-attr-content="{{ 'BLOCKTRAIL | ' + (meta.title || '') }}"> 
+  <meta property="og:type" content="website"> 
+  <meta property="og:url" bt-attr-content="{{ meta.canonical }}"> 
+  <meta property="og:description" bt-attr-content="{{ meta.description || '' }}"> 
+  <meta property="og:image" bt-attr-content="{{ meta.image }}"> 
+  <link rel="stylesheet" href="https://static1.blocktrail.com/static/vbc0a06e9de/compiled/desktop.min.css"> 
+  <script src="https://static0.blocktrail.com/static/vbc0a06e9de/compiled/sdk.min.js"></script> 
+  <script src="https://static1.blocktrail.com/static/vbc0a06e9de/compiled/base.min.js"></script> 
+  <script src="https://static0.blocktrail.com/static/vbc0a06e9de/compiled/app.min.js"></script> 
+  <script type="text/javascript">
+        window.prerenderReady = true;
+
+        ZeroClipboard.config( { swfPath: 'https://static1.blocktrail.com/static/libs/zeroclipboard/ZeroClipboard.swf' } );
+
+        $script.define('https://static0.blocktrail.com/static/vbc0a06e9de/compiled/d3.min.js', 'd3');
+        $script.define('https://static1.blocktrail.com/static/vbc0a06e9de/compiled/highcharts.min.js', 'highcharts');
+        $script.define('https://static0.blocktrail.com/static/vbc0a06e9de/compiled/scanqrcode.min.js', 'scanqrcode');
+        $script.define('https://static1.blocktrail.com/static/vbc0a06e9de/compiled/app_lazy.min.js',
+            ['app_lazy',
+                'sparkline',
+                'socket',
+                'qrcode',
+                'daterangepicker']);
+        $script.define('//www.google.com/recaptcha/api/js/recaptcha_ajax.js', 'recaptcha');
+
+        angular.module('blocktrail')
+            .constant('CONFIG', {
+                SITE_URL         : 'https://www.blocktrail.com/',
+                STATIC_URL       : 'https://static0.blocktrail.com/static/vbc0a06e9de',
+                STATIC_CLEAN_URL : 'https://static1.blocktrail.com/static',
+                API_URL        : 'https://api.blocktrail.com',
+                CHANNEL_PREFIX : 'whisper',
+                STATS_TRACKING : true,
+                RECAPTCHA_KEY  : '6LcptvYSAAAAAKh0uKO-7_MymemEhQqPBTMSPTXI',
+                ENV            : 'production',
+                WALLET_URL     : 'https://wallet.btc.com'
+            })
+            .constant('FEATURES', {"ECONOMY_PAGE":false})
+        ;
+
+        angular.module('blocktrail.networks', [])
+            .constant('NETWORKS', {"btc":{"IDX":0,"WEBHOOKS_SUPPORT":true,"SHORT_CODE":"BTC","TESTNET":false,"NAME":"Bitcoin","COIN_DISPLAYS":{"8":"BTC","5":"mBTC","3":"uBTC","2":"bits","0":"satoshi"},"URI_SCHEME":"bitcoin","WHISPER_SOCKET":"wss:\/\/socket.blocktrail.com:8443\/whisper"},"tbtc":{"IDX":1,"WEBHOOKS_SUPPORT":true,"SHORT_CODE":"tBTC","TESTNET":true,"NAME":"Bitcoin TestNet","COIN_DISPLAYS":{"8":"tBTC","5":"mtBTC","3":"utBTC","2":"bits","0":"satoshi"},"URI_SCHEME":"bitcoin","WHISPER_SOCKET":"wss:\/\/socket.blocktrail.com:8444\/whisper"},"bcc":{"IDX":2,"WEBHOOKS_SUPPORT":true,"SHORT_CODE":"BCC","TESTNET":false,"NAME":"BitcoinCash","COIN_DISPLAYS":{"8":"BCC","5":"mBCC","3":"uBCC","2":"bits","0":"satoshi"},"URI_SCHEME":"bitcoincash","WHISPER_SOCKET":""},"tbcc":{"IDX":3,"WEBHOOKS_SUPPORT":true,"SHORT_CODE":"tBCC","TESTNET":true,"NAME":"BitcoinCash TestNet","COIN_DISPLAYS":{"8":"tBCC","5":"mtBCC","3":"utBCC","2":"bits","0":"satoshi"},"URI_SCHEME":"bitcoincash","WHISPER_SOCKET":""}})
+            .constant('DEFAULT_PRECISION', 8)
+            .constant('DEFAULT_CURRENCY', 'USD')
+        ;
+    </script> 
+ </head> 
+ <body ng-class="{homepage: isHomePage}"> 
+  <div id="wrap"> 
+   <div ng-include src="'blockchain/navbar.html'"></div> 
+   <toaster-container></toaster-container> 
+   <div> 
+    <div ui-view class="view"></div> 
+    <div id="push"></div> 
+   </div> 
+  </div> 
+  <footer id="page-footer" class="" ng-controller="FooterCtrl"> 
+   <a href="{{ $state.href('home') }}" class="footer_img"><img ng-src="{{ CONFIG.STATIC_URL }}/img/b-alt.png"></a> 
+   <div class="container"> 
+    <div class="footer-content"> 
+     <div class="row"> 
+      <div class="col-md-4 col-xs-12"> 
+       <div style="text-align: center;margin-top:50px;"> 
+        <a ng-href="/" target="_self"> <img ng-src="{{ CONFIG.STATIC_URL }}/img/blocktrail-footer.png" style="width:100px;"> </a> 
+       </div> 
+       <div class="help-block" style="text-align: center">
+        A PLATFORM FOR BITCOIN
+       </div> 
+      </div> 
+      <div class="col-md-2 col-xs-6"> 
+       <h4>COMPANY</h4> 
+       <ul class="nav nav-stacked wrapper"> 
+        <li><a ng-href="/about" target="_self">About</a></li> 
+        <li><a target="_blank" href="https://blog.blocktrail.com">Our Blog</a></li> 
+        <li><a ng-href="/legal" target="_self">Terms of Service</a></li> 
+        <li><a ng-href="/privacy" target="_self">Privacy Policy</a></li> 
+        <li><a ng-href="/faq" target="_self">FAQ</a></li> 
+       </ul> 
+      </div> 
+      <div class="col-md-2 col-xs-6"> 
+       <h4>DEVELOPERS</h4> 
+       <ul class="nav nav-stacked wrapper"> 
+        <li><a ng-href="{{ $state.href('api') }}" ng-class="{'oranje':!user.isLoggedIn}">Bitcoin API</a></li> 
+        <li><a ng-href="{{ $state.href('api.docs.main') }}">Documentation</a></li> 
+        <li><a href="https://tipbot.blocktrail.com" target="_self">Slack Tipbot</a></li> 
+        <li><a ng-href="{{ href('explorer.home', {verifysignedmessage: 1}) }}">Verify Signed Message</a></li> 
+       </ul> 
+      </div> 
+      <div class="col-md-2 col-xs-6"> 
+       <h4>EXPLORER</h4> 
+       <ul class="nav nav-stacked wrapper"> 
+        <li><a href="/BTC" target="_self">Bitcoin Explorer</a></li> 
+        <li><a href="/tBTC" target="_self">Testnet Explorer</a></li> 
+       </ul> 
+      </div> 
+      <div class="col-md-2 col-xs-6"> 
+       <h4>SOCIAL</h4> 
+       <ul class="nav nav-stacked wrapper"> 
+        <li><a target="_blank" href="https://www.twitter.com/blocktrail">Twitter</a></li> 
+        <li><a target="_blank" href="https://www.facebook.com/blocktrail">Facebook</a></li> 
+        <li><a target="_blank" href="https://www.linkedin.com/company/blocktrail-b-v-">Linkedin</a></li> 
+        <li><a target="_blank" href="https://instagram.com/blocktrail_/">Instagram</a></li> 
+       </ul> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </footer> 
+  <script>
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-48223601-2', 'www.blocktrail.com');
+            ga('require', 'displayfeatures');
+            // ga('send', 'pageview');
+
+        </script> 
+  <script>
+            window.selfXssWarning = (function() {
+                // print warning for Self-XSS
+                var consoleWarning = function() {
+                    if (window.console || "console" in window) {
+                        console.log("%c WARNING!!!", "color: red; font-size: 50px;");
+                        console.log("%c This browser feature is for developers only. Please do not copy-paste any code or run any scripts here." , "color: orange; font-size: 16px;");
+                        console.log("%c If somebody is asking you to copy-paste any code here you're most likely being targeted by a malicious attacker!" , "color: orange; font-size: 16px;");
+                        console.log("%c For more information, see: http://en.wikipedia.org/wiki/Self-XSS", "color: orange; font-size: 16px;");
+                    }
+                };
+
+                // repeat warning every 60s, incase other things are logging to console in the meantime
+                var warningInterval = setInterval(consoleWarning, 60000);
+                // print first warning after 1s, just to let any initial console logging happen from other things
+                var firstWarningTimeout = setTimeout(consoleWarning, 1000);
+
+                return {
+                    disable: function() {
+                        clearInterval(warningInterval);
+                    }
+                };
+            })();
+        </script>   
+ </body>
+</html>
