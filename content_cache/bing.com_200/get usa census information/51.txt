@@ -1,0 +1,1374 @@
+<!doctype html>
+<html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" lang="en">
+ <head>
+  <link rel="canonical" href="https://msdn.microsoft.com/en-us/library/hh874692.aspx"> 
+  <title>Extending JavaScript IntelliSense</title> 
+  <meta name="DCS.dcsuri" content="/en-us/library/hh874692(d=default,l=en-us,v=vs.140).aspx"> 
+  <meta name="NormalizedUrl" content="https://msdn.microsoft.com/en-us/library/hh874692(d=default,l=en-us,v=vs.140).aspx"> 
+  <meta name="ms.normalizedurl" content="https://msdn.microsoft.com/en-us/library/hh874692(d=default,l=en-us,v=vs.140).aspx"> 
+  <meta name="ms.prod" content="visual-studio-dev14"> 
+  <meta name="ms.devlang" content="na"> 
+  <meta name="ms.topic" content="article"> 
+  <meta name="VotingContextUrl" content="https://msdn.microsoft.com/en-us/library/hh874692(d=default,l=en-us,v=vs.140).aspx"> 
+  <meta name="MN" content="FB361397-11:45:52 AM"> 
+  <meta name="Search.ShortId" content="hh874692"> 
+  <meta name="ms.shortidmsdn" content="hh874692"> 
+  <meta name="ms.locale" content="en-us"> 
+  <meta name="ms.prodver" content="VS.140"> 
+  <meta name="ms.contentlang" content="EN"> 
+  <meta name="ms.lang" content="EN"> 
+  <meta name="ms.loc" content="US"> 
+  <meta name="ms.sitever" content="2017.09.29.3"> 
+  <meta name="ms.assetid" content="004e1ab6-bd7a-4327-9e01-89b9be96ba2f"> 
+  <meta name="ms.auth" content="0"> 
+  <meta name="ms.technology" content="vs-ide-general"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <script type="text/javascript" data-do-not-move="true">
+        //<![CDATA[
+        var AmbientContext = null;
+
+        (function(){
+            var root = (function(){return this;}).call(null);
+
+            var GetCookie = function(name){
+                var cookies = root.document.cookie ? root.document.cookie.split('; ') : [];
+                for (var i = 0; i < cookies.length; i++) {
+                    var pos = cookies[i].indexOf('=');
+                    if (name === root.decodeURIComponent(cookies[i].slice(0, pos)))
+                    {
+                        var cookie = cookies[i].slice(pos + 1).replace(/\+/g, ' ');
+                        cookie = root.decodeURIComponent(cookie);
+                        return cookie;
+                    }
+                }
+            };
+
+            var JsonDeserialize = function(content) {
+                return root.JSON && root.JSON.parse ? root.JSON.parse(content) : (new Function('return (' + content + ')'))();
+            };
+
+            try {
+                AmbientContext = GetCookie('AmbientContext');
+                AmbientContext = AmbientContext && JsonDeserialize(AmbientContext);
+            } catch(ex) {
+            } finally {
+                AmbientContext = AmbientContext || null;
+            }
+        })();
+        //]]>
+    </script> 
+  <script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.9.1.min.js" data-do-not-move="true" data-provides="jQuery"></script> 
+  <link rel="stylesheet" type="text/css" href="https://uhf.microsoft.com/mscc/statics/mscc-0.3.6.min.css">
+  <link rel="stylesheet" type="text/css" href="https://i-msdn.sec.s-msft.com/Combined.css?resources=0:ImageSprite,0:TopicResponsive,0:TopicResponsive.MediaQueries,1:CodeSnippet,1:ProgrammingSelector,1:ExpandableCollapsibleArea,0:CommunityContent,1:TopicNotInScope,1:FeedViewerBasic,1:ImageSprite,2:Header,2:HeaderFooterSprite,2:Header.MediaQueries,3:Banner.MediaQueries,0:Breadcrumbs,0:Breadcrumbs.MediaQueries,0:ResponsiveToc,0:ResponsiveToc.MediaQueries,1:VersionSelector,0:LibraryMemberFilter,2:Footer,2:Footer.MediaQueries,4:StandardRating,5:LinkList,0:BaseResponsive,6:MsdnResponsive,0:Tables.MediaQueries;/Areas/Library/Content:0,/Areas/Epx/Content/Css:1,/Areas/Centers/Themes/StandardDevCenter/Content:2,/Areas/Epx/Shared/Content:3,/Areas/Global/Content:4,/Areas/Epx/Themes/Base/Content:5,/Areas/Library/Themes/Msdn/Content:6&amp;amp;v=A12E0682B1C43F6DD42EBB4575A81B90">
+ </head> 
+ <body class="library Chrome"> 
+  <div id="page"> 
+   <link type="text/css" rel="stylesheet"> 
+   <input type="hidden" id="isHeaderBleeding" value="true"> 
+   <div id="ux-header" dir="ltr" class="ltr msdn" ms.pgarea="header"> 
+    <div id="ux-banner"> 
+     <div id="msccBanner" dir="ltr" data-site-name="msdn.microsoft.com" data-mscc-version="0.3.6" data-nver="aspnet-2.0.6" data-sver="0.1.2" class="cc-banner" role="alert">
+      <div class="cc-container">
+       <svg class="cc-icon cc-v-center" x="0px" y="0px" viewbox="0 0 44 44" height="30px" fill="none" stroke="currentColor">
+        <circle cx="22" cy="22" r="20" stroke-width="2"></circle>
+        <line x1="22" x2="22" y1="18" y2="33" stroke-width="3"></line>
+        <line x1="22" x2="22" y1="12" y2="15" stroke-width="3"></line>
+       </svg> 
+       <span class="cc-v-center cc-text">This site uses cookies for analytics, personalized content and ads. By continuing to browse this site, you agree to this use.</span> 
+       <a href="https://go.microsoft.com/fwlink/?linkid=845480" aria-label="Learn more about Microsoft’s Cookie Policy" id="msccLearnMore" class="cc-link cc-v-center cc-float-right" data-mscc-ic="false">Learn more</a>
+      </div>
+     </div> 
+    </div> 
+    <header> 
+     <span id="singleCol"></span> 
+     <span id="doubleCol"></span> 
+     <span id="isMobile"></span> 
+     <div> 
+      <div class="row topRow" role="banner"> 
+       <div class="top"> 
+        <div class="left"> 
+         <a class="msdnLogoImg" href="https://msdn.microsoft.com/en-us" title="MSDN home" ms.cmpgrp="mslogo"> 
+          <div class="clip70x15"> 
+           <img alt="Microsoft Logo" id="msft-logo" class="msft-logo" src="https://i-msdn.sec.s-msft.com/Areas/Centers/Themes/StandardDevCenter/Content/HeaderFooterSprite.png?v=636422593544160354"> 
+          </div> </a> 
+         <div class="GrayPipeDiv clip1x18"> 
+          <img alt="Gray Pipe" class="GrayPipe" src="https://i-msdn.sec.s-msft.com/Areas/Centers/Themes/StandardDevCenter/Content/HeaderFooterSprite.png?v=636422593544160354"> 
+         </div> 
+         <a class="DevCenterFullNameNonMegaBlade" href="https://msdn.microsoft.com/en-us">Developer Network</a> 
+         <a class="DevCenterFullName" href="https://msdn.microsoft.com/en-us">Developer Network</a> 
+         <a class="DevCenterShortName" href="https://msdn.microsoft.com/en-us">Developer</a> 
+        </div> 
+        <div class="right" ms.cmpgrp="aux nav"> 
+         <div id="signIn" aria-label="Profile button"> 
+          <div class="profileImage"></div> 
+          <a class="scarabLink" href="https://login.live.com/login.srf?wa=wsignin1.0&amp;rpsnv=13&amp;ct=1507056352&amp;rver=6.7.6640.0&amp;wp=mcmbi&amp;wlcxt=msdn%24msdn%24msdn&amp;wreply=https%3a%2f%2fmsdn.microsoft.com%2fen-us%2flibrary%2fhh874692.aspx&amp;lc=1033&amp;id=254354&amp;mkt=en-us">Sign in</a>
+         </div> 
+         <div class="auxNav"> 
+          <div> 
+           <div data-fragmentname="Subscriptions" id="Fragment_Subscriptions" xmlns="http://www.w3.org/1999/xhtml"> 
+            <a href="https://my.visualstudio.com/?wt.mc_id=o~msft~msdn~nav~subscriber&amp;campaign=o~msft~msdn~nav~subscriber" id="Subscriptions_2153_1" xmlns="http://www.w3.org/1999/xhtml"> <p xmlns="">Subscriber portal</p> </a> 
+           </div> 
+           <div data-fragmentname="GetTools" id="Fragment_GetTools" xmlns="http://www.w3.org/1999/xhtml"> 
+            <a href="https://www.visualstudio.com/free-developer-offers/" id="GetTools_2153_3" xmlns="http://www.w3.org/1999/xhtml">Get tools</a> 
+           </div> 
+          </div> 
+          <div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="row middleRow"> 
+       <div class="expandTop"> 
+        <div class="left"></div> 
+        <div class="right"></div> 
+       </div> 
+      </div> 
+     </div> 
+     <div id="buttomRowWrapper" class="bg_default"> 
+      <div class="row buttomRow bg_default"> 
+       <div class="bottom"> 
+        <div class="left" role="navigation" aria-label="header toc" ms.cmpgrp="main nav"> 
+         <a id="grip" class="menu-icon" href="javascript:void(0)" role="button" aria-label="navigation menu" data-mscc-ic="false"></a> 
+         <div id="drawer"> 
+          <div class="toc"> 
+           <nav> 
+            <ul class="navL1"> 
+             <li class="inactive toggle"> <a href="javascript:void(0)" role="button" aria-expanded="false" data-mscc-ic="false">Downloads</a> 
+              <ul class="navL2"> 
+               <li class="inactive"> <a href="https://www.visualstudio.com/downloads/download-visual-studio-vs" role="link" title="Visual Studio">Visual Studio</a> </li> 
+               <li class="inactive"> <a href="https://msdn.microsoft.com/microsoft-sdks-msdn" role="link" title="SDKs">SDKs</a> </li> 
+               <li class="inactive toggle"> <a href="javascript:void(0)" title="Trial software" role="button" aria-expanded="false" data-mscc-ic="false">Trial software</a> 
+                <ul class="navL3"> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/evalcenter" title="Free downloads" role="link">Free downloads</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/officeevaluationresources" title="Office resources" role="link">Office resources</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/sharepoint2013resources" title="SharePoint Server 2013 resources" role="link">SharePoint Server 2013 resources</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/sqlserver2014expressresources" title="SQL Server 2014 Express resources" role="link">SQL Server 2014 Express resources</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/windowsserver2012r2resources" title="Windows Server 2012 resources" role="link">Windows Server 2012 resources</a> </li> 
+                </ul> </li> 
+              </ul> </li> 
+             <li class="inactive toggle"> <a href="javascript:void(0)" role="button" aria-expanded="false" data-mscc-ic="false">Programs</a> 
+              <ul class="navL2"> 
+               <li class="inactive toggle"> <a href="javascript:void(0)" title="Subscriptions" role="button" aria-expanded="false" data-mscc-ic="false">Subscriptions</a> 
+                <ul class="navL3"> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/msdn-subscriptions-overview" title="Overview" role="link">Overview</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/msdn-subscriptions-administration" title="Administrators" role="link">Administrators</a> </li> 
+                </ul> </li> 
+               <li class="inactive toggle"> <a href="javascript:void(0)" title="Students" role="button" aria-expanded="false" data-mscc-ic="false">Students</a> 
+                <ul class="navL3"> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/imagine/imagine-home" title="Microsoft Imagine" role="link">Microsoft Imagine</a> </li> 
+                 <li class="inactive"> <a href="https://msdn.microsoft.com/microsoftstudentpartners" title="Microsoft Student Partners" role="link">Microsoft Student Partners</a> </li> 
+                </ul> </li> 
+               <li class="inactive"> <a href="https://msdn.microsoft.com/applicationbuilder" role="link" title="ISV">ISV</a> </li> 
+               <li class="inactive"> <a href="https://www.microsoft.com/bizspark" role="link" title="Startups">Startups</a> </li> 
+               <li class="inactive"> <a href="https://events.microsoft.com/" role="link" title="Events">Events</a> </li> 
+              </ul> </li> 
+             <li class="inactive toggle"> <a href="javascript:void(0)" role="button" aria-expanded="false" data-mscc-ic="false">Community</a> 
+              <ul class="navL2"> 
+               <li class="inactive"> <a href="https://msdn.microsoft.com/magazine/dd767791" role="link" title="Magazine">Magazine</a> </li> 
+               <li class="inactive"> <a href="https://social.msdn.microsoft.com/forums/" role="link" title="Forums">Forums</a> </li> 
+               <li class="inactive"> <a href="https://blogs.msdn.microsoft.com/" role="link" title="Blogs">Blogs</a> </li> 
+               <li class="inactive"> <a href="https://channel9.msdn.com/" role="link" title="Channel 9">Channel 9</a> </li> 
+              </ul> </li> 
+             <li class="inactive current toggle"> <a href="javascript:void(0)" role="button" aria-expanded="false" data-mscc-ic="false">Documentation</a> 
+              <ul class="navL2"> 
+               <li class="inactive current"> <a href="https://msdn.microsoft.com/library" role="link" title="APIs and reference">APIs and reference</a> </li> 
+               <li class="inactive"> <a href="https://msdn.microsoft.com/developer-centers-msdn" role="link" title="Dev centers">Dev centers</a> </li> 
+               <li class="inactive"> <a href="https://code.msdn.microsoft.com/" role="link" title="Samples">Samples</a> </li> 
+               <li class="inactive"> <a href="https://msdn.microsoft.com/mt703209" role="link" title="Retired content">Retired content</a> </li> 
+              </ul> </li> 
+            </ul> 
+           </nav> 
+          </div> 
+         </div> 
+        </div> 
+        <div class="right" ms.title="search" role="search"> 
+         <div data-fragmentname="SearchBox" id="Fragment_SearchBox" xmlns="http://www.w3.org/1999/xhtml"> 
+          <div class="SearchBox"> 
+           <form id="HeaderSearchForm" name="HeaderSearchForm" method="get"> 
+            <button id="FakeHeaderSearchButton" value="Search" type="submit" class="header-search-button" role="button" aria-label="search finder"> 
+             <div id="search-finder-div" class="clip16x20"> 
+              <img alt="search finder" id="search-finder" class="search-finder" src="https://i-msdn.sec.s-msft.com/Areas/Centers/Themes/StandardDevCenter/Content/HeaderFooterSprite.png?v=636422593544160354"> 
+             </div> </button> 
+            <button id="HeaderSearchButton" style="display:none"></button> 
+            <div id="searchSplitter"></div> 
+            <div id="searchCloseIconDiv" class="clip16x20" tabindex="0"> 
+             <img alt="search clear" id="searchCloseIcon" class="search-clear-x" src="https://i-msdn.sec.s-msft.com/Areas/Centers/Themes/StandardDevCenter/Content/HeaderFooterSprite.png?v=636422593544160354"> 
+            </div> 
+            <div id="searchTextContainer" style="width: 0;"> 
+             <input id="HeaderSearchTextBox" name="query" type="text" aria-label="search edit textbox" maxlength="200" onfocus="Epx.Controls.SearchBox.watermarkFocus(event, this.title)" onblur="Epx.Controls.SearchBox.watermarkBlur(event, this.title)"> 
+            </div> 
+           </form> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </header> 
+   </div> 
+   <div id="jumpInfo" style="display: none">
+    We’re sorry. The content you requested has been removed. You’ll be auto redirected in 1 second.
+   </div> 
+   <link type="text/css" rel="stylesheet"> 
+   <link type="text/css" rel="stylesheet"> 
+   <div id="breadcrumbs" ms.pgarea="body" ms.cmpgrp="breadcrumbs"> 
+    <div id="breadcrumbDesktop" class="breadCrumb"> 
+     <span class="breadcrumbEllipsis"><a href="https://msdn.microsoft.com/en-us/library/dn762121.aspx" title="Visual Studio IDE"></a></span> 
+     <span><a href="https://msdn.microsoft.com/en-us/library/efc4xwkb.aspx" title="Writing Code"><span>Writing Code</span></a></span> 
+     <span><a href="https://msdn.microsoft.com/en-us/library/hcw1s69b.aspx" title="Using IntelliSense"><span>Using IntelliSense</span></a></span> 
+     <span class="breadcrumbDropSmall"> <a id="breadcrumbDropDownButton" href="#" targethref="https://msdn.microsoft.com/en-us/library/hcw1s69b.aspx" title="JavaScript IntelliSense"><span>JavaScript IntelliSense</span></a> </span> 
+    </div> 
+    <div id="breadcrumbDropDownMenu"></div> 
+    <div id="breadcrumbTablet" class="breadCrumb"> 
+     <span class="breadcrumbEllipsis"><a href="https://msdn.microsoft.com/en-us/library/hcw1s69b.aspx" title="Using IntelliSense"></a></span> 
+     <span><a href="https://msdn.microsoft.com/en-us/library/bb385682.aspx" title="JavaScript IntelliSense"><span>JavaScript IntelliSense</span></a></span> 
+     <span class="breadcrumbDropSmall"><a id="tocDropDownButton" href="#" title="Extending JavaScript IntelliSense"><span>Extending JavaScript IntelliSense</span></a></span> 
+    </div> 
+    <div id="tocDropDownMenu"></div> 
+    <div id="breadcrumbMobile" class="breadCrumb"> 
+     <span class="breadcrumbEllipsis"><a href="https://msdn.microsoft.com/en-us/library/bb385682.aspx" title="JavaScript IntelliSense"></a></span> 
+     <span class="breadcrumbDropSmall"><a id="tocPopupButton" href="#" title="Extending JavaScript IntelliSense"><span>Extending JavaScript IntelliSense</span></a></span> 
+    </div> 
+   </div> 
+   <div id="tocPopupMenu"> 
+    <div id="tocPopMenuClose" class="tocCloseLarge"></div> 
+    <div id="tocTitle">
+     Extending JavaScript IntelliSense
+    </div> 
+   </div> 
+   <div id="body" ms.pgarea="body" class=""> 
+    <span id="tabletView_large"></span> 
+    <span id="tabletView_small"></span> 
+    <span id="mobileView"></span> 
+    <div id="leftNav" ms.cmpgrp="left toc" role="navigation" aria-label="left toc"> 
+     <div id="tocnav" class="ArchiveV2"> 
+      <div class="tocunselected"> 
+       <div id="tocExpandArea"> 
+        <span class="toc_empty"></span> 
+        <span id="tocExpandButton"><a href="javascript:void(0)" aria-label="expand sibling toc" role="button"></a></span> 
+       </div> 
+       <div id="tocExpand"></div> 
+      </div> 
+      <div class="tocselected"></div> 
+      <div class="tocunselected"> 
+       <div class="toclevel " data-toclevel="1"> 
+        <a href="https://msdn.microsoft.com/en-us/library/mt162307.aspx" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Create JSDoc Comments">Create JSDoc Comments</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="1"> 
+        <a href="https://msdn.microsoft.com/en-us/library/bb514138.aspx" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Create XML Documentation Comments">Create XML Documentation Comments</a> 
+       </div> 
+       <div class="toclevel current" data-toclevel="1"> 
+        <a href="https://msdn.microsoft.com/en-us/library/hh874692.aspx" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Extending JavaScript IntelliSense">Extending JavaScript IntelliSense</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="1"> 
+        <a href="https://msdn.microsoft.com/en-us/library/hh395059.aspx" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Statement Completion for Identifiers">Statement Completion for Identifiers</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="1"> 
+        <a href="https://msdn.microsoft.com/en-us/library/mt125493.aspx" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="Customizing IntelliSense for RequireJS">Customizing IntelliSense for RequireJS</a> 
+       </div> 
+       <div class="toclevel " data-toclevel="1"> 
+        <a data-tochassubtree="true" href="https://msdn.microsoft.com/en-us/library/hh524453.aspx" id="mt548526_VS.140_en-us" mtpsaliasid="" mtpsassetid="" mtpsshortid="" title="XML Documentation Comments">XML Documentation Comments</a> 
+       </div> 
+      </div> 
+      <a id="tocMenuToggler" href="javascript:void(0)" role="button"> <span id="tocMenuTogglerIcon" class="tocMenuCollapse" role="button" aria-expanded="true" aria-label="Table of contents menu"></span> 
+       <div id="tocMenuTogglerLabel">
+        TOC
+       </div> </a> 
+     </div> 
+     <div style="display:none"> 
+      <div id="CollapseLocalizeString">
+       Collapse the table of content
+      </div> 
+      <div id="ExpandLocalizeString">
+       Expand the table of content
+      </div> 
+     </div> 
+     <div> 
+      <a id="isd_archiveControlResponsive" style="display:none;" href="javascript:void(0)" role="button" aria-label="Hide Archived Versions" data-include-archive="Show Archived Versions" data-exclude-archive="Hide Archived Versions"> </a> 
+      <div id="isd_archiveInstrument" style="display:none">
+       This documentation is archived and is not being maintained.
+      </div> 
+     </div> 
+    </div> 
+    <div id="content" class="content" ms.cmpgrp="content body" role="main"> 
+     <div id="archiveDisclaimerText" style="display:none">
+      This documentation is archived and is not being maintained.
+     </div> 
+     <div xmlns="http://www.w3.org/1999/xhtml"> 
+      <div class="topic"> 
+       <h1 class="title">Extending JavaScript IntelliSense</h1> 
+       <div class="lw_vs"> 
+        <div id="curversion"> 
+         <strong> Visual Studio 2015 </strong> 
+        </div> 
+        <div id="versionclick"> 
+         <div id="vsseperator" class="cl_lw_vs_seperator"></div> 
+         <div> 
+          <div> 
+           <a id="vsLink" href="javascript:void(0)" role="button" aria-label="Other Versions" aria-expanded="false"> Other Versions </a> 
+          </div> 
+          <div class="cl_vs_arrow clip10x10"> 
+           <img class="cl_lw_vs_arrow" id="vsArrow" alt="" src="https://i-msdn.sec.s-msft.com/Areas/Epx/Content/Images/ImageSprite.png?v=636422593604786198"> 
+          </div> 
+         </div> 
+         <ul id="vsPanel"> 
+          <li class="archived"> <a href="/en-us/library/hh874692(v=vs.120).aspx">Visual Studio 2013 </a> </li> 
+          <li class="archived"> <a href="/en-us/library/hh874692(v=vs.110).aspx">Visual Studio 2012</a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+       <div style="clear:both;"></div> 
+       <div id="mainSection"> 
+        <div id="mainBody">
+         &nbsp;
+         <p>The new home for Visual Studio documentation is <a href="http://docs.microsoft.com/visualstudio">Visual Studio 2017 Documentation</a> on docs.microsoft.com.</p>
+         <p>The latest version of this topic can be found at <a href="https://docs.microsoft.com/en-us/visualstudio/">Visual Studio 2017 Documentation</a>. The JavaScript IntelliSense extensibility feature enables you to customize IntelliSense results in the JavaScript editor for third-party libraries. This can improve the experience of developers who use these libraries.</p>
+         <p>The JavaScript language service provides IntelliSense features for third-party JavaScript libraries that are added to a project. For most libraries, statement completion is provided automatically by the language service. The following illustration shows an example of statement completion:</p>
+         <p><span><img id="88bd20c0-5e2a-4b53-9946-7224466aac56" alt="Example of statement completion" src="https://i-msdn.sec.s-msft.com/dynimg/IC613188.jpeg" title="Example of statement completion" xmlns=""></span></p>
+         <p>If your library includes descriptions of variables, functions, and objects in standard JavaScript comment tags (//), you automatically benefit, by default, from IntelliSense extensibility features, which provide descriptive information in a pop-up box that appears to the right of elements in a completion list, or when you type the opening parenthesis in a function call. The comments in the pop-up box contain the description of the member. The following example shows the pop-up box for a completion list.</p>
+         <p><span><img id="3b203e4d-a73c-4937-bb41-10a825090680" alt="Example of a Quick Info pop-up box" src="https://i-msdn.sec.s-msft.com/dynimg/IC613189.jpeg" title="Example of a Quick Info pop-up box" xmlns=""></span></p>
+         <p>To further improve the developer experience, you might want to provide type information to developers in the pop-up box. You can provide type information by using JavaScript <a href="https://msdn.microsoft.com/en-us/library/hh524453.aspx">XML Documentation Comments</a> instead of standard comment tags. You add XML Documentation Comments by using triple-slash comment tags (///) and a defined set of XML elements.</p>
+         <p>Alternatively, you can provide type information by using JavaScript IntelliSense extensibility. This feature enables you to customize IntelliSense results by creating JavaScript extensions and adding them to the script context. In the extension, which is a JavaScript file, you subscribe to events that are exposed by the <code>intellisense</code> object of the language service. JavaScript IntelliSense extensibility is the preferred solution for libraries if a behavior pattern in the library prevents the JavaScript language service from providing the desired level of IntelliSense support, and if an alternative to declarative XML Documentation Comments is also needed. By customizing the IntelliSense results, you can create a first-class IntelliSense experience, regardless of any behavioral patterns that might restrict the language service's default capabilities. For more information, see <a href="https://msdn.microsoft.com/en-us/library/hh395059.aspx">Statement Completion for Identifiers</a>.</p>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Adding an Extension to the Script Context</span></a>
+            <div id="Anchor_0" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh874692.aspx#Anchor_0" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <a id="Adding-an-Extension-to-the-Script-Context"></a>
+          </div>
+         </div>
+         <p>For an IntelliSense extension to be executed, it needs to be added to the current script context. The extension can be automatically added to the script context by the automatic discovery mechanism, or you can add the extension to the script context manually by using reference groups or the reference directive.</p>
+         <p>The automatic discovery mechanism enables the language service to automatically find extensions that follow the file naming convention <em>libraryname</em>.intellisense.js, and that are located in the same directory as the library to which the extension applies. For example, a valid extension for the jQuery library would be jQuery.intellisense.js. For more restrictive jQuery extensions, you can use file names such as jQuery-1.7.1.intellisense.js (a version-specific extension) or jQuery.ui.intellisense.js (an extension for a scoped jQuery library). The most restrictive version of the extension is used if more than one extension is found for a given library.</p>
+         <p>If you want to use the extension for all your JavaScript project files, you might instead choose to add the extension to a reference group. There are several types of reference groups, either those that include implicit references and those that include dedicated worker references. To add an extension, you typically need to add the file as an implicit reference group, either <strong>Implicit (Windows)</strong>, <strong>Implicit (Web)</strong>. Implicit references are in scope for every .js file opened in the Code Editor. When you use this method, you need to add both the extension and the file that the extension is supplementing.</p>
+         <p>Use the <strong>IntelliSense</strong> page of the <strong>Options</strong> dialog box to add an extension as a reference group. You can access the <strong>IntelliSense</strong> page by choosing <strong>Tools</strong>, <strong>Options</strong> on the menu bar, and then choosing <strong>Text Editor</strong>, <strong>JavaScript</strong>, <strong>IntelliSense</strong>, <strong>References</strong>. For more information about reference groups, see <a href="https://msdn.microsoft.com/en-us/library/bb385682.aspx">JavaScript IntelliSense</a> and <a href="https://msdn.microsoft.com/en-us/library/hh362485.aspx">Options, Text Editor, JavaScript, IntelliSense</a>.</p>
+         <p>If you want to use the extension for a specific set of files, use a reference directive. When you use this method, you need to reference both the extension and the file the extension is supplementing. For information about using the reference directive, see <a href="https://msdn.microsoft.com/en-us/library/bb385682.aspx">JavaScript IntelliSense</a>.</p>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Handling IntelliSense events</span></a>
+            <div id="Anchor_1" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh874692.aspx#Anchor_1" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <a id="Handling-IntelliSense-events"></a>
+          </div>
+         </div>
+         <p>The extensibility feature enables you to customize IntelliSense results by subscribing to events such as the <code>statementcompletion</code> event of the language service <code>intellisense</code> object. The following example shows a simple extension that's used by the language service to hide members that begin with an underscore from statement completion. This code is contained in underscorefilter.js and is in the \\<em>Visual Studio installation path</em>\JavaScript\References folder.</p> 
+         <div id="code-snippet-1" class="codeSnippetContainer" xmlns=""> 
+          <div class="codeSnippetContainerTabs"> 
+           <div class="codeSnippetContainerTabSingle" dir="ltr">
+            <a>JavaScript</a>
+           </div> 
+          </div> 
+          <div class="codeSnippetContainerCodeContainer"> 
+           <div class="codeSnippetToolBar"> 
+            <div class="codeSnippetToolBarText"> 
+             <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_0b864088-cc32-454f-bc39-d3c782557295');" ms.cmptyp="CodeSnippet">Copy</a> 
+            </div> 
+           </div> 
+           <div id="CodeSnippetContainerCode_0b864088-cc32-454f-bc39-d3c782557295" class="codeSnippetContainerCode" dir="ltr"> 
+            <div style="color:Black;">
+             <pre>
+intellisense.addEventListener(<span style="color:#A31515;">'statementcompletion'</span>, <span style="color:Blue;">function</span> (event) {  
+    <span style="color:Blue;">if</span> (event.targetName === <span style="color:#A31515;">"this"</span>) <span style="color:Blue;">return</span>;  
+  
+    <span style="color:Blue;">var</span> filterRegex;  
+  
+    <span style="color:Blue;">if</span> (event.target === undefined || event.target === window)  
+        filterRegex = /^_.*\d{2,}/;  
+    <span style="color:Blue;">else</span>  
+        filterRegex = /^_.*/;  
+  
+    event.items = event.items.filter(<span style="color:Blue;">function</span> (item) {  
+        <span style="color:Blue;">return</span> !filterRegex.test(item.name);  
+    });  
+});  
+
+</pre>
+            </div> 
+           </div> 
+          </div> 
+         </div> 
+         <p>In the preceding code, the extension checks the <a href="#TargetName">targetName Property</a> and <a href="#Target">target Property</a> properties of the <code>statementcompletion</code> event object to exclude objects such as <code>this</code> and <code>window</code>, and to ensure that a valid statement completion list can be identified. If a completion list can be identified, the extension updates the statement completion <a href="#Items">items Property</a> collection by filtering out members that begin with an underscore.</p>
+         <p>For additional examples, look in the \\<em>Visual Studio installation path</em>\JavaScript\References folder. The showPlainComments.js file in this folder provides examples of using other events to provide default IntelliSense support for standard JavaScript comment tags (//). Like underscorefilter.js, showPlainComments.js is already available as a working extension, and you can see the resulting IntelliSense information when using comment tags in your code for variables, functions, and objects. For additional examples, see <a href="#CodeExamples">Code Examples</a>.</p>
+         <table summary="table">
+          <tbody>
+           <tr>
+            <th scope="col"><span><img id="s-e6f6a65cf14f462597b64ac058dbe1d0-system-media-system-caps-icon-warning" alt="System_CAPS_ICON_warning.jpg" src="https://i-msdn.sec.s-msft.com/dynimg/IC174466.jpeg" title="System_CAPS_ICON_warning.jpg" xmlns=""></span>&nbsp;
+             <token space="preserve">
+              Warning 
+             </token></th>
+           </tr>
+           <tr>
+            <td><p> If you modify the extension files included with Visual Studio, you may disable JavaScript IntelliSense or the feature supported by the extension.</p></td>
+           </tr>
+          </tbody>
+         </table>
+         <p>In your extension code, you can create handlers for the following event types by using <code>addEventListener</code>:</p>
+         <ul>
+          <li><p><code>statementcompletion</code>, which adds a handler for a statement completion event. Statement completion provides a list of members for a particular type that appears after you type a special character such as a period (.), or a list of identifiers that appears while you type or when you press CTRL + J. The handler receives an event object of type <code>CompletionEvent</code>, which supports the following members: <a href="#Items">items Property</a>, <a href="#Target">target Property</a>, <a href="#TargetName">targetName Property</a>, and <a href="#Scope">scope Property</a>.</p></li>
+          <li><p><code>signaturehelp</code>, which adds a handler for IntelliSense Parameter Info. Parameter information gives you information about the number, names, and types of parameters required by a function. The handler receives an event object of type <code>SignatureHelpEvent</code>, which supports the following members: <a href="#Target">target Property</a>, <a href="#ParentObject">parentObject Property</a>, <a href="#FunctionComments">functionComments Property</a>, <a href="#FunctionHelp">functionHelp Property</a>.</p></li>
+          <li><p><code>statementcompletionhint</code>, which adds a handler for IntelliSense Quick Info. The Quick Info pop-up box shows the complete declaration for identifiers in your code. The handler receives an event object of type <code>CompletionHintEvent</code>, which supports the following members: <a href="#CompletionItem">completionItem Property</a>, and <a href="#SymbolHelp">symbolHelp Property</a>.</p></li>
+         </ul>
+         <p>For examples that show IntelliSense features such as statement completion, parameter information, and Quick Info, see <a href="https://msdn.microsoft.com/en-us/library/hcw1s69b.aspx">Using IntelliSense</a>.</p>
+         <table summary="table">
+          <tbody>
+           <tr>
+            <th scope="col"><span><img id="s-e6f6a65cf14f462597b64ac058dbe1d0-system-media-system-caps-icon-note" alt="System_CAPS_ICON_note.jpg" src="https://i-msdn.sec.s-msft.com/dynimg/IC101471.jpeg" title="System_CAPS_ICON_note.jpg" xmlns=""></span>&nbsp;
+             <token space="preserve">
+              Note 
+             </token></th>
+           </tr>
+           <tr>
+            <td><p> In JavaScript, Quick Info refers to the pop-up box that appears to the right of a completion list. You cannot manually invoke Quick Info.</p></td>
+           </tr>
+          </tbody>
+         </table>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">intellisense Object</span></a>
+            <div id="Anchor_2" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh874692.aspx#Anchor_2" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <a id="intellisense-Object"></a>
+           <a id="intellisenseObject"></a>
+          </div>
+         </div>
+         <p>The following table shows the functions that are available for the <code>intellisense</code> object. The <code>intellisense</code> object is available only at design time.</p>
+         <table responsive="true" summary="table">
+          <thead>
+           <tr responsive="true">
+            <th scope="col">Function</th>
+            <th scope="col">Description</th>
+           </tr>
+          </thead>
+          <tbody>
+           <tr>
+            <td data-th="Function"><code>addEventListener(type, handler);</code></td>
+            <td data-th="Description">Adds an event handler for an IntelliSense event.<br><br>&nbsp;<code>type</code> is a string value. Valid values include <code>statementcompletion</code>, <code>signaturehelp</code>, and <code>statementcompletionhint</code>.<br><br>&nbsp;<code>handler</code> is an event handler function that receives an event object of one of the following types:<br><br> - <code>CompletionEvent</code>, used for the <code>statementcompletion</code> event.<br>- <code>SignatureHelpEvent</code>, used for the <code>signaturehelp</code> event.<br>- <code>CompletionHintEvent</code>, used for the <code>statementcompletionhint</code> event.<br><br> For examples that use this function, see <a href="#CodeExamples">Code Examples</a>.</td>
+           </tr>
+           <tr>
+            <td data-th="Function"><code>annotate(obj, doc);</code></td>
+            <td data-th="Description">Specifies documentation for an object by copying documentation comments from one object to another object.<br><br>&nbsp;<code>obj</code> specifies the object to which to copy the documentation.<br><br>&nbsp;<code>doc</code> specifies the object from which to copy the documentation.<br><br> For an example that shows how to use this function, see <a href="#Annotations">Adding IntelliSense Annotations</a>.</td>
+           </tr>
+           <tr>
+            <td data-th="Function"><code>getFunctionComments(func);</code></td>
+            <td data-th="Description">Returns the comments for a specified function.<br><br>&nbsp;<code>func</code> specifies the function for which comments are returned.<br><br> You can set the <code>func</code> parameter by using <code>completionItem.value</code>.<br><br> The returned <code>functionComments</code> object includes the following members: <code>above</code>, <code>inside</code>, and <code>paramComment</code>. For more information, see the <a href="#FunctionComments">functionComments Property</a> property.<br><br>&nbsp;<code>getFunctionComments</code> can be called only from within one of the event handlers that are registered by <code>addEventListener</code>.<br><br> For an example that shows how to use this function, see \\<em>Visual Studio installation path</em>\JavaScript\References\showPlainComments.js.</td>
+           </tr>
+           <tr>
+            <td data-th="Function"><code>logMessage(msg);</code></td>
+            <td data-th="Description">Sends diagnostic messages to the Output window.<br><br>&nbsp;<code>msg</code> is a string that contains the message.<br><br> For an example that shows how to use this function, see <a href="#Logging">Sending Messages to the Output Window</a>.</td>
+           </tr>
+           <tr>
+            <td data-th="Function"><code>nullWithCompletionsOf(value);</code></td>
+            <td data-th="Description">Returns a special null value for which the completion list is determined by the object passed in the <code>value</code> parameter.<br><br>&nbsp;<code>value</code> determines the completion list for the returned value. <code>value</code> can be any type.<br><br> The null return value is treated as null at design-time, but the completion list for the return value is the same as the completion list for the <code>value</code> parameter.<br><br> One use for this function is to provide IntelliSense for a return value when the return type is predictable at runtime, but the return value is <code>null</code> at design-time.</td>
+           </tr>
+           <tr>
+            <td data-th="Function"><code>redirectDefinition(func, definition);</code></td>
+            <td data-th="Description">Instructs IntelliSense to use the provided definition function instead of the original func function when parameter help or <strong>Go To Definition</strong> is requested.<br><br>&nbsp;<code>func</code> specifies the target function.<br><br>&nbsp;<code>definition</code> specifies the function to be used instead of the target function for parameter information and <strong>Go To Definition</strong>.</td>
+           </tr>
+           <tr>
+            <td data-th="Function"><code>setCallContext(func, thisArg);</code></td>
+            <td data-th="Description">Sets the call context, or scope, for the specified function.<br><br>&nbsp;<code>func</code> specifies the function for which to set the scope.<br><br>&nbsp;<code>thisArg</code> is an object literal to which the <code>this</code> keyword can refer to, which specifies the new scope for the member. You can include arguments to pass in this parameter, for example, <code>intellisense.setCallContext(func, { thisArg: "", args: [23,2] });</code><br><br>&nbsp;<code>setCallContext</code> provides behavior similar to <code>Function.prototype.bind</code>, except that it used only for design-time IntelliSense support. You can use <code>setCallContext</code> to set the function scope if you need to simulate a call to code that is not otherwise reachable, so that when you call the function, the function call will include the correct scope and arguments.</td>
+           </tr>
+           <tr>
+            <td data-th="Function"><code>undefinedWithCompletionsOf(value);</code></td>
+            <td data-th="Description">Returns a special undefined value for which the completion list is determined by the object passed in the <code>value</code> parameter.<br><br>&nbsp;<code>value</code> determines the completion list for the returned value. <code>value</code> can be any type.<br><br> The undefined return value is treated as undefined at design-time, but the completion list for the return value is the same as the completion list for the <code>value</code> parameter.<br><br> One use for this function is to provide IntelliSense for a return value when the return type is predictable at runtime, but the return value is undefined at design-time.</td>
+           </tr>
+           <tr>
+            <td data-th="Function"><code>version()</code></td>
+            <td data-th="Description">Returns the Visual Studio version.</td>
+           </tr>
+          </tbody>
+         </table>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Event Members</span></a>
+            <div id="Anchor_3" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh874692.aspx#Anchor_3" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <a id="Event-Members"></a>
+          </div>
+         </div>
+         <p>The following sections describe the members that are exposed in the event object for the following events: <code>statementcompletion</code>, <code>signaturehelp</code>, and <code>statementcompletionhint</code>.</p>
+         <h3 class="subHeading"><a id="completionItem-Property"></a><a id="CompletionItem"></a> completionItem Property</h3>
+         <p>Returns the identifier, known as the completion item, for which a Quick Info pop-up box is requested. This property is available for the <code>statementcompletionhint</code> event object and for the <a href="#Items">items Property</a> property of the <code>statementcompletion</code> event object.</p>
+         <p>Return value: <code>completionItem</code> object</p>
+         <p>Following are the members of the <code>completionItem</code> object:</p>
+         <ul>
+          <li><p><code>name</code>. Read/write when used in the <code>items</code> collection; otherwise, read-only. Returns a string that identifies the completion item.</p></li>
+          <li><p><code>kind</code>. Read/write when used in the <code>items</code> collection; otherwise, read-only. Returns a string that represents the type of completion item. The possible values are method, field, property, parameter, variable, and reserved.</p></li>
+          <li><p><code>glyph</code>. Read/write when used in the <code>items</code> collection; otherwise, read-only. Returns a string that represents an icon that's displayed in the completion list. The possible values for <code>glyph</code> use the following format: vs:<em>glyphType</em>, where <em>glyphType</em> corresponds to the language-independent members in the <a href="https://msdn.microsoft.com/en-us/library/microsoft.visualstudio.language.intellisense.standardglyphgroup.aspx">StandardGlyphGroup</a> enumeration. For example, <code>vs:GlyphGroupMethod</code> is one possible value for <code>glyph</code>. When <code>glyph</code> is not set, the <code>kind</code> property determines the default icon.</p></li>
+          <li><p><code>parentObject</code>. Read-only. Returns the parent object.</p></li>
+          <li><p><code>value</code>. Read-only. Returns an object that represents the value of the completion item.</p></li>
+          <li><p><code>comments</code>. Read-only. Returns a string that contains the comments that are above the field or variable.</p></li>
+          <li><p><code>scope</code>. Read-only. Returns the scope of the completion item. The possible values are global, local, parameter, and member.</p></li>
+         </ul>
+         <h3 class="subHeading"><a id="items-Property"></a><a id="Items"></a> items Property</h3>
+         <p>Gets or sets the array of statement completion items. Each element in the array is a <a href="#CompletionItem">completionItem Property</a> object. The <code>items</code> property is available for the <code>statementcompletion</code> event object.</p>
+         <p>Return value: array</p>
+         <h3 class="subHeading"><a id="functionComments-Property"></a><a id="FunctionComments"></a> functionComments Property</h3>
+         <p>Returns the comments for the function. This property is available for the <code>signaturehelp</code> event object.</p>
+         <p>Return value: <code>comments</code> object</p>
+         <p>Following are the members of the <code>comments</code> object:</p>
+         <ul>
+          <li><p><code>above</code>. Returns the comments above the function.</p></li>
+          <li><p><code>inside</code>. Returns the comments inside the function, typically in VSDoc format.</p></li>
+          <li><p><code>paramComments</code>. Returns an array representing comments for each parameter in the function. The members of the array include:</p>
+           <ul>
+            <li><p><code>name</code>. Returns a string representing the parameter name.</p></li>
+            <li><p><code>comment</code>. Returns a string that contains the parameter comment.</p></li>
+           </ul></li>
+         </ul>
+         <h3 class="subHeading"><a id="functionHelp-Property"></a><a id="FunctionHelp"></a> functionHelp Property</h3>
+         <p>Returns the Help for the function. This property is available for the <code>signaturehelp</code> event object.</p>
+         <p>Return value: <code>functionHelp</code> object</p>
+         <p>Following are the members of the <code>functionHelp</code> object:</p>
+         <ul>
+          <li><p><code>functionName</code>. Read/write. Returns a string that contains the function name.</p></li>
+          <li><p><code>signatures</code>. Read/write. Gets or sets the array of function signatures. Each element in the array is a <code>signature</code> object. Some <code>signature</code> properties, such as <code>locid</code>, correspond to common <a href="https://msdn.microsoft.com/en-us/library/hh524453.aspx">XML Documentation Comments</a> attributes.</p><p>The members of the <code>signature</code> object include:</p>
+           <ul>
+            <li><p><code>description</code>. Read/write. Returns a string that describes the function.</p></li>
+            <li><p><code>locid</code>. Read/write. Returns a string identifier that contains localization information about the function.</p></li>
+            <li><p><code>helpKeyword</code>. Read/write. Returns a string that contains the Help keyword.</p></li>
+            <li><p><code>externalFile</code>. Read/write. Returns a string that represents the file that contains the member ID.</p></li>
+            <li><p><code>externalid</code>. Read/write. Returns a string that represents the member ID of the function.</p></li>
+            <li><p><code>params</code>. Read/write. Gets or sets the array of parameters for the function. Each element in the parameters array is a <code>parameter</code> object that has properties that correspond to the following attributes of the <a href="https://msdn.microsoft.com/en-us/library/hh542720.aspx">&lt;param&gt;</a> element:</p>
+             <ul>
+              <li><p><code>name</code>. Read/write. Returns a string that represents the parameter name.</p></li>
+              <li><p><code>type</code>. Read/write. Returns a string that represents the parameter type.</p></li>
+              <li><p><code>elementType</code>. Read/write. If the type is <code>Array</code>, returns a string that represents the type of the elements in the array.</p></li>
+              <li><p><code>description</code>. Read/write. Returns a string that describes the parameter.</p></li>
+              <li><p><code>locid</code>. Read/write. Returns a string identifier that contains localization information about the function.</p></li>
+              <li><p><code>optional</code>. Read/write. Returns a string that indicates whether the parameter is optional. <code>true</code> indicates that the parameter is optional; <code>false</code> indicates that it isn't.</p></li>
+             </ul></li>
+            <li><p><code>returnValue</code>. Read/write. Gets or sets a return value object with properties that correspond to the following attributes of the <a href="https://msdn.microsoft.com/en-us/library/hh542719.aspx">&lt;returns&gt;</a> element:</p>
+             <ul>
+              <li><p><code>type</code>. Read/write. Returns a string that represents the return type.</p></li>
+              <li><p><code>elementType</code>. Read/write. If the type is <code>Array</code>, returns a string that represents the type of the elements in the array.</p></li>
+              <li><p><code>description</code>. Read/write. Returns a string that describes the return value.</p></li>
+              <li><p><code>locid</code>. Read/write. Returns a string identifier that contains localization information about the function.</p></li>
+              <li><p><code>helpKeyword</code>. Read/write. Returns a string that contains the Help keyword.</p></li>
+              <li><p><code>externalFile</code>. Read/write. Returns a string that represents the file that contains the member ID.</p></li>
+              <li><p><code>externalid</code>. Read/write. Returns a string that represents the member ID of the function.</p></li>
+             </ul></li>
+           </ul></li>
+         </ul>
+         <h3 class="subHeading"><a id="parentObject-Property"></a><a id="ParentObject"></a> parentObject Property</h3>
+         <p>Returns the parent object of a member function. For example, for <code>document.getElementByID</code>, <code>parentObject</code> returns the <code>document</code> object. This property is available for the <code>signaturehelp</code> event object.</p>
+         <p>Return value: object</p>
+         <h3 class="subHeading"><a id="target-Property"></a><a id="Target"></a> target Property</h3>
+         <p>Returns an object that represents the item to the left of the trigger character, which is a period (.). For functions, <code>target</code> returns the function for which Parameter Info is requested. This property is available for the <code>statementcompletion</code> and <code>signaturehelp</code> event objects.</p>
+         <p>Return value: object</p>
+         <h3 class="subHeading"><a id="targetName-Property"></a><a id="TargetName"></a> targetName Property</h3>
+         <p>Returns a string that represents the target. For example, for "this.", <code>targetName</code> returns "this". For "A.B" (when the cursor is after "B"), <code>targetName</code> returns "B". This property is available for the <code>statementcompletion</code> event object.</p>
+         <p>Return value: string</p>
+         <h3 class="subHeading"><a id="symbolHelp-Property"></a><a id="SymbolHelp"></a> symbolHelp Property</h3>
+         <p>Returns the completion item for which a Quick Info pop-up box is requested. This property is available for the <code>statementcompletionhint</code> event object.</p>
+         <p>Return value: <code>symbolHelp</code> object.</p>
+         <p>Some properties of the <code>symbolHelp</code> object, such as <code>locid</code>, correspond to common <a href="https://msdn.microsoft.com/en-us/library/hh524453.aspx">XML Documentation Comments</a> attributes.</p>
+         <p>Following are the members of the <code>symbolHelp</code> object:</p>
+         <ul>
+          <li><p><code>name</code>. Read/write. Returns a string that contains the identifier name.</p></li>
+          <li><p><code>symbolType</code>. Read/write. Returns a string that represents the symbol type. Possible values include Unknown, Boolean, Number, String, Object, Function, Array, Date, and Regex.</p></li>
+          <li><p><code>symbolDisplayType</code>. Read/write. Returns a string that contains the type name to display. If <code>symbolDisplayType</code> isn't set, <code>symbolType</code> is used.</p></li>
+          <li><p><code>elementType</code>. Read/write. If the <code>symbolType</code> is <code>Array</code>, returns a string that represents the type of the elements in the array.</p></li>
+          <li><p><code>scope</code>. Read/write. Returns a string that represents the scope of the symbol. Possible values include global, local, parameter, and member.</p></li>
+          <li><p><code>description</code>. Read/write. Returns a string that contains a description of the symbol.</p></li>
+          <li><p><code>locid</code>. Read/write. Returns a string identifier that contains localization information about the symbol.</p></li>
+          <li><p><code>helpKeyword</code>. Read/write. Returns a string that contains the Help keyword.</p></li>
+          <li><p><code>externalFile</code>. Read/write. Returns a string that represents the file that contains the member ID.</p></li>
+          <li><p><code>externalid</code>. Read/write. Returns a string that represents the member ID of the symbol.</p></li>
+          <li><p><code>functionHelp</code>. Read/write. Returns a <a href="#FunctionHelp">functionHelp Property</a>, which might contain information when the <code>symbolType</code> is Function.</p></li>
+         </ul>
+         <h3 class="subHeading"><a id="scope-Property"></a><a id="Scope"></a> scope Property</h3>
+         <p>Returns the completion scope of the event. The possible values for the completion scope are global and members. This property is available for the <code>statementcompletion</code> event object.</p>
+         <p>Return value: string</p>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Debugging IntelliSense extensions</span></a>
+            <div id="Anchor_4" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh874692.aspx#Anchor_4" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <a id="Debugging-IntelliSense-extensions"></a>
+          </div>
+         </div>
+         <p>You can't debug extensions, but you can use the <a href="#intellisenseObject">intellisense Object</a> function to send information to the Visual Studio Output window. For an example that shows how to use this function, see <a href="#Logging">Sending Messages to the Output Window</a> later in this topic. For <code>logMessage</code> to work, at least one event handler must be registered in an extension.</p>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">Code Examples</span></a>
+            <div id="Anchor_5" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh874692.aspx#Anchor_5" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <a id="Code-Examples"></a>
+           <a id="CodeExamples"></a>
+          </div>
+         </div>
+         <p>This section includes code examples that show how to use the IntelliSense extensibility APIs. There are also other ways to use these APIs. For additional examples, see the following files in the \\<em>Visual Studio installation path</em>\JavaScript\References folder. These are working examples used by the JavaScript language service.</p>
+         <ul>
+          <li><p>underscoreFilter.js. This code hides private members from IntelliSense. It includes event handlers for the <code>statementcompletion</code> event.</p></li>
+          <li><p>showPlainComments.js. This code provides IntelliSense support for standard comments. It includes event handlers for the <code>signaturehelp</code> and <code>statementcompletionhint</code> events.</p></li>
+         </ul>
+         <h3 class="subHeading"><a id="Adding-IntelliSense-Annotations"></a><a id="Annotations"></a> Adding IntelliSense Annotations</h3>
+         <p>The following procedure shows how to provide IntelliSense documentation support for a third-party library without modifying the library directly. To do this, you can use <code>intellisense.annotate</code> in an extension.</p>
+         <p>For this example to work, you need the following JavaScript files in your project:</p>
+         <ul>
+          <li><p>demoLib.js, which is a project file that represents a third-party library.</p></li>
+          <li><p>demoLib.intellisense.js, which is the IntelliSense extension. This file doesn't need to be included in the project, but it does need to be in the same folder as exampleLib.js.</p></li>
+          <li><p>appCode.js, which is a project file that represents app code.</p></li>
+         </ul>
+         <h5 class="subHeading"><a id="To-add-an-IntelliSense-annotation"></a>To add an IntelliSense annotation</h5>
+         <ol>
+          <li><p>Add the following code to demoLib.js.</p> 
+           <div id="code-snippet-2" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_c11e1fea-b2d8-4cca-ad21-460a45db669b');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_c11e1fea-b2d8-4cca-ad21-460a45db669b" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+<span style="color:Blue;">function</span> someFunc(a) { };  
+<span style="color:Blue;">var</span> rectangle;  
+
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>Add the following code to demoLib.intellisense.js.</p> 
+           <div id="code-snippet-3" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_844cbbcf-7d0a-440d-a368-65e43832a6cf');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_844cbbcf-7d0a-440d-a368-65e43832a6cf" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+intellisense.annotate(someFunc, <span style="color:Blue;">function</span> (a) {  
+    <span style="color:Green;">/// &lt;signature&gt;  </span>
+    <span style="color:Green;">/// &lt;summary&gt;Description of someFunc&lt;/summary&gt;  </span>
+    <span style="color:Green;">/// &lt;param name="a"&gt;Param a&lt;/param&gt;  </span>
+    <span style="color:Green;">/// &lt;/signature&gt;  </span>
+});  
+
+intellisense.annotate(window, {  
+    <span style="color:Green;">// This is a comment on a global variable named rectangle.  </span>
+    rectangle: undefined  
+});  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>Add the following reference directive as the first line in appCode.js. The path used here indicates that the JavaScript files are in the same folder.</p> 
+           <div id="code-snippet-4" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_1e9320d9-28cb-42b3-9536-b6843a8afdad');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_1e9320d9-28cb-42b3-9536-b6843a8afdad" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+<span style="color:Green;">/// &lt;reference path="demoLib.js" /&gt;  </span>
+
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>In appCode.js, type the following code. You'll see the XML documentation comments in the extension displayed as IntelliSense Parameter Info.</p><p><span><img id="f0def27c-6eba-4131-bdb3-a9799629d2fd" alt="Example showing the use of intellisense.annotate" src="https://i-msdn.sec.s-msft.com/dynimg/IC636432.jpeg" title="Example showing the use of intellisense.annotate" xmlns=""></span></p></li>
+          <li><p>In appCode.js, type the following code. While you type, you'll see the standard comments in the extension displayed as IntelliSense Quick Info.</p><p><span><img id="3912a47f-91b6-4323-88e9-d5c5e47aba96" alt="Example showing the use of intellisense.annotate" src="https://i-msdn.sec.s-msft.com/dynimg/IC636433.jpeg" title="Example showing the use of intellisense.annotate" xmlns=""></span></p></li>
+         </ol>
+         <h3 class="subHeading"><a id="Sending-Messages-to-the-Output-Window"></a><a id="Logging"></a> Sending Messages to the Output Window</h3>
+         <p>The following procedure shows how to send messages to the Output window. You can send messages to help debug IntelliSense extensions.</p>
+         <p>For this example to work, you need the following JavaScript files in your project:</p>
+         <ul>
+          <li><p>exampleLib.js, which is a project file that represents a third-party library.</p></li>
+          <li><p>exampleLib.intellisense.js, which is the IntelliSense extension. This file doesn't need to be included in the project, but it does need to be in the same folder as exampleLib.js.</p></li>
+          <li><p>appCode.js, which is a project file that represents app code.</p></li>
+         </ul>
+         <h5 class="subHeading"><a id="To-send-a-message-to-the-Output-window"></a>To send a message to the Output window</h5>
+         <ol>
+          <li><p>Add the following code to exampleLib.js.</p> 
+           <div id="code-snippet-5" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_35a59ece-13c9-4525-ba01-1b460e1df822');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_35a59ece-13c9-4525-ba01-1b460e1df822" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+<span style="color:Blue;">var</span> someVar = {  
+    a: 1,  
+    b: <span style="color:#A31515;">'hello'</span>  
+};  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>Add the following code to exampleLib.intellisense.js.</p> 
+           <div id="code-snippet-6" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_e7fd3443-c70c-40e1-b053-80165a123c71');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_e7fd3443-c70c-40e1-b053-80165a123c71" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+intellisense.addEventListener(<span style="color:#A31515;">'statementcompletion'</span>, <span style="color:Blue;">function</span> (e) {  
+    <span style="color:Green;">// Prints out statement completion info: Either (1) the member   </span>
+    <span style="color:Green;">// list, if the trigger character was typed, or (2) the   </span>
+    <span style="color:Green;">// statement completion identifiers.  </span>
+    <span style="color:Green;">// e.target represents the object left of the trigger character.  </span>
+    intellisense.logMessage(  
+        e.target ? <span style="color:#A31515;">'member list requested, target: '</span> + e.targetName : <span style="color:#A31515;">'statement completion for current scope requested'</span>);  
+
+    <span style="color:Green;">// Prints out all statement completion items.  </span>
+    e.items.forEach(<span style="color:Blue;">function</span> (item) {  
+        intellisense.logMessage(<span style="color:#A31515;">'[completion item] '</span> + item.name + <span style="color:#A31515;">', kind:'</span> + item.kind + <span style="color:#A31515;">', scope:'</span> + item.scope + <span style="color:#A31515;">', value:'</span> + item.value);  
+    });  
+});  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>Add the following reference directive as the first line in appCode.js. The path used here indicates that the JavaScript files are in the same folder.</p> 
+           <div id="code-snippet-7" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_65802cd7-5a61-45dd-8f7a-9bf2b0ce9fa9');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_65802cd7-5a61-45dd-8f7a-9bf2b0ce9fa9" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+<span style="color:Green;">/// &lt;reference path="exampleLib.js" /&gt;  </span>
+
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>In the Output window, choose <strong>JavaScript Language Service</strong> in the <strong>Show output from</strong> list. (To view the Output window, select <strong>Output</strong> from the View menu.)</p></li>
+          <li><p>In appCode.js, type the following code. While you type, the Output window shows messages from the language service. The first message in the Output window indicates that statement completion for the current scope has been requested.</p> 
+           <div id="code-snippet-8" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_fcffa652-e488-4587-b913-6baa5e03d267');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_fcffa652-e488-4587-b913-6baa5e03d267" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+some  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> <p>Following is a partial view of the output you should see.</p> 
+           <div id="code-snippet-9" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>scr</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_f4041f6e-8025-4a8c-88be-df5dda4fd9ef');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_f4041f6e-8025-4a8c-88be-df5dda4fd9ef" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+03:16:14.3113: statement completion for current scope requested  
+03:16:14.3113: [completion item] break, kind:reserved, scope:undefined, value:undefined  
+03:16:14.3113: [completion item] case, kind:reserved, scope:undefined, value:undefined  
+03:16:14.3113: [completion item] catch, kind:reserved, scope:undefined, value:undefined  
+
+…  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>Choose the <strong>Clear All</strong> button in the Output window.</p></li>
+          <li><p>Type the following code. The first message in the output window indicates that a member list has been requested.</p> 
+           <div id="code-snippet-10" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_40a0e388-7e98-4b4e-84f4-03235c1910fd');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_40a0e388-7e98-4b4e-84f4-03235c1910fd" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+someVar.  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> <p>Following is a partial view of the output you should see:</p> 
+           <div id="code-snippet-11" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>scr</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_6485154f-7028-4ab5-952d-010a899e86c8');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_6485154f-7028-4ab5-952d-010a899e86c8" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+03:17:43.4032: member list requested, target: someVar  
+03:17:43.4032: [completion item] a, kind:field, scope:member, value:1  
+03:17:43.4032: [completion item] b, kind:field, scope:member, value:hello  
+03:17:43.4032: [completion item] constructor, kind:method, scope:member, value:  
+
+…  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+         </ol>
+         <h3 class="subHeading"><a id="Changing-the-IntelliSense-icons"></a><a id="Icons"></a> Changing the IntelliSense icons</h3>
+         <p>The following procedure shows how to change the icons displayed by IntelliSense by default. This might be useful when you provide IntelliSense information about library-specific concepts such as namespaces, classes, interfaces, and enumerations.</p>
+         <p>For available icon values, see <a href="https://msdn.microsoft.com/en-us/library/microsoft.visualstudio.language.intellisense.standardglyphgroup.aspx">StandardGlyphGroup</a>.</p>
+         <p>For this example to work, you need the following JavaScript files in your project:</p>
+         <ul>
+          <li><p>exampleLib.js, which is a project file that represens a third-party library.</p></li>
+          <li><p>exampleLib.intellisense.js, which is the IntelliSense extension. This file doesn't need to be included in the project, but it does need to be in the same folder as exampleLib.js.</p></li>
+          <li><p>appCode.js, which is a project file that represents app code.</p></li>
+         </ul>
+         <h5 class="subHeading"><a id="To-change-the-icons"></a>To change the icons</h5>
+         <ol>
+          <li><p>Add the following code to exampleLib.js.</p> 
+           <div id="code-snippet-12" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_73b76d3f-bb8b-43c8-85d0-1dc49328b57f');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_73b76d3f-bb8b-43c8-85d0-1dc49328b57f" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+<span style="color:Blue;">function</span> Namespace(name) {  
+    <span style="color:Blue;">this</span>._isNamespace = <span style="color:Blue;">true</span>;  
+    window[name] = <span style="color:Blue;">this</span>;  
+};  
+
+<span style="color:Blue;">function</span> Enum(values) {  
+    <span style="color:Blue;">var</span> e = Object.create(values);  
+    e._isEnum = <span style="color:Blue;">true</span>;  
+    <span style="color:Blue;">return</span> e;  
+};  
+
+<span style="color:Blue;">var</span> SomeNamespace = <span style="color:Blue;">new</span> Namespace(<span style="color:#A31515;">'SomeNamespace'</span>);  
+<span style="color:Green;">// A constructor function is considered a class.  </span>
+SomeNamespace.SomeClass1 = <span style="color:Blue;">function</span> () { }  
+SomeNamespace.Enum1 = <span style="color:Blue;">new</span> Enum({ VALUE1: 0, VALUE2: 1 });  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>Add the following code to exampleLib.intellisense.js.</p> 
+           <div id="code-snippet-13" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_f71c1c33-a163-44f4-9835-c9f352d6362b');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_f71c1c33-a163-44f4-9835-c9f352d6362b" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+intellisense.addEventListener(<span style="color:#A31515;">'statementcompletion'</span>, <span style="color:Blue;">function</span> (e) {  
+    e.items.forEach(<span style="color:Blue;">function</span> (item) {  
+        <span style="color:Green;">// Detect a namespace by using the _isNamespace flag.  </span>
+        <span style="color:Blue;">if</span> (item.value &amp;&amp; item.value._isNamespace) {  
+            item.glyph = <span style="color:#A31515;">'vs:GlyphGroupNamespace'</span>;  
+            }  
+
+        <span style="color:Blue;">if</span> (item.parentObject &amp;&amp; item.parentObject._isNamespace) {  
+            <span style="color:Green;">// The item is a member of a namespace.   </span>
+
+            <span style="color:Green;">// All constructor functions that are part of a namespace   </span>
+            <span style="color:Green;">// are considered classes.   </span>
+            <span style="color:Green;">// A constructor function starts with  </span>
+            <span style="color:Green;">// an uppercase letter by convention.    </span>
+            <span style="color:Blue;">if</span> (<span style="color:Blue;">typeof</span> item.value == <span style="color:#A31515;">'function'</span> &amp;&amp; (item.name[0].toUpperCase()   
+                == item.name[0])) {  
+                item.glyph = <span style="color:#A31515;">'vs:GlyphGroupClass'</span>;  
+            }  
+
+            <span style="color:Green;">// Detect an enumeration by using the _isEnum flag.  </span>
+            <span style="color:Blue;">if</span> (item.value &amp;&amp; item.value._isEnum) {  
+                item.glyph = <span style="color:#A31515;">'vs:GlyphGroupEnum'</span>;  
+            }  
+        }  
+    });  
+});  
+
+intellisense.addEventListener(<span style="color:#A31515;">'statementcompletionhint'</span>, <span style="color:Blue;">function</span> (e) {  
+    <span style="color:Blue;">if</span> (e.completionItem.value) {  
+        <span style="color:Blue;">if</span> (e.completionItem.value._isNamespace) {  
+            e.symbolHelp.symbolDisplayType = <span style="color:#A31515;">'Namespace'</span>;  
+        }  
+        <span style="color:Blue;">if</span> (e.completionItem.value._isEnum) {  
+            e.symbolHelp.symbolDisplayType = <span style="color:#A31515;">'Enum'</span>;  
+        }  
+    }  
+});  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>Add the following reference directive as the first line in appCode.js. The path used here indicates that the JavaScript files are in the same folder.</p> 
+           <div id="code-snippet-14" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_6aa66f83-cd69-49ae-945c-33b3972dadb4');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_6aa66f83-cd69-49ae-945c-33b3972dadb4" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+<span style="color:Green;">/// &lt;reference path="exampleLib.js" /&gt;  </span>
+
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>In appCode.js, type the following code. While you type, you'll see that the icon for the namespace has changed to "{}", as is used in C#.</p><p><span><img id="3b5690ad-3b8a-4007-b384-7b028e0938a4" alt="Example showing the use of glyph property" src="https://i-msdn.sec.s-msft.com/dynimg/IC636873.jpeg" title="Example showing the use of glyph property" xmlns=""></span></p></li>
+          <li><p>In appCode.js, type the following code. While you type, you'll see a new enumeration icon for the Enum1 member, and a new class icon for the SomeClass1 member.</p><p><span><img id="b341a803-2bfa-48b0-9cfd-b944018d559a" alt="Example showing use of the glyph property" src="https://i-msdn.sec.s-msft.com/dynimg/IC636434.jpeg" title="Example showing use of the glyph property" xmlns=""></span></p></li>
+         </ol>
+         <h3 class="subHeading"><a id="Avoiding-run-time-effects-on-IntelliSense-results"></a><a id="Overriding"></a> Avoiding run-time effects on IntelliSense results</h3>
+         <p>The JavaScript language service runs code to dynamically provide IntelliSense information. As a result, run-time behavior can occasionally interfere with desired results. The following procedure shows how to override IntelliSense results when run-time behavior results in incorrect IntelliSense.</p>
+         <p>For this example to work, you need the following JavaScript files in your project:</p>
+         <ul>
+          <li><p>exampleLib.js, which is a project file that represents a third-party library.</p></li>
+          <li><p>exampleLib.intellisense.js, which is the IntelliSense extension. This file doesn't need to be included in the project, but it does need to be in the same folder as exampleLib.js.</p></li>
+          <li><p>appCode.js, which is a project file that represents app code.</p></li>
+         </ul>
+         <h5 class="subHeading"><a id="To-avoid-run-time-effects-on-IntelliSense-results"></a>To avoid run-time effects on IntelliSense results</h5>
+         <ol>
+          <li><p>Add the following code to exampleLib.js.</p> 
+           <div id="code-snippet-15" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_d1351d7c-1974-4f83-8f58-747f27631d6a');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_d1351d7c-1974-4f83-8f58-747f27631d6a" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+<span style="color:Blue;">function</span> after(count, func) {  
+    <span style="color:Blue;">return</span> <span style="color:Blue;">function</span> () {  
+        <span style="color:Blue;">if</span> (--times &lt; 1) {  
+            <span style="color:Blue;">return</span> func.apply(<span style="color:Blue;">this</span>, arguments);  
+        }  
+    };  
+};  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> <p>In the preceding code, the wrapped function ignores initial calls, based on the value of <code>count</code>, and doesn't return results.</p></li>
+          <li><p>Add the following reference directive as the first line in appCode.js. The path used here indicates that the JavaScript files are in the same folder.</p> 
+           <div id="code-snippet-16" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_78ed85bd-b610-4141-82d8-06a781f64570');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_78ed85bd-b610-4141-82d8-06a781f64570" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+<span style="color:Green;">/// &lt;reference path="exampleLib.js" /&gt;  </span>
+
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>In appCode.js, type the following code. The identifier list appears instead of IntelliSense because the wrapped function is never called, which means that the <code>throttled</code> function doesn't return any results.</p><p><span><img id="126bb6d9-b682-4267-89f5-6a59d4c4a3df" alt="Example of overriding intellisense results" src="https://i-msdn.sec.s-msft.com/dynimg/IC636874.jpeg" title="Example of overriding intellisense results" xmlns=""></span></p></li>
+          <li><p>Add the following code to exampleLib.intellisense.js. This will change the design-time behavior so that IntelliSense is shown for the wrapped function, as expected.</p> 
+           <div id="code-snippet-17" class="codeSnippetContainer" xmlns=""> 
+            <div class="codeSnippetContainerTabs"> 
+             <div class="codeSnippetContainerTabSingle" dir="ltr">
+              <a>JavaScript</a>
+             </div> 
+            </div> 
+            <div class="codeSnippetContainerCodeContainer"> 
+             <div class="codeSnippetToolBar"> 
+              <div class="codeSnippetToolBarText"> 
+               <a name="CodeSnippetCopyLink" style="display: none;" title="Copy to clipboard." href="javascript:if (window.epx.codeSnippet)window.epx.codeSnippet.copyCode('CodeSnippetContainerCode_bbc4c911-4722-4a26-98d0-c5154a069f3e');" ms.cmptyp="CodeSnippet">Copy</a> 
+              </div> 
+             </div> 
+             <div id="CodeSnippetContainerCode_bbc4c911-4722-4a26-98d0-c5154a069f3e" class="codeSnippetContainerCode" dir="ltr"> 
+              <div style="color:Black;">
+               <pre>
+window.after = <span style="color:Blue;">function</span> (count, func) {  
+    <span style="color:Green;">// Just return func.   </span>
+    <span style="color:Blue;">return</span> func;  
+};  
+
+</pre>
+              </div> 
+             </div> 
+            </div> 
+           </div> </li>
+          <li><p>In appCode.js, test the results by typing the same code that you typed previously. This time, IntelliSense provides the desired information.</p><p><span><img id="c19a6255-6b82-47bc-bfbd-231267ec6b63" alt="Example of overriding IntelliSense results" src="https://i-msdn.sec.s-msft.com/dynimg/IC636875.jpeg" title="Example of overriding IntelliSense results" xmlns=""></span></p></li>
+         </ol>
+         <div>
+          <h2 class="LW_CollapsibleArea_TitleDiv">
+           <div>
+            <a class="LW_CollapsibleArea_TitleAhref" title="Collapse" role="heading"><span class="cl_CollapsibleArea_expanding LW_CollapsibleArea_Img"></span><span class="LW_CollapsibleArea_Title">See Also</span></a>
+            <div id="Anchor_6" class="LW_CollapsibleArea_Anchor_Div">
+             <a href="/en-us/library/hh874692.aspx#Anchor_6" class="LW_CollapsibleArea_Anchor_Img" title="Right-click to copy and share the link for this section"></a>
+            </div>
+            <div class="LW_CollapsibleArea_HrDiv">
+             <hr class="LW_CollapsibleArea_Hr">
+            </div>
+           </div></h2>
+          <div class="sectionblock">
+           <a id="See-Also"></a>
+          </div>
+         </div>
+         <p><a href="https://msdn.microsoft.com/en-us/library/bb385682.aspx">JavaScript IntelliSense</a><br><a href="https://msdn.microsoft.com/en-us/library/hh395059.aspx">Statement Completion for Identifiers</a></p>
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="libraryMemberFilter"> 
+      <div class="filterContainer"> 
+       <span>Show:</span> 
+       <label> <input type="checkbox" class="libraryFilterInherited" checked value="Inherit">Inherited </label> 
+       <label> <input type="checkbox" class="libraryFilterProtected" checked value="Protected">Protected </label> 
+      </div> 
+     </div> 
+     <input type="hidden" id="libraryMemberFilterEmptyWarning" value="There are no members available with your current filter settings."> 
+    </div> 
+    <div id="rightNavigationMenu" ms.cmpgrp="right nav"> 
+     <div id="mobileButtons"> 
+      <div id="navigationButtons"> 
+       <a id="isd_print" href="https://msdn.microsoft.com/en-us/library/hh874692(d=printer).aspx" rel="nofollow"><ins class="print"></ins>Print </a> 
+       <a id="isd_printABook" href="/en-us/library/export/help/?returnurl=%2fen-us%2flibrary%2fhh874692.aspx"> <ins class="export"></ins>Export (<span class="count">0</span>) </a> 
+      </div> 
+     </div> 
+     <div id="navMain"> 
+      <div id="closeNavigation"> 
+       <a class="tocCloseSmall" id="closeButton"></a> 
+      </div> 
+      <div id="navigationButtons"> 
+       <a id="isd_print" href="https://msdn.microsoft.com/en-us/library/hh874692(d=printer).aspx" rel="nofollow"><ins class="print"></ins>Print </a> 
+       <a id="isdShare" href="#" role="button" aria-expanded="false"> <ins class="share"></ins>Share </a> 
+       <div id="socials" style="display: none"> 
+        <a class="isdFacebook" href="#" aria-label="Share on Facebook"> <ins class="facebook"></ins> </a> 
+        <a class="isdTwitter" href="#" aria-label="Share on Twitter"> <ins class="twitter"></ins> </a> 
+        <a class="isdGooglePlus" href="#" aria-label="Share on Google+"> <ins class="googlePlus"></ins> </a> 
+       </div> 
+      </div> 
+      <div id="indoc_toc" style="display: none" ms.cmpgrp="indoc toc"> 
+       <div id="indoc_title">
+        IN THIS ARTICLE
+       </div> 
+       <ul id="indoc_toclist"></ul> 
+      </div> 
+     </div> 
+    </div> 
+    <div id="rightNavigationMenuThumbnail" class="rightNavigationMenuThumbnail"> 
+    </div> 
+   </div> 
+   <div class="clear"></div> 
+   <input name="__RequestVerificationToken" type="hidden" value="UgDfVDX-W6SamOx-96ps1Axm3f1AhKwodpqSFP_LneKXgk8pN7p6VMxEZyS2J01LB6LHwM8lU-PtYaq2Hw-J2D-v61Q1"> 
+   <input id="ratingValueSubmitUrl" type="hidden" value="https://msdn.microsoft.com/en-us/library/feedback/rate/hh874692.aspx"> 
+   <input id="ratingAdditionalSubmitUrl" type="hidden" value="https://msdn.microsoft.com/en-us/library/feedback/additional/hh874692.aspx"> 
+   <input id="isTopicRated" type="hidden" value="false"> 
+   <div id="lib-footer"> 
+    <link type="text/css" rel="stylesheet"> 
+    <div id="ux-footer" class="" style="" dir="ltr" ms.pgarea="footer"> 
+     <div id="standardRatingBefore" class="clear stdr-container-before"></div> 
+     <div id="standardRating" class="stdr-container" ms.pgarea="body"> 
+      <div class="stdr-close"></div> 
+      <div class="stdr-vote stdr-content"> 
+       <div class="stdr-content"> 
+        <span class="stdr-votetitle">Is this page helpful?</span> 
+        <button class="stdr-yes" aria-label="Yes, this page was helpful">Yes</button> 
+        <button class="stdr-no" aria-label="No, this page was not helpful">No</button> 
+        <input id="s_ratingValue" type="hidden" value=""> 
+       </div> 
+      </div> 
+      <div class="stdr-feedback" style="display: none"> 
+       <div class="stdr-form"> 
+        <div class="stdr-fieldtitle">
+         Additional feedback?
+        </div> 
+        <textarea class="stdr-detail" rows="6" maxlength="1500"></textarea> 
+        <div> 
+         <span class="stdr-count"><span class="stdr-charcnt">1500</span> characters remaining</span> 
+         <div class="stdr-buttons"> 
+          <button class="stdr-provide" aria-label="Submit my additional feedback">Submit</button> 
+          <button class="stdr-skip" aria-label="Skip additional feedback">Skip this</button> 
+         </div> 
+        </div> 
+        <div class="clear"></div> 
+       </div> 
+      </div> 
+      <div class="stdr-thanks" style="display: none"> 
+       <div class="stdr-content"> 
+        <span class="stdr-thankyou">Thank you!</span> 
+        <span class="stdr-appreciate">We appreciate your feedback.</span> 
+       </div> 
+      </div> 
+      <div id="contentFeedbackQAContainer" style="display: none;"></div> 
+     </div> 
+     <div id="standardRatingPlaceholder" style="display: none"></div> 
+     <footer class="top" role="navigation" aria-label="footer"> 
+      <div data-fragmentname="LeftLinks" id="Fragment_LeftLinks" xmlns="http://www.w3.org/1999/xhtml"> 
+       <div class="linkList"> 
+        <h4 class="linkListTitle">Dev centers</h4> 
+        <ul class="links"> 
+         <li> <a href="https://developer.microsoft.com/en-us/windows" id="LeftLinks_2148_1" class="windowsBlue" xmlns="http://www.w3.org/1999/xhtml">Windows</a> </li> 
+         <li> <a href="https://dev.office.com/" id="LeftLinks_2148_3" class="office" xmlns="http://www.w3.org/1999/xhtml">Office</a> </li> 
+         <li> <a href="https://www.visualstudio.com/" id="LeftLinks_2148_4" class="visualStudio" xmlns="http://www.w3.org/1999/xhtml">Visual Studio</a> </li> 
+         <li> <a href="https://docs.microsoft.com/en-us/azure/" target="_blank" id="LeftLinks_2148_12" xmlns="http://www.w3.org/1999/xhtml">Microsoft Azure</a> </li> 
+         <li> <a href="https://msdn.microsoft.com/developer-centers-msdn" id="LeftLinks_2148_5" xmlns="http://www.w3.org/1999/xhtml">More...</a> </li> 
+        </ul> 
+       </div> 
+      </div> 
+      <div id="rightLinks"> 
+       <div data-fragmentname="CenterLinks1" id="Fragment_CenterLinks1" xmlns="http://www.w3.org/1999/xhtml"> 
+        <div class="linkList"> 
+         <h4 class="linkListTitle">Learning resources</h4> 
+         <ul class="links"> 
+          <li> <a href="https://mva.microsoft.com/" id="CenterLinks1_2151_4" xmlns="http://www.w3.org/1999/xhtml">Microsoft Virtual Academy</a> </li> 
+          <li> <a href="https://channel9.msdn.com/" id="CenterLinks1_2151_5" xmlns="http://www.w3.org/1999/xhtml">Channel 9</a> </li> 
+          <li> <a href="https://msdn.microsoft.com/magazine/" id="CenterLinks1_2151_7" xmlns="http://www.w3.org/1999/xhtml">MSDN Magazine</a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+       <div data-fragmentname="CenterLinks2" id="Fragment_CenterLinks2" xmlns="http://www.w3.org/1999/xhtml"> 
+        <div class="linkList"> 
+         <h4 class="linkListTitle">Community</h4> 
+         <ul class="links"> 
+          <li> <a href="https://social.msdn.microsoft.com/forums/en-us/home" id="CenterLinks2_2151_8" xmlns="http://www.w3.org/1999/xhtml">Forums</a> </li> 
+          <li> <a href="https://blogs.msdn.microsoft.com/developer-tools/" id="CenterLinks2_2151_9" xmlns="http://www.w3.org/1999/xhtml">Blogs</a> </li> 
+          <li> <a href="https://www.codeplex.com/" id="CenterLinks2_2151_10" xmlns="http://www.w3.org/1999/xhtml">Codeplex</a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+       <div data-fragmentname="CenterLinks3" id="Fragment_CenterLinks3" xmlns="http://www.w3.org/1999/xhtml"> 
+        <div class="linkList"> 
+         <h4 class="linkListTitle">Support</h4> 
+         <ul class="links"> 
+          <li> <a href="https://msdn.microsoft.com/hh361695" id="CenterLinks3_2151_11" xmlns="http://www.w3.org/1999/xhtml">Self support</a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+       <div data-fragmentname="CenterLinks4" id="Fragment_CenterLinks4" xmlns="http://www.w3.org/1999/xhtml"> 
+        <div class="linkList"> 
+         <h4 class="linkListTitle">Programs</h4> 
+         <ul class="links"> 
+          <li> <a href="https://bizspark.microsoft.com/Startups/Index" id="CenterLinks4_2151_13" xmlns="http://www.w3.org/1999/xhtml">BizSpark (for startups)</a> </li> 
+          <li> <a href="https://imagine.microsoft.com/en-us" id="CenterLinks4_2151_22" xmlns="http://www.w3.org/1999/xhtml">Microsoft Imagine (for students)</a> </li> 
+         </ul> 
+        </div> 
+       </div> 
+      </div> 
+     </footer> 
+     <footer class="bottom" role="contentinfo"> 
+      <span class="localeContainer"> 
+       <form class="selectLocale" id="selectLocaleForm" action="https://msdn.microsoft.com/en-us/selectlocale-dmc"> 
+        <input type="hidden" name="fromPage" value="https%3a%2f%2fmsdn.microsoft.com%2fen-us%2flibrary%2fhh874692.aspx"> 
+        <a href="#" onclick="$('#selectLocaleForm').submit();return false;" title="Change your language">United States (English)</a> 
+       </form> </span> 
+      <div data-fragmentname="BottomLinks" id="Fragment_BottomLinks" xmlns="http://www.w3.org/1999/xhtml"> 
+       <div class="linkList"> 
+        <ul class="links horizontal"> 
+         <li> <a href="https://msdn.microsoft.com/en-us/flashnewsletter" id="BottomLinks_2148_7" xmlns="http://www.w3.org/1999/xhtml">Newsletter</a> </li> 
+         <li> <a href="https://msdn.microsoft.com/en-us/dn529288" id="BottomLinks_2148_8" xmlns="http://www.w3.org/1999/xhtml">Privacy &amp; cookies</a> </li> 
+         <li> <a href="https://msdn.microsoft.com/en-us/cc300389" id="BottomLinks_2148_9" xmlns="http://www.w3.org/1999/xhtml">Terms of use</a> </li> 
+         <li> <a href="https://www.microsoft.com/en-us/legal/intellectualproperty/Trademarks/" id="BottomLinks_2148_10" xmlns="http://www.w3.org/1999/xhtml">Trademarks</a> </li> 
+        </ul> 
+       </div> 
+      </div> 
+      <span class="logoLegal"> <span class="logoSpan clip67x13" role="img" tabindex="0" aria-label="microsoft logo"> <img alt="logo" class="logo" src="https://i-msdn.sec.s-msft.com/Areas/Centers/Themes/StandardDevCenter/Content/HeaderFooterSprite.png?v=636422593544160354"> </span> <span class="copyright">© 2017 Microsoft</span> </span> 
+     </footer> 
+    </div> 
+   </div> 
+   <div class="footerPrintView"> 
+    <div class="footerCopyrightPrintView">
+     © 2017 Microsoft
+    </div> 
+   </div> 
+   <input id="tocPaddingPerLevel" type="hidden" value="17"> 
+   <input id="MtpsDevice" type="hidden" value="Default"> Third party scripts and code linked to or referenced from this website are licensed to you by the parties that own such code, not by Microsoft. See ASP.NET Ajax CDN Terms of Use – http://www.asp.net/ajaxlibrary/CDN.ashx. WebTrends view model not available or IncludeLegacyWebTrendsScriptInGlobal feature flag is off 
+   <div id="globalRequestVerification"> 
+    <input name="__RequestVerificationToken" type="hidden" value="vItCPgJkwe5AWqsZFEMhGExjzc9G7FuN-5PzBRKbrOoT8ieTIogqpP1X0DjHOGRJtFVwzW6JmsVpyytu8cKMV1Y-csc1"> 
+   </div> 
+  </div> 
+  <script type="text/javascript" class="mtps-injected">
+/*<![CDATA[*/
+(function(window,document){"use strict";function preload(scripts){for(var result=[],script,e,i=0;i<scripts.length;i++)script=scripts[i],script.hasOwnProperty("url")&&(e=document.createElement("script"),e.src=script.url,script.throwaway=e),result.push(script);return result}function inject(scripts,index){var script,elem;if(index>=scripts.length){delete mtps.injectScripts;return}script=scripts[index];elem=document.createElement("script");elem.className="mtps-injected";elem.async=!1;var isLoaded=!1,timeoutId=0,injectNextFnName="",injectNext=elem.onerror=function(){isLoaded||(isLoaded=!0,inject(scripts,index+1),window.clearTimeout(timeoutId),elem.onload=elem.onerror=elem.onreadystatechange=null,injectNextFnName&&delete mtps[injectNextFnName],elem.removeEventListener&&elem.removeEventListener("load",injectNext,!1))};elem.addEventListener?elem.addEventListener("load",injectNext,!1):elem.readyState==="uninitialized"?elem.onreadystatechange=function(){(this.readyState==="loaded"||this.readyState==="complete")&&injectNext()}:elem.onload=injectNext;script.hasOwnProperty("url")?(timeoutId=window.setTimeout(injectNext,12e4),elem.src=script.url):(injectNextFnName="_injectNextScript_"+index,mtps[injectNextFnName]=injectNext,timeoutId=window.setTimeout(injectNext,2e3),elem.text="try {\n"+script.txt+"\n} finally { MTPS."+injectNextFnName+" && MTPS."+injectNextFnName+"(); }");parent.appendChild(elem)}var mtps=window.MTPS||(window.MTPS={}),parent=document.getElementsByTagName("head")[0];mtps.injectScripts=function(scripts){inject(preload(scripts),0)}})(window,document);
+MTPS.injectScripts([
+	{ txt: "/**/\r\n(window.MTPS || (window.MTPS = {})).cdnDomains || (window.MTPS.cdnDomains = { \r\n\t\"image\": \"https://i-msdn.sec.s-msft.com\", \r\n\t\"js\": \"https://i2-msdn.sec.s-msft.com\", \r\n\t\"css\": \"https://i-msdn.sec.s-msft.com\", \r\n\t\"ttf\": \"https://i-msdn.sec.s-msft.com\"\r\n});\r\n/**/" },
+	{ txt: "//\n\n        window.appInsightsId = \u00275eb1b2eb-c47a-497a-a7ac-a1c230b2882f\u0027;\n        //" },
+	{ url: "https://i2-msdn.sec.s-msft.com/Combined.js?resources=0:Utilities,1:Layout,2:Header,3:Breadcrumbs,4:LibraryRightNavigationMenu,4:PrintExportButton,5:StandardRating,2:Footer,0:Topic,3:ResponsiveSupport,6:JSLLRecord,0:ABTestControl;/Areas/Epx/Content/Scripts:0,/Areas/Epx/Themes/Base/Content:1,/Areas/Centers/Themes/StandardDevCenter/Content:2,/Areas/Library/Content:3,/Areas/Library/Themes/Base/Content:4,/Areas/Global/Content:5,/Areas/Centers/Themes/Base/Content:6\u0026amp;hashKey=5BCC6179B3A366032BFF561B6ACBF9DE\u0026amp;v=5D986C58610A6C754EF254BBAE46E347" },
+	{ url: "https://uhf.microsoft.com/mscc/statics/mscc-0.3.6.min.js" },
+	{ url: "https://i2-msdn.sec.s-msft.com/Areas/Epx/Themes/Base/Content/SearchBox.js" },
+	{ url: "https://i1.services.social.microsoft.com/search/Widgets/SearchBox.jss?boxid=HeaderSearchTextBox\u0026btnid=HeaderSearchButton\u0026minimumTermLength=2\u0026pgArea=header\u0026brand=Msdn\u0026loc=en-us\u0026focusOnInit=false\u0026emptyWatermark=true\u0026searchButtonTooltip=Search MSDN" },
+	{ url: "https://i2-msdn.sec.s-msft.com/Combined.js?resources=0:JumpRedirect,1:CmpgrpForHeader,1:ResponsiveToc;/Areas/Epx/Themes/Base/Content:0,/Areas/Library/Content:1\u0026amp;hashKey=27CB08B1B0C7422F93D5325C9A4B4479\u0026amp;v=5D986C58610A6C754EF254BBAE46E347" },
+	{ txt: "MTPS = window.MTPS || {}; MTPS.LocalizedStrings = window.MTPS.LocalizedStrings || {}; MTPS.LocalizedStrings.ExpandButtonTooltip = \u0027Expand\u0027; MTPS.LocalizedStrings.CollapseButtonTooltip = \u0027Collapse\u0027; MTPS.LocalizedStrings.EnhancedExpandTooltip = \u0027Click to expand. Double-click to expand all.\u0027; MTPS.LocalizedStrings.EnhancedCollapseTooltip = \u0027Click to collapse. Double-click to collapse all.\u0027; MTPS.LocalizedStrings.ExpandAllButtonTooltip = \u0027Expand All\u0027; MTPS.LocalizedStrings.CollapseAllButtonTooltip = \u0027Collapse All\u0027;" },
+	{ url: "https://i2-msdn.sec.s-msft.com/Combined.js?resources=0:LibraryMemberFilter,1:Toc_Fixed,1:CodeSnippet,1:TopicNotInScope,1:VersionSelector,1:SurveyBroker;/Areas/Library/Content:0,/Areas/Epx/Content/Scripts:1\u0026amp;hashKey=D8D1FFAA6CA68460B7EFA5923975CA44\u0026amp;v=5D986C58610A6C754EF254BBAE46E347" },
+	{ txt: "$(document).ready(function() {\n        try {\n            var token = $(\"#globalRequestVerification input[name=\u0027__RequestVerificationToken\u0027]\").clone();\n            $(\"#siteFeedbackForm\").append(token);\n        } catch(err) {\n            \n        }\n    });" }
+]);
+
+/*]]>*/
+</script>  
+ </body>
+</html>

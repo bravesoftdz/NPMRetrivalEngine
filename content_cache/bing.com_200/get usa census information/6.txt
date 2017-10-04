@@ -1,0 +1,1565 @@
+<!doctype html>
+<!--[if IE 8]>
+<html class="ie8" lang="en-US">
+<![endif]-->
+<!--[if !(IE 8) ]><!-->
+<html lang="en-US">
+ <!--<![endif]-->
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <title>Manipulating and mapping US Census data in R using the acs, tigris and leaflet packages | Technical Tidbits From Spatial Analysis &amp; Data Science</title> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="pingback" href="http://zevross.com/blog/xmlrpc.php"> 
+  <link rel="dns-prefetch" href="//s0.wp.com"> 
+  <link rel="dns-prefetch" href="//s.gravatar.com"> 
+  <link rel="dns-prefetch" href="//fonts.googleapis.com"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="Technical Tidbits From Spatial Analysis &amp; Data Science » Feed" href="http://zevross.com/blog/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Technical Tidbits From Spatial Analysis &amp; Data Science » Comments Feed" href="http://zevross.com/blog/comments/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Technical Tidbits From Spatial Analysis &amp; Data Science » Manipulating and mapping US Census data in R using the acs, tigris and leaflet packages Comments Feed" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/feed/"> 
+  <script type="text/javascript">window._wpemojiSettings={"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.2.1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.2.1\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/zevross.com\/blog\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.7.6"}};!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),!(j.toDataURL().length<3e3)&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57331,65039,8205,55356,57096),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57331,55356,57096),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55357,56425,55356,57341,8205,55357,56507),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55357,56425,55356,57341,55357,56507),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);</script> 
+  <style type="text/css">img.wp-smiley,img.emoji{display:inline!important;border:none!important;box-shadow:none!important;height:1em!important;width:1em!important;margin:0 .07em!important;vertical-align:-.1em!important;background:none!important;padding:0!important}</style> 
+  <link rel="stylesheet" id="graphy-fonts-css" href="//fonts.googleapis.com/css?family=Lora%3A400%2C400italic%2C700%2C700italic%7CBitter%3A400&amp;subset=latin%2Clatin-ext" type="text/css" media="all"> 
+  <link rel="stylesheet" id="graphy-genericons-css" href="http://zevross.com/blog/wp-content/themes/graphy/genericons/genericons.css?ver=3.0.3" type="text/css" media="all"> 
+  <link rel="stylesheet" id="graphy-style-css" href="http://zevross.com/blog/wp-content/themes/graphy/style.css?ver=4.7.6" type="text/css" media="all"> 
+  <link rel="stylesheet" id="jetpack_css-css" href="http://zevross.com/blog/wp-content/plugins/jetpack/css/jetpack.css?ver=5.0" type="text/css" media="all"> 
+  <!-- This site uses the Google Analytics by MonsterInsights plugin v6.2.0 - Using Analytics tracking - https://www.monsterinsights.com/ --> 
+  <script type="text/javascript" data-cfasync="false">function __gaTrackerIsOptedOut(){return document.cookie.indexOf(disableStr+'=true')>-1;}
+var disableStr='ga-disable-UA-34021094-1';if(__gaTrackerIsOptedOut()){window[disableStr]=true;}
+function __gaTrackerOptout(){document.cookie=disableStr+'=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';window[disableStr]=true;}
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','__gaTracker');__gaTracker('create','UA-34021094-1','auto');__gaTracker('set','forceSSL',true);__gaTracker('send','pageview');</script> 
+  <!-- / Google Analytics by MonsterInsights --> 
+  <script type="text/javascript">//<![CDATA[
+var monsterinsights_frontend={"js_events_tracking":"true","is_debug_mode":"false","download_extensions":"doc,exe,js,pdf,ppt,tgz,zip,xls","inbound_paths":"","home_url":"http:\/\/zevross.com\/blog","track_download_as":"event","internal_label":"int","hash_tracking":"false"};
+//]]></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-content/plugins/google-analytics-for-wordpress/assets/js/frontend.min.js?ver=6.2.0"></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-includes/js/jquery/jquery.js?ver=1.12.4"></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1"></script> 
+  <link rel="https://api.w.org/" href="http://zevross.com/blog/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://zevross.com/blog/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://zevross.com/blog/wp-includes/wlwmanifest.xml"> 
+  <link rel="prev" title="Process a Raster for use in a Google Map Using R" href="http://zevross.com/blog/2015/08/21/process-a-raster-for-use-in-a-google-map-using-r/"> 
+  <link rel="next" title="Tips for reading spatial files into R with rgdal" href="http://zevross.com/blog/2016/01/13/tips-for-reading-spatial-files-into-r-with-rgdal/"> 
+  <meta name="generator" content="WordPress 4.7.6"> 
+  <link rel="canonical" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/"> 
+  <link rel="shortlink" href="http://wp.me/p4tuX4-mm"> 
+  <link rel="alternate" type="application/json+oembed" href="http://zevross.com/blog/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fzevross.com%2Fblog%2F2015%2F10%2F14%2Fmanipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="http://zevross.com/blog/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fzevross.com%2Fblog%2F2015%2F10%2F14%2Fmanipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3%2F&amp;format=xml"> 
+  <link rel="dns-prefetch" href="//v0.wordpress.com"> 
+  <style type="text/css">.site-logo{margin-top:px;padding-bottom:px}.entry-content a,.entry-summary a,.comment-content a,.comment-respond a,.navigation a,.comment-navigation a,.current-menu-item>a{color:#000}a:hover{color:#b85051}</style> 
+  <style type="text/css">.recentcomments a{display:inline!important;padding:0!important;margin:0!important}</style> 
+  <!-- Dynamic Widgets by QURL - http://www.qurl.nl //--> 
+  <!-- Jetpack Open Graph Tags --> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="Manipulating and mapping US Census data in R using the acs, tigris and leaflet packages"> 
+  <meta property="og:url" content="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/"> 
+  <meta property="og:description" content="Census data the hard way Plotting census data with ggplot2 Interactive plotting with the leaflet package Options 1: Convert the data.frame back to a SpatialPolygonsDataFrame Options 2: Make use of …"> 
+  <meta property="article:published_time" content="2015-10-14T20:32:51+00:00"> 
+  <meta property="article:modified_time" content="2016-05-06T13:49:02+00:00"> 
+  <meta property="og:site_name" content="Technical Tidbits From Spatial Analysis &amp; Data Science"> 
+  <meta property="og:image" content="http://zevross.com/blog/wp-content/uploads/2015/10/Capture.jpg"> 
+  <meta property="og:image:width" content="795"> 
+  <meta property="og:image:height" content="490"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:creator" content="@zevross"> 
+  <link rel="icon" href="http://zevross.com/blog/wp-content/uploads/2017/02/cropped-favicon-96x96-32x32.png" sizes="32x32"> 
+  <link rel="icon" href="http://zevross.com/blog/wp-content/uploads/2017/02/cropped-favicon-96x96-192x192.png" sizes="192x192"> 
+  <link rel="apple-touch-icon-precomposed" href="http://zevross.com/blog/wp-content/uploads/2017/02/cropped-favicon-96x96-180x180.png"> 
+  <meta name="msapplication-TileImage" content="http://zevross.com/blog/wp-content/uploads/2017/02/cropped-favicon-96x96-270x270.png"> 
+  <link rel="stylesheet" type="text/css" id="wp-custom-css" href="http://zevross.com/blog/?custom-css=c1e4945649"> 
+ </head> 
+ <body class="post-template-default single single-post postid-1386 single-format-standard has-sidebar footer-0 has-avatars"> 
+  <div id="page" class="hfeed site"> 
+   <header id="masthead" class="site-header" role="banner" style="display:none;"> 
+    <div class="site-branding"> 
+     <div class="site-logo">
+      <a href="http://zevross.com/blog/" rel="home"><img alt="" src="http://zevross.com/blog/wp-content/uploads/2014/04/logo_etched1.png"></a>
+     </div> 
+     <h1 class="site-title"><a href="http://zevross.com/blog/" rel="home">Technical Tidbits From Spatial Analysis &amp; Data Science</a></h1> 
+    </div> 
+    <div class="main-navigation-wrapper"> 
+     <nav id="site-navigation" class="main-navigation" role="navigation"> 
+      <h1 class="menu-toggle">Menu</h1> 
+      <a class="skip-link screen-reader-text" href="#content">Skip to content</a> 
+      <div class="menu-menu-1-container">
+       <ul id="menu-menu-1" class="menu">
+        <li id="menu-item-1802" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1802"><a href="http://zevross.com/blog/">Home</a></li> 
+        <li id="menu-item-1803" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1803"><a href="http://zevross.com/blog/up-and-running-with-r/">Intro R workshop</a></li> 
+        <li id="menu-item-1805" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1805"><a href="http://zevross.com/blog/spatial-r-workshop/">Spatial R workshop</a></li> 
+        <li id="menu-item-2029" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2029"><a href="http://zevross.com/blog/machine-learning-r-workshop/">Machine Learning R workshop</a></li> 
+       </ul>
+      </div> 
+     </nav>
+     <!-- #site-navigation --> 
+    </div> 
+    <div id="content" class="site-content"> 
+    </div>
+   </header>
+   <!-- #masthead --> 
+   <header class="navbar--top" role="banner">
+    <div class="navbar--top_wrapper">
+     <a href="//www.zevross.com" alt="ZevRoss Know Your Data" class="navbar__logo__link"></a> 
+     <a href="javascript:void(0)" id="js-navbar--top_mobile-toggle" class="navbar--top_mobile-toggle" alt="expand nav menu">
+      <svg height="48" viewbox="0 0 24 24" width="48" xmlns="http://www.w3.org/2000/svg">
+       <path d="M0 0h24v24H0z" fill="none"></path>
+       <path id="navbar--hamburger" fill="#b2b3B1" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+      </svg></a>
+     <nav class="navbar_nav" role="navigation">
+      <ul id="js-navbar-top-menu" class="navbar-top-menu">
+       <!-- simple nav links loop here -->
+       <li class="nav_link"><a href="//www.zevross.com">Home</a></li>
+       <!-- simple nav links loop here -->
+       <li class="nav_link"><a href="//www.zevross.com/research/">Research</a></li>
+       <!-- simple nav links loop here -->
+       <li class="nav_link"><a href="//www.zevross.com/news/">News</a></li>
+       <!-- simple nav links loop here -->
+       <li class="nav_link"><a href="//www.zevross.com/about/">About Us</a></li>
+       <!-- simple nav links loop here -->
+       <li class="nav_link--isactive nav_link"><a href="//www.zevross.com/blog/">Tech Blog</a></li>
+       <!-- simple nav links loop here -->
+       <li class="nav_link"><a href="//www.zevross.com/data-services/">Data Services</a></li>
+       <!-- simple nav links loop here -->
+       <li class="nav_link"><a href="//www.zevross.com/training/">Training</a></li>
+      </ul>
+     </nav>
+    </div>
+   </header> 
+   <div class="banner banner--subpages" style="background-image:url(/blog/wp-content/uploads/2017/06/xbanner-54ef07817a.png.pagespeed.ic_.X11ZVfI2mt.jpg.png)"></div> 
+   <div id="primary" class="content-area"> 
+    <main id="main" class="site-main" role="main"> 
+     <article id="post-1386" class="post-1386 post type-post status-publish format-standard hentry category-data-visualization category-ggplot2 category-gismaps category-r category-web-mapping"> 
+      <header class="entry-header"> 
+       <h1 class="entry-title">Manipulating and mapping US Census data in R using the <code>acs</code>, <code>tigris</code> and <code>leaflet</code> packages</h1> 
+       <div class="entry-meta"> 
+        <span class="posted-on">Posted on <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/" rel="bookmark"><time class="entry-date published" datetime="2015-10-14T16:32:51+00:00">October 14, 2015</time></a> </span> 
+        <span class="byline">by <span class="author vcard"> <a class="url fn n" href="http://zevross.com/blog/author/zevzevross-com/">zev@zevross.com</a> </span> </span> 
+        <span class="comments-link">· <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comments">33 Comments</a></span> 
+       </div>
+       <!-- .entry-meta --> 
+      </header>
+      <!-- .entry-header --> 
+      <div class="entry-content"> 
+       <div id="TOC"> 
+        <ul> 
+         <li><a href="#census-data-the-hard-way">Census data the hard way</a></li> 
+         <li><a href="#plotting-with-ggplot2">Plotting census data with ggplot2</a></li> 
+         <li><a href="#interactive-plotting-with-the-leaflet-package-not-leafletr">Interactive plotting with the <code>leaflet</code> package</a> 
+          <ul> 
+           <li><a href="#convert-the-data.frame-back-to-a-spatialpolygonsdataframe">Options 1: Convert the <code>data.frame</code> back to a <code>SpatialPolygonsDataFrame</code></a></li> 
+           <li><a href="#make-use-of-the-existing-spatialpolygonsdataframe">Options 2: Make use of the existing <code>SpatialPolygonsDataFrame</code></a></li> 
+          </ul> </li> 
+         <li><a href="#census-data-the-easyer-way">Census data the easy(er) way</a> 
+          <ul> 
+           <li><a href="#set-up-the-packages">1) Set up the packages</a></li> 
+           <li><a href="#get-the-spatial-data-tigris">2) Get the spatial data (<code>tigris</code>)</a></li> 
+           <li><a href="#get-the-tabular-data-acs">3) Get the tabular data (<code>acs</code>)</a></li> 
+           <li><a href="#do-the-merge-tigris">4) Do the merge (<code>tigris</code>)</a></li> 
+           <li><a href="#make-your-map-leaflet">5) Make your map (<code>leaflet</code>)</a></li> 
+          </ul> </li> 
+         <li><a href="#saving-your-map">Saving your map</a></li> 
+         <li><a href="#one-issue">One issue with the <code>leaflet</code> map</a></li> 
+        </ul> 
+       </div> 
+       <p>The US Census provides an incredible wealth of data but it’s not always easy to work with it. In the past, working with the tabular and spatial census data generally meant downloading a table from <a href="http://factfinder.census.gov/faces/nav/jsf/pages/index.xhtml">FactFinder</a> and a shapefile from the <a href="https://www.census.gov/geo/maps-data/">boundary files site</a> and joining the two, perhaps in a GIS system. These files could also be handled in R but getting the data, reading it into R and, in particular, merging tabular and spatial data can be a chore. Working with slots and all the different classes of data and functions can be challenging. </p> 
+       <p>A <a href="http://stackoverflow.com/questions/33084728/plotting-shp-file-in-leaflet-works-in-ggplot">recent interesting post on stackoverflow</a> by Claire Salloum prompted me to revisit this issue in R and I've definitely found some valuable new packages for capturing and manipulating Census data in R.</p> 
+       <p>Edited with an update related to ggplot2 version 2.0 on May 6, 2016</p> 
+       <h2 id="census-data-the-hard-way">Census data the hard way</h2> 
+       <p>The tabular data described in the stackoverflow post can be downloaded from this <a href="http://factfinder.census.gov/bkmk/table/1.0/en/ACS/13_5YR/B19001/0400000US36.14000">FactFinder link</a>. Note that I clicked on download and then chose “Data and annotations in a separate file” and included the descriptive data element names. I also <a href="http://www.zevross.com/web_production/blogposts/r_census/ACS_13_5YR_B19001.zip" target="_blank">posted a version</a> with just the variables used in this post. The spatial data for tracts comes from <a href="https://www.census.gov/geo/maps-data/data/cbf/cbf_tracts.html">this link</a>. We are using data from the US Census' American Community Survey. </p> 
+       <p>Let's start by loading our libraries</p> 
+       <pre><code class="r">library(rgdal)    # for readOGR and others
+library(sp)       # for spatial objects
+library(leaflet)  # for interactive maps (NOT leafletR here)
+library(dplyr)    # for working with data frames
+library(ggplot2)  # for plotting
+</code></pre> 
+       <p>Now we're ready to read in the shapefile that we downloaded and unzipped:</p> 
+       <pre><code class="r">tract &lt;- readOGR(dsn=".", layer = "cb_2014_36_tract_500k")
+## OGR data source with driver: ESRI Shapefile 
+## Source: "x:/junk/claire/leaflet_plot", layer: "cb_2014_36_tract_500k"
+## with 4906 features
+## It has 9 fields
+
+# convert the GEOID to a character
+tract@data$GEOID&lt;-as.character(tract@data$GEOID)
+</code></pre> 
+       <p>And now the tabular data we downloaded from FactFinder. We will use <code>dplyr</code> functions to manipulate the data and clean it up. If these functions are unfamiliar to you, take a look at a <a href="http://zevross.com/blog/2015/01/13/a-new-data-processing-workflow-for-r-dplyr-magrittr-tidyr-ggplot2/">previous blog post</a> on <code>dplyr</code>.</p> 
+       <pre><code class="r">data &lt;- read.csv("x:/junk/claire/leaflet_plot/ACS_13_5YR_B19001.csv", stringsAsFactors = FALSE)
+
+data &lt;- select(data, GEO.id2, GEO.display.label, HD01_VD01, HD01_VD17) %&gt;% 
+  slice(-1) %&gt;% # census has this extra descriptive record
+  rename(id=GEO.id2, geography=GEO.display.label, total=HD01_VD01,
+         over_200=HD01_VD17)
+
+data &lt;- mutate(data, id=as.character(id),
+               geography=as.character(geography),
+               total = as.numeric(total),
+               over_200 = as.numeric(over_200),
+               percent = (over_200/total)*100)
+
+</code></pre> 
+       <h2 id="plotting-with-ggplot2">Plotting census data with <code>ggplot2</code></h2> 
+       <p>In order to plot with <code>ggplot2</code> we need to combine our spatial and tabular data AND the result needs to be a data frame. Luckily, <code>ggplot2</code> has a nice function, <code>fortify</code>, to help us convert the polygons to a data frame and we can merge the ACS data to this data frame: </p> 
+       <pre><code class="r"># convert polygons to data.frame
+# Note that with ggplo2 version 2.0 you will need to 
+# Add maptools see http://bit.ly/1rybv3O
+library(maptools)
+ggtract&lt;-fortify(tract, region = "GEOID") 
+# join tabular data
+ggtract&lt;-left_join(ggtract, data, by=c("id")) 
+
+# here we limit to the NYC counties
+ggtract &lt;- ggtract[grep("Kings|Bronx|New York County|Queens|Richmond", ggtract$geography),]
+
+ggplot() +
+  geom_polygon(data = ggtract , aes(x=long, y=lat, group = group, fill=percent), color="grey50") +
+   scale_fill_gradientn(colours = c("red", "white", "cadetblue"),
+                       values = c(1,0.5, .3, .2, .1, 0))+
+  coord_map(xlim = c(-74.26, -73.71), ylim = c(40.49,40.92))
+</code></pre> 
+       <p><img src="data:image/png;base64,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" alt="plot of chunk unnamed-chunk-5"> </p> 
+       <p>This works. Not particularly pretty, but functional. We could play around with the color scale to come up with something better or we could invest our time in creating something more useful, an interactive map. Let’s give this a try.</p> 
+       <p>By the way, if you’d like more discussion on mapping with <code>ggplot2</code>, you could look at <a href="http://zevross.com/blog/2014/07/16/mapping-in-r-using-the-ggplot2-package/">this blog post</a>.</p> 
+       <h2 id="interactive-plotting-with-the-leaflet-package-not-leafletr">Interactive plotting with the <code>leaflet</code> package</h2> 
+       <p>In a previous <a href="http://zevross.com/blog/2014/04/11/using-r-to-quickly-create-an-interactive-online-map-using-the-leafletr-package/">blog post</a> I showed how to use the <code>leafletR</code> package but I've now moved to using the <code>leaflet</code> package from RStudio instead primarily because it does not require that the user convert a spatial object to a geoJSON object first. Robin Lovelace has a nice summary of <code>leaflet</code> <a href="http://robinlovelace.net/r/2015/02/01/leaflet-r-package.html">here</a>. There is also a nice post by Marco Sciaini <a href="http://spatialrecology.org/leafletmapping/">here</a>.</p> 
+       <p>The <code>leaflet</code> package requires the data input to be a spatial object. In our example, we started with a SpatialPolygonsDataFrame (which we created by reading using <code>readORG</code>) and then we converted this to a vanilla data frame using the <code>fortify</code> function. Given our example there are two approaches. You can convert your <code>data.frame</code> back to a spatial data frame and map with <code>leaflet</code> or you can make use of your existing spatial data frame (called <code>tract</code> above). I'll show the code for both versions (though, spoiler alert, using the existing data frame is much easier).</p> 
+       <h3 id="convert-the-data.frame-back-to-a-spatialpolygonsdataframe">Option 1: Convert the <code>data.frame</code> back to a <code>SpatialPolygonsDataFrame</code></h3> 
+       <p>Here you need to go through a lot of hoops. There may be an easier approach I have not considered but my experience is that you need to convert each tract to a <code>Polygon</code>, then to a <code>Polygons</code> object, then to a <code>SpatialPolygons</code> object and finally to a <code>SpatialPolygonsDataFrame</code>. No, this is not not fun! </p> 
+       <p>Here is the code. Note that I start by creating a function that will extract the records for a particular tract and then convert this tract data to a <code>Polygon</code> and then <code>Polygons</code> object:</p> 
+       <pre><code class="r">#function for creating a Polygons object for 
+# input tractname
+polyFunc&lt;-function(groupname, dat){
+  poly&lt;-filter(dat, id==groupname) %&gt;% 
+    select(long, lat)
+  return(Polygons(list(Polygon(poly)), groupname))
+}
+
+
+tracts &lt;- distinct(ggtract, id, percent)
+tractname &lt;- tracts$id
+polygons&lt;-lapply(tractname, function(x) polyFunc(x, dat=ggtract)) 
+sp.polygon&lt;-SpatialPolygons(polygons)
+df.polygon&lt;-SpatialPolygonsDataFrame(sp.polygon, 
+                                     data=data.frame(row.names=tractname, tracts))
+df.polygon &lt;- df.polygon[order(df.polygon$percent),]
+</code></pre> 
+       <p>Now that we have a <code>SpatialPolygonsDataFrame</code> we can create the interactive plot with the <code>leaflet</code> package:</p> 
+       <pre><code class="r">popup &lt;- paste0("GEOID: ", df.polygon$id, "&lt;br&gt;", "Percent of Households above $200k: ", round(df.polygon$percent,2))
+pal &lt;- colorNumeric(
+  palette = "YlGnBu",
+  domain = df.polygon$percent
+)
+
+map1&lt;-leaflet() %&gt;%
+  addProviderTiles("CartoDB.Positron") %&gt;%
+  addPolygons(data = df.polygon, 
+              fillColor = ~pal(percent), 
+              color = "#b2aeae", # you need to use hex colors
+              fillOpacity = 0.7, 
+              weight = 0.3, 
+              smoothFactor = 0.2,
+              popup = popup) %&gt;%
+  addLegend(pal = pal, 
+            values = df.polygon$percent, 
+            position = "bottomright", 
+            title = "Percent of Households&lt;br&gt;above $200k",
+            labFormat = labelFormat(suffix = "%")) 
+map1
+</code></pre> 
+       <p><iframe src="http://www.zevross.com/web_production/blogposts/r_census/map2.html" width="650" height="600"></iframe></p> 
+       <h3 id="make-use-of-the-existing-spatialpolygonsdataframe">Options 2: Make use of the existing <code>SpatialPolygonsDataFrame</code></h3> 
+       <p>Rather than go through the hoops of converting the <code>SpatialPolygonsDataFrame</code> to a <code>data.frame</code> and back let's make use of the original <code>SpatialPolygonsDataFrame</code> that we read in with <code>readOGR</code>.</p> 
+       <pre><code class="r">class(tract)
+## [1] "SpatialPolygonsDataFrame"
+## attr(,"package")
+## [1] "sp"
+
+# create a new version
+df.polygon2&lt;-tract #tract is the 
+
+# create a rec-field to make sure that we have the order correct
+# this probably is unnecessary but it helps to be careful
+df.polygon2@data$rec&lt;-1:nrow(df.polygon2@data)
+tmp &lt;- left_join(df.polygon2@data, data, by=c("GEOID"="id")) %&gt;% 
+  arrange(rec)
+
+# replace the original data with the new merged data
+df.polygon2@data&lt;-tmp
+# limit to NYC
+df.polygon2 &lt;- df.polygon2[grep("Kings|Bronx|New York County|Queens|Richmond", df.polygon2$geography),]
+#df.polygon2 &lt;- df.polygon2[order(df.polygon2$percent),]
+</code></pre> 
+       <p>Create the interactive plot with the <code>leaflet</code> package:</p> 
+       <pre><code class="r">popup &lt;- paste0("GEOID: ", df.polygon2$id, "&lt;br&gt;", "Percent of Households above $200k: ", round(df.polygon2$percent,2))
+pal &lt;- colorNumeric(
+  palette = "YlGnBu",
+  domain = df.polygon2$percent
+)
+
+map2&lt;-leaflet() %&gt;%
+  addProviderTiles("CartoDB.Positron") %&gt;%
+  addPolygons(data = df.polygon2, 
+              fillColor = ~pal(percent), 
+              color = "#b2aeae", # you need to use hex colors
+              fillOpacity = 0.7, 
+              weight = 1, 
+              smoothFactor = 0.2,
+              popup = popup) %&gt;%
+  addLegend(pal = pal, 
+            values = df.polygon2$percent, 
+            position = "bottomright", 
+            title = "Percent of Households&lt;br&gt;above $200k",
+            labFormat = labelFormat(suffix = "%")) 
+map2
+</code></pre> 
+       <p><iframe src="http://www.zevross.com/web_production/blogposts/r_census/map2.html" width="650" height="600"></iframe></p> 
+       <p>That was definitely a simpler way to map using downloaded census data. But what if we did not have to manually download data and spatial data? Enter the packages <code>acs</code> and <code>tigris</code>.</p> 
+       <h2 id="census-data-the-easyer-way">Census data the easy(er) way</h2> 
+       <p>There are two great packages that make downloading tabular and spatial data from the Census websites unnecessary for many cases. You can instead use the <code>acs</code> package by <a href="http://dusp.mit.edu/faculty/ezra-glenn">Ezra Glenn</a> to download tabular data and the <code>tigris</code> <a href="https://github.com/walkerke/tigris">package</a> by <a href="http://personal.tcu.edu/kylewalker/">Kyle Walker</a> and <a href="https://www.linkedin.com/in/hrbrmstr">Bob Rudis</a>. These packages make the process quite a bit smoother and self-contained.</p> 
+       <p>The code from this example is extracted in a large part from Kyle Walker's <a href="http://rpubs.com/walkerke/tigris">helpful page</a> on <code>tigris</code>.</p> 
+       <h3 id="set-up-the-packages">1) Set up the packages</h3> 
+       <pre><code class="r">library(tigris)
+library(acs)
+library(stringr) # to pad fips codes
+</code></pre> 
+       <h3 id="get-the-spatial-data-tigris">2) Get the spatial data (<code>tigris</code>)</h3> 
+       <pre><code class="r"># note that you can use county names in the tigris package but 
+# not in the acs.fetch function from the acs package so I'm using
+# fips numbers here.
+
+# grab the spatial data (tigris)
+counties &lt;- c(5, 47, 61, 81, 85)
+tracts &lt;- tracts(state = 'NY', county = c(5, 47, 61, 81, 85), cb=TRUE)
+</code></pre> 
+       <h3 id="get-the-tabular-data-acs">3) Get the tabular data (<code>acs</code>)</h3> 
+       <p>In order to do this you will need an API key from the US Census. Go to <a href="http://api.census.gov/data/key_signup.html" target="_blank">this site</a> to request one (takes a minute or two) and then use the <code>api.key.install</code> function in the `acs` package to use the key.</p> 
+       <pre><code class="r">api.key.install(key="YOUR API KEY")
+# create a geographic set to grab tabular data (acs)
+geo&lt;-geo.make(state=c("NY"),
+              county=c(5, 47, 61, 81, 85), tract="*")
+
+# !!!! important note -- the package has not been updated to 2013
+# data so I'm using the five year span that ends in 2012
+
+income&lt;-acs.fetch(endyear = 2012, span = 5, geography = geo,
+                table.number = "B19001", col.names = "pretty")
+
+# use of col.names = "pretty" above gives the full column definitions
+# if you want Census variable IDs use col.names="auto". Here are the
+# variables we want with pretty and auto results.
+#"Household Income: Total:" ("B19001_001")
+#"Household Income: $200,000 or more" ("B19001_017")
+
+
+# the resulting "income" object is not a data.frame it's a list
+# to see what's available
+
+names(attributes(income))
+##  [1] "endyear"        "span"           "acs.units"      "currency.year" 
+##  [5] "modified"       "geography"      "acs.colnames"   "estimate"      
+##  [9] "standard.error" "class"
+attr(income, "acs.colnames")
+##  [1] "Household Income: Total:"              
+##  [2] "Household Income: Less than $10,000"   
+##  [3] "Household Income: $10,000 to $14,999"  
+##  [4] "Household Income: $15,000 to $19,999"  
+##  [5] "Household Income: $20,000 to $24,999"  
+##  [6] "Household Income: $25,000 to $29,999"  
+##  [7] "Household Income: $30,000 to $34,999"  
+##  [8] "Household Income: $35,000 to $39,999"  
+##  [9] "Household Income: $40,000 to $44,999"  
+## [10] "Household Income: $45,000 to $49,999"  
+## [11] "Household Income: $50,000 to $59,999"  
+## [12] "Household Income: $60,000 to $74,999"  
+## [13] "Household Income: $75,000 to $99,999"  
+## [14] "Household Income: $100,000 to $124,999"
+## [15] "Household Income: $125,000 to $149,999"
+## [16] "Household Income: $150,000 to $199,999"
+## [17] "Household Income: $200,000 or more"
+
+# convert to a data.frame for merging
+income_df &lt;- data.frame(paste0(str_pad(income@geography$state, 2, "left", pad="0"), 
+                             str_pad(income@geography$county, 3, "left", pad="0"), 
+                             str_pad(income@geography$tract, 6, "left", pad="0")), 
+                        income@estimate[,c("Household Income: Total:",
+"Household Income: $200,000 or more")], 
+                        stringsAsFactors = FALSE)
+
+income_df &lt;- select(income_df, 1:3)
+rownames(income_df)&lt;-1:nrow(income_df)
+names(income_df)&lt;-c("GEOID", "total", "over_200")
+income_df$percent &lt;- 100*(income_df$over_200/income_df$total)
+</code></pre> 
+       <h3 id="do-the-merge-tigris">4) Do the merge (<code>tigris</code>)</h3> 
+       <p>The package <code>tigris</code> has a nice little merge function to do the sometimes difficult merge between the spatial and tabular data.</p> 
+       <pre><code class="r">income_merged&lt;- geo_join(tracts, income_df, "GEOID", "GEOID")
+# there are some tracts with no land that we should exclude
+income_merged &lt;- income_merged[income_merged$ALAND&gt;0,]
+</code></pre> 
+       <h3 id="make-your-map-leaflet">5) Make your map (<code>leaflet</code>)</h3> 
+       <pre><code class="r">popup &lt;- paste0("GEOID: ", income_merged$GEOID, "&lt;br&gt;", "Percent of Households above $200k: ", round(income_merged$percent,2))
+pal &lt;- colorNumeric(
+  palette = "YlGnBu",
+  domain = income_merged$percent
+)
+
+map3&lt;-leaflet() %&gt;%
+  addProviderTiles("CartoDB.Positron") %&gt;%
+  addPolygons(data = income_merged, 
+              fillColor = ~pal(percent), 
+              color = "#b2aeae", # you need to use hex colors
+              fillOpacity = 0.7, 
+              weight = 1, 
+              smoothFactor = 0.2,
+              popup = popup) %&gt;%
+  addLegend(pal = pal, 
+            values = income_merged$percent, 
+            position = "bottomright", 
+            title = "Percent of Households&lt;br&gt;above $200k",
+            labFormat = labelFormat(suffix = "%")) 
+map3
+</code></pre> 
+       <p><iframe src="http://www.zevross.com/web_production/blogposts/r_census/map3.html" width="650" height="600"></iframe></p> 
+       <h2 id="saving-your-map">Saving your maps</h2> 
+       <p>There is a nice function in the library <code>htmlWidgets</code> for saving your maps:</p> 
+       <pre><code class="r">library(htmlWidgets)
+saveWidget(map1, file="map1.html", selfcontained=FALSE)
+saveWidget(map2, file="map2.html", selfcontained=FALSE)
+saveWidget(map3, file="map3.html", selfcontained=FALSE)
+</code></pre> 
+       <p>If you get an error <code>pandoc document conversion failed</code> your data may be too big to save and you may need to use a less detailed version of the spatial data. Thanks to <a href="http://pandoc document conversion failed">this post</a> for pointing this out.</p> 
+       <h2 id="one-issue">One issue with the <code>leaflet</code> map</h2> 
+       <p><del datetime="2015-10-19T12:42:12+00:00">An astute observer will notice that the stroke lines (outlines) are not being rendered in these maps. In RStudio the lines appear (see image below). I experimented with opacity, width, color and even within the Chrome developer tools. I tried to save from the RStudio plot window and I tried saveWidget. If you have ideas please let me know.</del></p> 
+       <p>Rarely is the solution to an issue like this so simple. Thanks to Bob Rudis for pointing out that I should be using the hex codes for colors rather than using named colors so that they can be recognized in a web setting. I’ve made the changes above and it worked perfectly.</p> 
+       <p><a href="http://zevross.com/blog/wp-content/uploads/2015/10/Capture.jpg"><img src="http://zevross.com/blog/wp-content/uploads/2015/10/Capture.jpg" alt="Capture" width="795" height="490" class="aligncenter size-full wp-image-1404" srcset="http://zevross.com/blog/wp-content/uploads/2015/10/Capture.jpg 795w, http://zevross.com/blog/wp-content/uploads/2015/10/Capture-300x185.jpg 300w" sizes="(max-width: 795px) 100vw, 795px"></a></p> 
+      </div>
+      <!-- .entry-content --> 
+      <footer class="entry-meta entry-footer"> 
+       <span class="cat-links"> Posted in <a href="http://zevross.com/blog/category/data-visualization/" rel="category tag">Data Visualization</a>, <a href="http://zevross.com/blog/category/ggplot2/" rel="category tag">ggplot2</a>, <a href="http://zevross.com/blog/category/gismaps/" rel="category tag">GIS/Maps</a>, <a href="http://zevross.com/blog/category/r/" rel="category tag">R</a>, <a href="http://zevross.com/blog/category/web-mapping/" rel="category tag">Web Mapping</a> </span> 
+      </footer>
+      <!-- .entry-meta --> 
+     </article>
+     <!-- #post-## --> 
+     <nav class="navigation post-navigation" role="navigation"> 
+      <div class="nav-links"> 
+       <div class="nav-previous">
+        <h2>Previous post</h2>
+        <a href="http://zevross.com/blog/2015/08/21/process-a-raster-for-use-in-a-google-map-using-r/" rel="prev">Process a Raster for use in a Google Map Using R</a>
+       </div> 
+       <div class="nav-next">
+        <h2>Next post</h2>
+        <a href="http://zevross.com/blog/2016/01/13/tips-for-reading-spatial-files-into-r-with-rgdal/" rel="next">Tips for reading spatial files into R with <code>rgdal</code></a>
+       </div> 
+      </div>
+      <!-- .nav-links --> 
+     </nav>
+     <!-- .navigation --> 
+     <div id="comments" class="comments-area"> 
+      <h2 class="comments-title"> 33 responses </h2> 
+      <ol class="comment-list"> 
+       <li id="comment-7434" class="comment even thread-even depth-1"> 
+        <article id="div-comment-7434" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/a439b7bba94f9ab3856b44e3d0661e7d?s=84&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/a439b7bba94f9ab3856b44e3d0661e7d?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Brian Griner</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-7434"> <time datetime="2015-10-15T18:56:16+00:00"> October 15, 2015 at 6:56 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Great post. Thank you for sharing this. Brian</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=7434#respond" onclick="return addComment.moveForm( &quot;div-comment-7434&quot;, &quot;7434&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Brian Griner">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-7454" class="comment odd alt thread-odd thread-alt depth-1 parent"> 
+        <article id="div-comment-7454" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/adb3d43af5085fe44f8493a03b86aad2?s=84&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/adb3d43af5085fe44f8493a03b86aad2?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Adeela</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-7454"> <time datetime="2015-10-16T01:02:13+00:00"> October 16, 2015 at 1:02 am </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Very nice. May I use it to map kriging prediction values on ggmap?</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=7454#respond" onclick="return addComment.moveForm( &quot;div-comment-7454&quot;, &quot;7454&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Adeela">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-7491" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-2"> 
+          <article id="div-comment-7491" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-7491"> <time datetime="2015-10-16T08:21:53+00:00"> October 16, 2015 at 8:21 am </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>Yes, you can put anything with coordinates on a ggmap (this post, though, does not use ggmap)</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=7491#respond" onclick="return addComment.moveForm( &quot;div-comment-7491&quot;, &quot;7491&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-7650" class="comment odd alt thread-even depth-1 parent"> 
+        <article id="div-comment-7650" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/7d31c47934b6ccdc06f242a5fe0704e9?s=84&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/7d31c47934b6ccdc06f242a5fe0704e9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Tiernan</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-7650"> <time datetime="2015-10-20T14:16:23+00:00"> October 20, 2015 at 2:16 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Great tutorial! I’m so happy I stumbled across your blog. Have you considered adding your site to r-bloggers.com?</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=7650#respond" onclick="return addComment.moveForm( &quot;div-comment-7650&quot;, &quot;7650&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Tiernan">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-7655" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-2"> 
+          <article id="div-comment-7655" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-7655"> <time datetime="2015-10-20T18:12:26+00:00"> October 20, 2015 at 6:12 pm </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>Thanks. It’s a good idea to list at r-bloggers, I just haven’t looked into it ?</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=7655#respond" onclick="return addComment.moveForm( &quot;div-comment-7655&quot;, &quot;7655&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-7748" class="comment odd alt thread-odd thread-alt depth-1 parent"> 
+        <article id="div-comment-7748" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/7ab0c911d66918be7da89186e3061689?s=84&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/7ab0c911d66918be7da89186e3061689?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Andrew Clark</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-7748"> <time datetime="2015-10-22T22:43:18+00:00"> October 22, 2015 at 10:43 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Very informative article. Thanks</p> 
+          <p>a) Do any of the Provider Tiles actually show county names as an overlay?<br> b) I’m not familiar with US tracts. Are they just a code or do they also have neighborhood equivalent names</p> 
+          <p>I think there may be a typo<br> income_merged$id should be income_merged$GEOID</p> 
+          <p>cheers<br> pssguy</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=7748#respond" onclick="return addComment.moveForm( &quot;div-comment-7748&quot;, &quot;7748&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Andrew Clark">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-7763" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-2"> 
+          <article id="div-comment-7763" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-7763"> <time datetime="2015-10-23T08:44:06+00:00"> October 23, 2015 at 8:44 am </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>a) Yes some provider tiles have counties but I don’t know, off-hand, which ones. Here is a good list:<br> <a href="http://leaflet-extras.github.io/leaflet-providers/preview/" rel="nofollow">http://leaflet-extras.github.io/leaflet-providers/preview/</a></p> 
+            <p>b) Tracts are just a code and associated geography, they do not have neighborhood equivalent names.</p> 
+            <p>Yes, absolutely right about the typo, I’ve made the fix and appreciate you reporting this!</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=7763#respond" onclick="return addComment.moveForm( &quot;div-comment-7763&quot;, &quot;7763&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-8355" class="comment odd alt thread-even depth-1 parent"> 
+        <article id="div-comment-8355" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/1d9e2641a2b739b78d62981c77747325?s=84&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/1d9e2641a2b739b78d62981c77747325?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Rose</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-8355"> <time datetime="2015-11-03T11:54:39+00:00"> November 3, 2015 at 11:54 am </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Any chance you can post a direct link to the census data on your server? I’ve tried to download from census.gov 3 times, and each time I end up with a 4 kb, 2 row file!</p> 
+          <p>Anyway thanks a lot for this well-done post.</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=8355#respond" onclick="return addComment.moveForm( &quot;div-comment-8355&quot;, &quot;8355&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Rose">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-8519" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-2"> 
+          <article id="div-comment-8519" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-8519"> <time datetime="2015-11-06T08:42:12+00:00"> November 6, 2015 at 8:42 am </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>I updated the post with three things: a better link to the data at Census, a link to a ZIP with the data and an update about the API key needed to get ACS data. If you’re willing to test out the data links that would be helpful.</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=8519#respond" onclick="return addComment.moveForm( &quot;div-comment-8519&quot;, &quot;8519&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-10481" class="comment odd alt thread-odd thread-alt depth-1"> 
+        <article id="div-comment-10481" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/6d0b1a02d358e5c38d1c9006b4d624b3?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/6d0b1a02d358e5c38d1c9006b4d624b3?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Alex</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-10481"> <time datetime="2015-12-18T12:27:01+00:00"> December 18, 2015 at 12:27 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Great tutorial! I’ve been looking for something like this for awhile. EXTREMELY glad to have found a resource.</p> 
+          <p>The code worked for me… now to dive into understanding it all and mapping to my ACS data pulls</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=10481#respond" onclick="return addComment.moveForm( &quot;div-comment-10481&quot;, &quot;10481&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Alex">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-13549" class="comment even thread-even depth-1 parent"> 
+        <article id="div-comment-13549" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/1bc96c6a4837bf2b16c8b138072b50f6?s=84&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/1bc96c6a4837bf2b16c8b138072b50f6?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Mehdi</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-13549"> <time datetime="2016-02-10T16:21:30+00:00"> February 10, 2016 at 4:21 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Very nice post! thanks a lot!<br> Is there an easy way to produce maps for all of the USA instead of just a state? (Is there a “state code” that gives all the states, and if yes, is there a file with all the counties?)<br> Or do we need to loop over states?</p> 
+          <p>Thanks again!</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=13549#respond" onclick="return addComment.moveForm( &quot;div-comment-13549&quot;, &quot;13549&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Mehdi">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-13563" class="comment byuser comment-author-zevzevross-com bypostauthor odd alt depth-2"> 
+          <article id="div-comment-13563" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-13563"> <time datetime="2016-02-11T08:40:16+00:00"> February 11, 2016 at 8:40 am </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>Take a look at the documentation for <code>tigris</code>. If I understand your question correctly this is straightforward <code>counties(c("RI", "DE"))</code>.</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=13563#respond" onclick="return addComment.moveForm( &quot;div-comment-13563&quot;, &quot;13563&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-13749" class="comment even thread-odd thread-alt depth-1 parent"> 
+        <article id="div-comment-13749" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/b063baf5e4900a17c1aa649edcde6aa9?s=84&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/b063baf5e4900a17c1aa649edcde6aa9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">agustin</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-13749"> <time datetime="2016-02-18T20:37:26+00:00"> February 18, 2016 at 8:37 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Thanks for the post. One (probably stupid) question, when you download and unzip the tract data, which do you use? I have several extensions for the “cb_2014_36_tract_500k/cb_2014_36_tract_500k” file. </p> 
+          <p>Thanks!</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=13749#respond" onclick="return addComment.moveForm( &quot;div-comment-13749&quot;, &quot;13749&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to agustin">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-13843" class="comment byuser comment-author-zevzevross-com bypostauthor odd alt depth-2"> 
+          <article id="div-comment-13843" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-13843"> <time datetime="2016-02-22T10:29:03+00:00"> February 22, 2016 at 10:29 am </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>Take a look at this <a href="http://zevross.com/blog/2016/01/13/tips-for-reading-spatial-files-into-r-with-rgdal/" rel="nofollow">http://zevross.com/blog/2016/01/13/tips-for-reading-spatial-files-into-r-with-rgdal/</a></p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=13843#respond" onclick="return addComment.moveForm( &quot;div-comment-13843&quot;, &quot;13843&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-13848" class="comment even thread-even depth-1"> 
+        <article id="div-comment-13848" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/0994d29b9948e2e86f976dbf0579828a?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/0994d29b9948e2e86f976dbf0579828a?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Alyssa</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-13848"> <time datetime="2016-02-22T13:57:40+00:00"> February 22, 2016 at 1:57 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Wonderful tutorial. I’ve been playing with census data regarding American Indian land and populations. I didn’t know about the acs package. The link you provide to handling other spatial files is great–I’ll be playing with this all week.</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=13848#respond" onclick="return addComment.moveForm( &quot;div-comment-13848&quot;, &quot;13848&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Alyssa">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-14136" class="comment odd alt thread-odd thread-alt depth-1 parent"> 
+        <article id="div-comment-14136" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/0cb923f9e51793448b544f4be3fc5fd9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/0cb923f9e51793448b544f4be3fc5fd9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn"><a href="http://r-spatial.org/" rel="external nofollow" class="url">Edzer Pebesma</a></b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-14136"> <time datetime="2016-03-06T09:34:55+00:00"> March 6, 2016 at 9:34 am </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Great post. Also worth looking at is CRAN package mapview, which might simplify some of these things (in particular mapping multiple attributes in a leaflet window).</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=14136#respond" onclick="return addComment.moveForm( &quot;div-comment-14136&quot;, &quot;14136&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Edzer Pebesma">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-14159" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-2"> 
+          <article id="div-comment-14159" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-14159"> <time datetime="2016-03-07T08:25:29+00:00"> March 7, 2016 at 8:25 am </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>Very interesting! Thanks for sharing Edzer, it looks like an interesting map package.</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=14159#respond" onclick="return addComment.moveForm( &quot;div-comment-14159&quot;, &quot;14159&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-15367" class="comment odd alt thread-even depth-1 parent"> 
+        <article id="div-comment-15367" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/2ade44c38b912da61a8ea0c62a16a3b9?s=84&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/2ade44c38b912da61a8ea0c62a16a3b9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Seth</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-15367"> <time datetime="2016-05-05T21:19:28+00:00"> May 5, 2016 at 9:19 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Zev-</p> 
+          <p>The tigris merge is producing an error:<br> income_merged&lt;- geo_join(tracts, income_df, "GEOID", "GEOID")</p> 
+          <p>Error in data.frame(spatial_data@data, data_frame[match(spatial_data@data[[by_sp]], :<br> trying to get slot "data" from an object of a basic class ("function") with no slots</p> 
+          <p>Did the syntax with tigris change with a newer version?</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=15367#respond" onclick="return addComment.moveForm( &quot;div-comment-15367&quot;, &quot;15367&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Seth">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-15376" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-2 parent"> 
+          <article id="div-comment-15376" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-15376"> <time datetime="2016-05-06T09:50:16+00:00"> May 6, 2016 at 9:50 am </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>Hi, is it possible you missed a step? We just re-ran the code with the newest ACS and it worked. Both Hollie and I tested it out she was using acs 2.0, tigris 0.2.2 and R 3.2.5 and I’m using acs 1.2, tigris 0.2.2.9000, r 3.2.3. Let me know if you still have trouble.</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=15376#respond" onclick="return addComment.moveForm( &quot;div-comment-15376&quot;, &quot;15376&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> 
+          <ul class="children"> 
+           <li id="comment-15425" class="comment odd alt depth-3 parent"> 
+            <article id="div-comment-15425" class="comment-body"> 
+             <footer class="comment-meta"> 
+              <div class="comment-author vcard"> 
+               <img alt="" src="http://2.gravatar.com/avatar/2ade44c38b912da61a8ea0c62a16a3b9?s=84&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/2ade44c38b912da61a8ea0c62a16a3b9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+               <b class="fn">Seth</b> 
+               <span class="says">says:</span> 
+              </div>
+              <!-- .comment-author --> 
+              <div class="comment-metadata"> 
+               <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-15425"> <time datetime="2016-05-08T19:07:23+00:00"> May 8, 2016 at 7:07 pm </time> </a> 
+              </div>
+              <!-- .comment-metadata --> 
+             </footer>
+             <!-- .comment-meta --> 
+             <div class="comment-content"> 
+              <p>I reinstalled some of the packages and now it works. Not sure what the original problem was but regardless your code is indeed 100%. Thank you! I learned a lot from it.</p> 
+             </div>
+             <!-- .comment-content --> 
+             <div class="reply">
+              <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=15425#respond" onclick="return addComment.moveForm( &quot;div-comment-15425&quot;, &quot;15425&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Seth">Reply</a>
+             </div> 
+            </article>
+            <!-- .comment-body --> 
+            <ul class="children"> 
+             <li id="comment-15442" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-4"> 
+              <article id="div-comment-15442" class="comment-body"> 
+               <footer class="comment-meta"> 
+                <div class="comment-author vcard"> 
+                 <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+                 <b class="fn">zev@zevross.com</b> 
+                 <span class="says">says:</span> 
+                </div>
+                <!-- .comment-author --> 
+                <div class="comment-metadata"> 
+                 <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-15442"> <time datetime="2016-05-09T08:32:16+00:00"> May 9, 2016 at 8:32 am </time> </a> 
+                </div>
+                <!-- .comment-metadata --> 
+               </footer>
+               <!-- .comment-meta --> 
+               <div class="comment-content"> 
+                <p>Yes, I wonder what the issue was! Glad it’s working and thanks for the update.</p> 
+               </div>
+               <!-- .comment-content --> 
+               <div class="reply">
+                <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=15442#respond" onclick="return addComment.moveForm( &quot;div-comment-15442&quot;, &quot;15442&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+               </div> 
+              </article>
+              <!-- .comment-body --> </li>
+             <!-- #comment-## --> 
+            </ul>
+            <!-- .children --> </li>
+           <!-- #comment-## --> 
+          </ul>
+          <!-- .children --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-15907" class="comment odd alt thread-odd thread-alt depth-1 parent"> 
+        <article id="div-comment-15907" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/c637cd170b88ae275b2d14d0fac282ac?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/c637cd170b88ae275b2d14d0fac282ac?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Jordan</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-15907"> <time datetime="2016-05-31T13:36:29+00:00"> May 31, 2016 at 1:36 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>I’m interested in mapping at least two states, all tracts, blockgroups, or blocks…is this possible? I’ve tried many approaches…none seem to work.</p> 
+          <p>Thanks,</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=15907#respond" onclick="return addComment.moveForm( &quot;div-comment-15907&quot;, &quot;15907&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Jordan">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-15908" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-2"> 
+          <article id="div-comment-15908" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-15908"> <time datetime="2016-05-31T16:39:27+00:00"> May 31, 2016 at 4:39 pm </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>This is very possible. Probably your question is a job for stackoverflow. Show what you’ve tried and how it fails and provide a link.</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=15908#respond" onclick="return addComment.moveForm( &quot;div-comment-15908&quot;, &quot;15908&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-16201" class="comment odd alt thread-even depth-1 parent"> 
+        <article id="div-comment-16201" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/5217efca0a2be7adc55c4c5bcaaef2fd?s=84&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/5217efca0a2be7adc55c4c5bcaaef2fd?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Willie</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-16201"> <time datetime="2016-06-15T17:32:34+00:00"> June 15, 2016 at 5:32 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Zev,</p> 
+          <p>This is a great post, and I am completely new to this. I tried your “Census data the easy(er) way” section, and I received the following error message.</p> 
+          <p>Error in eval(expr, envir, enclos) : could not find function “select”</p> 
+          <p>Any idea how I can correct this error message? Thank you!</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=16201#respond" onclick="return addComment.moveForm( &quot;div-comment-16201&quot;, &quot;16201&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Willie">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-16206" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-2"> 
+          <article id="div-comment-16206" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-16206"> <time datetime="2016-06-15T18:53:20+00:00"> June 15, 2016 at 6:53 pm </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>Did you load dplyr — this is the package with select.</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=16206#respond" onclick="return addComment.moveForm( &quot;div-comment-16206&quot;, &quot;16206&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-18703" class="comment odd alt thread-odd thread-alt depth-1 parent"> 
+        <article id="div-comment-18703" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://0.gravatar.com/avatar/0d762fdf4ae87ccc74e7d6363ce09af3?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/0d762fdf4ae87ccc74e7d6363ce09af3?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Tahir</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-18703"> <time datetime="2016-08-29T21:15:42+00:00"> August 29, 2016 at 9:15 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Hello, I try to reproduce the map in the section “Census data the easy(er) way”. When I try to fetch data with acs.fetch() function, I get the following error: </p> 
+          <p>Error in matrix(unlist(value, recursive = FALSE, use.names = FALSE), nrow = nr, :<br> ‘data’ must be of a vector type, was ‘NULL’</p> 
+          <p>Could you help me to solve this problem?</p> 
+          <p>T.E.G.</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=18703#respond" onclick="return addComment.moveForm( &quot;div-comment-18703&quot;, &quot;18703&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Tahir">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-18960" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-2"> 
+          <article id="div-comment-18960" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-18960"> <time datetime="2016-09-06T12:00:42+00:00"> September 6, 2016 at 12:00 pm </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>We were not able to re-create your error, the code is running fine for us. Perhaps post to stackoverflow with more detail than you provided here and give us the link. We are using acs v 2.0.</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=18960#respond" onclick="return addComment.moveForm( &quot;div-comment-18960&quot;, &quot;18960&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+         <li id="comment-19488" class="comment odd alt depth-2 parent"> 
+          <article id="div-comment-19488" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/3988b628f266ac34c75a8678f431cd6d?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/3988b628f266ac34c75a8678f431cd6d?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">Olivia</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-19488"> <time datetime="2016-09-23T16:14:19+00:00"> September 23, 2016 at 4:14 pm </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>Hi – I’m having the same problem, did you ever resolve it?</p> 
+            <p>Olivia</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=19488#respond" onclick="return addComment.moveForm( &quot;div-comment-19488&quot;, &quot;19488&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Olivia">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> 
+          <ul class="children"> 
+           <li id="comment-19577" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-3"> 
+            <article id="div-comment-19577" class="comment-body"> 
+             <footer class="comment-meta"> 
+              <div class="comment-author vcard"> 
+               <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+               <b class="fn">zev@zevross.com</b> 
+               <span class="says">says:</span> 
+              </div>
+              <!-- .comment-author --> 
+              <div class="comment-metadata"> 
+               <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-19577"> <time datetime="2016-09-26T08:22:55+00:00"> September 26, 2016 at 8:22 am </time> </a> 
+              </div>
+              <!-- .comment-metadata --> 
+             </footer>
+             <!-- .comment-meta --> 
+             <div class="comment-content"> 
+              <p>We could not reproduce the issue. We ran the code again and it worked fine. Can you post details to stackoverflow including your version of the packages? (Use sessionInfo()) and we can take a look?</p> 
+             </div>
+             <!-- .comment-content --> 
+             <div class="reply">
+              <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=19577#respond" onclick="return addComment.moveForm( &quot;div-comment-19577&quot;, &quot;19577&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+             </div> 
+            </article>
+            <!-- .comment-body --> </li>
+           <!-- #comment-## --> 
+          </ul>
+          <!-- .children --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-28272" class="comment odd alt thread-even depth-1 parent"> 
+        <article id="div-comment-28272" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://1.gravatar.com/avatar/15f8b36cbd74fd8212f2aa4e7f4bb9fa?s=84&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/15f8b36cbd74fd8212f2aa4e7f4bb9fa?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Jon</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-28272"> <time datetime="2017-04-04T12:14:08+00:00"> April 4, 2017 at 12:14 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Sorry if I’m missing something, but where do I find the table number? </p> 
+          <p>Can anyone point me toward information on how to find the variables used in this example? If, say, I want to know how many children under 5 are in each tract in Oregon?</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=28272#respond" onclick="return addComment.moveForm( &quot;div-comment-28272&quot;, &quot;28272&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Jon">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-28282" class="comment even depth-2"> 
+          <article id="div-comment-28282" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://1.gravatar.com/avatar/15f8b36cbd74fd8212f2aa4e7f4bb9fa?s=84&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/15f8b36cbd74fd8212f2aa4e7f4bb9fa?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">Jon</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-28282"> <time datetime="2017-04-04T17:08:19+00:00"> April 4, 2017 at 5:08 pm </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>I struggled through this and figured out how table numbers and GEOIDs work. For those also new to census data, I’ve put together some resources that helped me figure things out:</p> 
+            <p>Basic intro to conventions in census data:<br> <a href="https://source.opennews.org/articles/how-use-census-bureau-american-community-survey/" rel="nofollow">https://source.opennews.org/articles/how-use-census-bureau-american-community-survey/</a></p> 
+            <p>List of table codes:<br> <a href="https://censusreporter.org/topics/table-codes/" rel="nofollow">https://censusreporter.org/topics/table-codes/</a></p> 
+            <p>GEOID’s:<br> <a href="https://www.census.gov/geo/reference/geoidentifiers.html" rel="nofollow">https://www.census.gov/geo/reference/geoidentifiers.html</a><br> (Expand “GEOID Structure for Geographic Areas”)</p> 
+            <p>And if you want to go into smaller geographic areas:<br> <a href="http://eglenn.scripts.mit.edu/citystate/2013/03/acs-r-a-worked-example-using-blockgroup-level-data/" rel="nofollow">http://eglenn.scripts.mit.edu/citystate/2013/03/acs-r-a-worked-example-using-blockgroup-level-data/</a></p> 
+            <p>FAQS:<br> Q: What is the income_df creation with str_pad doing?<br> A: Constructing GEOIDs. These will need to match the GEOID from the “tracts” object in geo_join(). The tracts object as written in this example is only valid if you are going the level of tracts. If you go up or down levels, see other functions (block_groups(), blocks(), etc). Basically look at the number of numerals in your GEOID from acs.get(), compared to the GEOIDs link above, and make sure you have the same numeral length.</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=28282#respond" onclick="return addComment.moveForm( &quot;div-comment-28282&quot;, &quot;28282&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Jon">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+       <li id="comment-28937" class="comment odd alt thread-odd thread-alt depth-1 parent"> 
+        <article id="div-comment-28937" class="comment-body"> 
+         <footer class="comment-meta"> 
+          <div class="comment-author vcard"> 
+           <img alt="" src="http://2.gravatar.com/avatar/b447aeab3e2b21d34a38db4037f1431a?s=84&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/b447aeab3e2b21d34a38db4037f1431a?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+           <b class="fn">Jimmy</b> 
+           <span class="says">says:</span> 
+          </div>
+          <!-- .comment-author --> 
+          <div class="comment-metadata"> 
+           <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-28937"> <time datetime="2017-05-04T14:19:38+00:00"> May 4, 2017 at 2:19 pm </time> </a> 
+          </div>
+          <!-- .comment-metadata --> 
+         </footer>
+         <!-- .comment-meta --> 
+         <div class="comment-content"> 
+          <p>Zev,</p> 
+          <p>Thank you so much for this tutorial. It will play a critical role in preparation for my job interview.</p> 
+         </div>
+         <!-- .comment-content --> 
+         <div class="reply">
+          <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=28937#respond" onclick="return addComment.moveForm( &quot;div-comment-28937&quot;, &quot;28937&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to Jimmy">Reply</a>
+         </div> 
+        </article>
+        <!-- .comment-body --> 
+        <ul class="children"> 
+         <li id="comment-29063" class="comment byuser comment-author-zevzevross-com bypostauthor even depth-2"> 
+          <article id="div-comment-29063" class="comment-body"> 
+           <footer class="comment-meta"> 
+            <div class="comment-author vcard"> 
+             <img alt="" src="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=84&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/cfea0c1fe6597b9476081cd041128fc9?s=168&amp;d=mm&amp;r=g 2x" class="avatar avatar-84 photo" height="84" width="84"> 
+             <b class="fn">zev@zevross.com</b> 
+             <span class="says">says:</span> 
+            </div>
+            <!-- .comment-author --> 
+            <div class="comment-metadata"> 
+             <a href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#comment-29063"> <time datetime="2017-05-12T08:14:58+00:00"> May 12, 2017 at 8:14 am </time> </a> 
+            </div>
+            <!-- .comment-metadata --> 
+           </footer>
+           <!-- .comment-meta --> 
+           <div class="comment-content"> 
+            <p>Good luck!</p> 
+           </div>
+           <!-- .comment-content --> 
+           <div class="reply">
+            <a rel="nofollow" class="comment-reply-link" href="http://zevross.com/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/?replytocom=29063#respond" onclick="return addComment.moveForm( &quot;div-comment-29063&quot;, &quot;29063&quot;, &quot;respond&quot;, &quot;1386&quot; )" aria-label="Reply to zev@zevross.com">Reply</a>
+           </div> 
+          </article>
+          <!-- .comment-body --> </li>
+         <!-- #comment-## --> 
+        </ul>
+        <!-- .children --> </li>
+       <!-- #comment-## --> 
+      </ol>
+      <!-- .comment-list --> 
+      <div id="respond" class="comment-respond"> 
+       <h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/blog/2015/10/14/manipulating-and-mapping-us-census-data-in-r-using-the-acs-tigris-and-leaflet-packages-3/#respond" style="display:none;">Cancel reply</a></small></h3> 
+       <form action="http://zevross.com/blog/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate> 
+        <p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> Required fields are marked <span class="required">*</span></p>
+        <p class="comment-form-comment"><label for="comment">Comment</label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" aria-required="true" required></textarea></p>
+        <p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" aria-required="true" required></p> 
+        <p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="email" value="" size="30" maxlength="100" aria-describedby="email-notes" aria-required="true" required></p> 
+        <p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200"></p> 
+        <p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="1386" id="comment_post_ID"> <input type="hidden" name="comment_parent" id="comment_parent" value="0"> </p>
+        <p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="23cd34bb26"></p>
+        <p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="32"></p> 
+       </form> 
+      </div>
+      <!-- #respond --> 
+     </div>
+     <!-- #comments --> 
+    </main>
+    <!-- #main --> 
+   </div>
+   <!-- #primary --> 
+   <div id="secondary" class="widget-area sidebar-area" role="complementary"> 
+    <aside id="text-2" class="widget widget_text"> 
+     <div class="textwidget">
+      <span style="color:#44586c;font-family: Lora, Georgia, serif">This is the home for posts on the more technical aspects of our work. For detail on our projects, clients, examples and more visit:</span>
+      <br>
+      <br> 
+      <a href="http://www.zevross.com">ZevRoss Spatial Analysis</a>
+     </div> 
+    </aside>
+    <aside id="search-2" class="widget widget_search">
+     <form role="search" method="get" class="search-form" action="http://zevross.com/blog/"> 
+      <label> <span class="screen-reader-text">Search for:</span> <input type="search" class="search-field" placeholder="Search …" value="" name="s"> </label> 
+      <input type="submit" class="search-submit" value="Search"> 
+     </form>
+    </aside>
+    <aside id="twitter_timeline-3" class="widget widget_twitter_timeline">
+     <a class="twitter-timeline" data-width="350" data-height="400" data-theme="light" data-link-color="#f96e5b" data-border-color="#e8e8e8" data-tweet-limit="3" data-lang="EN" data-partner="jetpack" data-widget-id="448484988552364032">My Tweets</a>
+    </aside>
+    <aside id="archives-2" class="widget widget_archive">
+     <h1 class="widget-title">Archives</h1> 
+     <ul> 
+      <li><a href="http://zevross.com/blog/2017/09/">September 2017</a></li> 
+      <li><a href="http://zevross.com/blog/2017/06/">June 2017</a></li> 
+      <li><a href="http://zevross.com/blog/2016/04/">April 2016</a></li> 
+      <li><a href="http://zevross.com/blog/2016/03/">March 2016</a></li> 
+      <li><a href="http://zevross.com/blog/2016/01/">January 2016</a></li> 
+      <li><a href="http://zevross.com/blog/2015/10/">October 2015</a></li> 
+      <li><a href="http://zevross.com/blog/2015/08/">August 2015</a></li> 
+      <li><a href="http://zevross.com/blog/2015/07/">July 2015</a></li> 
+      <li><a href="http://zevross.com/blog/2015/05/">May 2015</a></li> 
+      <li><a href="http://zevross.com/blog/2015/03/">March 2015</a></li> 
+      <li><a href="http://zevross.com/blog/2015/02/">February 2015</a></li> 
+      <li><a href="http://zevross.com/blog/2015/01/">January 2015</a></li> 
+      <li><a href="http://zevross.com/blog/2014/12/">December 2014</a></li> 
+      <li><a href="http://zevross.com/blog/2014/11/">November 2014</a></li> 
+      <li><a href="http://zevross.com/blog/2014/10/">October 2014</a></li> 
+      <li><a href="http://zevross.com/blog/2014/09/">September 2014</a></li> 
+      <li><a href="http://zevross.com/blog/2014/08/">August 2014</a></li> 
+      <li><a href="http://zevross.com/blog/2014/07/">July 2014</a></li> 
+      <li><a href="http://zevross.com/blog/2014/06/">June 2014</a></li> 
+      <li><a href="http://zevross.com/blog/2014/05/">May 2014</a></li> 
+      <li><a href="http://zevross.com/blog/2014/04/">April 2014</a></li> 
+      <li><a href="http://zevross.com/blog/2014/03/">March 2014</a></li> 
+      <li><a href="http://zevross.com/blog/2013/11/">November 2013</a></li> 
+     </ul> 
+    </aside>
+    <aside id="categories-2" class="widget widget_categories">
+     <h1 class="widget-title">Categories</h1> 
+     <ul> 
+      <li class="cat-item cat-item-10"><a href="http://zevross.com/blog/category/d3/">D3</a> </li> 
+      <li class="cat-item cat-item-9"><a href="http://zevross.com/blog/category/data-visualization/">Data Visualization</a> </li> 
+      <li class="cat-item cat-item-15"><a href="http://zevross.com/blog/category/database/">Database</a> </li> 
+      <li class="cat-item cat-item-5"><a href="http://zevross.com/blog/category/gdal/">GDAL</a> </li> 
+      <li class="cat-item cat-item-16"><a href="http://zevross.com/blog/category/ggplot2/">ggplot2</a> </li> 
+      <li class="cat-item cat-item-14"><a href="http://zevross.com/blog/category/gismaps/">GIS/Maps</a> </li> 
+      <li class="cat-item cat-item-17"><a href="http://zevross.com/blog/category/javascript/">JavaScript</a> </li> 
+      <li class="cat-item cat-item-12"><a href="http://zevross.com/blog/category/leafletjs/">LeafletJS</a> </li> 
+      <li class="cat-item cat-item-20"><a href="http://zevross.com/blog/category/markdown/">Markdown</a> </li> 
+      <li class="cat-item cat-item-8"><a href="http://zevross.com/blog/category/postgis/">PostGIS</a> </li> 
+      <li class="cat-item cat-item-7"><a href="http://zevross.com/blog/category/postgresql/">PostgreSQL</a> </li> 
+      <li class="cat-item cat-item-4"><a href="http://zevross.com/blog/category/python/">Python</a> </li> 
+      <li class="cat-item cat-item-2"><a href="http://zevross.com/blog/category/r/">R</a> </li> 
+      <li class="cat-item cat-item-11"><a href="http://zevross.com/blog/category/regular-expressions/">Regular Expressions</a> </li> 
+      <li class="cat-item cat-item-18"><a href="http://zevross.com/blog/category/shiny/">Shiny</a> </li> 
+      <li class="cat-item cat-item-3"><a href="http://zevross.com/blog/category/spatial/">Spatial</a> </li> 
+      <li class="cat-item cat-item-1"><a href="http://zevross.com/blog/category/uncategorized/">Uncategorized</a> </li> 
+      <li class="cat-item cat-item-6"><a href="http://zevross.com/blog/category/web-development/">Web Development</a> </li> 
+      <li class="cat-item cat-item-13"><a href="http://zevross.com/blog/category/web-mapping/">Web Mapping</a> </li> 
+     </ul> 
+    </aside>
+    <aside id="recent-comments-2" class="widget widget_recent_comments">
+     <h1 class="widget-title">Recent Comments</h1>
+     <ul id="recentcomments">
+      <li class="recentcomments"><span class="comment-author-link">Igor Hut</span> on <a href="http://zevross.com/blog/2016/04/19/r-powered-web-applications-with-shiny-a-tutorial-and-cheat-sheet-with-40-example-apps/#comment-32795">R powered web applications with Shiny (a tutorial and cheat sheet with 40 example apps)</a></li>
+      <li class="recentcomments"><span class="comment-author-link">bmwil3</span> on <a href="http://zevross.com/blog/2014/08/04/beautiful-plotting-in-r-a-ggplot2-cheatsheet-3/#comment-32631">Beautiful plotting in R: A <code>ggplot2</code> cheatsheet</a></li>
+      <li class="recentcomments"><span class="comment-author-link"><a href="http://spatial.usc.edu/" rel="external nofollow" class="url">Andrew</a></span> on <a href="http://zevross.com/blog/2015/02/12/using-r-to-download-and-parse-json-an-example-using-data-from-an-open-data-portal/#comment-32217">Using R to download and parse JSON: an example using data from an open data portal</a></li>
+      <li class="recentcomments"><span class="comment-author-link">Jayanta</span> on <a href="http://zevross.com/blog/2016/04/19/r-powered-web-applications-with-shiny-a-tutorial-and-cheat-sheet-with-40-example-apps/#comment-32210">R powered web applications with Shiny (a tutorial and cheat sheet with 40 example apps)</a></li>
+      <li class="recentcomments"><span class="comment-author-link">Jen</span> on <a href="http://zevross.com/blog/up-and-running-with-r/#comment-32035">Intro R workshop</a></li>
+     </ul>
+    </aside> 
+   </div>
+   <!-- #secondary --> 
+  </div>
+  <!-- #content --> 
+  <footer id="colophon" class="site-footer" role="contentinfo" style="width: 212px;float: left;margin-right: 7%;"> 
+   <div class="site-info"> 
+    <div class="site-copyright">
+     © 2017 
+     <a href="http://zevross.com/blog/" rel="home">Technical Tidbits From Spatial Analysis &amp; Data Science</a>
+    </div> 
+    <div class="site-credit">
+     Powered by 
+     <a href="http://wordpress.org/">WordPress</a> &amp; 
+     <a href="http://themegraphy.com/">Themegraphy</a>
+    </div> 
+   </div>
+   <!-- .site-info --> 
+  </footer>
+  <!-- #colophon --> 
+  <!-- #page --> 
+  <div style="clear:both;"></div> 
+  <footer class="footer--page">
+   <div class="footer__inner">
+    <div class="footer__content--right highlight" itemscope itemtype="http://schema.org/Person">
+     <div class="footer__contact">
+      <span class="footer__contact__name" itemprop="name">ZevRoss Spatial <br> Analysis</span>
+      <div itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+       <span itemprop="streetAddress">120 N Aurora St, Suite 3A</span>
+       <br>
+       <span itemprop="addressLocality">Ithaca</span>, 
+       <span itemprop="addressRegion">NY</span> 
+       <span itemprop="postalCode">14850</span>
+       <br>
+       <span itemprop="phoneNumber">607-277-0004</span>
+       <br>
+       <br>
+       <a class="footer__contact__email" href="mailto:info@zevross.com" itemprop="email">info@zevross.com</a>
+      </div>
+     </div>
+    </div>
+   </div>
+  </footer> 
+  <div style="display:none"> 
+   <div class="grofile-hash-map-a439b7bba94f9ab3856b44e3d0661e7d"> 
+   </div> 
+   <div class="grofile-hash-map-adb3d43af5085fe44f8493a03b86aad2"> 
+   </div> 
+   <div class="grofile-hash-map-cfea0c1fe6597b9476081cd041128fc9"> 
+   </div> 
+   <div class="grofile-hash-map-7d31c47934b6ccdc06f242a5fe0704e9"> 
+   </div> 
+   <div class="grofile-hash-map-7ab0c911d66918be7da89186e3061689"> 
+   </div> 
+   <div class="grofile-hash-map-1d9e2641a2b739b78d62981c77747325"> 
+   </div> 
+   <div class="grofile-hash-map-6d0b1a02d358e5c38d1c9006b4d624b3"> 
+   </div> 
+   <div class="grofile-hash-map-1bc96c6a4837bf2b16c8b138072b50f6"> 
+   </div> 
+   <div class="grofile-hash-map-b063baf5e4900a17c1aa649edcde6aa9"> 
+   </div> 
+   <div class="grofile-hash-map-0994d29b9948e2e86f976dbf0579828a"> 
+   </div> 
+   <div class="grofile-hash-map-0cb923f9e51793448b544f4be3fc5fd9"> 
+   </div> 
+   <div class="grofile-hash-map-2ade44c38b912da61a8ea0c62a16a3b9"> 
+   </div> 
+   <div class="grofile-hash-map-c637cd170b88ae275b2d14d0fac282ac"> 
+   </div> 
+   <div class="grofile-hash-map-5217efca0a2be7adc55c4c5bcaaef2fd"> 
+   </div> 
+   <div class="grofile-hash-map-0d762fdf4ae87ccc74e7d6363ce09af3"> 
+   </div> 
+   <div class="grofile-hash-map-3988b628f266ac34c75a8678f431cd6d"> 
+   </div> 
+   <div class="grofile-hash-map-15f8b36cbd74fd8212f2aa4e7f4bb9fa"> 
+   </div> 
+   <div class="grofile-hash-map-b447aeab3e2b21d34a38db4037f1431a"> 
+   </div> 
+  </div> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-content/plugins/akismet/_inc/form.js?ver=3.3.2"></script> 
+  <link rel="stylesheet" id="hljstheme-css" href="http://zevross.com/blog/wp-content/plugins/wp-code-highlightjs/styles/hybrid.css?ver=0.5.10" type="text/css" media="all"> 
+  <script type="text/javascript" src="https://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201740"></script> 
+  <script type="text/javascript" src="http://s.gravatar.com/js/gprofiles.js?ver=2017Octaa"></script> 
+  <script type="text/javascript">//<![CDATA[
+var WPGroHo={"my_hash":""};
+//]]></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-content/plugins/jetpack/modules/wpgroho.js?ver=4.7.6"></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-content/themes/graphy/js/navigation.js?ver=20140207"></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-content/themes/graphy/js/skip-link-focus-fix.js?ver=20130115"></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-includes/js/comment-reply.min.js?ver=4.7.6"></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-content/plugins/jetpack/_inc/twitter-timeline.js?ver=4.0.0"></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-includes/js/wp-embed.min.js?ver=4.7.6"></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-content/plugins/wp-code-highlightjs/highlight.common.pack.js?ver=0.5.10"></script> 
+  <script type="text/javascript" src="http://zevross.com/blog/wp-content/plugins/wp-code-highlightjs/highlight.custom.pack.js?ver=0.5.10"></script> 
+  <style>pre.hljs{padding:5px}pre.hljs code{}</style> 
+  <script type="text/javascript">(function($,window){var init_fn_flag=false;var init_fn=(function(){if(init_fn_flag)
+return;init_fn_flag=true;hljs.configure({"tabReplace":"    "});$('pre code').each(function(i,block){hljs.highlightBlock(block);});});$(document).ready(init_fn);$(window).on("load",init_fn);})(jQuery,window);</script> 
+  <script type="text/javascript" src="https://stats.wp.com/e-201740.js" async defer></script> 
+  <script type="text/javascript">_stq=window._stq||[];_stq.push(['view',{v:'ext',j:'1:5.0',blog:'66135838',post:'1386',tz:'-4',srv:'zevross.com'}]);_stq.push(['clickTrackerInit','66135838','1386']);</script> 
+  <script src="/blog/wp-content/themes/graphy/js/zr-navbar--mobile.js"></script>  
+ </body>
+</html>

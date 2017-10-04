@@ -1,0 +1,737 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head> 
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes"> 
+  <title>The Simplest Thing Possible: Creating Push Notifications with SignalR</title> 
+  <link rel="shortcut icon" type="image/x-icon" href="/Images/CodeIcon.png"> 
+  <meta property="fb:page_id" content="218352335971"> 
+  <meta property="fb:app_id" content="225285904297383"> 
+  <meta name="Description" content="The ASP.NET team has created lots of new goodies. One of the most useful, SignalR, is an async library for .NET to help build real-time, multi-user inte..."> 
+  <meta name="Keywords" content="Messaging, Web Development (general), SignalR, HTML 5, Open Source"> 
+  <meta name="Author" content="CODE Magazine, EPS Software Corp., John V. Petersen"> 
+  <meta name="Robots" content="all"> 
+  <meta property="og:title" content="The Simplest Thing Possible: Creating Push Notifications with SignalR"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:description" content="The ASP.NET team has created lots of new goodies. One of the most useful, SignalR, is an async library for .NET to help build real-time, multi-user inte..."> 
+  <meta property="og:url" content="http://www.codemag.com/article/1210071"> 
+  <meta property="og:image" content="http://www.codemag.com/Magazine/CoverLarge/ff09319a-75c8-40de-b038-29ee723fb730"> 
+  <meta name="twitter:title" content="The Simplest Thing Possible: Creating Push Notifications with SignalR"> 
+  <meta name="twitter:description" content="The ASP.NET team has created lots of new goodies. One of the most useful, SignalR, is an async library for .NET to help build real-time, multi-user inte..."> 
+  <meta name="twitter:image" value="http://www.codemag.com/Magazine/CoverLarge/ff09319a-75c8-40de-b038-29ee723fb730"> 
+  <link rel="publisher" href="https://plus.google.com/103030867107221566748/"> 
+  <link href="/Content/Reset.css" type="text/css" rel="stylesheet"> 
+  <link href="/Content/2015/MicroFormats.css" type="text/css" rel="stylesheet"> 
+  <link href="/Content/2015/Default.css" type="text/css" rel="stylesheet"> 
+  <link href="/Content/2015/Desktop.css" type="text/css" rel="stylesheet"> 
+  <style>
+        .areaForeground { color: rgb(66, 182, 74); } .areaBackground { background: rgb(66, 182, 74); } a.areaLink { color: rgb(66, 182, 74); } a.areaLink:hover { color: rgb(66, 182, 74); } a.areaLink:active { color: rgb(66, 182, 74); } a.areaLink:visited { color: rgb(66, 182, 74); }
+    </style> 
+  <link href="/Content/ViewStyles/Article/ShowArticle.css" type="text/css" rel="stylesheet"> 
+  <style>
+        h1, h2, h3, h4, h5 {
+            color: rgb(8, 57, 129);
+        }
+        a.areaLink {
+            color: rgb(8, 57, 129);
+        }
+        a.areaLink:visited {
+            color: rgb(8, 57, 129);
+        }
+        figure {
+            color: rgb(8, 57, 129);
+        }
+        #contentColumnSingle .article-tables table th {
+            background-color: rgb(8, 57, 129);
+        }
+        #contentColumnSingle .article-listings h1 {
+            background-color: rgb(8, 57, 129);
+        }
+        #contentColumnSingle .article-tables h1 {
+            color: rgb(8, 57, 129);
+        }
+        .article-pullquote {
+            background: rgb(8, 57, 129);
+        }
+        .article-pullquote-arrow {
+            background-image: url("/Images/Styles/SpeechBubbleArrow_8_57_129.png");
+        }
+        .side-info h1 {
+            color: rgb(8, 57, 129);
+        }
+        .side-info h2 {
+            color: rgb(8, 57, 129);
+        }
+        .tech-list li {
+            background-color: rgb(8, 57, 129);
+        }
+        #menu ul li.magazineMenuSelected a {
+            border-bottom: 3px solid rgb(8, 57, 129);
+        }
+        .download1ColumnButton {
+            display: none;
+        }                                                                          
+        .codeDownloadButton {
+            color: white;
+            background: rgb(8, 57, 129);
+            padding: 10px;
+            margin-bottom: 50px;
+            font-size: 1.5em;
+        }
+        .codeDownloadButton a {
+            color: white;
+            text-decoration: none;
+        }
+        .codeDownloadButton a:hover {
+            color: white;
+            text-decoration: none;
+        }
+        .codeDownloadButton a:visited {
+            color: white;
+            text-decoration: none;
+        }
+                
+                h1.title {
+                    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
+                    font-weight: 300;
+                }
+                .article-body h1 {
+                    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
+                    font-weight: 300;
+                }
+                .article-body h2 {
+                    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
+                    font-weight: 300;
+                }
+                .article-body h3 {
+                    font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
+                    font-weight: 300;
+                }
+            
+
+        @media only screen and ( min-device-width : 320px ) and ( max-device-width : 480px ) {
+            .download1ColumnButton {
+                display: inherit;
+            }                                                                          
+        }
+    </style> 
+  <script src="/Scripts/jquery-1.8.2.min.js" type="text/javascript"></script> 
+  <script src="/Scripts/jquery.unobtrusive-ajax.min.js" type="text/javascript"></script> 
+  <script src="/Scripts/jquery.validate.min.js" type="text/javascript"></script> 
+  <script src="/Scripts/jquery.validate.unobtrusive.min.js" type="text/javascript"></script> 
+  <script src="/Scripts/jquery.popupWindow.js" type="text/javascript"></script> 
+  <script src="/Scripts/Ads/Ads.js" type="text/javascript"></script> 
+  <script language="javascript" type="text/javascript">
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-44188652-1']);
+        _gaq.push(['_trackPageview']);
+
+        (function () {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+    </script> 
+  <script type="text/javascript">
+        function setPageHeight() {
+            var windowHeight = $(window).height();
+            var pageHeight = $('#page').height();
+            var headerHeight = $('#header').height();
+            if (windowHeight > pageHeight + headerHeight + 1)
+                $('#page').height(windowHeight - headerHeight - 1);
+        }
+
+        $(function () {
+            setPageHeight();
+            $(window).on('resize', setPageHeight);
+            $(document).on('scroll', function () {
+                $('.subMenu').removeClass('visibleSubMenu');
+                if ($(document).scrollTop() > 60) {
+                    $('#header').removeClass('headerLarge').addClass('headerSmall');
+                } else {
+                    $('#header').removeClass('headerSmall').addClass('headerLarge');
+                }
+                setPageHeight();
+            });
+            $('#header').on('click', function() {
+                $('.subMenu').removeClass('visibleSubMenu');
+            });
+            $('#menu>ul>li').on('mouseenter', function () {
+                $('.subMenu').removeClass('visibleSubMenu');
+                $(this).find('.subMenu').addClass('visibleSubMenu');
+            });
+            $('#main').on('mouseenter', function () {
+                $('.subMenu').removeClass('visibleSubMenu');
+            });
+            $('#mobileMenuIcon').on('click', function () {
+                if (!$('#page').hasClass('showMobileMenu')) {
+                    $('#page').addClass('showMobileMenu');
+                    $('#header').addClass('showMobileMenu');
+                    $('#mobileMenu').addClass('showMobileMenu');
+                    $('#mobileMenu').css('display', 'block');
+                    setTimeout(function () {
+                        $('#mobileMenu').css('z-index', 100);
+                    }, 300);
+                } else {
+                    $('#mobileMenu').css('z-index', -1);
+                    $('#page').removeClass('showMobileMenu');
+                    $('#header').removeClass('showMobileMenu');
+                    $('#mobileMenu').removeClass('showMobileMenu');
+                    setTimeout(function () {
+                        $('#mobileMenu').css('display', 'none');
+                    }, 300);
+                }
+            });
+        })
+    </script> 
+  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script> 
+ </head>
+ <body>
+  <div id="fb-root"></div> 
+  <script>
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "//connect.facebook.net/en_US/all.js#xfbml=1&appId=225285904297383";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script> 
+  <script language="javascript" type="text/javascript">
+        $(function() {
+            // Making the code snippets look pretty
+            $('pre').addClass('prettyprint');
+                        
+            // Adding a bunch of additional formatting to article sections
+            $('<p class="article-pullquote-arrow"></p>').insertAfter('.article-pullquote');
+            $('figcaption').html(function(i, html) {
+                return html.replace(/(\w+\s\w+)/, '<b>$1</b>');
+            });
+            $('.article-listings h1').html(function(i, html) {
+                return html.replace(/(\w+\s\w+)/, '<b>$1</b>');
+            });
+            $('.article-tables h1').html(function(i, html) {
+                return html.replace(/(\w+\s\w+)/, '<b>$1</b>');
+            });
+
+            //$('#largerText').click(function() {
+            //    $('.article-body').css('font-size','2em');
+            //});
+
+            // Serving up some ads
+            var adIndex = 0;
+            var firstAdPass = true;
+            var ads = [
+                { nameFirst: 'Magazine_Article_Rectangle_First', nameSubsequent: 'Magazine_Article_Rectangle_Subsequent', sizes: [[300, 250], [336, 280]], cssClass: 'rectangle-ad' },
+                { nameFirst: 'Magazine_Article_Banner_First', nameSubsequent: 'Magazine_Article_Banner_Subsequent', sizes: [468, 60], cssClass: 'banner-ad' }
+            ];
+            var childIndex = 3;
+            var paragraphsBetweenAds = 13;
+            var totalParagraphs = $('div.article-body p').length;
+            if (totalParagraphs > 100) paragraphsBetweenAds = 17;
+            else if (totalParagraphs > 90) paragraphsBetweenAds = 16;
+            else if (totalParagraphs > 80) paragraphsBetweenAds = 15;
+            else if (totalParagraphs > 70) paragraphsBetweenAds = 14;
+
+            for (var counter = 0; counter < 1000; counter++) {
+                var set = $('div.article-body p:nth-of-type(' + childIndex + ')');
+                if (set == undefined) break;
+                if (set.length < 1) break;
+
+                if (set[0].className == '') {
+                    var previousSet = set.prev();
+                    var previousIsOk = false;
+                    if (previousSet.length > 0) {
+                        if (previousSet[0].localName == 'p') {
+                            previousIsOk = true;
+                        }
+                    }
+                    var nextIsOk = false;
+                    if (previousIsOk) {
+                        var nextSet = set.next();
+                        if (nextSet.length > 0) {
+                            var nextSet2 = nextSet.next();
+                            if (nextSet2.length > 0) {
+                                var elementName = nextSet[0].localName;
+                                if ((elementName == 'p' && nextSet[0].className == '') || elementName == 'h1' || elementName == 'h2' || elementName == 'h3') {
+                                    nextIsOk = true;
+                                }
+                            }
+                        }
+                    }
+                    if (!previousIsOk || !nextIsOk) {
+                        childIndex++;
+                    } else {
+                        if (firstAdPass) {
+                            DisplaySelfRefreshingDoubleClickAd(set, ads[adIndex].nameFirst, ads[adIndex].sizes, 'Advertisement', 'after', ads[adIndex].cssClass);
+                        } else {
+                            DisplaySelfRefreshingDoubleClickAd(set, ads[adIndex].nameSubsequent, ads[adIndex].sizes, 'Advertisement', 'after', ads[adIndex].cssClass);
+                        }
+                        childIndex += paragraphsBetweenAds;
+                        adIndex++;
+                        if (adIndex >= ads.length) {
+                            firstAdPass = false;
+                            adIndex = 0;
+                        }
+                    }
+                } else {
+                    childIndex++;
+                }
+            }
+        });
+    </script>   
+  <div id="mobileMenu"> 
+   <ul>
+    <li class="neutralMenu"><a href="/">Home</a></li>
+    <li class="consultingMenu"><a href="/Consulting">Consulting</a></li>
+    <li class="staffingMenu"><a href="/Staffing">Staffing</a></li>
+    <li class="magazineMenuSelected"><a href="/Magazine">Magazine</a>
+     <div class="subMenu">
+      <ul>
+       <li><a class="areaLink" href="/Magazine">Magazine Home</a></li>
+       <li><a class="areaLink" href="/Magazine/AllIssues">All Issues</a></li>
+       <li><a class="areaLink" href="/Magazine/Subscribe">Subscribe</a></li>
+       <li><a class="areaLink" href="/My/Magazines">My (Digital) Magazines</a></li>
+       <li><a class="areaLink" href="/My/Fulfillment">Where is my Magazine?</a></li>
+       <li><a class="areaLink" href="/My">My Subscriber Account</a></li>
+       <li><a class="areaLink" href="/Advertise">Advertise</a></li>
+       <li><a class="areaLink" href="/Write">Write</a></li>
+      </ul>
+     </div></li>
+    <li class="frameworkMenu"><a href="/Framework">Framework</a></li>
+    <li class="trainingMenu"><a href="/Training">Training</a></li>
+    <li class="vfpconversionMenu"><a href="/VFPConversion">VFP Conversion</a></li>
+    <li class="neutralMenu"><a href="/logon">Sign in!</a></li>
+   </ul> 
+  </div> 
+  <div id="header" class="headerLarge"> 
+   <div id="logo"> 
+    <img src="/Images/Logos/CODEMagazine_Small_Blue.png">
+    <br> 
+   </div> 
+   <div id="menu"> 
+    <ul>
+     <li class="neutralMenu"><a href="/">Home</a>
+      <div class="subMenu article">
+       <ul>
+        <li><a class="areaLink" href="/">CODE Home</a></li>
+        <li><a class="areaLink" href="/About">About Us</a></li>
+        <li><a class="areaLink" href="/videos">Videos</a></li>
+        <li><a class="areaLink" href="/Press">Press Releases</a></li>
+        <li><a class="areaLink" href="/People">People</a></li>
+        <li><a class="areaLink" href="/Jobs">Careers</a></li>
+        <li><a class="areaLink" href="/Home/Privacy">Privacy Policy</a></li>
+        <li><a class="areaLink" href="/contact">Contact Us</a></li>
+       </ul>
+      </div></li>
+     <li class="consultingMenu"><a href="/Consulting">Consulting</a>
+      <div class="subMenu">
+       <ul>
+        <li><a class="areaLink" href="/Consulting">Consulting Home</a></li>
+        <li><a class="areaLink" href="/Consulting/Services">Services &amp; Technologies</a></li>
+        <li><a class="areaLink" href="/VFPConversion">VFP Conversion</a></li>
+        <li><a class="areaLink" href="/Cloud">Azure &amp; Other Clouds</a></li>
+        <li><a class="areaLink" href="/Energy">Energy Software</a></li>
+        <li><a class="areaLink" href="/contact">Contact Us</a></li>
+       </ul>
+      </div></li>
+     <li class="staffingMenu"><a href="/Staffing">Staffing</a>
+      <div class="subMenu">
+       <ul>
+        <li><a class="areaLink" href="/Staffing">Staffing Home</a></li>
+        <li><a class="areaLink" href="/Staffing">Looking for Staff?</a></li>
+        <li><a class="areaLink" href="/Staffing/Apply">Looking for Work?</a></li>
+        <li><a class="areaLink" href="/contact">Contact Us</a></li>
+       </ul>
+      </div></li>
+     <li class="magazineMenuSelected"><a href="/Magazine">Magazine</a>
+      <div class="subMenu">
+       <ul>
+        <li><a class="areaLink" href="/Magazine">Magazine Home</a></li>
+        <li><a class="areaLink" href="/Magazine/AllIssues">All Issues</a></li>
+        <li><a class="areaLink" href="/Magazine/Subscribe">Subscribe</a></li>
+        <li><a class="areaLink" href="/My/Magazines">My (Digital) Magazines</a></li>
+        <li><a class="areaLink" href="/My/Fulfillment">Where is my Magazine?</a></li>
+        <li><a class="areaLink" href="/My">My Subscriber Account</a></li>
+        <li><a class="areaLink" href="/Advertise">Advertise</a></li>
+        <li><a class="areaLink" href="/Write">Write</a></li>
+       </ul>
+      </div></li>
+     <li class="frameworkMenu"><a href="/Framework">Framework</a>
+      <div class="subMenu">
+       <ul>
+        <li><a class="areaLink" href="/Framework">Framework Home</a></li>
+        <li><a class="areaLink" href="/Framework/GetStarted">Get Started &amp; Documentation</a></li>
+        <li><a class="areaLink" href="/Framework/Download">Download</a></li>
+        <li><a class="areaLink" href="/Framework/Support">Support &amp; Services</a></li>
+       </ul>
+      </div></li>
+     <li class="trainingMenu"><a href="/Training">Training</a>
+      <div class="subMenu">
+       <ul>
+        <li><a class="areaLink" href="/Training">Training Home</a></li>
+        <li><a class="areaLink" href="/Training">Classes</a></li>
+        <li><a class="areaLink" href="/Training/Mentoring">Mentoring</a></li>
+        <li><a class="areaLink" href="/StateOfDotNet">State of .NET</a></li>
+        <li><a class="areaLink" href="/Lunch">Lunch with CODE</a></li>
+        <li><a class="areaLink" href="/CodeCamps">Code Camps</a></li>
+        <li><a class="areaLink" href="/Training/TopicSpecificTraining">ASP.NET MVC</a></li>
+        <li><a class="areaLink" href="/DevNet/DevNetTraining">DevNet Training</a></li>
+       </ul>
+      </div></li>
+     <li class="vfpconversionMenu"><a href="/VFPConversion">VFP Conversion</a>
+      <div class="subMenu">
+       <ul>
+        <li><a class="areaLink" href="/VFPConversion">VFP Conversion Home</a></li>
+        <li><a class="areaLink" href="/VFPConversion/VFPServices">Services</a></li>
+        <li><a class="areaLink" href="/VFPConversion/Tools">Tools</a></li>
+        <li><a class="areaLink" href="/VFPConversion/Articles">Articles</a></li>
+        <li><a class="areaLink" href="/VFPConversion/History">Fox End of Life</a></li>
+        <li><a class="areaLink" href="/contact">Contact Us</a></li>
+       </ul>
+      </div></li>
+     <li class="neutralMenu"><a href="/logon">Sign in!</a></li>
+    </ul> 
+   </div> 
+   <div id="mobileMenuIcon">
+    <img src="/Images/MobileMenu.png">
+   </div> 
+  </div> 
+  <div id="page"> 
+   <div id="main"> 
+    <div id="contentColumnSingle"> 
+     <div class="advertisement leaderboard-ad" style="width: 728px; margin-left: auto; margin-right: auto;">
+       Advertisement: 
+      <div id="div-gpt-ad-1378457852955-1" style="width:728px; height:90px;"> 
+       <script type="text/javascript">
+                googletag.cmd.push(function () {
+                    var slot1 = googletag.defineSlot("/36824843/Magazine_Article_Leaderboard_Top", [728, 90], "div-gpt-ad-1378457852955-1").addService(googletag.pubads());
+                    googletag.enableServices();
+                    googletag.display("div-gpt-ad-1378457852955-1");
+                    setInterval(function () { googletag.pubads().refresh([slot1]); }, 60000);
+                });
+            </script> 
+      </div> 
+     </div> 
+     <h1 class="title">The Simplest Thing Possible: Creating Push Notifications with SignalR</h1> 
+     <p>By <b>John V. Petersen</b></p> 
+     <div class="download1ColumnButton" style="padding-top: 25px; padding-bottom: 25px;"> 
+     </div> 
+     <div class="side-info"> 
+      <p><a href="https://www.codemag.com/subscribe/freearticle6b1?utm_source=articleviewer&amp;utm_medium=banner&amp;utm_campaign=Article-Viewer-Free-Subs"></a><img src="/Images/Logos/DoodleFreeSubscriptionBanner.png" alt="CODE Magazine"></p> 
+      <div style="margin-bottom: 20px; overflow: no-display;"> 
+       <div class="fb-share-button" style="float: left;" data-href="http://www.codemag.com/article/1210071" data-type="button"></div> 
+       <div style="margin-left: 5px; margin-top: 0; float: left;"> 
+        <a href="https://twitter.com/share" class="twitter-share-button" data-via="codemagazine" data-count="none">Tweet</a> 
+        <script>!function (d, s, id) { var js, fjs = d.getElementsByTagName(s)[0], p = /^http:/.test(d.location) ? 'http' : 'https'; if (!d.getElementById(id)) { js = d.createElement(s); js.id = id; js.src = p + '://platform.twitter.com/widgets.js'; fjs.parentNode.insertBefore(js, fjs); } }(document, 'script', 'twitter-wjs');</script> 
+       </div> 
+       <div style="margin-left: 5px; margin-top: 0; float: left;"> 
+        <script src="//platform.linkedin.com/in.js" type="text/javascript">lang: en_US</script> 
+        <script type="IN/Share"></script> 
+       </div> 
+       <div class="clearfix"></div> 
+      </div> 
+      <p class="author-image"><img src="/Article/AuthorPhotoSmall/68b52961-e4c4-4b50-9e8a-2b89c4d9dd6b"></p> 
+      <h1 class="author-name">John V. Petersen</h1> 
+      <p>John Petersen has been developing software for over 20 years. It all started when, as a staff accountant, he was asked to get involved in a system upgrade to replace an old IBM Series 1 computer (about the size of a large refrigerator!). Those first programs were written in Clipper, Summer 87. Since that time, John’s tools included dBase, FoxBase, Visual FoxPro and Visual Basic. An early adopter of .NET, he then decided to go to law school. After practicing law for a few years, John realized that technology was a lot more interesting than the law. Today, John focuses on ASP.NET development and is having more fun than ever solving business problems for clients. John is a Practice Director for Custom Application Development at Neudesic, a Microsoft Gold Partner and the Trusted Technology Partner in Business Innovation. A 9-time recipient of Microsoft’s Most Valuable Professional Award, John is a current ASP.NET/IIS MVP. John is also an ASP Insider and is the INETA Mentor for PA and WV. John is the author of several books and is a frequent contributor to CODE Magazine and DevPro magazine. John holds a BS in Business Administration from Mansfield University, an MBA in Information Systems from St. Joseph’s University and a JD from the Rutgers School of Law – Camden.<br><br> <br>email: johnvpetersen@gmail.com<br>blog: codebetter.com/johnvpetersen<br>twitter: @johnvpetersen</p> 
+      <div> 
+       <h2>This article was published in:</h2> 
+       <a href="/Magazine/Issue/ff09319a-75c8-40de-b038-29ee723fb730"><img src="/Magazine/Cover/ff09319a-75c8-40de-b038-29ee723fb730"></a> 
+      </div> 
+      <div> 
+       <h2>This article was filed under:</h2> 
+       <ul class="tech-list"> 
+        <li><a href="/Magazine/ByCategory/Messaging">Messaging</a></li> 
+        <li><a href="/Magazine/ByCategory/Web%20Development%20(general)">Web Development (general)</a></li> 
+        <li><a href="/Magazine/ByCategory/SignalR">SignalR</a></li> 
+        <li><a href="/Magazine/ByCategory/HTML%205">HTML 5</a></li> 
+        <li><a href="/Magazine/ByCategory/Open%20Source">Open Source</a></li> 
+       </ul> 
+       <div class="clearfix"></div> 
+      </div> 
+      <div class="advertisement skyscraper-ad">
+        Advertisement: 
+       <div id="div-gpt-ad-1378457852954-1" style="width:160px; height:600px;"> 
+        <script type="text/javascript">
+                    googletag.cmd.push(function () {
+                        var slot1 = googletag.defineSlot("/36824843/Magazine_Article_Skyscraper_Right", [160, 600], "div-gpt-ad-1378457852954-1").addService(googletag.pubads());
+                        googletag.enableServices();
+                        googletag.display("div-gpt-ad-1378457852954-1");
+                        setInterval(function () { googletag.pubads().refresh([slot1]); }, 60000);
+                    });
+                </script> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="article-body">
+      <p>The ASP.NET team has created lots of new goodies. One of the most useful, SignalR, is an async library for .NET to help build real-time, multi-user interactive web applications. Imagine this scenario: you have a web application and would like a simple way to push notifications to any number of clients. Perhaps you want to inform the client when something happens. You could write a polling mechanism, but that is inefficient. An event-based approach is a much more efficient approach. Event-based systems that can publish and subscribe to events are typically loosely coupled systems that easily adapt to change and are highly scalable. The SignalR library makes it very easy to build loosely coupled scalable applications that can send real-time updates to specified clients. In this article, I will take you through the some basic steps to get up and running with SignalR.</p>
+      <h2>The Example</h2>
+      <p>In this brief example I’ll demonstrate how to instrument an ASP.NET MVC 4 application. In other words, certain application components will be monitored when their services are invoked. This means that whenever a controller action is called, a message will be sent to clients that are equipped to respond to the message. The monitor in this case will be a simple HTML page with some JavaScript. </p>
+      <h2>SignalR Resources</h2>
+      <p>Before getting started, I want to cover some fundamentals about what you’ll use SignalR for, how it works, and how to get to other resources. You can find the home page for SignalR at <a href="http://www.signalr.net">www.signalr.net</a>. The home page itself does not contain much in the way of direct information but it does contain some important links to the SignalR GitHub source code repository at the following URL: https://github.com/SignalR/SignalR/. Within the GitHub Repository you will find all of the source code, issue list, code samples and wiki.</p>
+      <p>The canonical use for SignalR are those cases where messaging is required. For example, consider the Jabbr application (jabbr.net). Jabbr is a SignalR-based group chat system. You can view and download the code on GitHub (https://github.com/davidfowl/JabbR). </p>
+      <p>SignalR is an abstraction over a standard Internet connection. The two primary components in SignalR are hubs and persistent connections. Connection persistence is how the server can communicate with one or more clients. The vehicle to communicate with clients is a hub. The best way to demonstrate how SignalR works is to create an example project which is illustrated in the next section.</p>
+      <h2>Step 1 - Create a New Project</h2>
+      <p>The hypothetical is simple: broadcast a message to an HTML page when a controller action is invoked. To make this happen, the example will use SignalR’s Hub class. Per the documentation, a SignalR Hub provides an RPC framework over a persistent connection. Think of a SignalR Hub as a switchboard of sorts that takes care of communicating with a client. I’ll discuss the specifics of the Hub class in the next section. The MVC app for this example is a stock Internet-based MVC application.</p>
+      <h2>Step 2 - Install the SignalR NuGet Package</h2>
+      <p>With the MVC application in place, the next step is to install the SignalR NuGet Package. NuGet makes quick work of installing SignalR and all of its dependencies. <b>Figure 1 </b>illustrates the process.</p>
+      <figure>
+       <img src="/Article/Image/1210071/figure1.tif">
+       <figcaption>
+         Figure 1: SignalR NuGet Package installation using the NuGet Package Manager Console.
+       </figcaption>
+      </figure>
+      <h2>Step 3 - Create the Hub Class and Server Implementation Code</h2>
+      <p>With SignalR installed, the next step is to create the NotificationHub class (based on the Hub base class).</p>
+      <pre><code>using System;
+using System.Linq;
+using SignalR.Hubs;
+    
+namespace signalRExample
+{
+ public class NotificationHub : Hub
+ {
+  public string Activate()
+  {
+   return "Monitor Activated";
+  }
+ }
+}
+
+</code></pre>
+      <p>Next you want to create some server-side code that will send the message to whatever clients may be listening to this particular event. To facilitate, add the following code as a private method to the Home Controller class:</p>
+      <pre><code>void SendMessage(string message)
+{
+   GlobalHost
+  .ConnectionManager
+  .GetHubContext&lt;NotificationHub&gt;().Clients.sendMessage(
+message);
+}
+
+</code></pre>
+      <p>With the SendMessage method in place, you just need to add code that calls the method. The following example calls the SendMessage method from the Index Action:</p>
+      <pre><code>   SendMessage("Index action invoked.");
+
+</code></pre>
+      <h2>Step 4 - Create the Monitor Page to Receive the Push Notification Requests</h2>
+      <p>The last preparation step is to create the monitor page, shown in <b>Listing 1</b>.</p>
+      <p>I want to point out several key things is this code:</p>
+      <pre><code>&lt;script src="signalr/hubs"
+type="text/javascript"&gt;&lt;/script&gt;
+
+</code></pre>
+      <p>When the SignalR Package is installed, one of the dependencies installed is SignalR.Hosting.AspNet, which adds the signalr/hubs route to the route table. This url delivers additional JavaScript to the client that facilitates the work SignalR performs.</p>
+      <p>The following JavaScript code establishes the connection with the server:</p>
+      <pre><code>var notificationHub = $.connection.notificationHub;
+    
+$.connection.hub.start(function () {
+  notificationHub.activate(function (response) {
+  $("#target")
+   .find('ul')
+   .append($("&lt;li&gt;&lt;/li&gt;").html(response));
+  });
+});
+
+</code></pre>
+      <p>Notice the notificationHub variable. This refers to the NotificationHub class outlined earlier. On the JavaScript side, that class is referenced with this line of code:</p>
+      <pre><code>$.connection.notificationHub;
+
+</code></pre>
+      <p>The convention is simple. On the server, the name is camel cased and on the client, the name is not. The first letter is lower case. Neverthless, notificationHub on the client-side JavaScript refers to the NotificationHub class on the server. </p>
+      <p>In the connection code, the string is received from the server, which in this case is just the message “Monitor Activated”. <b>Figure 2 </b>illustrates how the page appears when first loaded.</p>
+      <figure>
+       <img src="/Article/Image/1210071/figure2.tif">
+       <figcaption>
+         Figure 2: The monitor.html displaying the message sent from the NotificationHub activate method.
+       </figcaption>
+      </figure>
+      <p class="article-pullquote">SignalR makes it easier than ever to invoke client-side scripts from the web server.</p>
+      <p>With the server-side code in place, whenever a Home Controller Action is invoked, assuming the SendMessage code is added to the controller action, a message is displayed on the monitor page. <b>Figure 3 </b>illustrates how the Monitor HTML appears after a few Home Controller Actions have been invoked.</p>
+      <figure>
+       <img src="/Article/Image/1210071/figure3.tif">
+       <figcaption>
+         Figure 3: The monitor.html displaying messages sent from Home Controller Actions.
+       </figcaption>
+      </figure>
+      <p>The results in <b>Figure 3 </b>are facilitated with this JavaScript code:</p>
+      <pre><code>var notificationHub = $.connection.notificationHub;
+    
+   notificationHub.sendMessage = function (content) {
+       $("#target")
+          .find('ul')
+          .append($("&lt;li&gt;&lt;/li&gt;").html(content));
+   };
+
+</code></pre>
+      <p>How does this JavaScript get called? Remember the SendMessage method added to the Home Controller:</p>
+      <pre><code>GlobalHost
+   .ConnectionManager
+   .GetHubContext&lt;NotificationHub&gt;()
+   .Clients.sendMessage(message);
+
+</code></pre>
+      <p>The sendMessage method in this snippet (C# code) actually refers to the sendMessage handler code (JavaScript). The NotificationHub class and SignalR make it very simple to establish these connections. From there, it’s simply a matter of convention over configuration. Simply respect the naming convention and that’s about it. It really is as simple as that. What we have here is C# code invoking code that tells clients to invoke specified JavaScript code. To quote the movie <i>Hangover</i>, when somebody asks you if SignalR is awesome, you can respond, “It’s pretty awesome!” </p>
+      <p>With a little more effort, you can scope messages to only certain clients. You accomplish this with SignalR Groups; the procedures are well-documented in the SignalR documentation. </p>
+      <h2>Conclusion</h2>
+      <p>Before SignalR, the thought of creating a persistent connection between a web server and clients would be a daunting task. While possible, it would require a lot of work. With SignalR, creating these connections that facilitate push notifications is very simple. Note that SignalR is open source. That means if there is a bug or a feature you would like to see implemented, you have the power to get involved and submit a patch! </p>
+     </div>
+     <div class="article-sidebars">
+      <h1>Sponsored Sidebar: Ramp up with CODE</h1>
+      <p>Need help getting a project off the ground, but don’t have much capital? Need help getting past a couple roadblocks? CODE is proud to announce the already popular 20 hour Introductory Service. Get full access to a CODE team member for 20 hours to have them help you on your project. Use this time for one-on-one mentoring, give your project the push to get started, or anything in between! How much? Only $1,500…that’s half price! Email <a href="mailto://creynolds@codemag.com">creynolds@codemag.com</a> to set up your time with a CODE specialist!</p>
+     </div>
+     <div class="article-listings">
+      <h1>Listing 1: Monitor.html document</h1>
+      <pre><code>&lt;!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+&lt;head&gt;
+    &lt;title&gt;&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div id = "target" class="display-label"&gt;
+   &lt;ul&gt;&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/body&gt;
+&lt;script src="Scripts/jquery-1.6.4.min.js"
+type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="Scripts/jquery.signalR-0.5.2.min.js"
+type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="signalr/hubs" type="text/javascript"&gt;&lt;/script&gt;
+&lt;link href="Content/Site.css" rel="stylesheet" type="text/css" /&gt;
+      
+&lt;script type="text/javascript"&gt;
+    $(function () {
+        var notificationHub = $.connection.notificationHub;
+      
+        notificationHub.sendMessage = function (content) {
+            $("#target")
+               .find('ul')
+               .append($("&lt;li&gt;&lt;/li&gt;").html(content));
+        };
+      
+        $.connection.hub.start(function () {
+            notificationHub.activate(function (response) {
+                $("#target")
+               .find('ul')
+               .append($("&lt;li&gt;&lt;/li&gt;").html(response));
+            });
+        });
+    });
+&lt;/script&gt;
+&lt;/html&gt;
+
+</code></pre>
+     </div> 
+     <div class="side-info2"> 
+      <p class="author-image"><img src="/Article/AuthorPhotoSmall/68b52961-e4c4-4b50-9e8a-2b89c4d9dd6b"> </p> 
+      <h1 class="author-name">John V. Petersen</h1> 
+      <p>John Petersen has been developing software for over 20 years. It all started when, as a staff accountant, he was asked to get involved in a system upgrade to replace an old IBM Series 1 computer (about the size of a large refrigerator!). Those first programs were written in Clipper, Summer 87. Since that time, John’s tools included dBase, FoxBase, Visual FoxPro and Visual Basic. An early adopter of .NET, he then decided to go to law school. After practicing law for a few years, John realized that technology was a lot more interesting than the law. Today, John focuses on ASP.NET development and is having more fun than ever solving business problems for clients. John is a Practice Director for Custom Application Development at Neudesic, a Microsoft Gold Partner and the Trusted Technology Partner in Business Innovation. A 9-time recipient of Microsoft’s Most Valuable Professional Award, John is a current ASP.NET/IIS MVP. John is also an ASP Insider and is the INETA Mentor for PA and WV. John is the author of several books and is a frequent contributor to CODE Magazine and DevPro magazine. John holds a BS in Business Administration from Mansfield University, an MBA in Information Systems from St. Joseph’s University and a JD from the Rutgers School of Law – Camden.<br><br> <br>email: johnvpetersen@gmail.com<br>blog: codebetter.com/johnvpetersen<br>twitter: @johnvpetersen</p> 
+      <div> 
+       <h2>This article was filed under:</h2> 
+       <ul class="tech-list"> 
+        <li><a href="/Magazine/ByCategory/Messaging">Messaging</a></li> 
+        <li><a href="/Magazine/ByCategory/Web%20Development%20(general)">Web Development (general)</a></li> 
+        <li><a href="/Magazine/ByCategory/SignalR">SignalR</a></li> 
+        <li><a href="/Magazine/ByCategory/HTML%205">HTML 5</a></li> 
+        <li><a href="/Magazine/ByCategory/Open%20Source">Open Source</a></li> 
+       </ul> 
+       <div class="clearfix"></div> 
+      </div> 
+      <div> 
+       <h2>This article was published in:</h2> 
+       <a href="/Magazine/Issue/ff09319a-75c8-40de-b038-29ee723fb730"><img src="/Magazine/Cover/ff09319a-75c8-40de-b038-29ee723fb730"></a> 
+      </div> 
+     </div> 
+     <div style="padding-top: 25px;"> 
+      <a href="https://www.codemag.com/subscribe/freearticle6b1?utm_source=articleviewer&amp;utm_medium=end_banner_c&amp;utm_campaign=Article-Viewer-Free-Subs"><img style="text-align: center;" src="/Images/Banners/End of Article Banner v2.png"></a> 
+     </div> 
+     <div style="padding-top: 25px;"> 
+      <h4>Have additional technical questions?</h4> 
+      <p style="margin-top: 10px;">Get help from the experts at <i>CODE Magazine</i> - sign up for our free hour of consulting!</p> 
+      <p>Contact CODE Consulting at <a href="mailto:techhelp@codemag.com">techhelp@codemag.com</a>.</p> 
+     </div> 
+     <div> 
+      <h4 style="margin-top: 50px; margin-bottom: 20px;">Got something to say? Leave a comment!</h4> 
+      <div class="fb-comments" data-href="http://www.codemag.com/article/1210071" data-width="550"></div> 
+     </div> 
+    </div> 
+    <div class="clearfix"></div> 
+   </div> 
+   <div id="footer"> 
+    <div class="copyright">
+     (c) by EPS Software Corp. 1993 - 2017
+    </div> 
+    <div class="vcard"> 
+     <!-- EPS company address using adr MicroFormat standard --> 
+     <div class="adr"> 
+      <div class="street-address">
+       6605 Cypresswood Dr.
+      </div> 
+      <div class="extended-address">
+       Suite 300
+      </div> 
+      <span class="locality">Houston</span> 
+      <span class="region">TX</span> 
+      <span class="postal-code">77379</span> 
+      <div class="country-name">
+       USA
+      </div> 
+     </div> 
+     <!-- Phone/fax in MicroFormat standard --> 
+     <div class="tel">
+      <div class="type">
+       Voice
+      </div>
+      <div class="value">
+       +1 (832) 717-4445
+      </div>
+     </div> 
+     <div class="tel">
+      <div class="type">
+       Fax
+      </div>
+      <div class="value">
+       +1 (832) 717-4460
+      </div>
+     </div> 
+     <div class="email">
+      Email: 
+      <a class="email" href="mailto:info@codemag.com">info@codemag.com</a>
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <!-- the following div tags are there so custom CSS can associated generic elements, such as graphics anywhere in the body content --> 
+  <div id="bodyAdorner1"> 
+   <span></span> 
+  </div> 
+  <div id="bodyAdorner2"> 
+   <span></span> 
+  </div> 
+  <div id="bodyAdorner3"> 
+   <span></span> 
+  </div> 
+  <!-- OLD CODE - Wasn't working and Google helped me by adding the code below 8/1/16.  Google Code for Remarketing Tag --> 
+  <!--
+    Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. See more information and instructions on how to setup the tag on: http://google.com/ads/remarketingsetup
+    ---------------------------------------------------> 
+  <!-- Google Code for Remarketing Tag --> 
+  <!--
+    Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. See more information and instructions on how to setup the tag on: http://google.com/ads/remarketingsetup
+    ---------------------------------------------------> 
+  <script type="text/javascript">
+    /* <![CDATA[ */
+    var google_conversion_id = 1067389305;
+    var google_custom_params = window.google_tag_params;
+    var google_remarketing_only = true;
+    /* ]]> */
+        </script> 
+  <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+        </script> 
+  <noscript> 
+   <div style="display:inline;"> 
+    <img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/1067389305/?value=0&amp;guid=ON&amp;script=0"> 
+   </div> 
+  </noscript>   
+ </body>
+</html>

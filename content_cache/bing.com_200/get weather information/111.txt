@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="HandheldFriendly" content="True"> 
+  <meta name="MobileOptimized" content="480"> 
+  <meta name="viewport" content="width=device-width, height=device-height initial-scale=1.0, maximum-scale=1.0, user-scalable=0"> 
+  <title>Java Reflection - Classes</title> 
+  <meta name="description" content="This text explains how to introspect classes at runtime using Java Reflection"> 
+  <meta name="keywords" content="java reflection classes"> 
+  <meta name="author" content="Jakob Jenkov"> 
+  <meta name="twitter:card" content="summary_large_image"> 
+  <meta name="twitter:site" content="@jjenkov"> 
+  <meta name="twitter:title" content="Java Reflection - Classes"> 
+  <meta name="twitter:description" content="This text explains how to introspect classes at runtime using Java Reflection"> 
+  <meta name="twitter:creator" content="@jjenkov"> 
+  <meta name="twitter:domain" content="jenkov.com"> 
+  <meta name="twitter:image:src" content="http://tutorials.jenkov.com/images/teaser500-300-tutorials.png"> 
+  <meta name="og:type" content="article"> 
+  <meta name="og:title" content="Java Reflection - Classes"> 
+  <meta property="og:url" content="http://tutorials.jenkov.com/java-reflection/classes.html"> 
+  <meta property="og:description" content="This text explains how to introspect classes at runtime using Java Reflection"> 
+  <meta property="og:image" content="http://tutorials.jenkov.com/images/teaser500-300-tutorials.png"> 
+  <link href="https://plus.google.com/108227213807945109821" rel="publisher"> 
+  <meta name="google-site-verification" content="i_TwzdElg-by5uXLvyAjuIaCjxo0yjtW8LdRPUDEEcw"> 
+  <!-- jQuery --> 
+  <!--<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script> --> 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
+ </head> 
+ <body> 
+  <style>
+body {background-color: #f0f0f0;background-image: linear-gradient(180deg, #f0f0f0, #e0e0e0);}
+.dataTable th, .dataTable td { padding: 2px 8px; }
+</style> 
+  <style id="layoutCss"></style> 
+  <style id="jqcCss"></style> 
+  <style id="articleCss"></style> 
+  <style id="navBarCss"></style> 
+  <style>
+code  { font-size: 14px; }
+</style> 
+  <script>
+lcv = "4";
+ls = localStorage;
+cacheLoaded = false;
+pageLoaded = false;
+
+var prevArticleInCategory = "/java-reflection/index.html";
+var nextArticleInCategory = "/java-reflection/constructors.html";
+</script> 
+  <script id="jqcJs"></script> 
+  <script id="bottomNavBarModule"></script> 
+  <script>
+function jsonp(url) {
+    var script   = document.createElement("script"); script.type = "text/javascript"; script.src = url;
+    document.body.appendChild(script);
+}
+function insertById(ids) {
+    for(var i=0, n=ids.length; i < n; i++) {
+        var el = document.getElementById(ids[i]);
+        if(el != null) { el.innerHTML = localStorage[ids[i]]; }
+    }
+}
+function insertByClass(ids) {
+    for(var i=0, n=ids.length; i<n; i++) {
+        var els = document.getElementsByClassName(ids[i]);
+        for(var j=0,m=els.length; j<m; j++) { els[j].innerHTML = localStorage[ids[i]]; }
+    }
+}
+function init() {
+    if(cacheLoaded == true && pageLoaded == true) {
+        console.log("initializing page");
+        insertById(["layoutCss", "jqcCss", "topBarLogo", "articleCss", "navBarCss", "bottomNavBar", "bottomNavBarModule", "jqcJs"]);
+        insertByClass(["authorPhoto", "authorSocialLinks", "newsletterForm", "googlePlusShare"]);
+        $(document).ready(function() { bottomNavBarModule(); });
+        console.log("page initialized");
+    }
+}
+if(ls.lcv != lcv) {
+    for(var i=0; i < ls.length; i++){
+        ls.removeItem(ls.key(i));
+    }
+    jsonp("/cached-" + lcv + ".js");
+    console.log("cache cleared");
+} else {
+    cacheLoaded = true;
+}
+ls.lcv = lcv;
+</script> 
+  <!-- jqComponents --> 
+  <script>
+articleLen = 8189;
+adRandom = Math.random() * 100;
+
+function dw(text) { document.write(text); }
+
+function writeAd(adSlot, w, h) {
+ dw("<script async src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'><"); dw("/script>");
+ dw("<ins class='adsbygoogle' style='display:inline-block;width:" + w + "px;height:" + h + "px' data-ad-client='ca-pub-5569543489255665' data-ad-slot='" +  adSlot + "'></ins>");
+ dw("<script>");
+ dw("(adsbygoogle = window.adsbygoogle || []).push({});");
+ dw("<"); dw("/script>");
+}
+
+function topAdStyles(w, mT, mB) {
+    var adEl = document.getElementById("topAds");
+    adEl.style.width = (w + "px"); adEl.style.marginTop = (mT + "px"); adEl.style.marginBottom = (mB + "px"); adEl.style.marginRight = "auto"; adEl.style.marginLeft = "auto";
+}
+
+function bottomAdStyles(elId, w, mT, mB) {
+    var adEl = document.getElementById(elId);
+    adEl.style.width = (w + "px"); adEl.style.marginTop = (mT + "px"); adEl.style.marginBottom = (mB + "px"); adEl.style.marginRight = "auto"; adEl.style.marginLeft = "auto";
+}
+</script> 
+  <div id="topBar"> 
+   <div jqc-row jqc-row-paddings="0:0 3:24"> 
+    <div jqc-cell="0:12c"> 
+     <div id="topBarContent"> 
+      <div id="topBarLogo"></div> 
+      <div id="topBarPhrase">
+       Tech and Media Labs
+      </div> 
+      <div id="topBarMenu"> 
+       <a href="http://tutorials.jenkov.com">Tutorials</a> 
+       <a href="http://jenkov.com/about/index.html">About</a> 
+       <a href="http://jenkov.com/rss.xml">RSS</a> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <div id="cookieNote"> 
+   <div jqc-row jqc-row-widths="0:100% 4:1200" jqc-row-paddings="0:0 3:24"> 
+    <div jqc-cell="0:12c"> 
+     <div class="card">
+       This site uses cookies to improve the user experience. 
+      <button onclick="hideCookieNote()">OK</button> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <script>
+function hideCookieNote() { document.getElementById("cookieNote").innerHTML = ""; ls.cookieNote = 0; }
+
+if(ls.cookieNote == 0) {
+    hideCookieNote();
+}
+</script> 
+  <div jqc-row jqc-row-widths="0:100% 4:1200" jqc-row-paddings="0:0"> 
+   <div jqc-cell="0:12c"> 
+    <div id="topAds"> 
+     <script>
+                var adEl = document.getElementById("topAds");
+                if(window.innerWidth > 970) {
+                    if(adRandom <= 5){
+                        writeAd("6094206201", 970, 90); /* wider ad - 5% of page views */
+                        topAdStyles(970, 20, 20);
+                    } else {
+                        writeAd("7630855405", 728, 90); /* standard ad */
+                        topAdStyles(728, 20, 20);
+                    }
+                } else if(window.innerWidth >= 728 && window.innerWidth <= 970)  {  /* Tutorials - Top Banner */
+                    writeAd("7630855405", 728, 90);
+                    topAdStyles(728, 20, 20);
+                } else {  /* Tutorials - Top Banner - Mobile */
+                    writeAd("3297914607", 320, 50);
+                    topAdStyles(320, 10, 0);
+                }
+            </script> 
+    </div> 
+   </div> 
+  </div> 
+  <div id="main"> 
+   <div jqc-row jqc-row-widths="0:100% 4:1200" jqc-column-counts="0:24" jqc-row-paddings="0:0 3:24" jqc-cell-spacings="0:8"> 
+    <div jqc-cell="0:0c  3:7c"> 
+     <div id="trailToc" class="card"> 
+      <div id="trailTitle">
+       Java Reflection
+      </div>
+      <ol>
+       <li><a href="/java-reflection/index.html">Java Reflection Tutorial</a></li>
+       <li><a href="/java-reflection/classes.html"><b>Java Reflection - Classes</b></a></li>
+       <li><a href="/java-reflection/constructors.html">Java Reflection - Constructors</a></li>
+       <li><a href="/java-reflection/fields.html">Java Reflection - Fields</a></li>
+       <li><a href="/java-reflection/methods.html">Java Reflection - Methods</a></li>
+       <li><a href="/java-reflection/getters-setters.html">Java Reflection - Getters and Setters</a></li>
+       <li><a href="/java-reflection/private-fields-and-methods.html">Java Reflection - Private Fields and Methods</a></li>
+       <li><a href="/java-reflection/annotations.html">Java Reflection - Annotations</a></li>
+       <li><a href="/java-reflection/generics.html">Java Reflection - Generics</a></li>
+       <li><a href="/java-reflection/arrays.html">Java Reflection - Arrays</a></li>
+       <li><a href="/java-reflection/dynamic-proxies.html">Java Reflection - Dynamic Proxies</a></li>
+       <li><a href="/java-reflection/dynamic-class-loading-reloading.html">Java Reflection - Dynamic Class Loading and Reloading</a></li>
+      </ol> 
+     </div> 
+     <br>
+     <br> 
+     <!-- Left Bar Adsense Banner Ad --> 
+     <div id="side-ads"> 
+      <script>
+                if(window.innerWidth >= 900){
+                    if(adRandom <= 94)     { writeAd("5873880207", 300,  600);}
+                    else if(adRandom < 96) { writeAd("3389666608", 160,  600);}
+                    else                   { writeAd("4257546205", 300, 1050);}
+                }
+            </script> 
+     </div> 
+     <br>
+     <br> 
+     <div style="display: none;" class="card newsletterForm"> 
+     </div> 
+    </div> 
+    <div jqc-cell="0:24c 3:17c"> 
+     <div class="card"> 
+      <h1>Java Reflection - Classes</h1> 
+      <div id="mainBody"> 
+       <div id="pageToc" itemscope itemtype="http://schema.org/SiteNavigationElement"> 
+        <ul>
+         <li><a href="#the-class-object">The Class Object</a></li>
+         <li><a href="#classname">Class Name</a></li>
+         <li><a href="#modifiers">Modifiers</a></li>
+         <li><a href="#package">Package Info</a></li>
+         <li><a href="#superclass">Superclass</a></li>
+         <li><a href="#interfaces">Implemented Interfaces</a></li>
+         <li><a href="#constructors">Constructors</a></li>
+         <li><a href="#methods">Methods</a></li>
+         <li><a href="#fields">Fields</a></li>
+         <li><a href="#annotations">Annotations</a></li>
+        </ul> 
+       </div> 
+       <div id="lastUpdate"> 
+        <table>
+         <tbody>
+          <tr>
+           <td class="authorPhoto"></td> 
+           <td><p style="margin: 0px 0px 6px 0px;"> Jakob Jenkov<br> Last update: 2014-05-21 </p> 
+            <div class="authorSocialLinks"></div> </td> 
+          </tr> 
+         </tbody>
+        </table> 
+       </div> 
+       <p> Using Java Reflection you can inspect Java classes at runtime. Inspecting classes is often the first thing you do when using Reflection. From the classes you can obtain information about </p> 
+       <ul> 
+        <li><a href="#classname">Class Name</a></li> 
+        <li><a href="#modifiers">Class Modifies (public, private, synchronized etc.)</a></li> 
+        <li><a href="#package">Package Info</a></li> 
+        <li><a href="#superclass">Superclass</a></li> 
+        <li><a href="#interfaces">Implemented Interfaces</a></li> 
+        <li><a href="#constructors">Constructors</a></li> 
+        <li><a href="#methods">Methods</a></li> 
+        <li><a href="#fields">Fields</a></li> 
+        <li><a href="#annotations">Annotations</a></li> 
+       </ul> 
+       <p> plus a lot more information related to Java classes. For a full list you should consult the <a target="_blank" href="http://java.sun.com/javase/6/docs/api/java/lang/Class.html">JavaDoc for java.lang.Class</a>. This text will briefly touch upon all accessing of the above mentioned information. Some of the topics will also be examined in greater detail in separate texts. For instance, this text will show you how to obtain all methods or a specific method, but a separate text will show you how to invoke that method, how to find the method matching a given set of arguments if more than one method exists with the same name, what exceptions are thrown from method invocation via reflection, how to spot a getter/setter etc. The purpose of this text is primarily to introduce the <code>Class</code> object and the information you can obtain from it. </p> 
+       <a name="the-class-object"></a> 
+       <h2>The Class Object</h2> 
+       <p> Before you can do any inspection on a class you need to obtain its <code>java.lang.Class</code> object. All types in Java including the primitive types (int, long, float etc.) including arrays have an associated <code>Class</code> object. If you know the name of the class at compile time you can obtain a <code>Class</code> object like this: </p> 
+       <pre class="codeBox">
+    Class myObjectClass = MyObject.class
+</pre> 
+       <p> If you don't know the name at compile time, but have the class name as a string at runtime, you can do like this: </p> 
+       <p> String className = ... //obtain class name as string at runtime Class class = Class.forName(className); </p> 
+       <p> When using the <code>Class.forName()</code> method you must supply the fully qualified class name. That is the class name including all package names. For instance, if 
+        <cod>
+         MyObject
+        </cod> is located in package <code>com.jenkov.myapp</code> then the fully qualified class name is <code>com.jenkov.myapp.MyObject</code> </p> 
+       <p> The <code>Class.forName()</code> method may throw a <code>ClassNotFoundException</code> if the class cannot be found on the classpath at runtime. </p> 
+       <a name="classname"></a> 
+       <h2>Class Name</h2> 
+       <p> From a <code>Class</code> object you can obtain its name in two versions. The fully qualified class name (including package name) is obtained using the <code>getName()</code> method like this: </p> 
+       <pre class="codeBox">
+    Class aClass = ... //obtain Class object. See prev. section
+    String className = aClass.getName();
+</pre> 
+       <p> If you want the class name without the pacakge name you can obtain it using the <code>getSimpleName()</code> method, like this: </p> 
+       <pre class="codeBox">
+    Class  aClass          = ... //obtain Class object. See prev. section
+    String simpleClassName = aClass.getSimpleName();
+</pre> 
+       <a name="modifiers"></a> 
+       <h2>Modifiers</h2> 
+       <p> You can access the modifiers of a class via the <code>Class</code> object. The class modifiers are the keywords "public", "private", "static" etc. You obtain the class modifiers like this: </p> 
+       <pre class="codeBox">
+  Class  aClass = ... //obtain Class object. See prev. section
+  int modifiers = aClass.getModifiers();
+</pre> 
+       <p> The modifiers are packed into an <code>int</code> where each modifier is a flag bit that is either set or cleared. You can check the modifiers using these methods in the class <code>java.lang.reflect.Modifier</code>: </p> 
+       <pre class="codeBox">
+    Modifier.isAbstract(int modifiers)
+    Modifier.isFinal(int modifiers)
+    Modifier.isInterface(int modifiers)
+    Modifier.isNative(int modifiers)
+    Modifier.isPrivate(int modifiers)
+    Modifier.isProtected(int modifiers)
+    Modifier.isPublic(int modifiers)
+    Modifier.isStatic(int modifiers)
+    Modifier.isStrict(int modifiers)
+    Modifier.isSynchronized(int modifiers)
+    Modifier.isTransient(int modifiers)
+    Modifier.isVolatile(int modifiers)
+</pre> 
+       <a name="package"></a> 
+       <h2>Package Info</h2> 
+       <p> You can obtain information about the package from a <code>Class</code> object like this: </p> 
+       <pre class="codeBox">
+Class  aClass = ... //obtain Class object. See prev. section
+Package package = aClass.getPackage();
+</pre> 
+       <p> From the <code>Package</code> object you have access to information about the package like its name. You can also access information specified for this package in the <code>Manifest</code> file of the JAR file this package is located in on the classpath. For instance, you can specify package version numbers in the <code>Manifest</code> file. You can read more about the <code>Package</code> class here: <a target="_blank" href="http://java.sun.com/javase/6/docs/api/java/lang/Package.html">java.lang.Package</a> </p> 
+       <a name="superclass"></a> 
+       <h2>Superclass</h2> 
+       <p> From the <code>Class</code> object you can access the superclass of the class. Here is how: </p> 
+       <pre class="codeBox">
+Class superclass = aClass.getSuperclass();
+</pre> 
+       <p> The superclass class object is a <code>Class</code> object like any other, so you can continue doing class reflection on that too. </p> 
+       <a name="interfaces"></a> 
+       <h2>Implemented Interfaces</h2> 
+       <p> It is possible to get a list of the interfaces implemented by a given class. Here is how: </p> 
+       <pre class="codeBox">
+Class  aClass = ... //obtain Class object. See prev. section
+Class[] interfaces = aClass.getInterfaces();
+</pre> 
+       <p> A class can implement many interfaces. Therefore an array of <code>Class</code> is returned. Interfaces are also represented by <code>Class</code> objects in Java Reflection. </p> 
+       <p> NOTE: Only the interfaces specifically declared implemented by a given class is returned. If a superclass of the class implements an interface, but the class doesn't specifically state that it also implements that interface, that interface will not be returned in the array. Even if the class in practice implements that interface, because the superclass does. </p> 
+       <p> To get a complete list of the interfaces implemented by a given class you will have to consult both the class and its superclasses recursively. </p> 
+       <a name="constructors"></a> 
+       <h2>Constructors</h2> 
+       <p> You can access the constructors of a class like this: </p> 
+       <pre class="codeBox">
+ Constructor[] constructors = aClass.getConstructors();
+</pre> 
+       <p> Constructors are covered in more detail in the text on <a href="constructors.html">Constructors</a>. </p> 
+       <a name="methods"></a> 
+       <h2>Methods</h2> 
+       <p> You can access the methods of a class like this: </p> 
+       <pre class="codeBox">
+ Method[] method = aClass.getMethods();
+</pre> 
+       <p> Methods are covered in more detail in the text on <a href="methods.html">Methods</a>. </p> 
+       <a name="fields"></a> 
+       <h2>Fields</h2> 
+       <p> You can access the fields (member variables) of a class like this: </p> 
+       <pre class="codeBox">
+ Field[] method = aClass.getFields();
+</pre> 
+       <p> Fields are covered in more detail in the text on <a href="fields.html">Fields</a>. </p> 
+       <a name="annotations"></a> 
+       <h2>Annotations</h2> 
+       <p> You can access the class annotations of a class like this: </p> 
+       <pre class="codeBox">
+ Annotation[] annotations = aClass.getAnnotations();
+</pre> 
+       <p> Annotations are covered in more detail in the text on <a href="annotations.html">Annotations</a>. </p> 
+       <div> 
+       </div> 
+       <div id="next">
+        Next: 
+        <a href="/java-reflection/constructors.html">Java Reflection - Constructors</a>
+       </div> 
+       <div id="bottomSocial"> 
+        <div style="display:inline-block;"> 
+         <table> 
+          <tbody>
+           <tr>
+            <td colspan="2"> 
+             <div class="g-plus" data-action="share" data-height="24" data-annotation="none"></div> <script type="text/javascript">
+                                    (function() {
+                                        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+                                        po.src = 'https://apis.google.com/js/platform.js';
+                                        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+                                     })();
+                                </script> <a href="https://twitter.com/share" class="twitter-share-button" data-via="jjenkov" target="_blank">Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script> </td>
+           </tr> 
+           <tr>
+            <td class="authorPhoto"></td>
+            <td><p style="margin: 0px 0px 6px 0px;">Jakob Jenkov</p>
+             <div class="authorSocialLinks"></div></td>
+           </tr> 
+          </tbody>
+         </table> 
+        </div> 
+        <div style="display:inline-block;" class="newsletterForm"></div> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <!-- Bottom ads - (nested row is working, but should perhaps not be a nested row?) (note: was a nested row in old design - not in new) --> 
+  <div jqc-row jqc-row-paddings="0:0"> 
+   <div jqc-cell="0:12c"> 
+    <div id="pageBottomAds"> 
+     <script>
+                    if(articleLen >= 4000){ /* for longer articles place ads here, at the bottom of the page */
+                        if(window.innerWidth >= 728 ) {  /* Adsense Ads - Bottom Banner */
+                            if(adRandom < 5)       { writeAd("2721937400", 970, 90);  bottomAdStyles("pageBottomAds", 970, 20, 20);}
+                            else if(adRandom < 30) { writeAd("9547200207", 970, 250); bottomAdStyles("pageBottomAds", 970, 20, 20);}
+                            else                   { writeAd("7776167002", 728, 90);  bottomAdStyles("pageBottomAds", 728, 20, 20);}
+                        } else if(window.innerWidth < 728) {  /* Adsense Ads - Bottom Banner - Mobile */
+                            if(adRandom < 50) {
+                                writeAd("4216244607", 320, 50); bottomAdStyles("pageBottomAds", 320, 10, 0);
+                            } else {
+                                writeAd("7377085404", 320, 100); bottomAdStyles("pageBottomAds", 320, 10, 0);
+                            }
+                        }
+                    }
+                </script> 
+     <br>
+     <br>
+     <br> 
+    </div> 
+    <div style="height: 30px"></div> 
+    <div id="disqusComments" class="card"> 
+     <div id="disqus_thread"></div> 
+     <script type="text/javascript">
+                var disqus_shortname = 'tutorials-jenkov-com'; // required: replace example with your forum shortname
+
+                /* * * DON'T EDIT BELOW THIS LINE * * */
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script> 
+     <noscript>
+      Please enable JavaScript to view the 
+      <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+     </noscript> 
+    </div> 
+   </div> 
+  </div> 
+  <span id="layoutManager" jqc-type="jqcResponsiveLayoutManager" jqc-row-paddings="0:8 4:0"></span> 
+  <div id="footerBar"> 
+   <div jqc-row> 
+    <div jqc-cell="0:12c">
+      Copyright &nbsp;Jenkov Aps 
+    </div> 
+   </div> 
+  </div> 
+  <div id="trailTocFixedDiv"> 
+   <div id="trailTocFixedCloseButton">
+    Close TOC
+   </div> 
+   <div id="trailTocFixedInnerDiv"></div> 
+  </div> 
+  <div id="bottomNavBar"></div> 
+  <!-- init page --> 
+  <script>
+pageLoaded = true;
+init();
+</script> 
+  <!-- Google Analytics Script --> 
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-4036229-3', 'auto');
+  ga('send', 'pageview');
+
+</script>  
+ </body>
+</html>

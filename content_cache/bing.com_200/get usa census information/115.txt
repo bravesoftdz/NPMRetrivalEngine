@@ -1,0 +1,2297 @@
+<!doctype html>
+<html lang="en">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <link rel="icon" href="//www.ibm.com/favicon.ico"> 
+  <link rel="canonical" href="http://www.ibm.com/developerworks/data/library/techarticle/dm-0606chun/index.html"> 
+  <meta name="geo.country" content="ZZ"> 
+  <meta name="dcterms.rights" content="© Copyright&nbsp;IBM Corporation&nbsp;2006"> 
+  <meta name="dcterms.date" content="2006-06-01"> 
+  <meta name="description" content="DB2 packages are database objects that contain executable forms of SQL statements. This article explains the importance of these objects to the way DB2 functions, and answers many questions that are common for both application developers and DBAs, such as why a package and application mismatch might occur, what DB2 system packages are created by default, when new system packages are bound to the database, and even what's inside a package. The authors support the concepts with detailed examples and review common problems and solutions."> 
+  <meta name="keywords" content="DB2, package, packages, embedded, SQL, SQLJ, PSM, SQL Procedures, LUW, Paolo Cirone, John Chun, cirone, chun, ddddmca"> 
+  <meta name="robots" content="index,follow"> 
+  <title>DB2 packages: Concepts, examples, and common problems</title> 
+  <script> 
+    digitalData = {
+        "page":{
+            "category":{
+                "primaryCategory":"SOFDCIMTZZ"
+            },
+            "pageInfo":{
+                "effectiveDate":"2006-06-01",
+                "language":"en",
+                "publishDate":"2006-06-01",
+                "publisher":"IBM Corporation",
+                "version":"v18",
+                "ibm":{ 
+                    "contentDelivery":"IBM developerWorks template",
+                    "contentProducer":"IBM developerWorks",
+                    "country":"ZZ",
+                    "owner":"developerWorks Content/Raleigh/IBM",
+                    "subject":"SSEPGG,B7D000,SWB00",
+                    "type":"CT316",
+                    "topic":"APIs,About the product,Access,Configuration and administration,Data access,Databases and data management,Java technology",
+                    "topicId":"125,363,602,79,270,41,9",
+                    "contentArea":"data",
+                    "contentAreaId":"18",
+                    "contentType":"article",
+                    "contentId":"125391",
+                    "brandProduct":"SSEPGG"
+                },
+                "keywords":"DB2, package, packages, embedded, SQL, SQLJ, PSM, SQL Procedures, LUW, Paolo Cirone, John Chun, cirone, chun, ddddmca",
+                "description":"DB2 packages are database objects that contain executable forms of SQL statements. This article explains the importance of these objects to the way DB2 functions, and answers many questions that are common for both application developers and DBAs, such as why a package and application mismatch might occur, what DB2 system packages are created by default, when new system packages are bound to the database, and even what's inside a package. The authors support the concepts with detailed examples and review common problems and solutions."
+            }
+        }
+    };
+    window._analytics = {
+        "segment_key":'HU3dbkAG5wE0F1IkRf9S1RexlAqo3jby'
+    };
+</script> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:site" content="@developerworks"> 
+  <meta property="og:title" content="DB2 packages: Concepts, examples, and common problems"> 
+  <meta property="og:description" content="DB2 packages are database objects that contain executable forms of SQL statements. This article explains the importance of these objects to the way DB2 functions, and answers many questions that are common for both application developers and DBAs, such as why a package and application mismatch might occur, what DB2 system packages are created by default, when new system packages are bound to the database, and even what's inside a package. The authors support the concepts with detailed examples and review common problems and solutions."> 
+  <meta property="og:image" content="http://www.ibm.com/developerworks/i/dw-social-201508.png"> 
+  <!-- Segment meta tag --> 
+  <meta name="segment" property="(developerWorks)" productTitle="developerWorks" value="Data and Analytics English (developerWorks)"> 
+  <!-- SITE MON : START (DO NOT DELETE) --> 
+  <!-- developerWorks monitoring token --> 
+  <!-- SITE MON : END (DO NOT DELETE) --> 
+  <!-- HEADER_SCRIPTS_AND_CSS_INCLUDE --> 
+  <!-- <script src="//cdn.optimizely.com/js/5399420604.js"></script> --> 
+  <!-- BEGIN: Use this section to set page specific variables for the Page Tag --> 
+  <script language="JavaScript">var NTPT_PGEXTRA="ibmSkillLevel=3&ibmCmaId=125391&ibmContentAreas=data";</script> 
+  <!--END --> 
+  <script src="//1.www.s81c.com/common/stats/ida_stats.js"></script> 
+  <link href="//1.www.s81c.com/common/v18/css/www.css" rel="stylesheet"> 
+  <link href="//1.www.s81c.com/common/v18/css/syntaxhighlighter.css" rel="stylesheet"> 
+  <script src="//1.www.s81c.com/common/v18/js/www.js"></script> 
+  <script src="//1.www.s81c.com/common/v18/js/syntaxhighlighter.js"></script> 
+  <link href="//1.www.s81c.com/common/v18/css/tables.css" rel="stylesheet"> 
+  <script src="//1.www.s81c.com/common/v18/js/tables.js"></script> 
+  <!--  Masthead/footer  --> 
+  <link href="//dw1.s81c.com/developerworks/css/dw-mf/v18/dw-mf-v18.css?v=092117" rel="stylesheet"> 
+  <!-- <link href="//dw1.s81c.com/developerworks/css/dw-mf/v18/alt-signedin-ux.css" rel="stylesheet" /> --> 
+  <!--[if lt IE 9]>
+    <link href="//dw1.s81c.com/developerworks/css/dw-mf/v18/dw-mf-ie8fix.css?v=022216" rel="stylesheet" />
+<![endif]--> 
+  <link href="//dw1.s81c.com/developerworks/css/v18/dw-article.css?v=073117" rel="stylesheet"> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-auth-properties.js?v=041017"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-auth.js?v=062717"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/dw-mf/v18/dw-mf.js?v=110316"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-include.js"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-article.js?v=051817"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-auto-links.js?v=091217"></script> 
+  <script src="//www.ibm.com/software/info/js/tactic.js"></script> 
+  <script src="//www.ibm.com/software/info/js/tacticbindlinks.js"></script> 
+  <!-- Segment --> 
+  <script src="//console.ng.bluemix.net/analytics/build/bluemix-analytics.min.js"></script> 
+  <!-- 
+<PageMap>
+    <DataObject type="document">
+        <Attribute name="topic">APIs,About the product,Access,Configuration and administration,Data access,Databases and data management,Java technology</Attribute>
+        <Attribute name="topicId">125,363,602,79,270,41,9</Attribute>
+        <Attribute name="contentArea">data</Attribute>
+        <Attribute name="contentAreaId">18</Attribute>
+        <Attribute name="abstract">DB2 packages are database objects that contain executable forms of SQL
+            statements. This article explains the importance of these objects to the way
+            DB2 functions, and answers many questions that are common for both application
+            developers and DBAs, such as why a package and application mismatch might
+            occur, what DB2 system packages are created by default, when new system
+            packages are bound to the database, and even what's inside a package. The
+            authors support the concepts with detailed examples and review common problems
+            and solutions.</Attribute>
+        <Attribute name="pub.date">2006-06-01</Attribute>
+        <Attribute name="contentType">article</Attribute>
+    </DataObject>
+</PageMap>
+--> 
+ </head> 
+ <body id="ibm-com" class="ibm-type dw-js-disabled"> 
+  <div id="ibm-top" class="ibm-landing-page"> 
+   <!-- MASTHEAD_BEGIN --> 
+   <div id="ibm-masthead" role="banner" aria-label="IBM"> 
+    <div id="ibm-mast-options"> 
+     <ul role="toolbar" aria-labelledby="ibm-masthead"> 
+      <li id="ibm-geo" role="presentation"><a href="http://www.ibm.com/planetwide/select/selector.html" role="button" aria-label="United States selected - Choose a country">United States</a></li> 
+     </ul> 
+    </div> 
+    <div id="ibm-universal-nav"> 
+     <nav role="navigation" aria-label="IBM"> 
+      <div id="ibm-home">
+       <a href="http://www.ibm.com/us/en/">IBM®</a>
+      </div> 
+      <ul id="ibm-menu-links" role="toolbar" aria-label="Site map"> 
+       <li><a href="http://www.ibm.com/sitemap/us/en/">Site map</a></li> 
+      </ul> 
+     </nav> 
+     <div id="ibm-search-module" role="search" aria-labelledby="ibm-masthead"> 
+      <form id="ibm-search-form" action="https://www.ibm.com/Search/" method="get"> 
+       <p> <label for="q">IBM</label> <input type="text" maxlength="100" value="" placeholder="Search" name="q" id="q" aria-label="Search developerWorks"> <input type="hidden" value="18" name="v"> <input type="hidden" value="utf" name="en"> <input type="hidden" value="en" name="lang"> <input type="hidden" value="us" name="cc"> <input type="hidden" name="sn" value="dw"> <input type="hidden" name="dws" value="dw"> <input type="hidden" name="hpp" value="20"> <input type="submit" id="ibm-search" class="ibm-btn-search" value="Submit"> </p> 
+      </form> 
+     </div> 
+    </div> 
+   </div>
+   <!-- MASTHEAD_END --> 
+   <!-- LAYOUT --> 
+   <div id="ibm-content-wrapper"> 
+    <!-- LEADSPACE_BEGIN --> 
+    <header role="banner" aria-labelledby="ibm-pagetitle-h1"> 
+     <!-- MASTHEAD_SITENAV_BEGIN --> 
+     <div class="ibm-sitenav-menu-container"> 
+      <div class="ibm-sitenav-menu-name"> 
+       <a href="//www.ibm.com/developerworks/"> <img width="186" height="24" alt="developerWorks®" src="//dw1.s81c.com/developerworks/i/mf/dw-mf-wordmark.svg"> </a> 
+      </div> 
+      <div class="ibm-sitenav-menu-list"> 
+       <ul role="menubar"> 
+        <li class="dw-navpage-learn ibm-haschildlist" role="presentation"> <span role="menuitem"><a href="//www.ibm.com/developerworks/learn/">Learn</a></span> 
+         <ul role="menu" aria-label="Learn" id="dw-mega-learn"> 
+          <li role="presentation"> 
+           <div class="ibm-columns"> 
+            <div class="ibm-col-5-3 dw-mega-main"> 
+             <h2>Learn with our tutorials and training</h2> 
+             <p class="dw-mega-main-p">developerWorks provides tutorials, articles and other technical resources to help you grow your development skills on a wide variety of topics and products. Learn about a specific product or take a course and get certified. So, what do you want to learn about?</p> 
+             <p class="ibm-button-link"> <a href="//www.ibm.com/developerworks/learn/" class="ibm-btn-pri">Choose a topic</a> </p> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured topics</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-mobile.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/mobile">Mobile development</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-bigdata.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/analytics">Big data</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-cognitive.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/cognitive">Cognitive computing</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-cloud.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/cloud">Cloud</a> 
+              </div> 
+             </div> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured destinations</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-swift.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/swift/?lnk=hm">Swift @ IBM</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-open.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/open/?lnk=hm">developerWorks Open</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-arch.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/architecture/?lnk=hm">Architecture center</a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> </li> 
+         </ul> </li> 
+        <li role="presentation" class="dw-navpage-develop ibm-haschildlist"> <span role="menuitem"><a href="//www.ibm.com/developerworks/develop/">Develop</a></span> 
+         <ul role="menu" aria-label="Develop" id="dw-mega-develop"> 
+          <li role="presentation"> 
+           <div class="ibm-columns"> 
+            <div class="ibm-col-5-3 dw-mega-main"> 
+             <h2>Develop with our trials &amp; downloads</h2> 
+             <p class="dw-mega-main-p">Start developing with product trials, free downloads, and IBM Bluemix™ services. Sort by topic or product name and find everything we have to offer.</p> 
+             <p class="ibm-button-link"> <a href="//www.ibm.com/developerworks/develop/" class="ibm-btn-pri">View all downloads &amp; trials</a> </p> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured products</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-bluemix.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/sso/bmregistration">Bluemix</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-websphere.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/downloads/ws/was/">WebSphere Application Server</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-db2express.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/downloads/im/db2express/">DB2 Express C</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-mobile.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//mobilefirstplatform.ibmcloud.com/">MobileFirst Platform Foundation</a> 
+              </div> 
+             </div> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured destinations</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-swift.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/swift/?lnk=hm">Swift @ IBM</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-open.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/open/?lnk=hm">developerWorks Open</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-arch.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/architecture/?lnk=hm">Architecture center</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-api-dest.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/api/">API Explorer</a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> </li> 
+         </ul> </li> 
+        <li role="presentation" class="dw-navpage-connect ibm-haschildlist"> <span role="menuitem"><a href="//www.ibm.com/developerworks/connect/">Connect</a></span> 
+         <ul role="menu" aria-label="Connect" id="dw-mega-connect"> 
+          <li role="presentation"> 
+           <div class="ibm-columns"> 
+            <div class="ibm-col-5-3 dw-mega-main"> 
+             <h2>Find a community and connect</h2> 
+             <p class="dw-mega-main-p">Learn from the experts and share with other developers in one of our dev centers. Ask questions and get answers with dW answers. Search for local events in your area. All in developerWorks communities.</p> 
+             <p class="ibm-button-link"> <a href="//www.ibm.com/developerworks/connect/" class="ibm-btn-pri">View communities</a> </p> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured Developer Centers</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-jazz-dev.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//jazz.net/">Jazz.net</a> 
+              </div> 
+             </div> 
+             <!--<div class="dw-mega-nav-item">
+                                        <div class="dw-mega-nav-img">
+                                            <img width="30" height="30" alt=""
+                                                src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-cloud-dev.png">
+                                        </div>
+                                        <div class="dw-mega-nav-link">
+                                            <a href="//developer.ibm.com/cloud-analytics/">IBM Cloud Analytics DEV</a>
+                                        </div>
+                                    </div>--> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-bluemix-dev.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/bluemix/">Bluemix</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-api-dev.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/api/">API Explorer</a> 
+              </div> 
+             </div> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured destinations</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-swift.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/swift/?lnk=hm">Swift @ IBM</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-open.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/open/?lnk=hm">developerWorks Open</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-arch.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/architecture/?lnk=hm">Architecture center</a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> </li> 
+         </ul> </li> 
+        <!-- dW featured --> 
+        <!-- <li role="presentation" class="dw-navpage-devcenter"><strong>Subheading</strong></li> --> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/cognitive/">Cognitive</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/cloud/">Cloud</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/analytics/">Data</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/iot/">Internet of Things</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/java/">Java</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/">All topics</a></li> 
+       </ul> 
+      </div> 
+     </div> 
+     <!-- MASTHEAD_SITENAV_END --> 
+     <!-- NAVIGATION_TRAIL_BEGIN --> 
+     <div id="ibm-leadspace-head" class="ibm-alternate"> 
+      <div id="ibm-leadspace-body"> 
+       <nav aria-label="Breadcrumb" role="navigation"> 
+        <ul id="dw-navigation-trail" itemscope itemtype="http://schema.org/BreadcrumbList">
+         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="http://www.ibm.com/developerworks/learn/"><span itemprop="name">Learn</span></a>
+          <meta itemprop="position" content="1"></li>
+         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="http://www.ibm.com/developerworks/data/"><span itemprop="name">Information Management</span></a>
+          <meta itemprop="position" content="2"></li>
+        </ul> 
+       </nav> 
+      </div> 
+     </div> 
+     <!-- NAVIGATION_TRAIL_END --> 
+    </header> 
+    <!-- LEADSPACE_END --> 
+    <!-- MAIN_CONTENT_BEGIN --> 
+    <main role="main" aria-labelledby="ibm-pagetitle-h1"> 
+     <div id="ibm-pcon"> 
+      <!-- BEGIN_IBM-CONTENT --> 
+      <div id="ibm-content"> 
+       <!-- BEGIN_IBM-CONTENT-BODY --> 
+       <div id="ibm-content-body"> 
+        <!-- BEGIN_IBM-CONTENT-MAIN --> 
+        <div id="ibm-content-main" class="dw-article"> 
+         <!-- BEGIN_INTERIOR-COLUMNS --> 
+         <div class="ibm-columns dw-article-toc"> 
+          <!-- LEFT_6_2_CONTENT_COLUMN_BEGIN --> 
+          <div id="dw-article-toc-container" class="ibm-col-6-2"> 
+           <div id="dw-article-toc-body"> 
+            <h2>Contents</h2>
+            <div class="ibm-alternate-rule">
+             <hr>
+            </div>
+            <ul role="directory" aria-label="Table of contents" class="ibm-plain-list">
+             <li><a href="#ibm-pagetitle-h1">Introduction</a></li>
+             <li><a href="#N10057">What are packages?</a></li>
+             <li><a href="#N1006E">Common use of packages in DB2 </a></li>
+             <li><a href="#system">DB2 system packages</a></li>
+             <li><a href="#embedded">Embedded SQL</a></li>
+             <li><a href="#N103D5">Packages and SQL routines</a></li>
+             <li><a href="#N10416">Authorizations and binding of routines</a></li>
+             <li><a href="#N10499">Package versioning and other information</a></li>
+             <li><a href="#N10767">Common problems and considerations involving packages </a></li>
+             <li><a href="#N108E7">Acknowledgements</a></li>
+             <li><a href="#N108EF">Further information</a></li>
+             <li><a href="#artdownload">Downloadable resources</a></li>
+             <li><a href="#artrelatedtopics">Related topics</a></li>
+             <li><a href="#icomments">Comments</a></li>
+            </ul> 
+           </div> 
+          </div> 
+          <!-- LEFT_6_2_CONTENT_COLUMN_END --> 
+          <!-- CENTER_6_4_CONTENT_COLUMN_BEGIN --> 
+          <div class="ibm-col-6-4"> 
+           <h1 id="ibm-pagetitle-h1" class="ibm-h1">DB2 packages: Concepts, examples, and common problems</h1>
+           <p class="dw-article-subhead">Understanding DB2 system and user application packages</p> 
+           <!-- Article Top Bar --> 
+           <div class="ibm-columns dw-article-topbar"> 
+            <!-- Author and article info. --> 
+            <div class="ibm-col-6-2 ibm-col-medium-6-4 dw-article-metadata"> 
+             <div class="dw-article-authordate">
+              John Chun and Paolo Cirone
+              <br>
+              <span class="dw-article-pubdate">Published on June 01, 2006</span>
+             </div> 
+            </div> 
+            <!-- Social --> 
+            <div class="ibm-col-6-2 ibm-col-medium-6-4 ibm-col-small-6-2 dw-article-social"> 
+             <!-- Sharing links --> 
+             <div id="dw-article-share-inline"> 
+              <div class="dw-article-sharelink-inline"> 
+               <div class="ibm-sharethispage"></div> 
+              </div> 
+             </div> 
+             <!-- Number of comments and link to comments --> 
+             <div id="dw-article-cmts"> 
+              <div class="dw-article-cmtslink"> 
+               <a onclick="tocLink('#icomments')" href="#icomments" role="link" tabindex="0" aria-label="Comments"> <img src="//dw1.s81c.com/developerworks/i/v18/article/dw-article-cmt-icon.png" width="29" height="29" alt="Comments"> </a> 
+              </div> 
+              <div class="dw-article-cmtslink"> 
+               <a onclick="tocLink('#icomments')" href="#icomments" role="link" tabindex="0"> 
+                <div id="nCmts"></div> </a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <!-- Article Body --> 
+           <h2 id="N10057" class="ibm-h2">What are packages?</h2>
+           <p><em>Packages</em> in DB2 are control-structure database objects that contain executable forms of SQL statements or placement holders for executable forms. In DB2 for Linux®, UNIX®, and Windows®, packages may also be referred to as <em>access plans</em>. Packages are stored in the database system catalog tables.</p>
+           <p>If an application intends to access a database using static SQL, the application developer must embed the appropriate SQL statements in the program source code. When the program source code is converted to an executable object (static SQL) or executed (dynamic SQL), the strategy for executing each embedded SQL statement is stored in a package as a single section. Each section is a bound form of the embedded SQL statement, and this form contains information such as which index to use and how to use the index (basically an access plan).</p>
+           <p>DB2 packages are used to execute SQL statements on the database server. They play a crucial role in how a DB2 client application interacts with the DB2 server.</p>
+           <h2 id="N1006E" class="ibm-h2">Common use of packages in DB2 </h2>
+           <div class="dw-article-sidebar ibm-background-cool-white-20">
+            <h5>Runtime Client</h5>
+            <p>The DB2 Runtime Client does not include any DB2 bind files. The task of binding is always left to administrators and best done during maintentance windows. Providing bind files to all general users who have access to the Runtime Client environment would go against the general rule of leaving bind tasks to administrators.</p>
+           </div>
+           <p>The general use of packages in DB2 can be categorized into two areas:</p>
+           <ul class="ibm-bullet-list">
+            <li><a href="#system">DB2 system packages</a>: This set of packages is supplied with all DB2 products (with the exception of the run time client). It consists of utilities and drivers that are required by DB2 clients to connect and perform tasks on a database server.</li>
+            <li><a href="#embedded">Embedded SQL packages</a>: The second set includes packages that are created by the user in the form of embedded applications or stored procedures.</li>
+           </ul>
+           <p>The following sections discuss the use of both kinds of packages in detail.</p>
+           <h2 id="system" class="ibm-h2">DB2 system packages</h2>
+           <p>The following are list files (*.lst) of packages that are required to be bound to the database from an administrative client or full DB2 product. Binding must be done once per db2level against every remote DB2 server the given installed code connects to.</p>
+           <p>Here are the typical commands used to bind system packages from the command line against DB2 Linux, UNIX, and Windows databases:</p>
+           <h5 id="bind" class="ibm-h5">Listing 1. Commands to bind system packages</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">bind BNDPATH/@db2ubind.lst blocking all sqlerror continue messages bind.msg grant public
+
+bind BNDPATH/@db2cli.lst blocking all sqlerror continue messages bind.msg grant public</pre></span>
+           <p> All host database systems have their own *.lst files for binding purposes:. </p>
+           <p><strong>ddcsmvs.lst</strong> - for DB2 for z/OS® and OS/390®</p>
+           <p><strong>ddcsvm.lst</strong> - for DB2 for VM®</p>
+           <p><strong>ddcsvse.lst</strong> - for DB2 for VSE®</p>
+           <p><strong>ddcs400.lst</strong> - for DB2 for AS/400® and iSeries™</p>
+           <p>The *.lst files are simple text files that contain a list of bind (*.bnd ) files. When binding the list file, you must specify the '@' character (at sign) and qualify the location of the *.lst file for the bind to be successful.</p>
+           <p>Among the various system packages, this article concentrates on the CLI packages (db2cli.lst).</p>
+           <p>Packages for each db2level are unique. They are specific to each DB2 fix pack level and platform, hence the need to bind packages from all unique levels of DB2 in your environment (at least once at install time).</p>
+           <p>Every new DB2 fix pack may have changes built into system packages. These changes result from APARs (defects) or feature additions. Changes to system packages will result in a change to the package names. This change to package naming is done to ensure that the new package does not interfere with another existing client that may be running at an earlier fix pack release. The existing client would require previously bound packages (bound at install time) to run applications at its given level. If the names were not changed as required, there would be no way to easily identify which package that existing client should use should another newer package be bound after a change has taken place.</p>
+           <p>Historically, DB2 would always have a unique package name depending on the platform and db2level for the client from which the package originated. This design resulted in many unnecessary packages on the server over time, as clients were cycled out of use as they aged. In DB2 UDB Version 7.2 and 8.x, the package name will only change if code changes demand an update to the DB2 packages.</p>
+           <p>With the installation of any new fix pack, a user with BINDADD authority on the database server is required to bind the necessary system bind files that exist in the sqllib/bnd directory.</p>
+           <h3 id="cli" class="ibm-h3">DB2 Call Level Interface (CLI) packages</h3>
+           <p>The DB2 Call Level Interface (DB2 CLI) is a callable SQL interface to the DB2 family of database servers. A callable SQL interface is an application program interface (API) for database access, which uses function calls to invoke dynamic SQL statements. It is an alternative to embedded dynamic SQL, but unlike embedded SQL, it does not require precompiling or binding for each application.</p>
+           <p>DB2 CLI is based on the Microsoft® Open Database Connectivity (ODBC) specification and the X/Open specification.</p>
+           <div class="dw-article-sidebar ibm-background-cool-white-20">
+            <h5>Autobind</h5>
+            <p>Autobind has a number of disadvantages and should be avoided whenever possible. These disadvantages include performance issues (extra network traffic) and package locking/contention issues. You should always perform system package bind during a maintenance window.</p>
+           </div>
+           <p>The DB2 CLI driver automatically creates DB2 packages required at connection time if packages are not found on the server. This is known as autobind. If a package already exists, the driver uses the existing package.</p>
+           <p>These packages are also required to be bound when fix packs are upgraded within the environment in question. By default, DB2 packages created by the DB2 driver are created in the NULLID collection (or library).</p>
+           <p>A dynamic section is the actual executable object that contains the logic needed to satisfy a dynamic SQL request. Each statement handle allocated in a CLI application will occupy one section within a CLI package.</p>
+           <p>In some cases, you may need to create additional DB2 CLI packages that in turn will contain more than the default number of dynamic sections. Should your application require more than the default number of sections (if you have an application that under heavy load has allocated more statement handles than there are sections, for example), you will fall into this scenario. The CLIPKG option discussed below demonstrates how to create more CLI packages. </p>
+           <p><strong>CLI package naming convention</strong></p>
+           <p>For each CLI bind file, generate multiple packages with different package names. The number of packages generated is equal to the number of isolation levels TIMES the value of the CLIPKG bind option. The default is three for the CLIPKG option. Theoretically, CLIPKG can be a maximum of 255 (ff). That is the limit due to our naming convention.</p>
+           <h5 id="fig1" class="ibm-h5">Figure 1. Naming convention for CLI packages</h5>
+           <img src="CLIPkg1.gif" class="ibm-downsize" alt="Naming convention for CLI packages" height="282" width="451">
+           <p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N100E4');return false;" href="#N100E4">View image at full size</a></p>
+           <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N100E4">
+            <img alt="Naming convention for CLI packages" src="CLIPkg1.gif" width="451">
+           </div>
+           <p>The cursors in the packages follow the naming convention in <a href="#listing2">Listing 2</a>:</p>
+           <h5 id="listing2" class="ibm-h5">Listing 2. Naming convention for cursors</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">Example: SQL_CURLH100C384
+  SQL : constant for all cursors
+    L or S: package size
+    H or N: hold or nohold
+    0,1,2,3,4 : isolation defined in sqllib\include\sqlmon.h
+    Cursor : constant for all cursors
+    1 to 64 sections in small pkgs and 1 to 384 sections in large packages</pre></span>
+           <h5 id="table1" class="ibm-h5">Table 1. DB2 CLI bind files and package names</h5>
+           <table border="0" cellpadding="0" cellspacing="0" class="ibm-data-table" data-widget="datatable" summary="Table using a heading tag for the caption, all         columns left-aligned" width="100%">
+            <thead xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+             <tr>
+              <th class="ibm-background-neutral-white-30">Bind file name</th>
+              <th class="ibm-background-neutral-white-30">Package name</th>
+              <th class="ibm-background-neutral-white-30">Needed by DB2 Universal Database</th>
+              <th class="ibm-background-neutral-white-30">Needed by host servers</th>
+              <th class="ibm-background-neutral-white-30">Description</th>
+             </tr>
+            </thead>
+            <tbody xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+             <tr>
+              <td class="tb-row">db2clipk.bnd</td>
+              <td>SYSSHxyy</td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>Dynamic placeholders - small package WITH HOLD</td>
+             </tr>
+             <tr>
+              <td class="tb-row">db2clipk.bnd</td>
+              <td>SYSSNxyy</td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>Dynamic placeholders - small package NOT WITH HOLD</td>
+             </tr>
+             <tr>
+              <td class="tb-row">db2clipk.bnd</td>
+              <td>SYSLHxyy</td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>Dynamic placeholders - large package WITH HOLD</td>
+             </tr>
+             <tr>
+              <td class="tb-row">db2clipk.bnd</td>
+              <td>SYSLNxyy</td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>Dynamic placeholders - large package NOT WITH HOLD</td>
+             </tr>
+             <tr>
+              <td class="tb-row">db2clist.bnd</td>
+              <td>SYSSTAT</td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>Common static CLI functions</td>
+             </tr>
+             <tr>
+              <td class="tb-row">db2schema.bnd</td>
+              <td>SQLL9Eyy</td>
+              <td>Yes</td>
+              <td>No</td>
+              <td>Catalog function support</td>
+             </tr>
+             <tr>
+              <td class="tb-row">db2cliws.bnd</td>
+              <td>SQLL65zz</td>
+              <td>Server Version 2 to 7</td>
+              <td>No</td>
+              <td>DB2 for Intel/UNIX catalog function support</td>
+             </tr>
+             <tr>
+              <td class="tb-row">db2cliv2.bnd</td>
+              <td>SQLL95zz</td>
+              <td>Server Version 2 to 7</td>
+              <td>No</td>
+              <td>Common static CLI functions</td>
+             </tr>
+            </tbody>
+           </table>
+           <p><strong>Notes for Table 1:</strong></p>
+           <ul class="ibm-bullet-list">
+            <li>'S' represents a small package, and 'L' represents a large package</li>
+            <li>'H' represents WITH HOLD, and 'N' represents NOT WITH HOLD</li>
+            <li>'x' is the isolation level: 0=NC, 1=UR, 2=CS, 3=RS, 4=RR</li>
+            <li>'yy' is the package iteration 00 through FF</li>
+            <li>'zz' is unique for each platform</li>
+           </ul>
+           <p>For example, for the dynamic packages:</p>
+           <ul class="ibm-bullet-list">
+            <li>SYSSN100 - A small package (65 sections), where all cursor declarations are for non-held cursors. Bound with isolation level UR. This is the first iteration of that package.</li>
+            <li>SYSLH401 - A large package (385 sections), where all cursor declarations are for held cursors. Bound with isolation level RS. This is the second iteration of that package.</li>
+           </ul>
+           <p><strong>Bind options used for CLI Packages</strong></p>
+           <p>CLI packages are automatically bound with ACTION ADD. Therefore, once the packages are created, any subsequent attempt at binding them will return an SQLCODE of -719 or -721 before commencing the whole bind process. The binder turns off this -719/-721 error and does not show it to the user. However, if a DB2 trace is taken, the -719 / -721 is logged. The ACTION ADD speeds up the binding process by only creating the package if it does NOT exist. Should the package already exist, under the covers, you would see the SQLCODEs denoted above and binding would stop. ACTION ADD eliminates lock contention for replacing already existing packages.</p>
+           <p>ACTION ADD is only sent to Linux, UNIX, and Windows and z/OS. Do not send it to other servers (for example, VSE, VM, OS400), as it was not supported at the time of this implementation.</p>
+           <p>When binding CLI, ignore all user-specified options, except ACTION, REPLVER, COLLECTION, and CLIPKG (other than options specified in the bind file). However, if COLLECTION has been specified, then all options are processed.</p>
+           <a id="impact"></a>
+           <p><strong>Package sections and their impact on CLI</strong></p>
+           <p>The use of packages poses a theoretical limit on the number of handles any application (which utilizes CLI) can allocate. Version 7 had a maximum limit of 512 handles per application. Version 8 has a maximum limit of 16384 per application. </p>
+           <p>It is possible to allocate up to 16,384 statement handles, but the application would have to use multiple isolation levels and hold cursor combinations since there are limits based on the package information.</p>
+           <p>Note that in addition to a theoretical limit, physical resource limitations, like memory, restrict actual statement handles any application can allocate.</p>
+           <p>The maximum theoretical number of sections that may be used at one time within a CLI application is 11,712. By default, three sections from each package (both large and small) are reserved for positioned update and delete statements. This is done since an UPDATE/DELETE WHERE CURRENT OF needs to be driven in the same package from which the cursor that executes the UPDATE/DELETE originated. Since there are a maximum of 33 packages (three small and up to 30 large ), reserve 99 (=33X3) sections in total for positioned update and deletes. That means real available sections or handles are 11,712 - 99 = 11,613. </p>
+           <p>So an application working with only CS isolation and HOLD cursors would effectively only be able to use about 11,613 statements (assuming no positioned updates or deletes). If, however, the application used a different isolation level or WITHOUT HOLD cursors as well as CS and HOLD CURSORs, it is possible to hit the maximum statement limit of 16,384.</p>
+           <p><strong> Package associated CLI keywords</strong></p>
+           <p>CLI keywords are set in the db2cli.ini file. An application will load and read the db2cli.ini file on the same machine on which it is executed. You will find a copy of the db2cli.ini file on all installed instances of DB2. So ensure that any application-driven changes to the db2cli.ini file occurs on the proper version of the file and in the correct location,which in most cases is wherever the application is run.</p>
+           <p>Keywords are only read from the db2cli.ini configuration file at the time an application is initialized. You can find a list of CLI keywords in <a href="sidefile1.html">Table 2</a>.</p>
+           <h3 id="N101AB" class="ibm-h3">JDBC packages</h3>
+           <p>Both the Legacy CLI-based JDBC and the Universal JDBC T2/T4 drivers use the same packages as the CLI driver discussed above. This piece of information is very handy in that if your target database already had CLI packages bound to it for the level of code your JDBC driver is based on, you do not need to bind the packages again. You are free to use them. The reverse is also true -- should you have the need to perform a bind against a newly created database with the JDBC driver, once the packages are created, all JDBC and CLI applications are free to use. Any CLI application does not need to perform a bind to run against that target database.</p>
+           <p><strong>Note:</strong> Again, remember packages may be different for every fix pack released by DB2. They are level dependent, and each fix pack should have its set of packages bound to any target database that it plans on connecting to and running applications against.</p>
+           <p>Should a newly installed JDBC client require its packages bound to an existing target database, that client may use the <code>db2jdbcbind</code> command to achieve this bind.</p>
+           <h3 id="N101BC" class="ibm-h3">db2jdbcbind - DB2 JDBC package binder command</h3>
+           <p><code>db2jdbcbind</code> is used to bind or rebind the JDBC packages to a DB2 database. DB2 V8 databases already have the JDBC packages preinstalled, thus <code>db2jdbcbind</code> usually only needs to be run usually downlevel servers. </p>
+           <p>The authorization required to run <code>db2jdbcbind</code> is one of the following: </p>
+           <ul class="ibm-bullet-list">
+            <li>sysadm</li>
+            <li>dbadm</li>
+            <li>BINDADD privilege if a package does not exist, and one of: 
+             <ul class="ibm-bullet-list">
+              <li>IMPLICIT_SCHEMA authority on the database if the schema name of the package does not exist </li>
+              <li>CREATEIN privilege on the schema if the schema name of the package exists </li>
+              <li>ALTERIN privilege on the schema if the package exists </li>
+              <li>BIND privilege on the package if it exists. This command establishes a database connection, so no previous connection is necessary.</li>
+             </ul></li>
+           </ul>
+           <h5 id="listing3" class="ibm-h5">Listing 3. Command syntax - db2jdbcbind</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">&gt;&gt;-db2jdbcbind--+------+-- -url jdbc:db2://server:port/dbname---&gt;
+                      '-help-'
+
+&gt;-- -user--username-- -password--password-----------------------&gt;
+
+
+&gt;--+-----------------------------+------------------------------&gt;
+   '- -collection--collection ID-'
+
+&gt;--+----------------------------+-------------------------------&gt;
+   '- -size--number of packages-'
+
+                 .-,------------------------------.
+                 V                                |
+&gt;-- -tracelevel----+-TRACE_ALL------------------+-+-------------&gt;&lt;
+                   +-TRACE_CONNECTION_CALLS-----+
+                   +-TRACE_CONNECTS-------------+
+                   +-TRACE_DIAGNOSTICS----------+
+                   +-TRACE_DRDA_FLOWS-----------+
+                   +-TRACE_DRIVER_CONFIGURATION-+
+                   +-TRACE_NONE-----------------+
+                   +-TRACE_PARAMETER_META_DATA--+
+                   +-TRACE_RESULT_SET_CALLS-----+
+                   +-TRACE_RESULT_SET_META_DATA-+
+                   '-TRACE_STATEMENT_CALLS------'</pre></span>
+           <p>Command parameters:</p>
+           <ul class="ibm-bullet-list">
+            <li><strong>help</strong> - Displays the help information for the command; any other parameter or option will be ignored when this is used. </li>
+            <li><strong>url jdbc:db2://(server:port/dbname)</strong> - A standard JDBC URL. Used for establishing the database connection. The DB2 JDBC type 4 driver is used to establish the connection, hence the use of the server and port parameters.</li>
+            <li><strong>user (username)</strong> - Specifies the userid used when connecting to the database the command is run against.</li>
+            <li><strong>password (password)</strong> - Specifies the password for the userid above.</li>
+            <li><strong>collection (collection ID)</strong> - The collection ID used for the packages created (CURRENT PACKAGESET). Default is NULLID. Use this parameter to create multiple copies of the package set. This option may only be used with the Connection or DataSource property currentPackageSet.</li>
+            <li><strong>size (number of packages)</strong> - The number of internal packages to bind for each isolation level and cursor holdability setting. The default is three. Since there are four isolation levels and two cursor holdability settings, there will be (4x2=8) eight times as many dynamic packages bound as are specified by this option. A sole static package is always bound for internal use. </li>
+            <li><strong>tracelevel</strong> - Only required for troubleshooting bind issues with the <code>db2jdbcbind</code> command. Options are listed above in the command diagram (<a href="#listing3">Listing 3</a>). </li>
+           </ul>
+           <h2 id="embedded" class="ibm-h2">Embedded SQL</h2>
+           <p>Up to this point, this article has discussed all packages that are associated with the CLI and JDBC drivers that ship with DB2. Applications built to use these drivers may use previously bound packages to execute their SQL statements against any target database that has these requisite packages bound.</p>
+           <p>Embedded SQL is another type of application that will need package(s) bound against a database so that it can execute its SQL. What differentiates these applications from the applications discussed thus far is that all embedded SQL applications have their own packages created and bound against any database it is designed to connect to and run against. These packages for embedded SQL type applications are used ONLY by the application that the bind file was created for. They are not shared with other applications, as seen above with the dynamic CLI and JDBC packages. Both static and dynamic statements may be run within these packages and associated sections as well. The benefits of a static execution (in other words, using packages bound solely for the use of its partner program) are reduced resource consumption, improved diagnostics, improved security, and greater repeatability of SQL performance due to static access paths and plans. Everything you need to get from the data is already in the package bound at bind time.</p>
+           <p>Embedded applications can be written in a number of host languages. They include C/C++, Java™ (SQLJ), COBOL, and FORTRAN. It should be noted that SQL statements placed in an application are not specific to the host languages. However, the method in which the database manager converts the SQL syntax for processing by the host languages is different. This processing difference arises because Java (SQLJ) requires different commands and steps from the other languages.</p>
+           <h3 id="N10219" class="ibm-h3">Non-Java embedded applications </h3>
+           <p>These include the C/C++, COBOL and FORTRAN languages. For these host programming languages, SQL syntax processing is handled by the DB2 precompiler (invoked using the <code>PREP</code> command), which converts embedded SQL statements into DB2 run time service API calls.</p>
+           <h3 id="N10224" class="ibm-h3">Package creation for embedded SQL</h3>
+           <p>To run applications written in compiled host languages, you must create the packages needed by the database manager at execution time. This involves the steps, as shown in the <a href="#fig2">Figure 2</a>:</p>
+           <h5 id="fig2" class="ibm-h5">Figure 2. Embedded SQL creation overview </h5>
+           <img src="figure2.gif" class="ibm-downsize" alt="Embedded SQL creation overview" height="676" width="468">
+           <p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10235');return false;" href="#N10235">View image at full size</a></p>
+           <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10235">
+            <img alt="Embedded SQL creation overview" src="figure2.gif" width="468">
+           </div>
+           <h3 id="N1023A" class="ibm-h3">PRECOMPILE, BIND, REBIND and DB2RBIND commands</h3>
+           <p>The <code>PRECOMPILE</code>, <code>BIND</code>, and <code>DB2RBIND</code> commands require you to already be connected to the target database. You need to have connected with a userid that has sufficient authority to issue the commands listed above.</p>
+           <h3 id="N1024B" class="ibm-h3"><code>PRECOMPILE</code> command</h3>
+           <p><code>PRECOMPILE</code> is an application process that modifies source files containing embedded SQL statements (*.sqc) and yields host language calls consisting of a source file(s) (*.c) and a package.</p>
+           <p>Without the any bind option, no bind file is created, but the package is created automatically at precompile time and bound to the database. Precompiling with the <code>bindfile</code> option provides a means to defer binding to some later point in time (rather than at precompile time). This deferred binding allows the same bind file package to be bound against multiple databases, thus allowing easy and consistent deployment across multiple database servers. It also lets the user create packages without access to the source code.</p>
+           <p>For the following set of examples, the sample.sqc application will be used:</p>
+           <h5 id="sample.sqc" class="ibm-h5">Listing 4. sample.sqc</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">/*--------------------------------------------------------------
+Sample developerworks embedded SQL C Program for DB2.
+This sample application utilizes the DB2 sample database
+which can be created using the "db2sampl" command.
+
+You need to connect to the sample database then issue db2 prep
+in order to generate a bind file.
+ db2 prep sample.sqc bindfile
+ cl -Zi -Od -c -W2 -DWIN32 sample.c
+ link -debug -out:sample.exe sample.obj db2api.lib
+This sample application takes one argument on the command line,
+a DEPT (department id) from staff table.
+It then finds the total number of staff registered with the
+given DEPT ID.
+
+--------------------------------------------------------------*/
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sqlcodes.&gt;
+#include &lt;sqlenv.h&gt;
+#define DONE   0
+
+/* Internal variables */
+char msg[1025];
+int rc;
+int errcount;
+
+
+
+/* Declare the SQL interface variables */
+
+EXEC SQL BEGIN DECLARE SECTION ;
+    short  total;
+    short  udept;
+
+EXEC SQL END DECLARE SECTION ;
+
+EXEC SQL INCLUDE SQLCA ;
+
+
+/*Outputs SQLCA*/
+
+OUTPUT_MESSG()
+  {                                      
+      if (rc == 0 &amp;&amp; sqlca.sqlcode != 0)
+      {
+        sqlaintp(msg, 1024, 0, &amp;sqlca);
+        printf("SQLCA Message: %s\n",msg);
+      }  
+  }
+
+/* This macro prints out all fields in the SQLCA */
+
+PRINT_SQLCA()                                                                \
+  {                                                                          \
+    printf("The SQLCA Structure\n");                                         \
+    printf("SQLCAID: %s\n", sqlca.sqlcaid);                                  \
+    printf("SQLCABC: %d\n", sqlca.sqlcabc);                                  \
+    printf("SQLCODE: %d\n", sqlca.sqlcode);                                  \
+    printf("SQLERRML: %d\n", sqlca.sqlerrml);                                \
+    printf("SQLERRMC: %s\n", sqlca.sqlerrmc);                                \
+    printf("SQLERRP: %s\n", sqlca.sqlerrp);                                  \
+    printf("SQLERRD[0]: %d\n", sqlca.sqlerrd[0]);                            \
+    printf("SQLERRD[1]: %d\n", sqlca.sqlerrd[1]);                            \
+    printf("SQLERRD[2]: %d\n", sqlca.sqlerrd[2]);                            \
+    printf("SQLERRD[3]: %d\n", sqlca.sqlerrd[3]);                            \
+    printf("SQLERRD[4]: %d\n", sqlca.sqlerrd[4]);                            \
+    printf("SQLERRD[5]: %d\n", sqlca.sqlerrd[5]);                            \
+    printf("SQLWARN: %s\n", sqlca.sqlwarn);                                  \
+    printf("SQLSTATE: %s\n", sqlca.sqlstate);                                \
+  }
+
+/* Prints the message in the SQLCA */
+
+
+STATUS(code,text_string,eExit)                                               \
+  {                                                                          \
+    OUTPUT_MESSG();                                                          \
+    if (sqlca.sqlcode != code || rc != 0 ) {                                 \
+      printf("%s\n",text_string);                                            \
+      printf("Expected code = %d\n",code);                                   \
+      if (rc == 0) {                                                         \
+          PRINT_SQLCA();                                                     \
+      }                                                                      \
+      else printf("RC: %d\n",rc);                                            \
+      errcount += 1;                                                         \
+      if (eExit == DONE) {  EXEC SQL CONNECT RESET; }                        \
+    }                                                                        \
+  }
+
+/*----------------------------------------------------------------------------
+Main section
+----------------------------------------------------------------------------*/
+
+main (int argc, char *argv[])
+{
+    /* Grab the first command argument.  This is the DEPT. */
+    if (argc &gt; 1) {
+        udept = atoi(argv[1]);
+        printf("Total personnel was requested for department : %d.\n", udept);
+    /* If there is no argument, exit. */
+    } else {
+        printf("Which DEPT would you like to enquire?\n");
+        exit(0);
+    }
+
+        EXEC SQL CONNECT TO SAMPLE;
+        STATUS(0, "Connect error", DONE);
+
+        /* Find the total number of personnel for given dept. */
+        EXEC SQL SELECT COUNT(ID) into :total
+            FROM STAFF
+            WHERE DEPT = :udept;
+
+        STATUS(0, "Query error ", DONE);
+
+        /* Report total number of personnel. */
+        printf("Total number of personnel in the department %d is %d.\n", udept, total);
+
+}</pre></span>
+           <h5 id="prep sample.sqc" class="ibm-h5">Listing 5. DB2 PREP command output -- prep sample.sqc</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">    D:\Sample\test&gt;db2 connect to sample
+
+       Database Connection information
+
+     Database server        = DB2/NT 8.2.0
+     SQL authorization ID   = CHUNJ
+     Local database alias   = SAMPLE
+
+     
+    D:\Sample\test&gt;db2 prep sample.sqc bindfile
+
+    LINE    MESSAGE FOR sample.sqc
+    ------  ------------------------------------------------------------
+            SQL0060W  The "C" precompiler is in progress.
+            SQL0091W  Precompilation or binding was ended with "0"
+                      errors and "0" warnings.
+
+    D:\Sample\test&gt;</pre></span>
+           <p>The PRECOMPILE step results in a modified source file. In this case, it is called sample.c</p>
+           <p>It is at this precompile time that the TIMESTAMP, which is also known as the UNIQUE ID or CONSISTENCY TOKEN, is generated and is associated with the package through the bind file and modified source code. This will be discussed further on in a later section.</p>
+           <h5 id="sample.c" class="ibm-h5">Listing 6. sample.c</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">static char sqla_program_id[162] =
+{
+ 42,0,65,68,65,75,65,73,83,65,77,80,76,69,32,32,110,65,111,67,
+ 78,89,69,87,48,49,49,49,49,32,50,32,8,0,67,72,85,78,74,32,
+ 32,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+ 0,0
+};
+
+#include "sqladef.h"
+
+static struct sqla_runtime_info sqla_rtinfo =
+{{'S','Q','L','A','R','T','I','N'}, sizeof(wchar_t), 0, {' ',' ',' ',' '}};
+
+
+static const short sqlIsLiteral   = SQL_IS_LITERAL;
+static const short sqlIsInputHvar = SQL_IS_INPUT_HVAR;
+
+
+#line 1 "sample.sqc"
+/*--------------------------------------------------------------------
+Sample developerworks embedded SQL C Program for DB2.
+This sample application utilizes the DB2 sample database
+which can be created using the "db2sampl" command.
+
+You need to connect to the sample database then issue db2 prep
+in order to generate a bind file.
+ db2 prep sample.sqc bindfile
+ cl -Zi -Od -c -W2 -DWIN32 sample.c
+ link -debug -out:sample.exe sample.obj db2api.lib
+This sample application takes one argument on the command line,
+a DEPT (department id) from staff table.
+It then finds the total number of staff registered with the
+given DEPT ID.
+
+---------------------------------------------------------------------*/
+
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sqlcodes.h&gt;
+#include &lt;sqlenv.h&gt;
+#define DONE   0
+
+/* Internal variables */
+char msg[1025];
+int rc;
+int errcount;
+
+
+
+/* Declare the SQL interface variables */
+
+
+/*
+EXEC SQL BEGIN DECLARE SECTION ;
+*/
+
+#line 33 "sample.sqc"
+
+    short  total;
+    short  udept;
+
+
+/*
+EXEC SQL END DECLARE SECTION ;
+*/
+
+#line 37 "sample.sqc"
+
+
+
+/*
+EXEC SQL INCLUDE SQLCA ;
+*/
+
+/* SQL Communication Area - SQLCA - structures and constants */
+#include "sqlca.h"
+struct sqlca sqlca;
+
+
+#line 39 "sample.sqc"
+
+
+
+/*Outputs SQLCA*/
+
+OUTPUT_MESSG()
+  {                                      
+      if (rc == 0 &amp;&amp; sqlca.sqlcode != 0)
+      {
+        sqlaintp(msg, 1024, 0, &amp;sqlca);
+        printf("SQLCA Message: %s\n",msg);
+      }  
+  }
+
+/* This macro prints out all fields in the SQLCA */
+
+PRINT_SQLCA()                                                                \
+  {                                                                          \
+    printf("The SQLCA Structure\n");                                         \
+    printf("SQLCAID: %s\n", sqlca.sqlcaid);                                  \
+    printf("SQLCABC: %d\n", sqlca.sqlcabc);                                  \
+    printf("SQLCODE: %d\n", sqlca.sqlcode);                                  \
+    printf("SQLERRML: %d\n", sqlca.sqlerrml);                                \
+    printf("SQLERRMC: %s\n", sqlca.sqlerrmc);                                \
+    printf("SQLERRP: %s\n", sqlca.sqlerrp);                                  \
+    printf("SQLERRD[0]: %d\n", sqlca.sqlerrd[0]);                            \
+    printf("SQLERRD[1]: %d\n", sqlca.sqlerrd[1]);                            \
+    printf("SQLERRD[2]: %d\n", sqlca.sqlerrd[2]);                            \
+    printf("SQLERRD[3]: %d\n", sqlca.sqlerrd[3]);                            \
+    printf("SQLERRD[4]: %d\n", sqlca.sqlerrd[4]);                            \
+    printf("SQLERRD[5]: %d\n", sqlca.sqlerrd[5]);                            \
+    printf("SQLWARN: %s\n", sqlca.sqlwarn);                                  \
+    printf("SQLSTATE: %s\n", sqlca.sqlstate);                                \
+  }
+
+/* Prints the message in the SQLCA */
+
+
+STATUS(code,text_string,eExit)                                               \
+  {                                                                          \
+    OUTPUT_MESSG();                                                          \
+    if (sqlca.sqlcode != code || rc != 0 ) {                                 \
+      printf("%s\n",text_string);                                            \
+      printf("Expected code = %d\n",code);                                   \
+      if (rc == 0) {                                                         \
+          PRINT_SQLCA();                                                     \
+      }                                                                      \
+      else printf("RC: %d\n",rc);                                            \
+      errcount += 1;                                                         \
+      if (eExit == DONE) {
+/*
+EXEC SQL CONNECT RESET;
+*/
+
+{
+#line 88 "sample.sqc"
+  sqlastrt(sqla_program_id, &amp;sqla_rtinfo, &amp;sqlca);
+#line 88 "sample.sqc"
+  sqlacall((unsigned short)29,3,0,0,0L);
+#line 88 "sample.sqc"
+  sqlastop(0L);
+}
+
+#line 88 "sample.sqc"
+ }                        \
+    }                                                                        \
+  }
+
+/*----------------------------------------------------------------------------
+Main section
+----------------------------------------------------------------------------*/
+
+main (int argc, char *argv[])
+{
+    /* Grab the first command argument.  This is the DEPT. */
+    if (argc &gt; 1) {
+        udept = atoi(argv[1]);
+        printf("Total personnel was requested for department : %d.\n", udept);
+    /* If there is no argument, exit. */
+    } else {
+        printf("Which DEPT would you like to enquire?\n");
+        exit(0);
+    }
+
+
+/*
+EXEC SQL CONNECT TO SAMPLE;
+*/
+
+{
+#line 108 "sample.sqc"
+  sqlastrt(sqla_program_id, &amp;sqla_rtinfo, &amp;sqlca);
+#line 108 "sample.sqc"
+  sqlaaloc(2,1,1,0L);
+    {
+      struct sqla_setdata_list sql_setdlist[1];
+#line 108 "sample.sqc"
+      sql_setdlist[0].sqltype = 460; sql_setdlist[0].sqllen = 7;
+#line 108 "sample.sqc"
+      sql_setdlist[0].sqldata = (void*)"SAMPLE";
+#line 108 "sample.sqc"
+      sql_setdlist[0].sqlind = 0L;
+#line 108 "sample.sqc"
+      sqlasetdata(2,0,1,sql_setdlist,NULL,0L);
+    }
+#line 108 "sample.sqc"
+  sqlacall((unsigned short)29,4,2,0,0L);
+#line 108 "sample.sqc"
+  sqlastop(0L);
+}
+
+#line 108 "sample.sqc"
+
+        STATUS(0, "Connect error", DONE);
+
+        /* Find the total number of personnel for given dept. */
+
+/*
+EXEC SQL SELECT COUNT(ID) into :total
+            FROM STAFF
+            WHERE DEPT = :udept;
+*/
+
+{
+#line 114 "sample.sqc"
+  sqlastrt(sqla_program_id, &amp;sqla_rtinfo, &amp;sqlca);
+#line 114 "sample.sqc"
+  sqlaaloc(2,1,2,0L);
+    {
+      struct sqla_setdata_list sql_setdlist[1];
+#line 114 "sample.sqc"
+      sql_setdlist[0].sqltype = 500; sql_setdlist[0].sqllen = 2;
+#line 114 "sample.sqc"
+      sql_setdlist[0].sqldata = (void*)&amp;udept;
+#line 114 "sample.sqc"
+      sql_setdlist[0].sqlind = 0L;
+#line 114 "sample.sqc"
+      sqlasetdata(2,0,1,sql_setdlist,NULL,0L);
+    }
+#line 114 "sample.sqc"
+  sqlaaloc(3,1,3,0L);
+    {
+      struct sqla_setdata_list sql_setdlist[1];
+#line 114 "sample.sqc"
+      sql_setdlist[0].sqltype = 500; sql_setdlist[0].sqllen = 2;
+#line 114 "sample.sqc"
+      sql_setdlist[0].sqldata = (void*)&amp;total;
+#line 114 "sample.sqc"
+      sql_setdlist[0].sqlind = 0L;
+#line 114 "sample.sqc"
+      sqlasetdata(3,0,1,sql_setdlist,NULL,0L);
+    }
+#line 114 "sample.sqc"
+  sqlacall((unsigned short)24,1,2,3,0L);
+#line 114 "sample.sqc"
+  sqlastop(0L);
+}
+
+#line 114 "sample.sqc"
+
+
+        STATUS(0, "Query error ", DONE);
+
+        /* Report total number of personnel. */
+        printf("Total number of personnel in the department %d is %d.\n", udept, total);
+
+}</pre></span>
+           <h3 id="N10277" class="ibm-h3">BIND command</h3>
+           <p>The <code>BIND</code> command invokes the bind utility. It prepares SQL statements stored in the bind file generated by the precompiler and creates a package that is stored in the database.</p>
+           <p>After sample.sqc was processed using the <code>PREP</code> command (above), the sample.c and sample.bnd files were produced. (sample.bnd file will only be produced if the <code>bindfile</code> option is specified; otherwise sample.bnd would be implicitly bound and no bind file will be produced).</p>
+           <p>The <code>BIND</code> command can be used to bind the sample.bnd file against the target database.</p>
+           <h5 id="bind sample" class="ibm-h5">Listing 7. DB2 BIND command output -- bind sampl.bnd</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">    D:\Sample\test&gt;db2 connect to sample
+
+       Database Connection information
+
+     Database server        = DB2/NT 8.2.0
+     SQL authorization ID   = CHUNJ
+     Local database alias   = SAMPLE
+
+     
+    D:\Sample\test&gt;db2 bind sample.bnd
+
+    LINE    MESSAGE FOR sample.bnd
+    ------  ------------------------------------------------------------
+            SQL0061W  The binder is in progress.
+            SQL0091W  Binding was ended with "0" errors and "0" warnings.
+
+    D:\Sample\test&gt;</pre></span>
+           <p>The bound package information can now be verified by querying the SYSCAT.PACKAGES table:</p>
+           <h5 id="syscat.packages" class="ibm-h5">Listing 8. SYSCAT.PACKAGES content</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">PKGSCHEMA PKGNAME BOUNDBY DEFINER DEFAULT_SCHEMA VALID UNIQUE_ID ... 
+--------- ------- ------- ------- -------------- ----- --------- ...
+...
+CHUNJ     SAMPLE  CHUNJ   CHUNJ   CHUNJ          Y     qAMUQUEW  ...
+...
+
+
+EXPLICIT_BIND_TIME         LAST_BIND_TIME             CODEPAGE ...
+-------------------------- -------------------------- --------
+2006-04-20-16.36.35.973001 2006-04-20-16.36.35.973001 1252     ...</pre></span>
+           <p>The resulting sample.c source can be compiled using any of the supported C/C++ compilers. For this example, we used MS Visual Studio C/C++ compiler (cl).The command <code>cl -Zi -Od -c -W2 -DWIN32 sample.c</code> produces the sample.obj file:</p>
+           <h5 id="compile c" class="ibm-h5">Listing 9. Source file compilation on Windows</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">    D:\Sample\test&gt;cl -Zi -Od -c -W2 -DWIN32 sample.c
+    Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 12.00.8804 for 80X86
+    Copyright (C) Microsoft Corp 1984-1998. All rights reserved.
+
+    sample.c
+
+    D:\Sample\test&gt;</pre></span>
+           <p>The sample.obj file can now be used to create the executable using the <code>link -debug -out:sample.exe sample.obj db2api.lib</code> command:</p>
+           <h5 id="linker" class="ibm-h5">Listing 10. Linking object file on Windows</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">    D:\Sample\test&gt;link -debug -out:sample.exe sample.obj db2api.lib
+    Microsoft (R) Incremental Linker Version 6.00.8447
+    Copyright (C) Microsoft Corp 1984-1998. All rights reserved.
+
+    D:\Sample\test&gt;</pre></span>
+           <p>Now that the C-embedded application is compiled and linked to produce an executable, sample.exe, it can be executed. The sample.exe application, in this case, accepts a single parameter that represents the department ID (DEPT) in the database table staff, which exists in the sample database. It returns the total personnel in the staff table that has same DEPT value fed into the application.</p>
+           <h5 id="execution" class="ibm-h5">Listing 11. Execution of sample embedded application</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">    D:\Sample\test&gt;sample 20
+    Total personnel was requested for department : 20.
+    Total number of personnel in the department 20 is 4.
+
+    D:\Sample\test&gt;</pre></span>
+           <p><strong>Common <code>BIND</code> options:</strong></p>
+           <ul class="ibm-bullet-list">
+            <li><code><strong>BLOCKING</strong></code>: Specifies if a cursor will be blocked (in other words, if data will be sent from the database in block sizes (RQRIOBLK) or not)</li>
+            <li><code><strong>COLLECTION</strong></code> &lt;schema-name&gt;: New schema name for the given package (30 character limit)</li>
+            <li><code><strong>DATETIME</strong></code>: Specifies default format for date/time returned to the caller</li>
+            <li><code><strong>DYNAMICRULES</strong></code>: Authorization ID that is used to resolve unqualified object in Dynamic SQL</li>
+            <li><code><strong>FUNCPATH</strong></code>: Specifies default function path used to resolve unqualified UDFs and stored procedures</li>
+            <li><code><strong>GRANT</strong></code>: Explicitly grants EXECUTE privilege on the package to a group and/or user</li>
+            <li><code><strong>ISOLATION</strong></code>: Specifies the default isolation level for the embedded SQL application</li>
+            <li><code><strong>OWNER authorization-ID</strong></code>: Changes the owner of package to a user other than the binder of the package</li>
+            <li><code><strong>QUALIFIER qualifier-name</strong></code>: Specifies qualifier for unqualified database objects</li>
+            <li><code><strong>QUERYOPT optimization-level</strong></code>: Specifies default query optimization for SQL within the embedded SQL application</li>
+            <li><code><strong>VALIDATE</strong></code>: Specifies when to check for authorization errors (in other words, bind or run time)</li>
+           </ul>
+           <p>The following are specific to DB2 or DB2 add-on product packages:</p>
+           <ul class="ibm-bullet-list">
+            <li><code><strong>CLIPKG</strong></code>: Creates more CLI large packages; only applicable for CLI bind files</li>
+            <li><code><strong>FEDERATED</strong></code>: Specifies whether static SQL references a federated nickname/view or not</li>
+           </ul>
+           <h3 id="N1030B" class="ibm-h3">REBIND command</h3>
+           <p>The <code>REBIND</code> command recreates package(s) for an application program that has previously been bound. The authorization ID logged in the BOUNDBY column of the SYSCAT.PACKAGES system catalog table is used as the binder authorization ID for the rebind and for the default schema for the table references in the package.</p>
+           <h5 id="syscat.packages2" class="ibm-h5">Listing 12. SYSCAT.PACKAGES output -- SYSCAT.PACKAGES2</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">PKGSCHEMA PKGNAME BOUNDBY DEFINER DEFAULT_SCHEMA VALID UNIQUE_ID ... 
+--------- ------- ------- ------- -------------- ----- --------- ...
+...
+CHUNJ     SAMPLE  CHUNJ   CHUNJ   CHUNJ         Y     qAMUQUEW  ...
+...
+
+
+EXPLICIT_BIND_TIME         LAST_BIND_TIME             CODEPAGE ...
+-------------------------- -------------------------- --------
+2006-04-20-16.36.35.973001 2006-04-20-16.36.35.973001 1252     ...</pre></span>
+           <p>One must REBIND a package if the existing bound package has been marked invalid or inoperative.</p>
+           <p>Invalidated packages will be marked inoperative in the SYSCAT.PACKAGES system catalog table through the VALID column if a function, or object, it depends on is dropped.</p>
+           <h5 id="syscat.packages3" class="ibm-h5">Listing 13. SYSCAT.PACKAGES output -- SYSCAT.PACKAGES3</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">PKGSCHEMA PKGNAME BOUNDBY DEFINER DEFAULT_SCHEMA VALID UNIQUE_ID ... 
+--------- ------- ------- ------- -------------- ----- --------- ...
+...
+CHUNJ     SAMPLE  CHUNJ   CHUNJ   CHUNJ          Y     qAMUQUEW  ...
+...
+
+
+EXPLICIT_BIND_TIME         LAST_BIND_TIME             CODEPAGE ...
+-------------------------- -------------------------- --------
+2006-04-20-16.36.35.973001 2006-04-20-16.36.35.973001 1252     ...</pre></span>
+           <p>Also, performing a REBIND should be considered when you wish to take advantage of new statistics on a table or after you add a new index to a table involved in the SQL statement in the package.</p>
+           <p>In the example, if we were to have altered an index on the sample table STAFF, we can issue the <code>REBIND</code> command in <a href="#listing14">Listing 14</a> against the 'sample' package.</p>
+           <p>Note that for the <code>REBIND</code> command, you specify the package name, not the bind file name. Also, <code>REBIND</code> does not automatically commit the transaction following a successful rebind, so you need to issue an explicit commit.</p>
+           <h5 id="listing14" class="ibm-h5">Listing 14. DB2 REBIND output -- rebind sampl.bnd</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">    D:\Sample\test&gt;db2 connect to sample
+
+       Database Connection information
+
+     Database server        = DB2/NT 8.2.0
+     SQL authorization ID   = CHUNJ
+     Local database alias   = SAMPLE
+
+     
+    D:\Sample\test&gt;db2 rebind sample.bnd
+    DB20000I  The REBIND PACKAGE command completed successfully.
+
+    D:\Sample\test&gt;db2 commit
+    DB20000I  The SQL command completed successfully.
+
+    D:\Sample\test&gt;</pre></span>
+           <p>After the rebind, EXPLICIT_BIND_TIME and LAST_BIND_TIME will be changed in the SYSCAT.PACKAGES catalog view.</p>
+           <h5 id="syscat.packages4" class="ibm-h5">Listing 15. SYSCAT.PACKAGES output -- SYSCAT.PACKAGES4</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">PKGSCHEMA PKGNAME BOUNDBY ... UNIQUE_ID ... EXPLICIT_BIND_TIME             ...
+--------- ------- ------- ... --------- ... ------------------------------ ...
+...
+CHUNJ     SAMPLE  CHUNJ   ... qAMUQUEW  ... 2006-04-22-10.16.55.258001 ...
+...
+
+
+LAST_BIND_TIME                  CODEPAGE ...
+------------------------------- --------
+2006-04-22-10.16.55.258001   1252    ...</pre></span>
+           <h3 id="N10355" class="ibm-h3">DB2RBIND command</h3>
+           <p>Rebinding is the process of recreating a package for an application program that was previously bound.</p>
+           <p>If the package that has been previously bound becomes invalid or inoperative, you can either drop and bind or rebind the invalid package.</p>
+           <p>Rebind is useful in cases where a new index was created or statistics have been updated after execution of the <code>RUNSTATS</code> command.</p>
+           <p>Invalid packages are implicitly (or automatically) rebound by the database manager when they are executed. Inoperative packages must be explicitly rebound by executing either the <code>BIND</code> command or the <code>REBIND</code> command.</p>
+           <h5 id="dbrbind" class="ibm-h5">Listing 16. DB2RBIND command output</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">    C:\SQLLIB\bnd&gt;db2rbind sample /l logfile.txt
+
+      Rebind done successfully for database 'SAMPLE'
+
+     
+    C:\SQLLIB\bnd&gt;</pre></span>
+           <h3 id="N10373" class="ibm-h3">Java-embedded application (SQLJ)</h3>
+           <p>Along with host language embedded SQL type applications, there are also embedded Java applications, better known as SQLJ programs. SQLJ is a method for accessing DB2 from a Java application that supports static execution. Again, the benefits of a static execution are reduced resource consumption, improved diagnostics, improved security, and greater repeatability of SQL performance due to static access paths and plans. Everything you need to get from the data is already in the package bound at bind time.</p>
+           <p><a href="#listing17">Listing 17</a> shows an example SQLJ program. It uses the same SQL shown in the previous example above written in embedded C.</p>
+           <h5 id="listing17" class="ibm-h5">Listing 17. DW2.sqlj</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">//***************************************************************************
+//
+// SOURCE FILE NAME: DW2.sqlj
+//
+// Sample developerworks embedded SQLJ Program for DB2.
+// This sample application utilizes the DB2 Sample database
+// which can be created using the "db2sampl" command.
+//
+// You need to run this through the SQLJ Translator then run the
+// db2sqljcustomize command against the sample db using the .ser file
+// created from the SQLJ step.
+// Of course you must also compile the resultant DW2.java code into
+// bytecode using the javac command.
+//
+// This sample application takes one argument on the command line,
+// a DEPT (department id) from staff table.
+// eg. java DW2 20
+//
+// It then finds the total number of staff registered within that DEPT ID
+// in the STAFF table under the SAMPLE database.
+//
+//***************************************************************************
+
+import java.sql.*;
+import java.io.*;
+import sqlj.runtime.*;
+import sqlj.runtime.ref.*;
+
+//====================================================================// MAIN
+//====================================================================
+
+class DW2
+{   static
+    {   try
+        {   Class.forName ("com.ibm.db2.jcc.DB2Driver").newInstance ();
+        }
+        catch (Exception e)
+        {   System.out.println ("\n  Error loading Driver \n");
+            System.exit(1);
+        }
+    }
+
+    public static void main(String argv[])
+    {   try
+        {
+            String url = "jdbc:db2:sample";
+            Connection con = null;
+
+            // Connect with implicit userid and pw
+            con = DriverManager.getConnection(url);
+
+            // Set the default context
+            DefaultContext ctx = new DefaultContext(con);
+            DefaultContext.setDefaultContext(ctx);
+
+            // Read in the query argument off the command line.
+            int udept = 0;
+            if (argv.length &gt; 0) {
+                udept = Integer.parseInt(argv[0]);
+                System.out.println ("Total personnel was requested for department :
+                " +udept);
+            } else {
+                throw new Exception("Which department?\n");
+            }
+
+            short total = 0;
+ 
+            // Find the number of folks in the Department specified.
+            #sql { SELECT COUNT(ID) into :total
+                   FROM STAFF
+                   WHERE DEPT = :udept } ;
+
+            System.out.println ("Total number of personnel in dept " +udept+ " is
+            " +total+ ".");
+            System.out.println ("Goodbye");
+        }
+
+        catch( Exception e )
+        {
+            System.out.println (e);
+        }
+    }
+}</pre></span>
+           <p>Commands covered in this section include:</p>
+           <ul class="ibm-bullet-list">
+            <li><strong>sqlj:</strong><p>sqlj is the translator that will take an embedded SQLJ program and create a .ser file used for binding and a .java file that will also be compiled into byte code as typical Java programs are compiled.</p></li>
+            <li><strong>db2sqljcustomize:</strong><p>This command will take the .ser file from the sqlj step, connect to the database against which the application will be run, and bind four bind files for this application, all with different isolation levels</p></li>
+            <li><strong>db2sqljbind:</strong><p>This command can be used to rebind this application against other databases; for example, it can be used for moving the application from the test to the production database. </p></li>
+           </ul>
+           <p>So the first thing to do with an SQLJ program is run it through the translator.</p>
+           <h5 id="listing18" class="ibm-h5">Listing 18. SQLJ command output</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">    (pcirone@bugdbug) /home/pcirone/sqlj $ sqlj DW2.sqlj
+    (pcirone@bugdbug) /home/pcirone/sqlj $ llection PAOLO DW2_SJProfile0.ser     &lt;
+    [ibm][db2][jcc][sqlj]
+    [ibm][db2][jcc][sqlj] Begin Customization
+    [ibm][db2][jcc][sqlj] Loading profile: DW2_SJProfile0
+    [ibm][db2][jcc][sqlj] Customization complete for profile DW2_SJProfile0.ser
+    [ibm][db2][jcc][sqlj] Begin Bind
+    [ibm][db2][jcc][sqlj] Loading profile: DW2_SJProfile0
+    [ibm][db2][jcc][sqlj] Driver defaults(user may override): BLOCKING ALL VALIDATE
+    BIND STATICREADONLY YES
+    [ibm][db2][jcc][sqlj] Fixed driver options: DATETIME ISO DYNAMICRULES BIND
+    [ibm][db2][jcc][sqlj] Binding package DW201 at isolation level UR
+    [ibm][db2][jcc][sqlj] Binding package DW202 at isolation level CS
+    [ibm][db2][jcc][sqlj] Binding package DW203 at isolation level RS
+    [ibm][db2][jcc][sqlj] Binding package DW204 at isolation level RR
+    [ibm][db2][jcc][sqlj] Bind complete for DW2_SJProfile0
+    (pcirone@bugdbug) /home/pcirone/sqlj $</pre></span>
+           <p>The SQLJ step above produced a number of files, namely, DW2.java, DW2.class, DW2_SJProfile0.ser, DW2_SJProfileKeys.class.</p>
+           <p>After this is done, you can run the DW2_SJProfile0.ser file through the <code>db2sqljcustomize</code> command. This will process the SQLJ profile containing embedded SQL statements. The SQLJ customization process binds four packages to the DB2 server (one for each isolation level). The isolation level, which is set as part of the DataSource or dynamically within the application, will be implemented at execution time by invoking one of these four packages. These packages, by default, have seven character root names followed by single digit (1 to 4) depending upon the isolation level.</p>
+           <p>This command augments the profile with DB2-specific information that will be used at runtime. It should be run AFTER the SQLJ program has been run through the translator, but BEFORE it is executed for the first time. See the Command Reference for more details on the command itself.</p>
+           <p>In <a href="#listing18">Listing 18</a>, you see the command run and what the output looks like. You also see the packages created. Here is the entire command entered above:</p>
+           <h5 id="db2sqljcustomize" class="ibm-h5">Listing 19. Entire command entered for Listing 18</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">db2sqljcustomize -user pcirone -password ******** -url jdbc:db2://bugdbug:22906/sample
+-collection PAOLO
+      -DW2_SJProfile0.ser</pre></span>
+           <p><strong>Note:</strong> When running the <code>db2sqljcustomize</code> command against a DB2 database on Z/OS, ensure that the collection ID used is in all uppercase. (That is a restriction by the server, not the client.) Against any Linux, UNIX, Windows database on the workstation, case does not matter; what you specify is what is used for the collection ID in the system catalog tables.</p>
+           <p>In <a href="#listing20">Listing 20</a>, you see a part of the packages created by the db2sqljcustomize utility:</p>
+           <h5 id="listing20" class="ibm-h5">Listing 20. SYSCAT.PACKAGES output -- SYSCAT.PACKAGES5</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">PKGSCHEMA PKGNAME BOUNDBY DEFINER DEFAULT_SCHEMA VALID UNIQUE_ID
+--------- ------- ------- ------- -------------- ----- ---------
+...
+PAOLO     DW201   PCIRONE PCIRONE PCIRONE        Y     jBCMXGDs
+PAOLO     DW202   PCIRONE PCIRONE PCIRONE        Y     jBCMXGDs
+PAOLO     DW203   PCIRONE PCIRONE PCIRONE        Y     jBCMXGDs
+PAOLO     DW204   PCIRONE PCIRONE PCIRONE        Y     jBCMXGDs
+...
+
+
+TOTAL_SECT FORMAT ISOLATION BLOCKING
+---------- ------ --------- --------
+1 3      UR        B
+1 3      CS        B
+1 3      RS        B
+1 3      RR        B</pre></span>
+           <p>The execution and output of the program:</p>
+           <h5 id="java DW2 20" class="ibm-h5">Listing 21. Execution of SQLJ sample application -- Java DW2 20</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">    (pcirone@bugdbug) /home/pcirone/sqlj $ java DW2 20
+    Total personnel was requested for department :20
+    Total number of personnel in dept 20 is 4.
+    Goodbye
+    (pcirone@bugdbug) /home/pcirone/sqlj $ _</pre></span>
+           <h2 id="N103D5" class="ibm-h2">Packages and SQL routines</h2>
+           <p>SQL Procedural Language (SQL PL) is a subset of SQL that provides procedural constructs in functions and procedures that can be used to implement logic around traditional SQL. It is a high-level language with simple syntax and command program control statements. It is a very powerful tool for application developers. One major advantage is it helps to reduce network traffic when running SQL statements against the server by doing the bulk of the work locally on the server itself.</p>
+           <p>As routines incorporate SQL, with which package is the SQL executed? Where is the access plan held? The answer is SQL routines have their own package associated with each and every routine (just as you would see in an embedded SQL program scenario). </p>
+           <p>Let's take the following example: It is an SQL procedure that will update the EMPLOYEE table in the SAMPLE database. The basic logic is used to determine if an adjustment is needed in an employee's salary according to their performance on a scale of 100. If the employee is a top performer with a rating of 90% or better, they qualify for a year over year raise of 15%. </p>
+           <h5 id="statement1" class="ibm-h5">Listing 22. Sample CREATE statement</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">CREATE PROCEDURE PAOLO.RAISE
+ (IN empnum CHAR(6), IN perfrating SMALLINT)
+ LANGUAGE SQL
+ BEGIN
+  IF perfrating &gt;= 90 THEN
+   UPDATE employee
+    SET salary = salary * 1.15
+   WHERE empno = empnum;
+  END IF;
+END</pre></span>
+           <p>Once you have created this procedure, various system catalog tables will be updated to hold the information for the said procedure. </p>
+           <p>One important table is the SYSCAT.PROCEDURES table. If you query this table after creating the PAOLO.RAISE procedure, you will see the following entry for the procedure:</p>
+           <h5 id="syscat.procedures" class="ibm-h5">Listing 23. SYSCAT.PROCEDURES output</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">PROCSCHEMA    PROCNAME    SPECIFICNAME          PROCEDURE_ID CREATE_TIME
+------------- ----------- --------------------- ------------ ----------------------------
+PAOLO         RAISE       SQL060423221235152  65752        2006-04-23-22.12.35.221806</pre></span>
+           <p>Notice the SPECIFICNAME column entry. This will come in handy when you look at SYSCAT.ROUTINEDEP. This table holds routine dependencies, including a column called BNAME. The value for BNAME for the procedure will be important when you look at the next table. Notice that we matched the SPECIFICNAME from the first table with the ROUTINENAME of the second table (SYSCAT.ROUTINEDEP). </p>
+           <p><strong>Note:</strong> SYSCAT.ROUTINEDEP supercedes SYSCAT.FUNCDEP in V810 and beyond. However, FUNCDEP will still remain as it was in V710. </p>
+           <h5 id="syscat.routinedep" class="ibm-h5">Listing 24. SYSCAT.ROUTINEDEP output</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">PROCSCHEMA    ROUTINENAME           BTYPE BSCHEMA BNAME
+------------- --------------------- ----- ------- ------------
+PAOLO         SQL060423221235152    K     PAOLO   P2123518</pre></span>
+           <p>The next step is to go to the SYSCAT.PACKAGES table and use the info on hand to get the final piece of the puzzle. </p>
+           <h5 id="N10407" class="ibm-h5">Listing 25. SYSCAT.PACKAGES output</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">PKGSCHEMA    PKGNAME    BOUNDBY    DEFINER  DEFAULT_SCHEMA  VALID  UNIQUE_ID
+------------ ---------- ---------  -------  --------------  -----  ---------
+PAOLO        P2123518   PCIRONE    PCIRONE  PCIRONE         Y      XAjMWXEW
+
+
+TOTAL_SECT FORMAT ISOLATION BLOCKING INSERT_BUF
+---------- ------ --------- -------- ----------
+1 0        CS     U         N</pre></span>
+           <p>So take BNAME, go to the SYSCAT.PACKAGES table, and see that it corresponds to the value in the PKGNAME column. BNAME in the previous table is the actual package name for this stored procedure. You will see other information on this package, as well, here. Things like the UNIQUE_ID (consistency token), isolation level for the package and SQL, and so on. </p>
+           <p>Using this information, it is simple to find the package from the function name and find the function name from the package name. This should help in various troubleshooting situations when trying to pull all the pieces together with routines and packages. </p>
+           <p>An additional procedure is made available to customers if they wish to rebind an SQL procedure's package without having to know the package name itself. REBIND_ROUTINE_PACKAGE is a stored procedure that will take three parameters, one of which is the procedure name you wish to rebind. Check the Information Center for more details on this method to rebind your procedures. </p>
+           <h2 id="N10416" class="ibm-h2">Authorizations and binding of routines</h2>
+           <p>There are several roles related to routines and packages. Roles can be defined as package owner, routine definer, and routine/package invoker. </p>
+           <h3 id="N1041E" class="ibm-h3">Package owner </h3>
+           <p>The package owner participates in the implementation of the routine through the execution of the precompile and binding of the package to the database. </p>
+           <p>It should be noted that the package owner can override the ownership through the <code>precompile</code>/<code>BIND</code> option and set it to an alternate user. </p>
+           <p>The relationship between bind file and package is one to many. Therefore, a routine library or executable can be comprised of multiple packages, resulting in multiple package owners (one for each package). </p>
+           <h3 id="N10430" class="ibm-h3">Routine definer </h3>
+           <p>The routine definer is someone who issues the <code>CREATE</code> statement to register a routine. This is in the case of SQL routines (stored procedures or UDFs), which require a <code>CREATE</code> statement to create/bind and register the underlying routine package, as shown above. </p>
+           <p>This role is usually associated with the DBA or package owner. At the time of routine invocation (when the package is being loaded), authentication is performed using the routine definer ID and not the routine invoker ID. </p>
+           <p>In order to successfully execute the routine, the routine definer must have one of either:</p>
+           <ul class="ibm-bullet-list">
+            <li>EXECUTE privilege on the package or packages of the routine and EXECUTE privilege on the routine itself</li>
+            <li>SYSADM or DBADM authority</li>
+           </ul>
+           <p>If the routine definer and the routine package owner are the same user, then the routine definer will have the required EXECUTE privileges on the packages. If the definer is not the package owner, the definer must be explicitly granted EXECUTE privilege on the packages by the package owner or any user with SYSADM or DBADM authority. </p>
+           <p>For SQL routines, the routine definer is also implicitly the package owner. Therefore, the definer will have <code>EXECUTE WITH GRANT</code> option on both the routine and on the routine package upon execution of the <code>CREATE</code> statement for the routine. </p>
+           <h3 id="N10451" class="ibm-h3">Routine invoker </h3>
+           <p>The routine invoker is someone who invokes the routine. </p>
+           <p>Routines can be invoked from a command window or from within an embedded SQL application. </p>
+           <p>For methods and UDFs, they will not be invoked on their own but through another SQL statement in which they are embedded, while procedures will be invoked using the <code>CALL</code> statement. </p>
+           <p>In the case of dynamic SQL in an application, the invoker is the runtime authorization ID of the immediately higher-level routine or application containing the routine invocation. (But this ID can also depend on the <code>DYNAMICRULES</code> option, to which a higher level routine or application was bound). </p>
+           <p>For static SQL, the invoker is the value of the OWNER <code>precompile</code>/<code>BIND</code> option of the package that contains the reference to the routine. </p>
+           <p>In order to successfully invoke the routine, users will require execute privilege on the routine (granted to user with <code>EXECUTE WITH GRANT</code> option privilege on the routine). </p>
+           <p>If the application containing dynamic SQL was bound with <code>DYNAMICRULES BIND</code>, then its runtime authorization ID will be its package owner and not the person invoking the package. </p>
+           <p>General syntax for <code>GRANT</code> statements:</p>
+           <ul class="ibm-bullet-list">
+            <li><code>db2 GRANT EXECUTE ON FUNCTION &lt;function name&gt; to &lt;user&gt;</code></li>
+            <li><code>db2 GRANT EXECUTE ON PROCEDURE &lt;procedure name&gt; to &lt;user&gt;</code></li>
+            <li><code>db2 GRANT EXECUTE ON METHOD &lt;method name&gt; to &lt;user&gt;</code></li>
+            <li><code>db2 GRANT EXECUTE ON PACKAGE &lt;package-schema&gt;.&lt;package-id&gt; to &lt;user&gt;</code></li>
+           </ul>
+           <p><strong>Note:</strong> When the <code>BIND</code> statement is issued with a <code>GRANT</code> clause, a binder package that grants the permissions is required. This binder package uses a NULLID collection to grant privileges to each package. This means that even when system packages like CLI packages are bound using the <code>COLLECTION</code> bind option to OS/390, there will always be a package that has a NULLID collection identifier when <code>GRANT</code> is used. </p>
+           <h2 id="N10499" class="ibm-h2">Package versioning and other information</h2>
+           <h3 id="N1049F" class="ibm-h3">Versioning </h3>
+           <p>DB2 provides a versioning feature where one can create multiple versions of an application using the <code>VERSION</code> option in the <code>PRECOMPILE</code> command. </p>
+           <p>This option allows multiple versions of the same package name (package and creator name) to coexist. </p>
+           <p>As an example, one can first precompile using the <code>VERSION</code> option, as seen in <a href="#listing26">Listing 26</a>: </p>
+           <h5 id="listing26" class="ibm-h5">Listing 26. Sample PREP statement with version option 1.0</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">DB2 PREP TEST.SQC VERSION V1.0</pre></span>
+           <p>This first 1.0 Version of the program may now be run. When you build the new version of TEST, you can change the version to 1.1 using the following precompile command: </p>
+           <h5 id="statement3" class="ibm-h5">Listing 27. Sample PREP statement with version option 1.1</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">DB2 PREP TEST.SQC VERSION V1.1</pre></span>
+           <p>This allows the new version of the application to exist in conjunction with first initial version of the application.</p>
+           <h3 id="N104CA" class="ibm-h3">Precompile timestamp/Consistency token/Unique ID</h3>
+           <p>When generating a package or a bind file, the precompiler generates a timestamp. The timestamp is stored in the bind file or package and in the modified source file. The timestamp is also known as the consistency token or unique ID. It is implemented as an eight-character value. </p>
+           <p>When an application is precompiled with binding enabled, the package and modified source file are generated with timestamps that match. If you use the <code>PRECOMPILE VERSION</code> option, and multiple versions of a package exist, each version will have with it an associated timestamp. When the application is run, the package name, creator, and timestamp are sent to the database manager, which checks for a package whose name, creator, and timestamp match that sent by the application. If such a match does not exist, one of the two following SQL error codes is returned to the application: </p>
+           <ul class="ibm-bullet-list">
+            <li><strong>SQL0818N</strong> (timestamp conflict): This error is returned if a single package is found that matches the name and creator (but not the consistency token), and the package has a version of "" (an empty string) </li>
+            <li><strong>SQL0805N</strong> (package not found): This error is returned in all other situations </li>
+           </ul>
+           <p>The consistency token is stored as an eight-character value representing the timestamp for that package. Here is how you can decode the consistency token back to the timestamp value: </p>
+           <h5 id="fig3" class="ibm-h5">Figure 3. Translating consistency token to timestamp value </h5>
+           <img src="timestamp.gif" class="ibm-downsize" alt="The SYSCAT.ROUTINEDEP view" height="331" width="572">
+           <p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N104E7');return false;" href="#N104E7">View image at full size</a></p>
+           <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N104E7">
+            <img alt="The SYSCAT.ROUTINEDEP view" src="timestamp.gif" width="572">
+           </div>
+           <p>This information can be retrieved using the <code>db2bfd -b</code> command against the bind (*.bnd) file and can also be found in the SYSCAT.PACKAGES view. </p>
+           <h3 id="N104F1" class="ibm-h3">Catalog views </h3>
+           <p>DB2 provides several views in each database to display information regarding various packages that were bound to that database:</p>
+           <h5 id="table3" class="ibm-h5">Table 3. SYSCAT.PACKAGES catalog view </h5>
+           <table border="0" cellpadding="0" cellspacing="0" class="ibm-data-table" data-widget="datatable" summary="" width="100%">
+            <thead xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+             <tr>
+              <th class="ibm-background-neutral-white-30">Column name</th>
+              <th class="ibm-background-neutral-white-30">Data type</th>
+              <th class="ibm-background-neutral-white-30">Description</th>
+             </tr>
+            </thead>
+            <tbody xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+             <tr>
+              <td class="tb-row">PKGSCHEMA</td>
+              <td>VARCHAR(128)</td>
+              <td>Schema qualifier of the package name</td>
+             </tr>
+             <tr>
+              <td class="tb-row">PKGNAME</td>
+              <td>CHAR(8)</td>
+              <td>Unqualified identifier of the package name</td>
+             </tr>
+             <tr>
+              <td class="tb-row">PKGVERSION</td>
+              <td>VARCHAR(64)</td>
+              <td>Version identifier of the package name</td>
+             </tr>
+             <tr>
+              <td class="tb-row">BOUNDBY</td>
+              <td>VARCHAR(128)</td>
+              <td>Authorization ID (OWNER) of the binder of the package</td>
+             </tr>
+             <tr>
+              <td class="tb-row">DEFINER</td>
+              <td>VARCHAR(128)</td>
+              <td>User ID under which the package was bound</td>
+             </tr>
+             <tr>
+              <td class="tb-row">DEFAULT_SCHEMA</td>
+              <td>VARCHAR(128)</td>
+              <td>Default schema (QUALIFIER) name used for unqualified names in static SQL statements</td>
+             </tr>
+             <tr>
+              <td class="tb-row">VALID</td>
+              <td>CHAR(1)</td>
+              <td>Y(Valid)|N(Not valid)|X(Package inoperative)</td>
+             </tr>
+             <tr>
+              <td class="tb-row">UNIQUE_ID</td>
+              <td>CHAR(8)</td>
+              <td>Internal date and time information indicating when the package was first created</td>
+             </tr>
+             <tr>
+              <td class="tb-row">TOTAL_SECT</td>
+              <td>SMALLINT</td>
+              <td>Total number of sections in the package</td>
+             </tr>
+             <tr>
+              <td class="tb-row">FORMAT</td>
+              <td>CHAR(1)</td>
+              <td>Date and time format associated with the package</td>
+             </tr>
+             <tr>
+              <td class="tb-row">ISOLATION</td>
+              <td>CHAR(2)</td>
+              <td>Isolation level: RR|RS|CS|UR</td>
+             </tr>
+             <tr>
+              <td class="tb-row">BLOCKING</td>
+              <td>CHAR(1)</td>
+              <td>Cursor blocking option: N|U|B</td>
+             </tr>
+             <tr>
+              <td class="tb-row">INSERT_BUF</td>
+              <td>CHAR(1)</td>
+              <td>Insert option used during bind: Y|N</td>
+             </tr>
+             <tr>
+              <td class="tb-row">REOPTVAR</td>
+              <td>CHAR(1)</td>
+              <td>Indicates whether the access path is reoptimized at execution time using input variable values: A|N|O</td>
+             </tr>
+             <tr>
+              <td class="tb-row">OS_PTR_SIZE</td>
+              <td>INTEGER</td>
+              <td>Indicates the word size for the platform on which the package was created: 32|64</td>
+             </tr>
+             <tr>
+              <td class="tb-row">LANG_LEVEL</td>
+              <td>CHAR(1)</td>
+              <td>LANGLEVEL value used during BIND: 0|1|2</td>
+             </tr>
+             <tr>
+              <td class="tb-row">FUNC_PATH</td>
+              <td>VARCHAR(254)</td>
+              <td>The SQL path used by the last BIND command for this package. This is used as the default path for REBIND. SYSIBM for pre-Version 2 packages.</td>
+             </tr>
+             <tr>
+              <td class="tb-row">QUERYOPT</td>
+              <td>INTEGER</td>
+              <td>Optimization class under which this package was bound. Used for REBIND. The classes are: 0|1|3|5|9.</td>
+             </tr>
+             <tr>
+              <td class="tb-row">EXPLAIN_LEVEL</td>
+              <td>CHAR(1)</td>
+              <td>Indicates whether explain was requested using the EXPLAIN or EXPLSNAP bind option: P|Blank</td>
+             </tr>
+             <tr>
+              <td class="tb-row">EXPLAIN_MODE</td>
+              <td>CHAR(1)</td>
+              <td>Value of EXPLAIN bind option: Y|N|A</td>
+             </tr>
+             <tr>
+              <td class="tb-row">EXPLAIN_SNAPSHOT</td>
+              <td>CHAR(1)</td>
+              <td>Value of EXPLSNAP bind option: Y|N|A</td>
+             </tr>
+             <tr>
+              <td class="tb-row">SQLWARN</td>
+              <td>CHAR(1)</td>
+              <td>Are positive SQLCODEs resulting from dynamic SQL statements returned to the application: Y|N</td>
+             </tr>
+             <tr>
+              <td class="tb-row">SQLMATHWARN</td>
+              <td>CHAR(1)</td>
+              <td>Value of the database configuration parameter DFT_SQLMATHWARN at the time of bind: Y|N</td>
+             </tr>
+             <tr>
+              <td class="tb-row">EXPLICIT_BIND_TIME</td>
+              <td>TIMESTAMP</td>
+              <td>The time at which this package was last explicitly bound or rebound</td>
+             </tr>
+             <tr>
+              <td class="tb-row">LAST_BIND_TIME</td>
+              <td>TIMESTAMP</td>
+              <td>Time at which the package last explicitly or implicitly bound or rebound</td>
+             </tr>
+             <tr>
+              <td class="tb-row">CODEPAGE</td>
+              <td>SMALLINT</td>
+              <td>Application code page at bind time</td>
+             </tr>
+             <tr>
+              <td class="tb-row">DEGREE</td>
+              <td>CHAR(5)</td>
+              <td>Indicates the limit on intra-partition parallelism when package was bound: 1|2-32767|ANY</td>
+             </tr>
+             <tr>
+              <td class="tb-row">MULTINODE_PLANS</td>
+              <td>CHAR(1)</td>
+              <td>Y|N</td>
+             </tr>
+             <tr>
+              <td class="tb-row">INTRA_PARALLEL</td>
+              <td>CHAR(1)</td>
+              <td>Indicates the use of intra-partition parallelism by static SQL statements within the package: Y|N|F</td>
+             </tr>
+             <tr>
+              <td class="tb-row">VALIDATE</td>
+              <td>CHAR(1)</td>
+              <td>B|R</td>
+             </tr>
+             <tr>
+              <td class="tb-row">DYNAMICRULES</td>
+              <td>CHAR(1)</td>
+              <td>B|D|E|H|I|R</td>
+             </tr>
+             <tr>
+              <td class="tb-row">SQLERROR</td>
+              <td>CHAR(1)</td>
+              <td>Indicates SQLERROR option on the most recent sub-command that bound or rebound the package: C|R</td>
+             </tr>
+             <tr>
+              <td class="tb-row">REFRESHAGE</td>
+              <td>DECIMAL(20,6)</td>
+              <td>Timestamp duration indicating the maximum length of time between when a REFRESH TABLE statement is to run</td>
+             </tr>
+             <tr>
+              <td class="tb-row">TRANSFORMGROUP</td>
+              <td>CHAR(1024)</td>
+              <td>String containing the transform group bind option</td>
+             </tr>
+             <tr>
+              <td class="tb-row">REMARK</td>
+              <td>VARCHAR(254)</td>
+              <td>User-supplied comment or null</td>
+             </tr>
+            </tbody>
+           </table>
+           <p>This topic can be found in <em>SQL Reference, Volume 1</em>. </p>
+           <p>SYSCAT.PACKAGEDEP catalog view contains a row for each dependency that packages have on indexes, tables, views, triggers, functions, aliases, types, and hierarchies.</p>
+           <h5 id="table4" class="ibm-h5">Table 4. SYSCAT.PACKAGEDEP catalog view</h5>
+           <table border="0" cellpadding="0" cellspacing="0" class="ibm-data-table" data-widget="datatable" summary="" width="100%">
+            <thead xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+             <tr>
+              <th class="ibm-background-neutral-white-30">Column name</th>
+              <th class="ibm-background-neutral-white-30">Data type</th>
+              <th class="ibm-background-neutral-white-30">Description</th>
+             </tr>
+            </thead>
+            <tbody xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+             <tr>
+              <td class="tb-row">PKGSCHEMA</td>
+              <td>VARCHAR(128)</td>
+              <td>Schema qualifier of the package name</td>
+             </tr>
+             <tr>
+              <td class="tb-row">PKGNAME</td>
+              <td>CHAR(8)</td>
+              <td>Unqualified identifier of the package name</td>
+             </tr>
+             <tr>
+              <td class="tb-row">UNIQUEID</td>
+              <td>CHAR(8)</td>
+              <td>Internal date and time information indicating when the package was first created</td>
+             </tr>
+             <tr>
+              <td class="tb-row">PKGVERSION</td>
+              <td>VARCHAR(64)</td>
+              <td>Version identifier of the package</td>
+             </tr>
+             <tr>
+              <td class="tb-row">BINDER</td>
+              <td>VARCHAR(128)</td>
+              <td>Binder of the package</td>
+             </tr>
+             <tr>
+              <td class="tb-row">BTYPE</td>
+              <td>CHAR(1)</td>
+              <td>Type of object BNAME: A|B|D|F|I|M|N|O|P|R|S|T|U|V|W</td>
+             </tr>
+             <tr>
+              <td class="tb-row">BSCHEMA</td>
+              <td>VARCHAR(128)</td>
+              <td>Qualified name of an object on which the package depends</td>
+             </tr>
+             <tr>
+              <td class="tb-row">BNAME</td>
+              <td>VARCHAR(128)</td>
+              <td>Qualified name of an object on which the package depends</td>
+             </tr>
+             <tr>
+              <td class="tb-row">TABAUTH</td>
+              <td>SMALLINT</td>
+              <td>If BTYPE is O, S, T, U, V or W, then it encodes the privileges that are required by this package (Select, Insert, Delete, Update)</td>
+             </tr>
+            </tbody>
+           </table>
+           <p>This topic can be found in <em>SQL Reference, Volume 1</em>. </p>
+           <p>SYSCAT.PACKAGEAUTH catalog view contains a row for every privilege held on a package. </p>
+           <h5 id="table5" class="ibm-h5">Table 5. SYSCAT.PACKAGEAUTH catalog view</h5>
+           <table border="0" cellpadding="0" cellspacing="0" class="ibm-data-table" data-widget="datatable" summary="Table using a heading tag for the caption, all         columns left-aligned" width="100%">
+            <thead xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+             <tr>
+              <th class="ibm-background-neutral-white-30">Column name</th>
+              <th class="ibm-background-neutral-white-30">Data type</th>
+              <th class="ibm-background-neutral-white-30">Description</th>
+             </tr>
+            </thead>
+            <tbody xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+             <tr>
+              <td class="tb-row">GRANTOR</td>
+              <td>VARCHAR(128)</td>
+              <td>Authorization ID of the user who granted the privileges</td>
+             </tr>
+             <tr>
+              <td class="tb-row">GRANTEE</td>
+              <td>VARCHAR(128)</td>
+              <td>Authorization ID of the user or group who holds the privileges</td>
+             </tr>
+             <tr>
+              <td class="tb-row">GRANTEETYPE</td>
+              <td>CHAR(1)</td>
+              <td>U = Grantee is an individual user|G = Grantee is a group</td>
+             </tr>
+             <tr>
+              <td class="tb-row">PKGSCHEMA</td>
+              <td>VARCHAR(128)</td>
+              <td>Name of the package on which the privileges are held</td>
+             </tr>
+             <tr>
+              <td class="tb-row">PKGNAME</td>
+              <td>VARCHAR(128)</td>
+              <td>Name of the package on which the privileges are held</td>
+             </tr>
+             <tr>
+              <td class="tb-row">CONTROLAUTH</td>
+              <td>CHAR(1)</td>
+              <td>Indicates whether grantee holds CONTROL privilege on the package: Y|N</td>
+             </tr>
+             <tr>
+              <td class="tb-row">BINDAUTH</td>
+              <td>CHAR(1)</td>
+              <td>Indicates whether grantee holds BIND privilege on the package: Y|N|G</td>
+             </tr>
+             <tr>
+              <td class="tb-row">EXECUTEAUTH</td>
+              <td>CHAR(1)</td>
+              <td>Indicates whether grantee holds EXECUTE privilege on the package: Y|N|G</td>
+             </tr>
+            </tbody>
+           </table>
+           <p>This topic can be found in <em>SQL Reference, Volume 1</em>. </p>
+           <p>In addition to these catalog tables, DB2 has a <code>LIST PACKAGES</code> command to display all packages associated with the current database that the user is connected to. </p>
+           <h5 id="N106F8" class="ibm-h5">Listing 28. LIST PACKAGES statement </h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">&gt;&gt;-LIST--+-PACKAGES-+--+------------------------------+---------&gt;
+         '-TABLES---'  |      .-USER----------------. |
+                       '-FOR--+-ALL-----------------+-'
+                              +-SCHEMA--schema-name-+
+                              '-SYSTEM--------------'
+
+&gt;--+-------------+---------------------------------------------&gt;&lt;
+   '-SHOW DETAIL-'</pre></span>
+           <h3 id="N106FD" class="ibm-h3">db2bfd - Bind file description tool command </h3>
+           <p>The <code>db2bfd</code> command can be used to display the content of the bind file. This utility is particularly useful in examining the bind file and to help determine problems related to packages. </p>
+           <p>One of the most useful options of the <code>db2bfd</code> utility is the <code>-b</code> option. It displays the bind file header information.</p>
+           <h5 id="db2bfd2" class="ibm-h5">Listing 29. db2bfd -b sample.bnd statement </h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">D:\Sample\test&gt;db2bfd -b sample.bnd
+
+sample.bnd:  Header Contents
+
+Header Fields:
+
+Field   Value
+-----   -----
+releaseNum      0x800
+Endian  0x4c
+numHvars        2
+maxSect         1
+numStmt         6
+optInternalCnt  4
+optCount        9
+
+
+Name                Value
+------------------  -----
+Isolation Level     Cursor Stability
+Creator             "CHUNJ   "
+App Name            "SAMPLE  "
+Timestamp           "qAMUQUEW:2006/04/20 16:20:12:42"
+Cnulreqd            Yes
+Sql Error           No package
+Validate            Bind
+Date                Default/local
+Time                Default/local
+
+
+*** All other options are using default settings as specified by the server ***
+
+
+
+D:\Sample\test&gt;</pre></span>
+           <p>As shown above, <code>db2bfd</code> with the <code>-b</code> option provides essential information like timestamp, app name, and creator. </p>
+           <h5 id="statement4" class="ibm-h5">Listing 30. db2bfd command syntax</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">             .-,-------.
+           V         |
+&gt;&gt;-db2bfd----+- -h-+-+--filespec-------------------------------&gt;&lt;
+             +- -b-+
+             +- -s-+
+             '- -v-'</pre></span>
+           <p><strong>Command parameters:</strong></p>
+           <ul class="ibm-bullet-list">
+            <li><strong>-h</strong>: Displays help information. When this option is specified, all other options are ignored, and only the help information is displayed.</li>
+            <li><strong>-b</strong>: Displays the bind file header</li>
+            <li><strong>-s</strong>: Displays the SQL statements</li>
+            <li><strong>-v</strong>: Displays the host variable declarations</li>
+            <li><strong>filespec</strong>: Name of the bind file whose contents are to be displayed. </li>
+           </ul>
+           <p>This topic can be found in <em>SQL Reference, Volume 1</em>. </p>
+           <h3 id="N10743" class="ibm-h3">CURRENT PACKAGE PATH special register for package schemas</h3>
+           <p>Packages can be logically grouped under package schemas. This means that packages with the same name can exist under multiple package schemas in the same database. (For example, dev.sample, test.sample, and prod.sample.) </p>
+           <p>When a package with multiple schemas exists, the database manager must determine in which schema to look for a specified package. This is where the <code>CURRENT PACKAGE PATH</code> special register comes into play. DB2 provides the <code>CURRENT PACKAGE PATH</code> special register, so that you can set the register to indicate the order of schema search for invoked packages. </p>
+           <p>This special register can be set in the db2cli.ini file or by using the SQLSetConnectAttr API. </p>
+           <p>In embedded SQL programs, you can set this register by including a <code>SET CURRENT PACKAGE PATH</code> statement in the source code. </p>
+           <p>You can also issue the <code>SET CURRENT PACKAGE PATH</code> statement at the beginning of the application to specify a list of schema names. </p>
+           <p>In DB2 OS/390 and z/OS, another similar special register called <code>CURRENT PACKAGESET</code> is available. It can be set explicitly to a single schema name using the <code>SET CURRENT PACKAGESET</code> statement. This is not available in any other platform other than OS/390 and z/OS. </p>
+           <h2 id="N10767" class="ibm-h2">Common problems and considerations involving packages </h2>
+           <p>When diagnosing bind/package-related issues, always attempt to simplify the scenario involved. </p>
+           <p>For diagnosing problems binding system packages, simplify the scenario and software layers involved by binding from the command line processor.</p>
+           <p>For package-related issues, information, again, is held in the SYSCAT.PACKAGES table. A db2 trace (<code>db2trc</code>) on the server side and <code>db2bfd</code> (with <code>-b</code> option) on the bind file are the most useful tools to investigate the cause of the issue. </p>
+           <p>In DB2 V8, a utility called <code>db2pd</code> was introduced. Running <code>db2pd</code> with the <code>-static</code> option will provide further information about the execution of static SQL and packages. </p>
+           <p>The following are some of the more common problematic scenarios you may encounter with packages:</p>
+           <h3 id="N10789" class="ibm-h3">Case 1: SQL0104N and SQL0440N messages on binding CLI packages</h3>
+           <p>Prior to Fix Pack 10, CLI packages bound clean only to Linux, Unix and Windows. With other servers, you get errors that are treated as warnings -- you commonly see an SQL0104N and SQL0440N. These sqlcodes are expected.</p>
+           <p>Against VM and VSE, not create WITH HOLD cursor packages. The following is the expected sample output from a bind against non-Linux, UNIX, and Windows servers: </p>
+           <h5 id="Output1" class="ibm-h5">Listing 31. Example bind output: </h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">LINE MESSAGES FOR db2clpcs.bnd
+------ --------------------------------------------------------------------
+197 SQL0440N No authorized routine named "PROCEDURE" of type
+"GET_ROUTINE_SAR" having compatible arguments was found.
+SQLSTATE=58020
+418 SQL0440N No authorized routine named "PROCEDURE" of type
+"PUT_ROUTINE_SAR" having compatible arguments was found.
+SQLSTATE=58020
+421 SQL0440N No authorized routine named "PROCEDURE" of type
+"PUT_ROUTINE_SAR" having compatible arguments was found.
+SQLSTATE=58020
+1135 SQL0104N An unexpected token "P" was found following "".
+Expected tokens may include: "&lt;END-OF-STATEMENT&gt;".
+SQLSTATE=42601
+....more errors...
+LINE MESSAGES FOR ddcsmvs.lst
+--------------------------------------------------------------------------
+SQL0091N Binding was ended with "0" errors and "17" warnings.</pre></span>
+           <p>The procedure listed in the messages above does not and cannot exist on the host. Thus, the resulting messages are expected. These listed procedures are for DB2 on Linux, UNIX, and Windows only. </p>
+           <p>A user/binder should specify the <code>BLOCKING ALL</code> and <code>SQLERROR CONTINUE</code> options.</p>
+           <p>This cosmetic issue has since been addressed through APAR JR20949 (V8, Fix Pack 10).</p>
+           <p>You can find more detail on the <a href="http://www-1.ibm.com/support/search.wss?rs=71&amp;tc=SSEPGG&amp;q=JR20949">DB2 for Linux, UNIX, and Windows support page</a>.</p>
+           <h3 id="N107AC" class="ibm-h3">Case 2: SQL0805N for NULLID.SYSxyN03 (where "x", "y" and "N" may be of varying values). </h3>
+           <p>As previously mentioned in the section "<a href="#cli">DB2 Call Level Interface (CLI) packages</a>," the default number of CLI packages is three.</p>
+           <p>This type of error normally occurs on CLI packages. (You know this is a CLI package, as it has NULLID collection and SYSxyNzz naming convention.) When the number of statement handles exceed the maximum value available per CLI package section that were originally bound, you run into this issue.</p>
+           <p>The number of statement handles available to a CLI application depends on the number of large packages the application has defined and is limited by the overall system resources (Refer to previous section "<a href="#impact">Package sections and their impact on CLI</a>"). </p>
+           <p>By default, three small and three large packages are created. Each small package allows a maximum of 64 statement handles per connection, and each large package allows a maximum of 384 statements per connections, giving a total of 1,344 statement handles. </p>
+           <p>Should an application require more than 1,344 handles, first examine the application at hand to see whether it has closing statement handles that are not needed. Basically, is the application cleaning up after itself as efficiently as it can be? It is important to make efficient use of limited resources (memory) and to prevent application memory leaks. </p>
+           <p>The second thing to review is the necessity of more packages. Perhaps the application is indeed cleaning up after itself, but it is a heavily used application in a production environment. These additional packages take up space and resources in the database, but if they are required, they are required. </p>
+           <p>In the case above, you are looking for NULLID.SYSxyN03. Since, by default, DB2 creates only three sections, packages up to NULLID.SYSxyN02 would have only been created (00, 01, 02).</p>
+           <p>If it is deemed that the application does require a larger number of handles that exceeds the number made available by three sections, then you can increase the number of packages using one of following methods:</p>
+           <ol>
+            <li>Set the CLIPKG CLI keyword in db2cli.ini to a value of 30</li>
+            <li>Bind with <code>CLIPKG</code> option</li>
+           </ol>
+           <h5 id="N107D4" class="ibm-h5">Listing 32. Example bind output: </h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">db2 "bind @db2cli.lst blocking all sqlerror continue grant public CLIPKG X"</pre></span>
+           <p>Where "X" is any number of large packages that can be created.</p>
+           <p>If the value is not an integer between three and 30, the default value will be used without error or warning.</p>
+           <p>Consider the following information if your application requires DB2 packages with a large number of dynamic sections:</p>
+           <p>Creating DB2 packages with a large number of dynamic sections may exhaust certain server resources. Many or all of these points may apply:</p>
+           <ul class="ibm-bullet-list">
+            <li>You may need to increase the database parameter PCKCACHE_SZ to allow the larger packages to be created.</li>
+            <li>The creation of more dynamic sections will slow down the initial creation of the DB2 package.</li>
+            <li>Using DB2 packages with a large number of dynamic sections may impact application performance.</li>
+            <li>If a small number of sections are in use at one time, there will be no impact on the application. </li>
+            <li>If a large number of sections are in use at one time, the performance of the application may decrease because the database will expend resources to check all open sections for locks.</li>
+            <li>As the number of open sections increases, so does the likelihood that a deadlock situation may occur.</li>
+            <li>If your application is mostly executing select statements, it is best to operate in the default mode of automatically committing the database.</li>
+            <li>Dynamic sections are not freed in the DB2 package until the database is committed, even if the statements are closed in the application.</li>
+            <li>In this mode, the database will commit every time an SQL statement is executed and free all of the sections that were opened.</li>
+            <li>If you need to operate in a manual commit mode, then it is advisable to commit to the database as often as possible to ensure that all server resources are freed in a timely manner. </li>
+            <li>The DB2 server has a limit on dynamic sections.</li>
+           </ul>
+           <h3 id="N107F8" class="ibm-h3">Case 3: SQL0805N error invoking embedded application</h3>
+           <p>If a package owner failed to bind the necessary bind file resulting from db2 precompiler processing (<code>PREP</code>), SQL0805N will result.</p>
+           <p>Using the previously introduced embedded C application sample, the following error will be returned upon execution if the application developer failed to bind the resulting sample.bnd file.</p>
+           <h5 id="N10807" class="ibm-h5"> Listing 33. SQL805N error resulting from the sample application</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">      $sample 20
+      Total personnel was requested for department : 20.
+      SQL0805N  Package "CHUNJ.SAMPLE 0X71414D5551554557" was not found.
+      SQLSTATE=51002
+
+      The SELECT failed.
+      Expected code = 0
+      The SQLCA Information
+      SQLCAID: SQLCA
+      SQLCABC: 136
+      SQLCODE: -805
+      SQLERRML: 31
+      SQLERRMC: CHUNJ.SAMPLE 0X71414D5551554557
+      SQLRACFIm
+      SQLERRP: SQLRACFIm
+      SQLERRD[0]: -2146303891
+      SQLERRD[1]: 0
+      SQLERRD[2]: 0
+      SQLERRD[3]: 0
+      SQLERRD[4]: 0
+      SQLERRD[5]: 0
+      SQLWARN:            51002
+      SQLSTATE: 51002</pre></span>
+           <p>If a package owner issued the <code>PREP</code> command without the <code>bindfile</code> option, the bind file is automatically bound to the server.</p>
+           <p><strong>Note:</strong> If you are receiving an -805 error on CLI packages, recall that by default, you only bind three small and three large packages (in other words, NULLID.SYSSH200, NULLID.SYSSH201, NULLID.SYSSH202, NULLID.SYSLH200, NULLID.SYSLH201, and NULLID.SYSLH202).</p>
+           <h3 id="N10818" class="ibm-h3">Case 4: SQL0818N error</h3>
+           <p>The SQL0818N sqlcode indicates a timestamp conflict has occurred when invoking the package. The timestamp value is stored in both the package and in the system view table (SYSCAT.PACKAGES as UNIQUE_ID) as well as the object code calling on that package. If these do not match, you will receive this error upon execution of that code. </p>
+           <p>In order to investigate the SQL0818N error, note the package which resulted in the error. </p>
+           <p>The package name does not necessarily translate to a bind file name and thus you will need some idea of which packages are part of which bind file. Also, multiple packages may be associated with a single bind file. </p>
+           <p>This case study uses the same SAMPLE embedded application that you saw earlier.</p>
+           <h5 id="N10828" class="ibm-h5"> Listing 34. SQL0818N error</h5>
+           <span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">      $sample 20
+      Total personnel was requested for department : 20.
+      SQL0818N  A timestamp conflict occurred. SQLSTATE=51003
+
+      The SELECT failed.
+      Expected code = 0
+      The SQLCA Information
+      SQLCAID: SQLCA
+      SQLCABC: 136
+      SQLCODE: -818
+      SQLERRML: 0
+      SQLERRMC:
+      SQLRALDP
+      SQLERRP: SQLRALDP
+      SQLERRD[0]: -2146303891
+      SQLERRD[1]: 0
+      SQLERRD[2]: 0
+      SQLERRD[3]: 0
+      SQLERRD[4]: 0
+      SQLERRD[5]: 0
+      SQLWARN:            51003
+      SQLSTATE: 51003</pre></span>
+           <p>Execution of the SAMPLE application resulted in the SQL0818N TIMESTAMP CONFLICT error. </p>
+           <p>To investigate the SQL0818N error, follow the basic information to get started: </p>
+           <ol>
+            <li>Information in the SYSCAT.PACKAGES catalog view: <p>You can obtain this information using following query: </p><span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">SELECT PKGSCHEMA, PKGNAME, UNQUE_ID FROM SYSCAT.PACKAGES WHERE PKGNAME='SAMPLE'</pre></span><h5 id="N1083C" class="ibm-h5">Listing 35. SYSCAT.Packages output</h5><span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">      PKGSCHEMA PKGNAME UNIQUE_ID
+      --------- ------- ---------
+      CHUNJ     SAMPLE  nAbMLWEW
+
+        1 record(s) selected.</pre></span></li>
+            <li>The <code>db2bfd -b</code> output of the bind file involved to verify the UNIQUE_ID associated with bind file at hand:<br><h5 id="N10849" class="ibm-h5">Listing 36. db2bfd -b output</h5><span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">      Header Fields:
+
+      Field               Value
+      -----               -----
+      releaseNum          0x800
+      Endian              0x42
+      numHvars            2
+      maxSect             1
+      numStmt             6
+      optInternalCnt      4
+      optCount            9
+
+      Name                Value
+      ----                -----
+      Isolation Level     Cursor Stability
+      Creator             "CHUNJ   "
+      App Name            "SAMPLE  "
+      Timestamp           "nAbMLWEW:2006/04/22 11:12:27:39"
+      Cnulreqd            Yes
+      Sql Error           No package
+      Validate            Bind
+      Date                Default/local
+      Time                Default/local</pre></span><br> You can further diagnose the issue by utilizing a utility like <code>HEXDUMP</code> to dissect the executable portion of the application to determine the UNIQUE_ID (TIMESTAMP/CONSISTENCY TOKEN) of the package it is referencing.<br><h5 id="fig4" class="ibm-h5">Figure 4. "hexdump -C sample" command output </h5><img src="case4c.gif" class="ibm-downsize" alt="hexdump -C sample command output" height="353" width="559"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10859');return false;" href="#N10859">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10859">
+              <img alt="hexdump -C sample command output" src="case4c.gif" width="559">
+             </div><p>Given these pieces of information alone, you know that there is a TIMESTAMP conflict, as the error message indicated.</p><p>The executable sample is referencing a timestamp <strong>ZAx4KWEW</strong>, while the bind file and SYSCAT.PACKAGES contains timestamp <strong>nAbMLWEW</strong>.</p><p>This evidence points to a bind file/executable mismatch.</p><p>The bind file does not appear to match the sample executable. The UNIQUE_ID present in SYSCAT.PACKAGES also does not match the value in the application. </p></li>
+            <li>A DB2 trace (<code>db2trc</code>) of the application execution that results in the SQL0818N error:<br><p>Even without obtaining the HEXDUMP output of the executable binary, you can determine the nature of the error by taking a db2 trace.</p><p>Recommended DB2 trace instructions:</p><h5 id="Instructions1" class="ibm-h5">Listing 37. Recommended DB2 trace instructions</h5><span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">dbtrc on -f trace.tmp
+&lt;Execute the application scenario that results in SQL0818N error.
+In this case "sample 20"&gt;
+db2trc off
+db2trc flw trace.dmp trace.flw
+db2trc fmt trace.dmp trace.fmt</pre></span><p>The server-side DB2 trace is essential (where the database resides).</p><p><a href="#fig5">Figure 5</a> demonstrates a local execution of the embedded application.</p><p>Reviewing the trace showed the following:</p><p>A communication buffer to the server sent by the client requesting the execution of package SAMPLE with TIMESTAMP (UNIQUE ID/CONSISTENCY TOKEN) <strong>ZAx4KWEW</strong>.</p><p>This will only be shown on the client-side DB2 trace. This demonstration executes the embedded application locally to the database, so db2 trace will contain client-side information as well.</p><h5 id="fig5" class="ibm-h5">Figure 5. DB2 trace of client request</h5><img src="case4trc1.gif" class="ibm-downsize" alt="DB2 trace of client request" height="515" width="572"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10892');return false;" href="#N10892">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10892">
+              <img alt="DB2 trace of client request" src="case4trc1.gif" width="572">
+             </div><p>Communication buffer received by server regarding execution of SAMPLE package with TIMESTAMP (UNQIUE ID/CONSISTENCY TOKEN) <strong>ZAx4KWEW</strong>:</p><h5 id="fig6" class="ibm-h5">Figure 6. DB2 trace of server receiving the request</h5><img src="case4trc2.gif" class="ibm-downsize" alt="DB2 trace of server receiving the request" height="454" width="532"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N108A1');return false;" href="#N108A1">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N108A1">
+              <img alt="DB2 trace of server receiving the request" src="case4trc2.gif" width="532">
+             </div><p>The above received communication is processed by the server to determine the request type, package name, and its consistency token.</p><h5 id="fig7" class="ibm-h5">Figure 7. DB2 trace of server processing the request </h5><img src="case4trc3.gif" class="ibm-downsize" alt="DB2 trace of server processing the request" height="462" width="565"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N108AD');return false;" href="#N108AD">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N108AD">
+              <img alt="DB2 trace of server processing the request" src="case4trc3.gif" width="565">
+             </div><p>But this results in SQL0818N, as seen further down the trace. Trace also shows the consistency token involved.</p><h5 id="fig8" class="ibm-h5">Figure 8. DB2 trace showing SQL0818N error </h5><img src="case4trc4.gif" class="ibm-downsize" alt="DB2 trace showing SQL0818N error" height="304" width="572"><p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N108B9');return false;" href="#N108B9">View image at full size</a></p>
+             <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N108B9">
+              <img alt="DB2 trace showing SQL0818N error" src="case4trc4.gif" width="572">
+             </div><p>Therefore, the trace captured the SQL0818N error, and you were looking for the sample package with a consistency token (or UNIQUE_ID/TIMESTAMP) of <strong>ZAx4KWEW</strong>.</p></li>
+           </ol>
+           <p>To resolve this issue, a package with consistency token ZAx4JWEW needs to be bound. If the appropriate bind file cannot be located to bind the proper package, the application may need to be rebuilt using the steps specified above (precompile and bind, in other words).</p>
+           <h3 id="N108C5" class="ibm-h3">Case 5: DATE/TIME format being returned from the Command Line Processor (CLP) is not in the desired format</h3>
+           <p>To change the way the CLP displays data (when querying databases using SQL statements through the CLP), rebind the CLP bind files against the database being queried. For example, to display the date and time in ISO format, following these steps:</p>
+           <ol>
+            <li>Create a text file containing the names of the CLP bind files. This file is used as the list file for binding multiple files with one <code>BIND</code> command. In this example, the file is named clp.lst, and its contents are: <br><h5 id="lstcontent1" class="ibm-h5">Listing 38. Content of clp.l </h5><span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">   db2clpcs.bnd +
+   db2clprr.bnd +
+   db2clpur.bnd +
+   db2clprs.bnd +
+   db2clpns.bnd</pre></span></li>
+            <li>Connect to the database. </li>
+            <li>Issue the following command:<br><h5 id="ISOBINDCMD" class="ibm-h5">Listing 39. ISO bind command </h5><span class="dw-code-nohighlight"><pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">db2 bind @clp.lst collection nullid datetime iso</pre></span></li>
+           </ol>
+           <h2 id="N108E7" class="ibm-h2">Acknowledgements</h2>
+           <p>Special thanks to Lorysa Bond, IBM DB2 RPD Advanced Support, for reviewing this article and providing valuable input.</p>
+           <h2 id="N108EF" class="ibm-h2">Further information</h2>
+           <p>During application development, you may hit one or more of the problems described above involving packages. Our intention is to help you understand the concept of the package a little more thoroughly and to solve common problems. Please refer to the product manuals for any other questions you may have on application development and packages.</p>
+           <!--CMA ID: 125391-->
+           <!--Site ID: 1-->
+           <!--XSLT stylesheet used to transform this file: dw-document-html-8.0.xsl--> 
+           <!-- Article Resources --> 
+           <div class="ibm-alternate-rule">
+            <hr>
+           </div>
+           <h4 id="artdownload" class="ibm-h4">Downloadable resources</h4>
+           <ul class="ibm-link-list">
+            <li><a class="ibm-pdf-link" href="dm-0606chun-pdf.pdf">PDF of this content</a></li>
+            <li><a class="ibm-download-link" href="http://www.ibm.com/developerworks/apps/download/index.jsp?contentid=125391&amp;filename=samples.zip&amp;method=http&amp;locale=">SQLJ and SQC sample code shown in this article</a> (samples.zip | 3KB)</li>
+           </ul>
+           <div class="ibm-alternate-rule">
+            <hr>
+           </div>
+           <h4 id="artrelatedtopics" class="ibm-h4">Related topics</h4>
+           <ul>
+            <li> Build your next development project with <a href="http://www.ibm.com/developerworks/downloads/?S_TACT=105AGX11&amp;S_CMP=art">IBM trial software</a>, available for download directly from developerWorks.</li>
+            <li><a href="http://publib.boulder.ibm.com/infocenter/db2luw/v8//index.jsp">IBM DB2 Universal Database V8 Information Center</a>: Find the complete set of official documentation and samples for the DB2 Universal Database for Linux, UNIX, and Windows products. </li>
+           </ul> 
+           <!-- Commenting --> 
+           <!-- INLINE_COMMENTS_BEGIN: --> 
+           <div class="ibm-alternate-rule">
+            <hr>
+           </div> 
+           <div id="dw-article-cmts-top" class="ibm-columns"> 
+            <div class="ibm-col-6-2"> 
+             <h4 id="icomments" class="ibm-h4">Comments</h4> 
+             <div id="dw-article-cmts-login"> 
+              <p><a onclick="window.location=userLinks[0].url;" tabindex="0" role="link">Sign in</a> or <a onclick="window.location=userLinks[1].url;" tabindex="0" role="link">register</a> to add and subscribe to comments.</p> 
+             </div> 
+            </div> 
+            <div class="ibm-col-6-2" id="dw-notify"> 
+             <input type="checkbox" value="1" name="comment_notification" id="comment_notification" disabled> 
+             <label for="comment_notification">Subscribe me to comment notifications</label> 
+            </div> 
+           </div> 
+           <div class="dw-article-cmts-container"> 
+            <div class="ibm-no-print" id="dw-icomments-container"> 
+            </div> 
+           </div> 
+           <!-- INLINE_COMMENTS_END --> 
+           <!-- CENTER_6_4_CONTENT_COLUMN_END --> 
+          </div> 
+         </div> 
+         <!--Rating_Meta_BEGIN-->
+         <div class="metavalue">
+          static.content.url=http://www.ibm.com/developerworks/js/artrating/
+         </div>
+         <div class="metavalue">
+          SITE_ID=1
+         </div>
+         <div class="metavalue">
+          Zone=Information Management
+         </div>
+         <div class="metavalue">
+          ArticleID=125391
+         </div>
+         <div class="metavalue">
+          ArticleTitle=DB2 packages: Concepts, examples, and common problems
+         </div>
+         <div class="metavalue">
+          publish-date=06012006
+         </div>
+         <script language="javascript" type="text/javascript">document.write('<div class="metavalue">url='+location.href.replace(/</g,  '%3C')+'</div>');</script>
+         <!--Rating_Meta_END--> 
+        </div> 
+        <!-- END_IBM-CONTENT-MAIN --> 
+       </div> 
+       <!-- END_IBM-CONTENT-BODY --> 
+      </div> 
+      <!-- END_IBM-CONTENT --> 
+     </div> 
+     <!-- END_IBM-PCON --> 
+    </main> 
+    <!-- MAIN_CONTENT_END --> 
+    <!-- END_CONTENT-WRAPPER --> 
+   </div> 
+   <!-- FOOTER_BEGIN --> 
+   <footer role="contentinfo" aria-label="IBM developerWorks"> 
+    <div id="dw-footer-module" class="dw-footer-home"> 
+     <section aria-label="Resources" role="contentinfo"> 
+      <div class="ibm-columns"> 
+       <div class="ibm-col-6-1 dw-footer-col-1"> 
+        <ul> 
+         <li class="dw-footer-heading" aria-label="developerWorks">developerWorks</li> 
+         <li><a href="//www.ibm.com/developerworks/aboutdw/">About</a></li> 
+         <li><a href="//www.ibm.com/developerworks/feedback">Help</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/ideas">Submit content</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/secure/report/">Report abuse</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/community/terms/thirdparty/">Third-party notice</a></li> 
+        </ul> 
+        <ul> 
+         <li class="dw-footer-heading" aria-label="Community">Community</li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/rfe/">Product feedback</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/connect/">Developer Centers</a></li> 
+        </ul> 
+        <ul> 
+         <li class="dw-footer-heading dw-follow-us" aria-label="Follow us">Follow us</li> 
+        </ul> 
+        <p class="dw-footer-social"> <a href="//twitter.com/developerWorks"> <img width="28" height="27" alt="Twitter" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-twitter.png"> </a> </p> 
+        <p class="dw-footer-social-right"> <a href="//www.facebook.com/developerworks"> <img width="28" height="27" alt="Facebook" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-facebook.png"> </a> </p> 
+        <br> 
+        <p class="dw-footer-social"> <a href="//www.linkedin.com/groups/IBM-developerWorks-8137234"> <img width="28" height="27" alt="LinkedIn" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-linkedin.png"> </a> </p> 
+        <p class="dw-footer-social-right"> <a href="//www.youtube.com/user/developerworks"> <img width="28" height="27" alt="YouTube" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-youtube.png"> </a> </p> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-2"> 
+        <ul> 
+         <li class="dw-footer-heading" aria-label="Join">Join</li> 
+         <li><a href="//developer.ibm.com/academic/">Faculty</a></li> 
+         <li><a href="//developer.ibm.com/students/">Students</a></li> 
+         <li><a href="//developer.ibm.com/startups/">Startups</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/isv/">Business Partners</a></li> 
+        </ul> 
+        <ul class="dw-footer-lang" aria-label="Select a language"> 
+         <li class="dw-footer-heading">Select a language</li> 
+         <li><a href="//www.ibm.com/developerworks/">English</a></li> 
+         <li><a href="//www.ibm.com/developerworks/cn/" lang="zh">??</a></li> 
+         <li><a href="//www.ibm.com/developerworks/jp/" lang="ja">???</a></li> 
+         <li><a href="//www.ibm.com/developerworks/ru/" lang="ru">???????</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/br/" lang="pt">Português (Brasil)</a></li> 
+         <li><a href="//www.ibm.com/developerworks/ssa/" lang="es">Español</a></li> 
+         <li><a href="//developer.ibm.com/kr/" lang="kr">??</a></li> 
+        </ul> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-3"> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-4"> 
+        <ul class="dw-footer-categories"> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/learn/">Tutorials &amp; training</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/accelerate/">Demos &amp; sample code</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/answers">Q&amp;A forums</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/dwblog/">dW Blog</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/events/">Events</a> </li> 
+        </ul> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-5"> 
+        <ul class="dw-footer-categories"> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/courses/">Courses</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/open/">Open source projects</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/tv/">Videos</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/recipes/">Recipes</a> </li> 
+        </ul> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-6"> 
+        <ul class="dw-footer-categories"> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/develop/">Downloads</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/api/">APIs</a> </li> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/newsletter/">Newsletters</a> </li> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/feeds/">Feeds</a> </li> 
+        </ul> 
+       </div> 
+      </div> 
+     </section> 
+    </div> 
+    <div id="dw-footer" class="ibm-padding-normal ibm-alternate"> 
+     <div class="ibm-columns"> 
+      <div class="ibm-col-1-1"> 
+       <div class="dw-footer-corporate-links"> 
+        <ul> 
+         <li><a href="//www.ibm.com/developerworks/aboutdw/contacts.html">Contact</a></li> 
+         <li><a href="//www.ibm.com/privacy/us/en/">Privacy</a></li> 
+         <li><a href="//www.ibm.com/developerworks/community/terms/use/">Terms of use</a></li> 
+         <li><a href="//www.ibm.com/accessibility/us/en/">Accessibility</a></li> 
+         <li class="ibm-feedbacklink"><a href="#">Feedback</a></li> 
+         <li id="ibm-truste-cp"><a onclick="truste.eu.clickListener();return false;" href="#">Cookie Preferences</a></li> 
+        </ul> 
+       </div> 
+       <div id="ibm-footer-locale-selector"></div> 
+      </div> 
+     </div> 
+    </div> 
+   </footer> 
+   <!-- FOOTER_END --> 
+   <!-- END_IBM-TOP --> 
+  </div> 
+  <!-- SCRIPTS_INCLUDE_BEGIN --> 
+  <!-- Styles --> 
+  <link rel="stylesheet" type="text/css" href="/developerworks/maverick/css/plugin/comments/jquery-comments.css"> 
+  <link rel="stylesheet" href="/developerworks/maverick/fonts/awesome-4.5.0/css/font-awesome.min.css"> 
+  <!-- Libraries --> 
+  <script type="text/javascript" src="/developerworks/maverick/js/plugin/comments/jquery-comments.min.js"></script> 
+  <script type="text/javascript" src="/developerworks/maverick/js/plugin/formatter/moment-with-locales.js"></script> 
+  <script type="text/javascript" src="/developerworks/maverick/js/ContentComments.js"></script> 
+  <script type="text/javascript" src="/developerworks/js/v18/ContentCommentsFormatter.js"></script> 
+  <script type="text/javascript" language="JavaScript">
+
+	IBMCore.common.module.masthead.subscribe("ready", "customjs", setupCommentsPlugin).runAsap(setupCommentsPlugin);
+
+	function setupCommentsPlugin(){
+		//debugger;
+			//alert(userLinks);
+			var commentsInitInfo = {
+				contentId : $("div[class=metavalue]:contains('ArticleID=')").text().split("=")[1],
+				siteId :  $("div[class=metavalue]:contains('SITE_ID=')").text().split("=")[1],
+				pluginDivId : '#dw-icomments-container',
+				notifyElementId : "#comment_notification",
+				loginMessageDivId : "#dw-article-cmts-login",
+				totalCommentsDivId : "#nCmts"
+			};				
+								
+			ContentComments.Setup(commentsInitInfo);
+	}
+</script> 
+  <script type="text/javascript">(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create','UA-41146412-3','auto');ga('require','linkid','linkid.js');var dcdate="2006-06-01";var cmaid="125391";ga('set','dimension1',dcdate);ga('set','dimension2',cmaid);var dw_canonical="http://www.ibm.com/developerworks/data/library/techarticle/dm-0606chun/index.html";dw_canonical=dw_canonical.substring(dw_canonical.indexOf(".ibm.com")+8);ga('send','pageview',{'page':dw_canonical,'dimension1':dcdate,'dimension2':cmaid});var trkOBL=function(url,id){id=id.split("-");var cat="v18 article";var act="Bluemix";if(id[2]=="dwpremium")act="Premium";if(id[2]=="dwopen")act="dWOpen";if(id[2]=="devops")act="Devops";act=act+' '+id[3];if(id[4]){var label=id[4];if(label=="btn")label="button";if(label=="txt")label="text link";if(label=="bnr")label="banner";if(label=="tl")label="tile";if(label=="regbar")label="registration bar";if(label=="vp")label="video promotion"}var ab=0;if(id[5]){if(id[5]=="ABa")ab=1;if(id[5]=="ABb")ab=2;if(id[5]=="ABc")ab=3;if(id[5]=="ABd")ab=4;if(id[5]=="ABe")ab=5;if(id[5]=="ABf")ab=6;if(id[5]=="ABg")ab=7;if(id[5]=="ABh")ab=8}ga('send','event',cat,act,label,ab,{'page':dw_canonical,'hitCallback':function(){document.location=url}})}</script>
+  <!-- Piwik --> 
+  <script type="text/javascript">
+    var _paq = _paq || [];
+    _paq.push(["setDomains", ["*.www.ibm.com/developerworks","*.www.ibm.com/developerworks"]]);
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+    var u="//developer.ibm.com/piwik/";
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', 7]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    })();
+</script> 
+  <noscript>
+   <p><img src="//developer.ibm.com/piwik/piwik.php?idsite=7" style="border:0;" alt=""></p>
+  </noscript> 
+  <!-- End Piwik Code -->
+  <!-- Hotjar Tracking Code for ibm.com --> 
+  <script>
+    (function(h,o,t,j,a,r){
+    h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+    h._hjSettings={hjid:42920,hjsv:5};
+    a=o.getElementsByTagName('head')[0];
+    r=o.createElement('script');r.async=1;
+    r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+    a.appendChild(r);
+    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+</script> 
+  <!-- SCRIPTS_INCLUDE_END -->   
+ </body>
+</html>
