@@ -76,17 +76,17 @@ public class ProcessData {
 		searchers.add(bing3);
 		searchers.add(npmsearch);
 
-		/*for (Searcher searcher : searchers) {
+		for (Searcher searcher : searchers) {
 			
 			System.out.println("Analizando "+ searcher.getId());
 			
-			//for (int i = 0 ; i < max_queries ; i++) {
+			for (int i = 0 ; i < max_queries ; i++) {
 
-				String query = "convert typewritten image to text document";//QueryManager.getInstance().getQueries().get(i);
+				String query = QueryManager.getInstance().getQueries().get(i);
 
 				System.out.println("Query "+ query);
 				
-				Ranking ranking = null;//CacheRankingManager.getInstance().loadRankingFromCache(searcher, query);
+				Ranking ranking = CacheRankingManager.getInstance().loadRankingFromCache(searcher, query);
 				if (ranking == null) {
 					List<String> data = CacheContentManager.getInstance().loadContentFromCache(searcher,query);
 					ranking = searcher.processData(data);//TODO data null
@@ -95,8 +95,8 @@ public class ProcessData {
 				
 				System.out.println();
 				
-			//}
-		}*/
+			}
+		}
 		
 		
 		
@@ -113,13 +113,13 @@ public class ProcessData {
 			
 			System.out.println("Analizando "+ searcher.getId());
 			
-			//for (int i = 0 ; i < max_queries ; i++) {
+			for (int i = 0 ; i < max_queries ; i++) {
 
-				String query = "convert typewritten image to text document";//QueryManager.getInstance().getQueries().get(i);
+				String query = QueryManager.getInstance().getQueries().get(i);
 
 				System.out.println("Query "+ query);
 				
-				Ranking ranking = null;//CacheRankingManager.getInstance().loadRankingFromCache(searcher, query);
+				Ranking ranking = CacheRankingManager.getInstance().loadRankingFromCache(searcher, query);
 				if (ranking == null) {
 					List<String> data = new ArrayList<String>();
 					data.add(query);
@@ -129,7 +129,7 @@ public class ProcessData {
 				
 				System.out.println();
 				
-			//}
+			}
 		}
 		
 

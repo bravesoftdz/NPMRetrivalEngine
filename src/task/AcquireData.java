@@ -74,7 +74,7 @@ public class AcquireData {
 			
 			System.out.println("Analizando "+ searcher.getContentId());
 			
-			for (int i = 60 ; i < QueryManager.getInstance().getQueries().size()/*max_queries*/ ; i++) {
+			for (int i = 0 ; i < max_queries; i++) {
 
 				String query = QueryManager.getInstance().getQueries().get(i);
 
