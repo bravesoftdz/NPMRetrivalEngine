@@ -80,9 +80,9 @@ public class ProcessData {
 			
 			System.out.println("Analizando "+ searcher.getId());
 			
-			for (int i = 0 ; i < max_queries ; i++) {
+			//for (int i = 0 ; i < max_queries ; i++) {
 
-				String query = QueryManager.getInstance().getQueries().get(i);
+				String query = "mobile app framework";//QueryManager.getInstance().getQueries().get(i);
 
 				System.out.println("Query "+ query);
 				
@@ -95,7 +95,7 @@ public class ProcessData {
 				
 				System.out.println();
 				
-			}
+			//}
 		}
 		
 		
@@ -113,9 +113,9 @@ public class ProcessData {
 			
 			System.out.println("Analizando "+ searcher.getId());
 			
-			for (int i = 0 ; i < max_queries ; i++) {
+			//for (int i = 0 ; i < max_queries ; i++) {
 
-				String query = QueryManager.getInstance().getQueries().get(i);
+				String query = "mobile app framework";//QueryManager.getInstance().getQueries().get(i);
 
 				System.out.println("Query "+ query);
 				
@@ -129,7 +129,7 @@ public class ProcessData {
 				
 				System.out.println();
 				
-			}
+			//}
 		}
 		
 

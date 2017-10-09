@@ -64,19 +64,19 @@ public class AcquireData {
 		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);
 		
 		List<Searcher> searchers = new ArrayList<Searcher>();
-		//searchers.add(google);
-		searchers.add(npm);
-		searchers.add(bing);
-		searchers.add(npmsearch);
+		searchers.add(google);
+		//searchers.add(npm);
+		//searchers.add(bing);
+		//searchers.add(npmsearch);
 
 
 		for (Searcher searcher : searchers) {
 			
 			System.out.println("Analizando "+ searcher.getContentId());
 			
-			for (int i = 0 ; i < max_queries; i++) {
+			//for (int i = 0 ; i < max_queries; i++) {
 
-				String query = QueryManager.getInstance().getQueries().get(i);
+				String query = "mobile app framework";/*QueryManager.getInstance().getQueries().get(i);*/
 
 				System.out.println("Query "+ query);
 				
@@ -86,7 +86,7 @@ public class AcquireData {
 		        	CacheContentManager.getInstance().saveContentInCache(data,searcher,query);
 		        }
 				System.out.println();
-			}
+			//}
 		}
 		
 		
