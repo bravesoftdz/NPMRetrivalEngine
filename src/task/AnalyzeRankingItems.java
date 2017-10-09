@@ -31,8 +31,8 @@ public class AnalyzeRankingItems {
 		//String[] folders = { "lucene", "bing.com_stanford_CRF", "google.com_stanford_CRF", "bing.com_str_match", "google.com_str_match", "bing.com_hyp_match", "google.com_hyp_match", "npmjs.com_optimal", "npmsearch.com", 
 		//						"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedFirstRankingAgregator"};
 		
-		String[] folders = { "lucene","npmjs.com_optimal", "npmsearch.com", 
-				"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedBordaFuse","WeightedFirstRankingAgregator","Filter_google.com_hyp_match"};
+		String[] folders = { "npmjs.com_optimal", "npmsearch.com", 
+				"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedBordaFuse","Filter_google.com_hyp_match"};
 
 		boolean end = false;
 		HashMap<String, Integer> hits4Search = new HashMap<String, Integer>();

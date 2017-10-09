@@ -1,677 +1,470 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01
+Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
  <head> 
-  <title>Internet Content Filtering and Blocking</title> 
-  <meta HTTP-EQUIV="Description" name="Description" content="Resources about Internet child safety, parental control, Internet filtering software, blocking software, porn blocker, porn filter, filter porn, filtered ISPs in Australia, related issues and commentary - an Australian perspective from Electronic Frontiers Australia (EFA)"> 
-  <meta HTTP-EQUIV="Keywords" name="Keywords" content="filters, filtering, filtering software, blocking, blocking software, porn blocker, porn blocker, porn filter, censorware, filtered ISPs, parental control, protect, children, protect kids, child safety, online safety, internet safety, censorship, internet censorship, online censorship, content regulation, australia, efa"> 
-  <meta HTTP-EQUIV="Last-Modified" content="Thu, 11 May 2006 05:15:54 GMT"> 
-  <meta HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1"> 
-  <meta HTTP-EQUIV="Window-target" CONTENT="_top"> 
-  <link rel="stylesheet" href="../../Styles/oldb.css" type="text/css"> 
-  <style type="text/css" media="all">@import "../../Styles/default.css";</style> 
-  <style type="text/css">
-<!-- 
-H1 {font-size: 1.37em }
-H2 {font-size: 1.28em;}
-H3 {font-size: 1.12em }
-H4 {font-size: 1.05em }
-H5 {font-size: 0.95em }
--->
-</style> 
+  <title>
+      Filter Files
+    </title> 
+  <meta name="GENERATOR" content="Modular DocBook HTML Stylesheet Version 1.79"> 
+  <link rel="HOME" title="Privoxy 3.0.26 User Manual" href="index.html"> 
+  <link rel="PREVIOUS" title="Actions Files" href="actions-file.html"> 
+  <link rel="NEXT" title="Privoxy's Template Files" href="templates.html"> 
+  <link rel="STYLESHEET" type="text/css" href="../p_doc.css"> 
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"> 
+  <link rel="STYLESHEET" type="text/css" href="p_doc.css"> 
  </head> 
- <body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#990099" alink="#990099"> 
-  <div id="wrapper"> 
-   <div id="level1"> 
-    <div id="topmenu"> 
-     <div id="tiletop"> 
-     </div> 
-     <div class="noindex"> 
-      <a name="top"></a> 
-      <span class="hide"><a href="#navskip"><img SRC="/Images/spacer.gif" ALT="Skip navigation links" width="1" height="1"></a></span> 
-      <div id="navmenu"> 
+ <body class="SECT1" bgcolor="#EEEEEE" text="#000000" link="#0000FF" vlink="#840084" alink="#0000FF"> 
+  <div class="NAVHEADER"> 
+   <table summary="Header navigation table" width="100%" border="0" cellpadding="0" cellspacing="0"> 
+    <tbody>
+     <tr> 
+      <th colspan="3" align="center"> Privoxy 3.0.26 User Manual </th> 
+     </tr> 
+     <tr> 
+      <td width="10%" align="left" valign="bottom"> <a href="actions-file.html" accesskey="P">Prev</a> </td> 
+      <td width="80%" align="center" valign="bottom"> </td> 
+      <td width="10%" align="right" valign="bottom"> <a href="templates.html" accesskey="N">Next</a> </td> 
+     </tr> 
+    </tbody>
+   </table> 
+   <hr align="LEFT" width="100%"> 
+  </div> 
+  <div class="SECT1"> 
+   <h1 class="SECT1"> <a name="FILTER-FILE">9. Filter Files</a> </h1> 
+   <p> On-the-fly text substitutions need to be defined in a <span class="QUOTE">"filter file"</span>. Once defined, they can then be invoked as an <span class="QUOTE">"action"</span>. </p> 
+   <p> <span class="APPLICATION">Privoxy</span> supports three different pcrs-based filter actions: <tt class="LITERAL"><a href="actions-file.html#FILTER">filter</a></tt> to rewrite the content that is send to the client, <tt class="LITERAL"><a href="actions-file.html#CLIENT-HEADER-FILTER">client-header-filter</a></tt> to rewrite headers that are send by the client, and <tt class="LITERAL"><a href="actions-file.html#SERVER-HEADER-FILTER">server-header-filter</a></tt> to rewrite headers that are send by the server. </p> 
+   <p> <span class="APPLICATION">Privoxy</span> also supports two tagger actions: <tt class="LITERAL"><a href="actions-file.html#CLIENT-HEADER-TAGGER">client-header-tagger</a></tt> and <tt class="LITERAL"><a href="actions-file.html#SERVER-HEADER-TAGGER">server-header-tagger</a></tt>. Taggers and filters use the same syntax in the filter files, the difference is that taggers don't modify the text they are filtering, but use a rewritten version of the filtered text as tag. The tags can then be used to change the applying actions through sections with <a href="actions-file.html#TAG-PATTERN">tag-patterns</a>. </p> 
+   <p> Finally <span class="APPLICATION">Privoxy</span> supports the <tt class="LITERAL"><a href="actions-file.html#EXTERNAL-FILTER">external-filter</a></tt> action to enable <tt class="LITERAL"><a href="filter-file.html#EXTERNAL-FILTER-SYNTAX">external filters</a></tt> written in proper programming languages. </p> 
+   <p> Multiple filter files can be defined through the <tt class="LITERAL"><a href="config.html#FILTERFILE">filterfile</a></tt> config directive. The filters as supplied by the developers are located in <tt class="FILENAME">default.filter</tt>. It is recommended that any locally defined or modified filters go in a separately defined file such as <tt class="FILENAME">user.filter</tt>. </p> 
+   <p> Common tasks for content filters are to eliminate common annoyances in HTML and JavaScript, such as pop-up windows, exit consoles, crippled windows without navigation tools, the infamous &lt;BLINK&gt; tag etc, to suppress images with certain width and height attributes (standard banner sizes or web-bugs), or just to have fun. </p> 
+   <p> Enabled content filters are applied to any content whose <span class="QUOTE">"Content Type"</span> header is recognised as a sign of text-based content, with the exception of <tt class="LITERAL">text/plain</tt>. Use the <a href="actions-file.html#FORCE-TEXT-MODE">force-text-mode</a> action to also filter other content. </p> 
+   <p> Substitutions are made at the source level, so if you want to <span class="QUOTE">"roll your own"</span> filters, you should first be familiar with HTML syntax, and, of course, regular expressions. </p> 
+   <p> Just like the <a href="actions-file.html">actions files</a>, the filter file is organized in sections, which are called <span class="emphasis"><i class="EMPHASIS">filters</i></span> here. Each filter consists of a heading line, that starts with one of the <span class="emphasis"><i class="EMPHASIS">keywords</i></span> <tt class="LITERAL">FILTER:</tt>, <tt class="LITERAL">CLIENT-HEADER-FILTER:</tt> or <tt class="LITERAL">SERVER-HEADER-FILTER:</tt> followed by the filter's <span class="emphasis"><i class="EMPHASIS">name</i></span>, and a short (one line) <span class="emphasis"><i class="EMPHASIS">description</i></span> of what it does. Below that line come the <span class="emphasis"><i class="EMPHASIS">jobs</i></span>, i.e. lines that define the actual text substitutions. By convention, the name of a filter should describe what the filter <span class="emphasis"><i class="EMPHASIS">eliminates</i></span>. The comment is used in the <a href="http://config.privoxy.org/" target="_top">web-based user interface</a>. </p> 
+   <p> Once a filter called <tt class="REPLACEABLE"><i>name</i></tt> has been defined in the filter file, it can be invoked by using an action of the form +<tt class="LITERAL"><a href="actions-file.html#FILTER">filter</a>{<tt class="REPLACEABLE"><i>name</i></tt>}</tt> in any <a href="actions-file.html">actions file</a>. </p> 
+   <p> Filter definitions start with a header line that contains the filter type, the filter name and the filter description. A content filter header line for a filter called <span class="QUOTE">"foo"</span> could look like this: </p> 
+   <p> </p> 
+   <table border="0" bgcolor="#E0E0E0" width="100%"> 
+    <tbody>
+     <tr> 
+      <td> <pre class="SCREEN">
+FILTER: foo Replace all "foo" with "bar"
+</pre> </td> 
+     </tr> 
+    </tbody>
+   </table> 
+   <p> Below that line, and up to the next header line, come the jobs that define what text replacements the filter executes. They are specified in a syntax that imitates <a href="http://www.perl.org/" target="_top">Perl</a>'s <tt class="LITERAL">s///</tt> operator. If you are familiar with Perl, you will find this to be quite intuitive, and may want to look at the PCRS documentation for the subtle differences to Perl behaviour. </p> 
+   <p> Most notably, the non-standard option letter <tt class="LITERAL">U</tt> is supported, which turns the default to ungreedy matching (add <tt class="LITERAL">?</tt> to quantifiers to turn them greedy again). </p> 
+   <p> The non-standard option letter <tt class="LITERAL">D</tt> (dynamic) allows to use the variables $host, $origin (the IP address the request came from), $path, $url and $listen-address (the address on which Privoxy accepted the client request. Example: 127.0.0.1:8118). They will be replaced with the value they refer to before the filter is executed. </p> 
+   <p> Note that '$' is a bad choice for a delimiter in a dynamic filter as you might end up with unintended variables if you use a variable name directly after the delimiter. Variables will be resolved without escaping anything, therefore you also have to be careful not to chose delimiters that appear in the replacement text. For example '&lt;' should be save, while '?' will sooner or later cause conflicts with $url. </p> 
+   <p> The non-standard option letter <tt class="LITERAL">T</tt> (trivial) prevents parsing for backreferences in the substitute. Use it if you want to include text like '$&amp;' in your substitute without quoting. </p> 
+   <p> If you are new to <a href="http://en.wikipedia.org/wiki/Regular_expressions" target="_top"><span class="QUOTE">"Regular Expressions"</span></a>, you might want to take a look at the <a href="appendix.html#REGEX">Appendix on regular expressions</a>, and see the <a href="http://perldoc.perl.org/perlre.html" target="_top">Perl manual</a> for <a href="http://perldoc.perl.org/perlop.html" target="_top">the <tt class="LITERAL">s///</tt> operator's syntax</a> and <a href="http://perldoc.perl.org/perlre.html" target="_top">Perl-style regular expressions</a> in general. The below examples might also help to get you started. </p> 
+   <div class="SECT2"> 
+    <h2 class="SECT2"> <a name="FILTER-FILE-TUT">9.1. Filter File Tutorial</a> </h2> 
+    <p> Now, let's complete our <span class="QUOTE">"foo"</span> content filter. We have already defined the heading, but the jobs are still missing. Since all it does is to replace <span class="QUOTE">"foo"</span> with <span class="QUOTE">"bar"</span>, there is only one (trivial) job needed: </p> 
+    <p> </p> 
+    <table border="0" bgcolor="#E0E0E0" width="100%"> 
+     <tbody>
+      <tr> 
+       <td> <pre class="SCREEN">
+s/foo/bar/
+</pre> </td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <p> But wait! Didn't the comment say that <span class="emphasis"><i class="EMPHASIS">all</i></span> occurrences of <span class="QUOTE">"foo"</span> should be replaced? Our current job will only take care of the first <span class="QUOTE">"foo"</span> on each page. For global substitution, we'll need to add the <tt class="LITERAL">g</tt> option: </p> 
+    <p> </p> 
+    <table border="0" bgcolor="#E0E0E0" width="100%"> 
+     <tbody>
+      <tr> 
+       <td> <pre class="SCREEN">
+s/foo/bar/g
+</pre> </td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <p> Our complete filter now looks like this: </p> 
+    <p> </p> 
+    <table border="0" bgcolor="#E0E0E0" width="100%"> 
+     <tbody>
+      <tr> 
+       <td> <pre class="SCREEN">
+FILTER: foo Replace all "foo" with "bar"
+s/foo/bar/g
+</pre> </td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <p> Let's look at some real filters for more interesting examples. Here you see a filter that protects against some common annoyances that arise from JavaScript abuse. Let's look at its jobs one after the other: </p> 
+    <p> </p> 
+    <table border="0" bgcolor="#E0E0E0" width="100%"> 
+     <tbody>
+      <tr> 
+       <td> <pre class="SCREEN">
+FILTER: js-annoyances Get rid of particularly annoying JavaScript abuse
+
+# Get rid of JavaScript referrer tracking. Test page: http://www.randomoddness.com/untitled.htm
+#
+s|(&lt;script.*)document\.referrer(.*&lt;/script&gt;)|$1"Not Your Business!"$2|Usg
+</pre> </td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <p> Following the header line and a comment, you see the job. Note that it uses <tt class="LITERAL">|</tt> as the delimiter instead of <tt class="LITERAL">/</tt>, because the pattern contains a forward slash, which would otherwise have to be escaped by a backslash (<tt class="LITERAL">\</tt>). </p> 
+    <p> Now, let's examine the pattern: it starts with the text <tt class="LITERAL">&lt;script.*</tt> enclosed in parentheses. Since the dot matches any character, and <tt class="LITERAL">*</tt> means: <span class="QUOTE">"Match an arbitrary number of the element left of myself"</span>, this matches <span class="QUOTE">"&lt;script"</span>, followed by <span class="emphasis"><i class="EMPHASIS">any</i></span> text, i.e. it matches the whole page, from the start of the first &lt;script&gt; tag. </p> 
+    <p> That's more than we want, but the pattern continues: <tt class="LITERAL">document\.referrer</tt> matches only the exact string <span class="QUOTE">"document.referrer"</span>. The dot needed to be <span class="emphasis"><i class="EMPHASIS">escaped</i></span>, i.e. preceded by a backslash, to take away its special meaning as a joker, and make it just a regular dot. So far, the meaning is: Match from the start of the first &lt;script&gt; tag in a the page, up to, and including, the text <span class="QUOTE">"document.referrer"</span>, if <span class="emphasis"><i class="EMPHASIS">both</i></span> are present in the page (and appear in that order). </p> 
+    <p> But there's still more pattern to go. The next element, again enclosed in parentheses, is <tt class="LITERAL">.*&lt;/script&gt;</tt>. You already know what <tt class="LITERAL">.*</tt> means, so the whole pattern translates to: Match from the start of the first &lt;script&gt; tag in a page to the end of the last &lt;script&gt; tag, provided that the text <span class="QUOTE">"document.referrer"</span> appears somewhere in between. </p> 
+    <p> This is still not the whole story, since we have ignored the options and the parentheses: The portions of the page matched by sub-patterns that are enclosed in parentheses, will be remembered and be available through the variables <tt class="LITERAL">$1, $2, ...</tt> in the substitute. The <tt class="LITERAL">U</tt> option switches to ungreedy matching, which means that the first <tt class="LITERAL">.*</tt> in the pattern will only <span class="QUOTE">"eat up"</span> all text in between <span class="QUOTE">"&lt;script"</span> and the <span class="emphasis"><i class="EMPHASIS">first</i></span> occurrence of <span class="QUOTE">"document.referrer"</span>, and that the second <tt class="LITERAL">.*</tt> will only span the text up to the <span class="emphasis"><i class="EMPHASIS">first</i></span> <span class="QUOTE">"&lt;/script&gt;"</span> tag. Furthermore, the <tt class="LITERAL">s</tt> option says that the match may span multiple lines in the page, and the <tt class="LITERAL">g</tt> option again means that the substitution is global. </p> 
+    <p> So, to summarize, the pattern means: Match all scripts that contain the text <span class="QUOTE">"document.referrer"</span>. Remember the parts of the script from (and including) the start tag up to (and excluding) the string <span class="QUOTE">"document.referrer"</span> as <tt class="LITERAL">$1</tt>, and the part following that string, up to and including the closing tag, as <tt class="LITERAL">$2</tt>. </p> 
+    <p> Now the pattern is deciphered, but wasn't this about substituting things? So lets look at the substitute: <tt class="LITERAL">$1"Not Your Business!"$2</tt> is easy to read: The text remembered as <tt class="LITERAL">$1</tt>, followed by <tt class="LITERAL">"Not Your Business!"</tt> (<span class="emphasis"><i class="EMPHASIS">including</i></span> the quotation marks!), followed by the text remembered as <tt class="LITERAL">$2</tt>. This produces an exact copy of the original string, with the middle part (the <span class="QUOTE">"document.referrer"</span>) replaced by <tt class="LITERAL">"Not Your Business!"</tt>. </p> 
+    <p> The whole job now reads: Replace <span class="QUOTE">"document.referrer"</span> by <tt class="LITERAL">"Not Your Business!"</tt> wherever it appears inside a &lt;script&gt; tag. Note that this job won't break JavaScript syntax, since both the original and the replacement are syntactically valid string objects. The script just won't have access to the referrer information anymore. </p> 
+    <p> We'll show you two other jobs from the JavaScript taming department, but this time only point out the constructs of special interest: </p> 
+    <p> </p> 
+    <table border="0" bgcolor="#E0E0E0" width="100%"> 
+     <tbody>
+      <tr> 
+       <td> <pre class="SCREEN">
+# The status bar is for displaying link targets, not pointless blahblah
+#
+s/window\.status\s*=\s*(['"]).*?\1/dUmMy=1/ig
+</pre> </td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <p> <tt class="LITERAL">\s</tt> stands for whitespace characters (space, tab, newline, carriage return, form feed), so that <tt class="LITERAL">\s*</tt> means: <span class="QUOTE">"zero or more whitespace"</span>. The <tt class="LITERAL">?</tt> in <tt class="LITERAL">.*?</tt> makes this matching of arbitrary text ungreedy. (Note that the <tt class="LITERAL">U</tt> option is not set). The <tt class="LITERAL">['"]</tt> construct means: <span class="QUOTE">"a single <span class="emphasis"><i class="EMPHASIS">or</i></span> a double quote"</span>. Finally, <tt class="LITERAL">\1</tt> is a back-reference to the first parenthesis just like <tt class="LITERAL">$1</tt> above, with the difference that in the <span class="emphasis"><i class="EMPHASIS">pattern</i></span>, a backslash indicates a back-reference, whereas in the <span class="emphasis"><i class="EMPHASIS">substitute</i></span>, it's the dollar. </p> 
+    <p> So what does this job do? It replaces assignments of single- or double-quoted strings to the <span class="QUOTE">"window.status"</span> object with a dummy assignment (using a variable name that is hopefully odd enough not to conflict with real variables in scripts). Thus, it catches many cases where e.g. pointless descriptions are displayed in the status bar instead of the link target when you move your mouse over links. </p> 
+    <p> </p> 
+    <table border="0" bgcolor="#E0E0E0" width="100%"> 
+     <tbody>
+      <tr> 
+       <td> <pre class="SCREEN">
+# Kill OnUnload popups. Yummy. Test: http://www.zdnet.com/zdsubs/yahoo/tree/yfs.html
+#
+s/(&lt;body [^&gt;]*)onunload(.*&gt;)/$1never$2/iU
+</pre> </td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <p> Including the <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Events-20001113/events.html#Events-eventgroupings-htmlevents" target="_top">OnUnload event binding</a> in the HTML DOM was a <span class="emphasis"><i class="EMPHASIS">CRIME</i></span>. When I close a browser window, I want it to close and die. Basta. This job replaces the <span class="QUOTE">"onunload"</span> attribute in <span class="QUOTE">"&lt;body&gt;"</span> tags with the dummy word <tt class="LITERAL">never</tt>. Note that the <tt class="LITERAL">i</tt> option makes the pattern matching case-insensitive. Also note that ungreedy matching alone doesn't always guarantee a minimal match: In the first parenthesis, we had to use <tt class="LITERAL">[^&gt;]*</tt> instead of <tt class="LITERAL">.*</tt> to prevent the match from exceeding the &lt;body&gt; tag if it doesn't contain <span class="QUOTE">"OnUnload"</span>, but the page's content does. </p> 
+    <p> The last example is from the fun department: </p> 
+    <p> </p> 
+    <table border="0" bgcolor="#E0E0E0" width="100%"> 
+     <tbody>
+      <tr> 
+       <td> <pre class="SCREEN">
+FILTER: fun Fun text replacements
+
+# Spice the daily news:
+#
+s/microsoft(?!\.com)/MicroSuck/ig
+</pre> </td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <p> Note the <tt class="LITERAL">(?!\.com)</tt> part (a so-called negative lookahead) in the job's pattern, which means: Don't match, if the string <span class="QUOTE">".com"</span> appears directly following <span class="QUOTE">"microsoft"</span> in the page. This prevents links to microsoft.com from being trashed, while still replacing the word everywhere else. </p> 
+    <p> </p> 
+    <table border="0" bgcolor="#E0E0E0" width="100%"> 
+     <tbody>
+      <tr> 
+       <td> <pre class="SCREEN">
+# Buzzword Bingo (example for extended regex syntax)
+#
+s* industry[ -]leading \
+|  cutting[ -]edge \
+|  customer[ -]focused \
+|  market[ -]driven \
+|  award[ -]winning # Comments are OK, too! \
+|  high[ -]performance \
+|  solutions[ -]based \
+|  unmatched \
+|  unparalleled \
+|  unrivalled \
+*&lt;font color="red"&gt;&lt;b&gt;BINGO!&lt;/b&gt;&lt;/font&gt; \
+*igx
+</pre> </td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <p> The <tt class="LITERAL">x</tt> option in this job turns on extended syntax, and allows for e.g. the liberal use of (non-interpreted!) whitespace for nicer formatting. </p> 
+    <p> You get the idea? </p> 
+   </div> 
+   <div class="SECT2"> 
+    <h2 class="SECT2"> <a name="PREDEFINED-FILTERS">9.2. The Pre-defined Filters</a> </h2> 
+    <p> The distribution <tt class="FILENAME">default.filter</tt> file contains a selection of pre-defined filters for your convenience: </p> 
+    <div class="VARIABLELIST"> 
+     <dl> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">js-annoyances</i></span> 
+      </dt> 
+      <dd> 
+       <p> The purpose of this filter is to get rid of particularly annoying JavaScript abuse. To that end, it </p> 
        <ul> 
-        <li><a href="/">Home</a></li> 
-        <li><a href="/about/">About EFA</a></li> 
-        <li><a href="/join/">Join EFA</a></li> 
-        <li><a href="/support/donations/">Donate to EFA</a></li> 
-        <li><a href="/about/contact/">Contact EFA</a></li> 
+        <li> <p> replaces JavaScript references to the browser's referrer information with the string "Not Your Business!". This compliments the <tt class="LITERAL"><a href="actions-file.html#HIDE-REFERRER">hide-referrer</a></tt> action on the content level. </p> </li> 
+        <li> <p> removes the bindings to the DOM's <a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Events-20001113/events.html#Events-eventgroupings-htmlevents" target="_top">unload event</a> which we feel has no right to exist and is responsible for most <span class="QUOTE">"exit consoles"</span>, i.e. nasty windows that pop up when you close another one. </p> </li> 
+        <li> <p> removes code that causes new windows to be opened with undesired properties, such as being full-screen, non-resizeable, without location, status or menu bar etc. </p> </li> 
        </ul> 
-      </div> 
-      <a name="navskip"></a> 
-     </div> 
-     <div class="spacer"></div> 
+       <p> Use with caution. This is an aggressive filter, and can break sites that rely heavily on JavaScript. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">js-events</i></span> 
+      </dt> 
+      <dd> 
+       <p> This is a very radical measure. It removes virtually all JavaScript event bindings, which means that scripts can not react to user actions such as mouse movements or clicks, window resizing etc, anymore. Use with caution! </p> 
+       <p> We <span class="emphasis"><i class="EMPHASIS">strongly discourage</i></span> using this filter as a default since it breaks many legitimate scripts. It is meant for use only on extra-nasty sites (should you really need to go there). </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">html-annoyances</i></span> 
+      </dt> 
+      <dd> 
+       <p> This filter will undo many common instances of HTML based abuse. </p> 
+       <p> The <tt class="LITERAL">BLINK</tt> and <tt class="LITERAL">MARQUEE</tt> tags are neutralized (yeah baby!), and browser windows will be created as resizeable (as of course they should be!), and will have location, scroll and menu bars -- even if specified otherwise. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">content-cookies</i></span> 
+      </dt> 
+      <dd> 
+       <p> Most cookies are set in the HTTP dialog, where they can be intercepted by the <tt class="LITERAL"><a href="actions-file.html#CRUNCH-INCOMING-COOKIES">crunch-incoming-cookies</a></tt> and <tt class="LITERAL"><a href="actions-file.html#CRUNCH-OUTGOING-COOKIES">crunch-outgoing-cookies</a></tt> actions. But web sites increasingly make use of HTML meta tags and JavaScript to sneak cookies to the browser on the content level. </p> 
+       <p> This filter disables most HTML and JavaScript code that reads or sets cookies. It cannot detect all clever uses of these types of code, so it should not be relied on as an absolute fix. Use it wherever you would also use the cookie crunch actions. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">refresh-tags</i></span> 
+      </dt> 
+      <dd> 
+       <p> Disable any refresh tags if the interval is greater than nine seconds (so that redirections done via refresh tags are not destroyed). This is useful for dial-on-demand setups, or for those who find this HTML feature annoying. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">unsolicited-popups</i></span> 
+      </dt> 
+      <dd> 
+       <p> This filter attempts to prevent only <span class="QUOTE">"unsolicited"</span> pop-up windows from opening, yet still allow pop-up windows that the user has explicitly chosen to open. It was added in version 3.0.1, as an improvement over earlier such filters. </p> 
+       <p> Technical note: The filter works by redefining the window.open JavaScript function to a dummy function, <tt class="LITERAL">PrivoxyWindowOpen()</tt>, during the loading and rendering phase of each HTML page access, and restoring the function afterward. </p> 
+       <p> This is recommended only for browsers that cannot perform this function reliably themselves. And be aware that some sites require such windows in order to function normally. Use with caution. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">all-popups</i></span> 
+      </dt> 
+      <dd> 
+       <p> Attempt to prevent <span class="emphasis"><i class="EMPHASIS">all</i></span> pop-up windows from opening. Note this should be used with even more discretion than the above, since it is more likely to break some sites that require pop-ups for normal usage. Use with caution. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">img-reorder</i></span> 
+      </dt> 
+      <dd> 
+       <p> This is a helper filter that has no value if used alone. It makes the <tt class="LITERAL">banners-by-size</tt> and <tt class="LITERAL">banners-by-link</tt> (see below) filters more effective and should be enabled together with them. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">banners-by-size</i></span> 
+      </dt> 
+      <dd> 
+       <p> This filter removes image tags purely based on what size they are. Fortunately for us, many ads and banner images tend to conform to certain standardized sizes, which makes this filter quite effective for ad stripping purposes. </p> 
+       <p> Occasionally this filter will cause false positives on images that are not ads, but just happen to be of one of the standard banner sizes. </p> 
+       <p> Recommended only for those who require extreme ad blocking. The default block rules should catch 95+% of all ads <span class="emphasis"><i class="EMPHASIS">without</i></span> this filter enabled. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">banners-by-link</i></span> 
+      </dt> 
+      <dd> 
+       <p> This is an experimental filter that attempts to kill any banners if their URLs seem to point to known or suspected click trackers. It is currently not of much value and is not recommended for use by default. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">webbugs</i></span> 
+      </dt> 
+      <dd> 
+       <p> Webbugs are small, invisible images (technically 1X1 GIF images), that are used to track users across websites, and collect information on them. As an HTML page is loaded by the browser, an embedded image tag causes the browser to contact a third-party site, disclosing the tracking information through the requested URL and/or cookies for that third-party domain, without the user ever becoming aware of the interaction with the third-party site. HTML-ized spam also uses a similar technique to verify email addresses. </p> 
+       <p> This filter removes the HTML code that loads such <span class="QUOTE">"webbugs"</span>. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">tiny-textforms</i></span> 
+      </dt> 
+      <dd> 
+       <p> A rather special-purpose filter that can be used to enlarge textareas (those multi-line text boxes in web forms) and turn off hard word wrap in them. It was written for the sourceforge.net tracker system where such boxes are a nuisance, but it can be handy on other sites, too. </p> 
+       <p> It is not recommended to use this filter as a default. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">jumping-windows</i></span> 
+      </dt> 
+      <dd> 
+       <p> Many consider windows that move, or resize themselves to be abusive. This filter neutralizes the related JavaScript code. Note that some sites might not display or behave as intended when using this filter. Use with caution. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">frameset-borders</i></span> 
+      </dt> 
+      <dd> 
+       <p> Some web designers seem to assume that everyone in the world will view their web sites using the same browser brand and version, screen resolution etc, because only that assumption could explain why they'd use static frame sizes, yet prevent their frames from being resized by the user, should they be too small to show their whole content. </p> 
+       <p> This filter removes the related HTML code. It should only be applied to sites which need it. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">demoronizer</i></span> 
+      </dt> 
+      <dd> 
+       <p> Many Microsoft products that generate HTML use non-standard extensions (read: violations) of the ISO 8859-1 aka Latin-1 character set. This can cause those HTML documents to display with errors on standard-compliant platforms. </p> 
+       <p> This filter translates the MS-only characters into Latin-1 equivalents. It is not necessary when using MS products, and will cause corruption of all documents that use 8-bit character sets other than Latin-1. It's mostly worthwhile for Europeans on non-MS platforms, if weird garbage characters sometimes appear on some pages, or user agents that don't correct for this on the fly. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">shockwave-flash</i></span> 
+      </dt> 
+      <dd> 
+       <p> A filter for shockwave haters. As the name suggests, this filter strips code out of web pages that is used to embed shockwave flash objects. </p> 
+       <p> </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">quicktime-kioskmode</i></span> 
+      </dt> 
+      <dd> 
+       <p> Change HTML code that embeds Quicktime objects so that kioskmode, which prevents saving, is disabled. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">fun</i></span> 
+      </dt> 
+      <dd> 
+       <p> Text replacements for subversive browsing fun. Make fun of your favorite Monopolist or play buzzword bingo. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">crude-parental</i></span> 
+      </dt> 
+      <dd> 
+       <p> A demonstration-only filter that shows how <span class="APPLICATION">Privoxy</span> can be used to delete web content on a keyword basis. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">ie-exploits</i></span> 
+      </dt> 
+      <dd> 
+       <p> An experimental collection of text replacements to disable malicious HTML and JavaScript code that exploits known security holes in Internet Explorer. </p> 
+       <p> Presently, it only protects against Nimda and a cross-site scripting bug, and would need active maintenance to provide more substantial protection. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">site-specifics</i></span> 
+      </dt> 
+      <dd> 
+       <p> Some web sites have very specific problems, the cure for which doesn't apply anywhere else, or could even cause damage on other sites. </p> 
+       <p> This is a collection of such site-specific cures which should only be applied to the sites they were intended for, which is what the supplied <tt class="FILENAME">default.action</tt> file does. Users shouldn't need to change anything regarding this filter. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">google</i></span> 
+      </dt> 
+      <dd> 
+       <p> A CSS based block for Google text ads. Also removes a width limitation and the toolbar advertisement. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">yahoo</i></span> 
+      </dt> 
+      <dd> 
+       <p> Another CSS based block, this time for Yahoo text ads. And removes a width limitation as well. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">msn</i></span> 
+      </dt> 
+      <dd> 
+       <p> Another CSS based block, this time for MSN text ads. And removes tracking URLs, as well as a width limitation. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">blogspot</i></span> 
+      </dt> 
+      <dd> 
+       <p> Cleans up some Blogspot blogs. Read the fine print before using this one! </p> 
+       <p> This filter also intentionally removes some navigation stuff and sets the page width to 100%. As a result, some rounded <span class="QUOTE">"corners"</span> would appear to early or not at all and as fixing this would require a browser that understands background-size (CSS3), they are removed instead. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">xml-to-html</i></span> 
+      </dt> 
+      <dd> 
+       <p> Server-header filter to change the Content-Type from xml to html. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">html-to-xml</i></span> 
+      </dt> 
+      <dd> 
+       <p> Server-header filter to change the Content-Type from html to xml. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">no-ping</i></span> 
+      </dt> 
+      <dd> 
+       <p> Removes the non-standard <tt class="LITERAL">ping</tt> attribute from anchor and area HTML tags. </p> 
+      </dd> 
+      <dt> 
+       <span class="emphasis"><i class="EMPHASIS">hide-tor-exit-notation</i></span> 
+      </dt> 
+      <dd> 
+       <p> Client-header filter to remove the <b class="COMMAND">Tor</b> exit node notation found in Host and Referer headers. </p> 
+       <p> If <span class="APPLICATION">Privoxy</span> and <b class="COMMAND">Tor</b> are chained and <span class="APPLICATION">Privoxy</span> is configured to use socks4a, one can use <span class="QUOTE">"http://www.example.org.foobar.exit/"</span> to access the host <span class="QUOTE">"www.example.org"</span> through the <b class="COMMAND">Tor</b> exit node <span class="QUOTE">"foobar"</span>. </p> 
+       <p> As the HTTP client isn't aware of this notation, it treats the whole string <span class="QUOTE">"www.example.org.foobar.exit"</span> as host and uses it for the <span class="QUOTE">"Host"</span> and <span class="QUOTE">"Referer"</span> headers. From the server's point of view the resulting headers are invalid and can cause problems. </p> 
+       <p> An invalid <span class="QUOTE">"Referer"</span> header can trigger <span class="QUOTE">"hot-linking"</span> protections, an invalid <span class="QUOTE">"Host"</span> header will make it impossible for the server to find the right vhost (several domains hosted on the same IP address). </p> 
+       <p> This client-header filter removes the <span class="QUOTE">"foo.exit"</span> part in those headers to prevent the mentioned problems. Note that it only modifies the HTTP headers, it doesn't make it impossible for the server to detect your <b class="COMMAND">Tor</b> exit node based on the IP address the request is coming from. </p> 
+      </dd> 
+     </dl> 
     </div> 
-    <div id="level2"> 
-     <div id="content"> 
-      <div id="logo"> 
-       <img class="logosml" SRC="../../Images/efansml.gif" ALT="Electronic Frontiers Australia" width="330" height="45"> 
-      </div> 
-      <h1 class="pagehead">Internet Content Filtering and Blocking</h1> 
-      <p class="updated" align="right"> Last Updated: 11 May 2006 </p> 
-      <blockquote class="quote">
-        We owe it to our children to improve the filter between their ears that will help them know whom to trust, how to click the "back button" to avoid inappropriate content and how to enjoy the wonders of the Internet, safely and privately. Internet safety education is key to this, and should be mandated, not filtering. 
-       <p class="author" align="right">-&nbsp; <a href="https://www.wiredsafety.org/resources/biographies/parry/index.html">Parry Aftab</a>, Executive Director-WiredSafety.org, <a href="https://www.ntia.doc.gov/ntiahome/ntiageneral/cipacomments/pre/aftab/cipacomments.htm">Submission to NTIA</a> 15 July 2002 </p> 
-      </blockquote> 
-      <h2>Contents:</h2> 
-      <ul class="clist"> 
-       <li><a href="#intro"><b>Introduction</b></a> </li>
-       <li><a href="#austlaw"><b>Australian Law related to use of Filtering Software</b></a> </li>
-       <li><a href="#filtering"><b>Content Filtering and Blocking Software</b></a> 
-        <ul> 
-         <li><a href="#pcb">PC-based (end user) Filters</a> 
-          <ul class="clist"> 
-           <li><a href="#ifff">"IIA Family Friendly Filters"</a> </li>
-           <li><a href="#cf">Other Commercial Filters</a> </li>
-           <li><a href="#ff">Free Filters</a> </li>
-          </ul> </li>
-         <li><a href="#pcsb">PC-based Filter Products with Server-Based Filtering</a> 
-          <ul class="clist"> 
-           <li><a href="#cfsb">Commercial Filters</a> </li>
-           <li><a href="#ffsb">Free Filters</a> </li>
-          </ul> </li>
-         <li><a href="#sb">Server-based Filter Products</a> </li>
-        </ul> </li>
-       <li><a href="#isps"><b>Filtered ISPs in Australia</b></a> </li>
-       <li><a href="#reviews"><b>Reviews of Filtering Software</b></a> 
-        <ul> 
-         <li><a href="#general">General Reviews</a> </li>
-         <li><a href="#underover">Reports on tests focussed on under- and over- blocking issues</a> </li>
-        </ul> </li>
-       <li><a href="#connections"><b>Filter Software Companies' connections with religious groups and/or governments</b></a> </li>
-       <li><a href="cens2a.html"><b>Content Rating and Labelling Systems</b></a> - see separate page. </li>
-       <li><a href="#advice"><b>Information and Advice for Parents about Internet Child Safety</b></a> </li>
-      </ul> 
-      <hr> 
-      <h1><a name="intro"></a>Introduction</h1> 
-      <p> In <a href="mandatoryblocking-timeline.html">recent years in Australia, various groups and individuals have campaigned</a> for government mandated ISP-based filtering and blocking of Web pages unsuitable for children. In 1999 it was politicians within the Federal Coalition Government, in early 2003 it was The Australia Institute, in late 2004 it was the Family First Party, in late 2005 it was people associated with the "Sexual Integrity Forum" organised by the Fatherhood Foundation including Senator Guy Barnett (Lib. Tas.). In early 2006 the <a href="mandatoryblocking.html">Federal Labor Party (ALP) announced</a> that they would implement mandatory ISP-filtering if elected. </p>
-      <p> While recent advocates of mandatory ISP blocking have proposed that adults could identify themselves as wanting to access blocked material and ask to opt-out of blocking, this would interfere with adults' right to privacy. EFA shares the view recently expressed by world-renowned child online safety expert, <a href="https://www.wiredsafety.org/resources/biographies/parry/index.html">Parry Aftab</a> (regarding the to-date unenforceable USA <i>Child Online Protection Act 1998</i> which would force adults to identify themselves to obtain legal material): </p>
-      <blockquote>
-       "
-       <i>'It annoys me a great deal that parents are not using software and now someone is trying to impinge on the privacy of adults, when the easy solution is using a filtering software. They work, and they have been working for the last five or six years,' Aftab said.</i>"
-       <br>(
-       <i><a href="http://www.sfgate.com/cgi-bin/article.cgi?file=/c/a/2006/02/12/MNGD0H7AH81.DTL&amp;type=tech">How best to protect kids from online porn</a></i>, San Francisco Chronicle, 12 Feb 2006)
-      </blockquote> 
-      <p> PC-based (end user) filters are readily available and most have <a href="mandatoryblocking.html#23_17">features</a> that can assist parents to protect children from a range of Internet dangers as well as blocking unsuitable Web pages. EFA does not endorse the use of filtering software because it may result in a false sense of security and/or unduly restrict young people's internet access due to over-blocking etc. Nevertheless, EFA considers that parents who wish to have technological assistance in protecting their children should install filtering software and configure it to suit their family's needs, rather than demand the government mandate a one-size-fits-all ISP filtering system. </p>
-      <p> The remainder of this page provides resources about relevant Australian Law, <a href="#filtering">filtering products (commercial and free)</a>, <a href="#reviews">reviews of filter products</a>, <a href="#isps">Australian ISPs offering filtered access</a>, and a section containing links to <a href="#advice">reputable sites providing Internet Safety tips, advice and information</a> for parents about danger to children online that cannot be avoided by merely filtering Web pages. </p>
-      <hr> 
-      <h1><a name="austlaw"></a>Australian Law related to use of Filtering Software</h1> 
-      <p> The use of filtering software in Australia is not mandatory, and ISPs are not required to make server-based filtering available. </p>
-      <p> However, since <a href="cens1.html">Internet censorship legislation</a> became operative on 1 January 2000, ISPs have been required to make one or more "scheduled" filtering products available to their customers, either via a direct link to download a filter, or to a download page on the Internet Industry Association ("IIA") site offering the full range of scheduled filters, or by providing a CD containing a filter for installation. Alternatively, or in addition, ISPs may choose to offer optional server-based filtering. </p>
-      <p> ISPs are not permitted to charge more than the cost price of obtaining, supplying and supporting filters (this is a requirement of the Industry Code referred to below). </p>
-      <p> The "scheduled" filters are filters listed in the <a href="http://www.iia.net.au/index.php?option=com_content&amp;task=category&amp;sectionid=3&amp;id=19&amp;Itemid=33">Industry Content Code of Practice</a> developed by the IIA and registered by the Australian Communications and Media Authority ("ACMA"), a government regulatory agency. The Code applies to all Australian ISPs and the ACMA has powers to enforce compliance. Further information is available on the <a href="http://www.acma.gov.au/ACMAINTER.65640:STANDARD:445498500:pc=PC_90080">ACMA's page about the Internet Content Codes</a> and the <a href="http://www.iia.net.au/index.php?option=com_content&amp;task=view&amp;id=416&amp;Itemid=9">IIA's Guide for Users</a>. </p>
-      <p> The scheduled filters are also known as "IIA Family Friendly Filters". As stated in the <a href="http://www.iia.net.au/index.php?option=com_content&amp;task=view&amp;id=416&amp;Itemid=9">IIA Guide for Users</a>: </p>
-      <blockquote>
-       "
-       <i>To qualify for IIA Family Friendly Filter status, a filter must undergo rigorous independent testing to ensure that it meets the criteria as set out in the IIA Codes. These include effectiveness, ease of use, configurability, availability of support and agreement by the filter company providing the filter to update the filter as required by ACMA, for example where ACMA determines following a complaint, that a specified site is prohibited under Australian law</i>."
-      </blockquote> 
-      <p> While not a requirement of legislation, the IIA also operates the "IIA Family Friendly ISP Program". As stated in the <a href="http://www.iia.net.au/index.php?option=com_content&amp;task=view&amp;id=121&amp;Itemid=33">IIA Guide for ISPs</a>: </p>
-      <blockquote>
-       "
-       <i>ISPs who are compliant with the IIA Codes are eligible to apply for IIA 'Family Friendly ISP' status. This does not require joining the IIA, although IIA member ISPs are able to participate in the program at no cost. Family Friendly ISPs are authorised to display the Ladybird Logo which signifies adherence to best practice standards.</i>"
-      </blockquote> 
-      <hr> 
-      <h1><a name="filtering"></a>Content Filtering and Blocking Software</h1> 
-      <p> Some of the software packages available to assist parents and educators to block access to sites considered unsuitable for children are listed below. These details are presented for information purposes only and should not be construed as EFA endorsement of suitability or effectiveness. </p>
-      <ul class="clist"> 
-       <li><a href="#pcb">PC-based (end user) Filters</a> 
-        <ul class="clist"> 
-         <li><a href="#ifff">"IIA Family Friendly Filters"</a> </li>
-         <li><a href="#cf">Other Commercial Filters</a> </li>
-         <li><a href="#ff">Free Filters</a> </li>
-        </ul> </li>
-       <li><a href="#pcsb">PC-based Filter Products with Server-Based Filtering</a> 
-        <ul class="clist"> 
-         <li><a href="#cfsb">Commercial Filters</a> </li>
-         <li><a href="#ffsb">Free Filters</a> </li>
-        </ul> </li>
-       <li><a href="#sb">Server-based Filter Products</a> </li>
-       <li><a href="#isps">Filtered ISPs in Australia</a> </li>
-       <li>See also separate section: <a href="#reviews">Reviews of Filtering Software</a> </li>
-      </ul> 
-      <h2><a name="pcb"></a>PC-based (end user) Filters</h2> 
-      <h3><a name="ifff"></a>"IIA Family Friendly Filters"</h3> 
-      <p> As noted above, these are filters that have qualified as scheduled/"IIA Family Friendly Filters" (according to <a href="http://www.iia.net.au/index.php?option=com_content&amp;task=view&amp;id=416&amp;Itemid=9">IIA's site</a> as at 30 April 2006) because the makers have submitted their filter for testing of "effectiveness, ease of use, configurability, availability of support" and agreed to block access to URLs notified to them by the ACMA. Products on the list have been on it since at least 2002 and since then no other or new filters have been added (as at 30 April 2006). The most recent test results were published by the ACMA in March 2002 in a report titled <a href="http://www.acma.gov.au/acmainterwr/aba/newspubs/documents/filtereffectiveness.pdf"><i>Effectiveness of Internet Filtering Software Products</i> [PDF 1591 Kb]</a>. However, new versions of most filters have been released since then. </p>
-      <p> These filters are also listed on <a href="http://www.netalert.net.au/02688-Filter-Overview.asp">NetAlert's "Recommended Home Filter" page</a> (as at 30 April 2006) which includes links to a NetAlert page about each filter and to NetAlert's <a href="http://www.netalert.net.au/02834-Filter-Comparison-Table.asp">Filter Comparison Table</a>. The links below are to the makers' sites. </p>
-      <ul> 
-       <li><a href="http://www.aol.com.au/site/website/aolinfo/aol_priceplans.php">AOL Parental Control</a> (Windows &amp; Mac) <br>(PC-based software communicates with AOL's server-based filtering system) </li>
-       <li><a href="http://www.arlington.com.au/">Arlington Custom Browser</a> (Windows) RRP AU$55 </li>
-       <li><a href="https://www.cyberpatrol.com/">Cyber Patrol</a> (Windows) RRP AU$90 </li>
-       <li><a href="http://www.securitysoft.com/">Cyber Sentinel</a> (Windows) RRP AU$99 </li>
-       <li><a href="http://www.cybersitter.com/">Cybersitter</a> (Windows) RRP AU$90<br> </li>
-       <li><a href="https://www.netnanny.com/">Net Nanny</a> (Windows) RRP AU$90<br> (Available for <a href="http://www.memberoffers.bigpond.com/offer.aspx?cat=learning_education&amp;id=af39289e-278a-4649-bac7-b8744a4f403c">AU$54.95 from Telstra</a> to Telstra Bigpond ISP customers.) </li>
-       <li><a href="http://www.symantec.com/product/index_homecomp.html">Norton Internet Security</a> (Windows &amp; Mac) RRP AU$125 &amp; AU$145 </li>
-      </ul> 
-      <h3><a name="cf"></a>Other Commercial Filters</h3> 
-      <ul> 
-       <li><a href="http://www.bsafehome.com/">Bsafe Home</a> US$49.95 per year / <a href="http://www.afafilter.com">American Family Filter</a> / <a href="http://www.8e6home.com">8e6 Home</a> (Windows). <br> More information about this product is provided in the section titled <a href="#pcsb">PC-based Filter Products with Server-Based Filtering</a> later herein. </li>
-       <li><a href="https://www.contentwatch.com/">Content Protect</a> (Windows) US$39.99 annual subscription.<br> 
-        <blockquote>
-         The filter maker, ContentWatch, Inc., is based in Salt Lake City Utah USA and was founded in March 2000. According to their web site, the Content Protect product "
-         <i>uses dynamic [real-time] analysis (in conjunction with word and URL lists) to filter Web content. As Web pages are requested, ContentProtect's dynamic analyzing engine has the ability to understand content in context and filter appropriately. Based on the user's filter settings, content is either filtered or blocked</i>" and includes a "remote management tool" which among other things "
-         <i>allows parents to remotely disable access to specific categories and services, or, if desired, to completely disable a family member's Internet connection</i>". The product was highly rated by 
-         <a href="http://www.webuser.co.uk/products/ContentWatch_ContentProtect_review_2633-207.html">WebUser Magazine in July 2005</a> and No. 1 by the 
-         <a href="http://internet-filter-review.toptenreviews.com/">2006 Internet Filter Report</a> site. 
-         <li><a href="http://www.safebrowse.com">Safe Eyes 2006</a> (Windows and Mac OS 10.4) US$49.95 per year.<br> More information about this product is provided in the section titled <a href="#pcsb">PC-based Filter Products with Server-Based Filtering</a> later herein. </li>
-        </blockquote></li>
-      </ul> 
-      <h3><a name="ff"></a>Free Filters</h3> 
-      <p> These filters are free for personal/home use, and some may be free for other use. Check the relevant site for details. </p>
-      <p> <b>Blacklist Filters:</b> </p>
-      <ul> 
-       <li><a href="http://www.k9webprotection.com/">K9 Web Protection</a> (Windows. Macintosh version planned for late 2006), Blue Coat Systems, California, USA.<br> More information about this product is provided in the section titled <a href="#pcsb">PC-based Filter Products with Server-Based Filtering</a> later herein. </li>
-       <li><a href="http://www.radiance.m6.net/">Naomi</a> (Windows), Radiant Morning Technologies, Italy.<br>This filter is available in numerous languages and the author of the program is apparently an individual, with assistance in development by a number of other individuals. </li>
-       <li><a href="http://www.we-blocker.com/about/index.html">We-blocker</a> (Windows), <a href="http://www.we-webcorp.com/main.php?pg=about">We-WebCorp.com</a>, Pheonix, Arizona, USA.<br>"<i>Launched in 1999 by two concerned businessmen ... to assist parents in protecting their families on the Internet by creating a community of Internet users to actively participate in the solution to inappropriate website content. ... Using We-Blocker, 'We' as a community can provide a safe Internet for everyone.</i>" </li>
-       <li><a href="https://www.censornet.com/">CensorNet</a> (Linux), Adelix Ltd, U.K.<br> CensorNet is a Debian-based Linux distribution "released under the GNU General Public License and distributed in the spirit of open source". </li>
-       <li><a href="http://dansguardian.org/">DansGuardian</a> (Linux), main developer Daniel Barron, U.K. <br>An Open Source web content filter which runs on Linux, FreeBSD, OpenBSD, NetBSD, Mac OS X, HP-UX, and Solaris. </li>
-      </ul> 
-      <p> <b>WhiteList Filters for young children:</b> </p>
-      <ul> 
-       <li><a href="http://www.kidrocket.org/">KidRocket Web Browser for Kids</a> <br>"<i>a simple &amp; effective way for kids to safely surf the internet. It will only go to the hand picked web sites programmed into the Web Browser. The rest of the internet &amp; WWW, along with its many safety concerns and hazards... are completely LOCKED OUT!</i>". </li>
-       <li><a href="http://www.parentpresent.org/NoWorrys/NoWorrys-Help.htm">NoWorrys</a> <br>"<i>a KidSafe internet filtering program that runs in stealth mode on your PC. NoWorrys works with Internet Explorer, and comes populated with a TrustFile of over 1000 KidSafe sites recommended by the American Library Association (ALA). IF a requested site (URL) is not in NoWorrys' TrustFile, then kids cannot get there. Parent/Administrator can navigate anywhere, and can update the TrustFile via a password protected Login.</i>" </li>
-      </ul> 
-      <h2><a name="pcsb"></a>PC-based Filter Products with Server-Based Filtering</h2> 
-      <h3><a name="cfsb"></a>Commercial Filters</h3> 
-      <ul> 
-       <li><a href="http://www.aol.com.au/site/website/aolinfo/aol_priceplans.php">AOL Parental Control</a> 
-        <blockquote>
-         According to Primus-AOL's 
-         <a href="http://www.aol.com.au/site/website/aolinfo/aol_byo_plans.php">"Bring your own Internet access to AOL"</a> page, AOL's Parental Control server-based filtering service and related software can be used to filter Internet access provided by any ISP (i.e. not only Internet access provided by Primus-AOL) on payment of a small monthly fee to Primus-AOL (AU$4.95 per month at April 2006). 
-         <p> However, it is not apparent from the web site whether AOL's PC-based software is capable of preventing the use of non-AOL browsers to bypass the server-based filtering system when a user is connected to the Internet through an ISP other than AOL. </p>
-        </blockquote> </li>
-       <li><a href="http://www.bsafehome.com/">Bsafe Home</a> (Windows) US$49.95 per year / <a href="http://www.afafilter.com">American Family Filter</a> / <a href="http://www.8e6home.com">8e6 Home</a>. 
-        <blockquote>
-         This filter is promoted and recommended by the American Family Association, a conservative Christian organisation. 
-         <p> The product consists of PC-based software with server-based filtering and reporting. It is a private-label version of the filter made by 8e6 Technologies. (The <a href="http://www.8e6.com/partners/pn_tech.htm">8e6 web site states</a> "Using the 8e6 Database, Bsafe currently markets a client software version entitled 8e6Home"). As <a href="http://responsiblenetizen.org/onlinedocs/documents/afo.html">detailed on the web site of Responsible Netizen Institute </a> (at the Center for Advanced Technology in Education, University of Oregon), 8e6 Technologies, formerly X-Stop/Log-on Data Corporation, is a company that appears to have been started in some form of partnership with the American Family Association.</p>
-        </blockquote> </li>
-       <li><a href="http://www.safebrowse.com">Safe Eyes 2006</a> (Windows and Mac OS 10.4) US$49.95 per year.<br> 
-        <blockquote>
-         The filter maker, SafeBrowse.com, Inc, is based in Georgia USA and was founded in 1999. Information in media releases on the site indicates that the Safe Eyes filter became available in 2003. 
-         <p> The product consists of PC-based software which connects to Safebrowse.com's server-based filtering system, in order to determine whether to permit or deny access. SafeBrowse <a href="http://www.safeeyes.com/safe-eyes/effective/">state</a> that they use "Secure Computing technology" for blocking and Secure Computing is listed as a "strategic partner", which probably means the blocking database used is supplied by Secure Computing, i.e. either the (previously known as) N2H2 Bess database and/or the SmartFilter database. SafeBrowse also <a href="http://www.safeeyes.com/faq2005/question.php?id=22">states</a>: "<i>Safe Eyes is designed to filter securely through our own servers. Our blazing fast categorization system determines the content category of each website you visit, and compares the category with your preferences to determine if the site should be blocked. This means that you never have to download any 'Site Lists' to keep Safe Eyes up-to-date.</i>". The product was <a href="http://www.pcmag.com/article2/0,1759,1945986,00.asp">PC Magazine "Editor's Choice" in April 2006</a>. </p>
-        </blockquote></li>
-      </ul> 
-      <h3><a name="ffsb"></a>Free Filters</h3> 
-      <ul> 
-       <li><a href="http://www.k9webprotection.com/">K9 Web Protection</a> (Windows. Macintosh version planned for late 2006). Free for home use.<br> 
-        <blockquote>
-         The filter maker, Blue Coat Systems, is based in California USA. The free filter for home use was 
-         <a href="http://www.k9webprotection.com/news.html">announced by Blue Coat Systems in a media release dated 4 April 2006</a>: "
-         <i>Blue Coat® Systems, Inc. (Nasdaq: BCSI), the leader in secure content and application delivery, today announced K9 Web Protection, a free Web filter that gives parents control over their family's use of the Internet. K9 Web Protection blocks more than 55 different categories of content, including pornography, hate speech and sites that promote violence or permit gambling. It enables parents to monitor and control what sites their children access, and enables them to block questionable sites, including the popular website MySpace.</i>" 
-         <p> The PC-based software connects to Blue Coat's Web filtering service, a server-based filtering database, in order to determine whether to permit or deny access. According to Blue Coat's site, if a user tries to go to a Web site that the database hasn't seen before, it scans the content of the site for inappropriate material, and then either permits or prohibits the site (Blue Coat call this process DRTR Dynamic Real-Time Rating). <a href="http://www.k9webprotection.com/faq.html#11">Blue Coat claim that</a> "<i>K9 Web Protection has one of the lowest over-blocking rates around. The engine that powers K9 is designed for commercial customers, who, quite naturally, don't want their employees to become non-productive because of a mistake in their filtering solution. So we've taken great care to not over-block. For example, K9 will allow you to access breast cancer sites, while blocking nudity or pornography. K9 will allow access to drug treatment and information sites, while blocking access to sites that promote or glamorize illegal drug use. The engine that K9 uses to decide which Web sites are inappropriate for children is more sophisticated than many other programs</i>". (It should be noted that many filter makers have made similar claims over the years and the filters subsequently found to over-block significantly.) </p>
-        </blockquote> </li>
-      </ul> 
-      <h2><a name="sb"></a>Server-Based Filter Products</h2> 
-      <p> Server-based filters are for installation on a centralised server through which end-user computers access the Internet. They may be installed on an ISP's or other company's server. </p>
-      <p> Also, some PC-based (end-user) filter products communicate with a server-based filtering system and/or blocklist database supplied by one of the filter vendors below in order to determine whether or not to permit access to web pages (see <a href="#pcsb">examples above</a>). The server-based filters below are included on IIA's "Family Friendly Filter" list as at 26 April 2006. </p>
-      <ul> 
-       <li><a href="http://www.aol.com.au/site/website/aolinfo/aol_priceplans.php">AOL Parental Control</a><br>(PC-based software communicates with AOL's server-based filtering system.) </li>
-       <li><a href="http://www.contentkeeper.com/">Content Keeper</a>, ContentKeeper Technologies, HQ: Braddon ACT, Australia. </li>
-       <li><a href="http://www.isheriff.com/">Internet Sheriff</a>, Tel.net Media, Brisbane &amp; Sydney, Australia. </li>
-       <li><a href="http://www.n2h2.com.au/">N2H2 (also known as Bess, iFilter)</a>. Note: <a href="http://www.securecomputing.com/index.cfm?skey=1453">N2H2 has been acquired by Secure Computing</a> and since October 2005 the 'N2H2 Bess' filter has ceased to be available for sale. It has been combined with SmartFilter to become Secure Computing's <a href="http://www.securecomputing.com/index.cfm?skey=1209">'SmartFilter, Bess Edition'</a>. </li>
-       <li><a href="http://www.securecomputing.com/index.cfm?skey=85">SmartFilter</a>, Secure Computing, HQ: California USA. </li>
-       <li><a href="https://www.websense.com/global/en/">Websense</a>, Websense, Inc, HQ: California USA. </li>
-       <li><a href="http://www.8e6.com/">8e6 (formerly X-Stop)</a>, 8e6 Technologies, HQ: California USA. </li>
-      </ul> 
-      <hr> 
-      <h1><a name="isps"></a>Filtered ISPs in Australia</h1> 
-      <p> The list below does not necessarily include all filtered ISPs (ISPs who provide server-based content filtering) in Australia, only those that EFA was aware of when this page was last updated. EFA has not conducted an exhaustive search to find filtered ISPs. </p>
-      <ul> 
-       <li><a href="http://www.iprimus.com.au/">iPrimus ISP</a><br> Nationwide dialup and broadband access including optional use of the <a href="http://www.iprimus.com.au/support/webfilter-faq.asp">iPrimus WebFilter</a>, a server-based content filtering system that (according to their web site in April 2006) uses N2H2 blocking software (previously named iFilter, Bess). </li>
-       <li><a href="http://www.itxtreme.com.au">ItXtreme Family Internet</a> (displays IIA Family Friendly ISP ladybird)<br> Nationwide dialup (via 0198) with server-based content filtering. According to a listing that was on the Australian Christian Business Directory web site in January 2005: "<i>ItXtreme Family Internet is a very unique Christian company that provides a premium high speed internet service with 98% national coverage at local call costs</i>" (<a href="http://72.14.203.104/search?q=cache:s2X4rZfSy3wJ:www.christiandirectory.org.au/browse.php%3Fbrowsemode%3Dbus%26busid%3D208">Google cache copy</a> available as at 28 April 2006). </li>
-       <li><a href="http://www.aol.com.au/">Primus-AOL ISP</a><br> Nationwide <a href="http://www.aol.com.au/site/website/aolinfo/aol_priceplans.php">dial-up access with AOL Parental Control included</a>.<br> </li>
-       <li><a href="http://www.webshield.net.au">Webshield ISP</a> (displays IIA Family Friendly ISP ladybird)<br> Nationwide dialup access (via 0198) and broadband access, with server-based content filtering. From the list of blocking categories on Webshield's site (in April 2006), it is likely the blocking software used is 8e6 (previously named X-Stop) as the descriptions of blocking categories are the same. According to a <a href="http://www.biblexplore.org/webshield.htm">page on the Lismore Christadelphians' 'Explore the Bible' web site</a> (April 2006): "<i>Webshield is an initiative undertaken by Christadelphians to help parents and concerned individuals take control of Internet Content</i>". </li>
-      </ul> 
-      <p> Note: Filtered ISP services may not be suitable for families wanting different levels of access restriction based on age, etc, of family members. While some of the above services appear to provide customisable levels/categories of filtering, the customisation apparently applies on an Internet access account basis, i.e. to the whole family using the account, rather than being customisable for each family member using the account. Also, they may not be suitable where one or more members wish to use P2P technology. In the latter regard, for example, Webshield <a href="http://www.webshield.net.au/htm2/a_services.htm">state on their web site</a> that access to all content available using peer to peer (P2P) technologies is blocked because "[i]t is impossible to filter the information exchanged" via P2P. It is possible that all or many filtered ISPs also block access to P2P networks without making that clear on their web site. Many PC-based (end-user) filters provide an option to block, or not block, access to P2P and some enable this option to be set differently for each user of the PC (e.g. each member of a family). </p>
-      <hr> 
-      <h1><a name="reviews"></a>Reviews and Tests of Filtering Software</h1> 
-      <h2><a name="general"></a>General Reviews </h2> 
-      <p> This section contains links to reviews and commentaries that are primarily focussed on the features and ease of use of various filter products. See later section for <a href="#underover">reviews and commentaries focussed on effectiveness/accuracy and under- and over- blocking issues</a>. </p>
-      <p> Note: This section does not necessarily include all recent reviews and intending purchasers are advised to conduct further research with a view to ascertaining whether there are any other reviews that may have different opinions about the products. </p>
-      <h4>Reviews of multiple filters</h4> 
-      <ul> 
-       <li><a href="http://www.consumersearch.com/www/software/parental-control-software/fullstory.html">Parental Control Software Reviews</a>, ConsumerSearch.com, March 2006.<br> ConsumerSearch provides a <a href="http://www.consumersearch.com/www/software/parental-control-software/fullstory.html">"full story" report</a> on the findings of reviews of filtering products conducted by magazines and organisations, and also <a href="http://www.consumersearch.com/www/software/parental-control-software/reviews.html">rates the reviews (together with links to the reviews)</a> "based on credibility in testing, evaluating and identifying the best Parental Control Software". </li>
-       <li><a href="http://internet-filter-review.toptenreviews.com/">2006 Internet Filter Report</a>. The <a href="http://internet-filter-review.toptenreviews.com/">Internet Filter Review site</a> provides reviews and side-by-side comparisons of Internet filter software. </li>
-       <li><a href="http://www.netalert.net.au/02834-Filter-Comparison-Table.asp">NetAlert's Filter Comparison Table</a>. </li>
-       <li><a href="http://www.internetfamilyfun.com/internetsafety/filteringsoftware.htm">Top Picks - Parental Filtering Software for Families</a>. </li>
-      </ul> 
-      <h4>Reviews of single filters</h4> 
-      <ul> 
-       <li>AOL Parental Control 
-        <ul class="compact"> 
-         <li>4/2004, <a href="http://www.webuser.co.uk/products/AOL_9_review_1891-207.html">Webuser Magazine U.K.</a> </li>
-        </ul> </li>
-       <li>CyberPatrol 7 
-        <ul class="compact"> 
-         <li>8/2005, <a href="http://www.webuser.co.uk/products/SurfControl_CyberPatrol_7_review_2632-207.html">Webuser Magazine U.K.</a> </li>
-         <li>7/2005, <a href="http://www.pcmag.com/article2/0,1759,1840517,00.asp">PC Magazine (PCmag.com), USA.</a> </li>
-        </ul> </li>
-       <li>Cybersitter 9 
-        <ul class="compact"> 
-         <li>7/2005, <a href="http://www.webuser.co.uk/products/Cybersitter_9_review_2635-207.html">Webuser Magazine U.K.</a> </li>
-        </ul> </li>
-       <li>ContentProtect 
-        <ul class="compact"> 
-         <li>7/2005, <a href="http://www.webuser.co.uk/products/ContentWatch_ContentProtect_review_2633-207.html">Webuser Magazine U.K.</a> </li>
-         <li> </li>
-        </ul> </li>
-       <li>K9 Web Protection<br> Note: This free filter only became available in April 2006. It was apparently available as a beta or trial version for some months previously. 
-        <ul class="compact"> 
-         <li>3/2006, <a href="http://www.techsupportalert.com/issues/issue131.htm#Section_2.4">The Best Free Parental Filter: Part 2</a>, Gizmo Richard's Support Alert Newsletter, Issue 131.<br> "<i>In issue #130 I gave a very positive review of the free parental filter <b>K9 Web Protection</b> by Blue Coat Systems [1]. It's definitely the best free filter I've tried but it has one downside; in order to provide the filtering it uses Blue Coat's web servers which can slow down your browsing a tad. Subscriber Adi Lana wrote in tell me about another free parental filter called <b>Naomi</b> [2] that has the advantage of filtering locally. I tried it out and it's quite impressive ... on balance I preferred K9's smarter logic, greater configurability and friendlier behavior. Modem users will however, appreciate Naomi's speed advantage.</i>" </li>
-        </ul> </li>
-       <li>Naomi 
-        <ul class="compact"> 
-         <li>3/2006, see above (<a href="http://www.techsupportalert.com/issues/issue131.htm#Section_2.4">The Best Free Parental Filter: Part 2</a>, Gizmo Richard's Support Alert Newsletter, Issue 131.) </li>
-         <li>2005-2006, <a href="http://www.snapfiles.com/opinions/Naomi/Naomi.html">User reviews on SnapFiles.com</a> </li>
-        </ul> </li>
-       <li>Net Nanny 5.1 
-        <ul class="compact"> 
-         <li>1/2003, <a href="http://www.pcmag.com/article2/0,4149,842049,00.asp">PC Magazine (PCmag.com), USA.</a> </li>
-         <li>8/2004, <a href="http://www.pcmag.com/article2/0,1759,1650540,00.asp">PC Magazine (PCmag.com), USA.</a> </li>
-        </ul> </li>
-       <li>Norton Internet Security 2006 
-        <ul class="compact"> 
-         <li>2/2006, <a href="http://www.webuser.co.uk/products/Norton_Internet_Security_2006_review_2924-207.html">Webuser Magazine U.K.</a> </li>
-        </ul> </li>
-       <li>Safe Eyes 2006 
-        <ul class="compact"> 
-         <li>4/2006, <a href="http://www.pcmag.com/article2/0,1759,1945986,00.asp">PC Magazine (PCmag.com), USA.</a> </li>
-         <li>3/2006, <a href="http://www.macupdate.com/info.php/id/19159">MacUpdate</a> </li>
-        </ul> </li>
-       <li>We-Blocker 
-        <ul class="compact"> 
-         <li>8/2002, <a href="http://www.webuser.co.uk/products/WeBlocker_review_404-207.html">Webuser Magazine U.K.</a> </li>
-         <li>10/1999, <a href="http://familyinternet.about.com/cs/filteringsoftware/l/blweblocker.htm">Marcy Zitz, Family Internet.About.Com</a>. </li>
-         <li>Undated, <a href="http://www.kidsdomain.com/down/pc/we-blocker.html">Kaboose-Where Families Get Going</a>. </li>
-        </ul> </li>
-      </ul> 
-      <h2><a name="underover"></a>Reports on tests focussed on under- and over- blocking issues</h2> 
-      <p> Criticisms have been been made about the nature of the material that is blocked by particular packages. The list of sites blocked by each package is generally a closely-guarded secret and as such, parents have no option but to trust the judgement and stated policies of the commercial entities responsible. (Net Nanny is one of the few filters, possibly the only one, that allows authorised users to review the list of permitted and restricted sites.) </p>
-      <p> CYBERsitter in particular came under a storm of criticism in 1996/97 for its action in blocking <a href="http://www.peacefire.org/censorware/CYBERsitter.html"> Peacefire, </a> a teenage anti-censorship group, threatening legal action against critics and journalists, blocking entire domains, as well as blocking feminist and other sites which many parents would not consider objectionable. This is the danger of corporatised censorship. </p>
-      <p> Under- and over- blocking can result from a variety of factors including: </p>
-      <ul> 
-       <li>Many filter makers build their blocking databases by using software that crawls the Web looking for pages that contain particular keywords, etc, and then use automated artificial intelligence to categorise 'suspect' pages. While some filter makers claim that a human reviews the automated categorisation, it would be physically impossible for humans, even a large group of humans, to review every page. </li>
-       <li>Some filter makers' products do not include a URL blocking database. Instead, the software uses artificial intelligence to automatically analyse every page in real time and either permit or deny access. </li>
-       <li>Some filter makers may intentionally block information that is not in accord with their own views, morals, and/or religious beliefs (e.g. information about safe sex, contraception, abortion, feminism, homosexuality, etc). This is particularly likely in products targeted at the fundamentalist Christian market. Whether or not this is a problem for end-users with different views depends on whether such content is included in blocking categories that the end-user can switch off, or whether it is lumped into a category such as "pornography", "sex", etc, which cannot be switched off without also permitting access to sexually explicit material. (For information about filter software companies known to have connections with religious groups, see <a href="#connections">Filter Software Companies' connections with religious groups and/or governments</a>.) </li>
-      </ul> 
-      <p> The following references provide information about under- and over- blocking by filtering software. First is a listing of <a href="#multiplef">reports about multiple filter products</a>, followed by a section listing <a href="#singlef">reports about single filter products</a>. </p>
-      <h4><a name="multiplef"></a>Reports about multiple filters</h4> 
-      <dl> 
-       <dt>
-        <a href="http://responsiblenetizen.org/onlinedocs/pdf/whodefinesevil.pdf"><i>Who Defines Evil? Statement Regarding the Kaiser Family Foundation Study on How Filtering Affects Access to Health Information</i></a>, Nancy Willard, M.S., J.D. Director, Center for Safe and Responsible Internet Use (was Responsible Netizen Institute), December 2002. 
-       </dt>
-       <dd>
-        "
-        <i>...The <a href="#kaiser">Kaiser study</a> demonstrates the reasons why it is both unwise and inappropriate to place reliance on filtering software to protect young people when they are using the Internet. ... Filtering companies and their conservative pro-filtering allies promise that filtering will protect young people on the Internet. This misrepresentation creates a dangerous level of false security and complacency. It is dangerous to believe that we can protect young people by establishing electronically fenced playpens. The snakes can still get in and teens can easily get out. Filtering software is not infallible, it does not protect against all concerns and it is not, and will never be, present on all computers that our young people will access. Filters are not the solution. They will never be the solution. ...</i>" 
-       </dd>
-       <dt>
-        <a name="kaiser"></a>
-        <a href="http://www.kaisernetwork.org/health_cast/uploaded_files/Internet_Filtering_exec_summ.pdf"><i>See No Evil: How Internet Filters Affect the Search for Online Health Information</i></a> [PDF], Kaiser Family Foundation, 10 Dec 2002. 
-       </dt>
-       <dd>
-        This study primarily tested filtering products widely used in schools or libraries: 
-        <b>SmartFilter, 8e6, Websense, CyberPatrol, Symantec, and N2H2</b>. The researchers also tested one product widely used in the home, 
-        <b>AOL Parental Controls</b>. 
-       </dd>
-       <dt>
-        <a href="http://www.acma.gov.au/acmainterwr/aba/newspubs/documents/filtereffectiveness.pdf"><i>Effectiveness of Internet Filtering Software Products</i> [PDF 1591 Kb]</a>, Commonwealth Scientific and Industrial Research Organisation (CSIRO), published by the Australian Broadcasting Authority in March 2002.
-        <br> 
-       </dt>
-       <dd>
-        Products Evaluated: 
-        <b>AOL Parental Control, Arlington Browser, Cyber Patrol, Cyber Sentinel, CyberSitter, Eyeguard, I-Gear, Internet Sheriff, N2H2, Net Nanny, Norton Internet Security, Smart Filter, T.O.O. Cool, X-Stop</b>. 
-       </dd>
-       <dd>
-        "
-        <i>This report presents the findings of a study commissioned by the Australian Broadcasting Authority (ABA) and NetAlert into the effectiveness of a number of Internet content filtering products. The study examined both how easy the products were to install and use, and how effectively they filtered Internet content. The products under evaluation all attempt to effectively filter the Internet, blocking access to 'undesirable' content, such as pornography or racist propaganda, and letting all other content pass through untouched. In reality, this is an impossible goal as the Internet is just too big and dynamic, and all products will pass through some content they should have blocked and block some content that should have passed through.</i>" 
-       </dd>
-       <dt>
-        <a href="https://cyber.law.harvard.edu/people/edelman/mul-v-us/"><i>Sites Blocked by Internet Filtering Programs - Edelman Expert Report for Multnomah County Public Library et al., vs. United States of America, et al.</i></a>, Ben Edelman, The Berkman Center for Internet &amp; Society at Harvard Law School, March 2002 
-       </dt>
-       <dd>
-        "
-        <i>In the course of a pending ACLU challenge to the Children's Internet Protection Act (CIPA), I was asked to design and implement systems to identify particular web pages that are blocked by four specific Internet filtering programs but which do not fit within the programs' self-defined categories for blocking. ... My testing focused on <b>Surfcontrol Cyber Patrol 6, N2H2 Internet Filtering 2.0, Secure Computing SmartFilter 3.0, and Websense Enterprise 4.3.</b></i>" 
-       </dd>
-       <dt>
-        <a href="http://sethf.com/anticensorware/general/slip.php"><i>The Pre-Slipped Slope - censorware vs the Wayback Machine web archive</i></a>, Seth Finkelstein, 23 Mar 2002. 
-       </dt>
-       <dd>
-        "
-        <i>Examines how various censorware programs blacklist an extensive (100 Terabytes) web-site archive called the '<a href="https://web.archive.org/">Wayback Machine</a>'. The control requirements of censorware lead to considering this archive site as a 'Loophole' or 'proxy avoidance systems'.</i>" 
-       </dd>
-       <dt>
-        <a href="http://www.fepproject.org/policyreports/internetfilters.html"><i>Internet Filters: A Public Policy Report</i></a>, Free Expression Policy Project (a project of the Brennan Center for Justice at NYU School of Law), October 2001. 
-       </dt>
-       <dd>
-        "
-        <i>Summarizes more than 70 tests and studies documenting massive over- and under-blocking by major filtering products. Artistic sites, public health information, and sexuality education are among the subjects blocked by filtering software</i>". 
-       </dd>
-       <dt>
-        <a href="http://www.copacommission.org/papers/filter_effect.pdf"><i>Internet Filter Effectiveness: Testing Over and Underinclusive Blocking Decisions of Four Popular Filters</i></a>, Christopher D. Hunter. Research paper submitted to the 
-        <a href="http://www.copacommission.org/papers/">COPA Commission</a>. April 2000. 
-       </dt>
-       <dd>
-        "
-        <i>The aim of this paper is to assess these competing claims by rigorously testing the effectiveness of four popular filtering programs: <b>CYBERsitter, Cyber Patrol, Net Nanny, and SurfWatch</b>. ...<br>This study sought to provide objective evidence of Internet software filter performance. As many journalists and civil libertarians have speculated, filters are not a particularly effective technology for protecting children from objectionable Internet content. Further, such programs also block a substantial percentage of web pages with no objectionable material. Overall, filters failed to block objectionable content 25 percent of the time, while on the other hand, they improperly blocked 21 percent of benign content. Given these problematic results, parents and legislators should rethink their current support for the use of Internet filtering technology.</i>" 
-       </dd>
-       <dt>
-        <a href="http://www.glaad.org/media/archive_detail.php?id=103"><i>Access Denied: An Impact of Internet Filtering Software on the Gay and Lesbian Community</i></a> (
-        <a href="http://www.glaad.org/documents/media/AccessDenied2.pdf?PHPSESSID=c761e05e3cf824305609c3957a7c15d9">Report V2 2000</a>, 
-        <a href="http://www.glaad.org/documents/media/AccessDenied1.pdf?PHPSESSID=c761e05e3cf824305609c3957a7c15d9">Report V1 1997</a>), Gay &amp; Lesbian Alliance Against Defamation (GLAAD), March 2000. 
-       </dt>
-      </dl> 
-      <p> </p>
-      <h4><a name="singlef"></a>Reports about single filters</h4> 
-      <dl> 
-       <dt>
-        <a href="http://sethf.com/anticensorware/bess/loophole.php"><i><b>N2H2</b> BESS's Secret LOOPHOLE (censorware vs. privacy &amp; anonymity)</i></a>, Seth Finkelstein, Nov 2002. 
-       </dt>
-       <dd>
-        "
-        <i>A secret category of BESS (N2H2), and more about why censorware must blacklist privacy, anonymity, and translators</i>". 
-       </dd>
-       <dt>
-        <a href="http://sethf.com/anticensorware/bess/google.php"><i><b>N2H2</b> BESS vs The Google Search Engine (Cache, Groups, Images)</i></a>, Seth Finkelstein, 4 Sep 2001.
-        <br> 
-       </dt>
-       <dd>
-        "
-        <i>This report examines how N2H2's censorware deals with archives of large amount of information. Three features are examined from the Google search engine (Cache, Groups, Images). N2H2/BESS is found to ban the cached pages everywhere, pass porn in groups, and consider all image searching to be pornography. The general problems of censorware versus large archives are discussed (i.e., why censorware is impelled to situations such as banning the Google cache).</i>". 
-       </dd>
-       <dt>
-        <a href="http://www.sethf.com/anticensorware/smartfilter/greatestevils.php"><i><b>SmartFilter</b>'s Greatest Evils</i></a>, Seth Finkelstein, 16 Nov 2000. 
-       </dt>
-       <dd>
-        "
-        <i>This paper examines what the censorware product SmartFilter considered to be the worst websites, as measured by the number of categories under which the site was blacklisted. It was discovered that two broad classes of websites were maximally blacklisted. These were privacy/anonymity service sites, and language-translation services. In retrospect, this is in fact an obvious requirement of censorware, as any private or anonymous browsing ability is antithetical to the goal of control in censorware.</i>" 
-       </dd>
-       <dt>
-        <a href="http://www.copacommission.org/papers/peacefire.org/censorware/Cyber_Sentinel/cyber-sentinel-blocked.html"><i>Sites blocked by <b>Cyber Sentinel</b></i></a>, Bennett Haselton. Research paper submitted to the 
-        <a href="http://www.copacommission.org/papers/">COPA Commission</a>. 8 February 2000. 
-       </dt>
-       <dd>
-        "
-        <i>The following sites were found to be blocked by Cyber Sentinel on August 1, 2000, in about an hour of ad-hoc experimentation. ... Cyber Sentinel does not come with a built-in list of blocked sites; it scans every page for certain keywords, and only blocks the page if one of those keywords is present. (Some of the pages we tested, such as news sites, have content that changes hourly, so at any time they might be blocked or unblocked depending on the current content.)</i>" 
-       </dd>
-       <dt>
-        <i><a href="http://www.censorware.net/reports/bess">Passing Porn, Banning the Bible: <b>N2H2</b>'s Bess in public schools</a></i>, The Censorware Project, 28 July 1999. 
-       </dt>
-       <dd>
-        "
-        <i>When you install a censorware product in your school district and turn on all the recommended categories, you expect that, at the very least, it will block hardcore sex. So why does Bess allow schoolchildren to see HardcoreSex.com? The Censorware Project recently completed a real-world examination of sites blocked - and not blocked - by a censorware product called "Bess." Bess is made by N2H2, who also makes Searchopolis. Our analysis shows that not only does the software block a great many valuable webpages, but also allows through a startlingly large amount of pornography.</i>" 
-       </dd>
-       <dt>
-        <i><a href="../../Publish/report_isheriff.html"><b>Internet Sheriff</b>: An Independent Review</a></i>, Electronic Frontiers Australia Inc., May 1999. 
-       </dt>
-       <dd>
-        Internet access accounts were purchased with Clairview's Brisbane ISP, CVue Internet with a view to evaluating the Internet Sheriff technology in terms of its stated objectives. Independent tests revealed that while Internet Sheriff technology blocked pornographic material (although not all), it also blocked a vast range of non-pornographic material, including political party and Christian web sites. 
-       </dd>
-       <dt>
-        <i><a href="http://www.censorware.net/reports/utah/">Report on the use of <b>Smartfilter</b> in Utah schools</a></i>, The Censorware Project, March 1999. 
-       </dt>
-       <dt>
-        <a href="http://censorware.net/reports/liza.html"><i>Protecting Judges Against Liza Minnelli - The <b>WebSENSE</b> Censorware at Work</i></a>, The Censorware Project, 21 June 1998. 
-       </dt>
-       <dd>
-        "
-        <i>...our [USA] tax dollars are being spent to protect judges, and library users, against Liza Minnelli, Jewish teens, a grocer, a speakers' bureau, a mortgage company--and some free speech advocates. All of these sites are blocked by WebSENSE under the Sex1, Sex2 or Adult Entertainment categories, the settings used in the federal courts and in libraries.</i>" 
-       </dd>
-       <dt>
-        <a href="http://censorware.net/reports/xstop/"><i>The <b>X-Stop</b> Files: Deja Voodoo</i></a>, The Censorware Project, 1998. 
-       </dt>
-       <dd>
-        "
-        <i>It should come as no surprise that members of the Censorware Project have been working behind the scenes with the lawyers for Mainstream Loudoun and ACLU since before the Loudoun County lawsuit was filed, which is why it has been over a year since our last public report on X-Stop. We have given the lawyers hundreds, maybe thousands, of 'bad' blocks, and many (though certainly not all) cited in the legal papers resulted from our work. Since X-Stop updates its blacklist every day, we looked at it several times, and each time, we found scores of new bad blocks, bans of sites which under no circumstances should be excluded from a public library.</i>" 
-       </dd>
-       <dd>
-        (The names of the 
-        <b>X-Stop</b> filter and the filter maker, Log-on Data Corporation, 
-        <a href="http://www.8e6.com/docs/8e6-Corporate-Fact-Sheet.pdf">were changed in late 2000</a> to 
-        <b>8e6 Technologies</b>). 
-       </dd>
-       <dt>
-        <a href="http://censorware.net/reports/cyberpatrol/ada-yoyo.html"><i>Blacklisted by <b>Cyber Patrol</b>: From Ada to Yoyo</i></a>, The Censorware Project, December 1997. 
-       </dt>
-       <dd>
-        "
-        <i>The report takes a close look at over 100 sites blocked by the highly-regarded web filtering software from MicroSystems (a subsidiary of The Learning Company).</i>" 
-       </dd>
-       <dt>
-        <a href="http://www2.epic.org/reports/filter-report.html"> <i>Faulty Filters: How Content Filters Block Access to Kid-Friendly Information on the Internet</i></a>, Electronic Privacy Information Center (EPIC), December 1997. 
-       </dt>
-       <dd>
-        "
-        <i>In order to determine the impact of software filters on the open exchange of information on the Internet, the Electronic Privacy Information Center conducted 100 searches using a traditional search engine and then conducted the same 100 searches using a new search engine that is advertised as the 'world's first family-friendly Internet search site'.</i>" 
-       </dd>
-       <dt>
-        <a href="http://censorware.net/essays/xstop_files_jw.html"><i>The X-Stop Files</i></a>, Jonathan Wallace, 5 October 1997. 
-       </dt>
-       <dd>
-        "
-        <i>Self-proclaimed library-friendly product blocks Quakers, free speech and gay sites</i>." 
-       </dd>
-       <dd>
-        (The names of the 
-        <b>X-Stop</b> filter and the filter maker, Log-on Data Corporation, 
-        <a href="http://www.8e6.com/docs/8e6-Corporate-Fact-Sheet.pdf">were changed in late 2000</a> to 
-        <b>8e6 Technologies</b>). 
-       </dd>
-       <dt>
-        <a href="http://censorware.net/essays/xstop_files_sf.html">The X-Stop Files: The Truth Isn't Out There</a>, Seth Finkelstein, October 1997. 
-       </dt>
-       <dd>
-        "
-        <i>So another censorware product has been found to secretly been blacklisting gay and lesbian material, anti-censorship sites, feminist resources and an incomprehensible scattershot collection of totally innocuous organizations. We can treat this as yet another 'bad apple' in the endless search for the magic anti-porn program. Or we can use it as a basis for examining why such a program won't ever exist.</i>" 
-       </dd>
-       <dt>
-        <a href="http://www.peacefire.org/censorware/CYBERsitter/"><i><b>CYBERsitter</b>: Where do we not want you to go today?</i></a>, Peacefire Teen Net Anti-Censorship Alliance. 
-       </dt>
-      </dl> 
-      <hr> 
-      <h1><a name="connections"></a>Filter Software Companies' connections with religious groups and/or governments</h1> 
-      <p> This section provides information about filter software companies known to have connections with religious groups, and/or that sell their filtering products to governments for the purpose of control of citizens' Internet access or promote their products to governments for that purpose. It does not necessarily include all such companies - there may be others not known about by EFA as at the last update of this page. </p>
-      <dl> 
-       <dt>
-        <a href="http://csriu.org/onlinedocs/documents/religious2.html"><i>Filtering Software: The Religious Connection</i></a>, Nancy Willard, M.S. J.D., Center for Safe and Responsible Internet Use, University of Oregon, February 24, 2002.
-        <br> 
-       </dt>
-       <dd>
-        "
-        <i>This report reviews the relationships of eight filtering software companies [whose products are currently being used in U.S. public schools, or that are marketing their products for use in public schools] with conservative religious organizations. ... Most of the companies have filtering categories in which they are blocking web sites presenting information known to be of concern to people with conservative religious values -- such as non-traditional religions and sexual orientation -- in the same category as material that no responsible adult would consider appropriate for young people.<br> The existence of these relationships and blocking categories raises the concern that the filtering products used in schools are inappropriately preventing students from accessing certain materials based on religious or other inappropriate bias.</i>" 
-       </dd>
-       <dd>
-         The above report includes an 
-        <a href="http://csriu.org/onlinedocs/documents/religious1.html">appendix</a> with a page of information about each of the eight companies: 
-        <b><br><a href="http://csriu.org/onlinedocs/documents/n2h2.html">N2H2 (Bess)</a> </b>(integrated with SmartFilter since late 2005)
-        <b>, <br><a href="http://csriu.org/onlinedocs/documents/symantec.html">Symantec (I-Gear)</a>, <br><a href="http://csriu.org/onlinedocs/documents/8e6.html">8e6 Technologies (R2000 or X-Stop)</a>, <br><a href="http://csriu.org/onlinedocs/documents/oak.html">Solid Oak (CyberSitter)</a>, <br><a href="http://csriu.org/onlinedocs/documents/711.html">NetComply/711.Net</a>, <br><a href="http://csriu.org/onlinedocs/documents/afo.html">BSafeSchool/American Family Online</a>, <br><a href="http://csriu.org/onlinedocs/documents/s4f.html">EduGuard/S4F</a>, <br><a href="http://csriu.org/onlinedocs/documents/surfclear.html">SurfClear</a></b>. 
-       </dd>
-       <dt>
-        8e6 Technologies (formerly X-Stop/Log-on Data Corporation), California USA 
-       </dt>
-       <dd>
-        As 
-        <a href="http://responsiblenetizen.org/onlinedocs/documents/afo.html">detailed on the web site of Responsible Netizen Institute </a> (at the Center for Advanced Technology in Education, University of Oregon), 8e6 Technologies, formerly X-Stop/Log-on Data Corporation, is a company that appears to have been started in some form of partnership with the American Family Association, a conservative Christian organisation. 
-       </dd>
-       <dt>
-        Content Protect, ContentWatch, Inc., Salt Lake City Utah USA 
-       </dt>
-       <dd>
-        According to an 
-        <a href="https://www.ksl.com/?nid=148&amp;sid=120718">article on KSL NewsRadio's site (21 October 2005)</a>, the president and CEO of Content Watch, Jack Sunderlage, helped produce a new DVD titled "
-        <i>Pornography -- The Great Lie: A Guide for Latter-day Saint Families</i>" and "
-        <i>also worked with Rep. John Dougall, R-Highland, who sponsored House Bill 260, passed by the 2005 Legislature</i>". 
-        <a href="http://www.slweekly.com/editorial/2005/city_2005-03-24.cfm">Salt Lake City Weekly (24 March 2005) reports</a> that "
-        <i>Upon consumer request, the law requires local ISPs to offer filtering systems blocking transmission of material deemed harmful to minors. Such materials will be flagged on an adult registry established by Utah Attorney General Mark Shurtleff</i>". 
-       </dd>
-       <dt>
-        Internet Sheriff, Tel.net Media, Australia 
-       </dt>
-       <dd>
-        Tel.net Media (formerly Clairview Internet) were prominent in the debate concerning mandatory filtering by ISPs in 1999. Company representatives appeared before the Senate Select Committee on Information Technologies on 3 May 1999 during the Committee's public inquiry into a Bill involving mandatory filtering by ISPs. During 
-        <a href="http://www.aph.gov.au/hansard/senate/commttee/s2281.pdf">testimony before the Committee</a>, the representatives criticised various aspects of the CSIRO's findings and report and demonstrated their Internet Sheriff product. The bulk of their testimony appeared designed to give the Committee the impression that Internet Sheriff was an ideal product for mandatory installation by ISPs. 
-       </dd>
-       <dd>
-        More recently, in April 2006, according to an article in the AustralianIT concerning a proposed trial of ISP based filtering in Tasmania (being organised by Senator Guy Barnett, a lobbyist for government mandated ISP filtering): 
-        <blockquote>
-         "
-         <i>[Internet Sheriff sales director Glen] Phillips said the content trial was less focused on capturing local customers than it was about showcasing the filtering technology to countries with more onerous censorship laws and repressive controls over information in the Asia-Pacific area. 'My market is really not Australia to tell you the truth,' Mr Phillips said.<br> He was emphatic that Chinese internet services were 'definitely' among his list of potential buyers for the technology.</i>" 
-         <br>(
-         <a href="http://australianit.news.com.au/articles/0,7204,18842788%5E15306%5E%5Enbv%5E,00.html"><i>Giants say no to porn filter trial</i></a>, Andrew Colley, AustralianIT, 18 April 2006) 
-        </blockquote> 
-       </dd>
-       <dt>
-        Safe Eyes, SafeBrowse.com, Inc, Georgia USA 
-       </dt>
-       <dd>
-        According to an August 2005 article titled 
-        <a href="http://www.christianindex.org/1487.article"><i>Metro Atlanta laymen develop Internet safeguard</i></a> in The Christian Index: "
-        <i>Shane [Kenny] and his brother, Aaron, both Georgia Baptists, have developed an Internet filter called Safe Eyes... When asked about Safeeyes.com being a Christian company, Kenny stated, 'I do not believe there is such a thing as a Christian company, however there is such a thing as a company that is run on Christian principles. ... Safeeyes.com is operated on Christian principles and I hope that is evident by the way the company is run.'</i>". 
-       </dd>
-       <dd>
-        Safe Eyes uses "Secure Computing technology" for blocking which probably means the blocking database used is supplied by Secure Computing, i.e. either the (previously known as) N2H2 Bess database and/or the SmartFilter database. 
-       </dd>
-       <dt>
-        SmartFilter, Secure Computing, California USA 
-       </dt>
-       <dd>
-        Secure Computing supplies its SmartFilter product to the governments of Iran, United Arab Emirates, Saudi Arabia and Tunisia. (These countries have either only one government-run ISP or most/all ISPs obtain their access through one government-run ISP/backbone provider.) 
-       </dd>
-       <dd>
-        As reported in The OpenNet Initiative's Report 
-        <a href="http://www.opennetinitiative.net/studies/iran/"><i>Internet Filtering in Iran in 2004-2005: A Country Study</i></a>: "
-        <i>Iran has recently acknowledged, as our testing confirms, that it uses the commercial filtering package SmartFilter - made by the US-based company, Secure Computing - as the primary technical engine of its filtering system. This commercial software product is configured as part of the Iranian filtering system to block both internationally-hosted sites in English and sites in local languages. SmartFilter, as with all commercial filtering software packages, is prone to over-blocking, errors, and a near-total lack of transparency. In effect, Iran outsources many of the decisions for what its citizens can access on the Internet to a United States company, which in turn profits from its complicity in such a regime.</i>". See also The OpenNet Initiative's Reports: 
-        <a href="http://www.opennetinitiative.net/studies/uae/"><i>Internet Filtering in the United Arab Emirates in 2004-2005</i></a> and 
-        <a href="http://www.opennetinitiative.net/studies/saudi/"><i>Internet Filtering in Saudi Arabia in 2004</i></a> and 
-        <a href="http://www.opennetinitiative.net/studies/tunisia/"><i>Internet Filtering in Tunisia in 2005</i></a>. 
-       </dd>
-       <dt>
-        Websense, Websense Inc, California USA. 
-       </dt>
-       <dd>
-        Websense supplies its filter product to the Republic of Yemen. Yemen limits what Internet content its citizens can access by using commercially available filtering technology and by controlling its two Internet service providers (both of which have Websense installed, one of which uses a Blue Coat integrated cache/filter appliance running Websense) through the state's powerful Ministry of Telecommunications. See 
-        <a href="http://www.opennetinitiative.net/studies/yemen/index.html"><i>Internet Filtering in Yemen in 2004-2005: A Country Study</i></a>, The OpenNet Initiative (a collaborative partnership of four leading academic institutions), 4 March 2006. 
-       </dd>
-      </dl> 
-      <hr> 
-      <h1><a name="advice"></a>Information and Advice for Parents about Online Safety</h1> 
-      <p> Information to guide and inform parents on ways to protect their children in using the Internet. </p>
-      <h2>Government:</h2> 
-      <ul> 
-       <li><a href="http://www.netalert.net.au">NetAlert</a>, the Internet Safety Advisory Body established by Australian Government.<br> NetAlert's site provides information and advice about potential problems, dangers and threats present on the Internet and ways in which users can act to minimise or avoid problems. Among other things, NetAlert provides an online <a href="http://www.netalert.net.au/03005-Technology-Toolbox.asp">Technology Toolbox Assistant</a> that "can help you to select a software product to meet your family's needs" and a <a href="http://www.netalert.net.au/01911-Helpline.asp">helpline</a> (phone, fax, email) for "instant help with Internet safety". </li>
-       <li><a href="http://www.cybersmartkids.com.au/">Cybersmart Kids Online</a>, Australian Communications and Media Authority ("ACMA"). <br> The Cybersmart Kids Online web site is a community awareness project developed by ACMA with the objective of providing parents and children with information and tools to help them have a rewarding, productive and safe experience of the internet. ACMA is the Australian Government agency <a href="http://www.acma.gov.au/ACMAINTER.65640:LANDING:854968966:pc=INTERNET,tlp=INTERNET">responsible for the regulation of online content</a>, telecommunications, broadcasting, and radiocommunications. </li>
-       <li><a href="http://www.ahtcc.gov.au/safeinternet.aspx">Online Safety Tips for Parents and Children</a>, Australian High Tech Crime Centre (hosted by the Australian Federal Police). </li>
-      </ul> 
-      <h2>Non-Government:</h2> 
-      <ul> 
-       <li><a href="http://www.choice.com.au/goArticle.aspx?id=105069&amp;p=1">Child safety online</a>, Choice Magazine, Australian Consumers Association, January 2006. <br>"Whether it?s stranger danger education, bike-helmet campaigns or health issues, there's a series of resources parents can call upon to help keep their kids safe in their daily lives. As it turns out what's commonsense in the real world also works in the virtual world of the internet." </li>
-       <li><a href="https://www.wiredsafety.org/">WiredSafety.org</a><br> The "world's largest online safety and help group" with more than 9,000 volunteers worldwide. "WiredSafety is headed by Parry Aftab (also a volunteer), a mom, international cyberspace privacy and security lawyer and children's advocate. Parry is the author of The Parent's Guide to Protecting Your Children in Cyberspace (McGraw-Hill), which has been adapted and translated around the world." </li>
-       <li><a href="http://www.safekids.com/commonsense.htm">Common Sense Rules Can Protect Kids on the Net</a>, by Larry Magid (the host of SafeKids.Com and SafeTeens.Com and a member of the board of directors of the U.S. National Center for Missing and Exploited Children). </li>
-       <li><a href="http://www.safekids.com/">SafeKids.com</a><br> A "family's guide to making the Internet and Technology fun, safe and productive". Operated by Larry Magid. </li>
-       <li><a href="http://www.safeteens.com/">SafeTeens.com</a><br> "A place for teens and parents to learn how to use the Internet safely. No preaching, just good advice". Operated by Larry Magid. </li>
-       <li><a href="http://www.blogsafety.com/">BlogSafety.com</a> <br> "BlogSafety.com, where teens, parents, teachers and adult bloggers can learn about the benefits of safe blogging &amp; social networking". Founded and co-directed by Larry Magid, a technology journalist and Anne Collier of NetFamilyNews. </li>
-       <li><a href="http://netfamilynews.org/index.shtml">Net Family News</a><br> "A nonprofit public service providing a forum and 'kid-tech news' for parents and educators in more than 50 countries. The forum is 24/7; news is weekly via email and podcast and daily via blog and RSS feed. Featuring the Net Family Newsletter, the journal-of-record on tech and digital media where children are concerned (since 1997) - distributed in partnership with SafeKids.com and London-based Childnet International. Based on the premise that informed, engaged parenting is essential to kids' constructive use of technology and the Net." </li>
-       <li><a href="http://csriu.org//onlinedocs/documents/nwnas.html">Choosing Not To Go Down the Not-so-good Cyberstreets</a> Nancy Willard, M.S., J.D., Center for Safe and Responsible Internet Use, University of Oregon, 13 December 2000.<br> 
-        <blockquote>
-         "Regardless of issues related to the use, effectiveness, and appropriateness of technology tools, laws, and labeling systems, the simple and plain truth is that virtually every young person in this country will, at one time or another, have unsupervised access to the Internet through an unfiltered and unmonitored system. Any young person who desires to access the 'darkside'(2) of the Internet will be able to find a way to do so. Technology tools, laws, and labeling systems are insufficient means to prevent such access. 
-         <p> The more important question, therefore, is how can we help young people gain the knowledge, decision-making skills, and motivation to make safe and responsible choices when they are using the Internet. ..."</p>
-        </blockquote> </li>
-       <li><a href="http://www.getnetwise.org/">GetNetWise</a><br> "GetNetWise is a public service brought to you by Internet industry corporations and public interest organizations to help ensure that Internet users have safe, constructive, and educational or entertaining online experiences." </li>
-       <li><a href="https://www.efa.org.au/Campaigns/aipcfaq.html">The Australian Internet Parental Control Frequently Asked Questions (FAQ)</a>, 1996.<br> A (now largely outdated) guide to assist concerned parents, legislators, educators, and the public in learning what is available to protect children. The Australian version was compiled by <a href="https://www.efa.org.au">EFA</a> in 1996 and was based on the original by <a href="http://www.vtw.org/">Voters Telecommunications Watch (VTW)</a> in the USA. </li>
-       <li><a href="http://www.fno.org/fnojun95.html">Protecting Our Children From the Internet (and the World)</a> - <i>From Now On</i>, A Monthly Electronic Commentary on Educational Technology Issues, Vol 4, No. 10, June 1995. </li>
-      </ul> 
-      <hr> 
-      <div class="navig"> 
-       <p>You are here: <a href="../../">EFA Home</a>&nbsp;»&nbsp;<a href="../../Issues/">Issues</a>&nbsp;»&nbsp;<a href="../../Issues/Censor/">Censorship</a>&nbsp;»&nbsp;Content Filtering &amp; Blocking </p> 
-      </div> 
-     </div> 
-     <div id="sidebar"> 
-      <div class="noindex"> 
-       <ul> 
-        <li>
-         <form method="get" id="searchform" action="http://efa.org.au.master.com/texis/master/search/"> 
-          <div>
-           <input type="text" maxlength="25" name="q" id="s" value=""> 
-           <input type="submit" id="searchsubmit" value="Search"> 
-          </div> 
-         </form></li> 
-        <li>
-         <ul> 
-          <li><a href="/search/">Advanced Search</a></li> 
-         </ul></li> 
-        <li><h2>Categories</h2> 
-         <ul> 
-          <li class="cat-item cat-item-4"><a href="https://www.efa.org.au/category/censorship/" title="View all posts filed under Censorship">Censorship</a></li> 
-          <li class="cat-item cat-item-11"><a href="https://www.efa.org.au/category/consumer-issues/" title="View all posts filed under Consumer Issues">Consumer Issues</a></li> 
-          <li class="cat-item cat-item-5"><a href="https://www.efa.org.au/category/copyright/" title="View all posts filed under Copyright">Copyright</a></li> 
-          <li class="cat-item cat-item-9"><a href="https://www.efa.org.au/category/defamation/" title="View all posts filed under Defamation">Defamation</a></li> 
-          <li class="cat-item cat-item-7"><a href="https://www.efa.org.au/category/domains/" title="View all posts filed under Domain names">Domain names</a></li> 
-          <li class="cat-item cat-item-1"><a href="https://www.efa.org.au/category/general/" title="View all posts filed under General">General</a></li> 
-          <li class="cat-item cat-item-8"><a href="https://www.efa.org.au/category/interception/" title="View all posts filed under Interception">Interception</a></li> 
-          <li class="cat-item cat-item-10"><a href="https://www.efa.org.au/category/media-releases/" title="View all posts filed under Media Releases">Media Releases</a></li> 
-          <li class="cat-item cat-item-3"><a href="https://www.efa.org.au/category/privacy/" title="View all posts filed under Privacy">Privacy</a></li> 
-         </ul></li> 
-        <li><h2>Campaigns</h2> 
-         <ul> 
-          <li><a href="http://www.openinternet.com.au/" title="Open Internet">EFA&#x2019;s Open Internet campaign</a></li> 
-          <li><a href="https://www.citizensnotsuspects.org.au/" title="Open Internet">EFA&#x2019;s Citizens Not Suspects campaign</a></li> 
-         </ul> </li>
-        <li><h2>EFA Info</h2> 
-         <ul> 
-          <li><a href="https://www.efa.org.au/projects/" title="EFA's current projects">EFA Projects</a></li> 
-          <li><a href="https://www.efa.org.au/publications/" title="EFA Submissions etc.">EFA Publications</a></li> 
-          <li><a href="https://www.efa.org.au/about/faq/" title="Frequently Asked Questions">FAQ</a></li> 
-          <li><a href="https://www.efa.org.au/foi-applications/" title="FOI requests that EFA has made">EFA FOI Requests</a></li> 
-          <li><a href="https://www.efa.org.au/about/lists/" title="Join one of EFA's mailing lists and stay informed">EFA Mailing Lists</a></li> 
-          <li><a href="https://www.efa.org.au/about/privacy-policy/">EFA Privacy Policy</a></li> 
-         </ul> </li> 
-        <li><h2>Reference Material</h2> 
-         <ul> 
-          <li><a href="https://www.efa.org.au/censorship/" title="Censorship Issues">Censorship</a></li> 
-          <li><a href="https://www.efa.org.au/privacy/" title="Privacy and Surveillance">Privacy</a></li> 
-          <li><a href="https://www.efa.org.au/ip/" title="Copyright and Intellectual Property Issues">Intellectual Property</a></li> 
-          <li><a href="https://www.efa.org.au/cryptography/" title="Cryptography Issues">Cryptography</a></li> 
-         </ul> </li> 
-        <li> 
-         <ul> 
-          <li><a href="https://www.efa.org.au/feed/"><img src="https://www.efa.org.au/main/wp-content/themes/efa3/images/feed-icon.png" title="RSS feed" alt="RSS feed" align="left" border="0"></a>&nbsp;<a href="https://www.efa.org.au/feed/">RSS feed</a></li> 
-         </ul> </li> 
-       </ul> 
-      </div> 
-     </div> 
+   </div> 
+   <div class="SECT2"> 
+    <h2 class="SECT2"> <a name="EXTERNAL-FILTER-SYNTAX">9.3. External filter syntax</a> </h2> 
+    <p> External filters are scripts or programs that can modify the content in case common <tt class="LITERAL"><a href="actions-file.html#FILTER">filters</a></tt> aren't powerful enough. </p> 
+    <p> External filters can be written in any language the platform <span class="APPLICATION">Privoxy</span> runs on supports. </p> 
+    <p> They are controlled with the <tt class="LITERAL"><a href="actions-file.html#EXTERNAL-FILTER">external-filter</a></tt> action and have to be defined in the <tt class="LITERAL"><a href="config.html#FILTERFILE">filterfile</a></tt> first. </p> 
+    <p> The header looks like any other filter, but instead of pcrs jobs, external filters contain a single job which can be a program or a shell script (which may call other scripts or programs). </p> 
+    <p> External filters read the content from STDIN and write the rewritten content to STDOUT. The environment variables PRIVOXY_URL, PRIVOXY_PATH, PRIVOXY_HOST, PRIVOXY_ORIGIN, PRIVOXY_LISTEN_ADDRESS can be used to get some details about the client request. </p> 
+    <p> <span class="APPLICATION">Privoxy</span> will temporary store the content to filter in the <tt class="LITERAL"><a href="config.html#TEMPORARY-DIRECTORY">temporary-directory</a></tt>. </p> 
+    <p> </p> 
+    <table border="0" bgcolor="#E0E0E0" width="100%"> 
+     <tbody>
+      <tr> 
+       <td> <pre class="SCREEN">
+EXTERNAL-FILTER: cat Pointless example filter that doesn't actually modify the content
+/bin/cat
+
+# Incorrect reimplementation of the filter above in POSIX shell.
+#
+# Note that it's a single job that spans multiple lines, the line
+# breaks are not passed to the shell, thus the semicolons are required.
+#
+# If the script isn't trivial, it is recommended to put it into an external file.
+#
+# In general, writing external filters entirely in POSIX shell is not
+# considered a good idea.
+EXTERNAL-FILTER: cat2 Pointless example filter that despite its name may actually modify the content
+while read line; \
+do \
+  echo "$line"; \
+done
+
+EXTERNAL-FILTER: rotate-image Rotate an image by 180 degree. Test filter with limited value.
+/usr/local/bin/convert - -rotate 180 -
+
+EXTERNAL-FILTER: citation-needed Adds a "[citation needed]" tag to an image. The coordinates may need adjustment.
+/usr/local/bin/convert - -pointsize 16 -fill white  -annotate +17+418 "[citation needed]" -
+</pre> </td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <div class="WARNING"> 
+     <table class="WARNING" border="1" width="100%"> 
+      <tbody>
+       <tr> 
+        <td align="CENTER"> <b>Warning</b> </td> 
+       </tr> 
+       <tr> 
+        <td align="LEFT"> <p> Currently external filters are executed with <span class="APPLICATION">Privoxy</span>'s privileges! Only use external filters you understand and trust. </p> </td> 
+       </tr> 
+      </tbody>
+     </table> 
     </div> 
-    <br>
-    <br> 
-    <div class="noindex"> 
-     <div id="footer"> 
-      <br> 
-      <a rel="license" href="https://creativecommons.org/licenses/by/2.5/au/deed.en"><img alt="Creative Commons License" style="border-width:0" src="/main/wp-content/themes/efatheme/images/cc-by-2.5-au.png"></a>
-      <br> 
-      <a href="/copyright/">Copyright</a> © 1995 - 2008 Electronic Frontiers Australia Inc.
-      <br> Unless otherwise stated, material on this website is available created by 
-      <a xmlns:cc="http://creativecommons.org/ns#" href="https://efa.org.au/" property="cc:attributionName" rel="cc:attributionURL">Electronic Frontiers Australia</a> 
-      <br> is licensed under a 
-      <a rel="license" href="https://creativecommons.org/licenses/by/2.5/au/">Creative Commons Attribution 2.5 Australia License</a>. 
-      <br> See our 
-      <a href="/copyright/">copyright policy</a> for exclusions and more information. 
-     </div> 
-    </div> 
-    <br> 
-    <br> 
-    <br> 
+    <p> External filters are experimental and the syntax may change in the future. </p> 
    </div> 
   </div> 
-  <script type="text/javascript">
-  var _paq = _paq || [];
-  _paq.push(["setCustomVariable", 1, "Software", "Legacy HTML", "page"]);
-  _paq.push(["trackPageView"]);
-  _paq.push(["enableLinkTracking"]);
-
-  (function() {
-    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://stats.efa.org.au/";
-    _paq.push(["setTrackerUrl", u+"piwik.php"]);
-    _paq.push(["setSiteId", "1"]);
-    var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
-    g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
-  })();
-</script> 
-  <img src="https://stats.efa.org.au/piwik.php?idsite=1&amp;rec=1" style="border:0" alt="">   
+  <div class="NAVFOOTER"> 
+   <hr align="LEFT" width="100%"> 
+   <table summary="Footer navigation table" width="100%" border="0" cellpadding="0" cellspacing="0"> 
+    <tbody>
+     <tr> 
+      <td width="33%" align="left" valign="top"> <a href="actions-file.html" accesskey="P">Prev</a> </td> 
+      <td width="34%" align="center" valign="top"> <a href="index.html" accesskey="H">Home</a> </td> 
+      <td width="33%" align="right" valign="top"> <a href="templates.html" accesskey="N">Next</a> </td> 
+     </tr> 
+     <tr> 
+      <td width="33%" align="left" valign="top"> Actions Files </td> 
+      <td width="34%" align="center" valign="top"> &nbsp; </td> 
+      <td width="33%" align="right" valign="top"> Privoxy's Template Files </td> 
+     </tr> 
+    </tbody>
+   </table> 
+  </div>   
  </body>
 </html>

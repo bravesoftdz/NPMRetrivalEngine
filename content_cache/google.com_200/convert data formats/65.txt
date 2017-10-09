@@ -1,157 +1,413 @@
 <!doctype html>
 <html>
  <head> 
-  <title>SnapLogic Documentation</title> 
-  <script src="/wiki/frontend-service-worker-register.js" async></script> 
-  <meta name="ajs-site-title" content="SnapLogic Documentation"> 
-  <meta http-equiv="X-UA-Compatible" content="IE=EDGE,chrome=IE7"> 
-  <meta charset="UTF-8"> 
-  <meta id="confluence-context-path" name="confluence-context-path" content="/wiki"> 
-  <meta id="confluence-base-url" name="confluence-base-url" content="https://docs-snaplogic.atlassian.net/wiki"> 
-  <meta id="atlassian-token" name="atlassian-token" content="dc31eca628444f88efe08f0e037a4900f2a35ee9"> 
+  <meta charset="utf-8"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
+  <title>Convert data to Base64 in Node.js</title> 
+  <meta name="HandheldFriendly" content="True"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <link rel="stylesheet" type="text/css" href="/assets/built/screen.css?v=81571df1f5"> 
+  <link rel="stylesheet" type="text/css" href="/assets/built/prism.css?v=81571df1f5"> 
+  <meta name="description" content="Using the Buffer class built-in to Node.js we look at how to convert data in a file to and from Base64."> 
+  <link rel="shortcut icon" href="/favicon.png" type="image/png"> 
+  <link rel="canonical" href="https://icodealot.com/convert-data-to-base64-in-nodejs/"> 
+  <meta name="referrer" content="no-referrer-when-downgrade"> 
+  <link rel="amphtml" href="https://icodealot.com/convert-data-to-base64-in-nodejs/amp/"> 
+  <meta property="og:site_name" content="ICODEALOT"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="Convert data to Base64 in Node.js"> 
+  <meta property="og:description" content="Using the Buffer class built-in to Node.js we look at how to convert data in a file to and from Base64."> 
+  <meta property="og:url" content="https://icodealot.com/convert-data-to-base64-in-nodejs/"> 
+  <meta property="article:published_time" content="2015-08-27T17:42:01.000Z"> 
+  <meta property="article:modified_time" content="2016-05-30T18:50:40.000Z"> 
+  <meta property="article:tag" content="Node.js"> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:title" content="Convert data to Base64 in Node.js"> 
+  <meta name="twitter:description" content="Using the Buffer class built-in to Node.js we look at how to convert data in a file to and from Base64."> 
+  <meta name="twitter:url" content="https://icodealot.com/convert-data-to-base64-in-nodejs/"> 
+  <meta name="twitter:label1" content="Written by"> 
+  <meta name="twitter:data1" content="Justin Biard"> 
+  <meta name="twitter:label2" content="Filed under"> 
+  <meta name="twitter:data2" content="Node.js"> 
+  <meta name="twitter:site" content="@icodealot"> 
+  <meta name="twitter:creator" content="@icodealot"> 
+  <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "ICODEALOT",
+        "logo": "https://icodealot.com/content/images/2017/09/brand.svg"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Justin Biard",
+        "image": {
+            "@type": "ImageObject",
+            "url": "//www.gravatar.com/avatar/35ca0dfd3dd7709fa43aee711713732d?s=250&d=mm&r=x",
+            "width": 250,
+            "height": 250
+        },
+        "url": "https://icodealot.com/author/justin/",
+        "sameAs": [
+            "https://twitter.com/icodealot"
+        ]
+    },
+    "headline": "Convert data to Base64 in Node.js",
+    "url": "https://icodealot.com/convert-data-to-base64-in-nodejs/",
+    "datePublished": "2015-08-27T17:42:01.000Z",
+    "dateModified": "2016-05-30T18:50:40.000Z",
+    "keywords": "Node.js",
+    "description": "Using the Buffer class built-in to Node.js we look at how to convert data in a file to and from Base64.",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://icodealot.com/"
+    }
+}
+    </script> 
+  <script type="text/javascript" src="/public/ghost-sdk.min.js?v=81571df1f5"></script> 
   <script type="text/javascript">
-    var contextPath = '/wiki';
+ghost.init({
+	clientId: "ghost-frontend",
+	clientSecret: "bd3c970544ca"
+});
 </script> 
-  <meta name="confluence-request-time" content="1505673273154"> 
-  <meta name="ajs-is-space-admin" content=""> 
-  <meta name="ajs-has-space-config" content=""> 
-  <meta name="ajs-show-new-app-switcher" content="true"> 
-  <meta name="ajs-use-keyboard-shortcuts" content="true"> 
-  <meta name="ajs-discovered-plugin-features" content="{}"> 
-  <meta name="ajs-keyboardshortcut-hash" content="c6fcbd6021c6683109b918881f91f3c7"> 
-  <meta name="ajs-team-calendars-display-time-format" content="displayTimeFormat12"> 
-  <meta id="team-calendars-display-week-number" content="false"> 
-  <meta id="team-calendars-user-timezone" content="America/Los_Angeles"> 
-  <script type="text/x-template" id="team-calendars-messages" title="team-calendars-messages"><fieldset class="i18n hidden"><input type="hidden" name="calendar3.month.long.july" value="July"><input type="hidden" name="calendar3.day.short.wednesday" value="Wed"><input type="hidden" name="calendar3.day.short.thursday" value="Thu"><input type="hidden" name="calendar3.month.short.march" value="Mar"><input type="hidden" name="calendar3.month.long.april" value="April"><input type="hidden" name="calendar3.month.long.october" value="October"><input type="hidden" name="calendar3.month.long.august" value="August"><input type="hidden" name="calendar3.month.short.july" value="Jul"><input type="hidden" name="calendar3.month.short.may" value="May"><input type="hidden" name="calendar3.month.short.november" value="Nov"><input type="hidden" name="calendar3.day.long.friday" value="Friday"><input type="hidden" name="calendar3.day.long.sunday" value="Sunday"><input type="hidden" name="calendar3.day.long.saturday" value="Saturday"><input type="hidden" name="calendar3.month.short.april" value="Apr"><input type="hidden" name="calendar3.day.long.wednesday" value="Wednesday"><input type="hidden" name="calendar3.month.long.december" value="December"><input type="hidden" name="calendar3.month.short.october" value="Oct"><input type="hidden" name="calendar3.day.long.monday" value="Monday"><input type="hidden" name="calendar3.month.short.june" value="Jun"><input type="hidden" name="calendar3.day.short.monday" value="Mon"><input type="hidden" name="calendar3.day.short.tuesday" value="Tue"><input type="hidden" name="calendar3.day.short.saturday" value="Sat"><input type="hidden" name="calendar3.month.long.march" value="March"><input type="hidden" name="calendar3.month.long.june" value="June"><input type="hidden" name="calendar3.month.short.february" value="Feb"><input type="hidden" name="calendar3.month.short.august" value="Aug"><input type="hidden" name="calendar3.month.short.december" value="Dec"><input type="hidden" name="calendar3.day.short.sunday" value="Sun"><input type="hidden" name="calendar3.month.long.february" value="February"><input type="hidden" name="calendar3.day.long.tuesday" value="Tuesday"><input type="hidden" name="calendar3.month.long.may" value="May"><input type="hidden" name="calendar3.month.long.september" value="September"><input type="hidden" name="calendar3.month.long.november" value="November"><input type="hidden" name="calendar3.month.short.january" value="Jan"><input type="hidden" name="calendar3.month.short.september" value="Sep"><input type="hidden" name="calendar3.day.long.thursday" value="Thursday"><input type="hidden" name="calendar3.month.long.january" value="January"><input type="hidden" name="calendar3.day.short.friday" value="Fri"></fieldset></script> 
-  <meta name="ajs-is-confluence-admin" content="false"> 
-  <meta name="ajs-connection-timeout" content="10000"> 
-  <meta name="ajs-date.format" content="MMM dd, yyyy"> 
-  <meta name="ajs-context-path" content="/wiki"> 
-  <meta name="ajs-base-url" content="https://docs-snaplogic.atlassian.net/wiki"> 
-  <meta name="ajs-version-number" content="1000.0.0-57e69bf"> 
-  <meta name="ajs-build-number" content="6452"> 
-  <meta name="ajs-remote-user" content=""> 
-  <meta name="ajs-remote-user-key" content=""> 
-  <meta name="ajs-atlassian-account-id" content=""> 
-  <meta name="ajs-remote-user-has-licensed-access" content="false"> 
-  <meta name="ajs-current-user-fullname" content=""> 
-  <meta name="ajs-current-user-avatar-url" content=""> 
-  <meta name="ajs-current-user-avatar-uri-reference" content="/wiki/aa-avatar/37a6259cc0c1dae299a7866489dff0bd?s=48&amp;d=https%3A%2F%2Fdocs-snaplogic.atlassian.net%2Fwiki%2Fimages%2Ficons%2Fprofilepics%2Fanonymous.png%3FnoRedirect%3Dtrue"> 
-  <meta name="ajs-static-resource-url-prefix" content="/wiki/s/2136669034/6452/57e69bf6b529f84ebf7f7f48761add3d35e62287/_"> 
-  <meta name="ajs-global-settings-attachment-max-size" content="104857600"> 
-  <meta name="ajs-user-locale" content="en_US"> 
-  <meta name="ajs-enabled-dark-features" content="adg3.no.auto.optout.space.header,adg3.no.auto.optout.logo,react.ui.graphql,adg3.compatible.customui271fdb3cf5a,fd-87.editor.spa,site-wide.shared-drafts,adg3.no.auto.optout.connect,adg3.feature.flag.analytics,adg3.no.auto.optout.global.colourscheme,adg3.compatible.customui0bb9eb0c67d,adg3.no.auto.optout.homepage,adg3.graphql.pagetree,frontend.cache.service.worker,edit.in.app.discovery,global.logo.update,react.ui.spacenav,react.ui.space.webitems,adg3.theme.auto.optout,react.ui.web.panels,adg3.sidebar.onboarding,mediaviewer.companion,adg3.no.auto.optout.space.colourscheme,react.ui.spa.cache,content.based.webresource.url.hashing,adg3.compatible.customui39eec5ed002,adg3.onboarding,exclude-wrm-resources-from-spa,document.conversion.direct.download,mobile.onboarding,discard-changes,adg3.compatible.customui401a9f4b421,es.indexing,adg3.sidebar,adg3.no.auto.optout.header,adg3.flat.pagetree,react.ui.quick-edit,eco.links.data,react.ui.pagetree.sidebar,adg3.compatible.customui66aa0c3dd7d,com.atlassian.connect.js.v5,site-wide.synchrony,fd-230.invite.to.edit,adg3.wasnot.spa,react.ui.graphql.sidebar,notification.plugin.api.enabled.com.atlassian.confluence.plugins.invitetoedit.api.ShareContentEvent,confluence.view.edit.transition,optional-likes-CONFDEV-53297,confluence-inline-comments-resolved,notification.plugin.api.enabled.com.atlassian.confluence.plugins.sharepage.api.ShareContentEvent,notification.plugin.api.enabled.com.atlassian.confluence.plugins.mentions.api.ConfluenceMentionEvent,jim.async.vertigo,rotp.admin.shortcuts,filestore.thumbnail,notification.plugin.api.enabled.com.atlassian.confluence.event.events.security.ForgotPasswordEvent,notification.plugin.api.enabled.com.atlassian.confluence.plugins.tasklist.event.SendTaskEmailEvent,filestore.direct.download,unified.usermanagement,sidebar.deferred,file-annotations,confluence.efi.onboarding.rich.space.content,frontend.editor.plugins,notification.plugin.api.enabled.com.atlassian.confluence.event.events.content.comment.CommentCreateEvent,com.atlassian.growth.experiments.aesJavaClient,notification.plugin.api.enabled.com.atlassian.confluence.plugins.requestaccess.events.AccessGrantedEvent,confluence.sidebar.deferred,notification.plugin.api.enabled.com.atlassian.confluence.event.events.follow.FollowEvent,notification.plugin.api.enabled.com.atlassian.confluence.plugins.inlinecomments.events.InlineCommentReplyEvent,confluence.baseurl.cdn.enabled,notification.plugin.api.enabled.com.atlassian.confluence.event.events.content.blogpost.BlogPostCreateEvent,confluence.attachment.index.media,connect.no-applinks,confluence.table.resizable,react.ui.dashboard,notification.batch,mention.service.userbase.sync.enabled,confluence-inline-comments-rich-editor,graphql.undefined.field.warn,unified.permissions,confluence.non.polling.index.flush,notification.plugin.api.enabled.com.atlassian.confluence.event.events.content.blogpost.BlogPostUpdateEvent,rotp.project.shortcuts,com.atlassian.growth.shakuni.disabled,notification.plugin.api.enabled.com.atlassian.confluence.event.events.content.page.async.PageCreatedEvent,identity-platform.enabled,baseurl.cdn.enabled,notification.plugin.api.enabled.com.atlassian.confluence.efi.emails.events.OnboardingWelcomeEmailEvent,filestore.direct.upload,notification.plugin.api.enabled.com.atlassian.confluence.plugins.files.notifications.event.FileContentMentionUpdateEvent,notification.plugin.api.enabled.com.atlassian.confluence.plugins.hipchat.api.events.HipChatUserMapped,quick-reload-inline-comments-flags,notification.plugin.api.enabled.com.atlassian.confluence.event.events.content.blogpost.BlogPostMovedEvent,jquery.feature.detection.cache,clc.quick.create,cql.search.screen,nps.survey.inline.dialog,confluence.efi.onboarding.new.templates,fabric.mentions,pdf-preview,notification.plugin.api.enabled.com.atlassian.confluence.event.events.content.page.async.PageMovedEvent,notification.plugin.api.enabled.com.atlassian.confluence.plugins.invitetoedit.api.ShareAttachmentEvent,previews.sharing,previews.versions,notification.plugin.api.enabled.com.atlassian.confluence.plugins.files.notifications.event.FileContentUpdateEvent,notification.plugin.api.enabled.com.atlassian.confluence.plugins.invitetoedit.api.ShareDraftEvent,collaborative-audit-log,notification.plugin.api.enabled.com.atlassian.confluence.plugins.files.notifications.event.FileContentRemoveEvent,confluence.wrap.macro,atlassian.aui.raphael.disabled,previews.conversion-service,notification.plugin.api.enabled.com.atlassian.confluence.event.events.content.comment.CommentUpdateEvent,editor.ajax.save,app-switcher.new,notification.plugin.api.enabled.com.atlassian.confluence.event.events.content.page.async.PageEditedEvent,previews.trigger-all-file-types,notification.plugin.api.enabled.com.atlassian.confluence.plugins.inlinecomments.events.InlineCommentResolveEvent,notification.plugin.api.enabled.com.atlassian.confluence.event.events.like.LikeCreatedEvent,notification.plugin.api.enabled.com.atlassian.confluence.plugins.inlinecomments.events.InlineCommentCreateEvent,notification.plugin.api.enabled.com.atlassian.confluence.plugins.invitetoedit.api.ShareCustomEvent,notification.plugin.api.enabled.com.atlassian.confluence.plugins.requestaccess.events.AccessRequestedEvent,previews.sharing.pushstate,attachment.index.media,fusion.bitbucket.rebrand,file-annotations.likes,confluence.pagenav.deferred,notification.plugin.api.enabled.com.atlassian.confluence.plugins.sharepage.api.ShareAttachmentEvent,confluence-inline-comments,confluence-inline-comments-dangling-comment,early.header.flush"> 
-  <meta name="ajs-atl-token" content="dc31eca628444f88efe08f0e037a4900f2a35ee9"> 
-  <meta name="ajs-confluence-flavour" content="STANDALONE"> 
-  <meta name="ajs-user-date-pattern" content="dd MMM yyyy"> 
-  <meta name="ajs-iframe-allowed-for-spa" content="false"> 
-  <link rel="shortcut icon" href="/wiki/s/2136669034/6452/57e69bf6b529f84ebf7f7f48761add3d35e62287/24/_/favicon-update.ico"> 
-  <link rel="icon" type="image/x-icon" href="/wiki/s/2136669034/6452/57e69bf6b529f84ebf7f7f48761add3d35e62287/24/_/favicon-update.ico"> 
-  <!-- 0.0.15-1861 -->
-  <!-- Fallback mode enabled --> 
-  <script type="text/javascript" src="https://d2uowa935fr33t.cloudfront.net/download/fallback-mode.07c8d6822727e7dcff64-v16.js"></script> 
-  <script type="text/javascript" data-src="https://d2uowa935fr33t.cloudfront.net/download/fallback-editor.09d3097a0aa98a38d65e-v16.js" id="fallback-mode-editor"></script> 
-  <link rel="search" type="application/opensearchdescription+xml" href="/wiki/opensearch/osd.action" title="SnapLogic Documentation"> 
+  <meta name="generator" content="Ghost 1.8"> 
+  <link rel="alternate" type="application/rss+xml" title="ICODEALOT" href="https://icodealot.com/rss/"> 
  </head> 
- <body id="com-atlassian-confluence" class="theme-default dashboard aui-layout aui-theme-default"> 
-  <div id="full-height-container"> 
-   <div id="header-precursor"> 
-    <div class="cell"> 
+ <body class="post-template tag-nodejs"> 
+  <div class="site-wrapper"> 
+   <header class="site-header outer"> 
+    <div class="inner"> 
+     <nav class="site-nav"> 
+      <div class="site-nav-left"> 
+       <a class="site-nav-logo" href="https://icodealot.com"><img src="/content/images/2017/09/brand.svg" alt="ICODEALOT"></a> 
+       <ul class="nav"> 
+        <li class="nav-home" role="presentation"><a href="https://icodealot.com">Home</a></li> 
+       </ul> 
+      </div> 
+      <div class="site-nav-right"> 
+       <div class="social-links"> 
+        <a class="social-link social-link-tw" href="https://twitter.com/icodealot" target="_blank">
+         <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 32 32">
+          <path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z" />
+         </svg> </a> 
+       </div> 
+       <a class="subscribe-button" href="#subscribe">Subscribe</a> 
+      </div> 
+     </nav> 
     </div> 
-   </div> 
-   <div class="PageContent"> 
-    <script>
-                var __INITIAL_STATE__ = typeof __INITIAL_STATE__ !== 'undefined' ? __INITIAL_STATE__ : { i18n: { locale: 'en-US', messages: {} } };
-            </script> 
-    <!-- 0.0.15-1861 -->
-    <div id="confluence-ui" class="confluence-dashboard"> 
-     <style>
-        #spa-loader-svg { animation: pulse 2s infinite; }
-        @keyframes pulse {
-          0% { opacity: 0.7; }
-          50% { opacity: 1; }
-          100% { opacity: 0.7; }
-        }
-    </style> 
-     <div id="spa-loader-svg" style="width:80px; margin:0 auto; padding-top:200px"> 
-      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="80px" height="80px" viewbox="0 0 40 40" version="1.1" focusable="false" role="img" aria-labelledby="title-ncwtri2">
-       <title id="title-ncwtri2">Confluence Home</title>
-       <defs>
-        <lineargradient x1="87.3894879%" y1="99.2165215%" x2="35.1317389%" y2="39.2162895%" id="linearGradient-1">
-         <stop stop-color="#A5ADBA" offset="0%" />
-         <stop stop-color="#C1C7D0" offset="100%" />
-        </lineargradient>
-        <lineargradient x1="14.1838118%" y1="5.80047897%" x2="61.141783%" y2="70.9663868%" id="linearGradient-2">
-         <stop stop-color="#A5ADBA" offset="0%" />
-         <stop stop-color="#C1C7D0" offset="100%" />
-        </lineargradient>
-       </defs>
-       <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="confluence-light" fill-rule="nonzero">
-         <path d="M10.0679208,24.8931748 C9.85301417,25.243638 9.61165744,25.6503075 9.40666954,25.9743206 C9.22318946,26.2843791 9.32168891,26.6842575 9.62818873,26.8736224 L13.9263221,29.5186276 C14.0771954,29.6117793 14.2591589,29.6404355 14.4313594,29.5981625 C14.6035598,29.5558895 14.7515684,29.4462293 14.8421552,29.2938021 C15.0140805,29.0061578 15.2355997,28.6325508 15.4769564,28.2324938 C17.1796785,25.4221758 18.8923193,25.7660265 21.9803628,27.2406169 L26.2421274,29.2673521 C26.4035355,29.3441777 26.5891716,29.3523812 26.7567273,29.2900928 C26.924283,29.2278045 27.0594818,29.1003316 27.1315104,28.9367264 L29.1780831,24.3079674 C29.3226768,23.9773763 29.1755503,23.5919046 28.8474575,23.4417282 C27.9481557,23.0185274 26.159471,22.175432 24.5493241,21.3984617 C18.7567628,18.5881437 13.8337469,18.7732941 10.0679208,24.8931748 Z" id="Shape" fill="url(#linearGradient-1)" />
-         <path d="M29.3400897,14.0618786 C29.5549964,13.7114154 29.7963531,13.3047459 30.001341,12.9807328 C30.1848211,12.6706743 30.0863216,12.2707959 29.7798218,12.081431 L25.4816884,9.43642585 C25.3287553,9.33452192 25.1403124,9.30085833 24.961556,9.343509 C24.7827995,9.38615966 24.6298552,9.50127703 24.5394053,9.66125129 C24.36748,9.9488956 24.1459608,10.3225026 23.9046041,10.7225596 C22.201882,13.5328776 20.4892412,13.1890269 17.4011977,11.7144365 L13.1526581,9.6910076 C12.99125,9.61418193 12.805614,9.60597847 12.6380582,9.66826684 C12.4705025,9.73055522 12.3353038,9.85802811 12.2632751,10.0216332 L10.2167024,14.6503923 C10.0721087,14.9809834 10.2192353,15.366455 10.547328,15.5166315 C11.4466298,15.9398323 13.2353145,16.7829277 14.8454614,17.559898 C20.6512477,20.3669097 25.5742636,20.1817593 29.3400897,14.0618786 Z" id="Shape" fill="url(#linearGradient-2)" />
-        </g>
-       </g>
-      </svg> 
+   </header> 
+   <main id="site-main" class="site-main outer" role="main"> 
+    <div class="inner"> 
+     <article class="post-full post tag-nodejs no-image"> 
+      <header class="post-full-header"> 
+       <section class="post-full-meta"> 
+        <time class="post-full-meta-date" datetime="2015-08-27">27 August 2015</time> 
+        <span class="date-divider">/</span> 
+        <a href="/tag/nodejs/">Node.js</a> 
+       </section> 
+       <h1 class="post-full-title">Convert Data to Base64 in Node.js</h1> 
+      </header> 
+      <section class="post-full-content"> 
+       <div class="kg-card-markdown">
+        <p>I was recently working on an internal project and needed to convert some Scalable Vector Graphics (SVG) images to Base64 encoded strings. The files were very small (&lt; 500 bytes). This particular application required all HTML content to be "inlined". Whatever your reason for showing up on my doorstep, this post describes how to convert data in a file to and from Base64 using Node.js.</p> 
+        <p><strong>Note:</strong> This is meant to be a simple utility that I can use as needed. This is not a production ready piece of code and it includes no error checking whatsoever. I am also assuming that you already have <a href="https://nodejs.org" target="_blank">Node.js</a> installed and that everything is working properly on your system.</p> 
+        <h2 id="base64encodetextdata">Base64 Encode Text Data</h2> 
+        <p><strong>Step 1:</strong> Create a new JavaScript program and call it whatever you want. I called mine <code>svg2base64.js</code> because that is what I am using it for. Then, enter the following code into your source file.</p> 
+        <pre><code class="language-js">var fs   = require('fs'),  
+    file = process.argv[2],
+    data = fs.readFileSync(file);
+
+console.log(data.toString('base64'));</code></pre> 
+        <p><strong>Step 2:</strong> Run the program and provide the file name parameter to generate a Base64 encoded string of that file's contents. The program will read the contents of a file identified by <code>argv[2]</code> and output that content as a Base64 encoded string.</p> 
+        <pre><code class="language-js">jbiard$ node svg2base64.js 48x48.svg 
+</code></pre> 
+        <p><strong>NB:</strong> My source file was XML-based. I did not test this program against binary data so you may need to alter the program to suite your own needs if you run into issues, although it <em>should</em> work. Assuming you fed this program a tiny data file (&lt; 500 bytes), then you will get output similar to the following:</p> 
+        <pre><code class="language-">PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Inllcy
+I/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNDgi
+IGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgcHJlc2VydmVBc3BlY3RSYXRpbz
+0ibm9uZSI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj48IVtDREFUQVsjYXZhdGFy
+XzEyM0FCQyB0ZXh0IHsgZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW
+1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3Bh
+Y2U7Zm9udC1zaXplOjhwdCB9IF1dPjwvc3R5bGU+PC9kZWZzPjxnIGlkPSJhdmF0YXJfMT
+IzQUJDIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIGZpbGw9IiNFRUVFRUUiLz48
+Zz48dGV4dCB4PSI2IiB5PSIyOCI+ZFsqXypdYjwvdGV4dD48L2c+PC9nPjwvc3ZnPg==</code></pre> 
+        <p>This program is very simple and as noted before, contains absolutely no error checking. If you are at all concerned about it then you should add any error checking code as needed.</p> 
+        <p>The magic here is happening using an instance of the Node.js Buffer class. Buffers have several methods for converting streams of data to various encodings. For more details, check out <a href="https://nodejs.org/api/buffer.html#buffer_buf_tostring_encoding_start_end" target="_blank">the documentation.</a></p> 
+        <h2 id="base64decodetextdata">Base64 Decode Text Data</h2> 
+        <p>It turns out going the other direction is not so bad. It does require a little more code. The next program we write will read a file that contains Base64 encoded data and output the data as text (ascii) to the console. Follow the same steps as before to create a script and run the program. (I called mine <code>base64toSVG.js</code> because that is what I used it for.)</p> 
+        <pre><code class="language-js">var fs   = require('fs'),  
+    file = process.argv[2],
+    data = fs.readFileSync(file);
+
+console.log(new Buffer(data.toString(), 'base64').toString('ascii'));</code></pre> 
+        <p>I stored the Base64 encoded SVG in a file called <code>svg.base64</code> and then I ran this new program as follows.</p> 
+        <pre><code class="language-js">jbiard$ node base64toSVG.js svg.base64 
+</code></pre> 
+        <p>The program reads the data from the file provided (svg.base64) and then converts that to a string. The final step uses the <code>toString('encoding')</code> function of the Buffer class to convert the data back to ASCII.</p> 
+        <pre><code class="language-svg">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+&lt;svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" preserveAspectRatio="none"&gt;
+    &lt;defs&gt;
+        &lt;style type="text/css"&gt;
+            &lt;![CDATA[#avatar_123ABC text { fill:#AAAAAA;font-weight:bold;font-family:Arial, Helvetica, Open Sans, sans-serif, monospace;font-size:8pt } ]]&gt;
+        &lt;/style&gt;
+    &lt;/defs&gt;
+    &lt;g id="avatar_123ABC"&gt;
+        &lt;rect width="48" height="48" fill="#EEEEEE"/&gt;
+        &lt;g&gt;
+            &lt;text x="6" y="28"&gt;d[*_*]b&lt;/text&gt;
+        &lt;/g&gt;
+    &lt;/g&gt;
+&lt;/svg&gt;</code></pre> 
+        <p><strong>NB:</strong> If your original file did not contain text data then this probably won't work for you. If your source file was binary for example, you will need to alter this program to work for your own use-case.</p> 
+        <pre><code class="language-js"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCA0OCA0OCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnM+PHN0eWxlIHR5cGU9InRleHQvY3NzIj48IVtDREFUQVsjYXZhdGFyXzEyM0FCQyB0ZXh0IHsgZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjhwdCB9IF1dPjwvc3R5bGU+PC9kZWZzPjxnIGlkPSJhdmF0YXJfMTIzQUJDIj48cmVjdCB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIGZpbGw9IiNFRUVFRUUiLz48Zz48dGV4dCB4PSI2IiB5PSIyOCI+ZFsqXypdYjwvdGV4dD48L2c+PC9nPjwvc3ZnPg==" alt="SVG" width="48px" height="48px"></code></pre> 
+        <p>Cheers!</p> 
+       </div> 
+      </section> 
+      <section class="subscribe-form"> 
+       <h3 class="subscribe-form-title">Subscribe to ICODEALOT</h3> 
+       <p>Get the latest posts delivered right to your inbox</p> 
+       <form action="//icodealot.us16.list-manage.com/subscribe/post?u=4b981671593d7a56392aa2b43&amp;id=9d5b084d86" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" novalidate> 
+        <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups--> 
+        <div style="position: absolute; left: -5000px;" aria-hidden="true">
+         <input type="text" name="b_4b981671593d7a56392aa2b43_9d5b084d86" tabindex="-1" value="">
+        </div> 
+        <div class="form-group"> 
+         <input type="email" value="" name="EMAIL" class="email subscribe-email" id="mce-EMAIL" placeholder="youremail@example.com" required> 
+        </div> 
+        <button class="" type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe"><span>Subscribe</span></button> 
+       </form> 
+       <!--End mc_embed_signup--> 
+      </section> 
+      <footer class="post-full-footer"> 
+       <section class="author-card"> 
+        <img class="author-profile-image" src="//www.gravatar.com/avatar/35ca0dfd3dd7709fa43aee711713732d?s=250&amp;d=mm&amp;r=x" alt="Justin Biard"> 
+        <section class="author-card-content"> 
+         <h4 class="author-card-name"><a href="/author/justin/">Justin Biard</a></h4> 
+         <p>Working with technology for 20+ years and just scratching the surface.</p> 
+        </section> 
+       </section> 
+       <div class="post-full-footer-right"> 
+        <a class="author-card-button" href="/author/justin/">Read More</a> 
+       </div> 
+      </footer> 
+     </article> 
+    </div> 
+   </main> 
+   <aside class="read-next outer"> 
+    <div class="inner"> 
+     <div class="read-next-feed"> 
+      <article class="read-next-card"> 
+       <header class="read-next-card-header"> 
+        <small class="read-next-card-header-sitetitle">— ICODEALOT —</small> 
+        <h3 class="read-next-card-header-title"><a href="/tag/nodejs/">Node.js</a></h3> 
+       </header> 
+       <div class="read-next-divider">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24">
+         <path d="M13 14.5s2 3 5 3 5.5-2.463 5.5-5.5S21 6.5 18 6.5c-5 0-7 11-12 11C2.962 17.5.5 15.037.5 12S3 6.5 6 6.5s4.5 3.5 4.5 3.5" />
+        </svg> 
+       </div> 
+       <div class="read-next-card-content"> 
+        <ul> 
+         <li><a href="/oracle-jet-native-apps-with-electron-and-node-js/">Oracle JET Native Apps with Electron and Node.js</a></li> 
+         <li><a href="/json-to-sqlite-on-the-raspberry-pi-with-node-js/">JSON to SQLite on the Raspberry Pi with Node.js</a></li> 
+         <li><a href="/get-multiple-redis-hashes-in-node-js/">Get Multiple Redis Hashes in Node.js</a></li> 
+        </ul> 
+       </div> 
+       <footer class="read-next-card-footer"> 
+        <a href="/tag/nodejs/">See all 5 posts ?</a> 
+       </footer> 
+      </article> 
+      <article class="post-card post tag-hyperion no-image"> 
+       <div class="post-card-content"> 
+        <a class="post-card-content-link" href="/business-rules-to-launch-them-all/"> 
+         <header class="post-card-header"> 
+          <span class="post-card-tags">Hyperion</span> 
+          <h2 class="post-card-title">Business Rules To Launch Them All</h2> 
+         </header> 
+         <section class="post-card-excerpt"> 
+          <p>So you have yourself one of those fancy on-premise Oracle EPM systems built with Hyperion Planning and Oracle Essbase. If you didn't do that or don't plan to do so, then you might</p> 
+         </section> </a> 
+        <footer class="post-card-meta"> 
+         <img class="author-profile-image" src="//www.gravatar.com/avatar/35ca0dfd3dd7709fa43aee711713732d?s=250&amp;d=mm&amp;r=x" alt="Justin Biard"> 
+         <span class="post-card-author"><a href="/author/justin/">Justin Biard</a></span> 
+         <a class="social-link social-link-card" href="https://twitter.com/share?text=Business%20Rules%20To%20Launch%20Them%20All&amp;url=https://icodealot.com/business-rules-to-launch-them-all/" onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;"> 
+          <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 32 32">
+           <path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z" />
+          </svg> </a> 
+         <a class="social-link social-link-card" href="https://www.facebook.com/sharer/sharer.php?u=https://icodealot.com/business-rules-to-launch-them-all/" onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;"> 
+          <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 32 32">
+           <path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z" />
+          </svg> </a> 
+        </footer> 
+       </div> 
+      </article> 
+      <article class="post-card post tag-msdos no-image"> 
+       <div class="post-card-content"> 
+        <a class="post-card-content-link" href="/batch-scripts-can-not-suck/"> 
+         <header class="post-card-header"> 
+          <span class="post-card-tags">MS-DOS</span> 
+          <h2 class="post-card-title">Batch Scripts Can Not Suck</h2> 
+         </header> 
+         <section class="post-card-excerpt"> 
+          <p>Note, I am assuming you are familiar with Microsoft Windows, possibly batch scripting, or at least have some interest in the topic. If you didn't know, the world is rife with batch scripts</p> 
+         </section> </a> 
+        <footer class="post-card-meta"> 
+         <img class="author-profile-image" src="//www.gravatar.com/avatar/35ca0dfd3dd7709fa43aee711713732d?s=250&amp;d=mm&amp;r=x" alt="Justin Biard"> 
+         <span class="post-card-author"><a href="/author/justin/">Justin Biard</a></span> 
+         <a class="social-link social-link-card" href="https://twitter.com/share?text=Batch%20Scripts%20Can%20Not%20Suck&amp;url=https://icodealot.com/batch-scripts-can-not-suck/" onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;"> 
+          <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 32 32">
+           <path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z" />
+          </svg> </a> 
+         <a class="social-link social-link-card" href="https://www.facebook.com/sharer/sharer.php?u=https://icodealot.com/batch-scripts-can-not-suck/" onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;"> 
+          <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 32 32">
+           <path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z" />
+          </svg> </a> 
+        </footer> 
+       </div> 
+      </article> 
      </div> 
     </div> 
-    <style>
-    /* A very basic CSS override to avoid FOUC when loading async styles */
-    body { font-family: sans-serif; font-size: 14px; margin:0; padding:0; }
-    a { text-decoration: none; }
-    h1 { font-weight: normal; }
-</style> 
-    <script type="text/javascript">
-    window.webpackManifest={"0":"store-subscriptions.a05c12fee0ecfdcf6834-v16.js","1":"en.18c0ee88e23030317a70-v16.js","2":"intl.06479319ce7a56ea6d53-v16.js","3":"translations.ru-RU.29a9fbb22c5b09f2fd9b-v16.js","4":"translations.pt.BR.d9dfa8c3236ccf3789c1-v16.js","5":"translations.ko-KR.436a3845b127145c2cee-v16.js","6":"translations.ja-JP.a6b8352405275d6aba83-v16.js","7":"translations.fr-FR.e5a861ab085781065ae3-v16.js","8":"translations.es-ES.2ce54cd4b696c19d5bfc-v16.js","9":"translations.en-US.5958984e053a20755445-v16.js","10":"translations.de-DE.da3dce3704d286468d05-v16.js","11":"ru-RU-polyfill.6be48c511d9a236db32c-v16.js","12":"pt-BR-polyfill.db88a0f3bf901ea9bf69-v16.js","13":"ko-KR-polyfill.336c96635e45f35172b1-v16.js","14":"ja-JP-polyfill.c43a1f526fe9a334e5c8-v16.js","15":"fr-FR-polyfill.7fab605e24cf384bf5a5-v16.js","16":"es-ES-polyfill.d1aae6bb6689aa36b169-v16.js","17":"en-US-polyfill.09ec0ef7c1767a218d5c-v16.js","18":"en-GB-polyfill.2598e923f2f4924b6cc8-v16.js","19":"de-DE-polyfill.010890cb892b019b95bf-v16.js","20":"ru.dca4a28e64ad4aa6a5cf-v16.js","21":"pt.a54001905e4db29c9599-v16.js","22":"ko.c7c781f0c1c7bcc7204d-v16.js","23":"ja.38a181d49a2e4210c507-v16.js","24":"fr.973b8a62f70ddb902a74-v16.js","25":"es.8e7a19e97b456a5fb168-v16.js","26":"de.b5eede8daca9a2af9a4e-v16.js","27":"adg3.space.blog.2de307a10c7ab95c7c99-v16.js","28":"fabric.editor.de35a357aa86f71840dc-v16.js","29":"adg3.sidebar.navigation.a4d9e02fe2d3c9df3427-v16.js","30":"space.overview.b35fc4b78de066ed5ddb-v16.js","31":"sidebar.navigation.b98fd39e1da6a0fd4743-v16.js","32":"space.viewpage.5b3d653a124076a847f0-v16.js","33":"dashboard.saved-for-later.ba3773cd86d7d63c8e13-v16.js","34":"dashboard.recent-work.246ff598e2474a55a25a-v16.js","35":"dashboard.recently-visited.b546e92597f9416cc18c-v16.js","36":"dashboard.recommended.80c2d17472f974d224fe-v16.js","37":"dashboard.popular.e86789267dd8409dd032-v16.js","38":"dashboard.all-updates.5372e9b503c950a82783-v16.js","39":"space.editpage.91e8c463cc488e14ea88-v16.js","40":"space.createpage.88845fe4c6503a949671-v16.js","41":"space.pages.90576b982967629f8a00-v16.js","42":"right-sidebar.b99f478f315e56367045-v16.js","43":"setup-analytics.52de029d16249625900d-v16.js","44":"dashboard.container.44fdbd3fdce6c5c159d0-v16.js","45":"adg3.sidebar.flattree.9311d2e525f55fa431f2-v16.js","46":"adg3.sidebar.pagetree.38f8d1dd54c24942babe-v16.js","47":"space.base.edd266148f1263450511-v16.js","48":"space.questions.a09c6089a45cd7033323-v16.js","49":"space.addon.677e813f0f3dd0832c6e-v16.js","50":"space.calendar.825702b545c66f6df53e-v16.js","51":"sentry.dc189f7599e37031a39b-v16.js","52":"atlaskit-styles.7b374c870056489b8851-v16.js","53":"mywork.redirect.bc5df988188de0aca85a-v16.js","54":"discover.redirect.fc5f2b5fadfdff97e95e-v16.js","55":"dashboard.index-redirect.8dc610efa8e9741d5887-v16.js","56":"space.index-redirect.657e8ca22b59664f5aba-v16.js","57":"dashboard.my-work.d493a9bae3677c362250-v16.js","58":"standalone-navigation.675377938ace0748a5d8-v16.js","59":"app.9293e8d146fbd5db4be3-v16.js","60":"commons.195f299dabdd7242bb70-v16.js","61":"atlassian-editor-plugins.56c5fc01bf4cc9f1f7dd-v16.js","62":"page.comments.4ffb98c83db11d67a5a9-v16.js","63":"page.header.ca167d9a6110c71ee56e-v16.js","64":"editor.2d60f4c73ed0e303a66e-v16.js","65":"page.byline.9361d3333201b31633d7-v16.js","66":"page.labels.d25e0dc3d18cc36c93f1-v16.js","67":"page.editor-loader.6fdfefa6b03412d5895b-v16.js","68":"page.quick-reload.0d207f0a9cd8fd7aeb27-v16.js","69":"editor-styles-legacy.0e05f479037e23960cc8-v16.js","70":"editor-styles-adg3.d7f62557215bbeab041c-v16.js","71":"page.editor-flags.90cda9ab612e22fb85fe-v16.js","72":"page.highlight-actions.334b1aeee4311c9f4990-v16.js","73":"atlassian-editor.5011091658b03eaa60b2-v16.js","78":"@atlaskit/editor-core.4a83646e1d366d10bc6f-v16.js","80":"adg3.lazy.sidebar.onboarding.ff2bf56bd43a965f1334-v16.js","81":"content.sortable-tables.7733b0f4854dfdc68aed-v16.js","82":"82.9e7687c569c6ebd0de5d-v16.js","83":"83.cec476f7337862c3aee0-v16.js"};
-    (function() {
-        function isDarkFeatureEnabled(key) {
-            var featuresMetaTag = document.querySelector('meta[name=ajs-enabled-dark-features]');
-        
-            if (featuresMetaTag) {
-                var featureList = featuresMetaTag.content.split(',');
-                return featureList.indexOf(key) > -1 && featureList.indexOf(key + 'disable') === -1;
-            }
-        }
-
-        if (isDarkFeatureEnabled('adg3.sidebar')) {
-            // This changes the background to white for ADG3 because AUI sets it to gray. This avoids a flash of gray
-            // while loading, and can be removed once AUI styles have been removed from Confluence.
-            document.body.style.backgroundColor = '#fff';
-        }
-        
-        function getExternalResources() {
-            if (isDarkFeatureEnabled('use.experimental.externalised.webresources')) {
-                return ["https://d2uowa935fr33t.cloudfront.net/download/modules/jquery/1.7.2.1-confluence-custom-m04/jquery-min.js","https://d2uowa935fr33t.cloudfront.net/download/modules/almond/0.2.5/almond-confluence-min.js","https://d2uowa935fr33t.cloudfront.net/download/modules/@atlassian/wrm/0.0.8/wrm.js","https://d2uowa935fr33t.cloudfront.net/download/modules/confluence-web-resources/0.0.1/module-exporter.js","https://d2uowa935fr33t.cloudfront.net/download/modules/confluence-web-resources/0.0.1/shims/jquery-amd.js"];
-            }
-            
-            return ["https://d2uowa935fr33t.cloudfront.net/download/modules/jquery/1.7.2.1-confluence-custom-m04/jquery-min.js"];
-        }
-        
-        function shouldExcludeWRMResources() {
-            return isDarkFeatureEnabled('adg3.sidebar') && isDarkFeatureEnabled('exclude-wrm-resources-from-spa');
-        }
-        
-        var externals = getExternalResources();
-        
-        var files = ["https://d2uowa935fr33t.cloudfront.net/download/vendor.bedafc7a5096d26804cd-v16.js","https://d2uowa935fr33t.cloudfront.net/download/commons.195f299dabdd7242bb70-v16.js","https://d2uowa935fr33t.cloudfront.net/download/app.9293e8d146fbd5db4be3-v16.js"];
-
-        if (shouldExcludeWRMResources()) {
-            files = externals.concat(files);
-        }
-
-        var frag = document.createDocumentFragment();
-        files.forEach(function(file) {
-            var scriptElement = window.document.createElement('script');
-            scriptElement.src = file;
-            scriptElement.async = false;
-            frag.appendChild(scriptElement);
-        });
-
-        document.head.appendChild(frag);
-    })();
-</script> 
+   </aside> 
+   <div class="floating-header"> 
+    <div class="floating-header-logo"> 
+     <a href="https://icodealot.com"> <img src="/content/images/2017/09/brand.svg" alt="ICODEALOT" class="site-logo-post"> </a> 
+    </div> 
+    <span class="floating-header-divider">—</span> 
+    <div class="floating-header-title">
+     Convert Data to Base64 in Node.js
+    </div> 
+    <div class="floating-header-share"> 
+     <div class="floating-header-share-label">
+      Share this 
+      <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24"> 
+       <path d="M7.5 15.5V4a1.5 1.5 0 1 1 3 0v4.5h2a1 1 0 0 1 1 1h2a1 1 0 0 1 1 1H18a1.5 1.5 0 0 1 1.5 1.5v3.099c0 .929-.13 1.854-.385 2.748L17.5 23.5h-9c-1.5-2-5.417-8.673-5.417-8.673a1.2 1.2 0 0 1 1.76-1.605L7.5 15.5zm6-6v2m-3-3.5v3.5m6-1v2" /> 
+      </svg> 
+     </div> 
+     <a class="floating-header-share-tw" href="https://twitter.com/share?text=Convert%20Data%20to%20Base64%20in%20Node.js&amp;url=https://icodealot.com/convert-data-to-base64-in-nodejs/" onclick="window.open(this.href, 'share-twitter', 'width=550,height=235');return false;"> 
+      <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 32 32">
+       <path d="M30.063 7.313c-.813 1.125-1.75 2.125-2.875 2.938v.75c0 1.563-.188 3.125-.688 4.625a15.088 15.088 0 0 1-2.063 4.438c-.875 1.438-2 2.688-3.25 3.813a15.015 15.015 0 0 1-4.625 2.563c-1.813.688-3.75 1-5.75 1-3.25 0-6.188-.875-8.875-2.625.438.063.875.125 1.375.125 2.688 0 5.063-.875 7.188-2.5-1.25 0-2.375-.375-3.375-1.125s-1.688-1.688-2.063-2.875c.438.063.813.125 1.125.125.5 0 1-.063 1.5-.25-1.313-.25-2.438-.938-3.313-1.938a5.673 5.673 0 0 1-1.313-3.688v-.063c.813.438 1.688.688 2.625.688a5.228 5.228 0 0 1-1.875-2c-.5-.875-.688-1.813-.688-2.75 0-1.063.25-2.063.75-2.938 1.438 1.75 3.188 3.188 5.25 4.25s4.313 1.688 6.688 1.813a5.579 5.579 0 0 1 1.5-5.438c1.125-1.125 2.5-1.688 4.125-1.688s3.063.625 4.188 1.813a11.48 11.48 0 0 0 3.688-1.375c-.438 1.375-1.313 2.438-2.563 3.188 1.125-.125 2.188-.438 3.313-.875z" />
+      </svg> </a> 
+     <a class="floating-header-share-fb" href="https://www.facebook.com/sharer/sharer.php?u=https://icodealot.com/convert-data-to-base64-in-nodejs/" onclick="window.open(this.href, 'share-facebook','width=580,height=296');return false;"> 
+      <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 32 32">
+       <path d="M19 6h5V0h-5c-3.86 0-7 3.14-7 7v3H8v6h4v16h6V16h5l1-6h-6V7c0-.542.458-1 1-1z" />
+      </svg> </a> 
+    </div> 
+    <progress class="progress" value="0"> 
+     <div class="progress-container"> 
+      <span class="progress-bar"></span> 
+     </div> </progress> 
+   </div> 
+   <footer class="site-footer outer"> 
+    <div class="site-footer-content inner"> 
+     <section class="copyright">
+      <a href="https://icodealot.com">ICODEALOT</a> © 2017
+     </section> 
+     <nav class="site-footer-nav"> 
+      <a href="https://icodealot.com">Latest Posts</a> 
+      <a href="https://twitter.com/icodealot" target="_blank">Twitter</a> 
+      <a href="https://ghost.org" target="_blank">Ghost</a> 
+     </nav> 
+    </div> 
+   </footer> 
+  </div> 
+  <div id="subscribe" class="subscribe-overlay"> 
+   <a class="subscribe-overlay-close" href="#"></a> 
+   <div class="subscribe-overlay-content"> 
+    <img class="subscribe-overlay-logo" src="/content/images/2017/09/brand.svg" alt="ICODEALOT"> 
+    <h1 class="subscribe-overlay-title">Subscribe to ICODEALOT</h1> 
+    <p class="subscribe-overlay-description">Stay up to date! Get all the latest &amp; greatest posts delivered straight to your inbox.</p> 
+    <form action="//icodealot.us16.list-manage.com/subscribe/post?u=4b981671593d7a56392aa2b43&amp;id=9d5b084d86" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" novalidate> 
+     <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups--> 
+     <div style="position: absolute; left: -5000px;" aria-hidden="true">
+      <input type="text" name="b_4b981671593d7a56392aa2b43_9d5b084d86" tabindex="-1" value="">
+     </div> 
+     <div class="form-group"> 
+      <input type="email" value="" name="EMAIL" class="email subscribe-email" id="mce-EMAIL" placeholder="youremail@example.com" required> 
+     </div> 
+     <button class="" type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe"><span>Subscribe</span></button> 
+    </form> 
+    <!--End mc_embed_signup--> 
    </div> 
   </div> 
-  <span style="display:none;" id="confluence-server-performance">{"serverDuration": 32, "requestCorrelationId": "00fbb1a5cc52b430"}</span>   
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous">
+    </script> 
+  <script type="text/javascript" src="/assets/js/jquery.fitvids.js?v=81571df1f5"></script> 
+  <script src="/assets/js/prism.js?v=81571df1f5"></script> 
+  <script>
+
+// NOTE: Scroll performance is poor in Safari
+// - this appears to be due to the events firing much more slowly in Safari.
+//   Dropping the scroll event and using only a raf loop results in smoother
+//   scrolling but continuous processing even when not scrolling
+$(document).ready(function () {
+    // Start fitVids
+    var $postContent = $(".post-full-content");
+    $postContent.fitVids();
+    // End fitVids
+
+    var progressBar = document.querySelector('progress');
+    var header = document.querySelector('.floating-header');
+    var title = document.querySelector('.post-full-title');
+
+    var lastScrollY = window.scrollY;
+    var lastWindowHeight = window.innerHeight;
+    var lastDocumentHeight = $(document).height();
+    var ticking = false;
+
+    function onScroll() {
+        lastScrollY = window.scrollY;
+        requestTick();
+    }
+
+    function onResize() {
+        lastWindowHeight = window.innerHeight;
+        lastDocumentHeight = $(document).height();
+        requestTick();
+    }
+
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(update);
+        }
+        ticking = true;
+    }
+
+    function update() {
+        var trigger = title.getBoundingClientRect().top + window.scrollY;
+        var triggerOffset = title.offsetHeight + 35;
+        var progressMax = lastDocumentHeight - lastWindowHeight;
+
+        // show/hide floating header
+        if (lastScrollY >= trigger + triggerOffset) {
+            header.classList.add('floating-active');
+        } else {
+            header.classList.remove('floating-active');
+        }
+
+        progressBar.setAttribute('max', progressMax);
+        progressBar.setAttribute('value', lastScrollY);
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', onScroll, {passive: true});
+    window.addEventListener('resize', onResize, false);
+
+    update();
+});
+</script> 
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-90669067-1', 'auto');
+  ga('send', 'pageview');
+
+</script>   
  </body>
 </html>

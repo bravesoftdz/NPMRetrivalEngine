@@ -23,7 +23,7 @@ public class QueryManager {
 	}
 
 	protected void loadQueries() {
-		String fichero = "examples/queries";
+		String fichero = ConfigManager.getInstance().getProperty("queries_dir")+"/queries";
 		try {
 			FileReader fr = new FileReader(fichero);
 			BufferedReader br = new BufferedReader(fr);

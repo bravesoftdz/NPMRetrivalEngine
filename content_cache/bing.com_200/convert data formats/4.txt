@@ -1,358 +1,712 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<!doctype html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
  <head> 
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
-  <title>Date/Epoch Time Converter - JavaScript Utilities/Tools - ESQSoft</title> 
-  <meta name="description" content="
-  This is a JavaScript utility for converting date-to-epoch time or epoch-to-date. 
-  keywords: What is Epoch, Convert Epoch Time, Epoch Conversion Tool
-  Be sure to bookmark us. Visit us at http://ESQSoft.com
-"> 
-  <meta name="keywords" content="date epoch time conversion converter convert epoc javascript epoch to date conversion date to epoch converter"> 
- </head>
- <body>
-  <script type="text/javascript" src="../template/template1.js"></script> 
-  <script type="text/javascript">
-document.write(header())
-</script> 
-  <h1>Date/Epoch Converter</h1> 
-  <form name="ivnForm" onsubmit="return false" style="margin:0;"> 
-   <br>
-   <br>
-   <b>Option <u>1</u>: Enter a human readable date</b> 
-   <h3> 
-    <table width="420" style="border:1px black solid;border-left:0;border-right:0;background-color:#ffd;"> 
-     <tbody>
-      <tr> 
-       <td class="content" nowrap>New Date:</td> 
-       <td width="100"> <select name="month" accesskey="1" onchange="if(window.getDays) window.getDays(this,this.form.day,this.form.year)"> <option value="0">January</option> <option value="1">February</option> <option value="2">March</option> <option value="3">April</option> <option value="4">May</option> <option value="5">June</option> <option value="6">July</option> <option value="7">August</option> <option value="8">September</option> <option value="9">October</option> <option value="10">November</option> <option value="11">December</option> </select> </td> 
-       <td width="50"> <select name="day" nchange="getDays(this.form.month,this.form.day,this.form.year)"></select> </td> 
-       <td width="40"> <input type="text" name="year" maxlength="4" onchange="getDays(this.form.month,this.form.day,this.form.year)" value="" style="width:50px;"> </td> 
-       <td width="150" nowrap>&nbsp;&nbsp; <script type="text/javascript">
-      var html = '<select name="hour">'
-      for(var i=0; i<=24; i++){ html+='<option value="'+i+'">'+i }
-      html += '</select>:<select name="minute">'
-      for(var i=0; i<=59; i++){ html+='<option value="'+i+'">'+i }
-      html += '</select>:<select name="second">'
-      for(var i=0; i<=59; i++){ html+='<option value="'+i+'">'+i }
-      document.write(html)
-      </script> </td> 
-      </tr> 
-      <tr> 
-       <td align="right" width="100%" colspan="5"> <button accesskey="c" style="width:90px;" onclick="toEpoch(this.form.month,this.form.day,this.form.year,this.form.hour,this.form.minute,this.form.second)">To Epo<u>c</u>h</button> </td> 
-      </tr> 
-     </tbody>
-    </table> </h3> 
-   <br>
-   <br>
-   <b>Option <u>2</u>: Enter an epoch time value</b> 
-   <h3> 
-    <table width="420" style="border:1px black solid;border-left:0;border-right:0;background-color:#ffd;"> 
-     <tbody>
-      <tr> 
-       <td class="content" nowrap>New Epoch Time Value:</td> 
-       <td width="100%"><input name="epoch" accesskey="2" value="[|| form.epoch]"></td> 
-      </tr> 
-      <tr> 
-       <td align="right" colspan="2"> <button style="width:90px;" onclick="document.getElementById('dynamo').innerHTML = toDate(this.form.epoch)" accesskey="o">T<u>o</u> Date</button> </td> 
-      </tr> 
-     </tbody>
-    </table> </h3> 
-   <br>
-   <br>
-   <b>Conversion Output:</b> 
-   <h3> 
-    <div id="dynamo" class="code" style="border:1px black solid;border-left:0;border-right:0;background-color:#ffd;height:100px;">
-      (the conversion will appear here) 
-    </div> <p><input type="checkbox" name="GMT" accesskey="g" onchange="populateDates();"> <u>G</u>MT (if unchecked, it uses your local time without attempting the offset.) </p></h3> 
-  </form> 
-  <p></p>
-  <h1>Current Time (from your computer)</h1> 
-  <h3> 
-   <table width="100%" cellpadding="5"> 
-    <tbody>
-     <tr valign="top">
-      <td> <b>Current Date/Time: (JavaScript)</b> <p></p>
-       <div id="jdate1">
-        (Sorry, it doesn't appear that your browser currently supports JavaScript.)
-       </div> </td>
-      <td> <b>Current Date/Time: (PerlScript)</b> <p></p>
-       <div id="pdate1">
-        (Sorry, it doesn't appear that you have 
-        <a href="http://www.xav.com/perl/Components/Windows/PerlScript.html" target="_blank">PerlScript</a> installed.)
-       </div> </td>
-     </tr> 
-    </tbody>
-   </table> <p></p>
-   <table width="100%" cellpadding="5"> 
-    <tbody>
-     <tr valign="top"> 
-      <td colspan="2" style="border-top:1px black solid;"> This section shows the output of two client-side scripting languages: JavaScript and PerlScript. Why JavaScript? (It's arguably the de facto standard for client-side scripting on the web.) Why PerlScript? (I just thought it was cool that there is a PERL interpreter for browsers, rare though it is.) I've left out VBScript, ...sorry. How the output for this section is generated is really secondary to the core date-to-epoch and epoch-to-date conversion topic. It's relevance in this example is that DHTML techniques using a client-side scripting language is what updates this webpage with your input without a reload from the server. </td> 
-     </tr> 
-    </tbody>
-   </table> </h3> 
-  <p></p>
-  <h1>What is Epoch</h1> 
-  <h3> Epoch has a few meanings (see also <a href="http://dictionary.reference.com/search?q=epoch">http://dictionary.reference.com/search?q=epoch</a>). The definition that we'll use is "0" in computer time. While there are folks who will argue this, for our purposes, this "0" time on our calendar was January 1, 1970 00:00:00 GMT. Epoch is useful in the programming world because it allows us to mathematically compare dates with other dates or some other measure of time. Said another way, it allows us to use a programming algorithm to make decisions regarding a human readable date or time. See the examples of usage section below for more detail. </h3> 
-  <p></p>
-  <h1>How to Convert between Date and Epoch</h1> 
-  <h3> I've had a number of inquiries into how to do the conversion. I figured folks interested in that level of detail would use the source code for this page to ascertain the approach used here. However, I suppose assuming everyone enjoys deciphering the idiosyncrasies of JavaScript for fun was a bit naive... my bad. I'll take a stab at explaining what the code does. <p>First off, the easiest way to get the current time in epoch (using JavaScript), is to call getTime() method of the JavaScript Date object and divide the return value by 1000. getTime returns the number of milliseconds elapsed, in your computer's timezone, since 1/1/1970 GMT. Because epoch is measured in seconds, you then want to divide the return value by 1000 to change milliseconds into seconds. Keep in mind that the JavaScript Date object will get it's time from your computer's clock. Here's a really simple example doing this. </p><p></p>
-   <div id="ivnS1"> 
-    <script type="text/javascript">
-function epochExample1(){
-  var d = new Date(); prompt('Cut/Paste into the converter to Test',(d.getTime()-d.getMilliseconds())/1000)
-}
-</script> 
-    <a href="#" onclick="epochExample1(); return false;">Click to Show Current Epoch Time</a> 
-   </div><p></p>
-   <div id="ivnT1" class="code" style="height:125px;"></div> <script type="text/javascript">
-if(document && document.getElementById){
-  sObj = document.getElementById('ivnS1'); tObj = document.getElementById('ivnT1');
-  if(sObj && sObj.innerHTML && tObj) tObj.innerHTML = '<xmp>'+sObj.innerHTML+'</xmp>'
-}
-</script> <p>Note: We're subtracting the milliseconds in order to get a whole number instead of a fraction. You could probably use parseInt similarly, in fact, here's another mini-example demonstrating the differences between (a) getTime()/1000 alone -- sometimes a fraction is returned, (b) method above, (getTime - milliseconds)/1000, and (c) parseInt(getTime/1000). </p>
-   <div id="ivnS3"> 
-    <script type="text/javascript">
-function testMethods1(){
-  /* testing differences between getTime/1000 vs. subtracting milliseconds vs. parseInt(getTime/1000) */
-  var d1 = new Date();
-  var d1t0 = d1.getTime()/1000;
-  var d1t1 = (d1.getTime()-d1.getMilliseconds())/1000;
-  var d1t2 = parseInt(d1.getTime()/1000);
-  var msg = 'Testing various methods:'
-  +'\n1) Date.getTime()/1000                          = '+d1t0
-  +'\n2) (Date.getTime()-Date.getMilliseconds())/1000 = '+d1t1
-  +'\n3) parseInt(Date.getTime()/1000)                = '+d1t2
-  alert(msg)
-  return false
-}
-</script> 
-    <p><a href="#" onclick="return testMethods1()">Click to test</a> </p>
-   </div><p></p>
-   <div id="ivnT3" class="code" style="height:125px;"></div> <script type="text/javascript">
-if(document && document.getElementById){
-  sObj = document.getElementById('ivnS3'); tObj = document.getElementById('ivnT3');
-  if(sObj && sObj.innerHTML && tObj) tObj.innerHTML = '<xmp>'+sObj.innerHTML+'</xmp>'
-}
-
-
-
-/* have the date in the example generated dynamically */
-var d = new Date(); 
-var syear = d.getFullYear() + 1;  // next year
-var tyears = syear-1970;
-var tdays = tyears * 365;
-var tseconds = 0;
-function dw(x){ document.write(x); }
-function years_2_seconds(n){ return n * 86400 }
-function days_2_seconds(n){ /* ? */ }
-function sanity_check(n,note){
-  if(!note) note = '';
-  var d=new Date();
-  alert('Converting what we\'ve got so far into seconds...\n\nEpoch = '+d.getTime(n)+'\nDate = '+d+'\n\n'+note);
-  return false;
-}
-</script> <p><b>"Tools are all well and good, but I like pain, how do you do this manually"</b> </p><p>Er ok... if you have a human friendly date/time that you want to convert, but you are shall we say "tool averse" or you just enjoy mental gymnastics (good for you, btw), I'll take a stab at explaining a process for doing this manually. </p><p>Keep in mind that an accurate description of what the JavaScript Date Object methods are doing isn't in scope--rather my effort to explain will be conceptual. (So easy even a Geico customer could do it, my caveman friend likes to say ;-) </p><p>You could do a rough calculation as follows: </p><p>For kicks and giggles let's use for our example a day that many folks will recognize, April 15, <script>dw(syear);</script>. And, we'll say it's 08:30 in the morning just to add some spice to this effort. </p><p><b>Years</b> </p><p>Start with the year: <script>dw(syear);</script>. Subtract out 1970 from the year. <script>dw(syear);</script> - 1970 leaves us with <script>dw(syear-1970)</script> years. (<a href="#" onclick="return sanity_check(years_2_seconds(syear-1970),'Note: this isn\'t complete yet, it\'s short leap year days to get us to Jan 1.')">Sanity check</a>) </p><p>Convert the years to days. So <script>dw(syear-1970)</script> years multiplied by 365 days in each of those years. This gives us <script>dw((syear-1970)*365)</script> days. 
-    <!--  (<a href="#" onclick="return sanity_check(cvt_2_seconds(syear-1970),'Note: this isn\'t complete yet, it\'s short leap year days to get us to Jan 1.')">Sanity check</a>) --> </p><p>Now the first relatively difficult issue--dealing with leap years. Like me, you may have had it explained to you that roughly every four years can be a leap year...with some caveats. Actually, (as a helpful individual has pointed out to me) the real rule is as follows: Years that are evenly divisible by 100 are not leap years, unless they are also evenly divisible by 400, in which case they are leap years, bringing the total number of days in that year to 366. </p><p>We need to examine each of the <script>dw(syear-1970)</script> years between our target and the 1970 starting point. (This is one reason a tool is so great. You don't have to brute force the effort.) Writing a quick script to determine the calculation... </p>
-   <div id="ivnS4"> 
-    <script type="text/javascript">
-/* note: syear variable set in earlier script -- it's the starting year from our example */
-
-function isLeapYear(year){
-  if( !year.toString().match(/[0-9]{0,4}/) ){ /* invalid input */ return false; }
-  if( (year % 4)==0 ){
-    if( (year % 100)==0 ){
-      if( (year % 400)==0 ){ return true; } 
-      else{ return false; } 
-    }
-    else{ return true; }
-  } 
-  else { return false; }
-}
-
-var leap_days = 0;
-var str = 'Leap years in the range are: ';
-for(var i=syear; i>1970; i--){ 
-  if(isLeapYear(i)){ leap_days++; str += ''+i+', '; }
-}
-str = str.replace(/,\s$/,'');
-document.write('The number of extra days due to leap years between 1970 and '+syear+' is [' + leap_days +'] days. ');
-document.write(str);
-</script> 
-   </div><p></p>
-   <div id="ivnT4" class="code" style="height:125px;"></div> <script type="text/javascript">
-if(document && document.getElementById){
-  sObj = document.getElementById('ivnS4'); tObj = document.getElementById('ivnT4');
-  if(sObj && sObj.innerHTML && tObj) tObj.innerHTML = '<xmp>'+sObj.innerHTML+'</xmp>'
-}
-</script> <p>Want to <a href="#" onclick="
-  try{
-    year = prompt('Enter a year to check',syear);
-    bool = isLeapYear(year);
-    alert( year + ' is'+ (bool?'':' NOT') +' a leap year.');
-  } catch(e) { alert('Trapping error: '+e); }
-  return false;
-">sanity check</a> whether a specific year is a leap year? (Uses algorithm in isLeapYear function code example above to calculate leap year.) </p><p>So, we need to add <script>dw(leap_days +' to our original '+tdays+' which brings us to '+(tdays+leap_days)+' total days so far'); tdays += leap_days;</script>. </p><p><b>Months in Days</b> </p><p>Now we need to factor in the months in the current year and convert to days. In our example, we're using April 15, so we have 15 days for the current month. January has 31 days, February has 28--unless this year is a leap year in which case it has 29. If this is a leap year, we caught it in our leap year check above. March has 31 days. Adding these up we get 15 + 31 + 28 + 31 = 105 days. Adding that back in to our running total of days we get <script>dw(tdays+' + 105 = '+(tdays+105)); tdays += 105;</script> </p><p>Now that we've got all of the days, let's convert those to seconds. It turns out that there are roughly 86,400 seconds in each day. (See the chart below for more useful conversions.) So we take <script>dw(tdays);</script> and multiply it by 86400 to get <script>tseconds = tdays * 86400; dw(tseconds);</script> seconds which have elapsed up until the beginning of April 15. </p><p><b>Hours, Minutes, ...Seconds?</b> </p><p>Now we need to factor in the hours and minutes that have passed in the current hypothetical day. It's 08:30. In each minute there are 60 seconds, in each hour there are 60 minutes, so we convert the 8 o'clock hour as 8 * 60 * 60. This gives us <script>dw(8 * 60 * 60); tseconds += (8 * 60 * 60);</script>. Further, we'll convert the 30 minutes since the 8 o'clock hour into seconds, 30 * 60 which gives us <script>dw(30 * 60); tseconds += (30 * 60);</script>. And we add those all back into the seconds so far to get <script>dw(tseconds);</script> </p><p><b>Add a dash of craziness...</b> </p><p>Lastly, we need to calculate our offset from GMT. Er, and then factor in daylight savings (ugh). In my case, PST, we're 8 hours different--and we participate in daylight savings. So I add (8 * 60 * 60) + (1 * 60 * 60) which gives <script>var offset_plus_dt = (8*60*60)+(1*60*60);dw(offset_plus_dt);</script>, back into my running seconds to get my local time. <script>tseconds += offset_plus_dt; /* PST offset from GMT, 8 hours different */ dw(tseconds);</script> </p><p>This should be the epoch time we're looking for. (See sanity checking your results below.) So, we're saying <script>dw(tseconds);</script> have elapsed since 1/1/1970--"0" in computer time. It's not very friendly from a human standpoint, but it's pure gold from a computer programming standpoint. </p><p><b>Sanity checking your results</b> </p><p>Plug <script>dw(tseconds);</script> back into the converter and see how far off March 15, 2006 you are. It's likely that you are off by some amount, probably the offset for your own local timezone. In general, you should always sanity check your results. Two good tests are, checking your results against today (using the current epoch from getTime/1000 for example), and "0" time. If your mechanism passes both tests, that's a good sign. </p><p>Another interesting note: I've heard folks suggest using UTC rather than local time. UTC is certainly an appropriate "global" approach to time based applications, particularly when your audience spans the globe; In that case, having a standard time to fallback on is excellent. In order to apply it to your specific locale, you would calculate the target timezone offset from UTC. There are some strange issues that come up. Calculating an offset accurately can be really tough in the real world. For example, Arizona time while correct in Windows, isn't correct in JavaScript. And that's just one example. I'm not an expert on timezones, so I don't know how prolific timezone offset problems are. I'd appreciate feedback from anyone in the know. </p></h3> 
-  <p></p>
-  <h1>Examples of Usage</h1> 
-  <h3> Of course, the most relevant question in all of this is "why would I want to do any of this?" I've had the need for this arise many times. One notable example which occurred while working for a web hosting company was that we wanted to turn messaging chunks on/off 3 days after a new signup for services. We had a marketing manager that wanted to play some messaging to our audience of webmasters three days into their experience. Because there is a steady inflow of customers, the exercise is an ongoing one, and relative to each specific account. We needed a way to identify a member of the 3+ day audience and then some logic to trigger the messaging. In turning that need into programming routines, we did the following steps. 
-   <ol> 
-    <li>First, we stored the epoch value of the date of each signup (for example, Jan 1, 2003 is 1041459471 in epoch). Now that the date value is an integer, we can do math with it. </li>
-    <li>Second, we calculate 3 days in epoch measures (seconds) as follows... (86400 * 3) </li>
-    <li>Third, compare the current time with the signup time, plus the 3 days epoch value. </li>
-   </ol> <p>By making signup date a variable, this rule can apply to anyone for whom we want to know 3 days into the future of their signup. <br>ex: $signup_date = 1041459471 (or whatever the epoch is for any given site) </p><pre>
-if ($current_time &gt; ($signup_date + (86400 * 3))) { 
-  /*  ...then this site was signed up more than 3 days ago
-        show them the relevant message
-  */
-}
-</pre> </h3> 
-  <p></p>
-  <h1>Common Time Measures in Epoch</h1> 
-  <h3> 1 Millisecond = 1/1000 in Epoch (used frequently with JavaScript conversions) <br>1 Second = 1 in Epoch <br>1 Minute = 60 in Epoch <br>10 Minutes = 600 in Epoch <br>1 Hour = 3600 in Epoch <br>6 Hours = 21600 in Epoch <br>12 Hours = 43200 in Epoch <br>1 Day = 86400 in Epoch (24 Hours) <br>1 Week = 604800 in Epoch (7 Days / 168 Hours) <br>1 Month = (see below... number of days in the month) <br>&nbsp;28 Days = 2419200 in Epoch (672 Hours) <br>&nbsp;29 Days = 2505600 in Epoch (696 Hours) <br>&nbsp;30 Days = 2592000 in Epoch (720 Hours) <br>&nbsp;31 Days = 2678400 in Epoch (744 Hours) <br>&nbsp;AVERAGE MONTHS IN YEAR = 2628000 in Epoch <br>&nbsp;&nbsp;(365 / 12 = 30.416666666666666666666666666667) (average months) <br>&nbsp;&nbsp;(30.416666666666666666666666666667 * 86400 = 2628000) (average months in Epoch) <br>1 Year = 31536000 in Epoch (365 days * 86400 seconds) </h3> 
-  <p></p>
-  <h1>Source Code for Converter and Examples</h1> 
-  <h3> 
-   <div id="ivnS2"> 
-    <script type="text/javascript">
-/*
-  Date/Epoch Functions
-  Author: Thomas Ballard (http://thomas.ballard.ws)
-
-  Note: slightly polluted to attempt to support a GMT/non-GMT (local) timezone offset feature. 
-  Hack and slash resulted in a form input having a toggle state... but these functions need 
-  to know that form and input to access the property for evaluation. Need to come back 
-  and make these methods more agnostic.
-*/
-if(!window.dDate) window.dDate = new Date()
-
-
-window.getEpoch = function(){
-  var GMT = document.ivnForm.GMT.checked
-  if(GMT){ 
-    var x = parseInt(Date.UTC(dDate.getUTCFullYear(),dDate.getUTCMonth(),dDate.getUTCDate(),dDate.getUTCHours(),dDate.getUTCMinutes(),dDate.getUTCSeconds(),dDate.getUTCMilliseconds())/1000);
-    return x;
-  } else {
-    var x = (dDate.getTime()-dDate.getMilliseconds())/1000;
-//    x += dDate.getTimezoneOffset();
-    return x;
-  }
-}
-
-
-
-window.getDays = function(mObj,dObj,yObj){
-  // build array of days in a select container based on selected month and year
-  iMonth=parseInt(mObj.options[mObj.selectedIndex].value)+1
-  iYear=(yObj.value?yObj.value:1900);
-
-  var iDays=31;
-  switch(iMonth){ /* determine the number of days this month including leap years */
-    case 4: case 6: case 9: case 11:  --iDays; break;
-    case 2: iDays=29; if (!((iYear%4==0)&&(iYear%100!= 0))||(iYear%400== 0)) --iDays;
-  }
-
-  dObj.options.length = 0;
-  for(var i=0; i<iDays; i++){
-    dObj.options[i] = new Option(i+1,i+1)
-  }
-}
-
-
-window.toDate = function(eObj){
-  var mEpoch = parseInt(eObj.value); 
-  if(mEpoch<10000000000) mEpoch *= 1000; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-
-  dDate.setTime(mEpoch)
-  return dDate;
-}
-
-
-window.toEpoch = function(mObj,dObj,yObj,hrObj,minObj,secObj){
-  var month = mObj.options[mObj.selectedIndex].value
-  var day = dObj.options[dObj.selectedIndex].value
-  var year = yObj.value
-  var hour = hrObj.options[hrObj.selectedIndex].value
-  var minute = minObj.options[minObj.selectedIndex].value
-  var second = secObj.options[secObj.selectedIndex].value
-
-  //alert(month+']['+day+']['+year)
-  dDate.setMonth(month,day)
-  dDate.setFullYear(year)
-  dDate.setHours(hour,minute,second)
-  //alert(dDate)
-
-  var zObj = document.getElementById('dynamo')
-  zObj.innerHTML = window.getEpoch()
-  if(window && window.clipboardData && window.clipboardData.setData)
-    bResult = window.clipboardData.setData("Text",zObj.innerHTML); //stuff the text onto the clipboard
-
-}
-</script> 
-    <script type="text/javascript">
-function populateDates(){
-  var fobj = document.forms.ivnForm
-  if(fobj.GMT.checked){
-    // GMT TIME
-    window.dDate = new Date(Date.UTC(dDate.getUTCFullYear(),dDate.getUTCMonth(),dDate.getUTCDate(),dDate.getUTCHours(),dDate.getUTCMinutes(),dDate.getUTCSeconds(),dDate.getUTCMilliseconds()));
-    fobj.month.selectedIndex = dDate.getUTCMonth(); // set initial month to current
-    fobj.year.value = dDate.getUTCFullYear()
-    getDays(fobj.month,fobj.day,fobj.year)
-    fobj.day.selectedIndex = dDate.getUTCDate()-1
-    fobj.epoch.value = window.getEpoch()
-    fobj.hour.selectedIndex = dDate.getUTCHours();
-    fobj.minute.selectedIndex = dDate.getUTCMinutes();
-    fobj.second.selectedIndex = dDate.getUTCSeconds();
-  } else {
-    // LOCAL TIME
-    window.dDate = new Date();
-    fobj.month.selectedIndex = dDate.getMonth(); // set initial month to current
-    fobj.year.value = dDate.getFullYear()
-    getDays(fobj.month,fobj.day,fobj.year)
-    fobj.day.selectedIndex = dDate.getDate()-1
-    fobj.epoch.value = window.getEpoch()
-    fobj.hour.selectedIndex = dDate.getHours();
-    fobj.minute.selectedIndex = dDate.getMinutes();
-    fobj.second.selectedIndex = dDate.getSeconds();
+  <meta charset="utf-8"> 
+  <title>dateformat</title> 
+  <meta name="description" content="A node.js package for Steven Levithan's excellent dateFormat() function."> 
+  <meta property="og:description" content="A node.js package for Steven Levithan's excellent dateFormat() function."> 
+  <meta property="og:title" content="dateformat"> 
+  <meta property="og:url" content="https://www.npmjs.com/package/dateformat"> 
+  <meta property="og:site_name" content="npm"> 
+  <meta name="keywords" content=""> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:url" content="https://www.npmjs.com/package/dateformat"> 
+  <meta name="twitter:title" content="npm: dateformat"> 
+  <meta name="twitter:description" content="A node.js package for Steven Levithan's excellent dateFormat() function."> 
+  <meta http-equiv="cleartype" content="on"> 
+  <meta name="apple-mobile-web-app-capable" content="no"> 
+  <meta name="viewport" content="width=device-width,minimum-scale=1.0,initial-scale=1,user-scalable=yes"> 
+  <meta name="x-npm:ga:id" content="UA-47041310-1"> 
+  <meta name="x-npm:ga:dimensions" content="{&quot;aboveChrome&quot;:&quot;dimension1&quot;,&quot;belowHeader&quot;:&quot;dimension3&quot;,&quot;packagePage&quot;:&quot;dimension2&quot;}"> 
+  <link rel="canonical" href="https://www.npmjs.com/package/dateformat"> 
+  <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="npm"> 
+  <link rel="stylesheet" media="all" href="/static/css/index.css?last-changed=6ce127b3f2f1d381a89d0ac9646eaa04"> 
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <![endif]--> 
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700"> 
+  <script src="/static/js/index.min.js?last-changed=804eef6a8969a48ed62dc89e2bb9ce65"></script> 
+  <style>
+      .marketing {
+  margin: 0px;
+  margin-left: -10px;
+  margin-bottom: 40px;
+  padding: 0px 0px;
+  font-size: 15px;
+  font-style: normal;
+  fond-variant: normal;
+  fort-weight: normal;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+  letter-spacing: -0.03em;
+  line-height: 22.5px;
   }
   
-  var GMT = document.ivnForm.GMT.checked
-  if(GMT){
-    var html = parseInt(Date.UTC(dDate.getUTCFullYear(),dDate.getUTCMonth(),dDate.getUTCDate(),dDate.getUTCHours(),dDate.getUTCMinutes(),dDate.getUTCSeconds(),dDate.getUTCMilliseconds())/1000)+' (Epoch)'
-    + '<br>'+dDate.toUTCString()+' (Standard)'
-  } else {
-    var html = (dDate.getTime()-dDate.getMilliseconds())/1000+' (Epoch)'
-    + '<br>'+dDate+' (Standard)'
+  .marketing a {
+  font-weight: 400;
+  text-decoration: none;
+  color: #cb3837;
   }
-  if(document && document.getElementById){
-    obj = document.getElementById('jdate1')
-    if(obj) obj.innerHTML = html
+  
+  .marketing h3 {
+  display: block;
+  margin: 0;
+  padding: 20px 0 10px 0;
+  font-size: 20px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 400;
+  line-height: 22px;
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.8);
   }
-}
-populateDates();
-</script> 
-    <script type="text/perlscript">
-$obj = $window->document->getElementById('pdate1');
-$obj->{innerHTML} = time . " (Epoch)<br>" . localtime(time) . " (Standard)";
-</script> 
-   </div><p></p>
-   <div id="ivnT2" class="code"></div> <script type="text/javascript">
-if(document && document.getElementById){
-  sObj = document.getElementById('ivnS2'); tObj = document.getElementById('ivnT2');
-  if(sObj && sObj.innerHTML && tObj) tObj.innerHTML = '<xmp>'+sObj.innerHTML+'</xmp>'
-}
-</script> </h3> 
-  <p></p>
-  <h1>Other Popular and Related Resources</h1> 
-  <ul class="list1"> 
-   <li><a href="http://www.esqsoft.com/javascript/expose-properties-and-methods-of-an-object.htm">Expose the properties and methods of an Object</a> </li>
-   <li><a href="http://www.thomas.ballard.ws/notes/ccstal-html-templates-described.htm">CCSTAL - A method for client-side dynamic templating</a> </li>
-  </ul> 
-  <p></p>
-  <h2>Additional Keywords: date epoch time conversion converter convert epoc javascript epoch to date conversion date to epoch converter</h2> 
-  <!-- end: content --> 
-  <script type="text/javascript">
-document.write(footer(''))
-</script>
+  
+  .marketing h3 a {
+  color: rgba(0, 0, 0, 0.8);
+  }
+  
+  .marketing h3 a:hover {
+  color: #cb3837;
+  }
+  
+  .marketing p {
+  line-height: 22.5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  }
+  
+  .marketing p a {
+  white-space: nowrap;
+  }
+  
+  #marketing-texthed {
+  margin-left: 10px;
+  }
+    </style> 
+  <link rel="apple-touch-icon" sizes="57x57" href="/static/images/touch-icons/apple-touch-icon-57x57.png"> 
+  <link rel="apple-touch-icon" sizes="60x60" href="/static/images/touch-icons/apple-touch-icon-60x60.png"> 
+  <link rel="apple-touch-icon" sizes="72x72" href="/static/images/touch-icons/apple-touch-icon-72x72.png"> 
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/images/touch-icons/apple-touch-icon-76x76.png"> 
+  <link rel="apple-touch-icon" sizes="114x114" href="/static/images/touch-icons/apple-touch-icon-114x114.png"> 
+  <link rel="apple-touch-icon" sizes="120x120" href="/static/images/touch-icons/apple-touch-icon-120x120.png"> 
+  <link rel="apple-touch-icon" sizes="144x144" href="/static/images/touch-icons/apple-touch-icon-144x144.png"> 
+  <link rel="apple-touch-icon" sizes="152x152" href="/static/images/touch-icons/apple-touch-icon-152x152.png"> 
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/images/touch-icons/apple-touch-icon-180x180.png"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/favicon-32x32.png" sizes="32x32"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/favicon-230x230.png" sizes="230x230"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/favicon-96x96.png" sizes="96x96"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/android-chrome-192x192.png" sizes="192x192"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/coast-228x228.png" sizes="228x228"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/favicon-16x16.png" sizes="16x16"> 
+  <link rel="manifest" href="/static/images/touch-icons/manifest.json"> 
+  <link rel="yandex-tableau-widget" href="/static/images/touch-icons/yandex-browser-manifest.json"> 
+  <meta property="og:image" content="https://www.npmjs.com/static/images/touch-icons/open-graph.png"> 
+  <meta name="apple-mobile-web-app-capable" content="yes"> 
+  <meta name="msapplication-TileColor" content="#cb3837"> 
+  <meta name="msapplication-TileImage" content="/static/images/touch-icons/mstile-144x144.png"> 
+  <meta name="msapplication-config" content="/static/images/touch-icons/browserconfig.xml"> 
+  <meta name="theme-color" content="#cb3837"> 
+ </head> 
+ <body itemscope itemtype="http://schema.org/WebSite" data-crumb="o5WOXd0DTFjZ4oYxN77D5S51TrIwQKChi3tqB5sSrx0"> 
+  <meta itemprop="url" content="https://www.npmjs.com/"> 
+  <header class="anonymous   "> 
+   <!-- logo --> 
+   <div class="header-item brand-container"> 
+    <div class="logo-container" id="npm-logo"> 
+     <a href="/">
+      <svg viewbox="0 0 18 7"> 
+       <path fill="#CB3837" d="M0,0v6h5v1h4v-1h9v-6" /> 
+       <path fill="#FFF" d="M1,1v4h2v-3h1v3h1v-4h1v5h2v-4h1v2h-1v1h2v-4h1v4h2v-3h1v3h1v-3h1v3h1v-4" /> 
+      </svg></a> 
+    </div> 
+   </div> 
+   <!-- /logo --> 
+   <!-- search --> 
+   <div class="header-item header-search-container"> 
+    <form class="site-search" id="npm-search" action="/search" method="get" itemprop="potentialAction" itemscope itemtype="http://schema.org/SearchAction"> 
+     <meta itemprop="target" content="https://www.npmjs.com/search?q={q}"> 
+     <div id="site-search-container"> 
+      <input name="q" value="" type="search" id="site-search" placeholder="find packages" tabindex="1" autocorrect="off" autocapitalize="off" itemprop="query-input"> 
+     </div> 
+     <button tabindex="2" type="submit"> <span class="a11y-only">Search</span> 
+      <svg viewbox="0 0 34 34" fill="none" stroke="currentColor"> 
+       <ellipse stroke-width="3" cx="16" cy="15" rx="12" ry="12" /> 
+       <path d="M26 26 l 8 8" stroke-width="3" stroke-linecap="square" /> 
+      </svg> </button> 
+    </form> 
+   </div> 
+   <!-- menu 1 --> 
+   <div class="header-item user-info-container"> 
+    <div class="user-info"> 
+     <ul class="user-info-salutation single"> 
+      <li><a href="/signup">sign up</a> or <a href="/login">log in</a></li> 
+      <li><a href="/login"><span class="a11y-only">log in</span>
+        <svg viewbox="-2765 2857 1080 1080"> 
+         <path fill="#986844" d="M-1811.2 3598.5c-.1-4.3-.3-11.3-.8-20.3-.9-15.8-2.7-40.9-6.6-70.7-6.9-52.6-21.6-130.1-52.6-200.4-22.3-50.4-53.5-97.1-90.3-135.2-4.4-20.5-16.7-66.5-43.5-104.8l-5-7.2-54 35.5c-44.5-22.4-91-33.7-138.6-33.7-47.5 0-94.1 11.3-138.6 33.7l-54-35.5-5 7.2c-26.8 38.3-39 84.3-43.5 104.8-36.8 38.1-68 84.8-90.3 135.3-31.1 70.3-45.8 147.8-52.6 200.4-6.1 46.6-7.2 81.6-7.5 93.8 16.6 14 31.3 29.8 46.9 45 17.2 16.7 39.4 28.2 59.1 41.6 1.7 1.1 3.1 2.6 4.2 4.1 15.7 10.4 31 15.4 50.2 19.5 19.2 4.1 35.6 5.6 55.6 7.3 38.7 3.2 77 7.7 115.5 12.6 43.1 5.4 86.5 11.5 130 13.1 41.6 1.5 81.8-9 121.8-19.3 8.9-2.3 17.9-4.5 26.8-6.8.6-4.2 3-8.1 6.7-10.4 40.1-25 81.2-48.2 122-72 5.9-3.5 13.7-1.9 17.9 3.3 9-8.9 17.1-18.2 24.3-27.9l.2-.2.2-.2c1.7-2.6 1.8-2.7 1.5-12.6z" /> 
+         <path fill="#FFF" d="M-1808.7 3494.8c-6.9-53.2-21.8-131.7-53.4-203.2-22.3-50.5-53.5-97.5-90.3-136.1-5.5-24.4-18.2-68.2-44.5-105.7l-10.6-15.1-57.3 37.7c-44.3-21.4-90.6-32.2-137.9-32.2-47.2 0-93.6 10.8-137.9 32.2l-57.3-37.7-10.6 15.1c-26.2 37.5-39 81.2-44.5 105.7-36.7 38.5-67.9 85.5-90.3 136.1-31.6 71.4-46.5 149.9-53.4 203.2-7.5 57.7-7.6 98-7.6 99.7v6.3l3.8 5.1c26 35 62.9 64.7 109.6 88.3 36.9 18.6 80 33.6 128.3 44.4 82.2 18.5 151.8 19 159.5 19h.6c7.7 0 77.3-.5 159.5-19 48.3-10.8 91.4-25.8 128.3-44.4 46.7-23.6 83.6-53.3 109.6-88.3l3.7-5v-6.3c.4-1.8.2-42.3-7.3-99.8zm-118.3 174.3c-34.8 17.6-75.8 31.8-121.8 42.1-80.7 18.1-150.4 18.3-153.4 18.3h-.6c-2.9 0-72.7-.2-153.4-18.3-46-10.3-87-24.5-121.8-42.1-41.7-21.1-74.7-47.2-98-77.6.4-22.5 5.1-167.5 58.6-288.5 21.8-49.3 52.4-94.9 88.5-131.8l1.8-1.9.5-2.6c2.7-13.1 12.9-56.4 36.3-93.4l37.2 24.5-7.3 16.6 22.8-11.9c43.3-22.6 88.7-34.1 135-34.1s91.7 11.5 135 34.1l22.8 11.9-7.3-16.6 37.2-24.5c23.4 37 33.6 80.4 36.3 93.4l.5 2.6 1.8 1.9c36.1 36.9 66.7 82.5 88.5 131.8 53.5 121 58.2 266.1 58.6 288.5-23.2 30.4-56.1 56.5-97.8 77.6zm-163-13c0 30.1-50.4 54.4-112.5 54.4s-112.5-24.4-112.5-54.4c0-30.1 50.4-54.4 112.5-54.4s112.5 24.3 112.5 54.4zm-223.5-65.3c0 12.3-10 22.3-22.3 22.3s-22.3-10-22.3-22.3 10-22.3 22.3-22.3c12.3-.1 22.3 9.9 22.3 22.3zm267.8 0c0 12.3-10 22.3-22.3 22.3s-22.3-10-22.3-22.3 10-22.3 22.3-22.3c12.3-.1 22.3 9.9 22.3 22.3z" /> 
+        </svg></a></li> 
+     </ul> 
+    </div> 
+    <!-- .user-info --> 
+   </div> 
+   <!-- /menu 1 --> 
+   <!-- menu 2 --> 
+   <div class="header-item header-nav-menu-container"> 
+    <a href="#" id="npm-expansions" class="npm-expansions" data-event-trigger="click" data-event-name="npm-expansions">node package manager</a> 
+    <div class="nav-menu-container" role="navigation"> 
+     <a class="nav-toggle drop-down-menu-toggle" href="#product-navigation"><span class="a11y-only">Toggle Navigation</span> 
+      <svg viewbox="0 0 44 44"> 
+       <rect x="4" y="12" fill="currentColor" width="36" height="2" /> 
+       <rect x="4" y="20" fill="currentColor" width="36" height="2" /> 
+       <rect x="4" y="28" fill="currentColor" width="36" height="2" /> 
+      </svg> </a> 
+     <div class="drop-down-menu-container" role="menu"> 
+      <nav id="product-navigation" class="product-navigation drop-down-menu"> 
+       <ul class="drop-down-menu-section products-list"> 
+        <li><a id="nav-enterprise-link" href="/npm/enterprise">npm Enterprise</a></li> 
+        <li><a id="nav-features-link" href="/features" data-event-trigger="click" data-event-name="features-nav-link">features</a></li> 
+        <li><a id="nav-pricing-link" href="/pricing">pricing</a></li> 
+        <li><a id="nav-docs-link" href="https://docs.npmjs.com">documentation</a></li> 
+        <li><a id="nav-support-link" href="/support">support</a></li> 
+       </ul> 
+      </nav> 
+     </div> 
+    </div> 
+   </div> 
+   <!-- /menu 2 --> 
+  </header> 
+  <div class="container content"> 
+   <div class="content-column"> 
+    <h1 class="package-name"> <a href="/package/dateformat">dateformat</a> <i class="icon-public"></i> </h1> 
+    <form class="star"> 
+     <input type="hidden" name="name" value="dateformat"> 
+     <input id="star-input" type="checkbox" name="isStarred" value="true"> 
+     <label for="star-input" class="icon-star"></label> 
+     <input type="hidden" name="crumb" value="o5WOXd0DTFjZ4oYxN77D5S51TrIwQKChi3tqB5sSrx0"> 
+    </form> 
+    <div id="readme" class="markdown"> 
+     <h1 class="package-name-redundant"><a id="user-content-dateformat" class="deep-link" href="#dateformat">
+       <svg aria-hidden="true" class="deep-link-icon" height="16" version="1.1" width="16">
+        <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+       </svg></a>dateformat</h1> 
+     <p class="package-description-redundant">A node.js package for Steven Levithan's excellent <a href="http://blog.stevenlevithan.com/archives/date-time-format">dateFormat()</a> function.</p> 
+     <p class="badge-only"><a href="https://travis-ci.org/felixge/node-dateformat"><img src="https://travis-ci.org/felixge/node-dateformat.svg" alt="Build Status" class="badge"></a></p> 
+     <h2><a id="user-content-modifications" class="deep-link" href="#modifications">
+       <svg aria-hidden="true" class="deep-link-icon" height="16" version="1.1" width="16">
+        <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+       </svg></a>Modifications</h2> 
+     <ul> 
+      <li>Removed the <code>Date.prototype.format</code> method. Sorry folks, but extending native prototypes is for suckers.</li> 
+      <li>Added a <code>module.exports = dateFormat;</code> statement at the bottom</li> 
+      <li>Added the placeholder <code>N</code> to get the ISO 8601 numeric representation of the day of the week</li> 
+     </ul> 
+     <h2><a id="user-content-installation" class="deep-link" href="#installation">
+       <svg aria-hidden="true" class="deep-link-icon" height="16" version="1.1" width="16">
+        <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+       </svg></a>Installation</h2> 
+     <div class="highlight bash">
+      <pre class="editor editor-colors">
+       <div class="line">
+        <span class="text"><span>$&nbsp;npm&nbsp;install&nbsp;dateformat</span></span>
+       </div>
+       <div class="line">
+        <span class="text"><span>$&nbsp;dateformat&nbsp;--help</span></span>
+       </div></pre>
+     </div> 
+     <h2><a id="user-content-usage" class="deep-link" href="#usage">
+       <svg aria-hidden="true" class="deep-link-icon" height="16" version="1.1" width="16">
+        <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+       </svg></a>Usage</h2> 
+     <p>As taken from Steven's post, modified to match the Modifications listed above:</p> 
+     <div class="highlight js">
+      <pre class="editor editor-colors">
+       <div class="line">
+        <span class="source js"><span class="storage type js"><span>var</span></span><span>&nbsp;dateFormat&nbsp;</span><span class="keyword operator assignment js"><span>=</span></span><span>&nbsp;</span><span class="meta function-call js"><span class="support function js"><span>require</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>dateformat</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="storage type js"><span>var</span></span><span>&nbsp;now&nbsp;</span><span class="keyword operator assignment js"><span>=</span></span><span>&nbsp;</span><span class="meta class instance constructor"><span class="keyword operator js"><span>new</span></span><span>&nbsp;</span><span class="entity name type instance js"><span>Date</span></span></span><span class="meta brace round js"><span>(</span><span>)</span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;Basic&nbsp;usage</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>now</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="string quoted double js"><span class="punctuation definition string begin js"><span>"</span></span><span>dddd,&nbsp;mmmm&nbsp;dS,&nbsp;yyyy,&nbsp;h:MM:ss&nbsp;TT</span><span class="punctuation definition string end js"><span>"</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;Saturday,&nbsp;June&nbsp;9th,&nbsp;2007,&nbsp;5:46:21&nbsp;PM</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;You&nbsp;can&nbsp;use&nbsp;one&nbsp;of&nbsp;several&nbsp;named&nbsp;masks</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>now</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="string quoted double js"><span class="punctuation definition string begin js"><span>"</span></span><span>isoDateTime</span><span class="punctuation definition string end js"><span>"</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;2007-06-09T17:46:21</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;...Or&nbsp;add&nbsp;your&nbsp;own</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="variable other object js"><span>dateFormat</span></span><span class="meta delimiter period js"><span>.</span></span><span class="variable other object js"><span>masks</span></span><span class="meta delimiter period js"><span>.</span></span><span class="variable other js"><span>hammerTime</span></span><span>&nbsp;</span><span class="keyword operator assignment js"><span>=</span></span><span>&nbsp;</span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>HH:MM!&nbsp;"Can</span><span class="constant character js"><span>\'</span></span><span>t&nbsp;touch&nbsp;this!"</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>now</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="string quoted double js"><span class="punctuation definition string begin js"><span>"</span></span><span>hammerTime</span><span class="punctuation definition string end js"><span>"</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;17:46!&nbsp;Can't&nbsp;touch&nbsp;this!</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;When&nbsp;using&nbsp;the&nbsp;standalone&nbsp;dateFormat&nbsp;function,</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;you&nbsp;can&nbsp;also&nbsp;provide&nbsp;the&nbsp;date&nbsp;as&nbsp;a&nbsp;string</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted double js"><span class="punctuation definition string begin js"><span>"</span></span><span>Jun&nbsp;9&nbsp;2007</span><span class="punctuation definition string end js"><span>"</span></span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="string quoted double js"><span class="punctuation definition string begin js"><span>"</span></span><span>fullDate</span><span class="punctuation definition string end js"><span>"</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;Saturday,&nbsp;June&nbsp;9,&nbsp;2007</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;Note&nbsp;that&nbsp;if&nbsp;you&nbsp;don't&nbsp;include&nbsp;the&nbsp;mask&nbsp;argument,</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;dateFormat.masks.default&nbsp;is&nbsp;used</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>now</span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;Sat&nbsp;Jun&nbsp;09&nbsp;2007&nbsp;17:46:21</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;And&nbsp;if&nbsp;you&nbsp;don't&nbsp;include&nbsp;the&nbsp;date&nbsp;argument,</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;the&nbsp;current&nbsp;date&nbsp;and&nbsp;time&nbsp;is&nbsp;used</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;Sat&nbsp;Jun&nbsp;09&nbsp;2007&nbsp;17:46:22</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;You&nbsp;can&nbsp;also&nbsp;skip&nbsp;the&nbsp;date&nbsp;argument&nbsp;(as&nbsp;long&nbsp;as&nbsp;your&nbsp;mask&nbsp;doesn't</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;contain&nbsp;any&nbsp;numbers),&nbsp;in&nbsp;which&nbsp;case&nbsp;the&nbsp;current&nbsp;date/time&nbsp;is&nbsp;used</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted double js"><span class="punctuation definition string begin js"><span>"</span></span><span>longTime</span><span class="punctuation definition string end js"><span>"</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;5:46:22&nbsp;PM&nbsp;EST</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;And&nbsp;finally,&nbsp;you&nbsp;can&nbsp;convert&nbsp;local&nbsp;time&nbsp;to&nbsp;UTC&nbsp;time.&nbsp;Simply&nbsp;pass&nbsp;in</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;true&nbsp;as&nbsp;an&nbsp;additional&nbsp;argument&nbsp;(no&nbsp;argument&nbsp;skipping&nbsp;allowed&nbsp;in&nbsp;this&nbsp;case):</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>now</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="string quoted double js"><span class="punctuation definition string begin js"><span>"</span></span><span>longTime</span><span class="punctuation definition string end js"><span>"</span></span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language boolean true js"><span>true</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;10:46:21&nbsp;PM&nbsp;UTC</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;...Or&nbsp;add&nbsp;the&nbsp;prefix&nbsp;"UTC:"&nbsp;or&nbsp;"GMT:"&nbsp;to&nbsp;your&nbsp;mask.</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>now</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="string quoted double js"><span class="punctuation definition string begin js"><span>"</span></span><span>UTC:h:MM:ss&nbsp;TT&nbsp;Z</span><span class="punctuation definition string end js"><span>"</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;10:46:21&nbsp;PM&nbsp;UTC</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;You&nbsp;can&nbsp;also&nbsp;get&nbsp;the&nbsp;ISO&nbsp;8601&nbsp;week&nbsp;of&nbsp;the&nbsp;year:</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>now</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="string quoted double js"><span class="punctuation definition string begin js"><span>"</span></span><span>W</span><span class="punctuation definition string end js"><span>"</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;42</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span>&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;and&nbsp;also&nbsp;get&nbsp;the&nbsp;ISO&nbsp;8601&nbsp;numeric&nbsp;representation&nbsp;of&nbsp;the&nbsp;day&nbsp;of&nbsp;the&nbsp;week:</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="meta function-call js"><span class="entity name function js"><span>dateFormat</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>now</span><span class="meta delimiter object comma js"><span>,</span></span><span class="string quoted double js"><span class="punctuation definition string begin js"><span>"</span></span><span>N</span><span class="punctuation definition string end js"><span>"</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;6</span><span>&nbsp;</span></span></span>
+       </div></pre>
+     </div> 
+     <h3><a id="user-content-mask-options" class="deep-link" href="#mask-options">
+       <svg aria-hidden="true" class="deep-link-icon" height="16" version="1.1" width="16">
+        <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+       </svg></a>Mask options</h3> 
+     <table> 
+      <thead> 
+       <tr> 
+        <th>Mask</th> 
+        <th>Description</th> 
+       </tr> 
+      </thead> 
+      <tbody> 
+       <tr> 
+        <td><code>d</code></td> 
+        <td>Day of the month as digits; no leading zero for single-digit days.</td> 
+       </tr> 
+       <tr> 
+        <td><code>dd</code></td> 
+        <td>Day of the month as digits; leading zero for single-digit days.</td> 
+       </tr> 
+       <tr> 
+        <td><code>ddd</code></td> 
+        <td>Day of the week as a three-letter abbreviation.</td> 
+       </tr> 
+       <tr> 
+        <td><code>dddd</code></td> 
+        <td>Day of the week as its full name.</td> 
+       </tr> 
+       <tr> 
+        <td><code>m</code></td> 
+        <td>Month as digits; no leading zero for single-digit months.</td> 
+       </tr> 
+       <tr> 
+        <td><code>mm</code></td> 
+        <td>Month as digits; leading zero for single-digit months.</td> 
+       </tr> 
+       <tr> 
+        <td><code>mmm</code></td> 
+        <td>Month as a three-letter abbreviation.</td> 
+       </tr> 
+       <tr> 
+        <td><code>mmmm</code></td> 
+        <td>Month as its full name.</td> 
+       </tr> 
+       <tr> 
+        <td><code>yy</code></td> 
+        <td>Year as last two digits; leading zero for years less than 10.</td> 
+       </tr> 
+       <tr> 
+        <td><code>yyyy</code></td> 
+        <td>Year represented by four digits.</td> 
+       </tr> 
+       <tr> 
+        <td><code>h</code></td> 
+        <td>Hours; no leading zero for single-digit hours (12-hour clock).</td> 
+       </tr> 
+       <tr> 
+        <td><code>hh</code></td> 
+        <td>Hours; leading zero for single-digit hours (12-hour clock).</td> 
+       </tr> 
+       <tr> 
+        <td><code>H</code></td> 
+        <td>Hours; no leading zero for single-digit hours (24-hour clock).</td> 
+       </tr> 
+       <tr> 
+        <td><code>HH</code></td> 
+        <td>Hours; leading zero for single-digit hours (24-hour clock).</td> 
+       </tr> 
+       <tr> 
+        <td><code>M</code></td> 
+        <td>Minutes; no leading zero for single-digit minutes.</td> 
+       </tr> 
+       <tr> 
+        <td><code>MM</code></td> 
+        <td>Minutes; leading zero for single-digit minutes.</td> 
+       </tr> 
+       <tr> 
+        <td><code>N</code></td> 
+        <td>ISO 8601 numeric representation of the day of the week.</td> 
+       </tr> 
+       <tr> 
+        <td><code>o</code></td> 
+        <td>GMT/UTC timezone offset, e.g. -0500 or +0230.</td> 
+       </tr> 
+       <tr> 
+        <td><code>s</code></td> 
+        <td>Seconds; no leading zero for single-digit seconds.</td> 
+       </tr> 
+       <tr> 
+        <td><code>ss</code></td> 
+        <td>Seconds; leading zero for single-digit seconds.</td> 
+       </tr> 
+       <tr> 
+        <td><code>S</code></td> 
+        <td>The date's ordinal suffix (st, nd, rd, or th). Works well with <code>d</code>.</td> 
+       </tr> 
+       <tr> 
+        <td><code>l</code></td> 
+        <td>Milliseconds; gives 3 digits.</td> 
+       </tr> 
+       <tr> 
+        <td><code>L</code></td> 
+        <td>Milliseconds; gives 2 digits.</td> 
+       </tr> 
+       <tr> 
+        <td><code>t</code></td> 
+        <td>Lowercase, single-character time marker string: a or p.</td> 
+       </tr> 
+       <tr> 
+        <td><code>tt</code></td> 
+        <td>Lowercase, two-character time marker string: am or pm.</td> 
+       </tr> 
+       <tr> 
+        <td><code>T</code></td> 
+        <td>Uppercase, single-character time marker string: A or P.</td> 
+       </tr> 
+       <tr> 
+        <td><code>TT</code></td> 
+        <td>Uppercase, two-character time marker string: AM or PM.</td> 
+       </tr> 
+       <tr> 
+        <td><code>W</code></td> 
+        <td>ISO 8601 week number of the year, e.g. 42</td> 
+       </tr> 
+       <tr> 
+        <td><code>Z</code></td> 
+        <td>US timezone abbreviation, e.g. EST or MDT. With non-US timezones or in the</td> 
+       </tr> 
+       <tr> 
+        <td><code>'...'</code>, <code>"..."</code></td> 
+        <td>Literal character sequence. Surrounding quotes are removed.</td> 
+       </tr> 
+       <tr> 
+        <td><code>UTC:</code></td> 
+        <td>Must be the first four characters of the mask. Converts the date from local time to UTC/GMT/Zulu time before applying the mask. The "UTC:" prefix is removed.</td> 
+       </tr> 
+      </tbody> 
+     </table> 
+     <h3><a id="user-content-named-formats" class="deep-link" href="#named-formats">
+       <svg aria-hidden="true" class="deep-link-icon" height="16" version="1.1" width="16">
+        <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+       </svg></a>Named Formats</h3> 
+     <table> 
+      <thead> 
+       <tr> 
+        <th>Name</th> 
+        <th>Mask</th> 
+        <th>Example</th> 
+       </tr> 
+      </thead> 
+      <tbody> 
+       <tr> 
+        <td><code>default</code></td> 
+        <td><code>ddd mmm dd yyyy HH:MM:ss</code></td> 
+        <td>Sat Jun 09 2007 17:46:21</td> 
+       </tr> 
+       <tr> 
+        <td><code>shortDate</code></td> 
+        <td><code>m/d/yy</code></td> 
+        <td>6/9/07</td> 
+       </tr> 
+       <tr> 
+        <td><code>mediumDate</code></td> 
+        <td><code>mmm d, yyyy</code></td> 
+        <td>Jun 9, 2007</td> 
+       </tr> 
+       <tr> 
+        <td><code>longDate</code></td> 
+        <td><code>mmmm d, yyyy</code></td> 
+        <td>June 9, 2007</td> 
+       </tr> 
+       <tr> 
+        <td><code>fullDate</code></td> 
+        <td><code>dddd, mmmm d, yyyy</code></td> 
+        <td>Saturday, June 9, 2007</td> 
+       </tr> 
+       <tr> 
+        <td><code>shortTime</code></td> 
+        <td><code>h:MM TT</code></td> 
+        <td>5:46 PM</td> 
+       </tr> 
+       <tr> 
+        <td><code>mediumTime</code></td> 
+        <td><code>h:MM:ss TT</code></td> 
+        <td>5:46:21 PM</td> 
+       </tr> 
+       <tr> 
+        <td><code>longTime</code></td> 
+        <td><code>h:MM:ss TT Z</code></td> 
+        <td>5:46:21 PM EST</td> 
+       </tr> 
+       <tr> 
+        <td><code>isoDate</code></td> 
+        <td><code>yyyy-mm-dd</code></td> 
+        <td>2007-06-09</td> 
+       </tr> 
+       <tr> 
+        <td><code>isoTime</code></td> 
+        <td><code>HH:MM:ss</code></td> 
+        <td>17:46:21</td> 
+       </tr> 
+       <tr> 
+        <td><code>isoDateTime</code></td> 
+        <td><code>yyyy-mm-dd'T'HH:MM:ss</code></td> 
+        <td>2007-06-09T17:46:21</td> 
+       </tr> 
+       <tr> 
+        <td><code>isoUtcDateTime</code></td> 
+        <td><code>UTC:yyyy-mm-dd'T'HH:MM:ss'Z'</code></td> 
+        <td>2007-06-09T22:46:21Z</td> 
+       </tr> 
+      </tbody> 
+     </table> 
+     <h2><a id="user-content-license" class="deep-link" href="#license">
+       <svg aria-hidden="true" class="deep-link-icon" height="16" version="1.1" width="16">
+        <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+       </svg></a>License</h2> 
+     <p>(c) 2007-2009 Steven Levithan <a href="http://stevenlevithan.com/">stevenlevithan.com</a>, MIT license.</p> 
+    </div> 
+   </div> 
+   <div class="sidebar"> 
+    <div class="promotion" data-promotion-id="726" data-promotion-spot="packagePage">
+     <div class="marketing"> 
+      <h3 id="marketing-texthed"> <a href="https://www.npmjs.com/enterprise" title="npm Enterprise">Use this within your firewall</a></h3> 
+      <p>Combine open-source packages with your private code and publish to a private registry behind the firewall. <a href="https://www.npmjs.com/enterprise" title="npm Enterprise" target="_blank">npm ? enterprise developers</a></p>
+     </div>
+    </div> 
+    <div class="autoselect-wrapper npm-install icon-download"> 
+     <input type="text" value="npm install dateformat" readonly> 
+     <p><a href="/package/dateformat/tutorial">how? learn more</a></p> 
+    </div> 
+    <ul class="box"> 
+     <li class="last-publisher"> <a href="/~jonschlinkert"> <img src="https://s.gravatar.com/avatar/40ef514f9fbe67bca1ba8fa8d539a826?size=100&amp;default=retro" alt="jonschlinkert"> <span>jonschlinkert</span> </a> published <span data-date="2016-11-25T06:15:25.073Z" data-date-format="relative"> 2016-11-25T06:15:25.073Z </span> </li> 
+     <li> <strong>2.0.0</strong> is the latest of 16 releases </li> 
+     <li> <a href="https://github.com/felixge/node-dateformat">github.com/felixge/node-dateformat</a> </li> 
+     <li> <a href="http://spdx.org/licenses/MIT.html">MIT</a> <img class="osi" alt="Licensed on OSI-approved terms" src="/static/images/osi.svg">® </li> 
+    </ul> 
+    <h3 title="collaborators"> Collaborators <small><a href="/package/dateformat/access">list</a></small> </h3> 
+    <ul class="humans collaborators"> 
+     <li> <a href="/~jonschlinkert" rel="tipsy" title="jonschlinkert"> <img src="https://s.gravatar.com/avatar/40ef514f9fbe67bca1ba8fa8d539a826?size=100&amp;default=retro" alt="jonschlinkert"> </a> </li> 
+     <li> <a href="/~ctavan" rel="tipsy" title="ctavan"> <img src="https://s.gravatar.com/avatar/0c25fab8e807e1680e445ef9107cab5c?size=100&amp;default=retro" alt="ctavan"> </a> </li> 
+     <li> <a href="/~felixge" rel="tipsy" title="felixge"> <img src="https://s.gravatar.com/avatar/23968f0ca75b13463d2db5343e5c2096?size=100&amp;default=retro" alt="felixge"> </a> </li> 
+    </ul> 
+    <h3>Stats</h3> 
+    <ul class="box"> 
+     <li> <strong class="pretty-number daily-downloads">157189</strong> downloads in the last day </li> 
+     <li> <strong class="pretty-number weekly-downloads">2646641</strong> downloads in the last week </li> 
+     <li> <strong class="pretty-number monthly-downloads">9773710</strong> downloads in the last month </li> 
+     <li id="issues" data-ghapi="https://api.github.com/repos/felixge/node-dateformat"> <span class="original">Have an issue? <a href="https://github.com/felixge/node-dateformat/issues">File it.</a></span> <span class="enhanced" style="display:none"> <a href="https://github.com/felixge/node-dateformat/issues"></a> on GitHub </span> </li> 
+     <li id="pull_requests" style="display:none"> <a href="https://github.com/felixge/node-dateformat/pulls"></a> on GitHub </li> 
+    </ul> 
+    <h3>Try it out</h3> 
+    <ul class="box"> 
+     <li class="runkit"><a href="https://runkit.com/npm/dateformat" target="_blank">Test dateformat in your browser.</a></li> 
+    </ul> 
+    <h3>Keywords</h3> 
+    <p class="list-of-links"> None </p> 
+    <h3>Dependencies </h3> 
+    <p class="list-of-links"> None </p> 
+    <h3><a href="/browse/depended/dateformat">Dependents (979)</a></h3> 
+    <p class="list-of-links dependents"> <a href="/package/react-enterprise-components">react-enterprise-components</a>, <a href="/package/pinlog">pinlog</a>, <a href="/package/mctermjs">mctermjs</a>, <a href="/package/git-template">git-template</a>, <a href="/package/smart-payments">smart-payments</a>, <a href="/package/fosify">fosify</a>, <a href="/package/github-issue-reports">github-issue-reports</a>, <a href="/package/investigator">investigator</a>, <a href="/package/reftest-runner">reftest-runner</a>, <a href="/package/dailylog">dailylog</a>, <a href="/package/bintray-api">bintray-api</a>, <a href="/package/tskr-logger">tskr-logger</a>, <a href="/package/natron-logging">natron-logging</a>, <a href="/package/horizon-logger">horizon-logger</a>, <a href="/package/measured-elasticsearch">measured-elasticsearch</a>, <a href="/package/apeman-util">apeman-util</a>, <a href="/package/ghost-export">ghost-export</a>, <a href="/package/generator-ngbp-module">generator-ngbp-module</a>, <a href="/package/fetch-movies">fetch-movies</a>, <a href="/package/dynamodb-eventstore">dynamodb-eventstore</a>, <a href="/package/gulp-build-tools">gulp-build-tools</a>, <a href="/package/itunes-app-reviews">itunes-app-reviews</a>, <a href="/package/tangram-cli">tangram-cli</a>, <a href="/package/ghost-publisher">ghost-publisher</a>, <a href="/package/logfd">logfd</a>, <a href="/package/node-oyster">node-oyster</a>, <a href="/package/adif">adif</a>, <a href="/package/bens-gulp-build-tools">bens-gulp-build-tools</a>, <a href="/package/karma-json-to-file">karma-json-to-file</a>, <a href="/package/sbool-node-utils">sbool-node-utils</a>, <a href="/package/nomp-droplp">nomp-droplp</a>, <a href="/package/custom-logger">custom-logger</a>, <a href="/package/node-dev-env">node-dev-env</a>, <a href="/package/nf-conventional-changelog">nf-conventional-changelog</a>, <a href="/package/junitwriter">junitwriter</a>, <a href="/package/eshot">eshot</a>, <a href="/package/tomasi">tomasi</a>, <a href="/package/cli-time">cli-time</a>, <a href="/package/gobbler">gobbler</a>, <a href="/package/gills">gills</a>, <a href="/package/ysf_grunt">ysf_grunt</a>, <a href="/package/tcapp">tcapp</a>, <a href="/package/my-first-program">my-first-program</a>, <a href="/package/conventional-commits-template">conventional-commits-template</a>, <a href="/package/http-stahp">http-stahp</a>, <a href="/package/wd-deploy">wd-deploy</a>, <a href="/package/hubot-basecamp">hubot-basecamp</a>, <a href="/package/gentle">gentle</a>, <a href="/package/cloudant-backup">cloudant-backup</a>, <a href="/package/awssum-amazon">awssum-amazon</a>, <a href="/browse/depended/dateformat">and more</a> </p> 
+    <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "dateformat",
+      "description": "A node.js package for Steven Levithan&#x27;s excellent dateFormat() function.",
+      "url": "https://www.npmjs.com/package/dateformat",
+      "keywords": "",
+      "applicationCategory": "DeveloperApplication",
+      "offers": {
+         "@type": "Offer",
+         "price": "0.00"
+      }
+    }
+  </script> 
+    <div class="hiring-container" data-template="sidebar"></div> 
+   </div> 
+  </div> 
+  <footer class="pane bg-npm-navy-1"> 
+   <div class="container"> 
+    <div class="row"> 
+     <div class="col-md-6 col-md-offset-3"> 
+      <h3 class="h4 type-npm-pastel-3">You Need Help</h3> 
+      <hr class="divider-1"> 
+      <ul class="list-unstyled h6 em-default"> 
+       <li class="pbl"><a class="type-neutral-11" href="https://docs.npmjs.com">Documentation</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/support">Support / Contact Us</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="http://status.npmjs.org/">Registry Status</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="https://github.com/npm/www/issues">Website Issues</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="https://github.com/npm/npm/issues">CLI Issues</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/security">Security</a></li> 
+      </ul> 
+     </div> 
+     <div class="col-md-6 col-md-offset-1"> 
+      <h3 class="h4 type-npm-pastel-3">About npm</h3> 
+      <hr class="divider-1"> 
+      <ul class="list-unstyled h6 em-default"> 
+       <li class="pbl"><a class="type-neutral-11" href="/about">About npm, Inc</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/jobs">Jobs</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/npm-weekly">npm Weekly</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="http://blog.npmjs.org">Blog</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="https://twitter.com/npmjs">Twitter</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="https://github.com/npm">GitHub</a></li> 
+      </ul> 
+     </div> 
+     <div class="col-md-6 col-md-offset-1"> 
+      <h3 class="h4 type-npm-pastel-3">Legal Stuff</h3> 
+      <hr class="divider-1"> 
+      <ul class="list-unstyled h6 em-default"> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/terms">Terms of Use</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/conduct">Code of Conduct</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/disputes">Package Name Disputes</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/privacy">Privacy Policy</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/receiving-reports">Reporting Abuse</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/">Other policies</a></li> 
+      </ul> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="txt-c container"> 
+    <a class="npm-loves-you type-neutral-11" href="/"> npm loves you </a> 
+   </div> 
+  </footer> 
+  <script defer async src="https://cdn.optimizely.com/js/3318080746.js"></script> 
+  <script defer async src="//img.en25.com/i/elqCfg.min.js"></script>
+  <!-- Eloqua -->   
+  <!-- pid&#x3D;30625 d2bb1d5ce18a409301499285a5c4b1741714dca6 https://www.npmjs.com www-16-west.internal.npmjs.com  --> 
  </body>
 </html>

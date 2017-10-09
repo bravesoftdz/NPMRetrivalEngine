@@ -1,1820 +1,1170 @@
-<html>
+<!doctype html>
+<html lang="en">
  <head> 
-  <title>Software</title> 
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge"> 
+  <!--
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:trackback="http://madskills.com/public/xml/rss/module/trackback/">
+ <rdf:Description
+  rdf:about="https://www.phpclasses.org/trackback/package/2874-PHP-Recognize-text-objects-in-graphical-images.html"
+  dc:identifier="https://www.phpclasses.org/trackback/package/2874-PHP-Recognize-text-objects-in-graphical-images.html"
+  dc:title="How to Create a PHP Captcha Decoder with PHP OCR Class: Recognize text &amp; objects in graphical images - PHP Classes"
+  trackback:ping="https://www.phpclasses.org/trackback/package/2874-PHP-Recognize-text-objects-in-graphical-images.html" />
+</rdf:RDF>
+--> 
+  <title>How to Create a PHP Captcha Decoder with PHP OCR Class: Recognize text &amp; objects in graphical images - PHP Classes</title> 
+  <link rel="stylesheet" type="text/css" href="https://files.phpclasses.org/styles.css"> 
+  <link rel="stylesheet" type="text/css" href="https://files.phpclasses.org/responsive.css"> 
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <link rel="shortcut icon" href="https://files.phpclasses.org/graphics/phpclasses/favicon.ico"> 
+  <link rel="alternate" href="https://www.phpclasses.org/browse/feed/changes/package/2874.xml" type="application/rss+xml" title="How to Create a PHP Captcha Decoder with PHP OCR Class: Recognize text &amp; objects in graphical images"> 
+  <link rel="alternate" href="https://feeds.feedburner.com/phpclasses-xml" type="application/rss+xml" title="Latest published classes"> 
+  <link rel="alternate" href="https://feeds.feedburner.com/phpclassesreviews-xml" type="application/rss+xml" title="Latest published book reviews"> 
+  <link rel="pingback" href="https://www.phpclasses.org/pingback/package/2874-PHP-Recognize-text-objects-in-graphical-images.html"> 
+  <link rel="canonical" href="https://www.phpclasses.org/package/2874-PHP-Recognize-text-objects-in-graphical-images.html"> 
+  <meta name="author" content="Andrey Kucherenko"> 
+  <meta name="description" lang="en" content="This is class can be used as a tool for optical character recognition. It can recognize text in monochrome graphical images after a training phase. The training phase is necessary to let the class build recognition data structures from images that have known characters. The training data structures are used during the recognition process to attempt to identify text in real images using the..."> 
+  <meta name="keywords" lang="en" content=", ocr, phpOCR, ocr captcha, captcha decoder, TIFF, php ocr, captcha ocr, image Transform"> 
+  <script type="text/javascript" src="https://files.phpclasses.org/js/contentLoader.js"></script> 
+  <script type="text/javascript"><!--
+var cl = new ML.content.contentLoader();
+
+var cookies = document.cookie.split(";"), expires = new Date();
+for(var c = 0; c < cookies.length; ++c)
+{
+ var m = cookies[c].match(/^ +([^=]+)/);
+ if(m && m[1] === "visit")
+	break;
+}
+if(c === cookies.length)
+{
+	expires.setTime(expires.getTime()+(24*60*60*1000));
+	document.cookie = "visit=" + (new Date()).getTime() + "; expires=" + expires.toGMTString() + "; path=/;";
+}
+
+// --></script> 
+  <link rel="stylesheet" type="text/css" href="https://files.phpclasses.org/css/package.css?ts=1455498054"> 
+  <script type="text/javascript" src="https://files.phpclasses.org/animation.js"></script> 
+  <script type="text/javascript"><!--
+  (function(i,s,o,g,r,a,m){i["GoogleAnalyticsObject"]=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,"script","//www.google-analytics.com/analytics.js","ga");
+
+  ga("create", "UA-93559-1", "phpclasses.org");
+  ga("send", "pageview");
+
+// --></script> 
  </head> 
- <body bgcolor="#ffffff"> 
-  <style type="text/css">
-        div#skipmenu{
-        	position:relative;
-        }
-        div#skipmenu a{
-        	position:absolute;
-        	top: -1000px;
-        	left:-1000px;
-        	height: 1px;
-        	width: 1px;
-        	overflow:hidden;
-        }
-
-        div#skipmenu a:active, div#skipmenu a.skippy:focus, div#skipmenu a.skippy:hover{
-        	position: absolute;
-        	top:auto;
-        	left:auto;
-        	width:100%;
-        	height: 1em;
-        	width: auto;
-        	font-size:1em;
-        	font-weight:bold;
-        	width:100%;
-        	padding-bottom:15px;
-        	color: black;
-        	z-index:100;
-        	text-align:right;
-        	margin-bottom:25px;
-        }
-
-	.title {
-		text-align:center;
-		padding: 0;
-		margin: 0;
-	}
-	.title h1 {
-		margin: 0;
-	}
-
-	.title h1 span {
-		padding-left: 1em;
-		color: white;
-		background: black;
-		text-align:center;
-		margin: 0;
-	 }
-
-	.title ul {
-		text-align:center;
-		list-style-type: none;
-		display: inline-block;
-		/*border: 1px black solid;*/
-		margin: 0;
-		padding: 0;
-		margin-bottom: 30px;
-	}
-	.title li {
-		float: left;
-		border-left: 1px solid #000;
-		padding: 3px 15px;
-		display: inline;
-	}
-	.title li.first {
-		float: left;
-		border-left: 0;
-		display: inline;
-	}
-	
-
-</style> 
-  <div id="skipmenu">
-   <a href="#skip">Skip Navigation</a>
-  </div> 
-  <div class="title"> 
-   <h1><span>NIH Image Processing Interest Group<span></span></span></h1> 
-   <ul> 
-    <li class="first"><a href="/">Home</a> </li>
-    <li><a href="/about.html">About</a> </li>
-    <li><a href="/list.cgi">Researcher Index</a> </li>
-    <li><a href="/list.cgi?order=IC">Institute Index</a> </li>
-    <li><a href="/disclaimer.html">Disclaimers</a> </li>
-    <li><a href="/privacy.html">Privacy</a> </li>
-   </ul> 
-  </div> 
-  <a name="skip"></a> 
-  <center> 
-   <table width="540" border="1" cellspacing="0" cellpadding="3" align="center"> 
-    <tbody>
-     <tr>
-      <th colspan="20">Software</th>
-     </tr> 
-     <tr> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#afni">AFNI</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#alice">Alice/Cheshire</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#analysis">analySIS</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#analyze">ANALYZE</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#astra">Astra Image</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#envi">ENVI</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#fpimage">FP Image</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#fsl">FSL</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#gimp">Gimp</a><span class="shareware">**</span></font></td> 
-     </tr> 
-     <tr> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#idl">IDL</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#idl">IDL</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#iiv">iiV</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#imagej">ImageJ</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#imagelab">Image lab</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#iptk">Image Processing Tool Kit CD-ROM</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#iptk3">Image Processing Toolbox 3</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#ipl">Intel Image Processing Library</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#xpress">ImagXpress</a></font></td> 
-     </tr> 
-     <tr> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#imagnspect">ImagNSpect</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#jwave">JWAVE</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#khoros">Khoros</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#jwave">JWAVE</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#khoros">Khoros</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#leadtools">LEADTOOLS</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#lyngby">Lyngby</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#medx">MEDx</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#matlab">Matlab</a></font></td> 
-     </tr> 
-     <tr> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#medic">MedicView</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#mipav">MIPAV</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#mricro">MRIcro</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#neuronavigator">NeuroNavigator</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#image">NIHImage</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#piano">PIANO</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#pixies">Pixies</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#pvwave">PV-WAVE</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#srview">SRView</a></font></td> 
-     </tr> 
-     <tr> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#spm">SPM</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#xmedcon">XMedcon</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#xv">XV</a><span class="shareware">**</span></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1"><a href="ip_packages.html#viewnix">3DVIEWNIX</a></font></td> 
-      <td><font face="Arial, Helvetica, sans-serif" size="-1">(<span class="shareware">*</span>=shareware)<br>(<span class="shareware">**</span>=freeware)</font></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <p>&nbsp;</p>
-   <p> <a name="afni"></a> </p> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>AFNI</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>Free</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>Robert Cox</td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> Unix based machines, (Source Available) </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> AFNI is an environment for processing and displaying functional MRI data. It was designed and written at MCW, largely by RW Cox, starting in 1994. AFNI runs under Unix+X11+Motif systems, including SGI and Linux. It now comprises over 100,000 lines of C source code, and its capabilities are continually being extended. In addition, a skilled C programmer can add interactive and batch functions to AFNI with relative ease. 
-       <ul>
-         Main features include: 
-        <li>Switch viewing/analysis between many different datasets. </li>
-        <li>Image display in axial, sagittal, and/or coronal views (including multi-image montages). </li>
-        <li>Display of graphs (line and surface) of data extracted from image viewers. </li>
-        <li>Time series graphing of square regions from image viewers. </li>
-        <li>Linked image/graph viewing of multiple 3D datasets (e.g., linked scrolling through multiple brains). </li>
-        <li>Transformation to Talairach coordinates (12 sub-volume piecewise linear method). </li>
-        <li>Computation of activation maps using the "correlation method". </li>
-        <li>Color overlay of activation maps onto higher-resolution anatomical images (resampling of lower-resolution functionals is handled on the fly). </li>
-        <li>Interactive thresholding of functional overlays. 
-         <ul> 
-         </ul> </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> <p>? <a href="http://afni.nimh.nih.gov/afni"> AFNI home page </a><a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> </p> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="analyze"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>ANALYZE</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$<br> somewhat popular, a few site licenses can be found around campus</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>Biomedical Imaging Resource at the Mayo Foundation </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> 
-       <ul> 
-        <li>Sun Microsystems SPARCstations. </li>
-        <li>Silicon Graphics Indy, Indigo 2, and Challenge. </li>
-        <li>Hewlett Packard 9000/700 Series, 720, 735. </li>
-        <li>International Business Machines RS/6000 Series. </li>
-        <li>Digital Equipment Corporation Alpha Series. </li>
-        <li>IBM PC Compatibles (LINUX). </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> The ANALYZE<sup>tm</sup> system features integrated, complimentary tools for fully interactive display, manipulation and measurement of multidimensional image data. It can be applied to data from many different imaging modalities, including CT, MRI, PET, SPECT, ultrasound and digital microscopy. The software runs efficiently on standard UNIX workstations without the need for special-purpose hardware. The software architecture permits systematic enhancements and extensions, and provides an effective shell for rapid prototyping of customized imaging applications solutions. The ANALYZE<sup>tm</sup> software system is continually evolving to extend its range of capabilities and expand its scope of applications, strongly influenced by collaborative research projects and the ANALYZE<sup>tm</sup> user community. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.mayo.edu/bir/analyze/ANALYZE_Main.html" target="_top"> ANALYZE Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="alice"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>Alice/Cheshire</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$<br></td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.perceptive.com" target="_top">PAREXEL International Corporation</a> </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> Windows 95/98, Windows NT </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> Since 1994, Alice has provided 3D oriented analysis for scientific and medical research imaging. Alice brings you advanced tools for region and volume analyses, plug-in file import/export extensions to support a variety of scanner file formats, and a modular architecture that provides a flexible upgrade path, cost control, and protection from obsolescence. <p> Cheshire , intended for clinical use, provides an ideal solution for teleradiology, telecardiology, in-hospital view stations and image review for referring physicians. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.perceptive.com/ALICE.HTM" target="_top"> Alice Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer) <br> ?</a><a href="http://www.perceptive.com/CHESHIRE.HTM" target="_top"> Cheshire Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer) </a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="analysis"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>analySIS</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$<br> </td>
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>Soft Imaging System GmbH</td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> 
-       <ul> 
-        <li>MS Windows 95/98, NT 4.0 and Windows 2000. </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> analySIS? is the leading software for image acquisition, archiving, processing and analysis. This software offers interfaces for virtually all microscopes and cameras, and has been developed with bio-medical and materials science as well as general image-processing applications in mind. With its flexibility, analySIS? `pushes the envelope' and sets new standards for state-of-the-art scientific image processing. <p> analySIS? is available in three expansion levels: DOCU, AUTO and PRO. DOCU has its focus on image acquisition, archiving, documentation, interactive measurements and macro programming. AUTO, as the next higher level of analySIS?, is the standard among image-processing systems against which all others are measured. In addition to the functions available in the Docu version, Auto provides a wealth of image-processing functions such as automatic analysis, morphological operators and the programming language Imaging C. PRO is the most powerful level of analySIS?. It is designed right from the beginning to satisfy the most demanding requirements for image processing and analysis. Its sheer number of available functions and the embedded programming environment set up a framework that offers the latest developments in the field of digital image analysis. </p><p> Depending on the specific tasks and requirements, analySIS? can be combined with a number of different hardware and software options. analySIS? can be set up as a turnkey solution or individually configured for highest value. analySIS?, together with the modules, add-ins and interfaces, represents a complete product family. All products in this family are developed with future enhancements in mind. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.soft-imaging.de/eng/brochure/bro3_e.htm" target="_top"> analySIS Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="astra"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>Astra Image</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$, but free demos are available </td>
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.phasespace.com.au">Phase Space Technology</a></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> 
-       <ul> 
-        <li>Windows® 95/98 </li>
-        <li>Windows NT? (Intel) </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> Astra Image - the new standard in PC based image processing. Astra Image 1.5 combines workstation-class image processing and restoration functions into a single application including:<br> spatial domain processing <br> frequency domain processing and restoration <br> extensive statistical and visualisation functions <br> plug-ins, allowing for great flexibility <br> <p> The full version of Astra Image gives you the following benefits:<br> Save files in a variety of formats, print images and copy to the clipboard <br> Printed manual <br> Free support by email, telephone and fax <br> Free bugfixes and upgrades to minor versions <br> Discounts on upgrades to major versions <br> We can ship Astra Image to you by email and/or disk <br> Ability to develop Astra Image plug-ins <br> </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.phasespace.com.au/astraimage" target="_top"> Astra Image Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="envi"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>ENVI (The Environment for Visualizing Images)</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$ </td>
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.rsinc.com">Research Systems Inc.</a></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> 
-       <ul> 
-        <li>Compaq Tru64 UNIX </li>
-        <li>HP-UX </li>
-        <li>IBM AIX® </li>
-        <li>Linux </li>
-        <li>Power Macintosh® </li>
-        <li>SGI IRIX? </li>
-        <li>Sun? Solaris &amp; Solaris x86 </li>
-        <li>Windows® 95/98 </li>
-        <li>Windows NT? (Alpha, Intel) </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> Because ENVI has no limits on file size or number of bands, you can efficiently access and analyze any size or type of file. ENVI's open architecture seamlessly handles data from leading providers such as Landsat, SPOT, RADARSAT, NASA, NOAA, EROS Data Center and ESA, and is ready to accommodate data from EarthWatch, ORBIMAGE and Space Imaging. <p> Unlike other image processing packages, ENVI boasts a fully-accessible underlying language, the <a href="#idl">Interactive Data Language (IDL)</a>, so you can expand ENVI's features or create your own routines. IDL, a fourth-generation programming language, is so powerful that you can develop the solution you need in a fraction of the time it would take in traditional languages. IDL also includes a vast library of analysis and visualization functions so you can quickly prototype applications and create complete, custom solutions. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.rsinc.com" target="_top"> Research Systems Inc. Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> ?<a href="news:comp.lang.idl-pvwave"> comp.lang.idl-pvwave</a>(IDL and PVWAVE newsgroup) <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="fpimage"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>FP Image</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$ </td>
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="mailto:billw@vom.com">Bill Wahlberg</a></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> 
-       <ul> 
-        <li>Windows </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> View and Process Floating Point and Integer Images <br> Reads Proprietary Formats (user definable) <br> Powerful Image Processor Scripting Language <br> 3D Rendering Engine <br> </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.fpimage.com" target="_top"> FP Image Home Page </a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="fsl"></a> 
-   <pre>
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>FSL - The FMRIB Software Library</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>Free </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.fmrib.ox.ac.uk">Oxford Centre for Functional Magnetic Resonance Imaging of the Brain</a></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Unix, Linux </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> The FMRIB Software Library (FSL) is a collection of functional and structural brain image analysis tools, written mainly by members of the Image Analysis Group in FMRIB. FSL is completely self-contained. Most of the tools can be run either from the unix command line or as GUIs (graphical user interfaces). Tools which can be run from the Unix command line are ticked under "CLI" (Command Line Interface) and tools which can be run as a GUI are ticked under "GUI". 
-       <table border> 
+ <body> 
+  <div id="MainContainer"> 
+   <div id="TopLine"></div> 
+   <div id="Container"> 
+    <div id="UserContent"> 
+     <div class="c1025" id="user-bar">
+      <div id="user">
+       <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0" align="center"> 
         <tbody>
-         <tr>
-          <th>Tool</th> 
-          <th>Description</th>
-         </tr> 
-         <tr>
-          <td>BET</td> 
-          <td>Brain Extraction Tool - automatically segments brain from non-brain.</td>
-         </tr> 
-         <tr>
-          <td>FLIRT</td> 
-          <td>FMRIB's Linear Image Registration Tool - automatic accurate robust linear (affine) inter- and intra-modal registration</td>
-         </tr> 
-         <tr>
-          <td>FEAT</td> 
-          <td>FMRIB's Easy Analysis Tool - Advanced FMRI analysis with easy-to-use GUI, FILM (FMRIB's Improved Linear Model, the main program at the heart of FEAT) analysis and HRF-model-free analysis, automatic registration to structural and/or standard space, and fixed- and random-effects group statistics </td>
-         </tr> 
-         <tr>
-          <td>SUSAN</td> 
-          <td>nonlinear (doesn't blur edges) noise reduction for 3D images</td>
-         </tr> 
-         <tr>
-          <td>IRVA</td> 
-          <td>Inter-Repetition Variance Analysis - tool for running an FMRI analysis without specifying a waveform (also available from inside FEAT)</td>
+         <tr> 
+          <td width="49.5%" style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+          <td style=" white-space: nowrap ;"><a href="/login.html?page=phpocr">Login</a></td> 
+          <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+          <td style=" white-space: nowrap ;"><a href="/register.html?page=phpocr">Register</a></td> 
+          <td width="49.5%" style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
          </tr> 
         </tbody>
-       </table> </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.fmrib.ox.ac.uk/fsl" target="_top"> FSL home page</a> (<a href="http://www.nih.gov/about/disclaim.htm">disclaimer</a>)<br> </td>
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="gimp"></a> 
-   <pre>
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>Gimp</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>Free </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>Peter Mattis and Spencer Kimball</td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Unix, Linux </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> GIMP is an acronym for GNU Image Manipulation Program. It is a freely distributed piece of software suitable for such tasks as photo retouching, image composition and image authoring. It is an extremely capable piece of software with many capabilities. It can be used as a simple paint program, a expert quality photo retouching program, an online batch processing system, a mass production image renderer, a image format converter, etc. <p> GIMP is extremely expandedable and extensible. It is designed to be augmented with plugins and extensions to do just about anything. The advanced scripting interface allows everything from the simplest task to the most complex image manipulation procedures to be easily scripted. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.gimp.org" target="_top"> GIMP home page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> ?<a href="http://www.sunfreeware.com" target="_top"> SUN freeware site</a> (for simple Solaris downloads) <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="idl"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>IDL (Interactive Data Language)</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$<br> very popular, many site licenses around campus</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.rsinc.com">Research Systems</a></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> 
-       <ul> 
-        <li>Compaq Tru64 UNIX </li>
-        <li>HP-UX </li>
-        <li>IBM AIX® </li>
-        <li>Linux </li>
-        <li>Power Macintosh® </li>
-        <li>SGI IRIX? </li>
-        <li>Sun? Solaris &amp; Solaris x86 </li>
-        <li>Windows® 95/98 </li>
-        <li>Windows NT? (Alpha, Intel) </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> IDL, the Interactive Data Language, is the ideal software for data analysis, visualization, and cross-platform application development. IDL combines all of the tools you need for any type of project from "quick-look," interactive analysis and display to large-scale commercial programming projects. All in an easy-to-use, fully extensible environment. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.rsinc.com" target="_top"> Research Systems Inc. Home Page </a><a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> ?<a href="news:comp.lang.idl-pvwave"> comp.lang.idl-pvwave</a>(IDL and PVWAVE newsgroup) <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="iiv"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>iiV </b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>freeware<br> </td>
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td> Cognitive Neuroimaging Unit, VA Medical Center, Minneapolis, MN. </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> 
-       <ul> 
-        <li>Any JAVA supported platform </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> iV (formerly CNUViewer) is a brain imaging data display tool written in Java1.1 developed by the Cognitive Neuroimaging Unit, VA Medical Center, Minneapolis, MN. It is made freely available for downloading and running with no implied or expressed warranties. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://james.psych.umn.edu/iiV/" target="_top"> iiV Home Page </a><a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="imagelab"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>Image Lab</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.mcm-design.dk/cream.htm" target="_top">MCM DESIGN</a> </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> Windows 95, 98, 2000<br> Windows NT 4.0 </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> Image Lab is a software package for scientific and routine image analysis. Image Lab, enables you to perform analysis on colour and grey scale images, right on your own PC, acquired from a scanner or camera of your choice. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.mcm-design.dk/cream.htm" target="_top"> Image Lab Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> </td>
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="iptk3"></a> 
-   <pre>
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>Image Processing Toolbox 3</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$, but free demo is available</td> 
-     </tr> 
-     <tr> 
-      <th>Authors:</th> 
-      <td><a href="http://www.mathworks.com">MathWorks</a> </td>
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> UNIX <br> Windows </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> <p> The Image Processing Toolbox extends the MATLAB? computing environment to provide functions and interactive tools for enhancing and analyzing digital images and developing image processing algorithms. In addition, it facilitates the learning and teaching of image processing techniques in both academic and research settings. </p><p> Together, MATLAB and the Image Processing Toolbox provide scientists, researchers, and engineers with a diverse, flexible set of tools for solving complex imaging problems in disciplines such as aerospace/defense, astronomy, remote sensing, medical and scientific imaging, and materials science. Most functions are implemented in the open MATLAB language, letting you explore and customize existing toolbox algorithms or develop your own. </p><p> You can use the toolbox for the restoration of noisy or degraded images, image enhancement for improved intelligibility, blob analysis, and extraction and analysis of image data with 2-D statistics and transforms, as well as to develop complete solutions to challenging image processing problems that involve multidimensional data sets. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.mathworks.com/products/image/" target="_top"> Image Processing ToolKit 3 Home Page</a> (<a href="http://www.nih.gov/about/disclaim.htm">disclaimer</a>)<br> </td>
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="iptk"></a> 
-   <pre>
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>Image Processing Tool Kit CD-ROM</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$, but free demo is available</td> 
-     </tr> 
-     <tr> 
-      <th>Authors:</th> 
-      <td>Chris Russ and John Russ </td>
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> Macintosh <br> Windows </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> The IP Tool Kit CD-ROM is a hybrid format readable by both MacOS and Windows computers. It contains the following resources. 1. A comprehensive set of more than 150 plug-in modules for Photoshop. Functionally identical sets of drop-ins are provided for the Macintosh and Windows versions of Photoshop 3.0, 4.0 and 5.0 (they will also run with rev. 2.5, and with other host programs that faithfully adhere to the interface conventions set forth in the Adobe Photoshop Software Developers Kit - visit the Adobe site for technical information ). By using the consistent cross-platform user interface of Adobe Photoshop, and its broad capabilities for image acquisition, storage, and printing, these routines allow users to transform this easy-to-use program for quantitative and scientific image analysis. The plug-in modules appear under Photoshop's "Filters" menu, organized into a series of hierarchical sub-menus that include extensive spatial and Fourier domain processing, color processing, interactive and automatic thresholding and segmentation, morphological operators, Boolean and mathematical operations, and extensive measurement capabilites. A list of the plug-ins details the individual operations. <p> 2. A 350+ page tutorial "The Image Processing and Analysis Cookbook" that describes and illustrates the step-by-step use of image analysis tools to extract information from the images on the CD. This deals with the use of the drop-in modules as well as standard functions of Adobe Photoshop. The tutorial is a "PDF" or Acrobat file that can be viewed (or printed) complete with formatting and graphics on either a Mac or Windows computer using the Adobe Acrobat Reader, which is included. The tutorial is intended to be a hands-on "how to do it" companion. We also strongly recommend the use of "The Image Processing Handbook" 3rd edition, by John C. Russ, published 1998 by CRC Press, Boca Raton, FL (isbn number 0-8493-2532-1), which you can purchase for less than US $100 from your local bookseller or Amazon.com. </p><p> 3. A set of image files that correspond to those in the textbook and tutorial, and are used in the hands-on laboratory component of the Image Analysis Short Course taught each year at N. C. State University and at the Danish Technological Institute. The CD has a collection of more than 300 images (grey scale, binary and color) that illustrate many types of problems that require image processing tools, and the various types of measurements that can be performed. The images are saved as standard TIFF files that can be opened by most image analysis programs. Of course, Photoshop can also be used to apply the Tool Kit routines to other images acquired from your own applications. </p><p> 4. A complete functional image analysis program that can be used with the plug-ins on either Mac or Windows (95/NT/98). By special arrangement with the publisher we include a complete copy of Digital Darkroom version 1.2. This easy-to-use program allows purchasers to use the Tool Kit even if they do not have Photoshop or one of the other programs that accept Photoshop plug-ins (see compatibility notes below). </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://members.aol.com/ImagProcTK/" target="_top"> Image Processing Tool Kit CD Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> </td>
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="ipl"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>Intel Image Processing Library</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$</td> 
-     </tr> 
-     <tr> 
-      <th>Authors:</th> 
-      <td><a href="http://developer.intel.com">INTEL</a> </td>
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> Windows 95, 98, 2000 and NT </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> The Intel? Image Processing Library provides a set of low-level image manipulation functions in the form of standard DLLs and static libraries. Currently, versions of the library have been developed for the Pentium? processor, the Pentium Pro processor, the Pentium processor with MMX Technology, the Pentium II processor, and the Pentium III processor. A separate DLL is available for each of these processors. <p> The library functions perform filtering, thresholding, arithmetic, logical, and morphological operations. In addition, a number of functions perform linear geometric and linear image transforms. The linear image transforms include the fast Fourier transform (FFT) and the discrete cosine transform (DCT). </p><p> The library uses a flexible image format, supporting channels of 1-, 8-, 16-, and 32-bit integer pixels, as well as 32-bit floating-point pixels, with an arbitrary number of channels per image. Conversion to and from the Windows* DIB (device-independent bitmap) image format is supported, as are conversions between color and gray scale. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://developer.intel.com/vtune/perflibst/ipl/" target="_top"> Intel Image Processing Library Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> </td>
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="xpress"></a> 
-   <pre>
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>ImagXpress</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$</td> 
-     </tr> 
-     <tr> 
-      <th>Authors:</th> 
-      <td><a href="http://www.pegasustools.com">Pegasus Software</a></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> Major corporations world-wide are making ImagXpress the cornerstone of their imaging projects. Why? Because ImagXpress gives developers imaging technology that is powerful, flexible and best of all reliable. With over 80 image processing functions and support for over 30 file formats, ImagXpress includes the standard imaging functions you expect, and the advanced imaging features you need, like high performance deskew and despeckle. ImagXpress supports multiple page TIFF, including compacting of multiple page files, TIFF tag editing, and Wang TIFF annotation compatibility. <p> ImagXpress includes TWAIN scanner support, video frame capture, advanced printing support, and fully-programmable annotations. ImagXpress also offers expandability with add-on tookits for Barcode recognition and printing, Intelligent Character Recognition (ICR), Optical Mark Recognition (OMR) and high-speed ISIS scanning. ImagXpress Professional includes CapturePRO for video capture, TwainPRO for low level image scanning, PrintPRO for expanded printing capabilities and NotateXpress for annotation. All of this comes in a clean, consistent programming interface across the various development environments you use. ImagXpress supports your platform of choice with COM objects, lightweight ActiveX controls, and Delphi VCLs and provides samples for Visual Basic, VC++, C++ Builder, Delphi, Access, and HTML. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.pegasustools.com/products/imagxpress" target="_top"> ImagXpress Home Page</a>(<a href="http://www.nih.gov/about/disclaim.htm"> disclaimer</a>)<br> </td>
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="imagnspect"></a> 
-   <pre>
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>ImagNSpect</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>free</td> 
-     </tr> 
-     <tr> 
-      <th>Authors:</th> 
-      <td><a href="mailto:dak@dakx.com">D.A. Kopf</a></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> Macintosh </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> A free Mac program originally designed to display and analyze registered multispectral images. Drawing a region on one image copies it to all the others and enters the mean and standard deviation into a database. Handles byte, integer, longint, floating point, and complex (FT) images. The FT routine includes prime radices up to 19. Other features include live brightness/contrast/color LUT adjustment, principal components, histogram masking, gaussian fits, 3D rendering, rubber sheeting, cross-correlation. Most bottlenecks are written in both 60840 and PowerPC assembly, however due to some explicit 68831 FPU code, a floating point emulator (SoftFPU, PowerFPU) must be installed in order to run the program. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://dakx.com/imns/" target="_top"> ImagNSpect Home Page</a>(<a href="http://www.nih.gov/about/disclaim.htm"> disclaimer</a>)<br> </td>
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="imagej"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>ImageJ</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>Free</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>Wayne Rasband </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>Wayne Rasband (<a href="mailto:wayne@codon.nih.gov">wayne@codon.nih.gov</a>) </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Any platform that supports Java 1.1, including Windows, Macintosh and Unix</td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td>ImageJ is a Java version of <a href="#image">NIH Image</a> 
-       <ul>
-         Main features include: 
-        <li>Supports 8-bit, 16-bit, float and RGB data types. </li>
-        <li>Extendable via user-written Java plugins </li>
-        <li>Runs as either an application or an applet. </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://rsb.info.nih.gov/ij" target="_top"> IMAGEJ Home Page</a><br> ?<a href="http://list.nih.gov/archives/imagej.html" target="_top"> IMAGEJ Special Interest Group</a> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="jwave"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>JWAVE</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$<br> </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>Visual Numerics</td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Any platform supporting JAVA </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> JWAVE is Web-based software that allows you to quickly access and understand what your data means, from anywhere, at anytime. With JWAVE, you can rapidly analyze, visualize and share critical information immediately with everyone in the organization, regardless of the computer platform. JWAVE is based on a multitiered architecture that enables you to easily create applications that embrace open standards and will grow as your organization grows. Included is a sophisticated set of analysis and visualization routines that run on the server, avoiding network bottlenecks and costly downloads of information. Increase productivity and reduce costs with JWAVE by allowing all departments to standardize and distribute information on a single platform, the Web. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.vni.com/products/wpd/jwave/index.html" target="_top"> JWAVE Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> ?<a href="#pvwave"> PV-WAVE</a> <br> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="khoros"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>Khoros</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.khoral.com target=_top">Khoral Research Inc</a> </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>UNIX (DEC, SGI, Solaris, HP), LINUX </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> Quickly develop solutions to complex computing problems. With multi-platform support, you can manage large-scale, complex software systems and integrate a diverse software base into a uniform framework. Khoros Pro delivers flexible functionality in a variety of application areas: 
-       <ul> 
-        <li>Software Development Environment Manage all stages of the software life-cycle, from prototyping to evaluation to deployment. </li>
-        <li>System Integration Environment Integrate Complex code into a single seamless environment. </li>
-        <li>Visual Programming Environment Rapidly prototype solutions using the visual programming language Cantata. </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.khoral.com" target="_top"> Khoral Research Inc. Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="leadtools"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>LEADTOOLS</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.leadtools.com" target="_top"> LEAD Technologies</a></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Persons:</th> 
-      <td> None </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> Windows3.x, Windows NT/95/98, OS/2, MS-DOS, Unix, Linux, Macintosh, DEC Alpha </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> LEADTOOLS Medical Imaging includes general medical imaging technologies (1-16,24,32 bit color, 1-16 bit grayscale and window leveling of 12 and 16-bit grayscale images), support for the DICOM file format, and support for DICOM Communications. Load, process, display, window level and save 12 and 16 bit grayscale images (including support for 16-bit grayscale TIFF). Detect and set LowBit and HighBit for image data, display images with automatic LUT intensity expansion, or set LUT entries and ranges with specific values and gradients. Display images through the LUT without changing the data, or process the image data using the LUT. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.leadtools.com" target="_top"> LEADTOOLS Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="lyngby"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>Lyngby</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>freeware</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>Technical University of Denmark </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Persons:</th> 
-      <td> None </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> Any platform supported by Matlab </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> Lyngby is a Matlab toolbox for analysis of functional neuroimages. The toolbox includes Cross-correlation, FIR filter analysis, K-means and the Lange-Zeger method. It is under continuous development. Matlab 5.2 is required, though many functions will work with Matlab 4.2. No other toolboxes are necessary. </td>
-      <td> </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://hendrix.imm.dtu.dk/software/lyngby" target="_top"> Lyngby Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a> <br> ?<a href="http://hendrix.imm.dtu.dk/software/lyngby/doc/lyngby.latex2html/lyngby.html" target="_top"> Lyngby Documentation Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a> <br> ?<a href="http://hendrix.imm.dtu.dk/software/lyngby/mail/maillist.html" target="_top"> Lyngby Mail list Archive Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="matlab"></a> 
-   <pre>
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>MATLAB</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$ </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.mathworks.com" target="_top"> MathWorks</a> </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Persons:</th> 
-      <td> None </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> almost everything </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> MATLAB is an integrated technical computing environment that combines numeric computation, advanced graphics and visualization, and a high-level programming language. MATLAB includes hundreds of functions for: ? Data analysis and visualization ? Numeric and symbolic computation ? Engineering and scientific graphics ? Modeling, simulation, and prototyping ? Programming, application development, and GUI design <p> MATLAB is used in a variety of application areas including signal and image processing, control system design, financial engineering, and medical research. The open architecture makes it easy to use MATLAB and companion products to explore data and create custom tools that provide early insights and competitive advantages. An overview of The MathWorks product family is available. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> <p>?<a href="http://www.mathworks.com/products/matlab" target="_top"> MATLAB Home Page</a> (<a href="http://www.nih.gov/about/disclaim.htm">disclaimer</a>)<br> ?<a href="news:comp.soft-sys.matlab" target="_top"> comp.soft-sys.matlab newsgroup</a> </p></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="medic"></a> 
-   <pre>
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>MedicView</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$, but free demo available</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.medicimaging.com" target="_top"> Medical Processing and Acquistion Systems</a></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Persons:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Windows</td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> 
-       <ul> 
-        <li>image viewer (supports files of type InterFile, DICOM, Acr/Nema, Analyze, Gif98, INW(RUG), ECAT/Matrix and PIP) </li>
-        <li>image type conversion </li>
-        <li>clinical protocols for all standard nuclear medicine studies </li>
-        <li>ROI and Profile image analysis and masking </li>
-        <li>patient management </li>
-        <li>reporting and archiving </li>
-        <li>local, hospital and internet communication </li>
-        <li>internet consultancy on nuclear medicine clinical studies </li>
-        <li>acquisition and processing of gamma camera signals </li>
-        <li>quality control of gamma cameras </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> <p>?<a href="http://www.medicimaging.com" target="_top"> MEDICView Home Page </a> (<a href="http://www.nih.gov/about/disclaim.htm">disclaimer</a>)</p> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="medx"></a> 
-   <pre>
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>MEDx</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>Free to NIH employees </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.sensor.com" target="_top"> Sensor System Inc</a> and NIH </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Persons:</th> 
-      <td> Jeff Solomon (<a href="mailto:jsolomon@sensor.com">jsolomon@sensor.com</a>) <br> Ian Heaton (<a href="mailto:ianh@sensor.com">ianh@sensor.com)</a> </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Solaris, Red Hat Linux, SGI IRIX </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> A UNIX based software package used to visualize and analyze 2D and 3D medical image data. 
-       <ul>
-         Main features include: 
-        <li> 2D/3D registration </li>
-        <li> fMRI analysis </li>
-        <li> scripting </li>
-        <li> segmentation </li>
-        <li> region of interest analysis </li>
-        <li> 3D visualization </li>
-        <li> incorporation of SPM 96 </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> <p>?<a href="http://www-medx.cc.nih.gov/medx_index.html" target="_top"> MEDx Home Page</a> (<a href="http://www.nih.gov/about/disclaim.htm">disclaimer</a>)</p> <p>?<a href="http://www.medicalnumerics.com/products/medx/users_guide.html" target="_top"> MEDx User's Guide</a> (<a href="http://www.nih.gov/about/disclaim.htm">disclaimer</a>)</p> <p>?<a href="http://medx.sensor.com/products/medx/tutorials.html" target="_top"> MEDx Tutorials</a> (<a href="http://www.nih.gov/about/disclaim.htm">disclaimer)</a>)</p> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="mipav"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>MIPAV</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>Free </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td> Matthew McAuliffe </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td> Matthew McAuliffe (<a href="mailto:mcmatt@mail.nih.gov">mcmatt@mail.nih.gov</a>) </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> Any JAVA-capable operating system, including Windows, Macintosh, Irix, and Solaris </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> MIPAV is a n-dimensional general-purpose image processing program to assist NIH researchers to extract quantitative information from various medical imaging modalities to better understand, diagnose, monitor, and treat medical disorders. <p> MIPAV is written using the Java programming language and has taken advantage of Java's intrinsic object-oriented capabilities to improve code reuse and functionality and portability. MIPAV is available on any Java-capable operating system, including Windows, Macintosh, Irix, and Solaris. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://mipav.cit.nih.gov" target="_top"> MIPAV Home Page</a> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="mricro"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>MRIcro</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>Free </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td> <a href="mailto:&quot;chris.rorden@nottingham.ac.uk&quot;">Chris Rorden</a> </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td> none </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td> Windows, Linux </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> MRIcro is a freeware medical image viewer. It can read Analyze, DICOM, GE Genesis, ECAT, Interfile and Siemens images and convert images to Analyze format (for analysis with SPM or other packages). Tools are provided for defining regions of interest. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.psychology.nottingham.ac.uk/staff/cr1/mricro.html" target="_top"> MRICro Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)<br> ?</a><a href="http://www.psychology.nottingham.ac.uk/staff/cr1/mritut.html" target="_top"> MRICro Tutorial</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)<br> ?</a><a href="http://www.psychology.nottingham.ac.uk/staff/cr1/linux.html" target="_top"> MRICro on Linux</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)<br> </a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="neuronavigator"></a> 
-   <pre>
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>NeuroNavigator</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$ </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.sensor.com" target="_top"> Sensor System Inc</a> and NIH </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Persons:</th> 
-      <td> None </td>
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Solaris, Red Hat Linux, SGI IRIX </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> NeuroNavigator maps brain activity, including verification of activation and image quality, motion detection and correction, spatial and temporal intensity adjustment, smoothing, statistical map construction, segmentation, registration, image fusion, and spatial normalization to standardized coordinate maps. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> No home page yet for NeuroNavigator </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="image"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>NIH Image</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>Free</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>Wayne Rasband </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>Wayne Rasband (<a href="mailto:wayne@codon.nih.gov">wayne@codon.nih.gov</a>) </td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Macintosh </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> NIH Image is an entry-level, general purpose image processing and analysis program for the Macintosh. 
-       <ul>
-         Main features include: 
-        <li>Pascal-like macro language </li>
-        <li>video capture </li>
-        <li>3D "stacks" </li>
-       </ul> </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://rsb.info.nih.gov/nih-image" target="_top"> NIH Image Home Page</a> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="pixies"></a> 
-   <pre>
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>Pixies</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>freeware </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td> <a href="http://www.apteryx.fr" target="_top"> APTERYX</a> </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Windows/NT/95/98, Mac OS, Solaris SPARC, Solaris 386, HP-UX, Linux </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> Pixies is a user-friendly application dedicated to the analysis of biomedical image series and including sophisticated analysis tools developped within a research lab that has been involved in the analysis of medical image series for almost twenty years. The idea underlying the Pixies project was to use the internet to make the most recent sophisticated medical image analysis tools, including the original method of factor analysis of medical image series, available to the largest medical and research community. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.apteryx.fr/en/pixies" target="_top"> Pixies Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="piano"></a> 
-   <pre>
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>PIANO</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>freeware </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td> <a href="http://mbi.dkfz-heidelberg.de/mbi/" target="_top"> German Cancer Research Center <br> Division of Medical and Biological Informatics</a> </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Linux, IRIX, Solaris, Windows </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> Piano is a library containing ~75 algorithms and tools for multi-dimensional medical image processing, analysis and visualization. It is used in our group for several projects in the field of surgical planning. Piano is licensed under the BSD License. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://mbi.dkfz-heidelberg.de/mbi/software/" target="_top"> PIANO Home Page</a> (<a href="http://www.nih.gov/about/disclaim.htm">disclaimer</a>)</td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-</pre> 
-   <a name="pvwave"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>PVWAVE</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>$<br> not very popular, but a site license or two can be found around campus</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>Visual Numerics</td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>UNIX, Windows NT, Windows 95 </td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> PV-WAVE is the most extensive Visual Data Analysis (VDA) solution used for analyzing, interpreting and presenting large amounts of data from business and research environments. PV-WAVE's features include image and signal processing, data import and export, 3D surface, plot, histogram, contour, animation, color editor and a database table display. <p>An array-oriented fourth-generation language, PV-WAVE accelerates application development, accommodates most data types, and supports cross-platform development and deployment on UNIX, Windows NT and Windows 95. Along with its Web-enabled architecture, PV-WAVE includes hundreds of comprehensive numerical and statistical algorithms from the IMSL Numerical Libraries, and has a user-friendly GUI. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.vni.com/products/wave/index.html" target="_top"> PV-WAVE Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> ?<a href="news:comp.lang.idl-pvwave"> comp.lang.idl-pvwave</a>(IDL and PVWAVE newsgroup) <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> ?<a href="#jwave"> JWAVE</a> <br> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="srview"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>SRView</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>free<br> </td>
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td><a href="http://www.synergyresearch.com">Synergy Research</a></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td><a href="mailto:woltz@synergyresearch.com">Lawrence Woltz</a></td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>UNIX, Linux, Mac OS X (Requires Unix X Window manager)</td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> SRView is an image display and analysis program for 3D and 3D+time images. <p> Features include: <br> Display of three orthogonal views with cross-references. <br> Display of multiple images at successive z or t values. <br> Reads DICOM, AFNI, and NIAAA's in-house image formats. <br> Interactive traversal along any of the four dimensions. <br> Interactive rotations in 3 dimensions. <br> ROI and mask creation and editing. <br> Interactive time vector plotting from 4D images. <br> Scripting using an embedded Tcl/Tk interpreter. </p></td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.synergyresearch.com/SRView.html" target="_top"> SRView Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><br> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="spm"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>SPM</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>Free</td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>Wellcome Department of Cognitive Neurology</td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>Unix-Based</td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> Statistical Parametric Mapping refers to the construction and assessment of spatially extended statistical process used to test hypotheses about [neuro]imaging data from SPECT/PET &amp; fMRI. These ideas have been instantiated in software that is called SPM. </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://www.fil.ion.bpmf.ac.uk/spm" target="_top"> SPM Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-     </tr> 
-    </tbody>
-   </table> 
-   <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-</pre> 
-   <a name="xmedcon"></a> 
-   <pre>
-
-
-
-</pre> 
-   <table border align="center" width="620"> 
-    <tbody>
-     <tr> 
-      <th>Name:</th> 
-      <td><span class="name"><b>XMedcon</b></span></td> 
-     </tr> 
-     <tr> 
-      <th>NIH Availability:</th> 
-      <td>Freeware </td> 
-     </tr> 
-     <tr> 
-      <th>Author:</th> 
-      <td>(Instituut voor Nucleaire Wetenschappen) </td> 
-     </tr> 
-     <tr> 
-      <th>NIH Contact Person:</th> 
-      <td>None</td> 
-     </tr> 
-     <tr> 
-      <th>Supported Platforms:</th> 
-      <td>source available</td> 
-     </tr> 
-     <tr> 
-      <th>Brief Description:</th> 
-      <td> The title (X)MedCon stands for a Medical Image Conversion Utility released under the GNU's GPL license. It bundles the C sourcecode, a library, a flexible command-line program and an X-Windows GUI based on the amazing Gtk+ libraries. Format conversion is the only goal this utility will ever try to do and that in particular for reconstructed nuclear medicine images. <p> In the following list you can see an overview of the supported formats: </p><pre>
-
-       Format           Functionality        Remarks 
-       Acr/Nema 2.0     Read &amp; Write         Papyrus alike ... 
-       Analyze (SPM)    Read &amp; Write         Basically for the use in the SPM
-       utility 
-       DICOM 3.0        Read &amp; Write         Requires vt-dicom library
-       (included) 
-       ECAT 6.4         Read &amp; Write         Proprietary format from CTI 
-       GIF87a/89a       Read &amp; Write         Well-known format in desktop
-       utilities 
-       InterFile 3.3    Read &amp; Write         Remarkable with editable text
-       header 
-       INW (RUG)        Read &amp; Write         Forgotten locally used format
-        </pre> </td> 
-     </tr> 
-     <tr> 
-      <th>For more Information:</th> 
-      <td> ?<a href="http://petaxp.rug.ac.be/xmedcon" target="_top"> XMedcon Home Page </a><a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a> </td>
-     </tr> 
-    </tbody>
-   </table> 
-  </center>
-  <pre>
-   <center>
-    <center>
-     <font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font> 
-     <a name="xv"></a> 
-     <pre>
-
-
-
-</pre> 
-     <table border align="center" width="620"> 
-      <tbody>
-       <tr> 
-        <th>Name:</th> 
-        <td><span class="name"><b>XV</b></span></td> 
-       </tr> 
-       <tr> 
-        <th>NIH Availability:</th> 
-        <td>Shareware - government sites must register </td> 
-       </tr> 
-       <tr> 
-        <th>Author:</th> 
-        <td>John Bradley </td> 
-       </tr> 
-       <tr> 
-        <th>NIH Contact Person:</th> 
-        <td>None</td> 
-       </tr> 
-       <tr> 
-        <th>Supported Platforms:</th> 
-        <td>UNIX-based</td> 
-       </tr> 
-       <tr> 
-        <th>Brief Description:</th> 
-        <td> xv is an interactive image manipulation program for the X Window System. It can operate on images in the GIF, JPEG, TIFF, PBM, PGM, PPM, XPM, X11 bitmap, Sun Rasterfile, Targa, RLE, RGB, BMP, PCX, FITS, and PM formats on all known types of X displays. It can generate PostScript files, and if you have ghostscript (version 2.6 or above) installed on your machine, it can also display them. </td> 
-       </tr> 
-       <tr> 
-        <th>For more Information:</th> 
-        <td> ?<a href="http://www.trilon.com/xv/xv.html" target="_top"> XV Home Page </a><a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a><a href="http://www.trilon.com/xv/xv.html" target="_top"><br> ?</a><a href="http://www.sunfreeware.com" target="_top"> SUN freeware site</a> (for simple Solaris downloads) <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-       </tr> 
-      </tbody>
-     </table> 
-     <pre><font face="Arial, Helvetica, sans-serif" size="-1"><a href="#top">back to top</a></font>
-
-
-
-
-
-
-<a name="viewnix"></a> 
-
-<pre>
-
-
-
-</pre>
-
-    
-      <table border align="center" width="620">
-
-      
-       <tbody>
-        <tr> 
-         <th>Name:</th> 
-         <td><span class="name"><b>3DVIEWNIX</b></span></td> 
-        </tr> 
-        <tr> 
-         <th>NIH Availability:</th> 
-         <td>$1000, but free 6 month demo is available</td> 
-        </tr> 
-        <tr> 
-         <th>Author:</th> 
-         <td>Medical Image Processing Group<br> Department of Radiology, Univ. of Penn.</td> 
-        </tr> 
-        <tr> 
-         <th>NIH Contact Person:</th> 
-         <td>None</td> 
-        </tr> 
-        <tr> 
-         <th>Supported Platforms:</th> 
-         <td>Unix-based</td> 
-        </tr> 
-        <tr> 
-         <th>Brief Description:</th> 
-         <td> 3DVIEWNIX is a transportable, very inexpensive software system developed by the Medical Image Processing Group, Department of Radiology, University of Pennsylvania, Philadelphia. It has state-of-the-art capabilities for visualizing, manipulating, and analyzing multidimensional, multimodality image information. </td> 
-        </tr> 
-        <tr> 
-         <th>For more Information:</th> 
-         <td> ?<a href="http://www.mipg.upenn.edu/~Vnews" target="_top"> 3DVIEWNIX Home Page</a> <a href="http://www.nih.gov/about/disclaim.htm">(disclaimer)</a></td> 
-        </tr> 
-       </tbody>
-      </table>
-</pre>
-    </center>
-
-
-    <style type="text/css">
-div.footer {
-	font-size:80%;
-
-	width: 100%
-	border: 1px solid black;
-	padding: 2em;
-	text-align: center;
-
-	border-radius:          10px;
-        -moz-border-radius:     10px;
-        -webkit-border-radius:  10px;
-
-}
-div img {
-	margin: 1em;
-	border: 0;
-}
-
-div.left {
-	display: inline;
-}
-div.right {
-	display: inline;
-}
-
-</style>
-
-
-    <div class="footer"> 
-     <p> Comments and suggestions for improving the site may be sent to <a href="mailto:www@image.nih.gov?subject=Comment about the Image WWW site">www@image.nih.gov</a>. Last modified: 4 April 2011. </p>
-     <div class="centre"> 
-      <div class="left"> 
-       <a href="http://www.dhhs.gov"><img src="/image/dhhs_logo.gif" height="40" alt="U.S. Department of Health and Human Services" title="U.S. Department of Health and Human Services"></a> 
+       </table> 
+      </div>
+     </div> 
+     <div class="u1025 responsive-menu">
+      <form style="margin: 0" action="/search.html" method="get"> 
+       <div id="navigation-menu">
+        <input type="checkbox" id="navigation-button">
+        <div class="menu-items">
+         <div>
+          <img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="All class groups" style="border: 0; vertical-align: middle"> 
+          <a href="/browse/">All class groups</a>
+         </div> 
+         <div>
+          <img src="https://files.phpclasses.org/graphics/phpclasses/latest.png" width="24" height="24" alt="Latest entries" style="border: 0; vertical-align: middle"> 
+          <a href="/browse/latest/latest.html">Latest entries</a>
+         </div> 
+         <div>
+          <img src="https://files.phpclasses.org/graphics/phpclasses/top.png" width="24" height="24" alt="Top 10 charts" style="border: 0; vertical-align: middle"> 
+          <a href="/browse/top/top.html">Top 10 charts</a>
+         </div> 
+         <div>
+          <img src="https://files.phpclasses.org/graphics/phpclasses/blog.png" width="24" height="24" alt="Blog" style="border: 0; vertical-align: middle"> 
+          <a href="/blog/">Blog</a>
+         </div> 
+         <div>
+          <img src="https://files.phpclasses.org/graphics/phpclasses/forum.png" width="24" height="24" alt="Forums" style="border: 0; vertical-align: middle"> 
+          <a href="/discuss/">Forums</a>
+         </div> 
+         <div>
+          <img src="https://files.phpclasses.org/graphics/phpclasses/help.png" width="24" height="24" alt="Help FAQ" style="border: 0; vertical-align: middle"> 
+          <a href="/faq/">Help FAQ</a>
+         </div> 
+        </div>
+        <label for="navigation-button" id="navigation-label"><span class="drop-icon"><img src="https://files.phpclasses.org/graphics/phpclasses/menu.png" width="24" height="24" alt="Navigation menu" style="border: 0"></span></label>
+       </div>
+       <a href="/"><img src="https://files.phpclasses.org/graphics/phpclasses/logo-small-phpclasses.svg" width="75" height="24" alt="logo small" style="vertical-align: top"></a>
+       <div id="user-menu">
+        <input type="checkbox" id="user-button">
+        <div class="menu-items">
+         <div>
+          <a href="/login.html?page=phpocr">Login</a>
+         </div> 
+         <div>
+          <a href="/register.html?page=phpocr">Register</a>
+         </div> 
+        </div>
+        <label for="user-button" id="user-label"><span class="drop-icon"><img src="https://files.phpclasses.org/graphics/phpclasses/user-menu.png" width="24" height="24" alt="User menu" style="border: 0"></span></label>
+       </div>
+       <div class="search-input">
+        <input type="text" name="words" size="16" placeholder="Search"> 
+        <input type="image" src="https://files.phpclasses.org/graphics/phpclasses/search.png" align="middle" style="width: 24px; height: 24px">
+       </div>
+       <input type="hidden" name="go_search" value="1"> 
+      </form>
+     </div> 
+    </div> 
+    <div id="PageContent"> 
+     <div id="Top"> 
+      <div id="logoPHP" class="c1025">
+       <a href="/"><img src="https://files.phpclasses.org/graphics/phpclasses/logo-phpclasses.png" width="180" height="60" alt="PHP Classes" style="border: 0"></a>
       </div> 
-      <div class="left"> 
-       <a href="http://www.nih.gov"><img src="/image/NIH_Logo.gif" height="35" alt="National Institutes of Health" title="National Institutes of Health"></a> 
+      <div class="c1025">
+       <img id="elephpant" alt="elePHPant" src="https://files.phpclasses.org/graphics/phpclasses/elephpant.png" width="133" height="117">
       </div> 
-      <div class="right"> 
-       <a href="http://www.usa.gov"><img src="/image/usagov_logo_color.gif" height="25" alt="USA.gov" title="USA.gov"></a> 
+      <div id="logoCompany" class="c1025">
+       <a href="http://www.icontem.com/" target="_blank" rel="nofollow"><img src="https://files.phpclasses.org/graphics/icontem.png" width="180" height="60" alt="Icontem" style="border: 0"></a>
+      </div> 
+      <h1>How to Create a PHP Captcha Decoder with PHP OCR Class: Recognize text &amp; objects in graphical images</h1> 
+      <div id="subtitle"></div> 
+     </div> 
+     <div id="PageInfo"> 
+      <div class="c1025">
+       <div id="navigation">
+        <form style="margin: 0" action="/search.html" method="get"> 
+         <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0" align="center"> 
+          <tbody>
+           <tr> 
+            <td width="49.5%" style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+            <td style=" white-space: nowrap ;"><a href="/search.html">Search</a> 
+             <div class="search-input">
+              <input type="text" name="words" size="16" placeholder="Search"> 
+              <input type="image" src="https://files.phpclasses.org/graphics/phpclasses/search.png" align="middle" style="width: 24px; height: 24px">
+             </div></td> 
+            <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+            <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="All class groups" style="border: 0; vertical-align: middle"> <a href="/browse/">All class groups</a></td> 
+            <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+            <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/latest.png" width="24" height="24" alt="Latest entries" style="border: 0; vertical-align: middle"> <a href="/browse/latest/latest.html">Latest entries</a></td> 
+            <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+            <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/top.png" width="24" height="24" alt="Top 10 charts" style="border: 0; vertical-align: middle"> <a href="/browse/top/top.html">Top 10 charts</a></td> 
+            <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+            <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/blog.png" width="24" height="24" alt="Blog" style="border: 0; vertical-align: middle"> <a href="/blog/">Blog</a></td> 
+            <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+            <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/forum.png" width="24" height="24" alt="Forums" style="border: 0; vertical-align: middle"> <a href="/discuss/">Forums</a></td> 
+            <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+            <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/help.png" width="24" height="24" alt="Help FAQ" style="border: 0; vertical-align: middle"> <a href="/faq/">Help FAQ</a></td> 
+            <td width="49.5%" style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <input type="hidden" name="go_search" value="1"> 
+        </form>
+       </div>
+      </div> 
+      <div class="c1025">
+       <div id="recommendpage">
+        <div id="recommendpagecontainer">
+         <table cellspacing="2" cellpadding="0" align="center"> 
+          <tbody>
+           <tr> 
+            <td class="tabcontent box light"><a href="https://www.phpclasses.org/recommend_page.html?title=How+to+Create+a+PHP+Captcha+Decoder+with+PHP+OCR+Class%3A+Recognize+text+%26+objects+in+graphical+images&amp;page=%2Fphpocr">Recommend</a> this page to a friend!</td> 
+            <td class="box light">
+             <div class="g-plusone" data-size="medium" data-href="https://www.phpclasses.org/phpocr"></div><script type="text/javascript"><!--
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+// --></script></td> 
+            <td class="box light">
+             <div id="fb-root"></div> <script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=236496503134263&version=v2.3";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, "script", "facebook-jssdk"));</script> 
+             <div class="fb-like" data-href="https://www.phpclasses.org/phpocr" data-width="80" data-layout="button_count" data-action="like" data-show-faces="false" data-share="true"></div> </td> 
+            <td class="box light"><a href="https://twitter.com/share" class="twitter-share-button" data-url="https://www.phpclasses.org/phpocr" data-count="horizontal" data-via="phpclasses" data-related="jsclassesearly:News and insights about the JSClasses site features and the JavaScript world in general"><img src="https://files.phpclasses.org/graphics/phpclasses/twitter.png" width="24" height="24" alt="ReTweet" style="border: 0; vertical-align: middle"> ReTweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script></td> 
+           </tr> 
+          </tbody>
+         </table>
+        </div>
+       </div> 
+      </div> 
+      <div> 
+       <div class="InfoContent">
+        <div>
+         <div class="author-information-nominee">
+          <!--htdig_noindex-->
+          <a name="author"></a>
+          <br>
+          <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+           <tbody>
+            <tr> 
+             <td width="1%" class="nbgu">&nbsp;</td> 
+             <td class="safe-padding nblu"><img src="https://files.phpclasses.org/graphics/phpclasses/user.png" width="24" height="24" alt="Author" style="border: 0; vertical-align: middle"> <b>Author</b></td> 
+             <td width="98%" class="nbgu">&nbsp;</td> 
+            </tr> 
+           </tbody>
+          </table> 
+          <!--/htdig_noindex-->
+          <table width="100%"> 
+           <tbody>
+            <tr> 
+             <td width="1%" valign="top" style="text-align: center; padding: 8px">
+              <!--htdig_noindex--><span itemprop="image" itemscope itemtype="http://schema.org/ImageObject">
+               <meta itemprop="width" content="80">
+               <meta itemprop="height" content="120"><img itemprop="url" class="photo" src="https://files.phpclasses.org/graphics/unknown.gif" width="80" height="120" alt="Picture of Andrey Kucherenko" title="Picture of Andrey Kucherenko"></span>
+              <div class="picture-user-name">
+               <a href="/browse/author/128217.html" rel="author">Andrey Kucherenko</a>
+              </div>
+              <!--/htdig_noindex--></td> 
+             <!--htdig_noindex-->
+             <td class="author-details" valign="top">
+              <table width="100%" cellspacing="0" cellpadding="2"> 
+               <tbody>
+                <tr class="even"> 
+                 <th align="right" width="1%" nowrap>Name:</th> 
+                 <td colspan="2"> <b><span itemprop="name">Andrey Kucherenko</span></b> is available for providing paid consulting. Contact <a href="/professionals/profile/1130/"><span itemprop="name">Andrey Kucherenko</span></a> .</td> 
+                </tr> 
+                <tr class="odd"> 
+                 <th align="right" width="1%" nowrap>Classes:</th> 
+                 <td nowrap colspan="2"> 1 package by <a href="/browse/author/128217.html" rel="author">Andrey Kucherenko</a></td> 
+                </tr> 
+                <tr class="even"> 
+                 <th align="right" width="1%" nowrap>Country:</th> 
+                 <td nowrap colspan="3"><img align="middle" width="21" height="21" src="https://files.phpclasses.org/graphics/ua.gif" alt="Ukraine" title="Ukraine"> <a href="/browse/country/ua/">Ukraine</a></td> 
+                </tr> 
+                <tr class="odd"> 
+                 <th align="right" width="1%" nowrap>Age:</th> 
+                 <td nowrap colspan="2">36</td> 
+                </tr> 
+                <tr class="even"> 
+                 <th align="right" width="1%" nowrap>All time rank:</th> 
+                 <td nowrap width="1%">27</td>
+                 <td nowrap>
+                  <!--htdig_noindex-->2 in <a href="/browse/author/bycountry/country/ua/">Ukraine</a> <img align="middle" width="21" height="21" src="https://files.phpclasses.org/graphics/ua.gif" alt="Ukraine" title="Ukraine">
+                  <!--/htdig_noindex--></td> 
+                </tr> 
+                <tr class="odd"> 
+                 <th align="right" width="1%" nowrap>Week rank:</th> 
+                 <td nowrap width="1%">33 <img src="https://files.phpclasses.org/graphics/phpclasses/down.png" width="24" height="24" alt="Down" style="border: 0; vertical-align: middle"></td>
+                 <td nowrap>
+                  <!--htdig_noindex-->1 in <a href="/browse/author/bycountry/country/ua/">Ukraine</a> <img align="middle" width="21" height="21" src="https://files.phpclasses.org/graphics/ua.gif" alt="Ukraine" title="Ukraine"> <img src="https://files.phpclasses.org/graphics/phpclasses/up.png" width="24" height="24" alt="Up" style="border: 0; vertical-align: middle">
+                  <!--/htdig_noindex--></td> 
+                </tr> 
+               </tbody>
+              </table></td> 
+             <td class="package-cell-cut-width-800" style="text-align: center; font-size: large; font-weight: bold; white-space: nowrap">Innovation award<br><a href="/award/innovation/"><img src="https://files.phpclasses.org/graphics/phpclasses/innovation-award-logo.png" width="89" height="89" alt="Innovation award" style="margin: 4px"></a><br>Nominee: 1x<br><br>Winner: 1x</td>
+            </tr> 
+           </tbody>
+          </table> 
+          <!--/htdig_noindex-->
+          <br>
+         </div>
+         <div class="package-information-nominee">
+          <!--htdig_noindex-->
+          <a name="description"></a>
+          <br>
+          <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+           <tbody>
+            <tr> 
+             <td width="1%" class="nbgu">&nbsp;</td> 
+             <td class="package-cell-cut-width-500 nblu"><b>Detailed description</b></td> 
+             <td class="nbgu">&nbsp;</td> 
+             <td class="nbtu light"><img src="https://files.phpclasses.org/graphics/phpclasses/down.png" width="24" height="24" alt="Download" style="border: 0; vertical-align: middle"> <b><a class="safe-padding" href="/browse/package/2874/download/zip.html">Download</a> <a class="safe-padding" href="/browse/package/2874/download/zip.html">.zip</a> <a class="safe-padding" href="/browse/package/2874/download/targz.html">.tar.gz</a></b></td> 
+             <td class="nbgu">&nbsp;</td> 
+             <td class="package-cell-cut-width-640 nbtu light"><img src="https://files.phpclasses.org/graphics/phpclasses/composer.png" width="24" height="24" alt="Install with Composer" style="border: 0; vertical-align: middle"> <b><a href="https://www.phpclasses.org/package_repositories.html?package=2874">Install with Composer</a></b></td> 
+             <td width="98%" class="nbgu">&nbsp;</td> 
+            </tr> 
+           </tbody>
+          </table> 
+          <!--/htdig_noindex-->
+         </div>
+         <div style="clear: left"></div>
+         <div class="framed light">
+          This is class can be used as a tool for optical character recognition.
+          <br> 
+          <br> It can recognize text in monochrome graphical images after a training phase. The training phase is necessary to let the class build recognition data structures from images that have known characters.
+          <br> 
+          <br> The training data structures are used during the recognition process to attempt to identify text in real images using the corner algorithm.
+         </div>
+         <br>
+        </div>
+       </div> 
+       <div id="ads">
+        <div class="c1025" style="text-align: center; margin-top: 12px; margin-bottom: 12px">
+         <div style="display: inline-block; margin-right: 10px">
+          <script type="text/javascript"><!--
+document.write(unescape('%3C')+'script type="text/javascript" src="https://www.phpclasses.org/tips.html?banner=120x60&amp;r=' + parseInt((new Date()).getTime() / 60000) + '"'+unescape('%3E')+unescape('%3C')+'/script'+unescape('%3E'));
+// --></script>
+         </div>
+         <div class="c1025" style="display: inline-block; margin-left: auto; margin-right: auto; text-align: center">
+          <!-- PHPClasses-Leaderboard --> 
+          <script type="text/javascript"><!--
+if(!googletag)
+{
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+(function() {
+var gads = document.createElement("script");
+gads.async = true;
+gads.type = "text/javascript";
+var useSSL = "https:" == document.location.protocol;
+gads.src = (useSSL ? "https:" : "http:") + 
+"//www.googletagservices.com/tag/js/gpt.js";
+var node = document.getElementsByTagName("script")[0];
+node.parentNode.insertBefore(gads, node);
+})();
+}
+
+googletag.cmd.push(function() {
+var slot = googletag.defineSlot("/1003428/PHPClasses-Leaderboard", [728, 90], "div-gpt-ad-1393793380546-0");
+slot.set("adsense_link_color", "0578C2");
+slot.set("adsense_url_color", "000000");
+slot.set("adsense_text_color", "000066");
+slot.set("adsense_channel_ids", "3874866991");
+slot.set("adsense_ad_types", "text_image");
+slot.addService(googletag.pubads());
+googletag.enableServices();
+});
+// --></script> 
+          <div align="center">
+           <div id="div-gpt-ad-1393793380546-0" style="width:728px; height:90px;"> 
+            <script type="text/javascript"><!--
+googletag.cmd.push(function() { googletag.display("div-gpt-ad-1393793380546-0"); });
+// --></script> 
+           </div>
+          </div> 
+         </div>
+         <div style="display: inline-block; margin-left: 10px"> 
+         </div>
+        </div>
+       </div> 
+       <div class="BodyContent"> 
+        <div class="BodyColumn"></div> 
+        <div id="BodyContent" class="InfoContent">
+         <!-- body_start -->
+         <div class="ct tabcontent" style="margin-top: 4px">
+          <!--htdig_noindex-->Details
+          <!--/htdig_noindex-->
+         </div>
+         <div class="cd">
+          {startverticalbanner}
+          <table id="code_file" width="100%"> 
+           <tbody>
+            <tr> 
+             <td class="framed light"><pre style="white-space: pre-wrap">This folder must have right to read/write for php user.</pre></td> 
+            </tr> 
+           </tbody>
+          </table> 
+         </div>
+         <br> 
+         <!--htdig_noindex--> 
+         <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+          <tbody>
+           <tr> 
+            <td width="49.5%" class="nbgu">&nbsp;</td> 
+            <td class="package-cell-cut-width-800 nbtu light"><a href="/browse/author/128217.html">Classes of Andrey Kucherenko</a></td> 
+            <td class="package-cell-cut-width-800 nbgu">&nbsp;<b>&gt;</b>&nbsp;</td> 
+            <td class="package-cell-cut-width-500 nblu"><b>How to Create a PHP Captcha Decoder with PHP OCR Class</b></td> 
+            <td class="package-cell-cut-width-500 nbgu">&nbsp;<b>&gt;</b>&nbsp;</td> 
+            <td class="package-cell-cut-width-500 nbtu light"><img src="https://files.phpclasses.org/graphics/phpclasses/down.png" width="24" height="24" alt="Download" style="border: 0; vertical-align: middle"> <b><a class="safe-padding" href="/browse/package/2874/download/zip.html">Download</a> <a class="safe-padding" href="/browse/package/2874/download/zip.html">.zip</a> <a class="safe-padding" href="/browse/package/2874/download/targz.html">.tar.gz</a></b></td> 
+            <td class="package-cell-cut-width-500 nbgu">&nbsp;<b>&gt;</b>&nbsp;</td> 
+            <td class="nbtu light"><img src="https://files.phpclasses.org/graphics/phpclasses/forum.png" width="24" height="24" alt="Support forum" style="border: 0; vertical-align: middle"> <a href="/discuss/package/2874/"><b>Support forum (11)</b></a></td> 
+            <td class="package-cell-cut-full-width nbgu">&nbsp;<b>&gt;</b>&nbsp;</td> 
+            <td class="package-cell-cut-full-width nblu"><img src="https://files.phpclasses.org/graphics/phpclasses/blog.png" width="24" height="24" alt="Blog" style="border: 0; vertical-align: middle"> <a href="/blog/package/2874/"><b>Blog</b></a></td> 
+            <td class="package-cell-cut-full-width nbgu">&nbsp;<b>&gt;</b>&nbsp;</td> 
+            <td class="package-cell-cut-full-width nbtu light"><a href="/browse/feed/changes/package/2874.xml"><img src="https://files.phpclasses.org/graphics/phpclasses/rss1.png" width="24" height="24" alt="RSS 1.0 feed" style="border: 0; vertical-align: middle"></a> <a href="/browse/feed/changes/package/2874.rss"><img src="https://files.phpclasses.org/graphics/phpclasses/rss2.png" width="24" height="24" alt="RSS 2.0 feed" style="border: 0; vertical-align: middle"></a> <a href="/browse/feed/changes/package/2874.xml">Latest changes</a></td> 
+            <td width="49.5%" class="nbgu">&nbsp;</td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <!--/htdig_noindex--> 
+         <!-- google_ad_section_start -->
+         <div style="width: 100%; padding-left: 0%; padding-right: 0%">
+          <table width="100%"> 
+           <tbody>
+            <tr> 
+             <td style="width: 336px; height: 280px" valign="top" class="package-cell-cut-width-640">
+              <!--htdig_noindex-->
+              <!-- PHPClasses-Below-The-Fold --> <script type="text/javascript"><!--
+if(!googletag)
+{
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+(function() {
+var gads = document.createElement("script");
+gads.async = true;
+gads.type = "text/javascript";
+var useSSL = "https:" == document.location.protocol;
+gads.src = (useSSL ? "https:" : "http:") + 
+"//www.googletagservices.com/tag/js/gpt.js";
+var node = document.getElementsByTagName("script")[0];
+node.parentNode.insertBefore(gads, node);
+})();
+}
+
+googletag.cmd.push(function() {
+var slot = googletag.defineSlot("/1003428/PHPClasses-Below-The-Fold", [300, 250], "div-gpt-ad-1393793380546-1");
+slot.set("adsense_link_color", "0578C2");
+slot.set("adsense_url_color", "000000");
+slot.set("adsense_text_color", "000066");
+slot.set("adsense_channel_ids", "9690621395");
+slot.set("adsense_ad_types", "text_image");
+slot.addService(googletag.pubads());
+googletag.enableServices();
+});
+// --></script> 
+              <div align="center">
+               <div id="div-gpt-ad-1393793380546-1" style="width:300px; height:250px;"> 
+                <script type="text/javascript"><!--
+googletag.cmd.push(function() { googletag.display("div-gpt-ad-1393793380546-1"); });
+// --></script> 
+               </div>
+              </div> 
+              <!--/htdig_noindex--></td> 
+             <td valign="top">
+              <table style="width: 100%; height: 280px" cellspacing="0" cellpadding="2"> 
+               <tbody>
+                <tr class="even"> 
+                 <th valign="top" align="right" width="1%" nowrap>
+                  <!--htdig_noindex-->Name:
+                  <!--/htdig_noindex--></th> 
+                 <td><b>How to Create a PHP Captcha Decoder with PHP OCR Class</b> 
+                  <div class="framed light" style="display: inline; padding: 10px">
+                   <img src="https://files.phpclasses.org/graphics/phpclasses/forum.png" width="24" height="24" alt="Support forum" style="border: 0; vertical-align: middle"> 
+                   <b><a href="/discuss/package/2874/"> 
+                     <!--htdig_noindex-->Support forum
+                     <!--/htdig_noindex--></a></b>
+                  </div></td> 
+                </tr> 
+                <tr class="odd"> 
+                 <th align="right" width="1%" nowrap>
+                  <!--htdig_noindex-->Base name:
+                  <!--/htdig_noindex--></th> 
+                 <td><tt><a href="https://www.phpclasses.org/phpocr">phpocr</a></tt></td> 
+                </tr> 
+                <tr class="even"> 
+                 <th align="right" width="1%" nowrap>
+                  <!--htdig_noindex-->Description:
+                  <!--/htdig_noindex--></th> 
+                 <td><b>Recognize text &amp; objects in graphical images</b></td> 
+                </tr> 
+                <!--htdig_noindex-->
+                <tr class="odd"> 
+                 <th align="right" width="1%" nowrap>Version:</th> 
+                 <td><tt>1.0.0</tt></td> 
+                </tr> 
+                <!--/htdig_noindex-->
+                <!--htdig_noindex-->
+                <tr class="even"> 
+                 <th align="right" width="1%" nowrap>PHP version:</th> 
+                 <td><tt>3</tt></td> 
+                </tr> 
+                <!--/htdig_noindex-->
+                <!--htdig_noindex-->
+                <tr class="odd"> 
+                 <th valign="top" align="right" width="1%" nowrap>License:</th> 
+                 <td>Free for non-commercial use</td> 
+                </tr> 
+                <!--/htdig_noindex-->
+                <!--htdig_noindex--> 
+                <tr class="even"> 
+                 <th align="right" width="1%" nowrap>All time users:</th> 
+                 <td nowrap>32648 users</td> 
+                </tr> 
+                <tr class="odd"> 
+                 <th align="right" width="1%" nowrap>All time rank:</th> 
+                 <td nowrap>14</td> 
+                </tr> 
+                <tr class="even"> 
+                 <th align="right" width="1%" nowrap>Week users:</th> 
+                 <td nowrap>19 users</td> 
+                </tr> 
+                <tr class="odd"> 
+                 <th align="right" width="1%" nowrap>Week rank:</th> 
+                 <td nowrap>27 <img src="https://files.phpclasses.org/graphics/phpclasses/down.png" width="24" height="24" alt="Down" style="border: 0; vertical-align: middle"></td> 
+                </tr> 
+                <!--/htdig_noindex--> 
+                <tr style="height: 99%"> 
+                 <td colspan="2">&nbsp;</td> 
+                </tr> 
+               </tbody>
+              </table> </td> 
+            </tr> 
+           </tbody>
+          </table> 
+         </div>
+         <!--htdig_noindex--> 
+         <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+          <tbody>
+           <tr> 
+            <td width="49.5%" class="nbgu">&nbsp;</td> 
+            <td class="nbtu light"><a href="#groups">Groups</a></td> 
+            <td class="package-cell-cut-full-width nbgu">&nbsp;</td> 
+            <td class="package-cell-cut-full-width nbtu light"><img src="https://files.phpclasses.org/graphics/phpclasses/rate.png" width="24" height="24" alt="Rate classes" style="border: 0; vertical-align: middle"> <a href="#ratings">User ratings</a></td> 
+            <td class="nbgu">&nbsp;</td> 
+            <td class="package-cell-cut-width-500 nbtu light"><a href="#trackback">Trackback</a></td> 
+            <td class="nbgu">&nbsp;</td> 
+            <td class="package-cell-cut-width-500 nbtu light"><a href="#applications">Applications</a></td> 
+            <td class="nbgu">&nbsp;</td> 
+            <td class="nbtu light"><img src="https://files.phpclasses.org/graphics/phpclasses/textfile.png" width="24" height="24" alt="Files" style="border: 0; vertical-align: middle"> <a href="#files">Files</a></td> 
+            <td width="49.5%" class="nbgu">&nbsp;</td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <!--/htdig_noindex--> 
+         <!--htdig_noindex-->
+         <a name="groups"></a>
+         <br>
+         <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+          <tbody>
+           <tr> 
+            <td width="1%" class="nbgu">&nbsp;</td> 
+            <td class="nblu"><b>Groups</b></td> 
+            <td width="98%" class="nbgu">&nbsp;</td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <!--/htdig_noindex-->
+         <table width="100%" cellspacing="0" cellpadding="2"> 
+          <tbody>
+           <tr class="even"> 
+            <td width="1%" nowrap>
+             <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/directory.png" width="24" height="24" alt="Group folder image" style="border: 0; vertical-align: middle"> <b><a href="//browse/class/7.html">Algorithms</a>
+              <!--/htdig_noindex--></b></td> 
+            <td width="1%" nowrap class="package-cell-cut-width-640"><b>
+              <!--htdig_noindex-->Numerical and statistical algorithms
+              <!--/htdig_noindex--></b></td> 
+            <td class="package-cell-cut-width-640">
+             <!--htdig_noindex--><a href="//browse/class/7/top/rated.html">View top rated classes</a>
+             <!--/htdig_noindex--></td> 
+           </tr> 
+           <tr class="odd"> 
+            <td width="1%" nowrap>
+             <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/directory.png" width="24" height="24" alt="Group folder image" style="border: 0; vertical-align: middle"> <b><a href="//browse/class/8.html">PHP 5</a>
+              <!--/htdig_noindex--></b></td> 
+            <td width="1%" nowrap class="package-cell-cut-width-640"><b>
+              <!--htdig_noindex-->Classes using PHP 5 specific features
+              <!--/htdig_noindex--></b></td> 
+            <td class="package-cell-cut-width-640">
+             <!--htdig_noindex--><a href="//browse/class/8/top/rated.html">View top rated classes</a>
+             <!--/htdig_noindex--></td> 
+           </tr> 
+           <tr class="even"> 
+            <td width="1%" nowrap>
+             <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/directory.png" width="24" height="24" alt="Group folder image" style="border: 0; vertical-align: middle"> <b><a href="//browse/class/11.html">Graphics</a>
+              <!--/htdig_noindex--></b></td> 
+            <td width="1%" nowrap class="package-cell-cut-width-640"><b>
+              <!--htdig_noindex-->Colors, images, charts and picture formats
+              <!--/htdig_noindex--></b></td> 
+            <td class="package-cell-cut-width-640">
+             <!--htdig_noindex--><a href="//browse/class/11/top/rated.html">View top rated classes</a>
+             <!--/htdig_noindex--></td> 
+           </tr> 
+           <tr class="odd"> 
+            <td width="1%" nowrap>
+             <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/directory.png" width="24" height="24" alt="Group folder image" style="border: 0; vertical-align: middle"> <b><a href="//browse/class/103.html">Artificial intelligence</a>
+              <!--/htdig_noindex--></b></td> 
+            <td width="1%" nowrap class="package-cell-cut-width-640"><b>
+              <!--htdig_noindex-->Automation of tasks using human-like intelligence
+              <!--/htdig_noindex--></b></td> 
+            <td class="package-cell-cut-width-640">
+             <!--htdig_noindex--><a href="//browse/class/103/top/rated.html">View top rated classes</a>
+             <!--/htdig_noindex--></td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <br> 
+         <script type="text/javascript" src="https://files.phpclasses.org/animation.js"></script> 
+         <script type="text/javascript"><!--
+	animate=new ML.Animation.Animate();
+
+	function ShowDirectory(previous, current)
+	{
+		animate.addAnimation(
+		{
+			name: "Show directory",
+			debug: 0,
+			effects: [
+				{
+					type: "Hide",
+					element: previous,
+					visibility: "display"
+				},
+				{
+					type: "Show",
+					element: current,
+					visibility: "display"
+				},
+				{
+					type: "FadeIn",
+					element: current+"_content",
+					duration: 0.5,
+					visibility: "display"
+				}
+			]
+		}
+		);
+	}
+// --></script> 
+         <!--htdig_noindex-->
+         <br>
+         <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+          <tbody>
+           <tr> 
+            <td width="1%" class="nbgu">&nbsp;</td> 
+            <td class="nblu"><b>Recommendations</b></td> 
+            <td width="98%" class="nbgu">&nbsp;</td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <!--/htdig_noindex-->
+         <p><big><b><a href="/recommend/850-i-need-to-read-text-from-a-php-file.html">ocr</a></b></big><br>i need to read text from a php file</p>
+         <p><big><b><a href="/recommend/748-Extract-text-from-images-with-accuracy.html">What is the best PHP extract text from image class?</a></b></big><br>Extract text from images with accuracy</p>
+         <p><big><b><a href="/recommend/669-Extract-scanned-image-to-text-file-conversion-code.html">What is the best PHP scanned image to text converter class?</a></b></big><br>Extract scanned image to text file conversion code</p>
+         <p><big><b><a href="/recommend/321-Get-the-text-in-CAPTCHA-images.html">Decaptha OCR Class</a></b></big><br>Get the text in CAPTCHA images</p>
+         <p><big><b><a href="/recommend/90-I-read-a-TIFF-document-image-to-transform-into-an-editable-text.html">What is the best PHP ocr class?</a></b></big><br>I read a TIFF document image to transform into an editable text</p>
+         <p><big><b><a href="/recommend/173-We-want-a-complete-PHP-ocr-to-embed-in-our-application.html">Recognize text in images</a></b></big><br>We want a complete PHP ocr to embed in our application</p>
+         <!--htdig_noindex-->
+         <br>
+         <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+          <tbody>
+           <tr> 
+            <td width="1%" class="nbgu">&nbsp;</td> 
+            <td class="nblu"><b>Innovation Award</b></td> 
+            <td width="98%" class="nbgu">&nbsp;</td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <!--/htdig_noindex-->
+         <table class="framed light" style="width: 100%; padding: 2px"> 
+          <tbody>
+           <tr> 
+            <td width="1%" align="center"><a href="/award/innovation/"><img src="/award/innovation/winner.png" width="89" height="89" alt="PHP Programming Innovation award winner" title="PHP Programming Innovation award winner" border="0"></a><br><b><span style="font-size: large">February 2006<br> 
+               <!--htdig_noindex-->Winner</span></b><br><br><b><big class="c360">Prize: <a rel="nofollow" href="http://www.zend.com/store/products/zend-studio.php">One copy of the Zend Studio</a></big></b>
+             <!--/htdig_noindex--></td> 
+            <td><i>Certain types of applications require reading text from documents that are stored as graphical images. That is the case of scanned documents.<br> <br> An OCR (Optical Character Recognition) tool can be used to recover the original text that is written in scanned documents. These are sophisticated tools that are trained to recognize text in graphical images.<br> <br> This class provides a base implementation for an OCR tool. It can be trained to learn how to recognize each letter drawn in an image. Then it can be used to recognize longer texts in real documents.<br> <br> Manuel Lemos</i></td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <!--htdig_noindex-->
+         <div class="package-cut-full-width">
+          <a name="ratings"></a>
+          <br>
+          <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+           <tbody>
+            <tr> 
+             <td width="1%" class="nbgu">&nbsp;</td> 
+             <td class="nblu"><b>User ratings</b></td> 
+             <td width="98%" class="nbgu">&nbsp;</td> 
+            </tr> 
+           </tbody>
+          </table> 
+          <table width="100%" cellspacing="0"> 
+           <tbody>
+            <tr> 
+             <th width="1%" align="right">Ratings</th>
+             <th align="center">
+              <!--htdig_noindex-->Utility
+              <!--/htdig_noindex--></th> 
+             <th align="center">
+              <!--htdig_noindex-->Consistency
+              <!--/htdig_noindex--></th> 
+             <th align="center">
+              <!--htdig_noindex-->Documentation
+              <!--/htdig_noindex--></th> 
+             <th align="center">
+              <!--htdig_noindex-->Examples
+              <!--/htdig_noindex--></th> 
+             <th align="center">
+              <!--htdig_noindex-->Tests
+              <!--/htdig_noindex--></th> 
+             <th align="center">
+              <!--htdig_noindex-->Videos
+              <!--/htdig_noindex--></th> 
+             <th align="center">
+              <!--htdig_noindex-->Overall
+              <!--/htdig_noindex--></th> 
+             <th align="center">
+              <!--htdig_noindex-->Rank
+              <!--/htdig_noindex--></th> 
+            </tr> 
+            <tr class="light"> 
+             <th width="1%" align="right" nowrap>All time:</th> 
+             <td align="center" nowrap><tt><b>Good</b> (83%)</tt></td> 
+             <td align="center" nowrap><tt><b>Good</b> (85%)</tt></td> 
+             <td align="center" nowrap><tt>-</tt></td> 
+             <td align="center" nowrap><tt>Sufficient (68%)</tt></td> 
+             <td align="center" nowrap><tt>-</tt></td> 
+             <td align="center" nowrap><tt>-</tt></td> 
+             <td align="center" nowrap><tt>Not sure (57%)</tt></td> 
+             <td align="center"><b>1567</b></td> 
+            </tr> 
+            <tr class="dark"> 
+             <th align="right" nowrap>Month:</th> 
+             <td colspan="8" align="center">
+              <!--htdig_noindex-->Not enough user ratings
+              <!--/htdig_noindex--></td> 
+            </tr> 
+           </tbody>
+          </table> 
+         </div>
+         <!--/htdig_noindex-->
+         <!--htdig_noindex-->
+         <a name="trackback"></a>
+         <br>
+         <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+          <tbody>
+           <tr> 
+            <td width="1%" class="nbgu">&nbsp;</td> 
+            <td class="nblu"><b>Pages that reference this package</b></td> 
+            <td width="98%" class="nbgu">&nbsp;</td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <table width="100%" cellspacing="0" cellpadding="2"> 
+          <tbody>
+           <tr>
+            <th></th> 
+           </tr> 
+           <tr class="even"> 
+            <td><a href="http://www.seodirectorynews.info/captcha-decoding-decodifica-captcha/" rel="nofollow">Captcha Decoding - Decodifica captcha</a><br>I CAPTCHA sono le immagini di verifica presenti nei form (che sono utilizzate per combattere lo spam automatico via bot)...</td> 
+           </tr> 
+           <tr class="odd"> 
+            <td><a href="http://www.seospecialist.it/black-hat-seo/decodifica-captcha.html" rel="nofollow">Decodifica Captcha</a><br>Pensavate che i vostri forum o i vostri form di registrazione fossero al sicuro con i i captcha? Vi sbaglivate?</td> 
+           </tr> 
+           <tr class="even"> 
+            <td><a href="http://forum.it.altervista.org/php-mysql-e-file-database/100524-estrarre-testo-da-unimmagine-semplice-con-php.html#post705509" rel="nofollow">Estrarre testo da un'immagine semplice con php</a><br>Puoi usare una classe OCR (Optical Character Recognition), che è un sofisticato sistema funzionante come un occhio umano digitale...</td> 
+           </tr> 
+           <tr class="odd"> 
+            <td><a href="http://web2innovations.com/money/2008/01/04/google-files-patent-for-recognizing-text-in-images/" rel="nofollow">Google files patent for recognizing text in images</a><br>Google has filed a patent application in July 2007, which has just recently become public claiming methods where robots can read and understand text in images and video...</td> 
+           </tr> 
+           <tr class="even"> 
+            <td><a href="http://www.webdevlogs.com/2006/12/03/phpocr/" rel="nofollow">phpOCR</a><br>phpOCR is a class from Andrey Kucherenko that can do Optical Character Recognition...</td> 
+           </tr> 
+           <tr class="odd"> 
+            <td><a href="http://www.php.de/php-fortgeschrittene/57779-phpocr.html#post445585" rel="nofollow">phpOCR</a><br>ich werde aus der phpOCR Class nicht schlau...</td> 
+           </tr> 
+           <tr class="even"> 
+            <td><a href="http://weblog.benetjoandarder.cat/phpocr-reconeixement-de-texte-per-php.xhtml" rel="nofollow">PhpOCR, reconeixement de texte per PHP</a><br>PhpOcr es una funció de php que permet reconèixer text des d?una imatge, d?aquí OCR...</td> 
+           </tr> 
+           <tr class="odd"> 
+            <td><a href="http://www.asiermarques.com/2007/06/25/phpocr-reconocer-texto-en-imagenes-desde-php/" rel="nofollow">phpOCR, reconocer texto en imágenes desde php</a><br>phpOCR es una librería que nos permite reconocer el texto que esta impreso en un archivo de imágen (Optical Character Recognition)...</td> 
+           </tr> 
+           <tr class="even"> 
+            <td><a href="http://yoshilounge.wordpress.com/2008/05/21/ocrphp/" rel="nofollow">Recognize Text &amp; Objects in Graphical Images with PHP</a><br>An OCR with PHP ?...</td> 
+           </tr> 
+           <tr class="odd"> 
+            <td><a href="http://www.elpablo.com.ar/wordpress/2008/01/02/reconocer-texto-en-imagenes-php/" rel="nofollow">Reconocer texto en imágenes - PHP</a><br>Cada vez me sorprenden más las cosas que se pueden hacer programando...</td> 
+           </tr> 
+           <tr class="even"> 
+            <td><a href="http://emilio.aesinformatica.com/2008/08/28/reconocimiento-de-texto-con-ocr-y-php/" rel="nofollow">Reconocimiento de texto con OCR y PHP</a><br>Hace mucho tiempo que se usa el reconocimiento óptico de caracteres o marcas, para poder determinar a partir de una imagen qué es lo que tiene dentro...</td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <p><img src="https://files.phpclasses.org/graphics/phpclasses/latest.png" width="24" height="24" alt="Latest pages that reference packages" style="border: 0; vertical-align: middle"> <a href="/browse/latest/trackbacks.html">Latest pages that reference packages</a></p> 
+         <!--/htdig_noindex-->
+         <!--htdig_noindex-->
+         <a name="applications"></a>
+         <br>
+         <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+          <tbody>
+           <tr> 
+            <td width="1%" class="nbgu">&nbsp;</td> 
+            <td class="nblu"><b>Applications that use this package</b></td> 
+            <td width="98%" class="nbgu">&nbsp;</td> 
+           </tr> 
+          </tbody>
+         </table> 
+         <div class="framed dark">
+          No pages of applications that use this class were specified.
+         </div> 
+         <p><img src="https://files.phpclasses.org/graphics/phpclasses/add.png" width="24" height="24" alt="Add link image" style="border: 0; vertical-align: middle"> If you know an application of this package, send a message to the <a class="button edit" target="_blank" href="/contact/package/2874.html">author</a> to add a link here.</p> 
+         <!--/htdig_noindex-->
+         <div id="files">
+          <a name="files"></a>
+          <!--htdig_noindex-->
+          <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+           <tbody>
+            <tr> 
+             <td width="1%" class="nbgu">&nbsp;</td> 
+             <td class="nblu"><img src="https://files.phpclasses.org/graphics/phpclasses/directory.png" width="24" height="24" alt="Files folder image" style="border: 0; vertical-align: middle"> <b>Files</b></td> 
+             <td width="98%" class="nbgu">&nbsp;</td> 
+            </tr> 
+           </tbody>
+          </table> 
+          <!--/htdig_noindex--> 
+          <div id="files_content" style="max-height: 600px; overflow: auto">
+           <table width="100%" cellspacing="0" cellpadding="2"> 
+            <!--htdig_noindex-->
+            <tbody>
+             <tr> 
+              <th>File</th> 
+              <th width="1%" nowrap>Role</th> 
+              <th>Description</th> 
+             </tr>
+             <!--/htdig_noindex--> 
+             <tr> 
+              <td width="1%" nowrap colspan="5">
+               <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/directory.png" width="24" height="24" alt="Files folder image" style="border: 0; vertical-align: middle"><tt><a href="#files/storage" onclick="ShowDirectory(&quot;files&quot;, &quot;files/storage&quot;); return false;">storage</a></tt> <i>(1 file)</i>
+               <!--/htdig_noindex--></td> 
+             </tr>
+             <tr id="file12738" class="even" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'even')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12738.html" title=".">B.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">B.png</td> 
+             </tr> 
+             <tr id="file12739" class="odd" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'odd')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12739.html" title=".">B1.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">B1.png</td> 
+             </tr> 
+             <tr id="file12728" class="even" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'even')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/textfile.png" width="24" height="24" alt="Plain text file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12728.html" title=".">char.object.php</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Class
+               <!--/htdig_noindex--></td> 
+              <td valign="top">char object</td> 
+             </tr> 
+             <tr id="file12731" class="odd" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'odd')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/textfile.png" width="24" height="24" alt="Plain text file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12731.html" title=".">config.php</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Conf.
+               <!--/htdig_noindex--></td> 
+              <td valign="top">config</td> 
+             </tr> 
+             <tr id="file12732" class="even" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'even')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/textfile.png" width="24" height="24" alt="Plain text file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12732.html" title=".">example.php</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Example
+               <!--/htdig_noindex--></td> 
+              <td valign="top">example</td> 
+             </tr> 
+             <tr id="file12733" class="odd" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'odd')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/textfile.png" width="24" height="24" alt="Plain text file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12733.html" title=".">example_1.php</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Example
+               <!--/htdig_noindex--></td> 
+              <td valign="top">example #1</td> 
+             </tr> 
+             <tr id="file12743" class="even" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'even')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12743.html" title=".">M.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">M.png</td> 
+             </tr> 
+             <tr id="file12744" class="odd" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'odd')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12744.html" title=".">M1.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">Sample image</td> 
+             </tr> 
+             <tr id="file12729" class="even" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'even')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/textfile.png" width="24" height="24" alt="Plain text file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12729.html" title=".">OCR.class.php</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Class
+               <!--/htdig_noindex--></td> 
+              <td valign="top">main phpOCR class</td> 
+             </tr> 
+             <tr id="file12818" class="odd" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'odd')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12818.html" title=".">plus.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">plus.png</td> 
+             </tr> 
+             <tr id="file12819" class="even" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'even')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12819.html" title=".">plus1.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">plus1.png</td> 
+             </tr> 
+             <tr id="file12745" class="odd" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'odd')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12745.html" title=".">W.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">char data</td> 
+             </tr> 
+             <tr id="file12746" class="even" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'even')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12746.html" title=".">W1.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">W1.png</td> 
+             </tr> 
+             <tr id="file12809" class="odd" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'odd')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12809.html" title=".">W2.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">Negative example image</td> 
+             </tr> 
+             <tr id="file12742" class="even" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'even')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12742.html" title=".">Z.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">Z.png</td> 
+             </tr> 
+             <tr id="file12741" class="odd" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'odd')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12741.html" title=".">z1.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">z1.png</td> 
+             </tr> 
+             <tr id="file12740" class="even" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'even')">
+              <td width="1%" nowrap valign="top"><tt>
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/imagefile.png" width="24" height="24" alt="Image file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12740.html" title=".">z11.png</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">z11.png</td> 
+             </tr> 
+            </tbody>
+           </table> 
+           <br> 
+          </div> 
+         </div> 
+         <div id="files/storage">
+          <a name="files/storage"></a>
+          <!--htdig_noindex-->
+          <table width="100%" style="margin-bottom: 6px; " cellpadding="4" cellspacing="0"> 
+           <tbody>
+            <tr> 
+             <td width="1%" class="nbgu">&nbsp;</td> 
+             <td class="nbtu light" onclick="ShowDirectory(&quot;files/storage&quot;, &quot;files&quot;); return false;"><img src="https://files.phpclasses.org/graphics/phpclasses/directory.png" width="24" height="24" alt="Files folder image" style="border: 0; vertical-align: middle"> <a href="#files">Files</a></td> 
+             <td class="nbgu">&nbsp;<b>/</b>&nbsp;</td> 
+             <td class="nblu"><b>storage</b></td> 
+             <td width="98%" class="nbgu">&nbsp;</td> 
+            </tr> 
+           </tbody>
+          </table> 
+          <!--/htdig_noindex--> 
+          <div id="files/storage_content" style="max-height: 600px; overflow: auto">
+           <table width="100%" cellspacing="0" cellpadding="2"> 
+            <!--htdig_noindex-->
+            <tbody>
+             <tr> 
+              <th>File</th> 
+              <th width="1%" nowrap>Role</th> 
+              <th>Description</th> 
+             </tr>
+             <!--/htdig_noindex--> 
+             <tr id="file12747" class="even" onmouseover="sec(this,'highlight')" onmouseout="sec(this,'even')">
+              <td width="1%" nowrap valign="top"><tt>&nbsp;&nbsp;
+                <!--htdig_noindex--><img src="https://files.phpclasses.org/graphics/phpclasses/browse.png" width="24" height="24" alt="Accessible without login" style="border: 0; vertical-align: middle"> <img src="https://files.phpclasses.org/graphics/phpclasses/textfile.png" width="24" height="24" alt="Plain text file" style="border: 0; vertical-align: middle"> <a href="/browse/file/12747.html" title="storage">readme</a>
+                <!--/htdig_noindex--></tt></td> 
+              <td width="1%" nowrap valign="top">
+               <!--htdig_noindex-->Data
+               <!--/htdig_noindex--></td> 
+              <td valign="top">Storage description</td> 
+             </tr> 
+            </tbody>
+           </table> 
+           <br> 
+          </div> 
+         </div> 
+         <script type="text/javascript"><!--
+var el = document.getElementById("files/storage");
+el.style.display = "none";
+// --></script> 
+         <div>
+          <table align="center">
+           <tbody>
+            <tr>
+             <td class="box light" style="text-align: center">
+              <!--htdig_noindex--><a name="download"><img src="https://files.phpclasses.org/graphics/phpclasses/composer.png" width="24" height="24" alt="Install with Composer" style="border: 0; vertical-align: middle"> <b></b></a><b><a href="https://www.phpclasses.org/package_repositories.html?package=2874">Install with Composer</a></b> - <img src="https://files.phpclasses.org/graphics/phpclasses/down.png" width="24" height="24" alt="Download" style="border: 0; vertical-align: middle"> <b>Download all files:</b> <tt><a href="https://www.phpclasses.org/browse/package/2874/download/targz.html" class="safe-padding">phpocr.tar.gz</a> <a href="/browse/package/2874/download/zip.html" class="safe-padding">phpocr.zip</a></tt>
+              <!--/htdig_noindex--><br>
+              <!--htdig_noindex-->
+              <div align="center">
+               NOTICE: if you are using a download manager program like 'GetRight', please 
+               <a href="https://www.phpclasses.org/login.html?page=package%2F2874-PHP-Recognize-text-objects-in-graphical-images.html">Login</a> before trying to download this archive.
+              </div>
+              <!--/htdig_noindex--> </td>
+            </tr>
+           </tbody>
+          </table>
+         </div> 
+         <!-- google_ad_section_end -->
+         <script type="text/javascript"><!--
+function sec(e, c)
+{
+	var n = e.id;
+
+	if(document.layers)
+	{
+		document.layers[n].className = c;
+	}
+	else
+	{
+		if(document.all)
+		{
+			document.all[n].className = c;
+		}
+		else
+		{
+			
+			if(e.className)
+			{
+				e.className = c
+			}
+		}
+	}
+}
+// --></script> 
+         <!-- body_end -->
+         <div class="c1025">
+          <br>
+          <div align="center">
+           <!-- PHPClasses-Bottom --> 
+           <script type="text/javascript"><!--
+if(!googletag)
+{
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+(function() {
+var gads = document.createElement("script");
+gads.async = true;
+gads.type = "text/javascript";
+var useSSL = "https:" == document.location.protocol;
+gads.src = (useSSL ? "https:" : "http:") + 
+"//www.googletagservices.com/tag/js/gpt.js";
+var node = document.getElementsByTagName("script")[0];
+node.parentNode.insertBefore(gads, node);
+})();
+}
+
+googletag.cmd.push(function() {
+var slot = googletag.defineSlot("/1003428/PHPClasses-Bottom", [728, 90], "div-gpt-ad-1393793380546-2");
+slot.set("adsense_link_color", "0578C2");
+slot.set("adsense_url_color", "000000");
+slot.set("adsense_text_color", "000066");
+slot.set("adsense_channel_ids", "0566202681");
+slot.set("adsense_ad_types", "text_image");
+slot.addService(googletag.pubads());
+googletag.enableServices();
+});
+// --></script> 
+           <div align="center">
+            <div id="div-gpt-ad-1393793380546-2" style="width:728px; height:90px;"> 
+             <script type="text/javascript"><!--
+googletag.cmd.push(function() { googletag.display("div-gpt-ad-1393793380546-2"); });
+// --></script> 
+            </div>
+           </div> 
+          </div>
+         </div>
+         <script type="text/javascript"><!--
+cl.loadContent();
+// --></script> 
+        </div> 
+        <div class="BodyColumn"></div> 
+       </div> 
       </div> 
      </div> 
-    </div>
-
-
-
-
-
-
-   </center></pre>
+     <div id="FooterInfo"> 
+      <div class="c1025">
+       <div id="endnavigation">
+        <table width="100%" style="margin-top: 6px; " cellpadding="4" cellspacing="0"> 
+         <tbody>
+          <tr> 
+           <td width="49.5%" style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+           <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/buy.png" width="24" height="24" alt="Advertise on this site" style="border: 0; vertical-align: middle"> <a href="/sponsor.html" target="_blank">Advertise on this site</a></td> 
+           <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+           <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/map.png" width="24" height="24" alt="Site map" style="border: 0; vertical-align: middle"> <a href="/sitemap/">Site map</a></td> 
+           <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+           <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/new.png" width="24" height="24" alt="Newsletter" style="border: 0; vertical-align: middle"> <a href="/newsletter/">Newsletter</a></td> 
+           <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+           <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/statistics.png" width="24" height="24" alt="Statistics" style="border: 0; vertical-align: middle"> <a href="/browse/statistics/statistics.html">Statistics</a></td> 
+           <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+           <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/tip.png" width="24" height="24" alt="Site tips" style="border: 0; vertical-align: middle"> <a href="/tips.html">Site tips</a></td> 
+           <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+           <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/privacy.png" width="24" height="24" alt="Privacy policy" style="border: 0; vertical-align: middle"> <a href="/faq/#privacy-policy">Privacy policy</a></td> 
+           <td style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+           <td style=" white-space: nowrap ;"><img src="https://files.phpclasses.org/graphics/phpclasses/mail.png" width="24" height="24" alt="Contact" style="border: 0; vertical-align: middle"> <a href="/faq/#contact">Contact</a></td> 
+           <td width="49.5%" style=" white-space: nowrap ; padding: 1px">&nbsp;</td> 
+          </tr> 
+         </tbody>
+        </table> 
+       </div>
+      </div> 
+      <div id="Copyright">
+       <div> 
+        <div style="float: left">
+         <address>For more information send a message to <code><a target="_blank" href="/faq/#contact">info at phpclasses dot org</a></code>.</address>
+        </div> 
+        <div style="float: right">
+         Copyright (c) 
+         <a href="http://www.icontem.com/" rel="nofollow" target="_blank">Icontem</a> 1999-2017
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+   </div>   
+  </div>
  </body>
 </html>

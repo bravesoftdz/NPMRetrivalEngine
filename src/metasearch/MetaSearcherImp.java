@@ -42,7 +42,7 @@ public class MetaSearcherImp implements MetaSearcher{
 		for (Searcher searcher : searchers) {
 			Ranking ranking = CacheRankingManager.getInstance().loadRankingFromCache(searcher, query);
 	        if(ranking == null){
-	        	System.out.println("Warning: Ranking " + searcher.getId() + "no se puede cargar");
+	        	System.out.println("Warning: Ranking " + searcher.getId() + " no se puede cargar");
 	        }else{
 	        	/*if(ranking.size()>ranking_size){
 	        		rankings.add(ranking.getRankingAtK(ranking_size));

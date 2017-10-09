@@ -1,503 +1,604 @@
-<!doctype html>
-<html lang="en">
- <head> 
-  <meta name="twitter:card" content="summary"> 
-  <meta name="twitter:description" content="Apart from being the most popular social network in the world, Facebook also provides support for developers to interact programmatically with its pla…"> 
-  <meta name="twitter:title" content="Facebook Graph API 'Leveraging Facebook authentication in third-party applications' on Hitch"> 
-  <meta name="twitter:site" content="@hitchhq"> 
-  <meta name="twitter:image" content="https://c.hitchhq.net/-/logos/5763a90f5ae7e610009bc6b9"> 
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#370d1d">
-  <link rel="apple-touch-icon-precomposed" href="https://c.hitchhq.net/-/images/favicon-152-20170113.png">
-  <link rel="shortcut icon" href="https://c.hitchhq.net/-/images/favicon-32-20170113.png">
-  <title>Facebook Graph API 'Leveraging Facebook authentication in third-party applications' - Hitch</title>
-  <meta name="description" content="Apart from being the most popular social network in the world, Facebook also provides support for developers to interact programmatically with its pla…">
-  <meta name="keywords" content="API, APIs, community, platform, Swagger, RAML, OpenAPI, Hitch">
-  <link rel="stylesheet" href="https://c.hitchhq.net/-/css/app-b88472f5c8.css">
-  <script type="text/javascript">if((window.devicePixelRatio===undefined?1:window.devicePixelRatio)>1)
-document.cookie='HTTP_IS_RETINA=1;path=/';</script>
-  <script type="text/javascript">window.__INITIAL_STATE__ = {"app":{"host":"https://www.hitchhq.com","current_url":{"protocol":"https","host":"www.hitchhq.com","path":"/facebook-graph-api/docs/facebook-authentication","query":{},"full":"https://www.hitchhq.com/facebook-graph-api/docs/facebook-authentication"}},"help":{},"notifications":{},"search":{},"user":{},"about":{},"activity":{},"support":{},"session":{"features":"[search]","host":"https://www.hitchhq.com"},"api":{"api":{"privacy":"public","created_at":"2016-06-17T07:38:55.982Z","logo":"https://c.hitchhq.net/-/logos/5763a90f5ae7e610009bc6b9","name":"Facebook Graph API","slug":"facebook-graph-api","published":true,"owner":"hitch","media_type":"api","machine_readable_url":null,"website":"","id":"5763a90f5ae7e610009bc6ba","description":"Facebook public API","team":""},"docs":[{"created_at":"2017-02-07T14:53:14.669Z","author":"templth","slug":"facebook-authentication","api_slug":"facebook-graph-api","state":"published","media_type":"doc","title":"Leveraging Facebook authentication in third-party applications","content":"Apart from being the most popular social network in the world, Facebook also provides support for developers to interact programmatically with its platform. In this guide, we will focus on the user authentication and how to leverage it for third-party applications.\n\nThe use case behind this is simple: helping users of your application or website authenticate using their Facebook profile, and prevent newcomers from registering using their email and password. This will make it easier for you to engage your application’s users. Since it delegates the user management to the Facebook platform, it’s only necessary to store user details received from Facebook.\n\nThe first step consists of creating an application on the Facebook platform.\n\n# Creating an application\n\nCreating an application can be done from the following address by clicking on “Skip and Create App ID” button: [https://developers.facebook.com/quickstarts/?platform=web](https://developers.facebook.com/quickstarts/?platform=web).\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e42f16487e001094368c)\n\nJust fill the fields of the creation form, click on the “Create App ID” button and that’s all. Your application is created.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e44f16487e001094368d)\n\nBy clicking on the \"Create App ID\", the application is actually created and we have access to its application tokens (**App ID** and **App Secret**). These tokens will be used for requests in the authentication flow.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e47816487e001094368e)\n\nIn our case, we need now to configure a “Website” platform and then a “Facebook Login” product.\n\n## Adding a Website platform\n\nAdding a platform can be done from the settings of the application within the Basic tab. \n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e4ff16487e001094368f)\n\nAfter having clicked on the “Add Platform” button, the list of supporting platform is displayed.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e51516487e0010943690)\n\nOnce you’ve selected the \"Website\" type for the platform, a platform is created and we can set the \"Site URL\" field. Since the aim of this article is to describe how things work, we will use the localhost domain with the port of our local server.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e54216487e0010943691)\n\nNow a Website platform is created, we can set the “App Domains” field in the settings.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e55d16487e0010943692)\n\nDon’t forget to save changes.\n\n## Adding a Facebook Login product\n\nTo configure the behavior of the authentication and properties related to OAuth, we need to create a product of type \"Facebook Login\". This can be done from the left menu of the application.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e59716487e0010943693)\n\nSelect then the \"Facebook Login\" type by clicking on \"Getting started\".\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e5b516487e0010943694)\n\nThe corresponding product is added and we can configure associated properties. After having checked that the \"Web OAuth Login\" is enabled, add a valid OAuth redirect URI according to our server application. In our case, we will use **http://localhost:3000/auth/facebook/callback**. The latter corresponds to a router in our application that will be called after a user is authenticated.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e5ef16487e0010943695)\n\nDon’t forget again to save changes.\n\nAt this step, the Facebook application is correctly configured to leverage authentication from the Facebook platform. Let’s describe now how to use this authentication.\n\n# Using Facebook authentication\n\nTo integrate Facebook authentication into our application we’ll need to call different URLs on the Facebook platform with different parameters. At some point, this platform will call us back according to specified redirect URIs.\n\nWithin this section, we will use Node to implement a simple server application that leverages Facebook authentication. Below is the skeleton of our application:\n\n```\n'use strict';\n\nconst express = require('express');\nconst bodyParser = require('body-parser');\nconst request = require('request-promise');\n\nconst app = express();\n\napp.use(express.static('public'));\n\napp.get(‘/authenticated’, function(req, res, next) {\n  // ...\n});\n\napp.listen(3000, function () {\n  console.log('Application started');\n});\n```\n\nBefore digging into the details of Facebook authentication, let’s provide an overview of interactions between the application and the Facebook platform.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e63016487e0010943696)\n\nLet’s start with the authentication.\n\n## Starting the authentication flow\n\nThe step consists of using the following URL: **https://www.facebook.com/v2.8/dialog/oauth**. This will initiate the authentication flow by providing an authentication and authorization screen. There are several options here. The simplest one is to use this address in a link within an HTML page. Parameters need to be specified at this level: the client_id one corresponding to the App ID and the redirect_uri to the URL to call after authentication.\n\nHere is a sample:\n\n```\n\u003ca href= \"https://www.facebook.com/v2.8/dialog/oauth?client_id=1667...\u0026redirect_uri=http%3A%2F%2Flocalhost:3000%2Fauth%2Ffacebook%2Fcallback\"\u003eAuthenticate with Facebook\u003c/a\u003e\n```\n\nNote that this URL could be used from JavaScript into a new window created by using the `open` method of the `window` object.\n\nIf we aren’t authenticated, Facebook will display a form to log in:\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e68f16487e0010943697)\n\nIf the application isn’t authorized for our Facebook user, Facebook will display a screen to ask for our agreement:\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e6a116487e0010943698)\n\n\nIf it’s the first time, the user tries to authenticate for this application, Facebook asks to authorize the application to have access to user public profile and friends.\n\nNote that if you already authorized the application and you’re logged into Facebook, no screen will be displayed and the redirect URI be called.\n\nThe redirect URI is then called with the following parameter if the authentication and authorization are successful:\n\n* **code** - corresponds to the access code that can be used with the application secret token to get the corresponding access token\n\nIf the user cancels the process, other parameters are provided to the redirect URI:\n\n* **error_reason** - contains the reason of the problem, in this case, **user_denied**;\n* **error** - corresponds to the global error, here **access_denied**;\n* **error_description** - corresponds to a readable error message, in this case, \"The user denied your request\".\n\n## Getting the access token\n\nThe Facebook provides the **/oauth/access_token** endpoint to get the access token based on the previously received code. The following parameters must be provided when executing a request on this endpoint:\n\n* **code** - the previously received code;\n* **client_id** - the application id;\n* **client_secret** - the application secret token;\n* **redirect_uri** - the redirect URI used in the dialog/oauth request. It internally used by Facebook to check the request but no redirect happens.\n\nHere is the way to execute this request in the server application based on the **request-promise** library:\n\n```\nconst FACEBOOK_APP_ID = '...';\nconst FACEBOOK_APP_SECRET = '...';\n\napp.get('/auth/facebook/callback', function(req, res, next) {\n  request({\n    url: 'https://graph.facebook.com/v2.8/oauth/access_token',\n    qs: {\n      code: req.query.code,\n      redirect_uri: 'http://localhost:3000/authenticated',\n      client_id: FACEBOOK_APP_ID,\n      client_secret: FACEBOOK_APP_SECRET\n    },\n    json: true\n  }).then((payload) =\u003e {\n    // …\n  });\n});\n```\n\nThe response payload will contain the access token value, the token type and when it will expire:\n\n```\n{\n  \"access_token\": \"EAAXsr727ZBw0BAH…\",\n  \"token_type\": \"bearer\",\n  \"expires_in\": 5155952\n}\n```\n\nNow we get an access token, we can use the Graph API of Facebook. In our case, we need to get hints about the current user.\n\n## Getting the current user details\n\nTo get the current user details, we can leverage the /me endpoint. To authenticate the corresponding request, we use the Authorization header with the Bearer security scheme. The following code describes to implement this request in our application:\n\n```\napp.get('/auth/facebook/callback', function(req, res, next) {\n  request({\n    url: 'https://graph.facebook.com/v2.8/oauth/access_token',\n    qs: {\n      // ...\n    },\n    json: true\n  }).then((payload) =\u003e {\n    request({\n      url: 'https://graph.facebook.com/v2.5/me',\n      headers: {\n        'Authorization': `Bearer ${payload.access_token}`\n      },\n      json: true\n    }).then((me) =\u003e {\n      // ...\n    });\n  });\n});\n```\n\nBy default, this request only returns the name and the identifier of the user, as described below:\n\n```\n{\n  \"name\": \"Thierry Templier\",\n  \"id\": \"10154931...\"\n}\n```\n\nIn this section, we described the interactions between our application and the Facebook platform to authenticate users. Most of the time, these interactions are hidden within security libraries. That’s the case in Node with the passport library and its integration with Facebook.\n\n# Using in a Node application with Express and Passport\n\nAs detailed on its website, Passport is an \"authentication middleware for Node.js. Extremely flexible and modular, Passport can be unobtrusively dropped into any Express-based web application. It provides a comprehensive set of strategies support authentication using a username and password, Facebook, Twitter, and more.\"\n\nIn addition, it also provides features like session management. The Facebook integration is provided by the passport facebook module.\n\nTo install them, just use the command: **npm install passport passport-facebook**.\n\n## Configuring Passport for Facebook\n\nTo configure the Facebook support for Passport, just configure the corresponding strategy as a middleware in the Express application. This allows us to configure the client ID and client secret tokens with the previous redirect URI called here callback URL.\n\nThe following snippet describes how to achieve this:\n\n```\nconst passport = require('passport');\nconst FacebookStrategy = require('passport-facebook').Strategy;\n\npassport.use(new FacebookStrategy({\n    clientID: FACEBOOK_APP_ID,\n    clientSecret: FACEBOOK_APP_SECRET,\n    callbackURL: 'http://localhost:3000/auth/facebook/callback'\n  },\n  function(accessToken, refreshToken, profile, cb) {\n    // Handle the user (create or update)\n    // Then call the callback\n    return cb(err, user);\n  }\n));\n```\n\n## Implementing routes\n\nSome routes need to be implemented in the application. The first one is to trigger authentication instead of directly using the dialog/oauth one, as previously. The second one is the route for the redirect URI that needs to be refactored to use Passport.\n\nThe following snippet describes the implementation of these routes:\n\n```\nconst app = express();\n\n// ...\n\napp.get('/auth/facebook',\n  passport.authenticate('facebook'));\n\napp.get('/auth/facebook/callback',\n  passport.authenticate('facebook', { failureRedirect: '/public/login.html' }),\n  function(req, res) {\n    // Successful authentication, redirect home.\n    res.redirect('/');\n  });\n```","id":"5899df5a16487e0010943688"},{"created_at":"2016-11-29T15:44:52.397Z","author":"sensiblewood","slug":"getting-started","api_slug":"facebook-graph-api","state":"published","media_type":"doc","title":"Getting Started","content":"Facebook clearly needs no introduction; it is the largest social network in the world, with over a [billion active users](https://www.statista.com/statistics/272014/global-social-networks-ranked-by-number-of-users/) and a significant platform that enables developers to create their own apps using Facebook’s tools and APIs. One of the most important features of this platform is the [Facebook Graph API](https://developers.facebook.com/docs/graph-api): This API is the access point for the vast majority of integrations such as “Post on Facebook” buttons you’d see anywhere on the web. \n\nFacebook describe the Graph API as the *“primary way for apps to read and write to the Facebook social graph”*, which demonstrates the importance of the API to Facebook themselves: It essentially allows an application (with the correct authority) to traverse the graph from a given entry point to anywhere a connection exists across any number of nodes. This is a very powerful feature given it allows applications to essentially take advantage of one of the core features of the Facebook social network: Understanding how to use the API is therefore critical for successfully exploiting the network.\n\n## Creating an App\n\nThe first step in creating a successful integration with the Graph API is registering an application, which is done via the Facebook developers site. To become a Facebook developer, all you need is a Facebook account; you browse to the [Facebook developer site](https://developers.facebook.com/) , click ‘Register’ and accept the terms and conditions (which you’ll obviously read :wink:) when prompted:\n\n![Registration Prompt](https://c.hitchhq.net/-/uploads/docs/images/583da34761af240010941917)\n\nOnce you’ve registered the quickstart wizard then prompts you to choose what type of application you are creating - iOS, Android, [Facebook Canvas](https://canvas.facebook.com/) or Website - and then gives you some prompts to correctly set-up your application (you are free to skip the wizard of course):\n\n\n![Create a New App ID](https://c.hitchhq.net/-/uploads/docs/images/583da37061af240010941918)\n\n\nWith an application created you are then able to access its dashboard, which provides the all important application ID and secret that allows you to create your integration with the Graph API:\n\n\n![Application Dashboard](https://c.hitchhq.net/-/uploads/docs/images/583da3e061af240010941919)\n\nThe application dashboard displays only basic information, and some line graphs showing metrics such as application usage and logins. More advanced settings are also available,  allowing you to tailor aspects of application profile such as creating IP whitelists and disabling access to settings via the API.\n\n![Advanced Settings](https://c.hitchhq.net/-/uploads/docs/images/583db65c61af24001094192f)\n\n\u003e To set a redirect URI (for implementing the OAuth 2.0 authorization dance) you must add the Facebook Login product to your product list on the dashboard; click the Add Product link on application dashboard.\n\nWith an application registered you are now in a position to start integrating with Graph API. However, before embarking on this it important to understand the role of security and how this affects what your application can access.\n\n\u003e Note at this point your application is in development mode, which means it will not be publicly available. To make your application publicly available it must undergo review. Submitting an application for review is also available from the dashboard.\n\n## Security\n\nFacebook security comes in a number of different shapes and sizes; for example, [Facebook Login](https://developers.facebook.com/docs/facebook-login/web/login-button) is a login flow for web applications that is implemented using the [JavaScript SDK](https://developers.facebook.com/docs/javascript) and is Facebook’s recommended method for logging users in and granting authority to applications to use their profile. Whichever mechanism you choose to implement at the heart of security is the role of [access tokens](https://developers.facebook.com/docs/facebook-login/access-tokens), which Facebook defines in three ways:\n\n* User access tokens: Portable short- or long-lived tokens that allow your application to act on behalf of a user;\n* App access tokens: As the name suggest, tokens that are granted to an application rather than a user. These tokens are inherently limited in scope as a user has not granted access to their social graph, meaning some data is hidden;\n* Page access tokens: An administrative token that allows a Facebook page to be managed.\n\nWhen using the Graph API there is a good chance you’ll be coding your application to get a user access token, as to do something meaningful with a user’s profile you need their permission. If you are doing this manually rather than using the JavaScript SDK this is implemented by Facebook using [OAuth 2.0](https://developers.facebook.com/docs/facebook-login/manually-build-a-login-flow). \n\n\u003e Facebook provides a great deal of [guidance on security](https://developers.facebook.com/docs/facebook-login/security) which you should review carefully to decide what’s best for your application.\n\nThe OAuth flow is fairly standard fare for anyone who has built one before. First, the application must redirect the user to the Facebook login page to authorize the app and the permissions it requires on their Facebook profile. Doing so simply means calling the Facebook OAuth URL:\n\n```\ncurl https://www.facebook.com/v2.8/dialog/oauth?client_id={app-id}\u0026redirect_uri={redirect-uri}\n```\n\n\u003e Note that Facebook versions it’s APIs on major/minor versions in the URI. All examples in this guide are shown as version 2.8.\n\nThe only mandatory parameters are client_id and redirect_uri, but there are several other OAuth 2.0 parameters such as state and response_type that can be sent according to your requirements. However, one noteworthy parameter that you should pay special attention to is scope: This outlines the [permissions](https://developers.facebook.com/docs/facebook-login/permissions/) your application will request when authorized by the user. You will get access to the user’s public profile by default, but almost all others need to be requested.\n\nOnce this call has been invoked the user should be presented with a Login dialog:\n\n![Login Dialog](https://c.hitchhq.net/-/uploads/docs/images/583db6b861af240010941930)\n\nWhen the user clicks Continue they are redirected to your application at the redirect URI; your application should host an appropriate route to handle this callback and decipher the parameters, as you need the *code* parameter to complete the flow. As an example, the Flask server below returns the value to the user:\n\n```python\n#!/usr/bin/env python\nfrom flask import Flask, request\n\napp = Flask(__name__)\n\n@app.route('/')\ndef callback():\n    return request.args.get('code', 'Code not found')\n\nif __name__ == '__main__':\n    app.run(port=8080, debug=True)\n```\n\nYour application then must collect an access token using the code parameter and also your app secret:\n\n```\ncurl https://graph.facebook.com/v2.8/oauth/access_token?client_id={app-id}\u0026redirect_uri={redirect-uri}\u0026client_secret={app-secret}\u0026code={code-parameter}\n ```\n\nThe response contains the access token, the type and how long the token is valid for (in seconds):\n\n```\n{\"access_token\":\"{access-token}\",\"token_type\":\"bearer\",\"expires_in\":{seconds-until-expiry}}\n```\n\nWith the access token in hand, your application can now make calls to the Graph API.\n\n\u003e The example below use cURL to make calls to the Graph API. However, if cURL isn’t your thing you have the option of using the interactive [Graph API Explorer](https://developers.facebook.com/tools/explorer/) to construct and execute your queries.\n\n## Making queries\n\nThe simplest call you can make is to ask about yourself: The /me endpoint tells you who you are and the ID of your Facebook profile:\n\n```\ncurl -H 'Authorization: Bearer {access-token}' 'https://graph.facebook.com/v2.8/me'\n{\"name\":\"Chris Wood\",\"id\":\"{user-id}\"}\n```\n\nThis may not seem particularly useful, but the /me endpoint can be used to access a great deal of information about a user, for example, to access my friends I can call:\n\n```\ncurl -H 'Authorization: Bearer {access-token}' 'https://graph.facebook.com/v2.8/me/friends\n```\n\nAccessing the /me endpoint also gives access to the user ID. You can use either /me or this identifier to create new posts on the user’s timeline:\n\n```\ncurl -H 'Authorization: Bearer {access-token}' -H ‘Content-Type: application/json’ -X POST 'https://graph.facebook.com/v2.8/{user-id}/feed’ -d ‘{“message”: “Getting started with Hitch”}’\n{\"id\":\"365916807090621_366005953748373\"}\n```\n\n![Getting Started Post](https://c.hitchhq.net/-/uploads/docs/images/583db6f561af240010941931)\n\nWith one or more user IDs you can also start to transverse the social graph. Facebook [highlights](https://developers.facebook.com/docs/graph-api/common-scenarios) the scenario of determining whether two people are friends:\n\n```\ncurl -H 'Authorization: Bearer {access-token}' 'https://graph.facebook.com/v2.8//{user-a-id}/friends/{user-b-id}’\n```\n\n\u003e There are an incredible number of permutations that can be explored: The possibilities are already well documented in the Graph API [reference material](https://developers.facebook.com/docs/graph-api) so refer to this for a deeper understanding of what you can accomplish with the social graph.\n\n## Webhooks\n\nThe final subject to mention is [webhooks](https://developers.facebook.com/docs/graph-api/webhooks): Facebook makes them available to receive real-time notifications about changes in a user’s graph. The webhooks are genuinely notifications i.e. they do not send a new value, only notify your application of the fact that a given field has changed so if you need the value you’ll need to then query the API to get it.\n\nTo add Webhooks you need to click the Add Product link on the application dashboard. Webhooks can be set for a number of nodes in the graph; user, page, permissions or an application:\n\n![Webhooks dialog](https://c.hitchhq.net/-/uploads/docs/images/583db72b61af240010941932)\n\nOnce you’ve chosen the one you want to set, you can choose which events you want your application to be notified on:\n\n![Subscription dialog](https://c.hitchhq.net/-/uploads/docs/images/583db73561af240010941933)\n\n## Final Thoughts\n\nIn this guide, we’ve focused on getting you up-and-running with the Facebook Graph API. However, the API delivers enormous potential for organizations to access the Facebook social network and you should spend time reviewing the references we’ve provided here to fully understand the possibilities. Our overview is just the tip of the iceberg for developers in creating your own imaginative integrations with Facebook that delight your users.","id":"583da27461af240010941916"},{"created_at":"2017-01-12T10:18:32.906Z","author":"templth","slug":"messenger-bot","api_slug":"facebook-graph-api","state":"published","media_type":"doc","title":"Implementing a Messenger Bot","content":"Chatbots are one of the hottest features nowadays. Businesses like AirFrance and French newspaper [20minutes](http://www.20minutes.fr/) and to are using them to provide a better experience by understanding the intents of users. Facebook provides a generic frame to implement and integrate chatbots into its Messenger platform.\n\nIn this article, we will describe how to implement a simple chat bot for this platform. We won’t describe how to understand user requests. It’s outside the scope of the article and can be implemented based on tools like [RiveScript](https://www.rivescript.com/) or [wit.ai](https://wit.ai/).\n\n# Understanding the foundations\n\nThe Facebook Messenger platform allows developers to implement and integrate chatbots. It relies on a Facebook application that can configure third-party applications using webhooks. A Facebook page is used to provide a way for users to use these chatbots.\n\nThe following figure provides an overview of these differents parts and how they interact together.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775a186905fc000f9c4213)\n\nLet’s now create the page and application for our chatbot.\n\n# Creating page and application\n\nThe first step consists of creating both application and page to make available the chatbot within Messenger.\n\n## Creating a page\n\nTo create a page, simply go to the address: https://www.facebook.com/pages/create/. We need then to choose a page type. In our case, it’s an App Page. We can set its name here.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775a5f6905fc000f9c4215)\n\nAfter having clicked on the “Get Started” button, Facebook provides a wizard to give details about the page. Since it’s just a page for testing, we can skip all the steps and actually create the page.\n\nAfter this, the page overview is displayed.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775aa66905fc000f9c421b)\n\nSince we want to use the messenger to send messages to our chatbot, we need to add a button to the page. Choose the “Send Message” type under the “Get in Touch with Us” category.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775ac56905fc000f9c421c)\n\nTo send messages, just click on the “Test Button” item in the button dropdown.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775ade6905fc000f9c421d)\n\nSince we created an App Page, we have now to create the application to link with.\n\n## Creating an application\n\nCreating an application can be done from the following address by clicking on “Skip and Create App ID” button: https://developers.facebook.com/quickstarts/?platform=web.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775b0c6905fc000f9c421e)\n\nJust fill the fields of the creation form, click on the “Create App ID” button and that’s all. Your application is created.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775b296905fc000f9c421f)\n\nWe can now generate a page access token from the application settings. This token will be used within our backend application to interact with the application.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775b426905fc000f9c4220)\n\nThe next step corresponds to implement and configure a webhook within this application.\n\n# Implementing a webhook\n\nNow we have an application, we need to implement and configure a webhook to receive and handle the user messages.\n\nSince we are in development, our target server is local and can be accessed through localhost. localhost can’t be resolved by the Messenger platform so we need an additional tool to make access our server. Several tools are available on the Web but we will use [ngrok](https://ngrok.com/), a secure introspectable tunnel to localhost.\n\nAfter having installed it, start it with the command:\n\n```\n$ ./ngrok localhost 3000\nVersion                       2.1.14\nRegion                        United States (us)\nWeb Interface                 http://127.0.0.1:4040\nForwarding                    http://509becc3.ngrok.io -\u003e localhost:2001\nForwarding                    https://509becc3.ngrok.io -\u003e localhost:2001                                                                                     \n\nConnections                   ttl     opn     rt1     rt5     p50     p90\n                              22      0       0.00    0.00    1.82    55.61\n                                                                                                                     \nHTTP Requests\n-------------\n```\n\nThe address is displayed in the console. In our case: http://509becc3.ngrok.io. We are free to use a path if we want to make the server handle several commands. In our case, we will use the /webhook/messenger path to handle requests.\n\n## Implementing the verification handler of the webhook\n\nWhen a webhook is configured for a Facebook page, a GET method is sent to this webhook to check it.\n\nWe will use Node and the [Express](https://github.com/expressjs/express) framework to implement the webhook. Here is its skeleton.\n\n```\n'use strict';\n\nconst express = require('express');\nconst bodyParser = require('body-parser');\n\n// Create the Express application\nvar app = express();\n\n// Register Express middlewares\napp.use(bodyParser.json());\n\n// Define routes\napp.get('/messenger/webhook', (req, res, next) =\u003e {\n  (...)\n});\n\napp.post('/messenger/webhook', (req, res, next) =\u003e {\n  (...)\n});\n\n// Start the server\napp.listen(2001, function() {\n  console.log('Listening on http://localhost:2001');\n});\n```\n\nRight now, we only implement the callback function for the GET method. This method will be called during the webhook registration. The method must check the mode (“subscribe”) and the verify token that we will define when registering the webhook in the application and return the hub.challenge query parameter. Here is a sample implementation:\n\n```\napp.get('/messenger/webhook', (req, res, next) =\u003e {\n  if (req.query['hub.mode'] === 'subscribe' \u0026\u0026\n      req.query['hub.verify_token'] === 'hitch-bot-token') {\n    res.status(200).send(req.query['hub.challenge']);\n  } else {\n    console.error(\"Failed validation. Make sure the validation tokens match.\");\n    res.sendStatus(403);          \n  } \n});\n```\n\nAfter having installed the **express** and **body-parser** modules with the “npm install express body-parser” command, we can start the server with the command: “node server.js”. server.js is the file containing the code above.\n\nLet’s configure now this webhook within the application.\n\n## Configuring the webhook\n\nTo configure a webhook, click on the “Setup Webhooks” button within the Messenger / Settings section of the application configuration. We need then to fill the callback URL, the verify token and select which features we want to use. In our case, “messages” is enough.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775d0c6905fc000f9c4225)\n\nAfter having clicked on the “Verify and Save” button, the Messenger platform sends a GET request to check the webhook. At this moment, the server containing the webhook must be started. We see the request in the trace of ngrok.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775d256905fc000f9c4226)\n\nAt this point, the webhook is enabled. It remains to associate the application and the previously created page. To achieve this, just select the page in the dropbox.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775d416905fc000f9c4227)\n\nOnce selected, we need to make the application subscribe to the page by clicking on the “Subscribe” button.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775d5b6905fc000f9c4229)\n\nThe application and the page are now connected together and the chatbot is potentially usable from the page by sending messages.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775d756905fc000f9c422c)\n\nWe need now to implement the message handler in the webhook to handle user messages.\n\n## Implementing the message handler\n\nWhen a message is sent by the user, the POST handler is called on our webhook with a JSON content as described below:\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775d946905fc000f9c422d)\n\nBefore handling the message, we need to:\n\n- check that the call is from a page (“object” attribute);\n- iterate over all entries (“entry” attribute);\n- iterator over all messaging elements in entries (“messaging” attribute);\n- check that message elements correspond to a message event.\n\nDon’t forget to send back a response with a 200 status within 20 seconds, to let the Message platform know that we successfully received the callback. Otherwise, the request will time out and we will keep trying to resend.\n\nHere is the corresponding implementation into our Express application:\n\n```\napp.post('/messenger/webhook', (req, res, next) =\u003e {\n  var data = req.body;\n\n  // Make sure this is a page subscription\n  if (data.object === 'page') {\n\n    // Iterate over each entry - there may be multiple if batched\n    data.entry.forEach(function(entry) {\n      var pageId = entry.id;\n      var timeOfEvent = entry.time;\n\n      // Iterate over each messaging event\n      entry.messaging.forEach(function(event) {\n        if (event.message) {\n          // Handle the message\n          (...)\n        } else {\n          console.log(\"Webhook received unknown event: \", event);\n        }\n      });\n    });\n\n    // Send response\n    res.sendStatus(200);\n  }\n});\n```\n\nWe could be a bit surprised to send back a response directly. The response is just to notify the Messenger platform that we successfully received the message. To send back an answer message to the user, we need to leverage the Send API with another request. We will describe how to do that in the section “Sending messages back”.\n\n## Checking message requests\n\nAs we can see, when a message is sent by the user, the Messenger platform calls our webhook with a POST method and provides the corresponding message text with some additional hints into a JSON content. But can we be sure that the sender is this platform and not a malicious application?\n\nWe can note that the received request is signed using the x-hub-signature header. This approach is a common way to secure webhook. This allows us to check the integrity and the origin of this request.\n\n```\nx-hub-signature: sha1=dbf78b391cf7535af2df998861800dfabbfd6483\n```\n\nTo check this signature, we need to leverage the app secret from the application dashboard under **Settings / Basic**.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775e236905fc000f9c422f)\n\nTo check the signature, we can leverage the [express-x-hub](https://github.com/alexcurtis/express-x-hub/) module. We need to configure it with the previous application secret and define the sha1 encryption. The next step consists of defining it as a middleware for our express middleware.\n\n```\nconst xhub = require('express-x-hub');\n\nconst app = express();\n\napp.use(xhub({\n  algorithm: 'sha1',\n  secret: ‘application-client-secret'\n}));\napp.use(bodyParser.json());\n\napp.post('/messenger/webhook', ...);\napp.get('/messenger/webhook', ...);\n\n(...)\n```\n\nWithin the POST route, we can leverage the hints this middleware set:\n\n- check the **isXHub** attribute to determine if there is a signature in the request;\n- call the **isXHubValid** method to check if the signature is valid according to our application client secret.\n\nHere is a sample of use:\n\n```\nfunction checkSignature(req) {\n  return (req.isXHub \u0026\u0026 req.isXHubValid());\n}\n\napp.post('/messenger/webhook', (req, res, next) =\u003e {\n  // Check the signature\n  if (checkSignature(req)) {\n    (...)\n  } else {\n    res.status(403).end();\n  }\n});\n```\n\nNow we handled the request, it’s time to send back a response message.\n\n# Sending messages back\n\nNow we handled messages sent by the user, it’s time to reply by sending messages back.\n\nWe will use the Send API. The following function describes how to send a message with the request module with Node. According to the kind of message we want to send, we will pass different structures for the message.\n\n```\nfunction sendMessengerResponse(messageData) {\n  return request({\n    uri: 'https://graph.facebook.com/v2.6/me/messages',\n    qs: { access_token: PAGE_ACCESS_TOKEN },\n    method: 'POST',\n    json: messageData\n  }).then(body =\u003e {\n    var recipientId = body.recipient_id;\n    var messageId = body.message_id;\n\n    console.log(‘Successfully sent message with id %s to recipient %s’, \n      messageId, recipientId);\n  }, (error) =\u003e {\n    console.error(\"Unable to send message.\");\n    console.error(error);\n  });  \n}\n```\n\nIt’s time to describe some structures of messages.\n\n## Simple text messages\n\nTo send a simple text message, we need to provide an object containing a recipient and the message content. In the following snippet, we echo the received message:\n\n```\nfunction sendMessengerTextMessage(recipientId, messageText) {\n  return sendMessengerResponse({\n    recipient: {\n      id: recipientId\n    },\n    message: {\n      text: messageText\n    }\n  });\n}\n\napp.post('/messenger/webhook', (req, res, next) =\u003e {\n  var data = req.body;\n\n  if (data.object === 'page') {\n    data.entry.forEach(function(entry) {\n      var pageId = entry.id;\n      var timeOfEvent = entry.time;\n\n      entry.messaging.forEach(function(event) {\n        if (event.message) {\n          // Handle the message\n          sendMessengerTextMessage(event.sender.id, message.text);\n        } else {\n          (...)\n        }\n      });\n    });\n\n    res.sendStatus(200);\n  }\n});\n```\n\nHere is the result of such processing when we enter “message from Hitch” into the chat box:\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775ef26905fc000f9c4235)\n\nEt voilà!\n\n## Structured messages\n\nThe Messenger platform provides other kinds of messages to different use cases through specific templates:\n\n- **Button template** - to a list of choice to the user;\n- **List template** - to return a list of elements;\n- **Generic template** - to return a list of cards.\n\nLet’s build now a more advanced response message containing a list of APIs that we can follow on the Hitch website. For each of them, we add a button to go the corresponding page on this website.\n\nTo use such feature, we need to provide an attachment attribute in the message payload, as described below:\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775f356905fc000f9c4236)\n\nThe following **sendMessengerTemplateMessage** method describes how to use this approach. Just provide the previous content in the **messageAttachment** parameter when calling the method.\n\n```\nfunction sendMessengerTemplateMessage(recipientId, messageAttachment) {\n  return sendMessengerResponse({\n    recipient: {\n      id: recipientId\n    },\n    message: {\n      attachment: messageAttachment\n    }\n  });\n}\n\napp.post('/messenger/webhook', (req, res, next) =\u003e {\n  var data = req.body;\n\n  if (data.object === 'page') {\n    data.entry.forEach(function(entry) {\n      var pageId = entry.id;\n      var timeOfEvent = entry.time;\n\n      entry.messaging.forEach(function(event) {\n        if (event.message) {\n          // Handle the message\n          sendMessengerTemplateMessage(event.sender.id, {\n          });\n        } else {\n          (...)\n        }\n      });\n    });\n\n    res.sendStatus(200);\n  }\n});\n```\n\nHere is the result of such processing when we enter “message from Hitch” into the chat box:\n\n![](https://c.hitchhq.net/-/uploads/docs/images/58775f7c6905fc000f9c423b)\n\n# Conclusion\n\nThe Messenger platform provides a convenient and powerful way to integrate chatbots in Facebook. Implementing a chatbot only consists of defining a server that is called when users send messages.\n\nIt allows developers to communicate with users by using different kinds of messages according to the user intents. The Messenger platform supports some templates to easily implement list messages and handles features like payment.","id":"587757f86905fc000f9c4210"}],"doc":{"created_at":"2017-02-07T14:53:14.669Z","author":{"id":"57743f4fbcdf76100036c192","created_at_timestamp":null,"updated_at_timestamp":null,"username":"templth","full_name":"Thierry Templier","avatar":"/avatars/57e3fbfbc780cb000fa2aa1d","following":{"apis":[]},"media_type":"user"},"slug":"facebook-authentication","api_slug":"facebook-graph-api","state":"published","media_type":"doc","title":"Leveraging Facebook authentication in third-party applications","content":"Apart from being the most popular social network in the world, Facebook also provides support for developers to interact programmatically with its platform. In this guide, we will focus on the user authentication and how to leverage it for third-party applications.\n\nThe use case behind this is simple: helping users of your application or website authenticate using their Facebook profile, and prevent newcomers from registering using their email and password. This will make it easier for you to engage your application’s users. Since it delegates the user management to the Facebook platform, it’s only necessary to store user details received from Facebook.\n\nThe first step consists of creating an application on the Facebook platform.\n\n# Creating an application\n\nCreating an application can be done from the following address by clicking on “Skip and Create App ID” button: [https://developers.facebook.com/quickstarts/?platform=web](https://developers.facebook.com/quickstarts/?platform=web).\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e42f16487e001094368c)\n\nJust fill the fields of the creation form, click on the “Create App ID” button and that’s all. Your application is created.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e44f16487e001094368d)\n\nBy clicking on the \"Create App ID\", the application is actually created and we have access to its application tokens (**App ID** and **App Secret**). These tokens will be used for requests in the authentication flow.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e47816487e001094368e)\n\nIn our case, we need now to configure a “Website” platform and then a “Facebook Login” product.\n\n## Adding a Website platform\n\nAdding a platform can be done from the settings of the application within the Basic tab. \n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e4ff16487e001094368f)\n\nAfter having clicked on the “Add Platform” button, the list of supporting platform is displayed.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e51516487e0010943690)\n\nOnce you’ve selected the \"Website\" type for the platform, a platform is created and we can set the \"Site URL\" field. Since the aim of this article is to describe how things work, we will use the localhost domain with the port of our local server.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e54216487e0010943691)\n\nNow a Website platform is created, we can set the “App Domains” field in the settings.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e55d16487e0010943692)\n\nDon’t forget to save changes.\n\n## Adding a Facebook Login product\n\nTo configure the behavior of the authentication and properties related to OAuth, we need to create a product of type \"Facebook Login\". This can be done from the left menu of the application.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e59716487e0010943693)\n\nSelect then the \"Facebook Login\" type by clicking on \"Getting started\".\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e5b516487e0010943694)\n\nThe corresponding product is added and we can configure associated properties. After having checked that the \"Web OAuth Login\" is enabled, add a valid OAuth redirect URI according to our server application. In our case, we will use **http://localhost:3000/auth/facebook/callback**. The latter corresponds to a router in our application that will be called after a user is authenticated.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e5ef16487e0010943695)\n\nDon’t forget again to save changes.\n\nAt this step, the Facebook application is correctly configured to leverage authentication from the Facebook platform. Let’s describe now how to use this authentication.\n\n# Using Facebook authentication\n\nTo integrate Facebook authentication into our application we’ll need to call different URLs on the Facebook platform with different parameters. At some point, this platform will call us back according to specified redirect URIs.\n\nWithin this section, we will use Node to implement a simple server application that leverages Facebook authentication. Below is the skeleton of our application:\n\n```\n'use strict';\n\nconst express = require('express');\nconst bodyParser = require('body-parser');\nconst request = require('request-promise');\n\nconst app = express();\n\napp.use(express.static('public'));\n\napp.get(‘/authenticated’, function(req, res, next) {\n  // ...\n});\n\napp.listen(3000, function () {\n  console.log('Application started');\n});\n```\n\nBefore digging into the details of Facebook authentication, let’s provide an overview of interactions between the application and the Facebook platform.\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e63016487e0010943696)\n\nLet’s start with the authentication.\n\n## Starting the authentication flow\n\nThe step consists of using the following URL: **https://www.facebook.com/v2.8/dialog/oauth**. This will initiate the authentication flow by providing an authentication and authorization screen. There are several options here. The simplest one is to use this address in a link within an HTML page. Parameters need to be specified at this level: the client_id one corresponding to the App ID and the redirect_uri to the URL to call after authentication.\n\nHere is a sample:\n\n```\n\u003ca href= \"https://www.facebook.com/v2.8/dialog/oauth?client_id=1667...\u0026redirect_uri=http%3A%2F%2Flocalhost:3000%2Fauth%2Ffacebook%2Fcallback\"\u003eAuthenticate with Facebook\u003c/a\u003e\n```\n\nNote that this URL could be used from JavaScript into a new window created by using the `open` method of the `window` object.\n\nIf we aren’t authenticated, Facebook will display a form to log in:\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e68f16487e0010943697)\n\nIf the application isn’t authorized for our Facebook user, Facebook will display a screen to ask for our agreement:\n\n![](https://c.hitchhq.net/-/uploads/docs/images/5899e6a116487e0010943698)\n\n\nIf it’s the first time, the user tries to authenticate for this application, Facebook asks to authorize the application to have access to user public profile and friends.\n\nNote that if you already authorized the application and you’re logged into Facebook, no screen will be displayed and the redirect URI be called.\n\nThe redirect URI is then called with the following parameter if the authentication and authorization are successful:\n\n* **code** - corresponds to the access code that can be used with the application secret token to get the corresponding access token\n\nIf the user cancels the process, other parameters are provided to the redirect URI:\n\n* **error_reason** - contains the reason of the problem, in this case, **user_denied**;\n* **error** - corresponds to the global error, here **access_denied**;\n* **error_description** - corresponds to a readable error message, in this case, \"The user denied your request\".\n\n## Getting the access token\n\nThe Facebook provides the **/oauth/access_token** endpoint to get the access token based on the previously received code. The following parameters must be provided when executing a request on this endpoint:\n\n* **code** - the previously received code;\n* **client_id** - the application id;\n* **client_secret** - the application secret token;\n* **redirect_uri** - the redirect URI used in the dialog/oauth request. It internally used by Facebook to check the request but no redirect happens.\n\nHere is the way to execute this request in the server application based on the **request-promise** library:\n\n```\nconst FACEBOOK_APP_ID = '...';\nconst FACEBOOK_APP_SECRET = '...';\n\napp.get('/auth/facebook/callback', function(req, res, next) {\n  request({\n    url: 'https://graph.facebook.com/v2.8/oauth/access_token',\n    qs: {\n      code: req.query.code,\n      redirect_uri: 'http://localhost:3000/authenticated',\n      client_id: FACEBOOK_APP_ID,\n      client_secret: FACEBOOK_APP_SECRET\n    },\n    json: true\n  }).then((payload) =\u003e {\n    // …\n  });\n});\n```\n\nThe response payload will contain the access token value, the token type and when it will expire:\n\n```\n{\n  \"access_token\": \"EAAXsr727ZBw0BAH…\",\n  \"token_type\": \"bearer\",\n  \"expires_in\": 5155952\n}\n```\n\nNow we get an access token, we can use the Graph API of Facebook. In our case, we need to get hints about the current user.\n\n## Getting the current user details\n\nTo get the current user details, we can leverage the /me endpoint. To authenticate the corresponding request, we use the Authorization header with the Bearer security scheme. The following code describes to implement this request in our application:\n\n```\napp.get('/auth/facebook/callback', function(req, res, next) {\n  request({\n    url: 'https://graph.facebook.com/v2.8/oauth/access_token',\n    qs: {\n      // ...\n    },\n    json: true\n  }).then((payload) =\u003e {\n    request({\n      url: 'https://graph.facebook.com/v2.5/me',\n      headers: {\n        'Authorization': `Bearer ${payload.access_token}`\n      },\n      json: true\n    }).then((me) =\u003e {\n      // ...\n    });\n  });\n});\n```\n\nBy default, this request only returns the name and the identifier of the user, as described below:\n\n```\n{\n  \"name\": \"Thierry Templier\",\n  \"id\": \"10154931...\"\n}\n```\n\nIn this section, we described the interactions between our application and the Facebook platform to authenticate users. Most of the time, these interactions are hidden within security libraries. That’s the case in Node with the passport library and its integration with Facebook.\n\n# Using in a Node application with Express and Passport\n\nAs detailed on its website, Passport is an \"authentication middleware for Node.js. Extremely flexible and modular, Passport can be unobtrusively dropped into any Express-based web application. It provides a comprehensive set of strategies support authentication using a username and password, Facebook, Twitter, and more.\"\n\nIn addition, it also provides features like session management. The Facebook integration is provided by the passport facebook module.\n\nTo install them, just use the command: **npm install passport passport-facebook**.\n\n## Configuring Passport for Facebook\n\nTo configure the Facebook support for Passport, just configure the corresponding strategy as a middleware in the Express application. This allows us to configure the client ID and client secret tokens with the previous redirect URI called here callback URL.\n\nThe following snippet describes how to achieve this:\n\n```\nconst passport = require('passport');\nconst FacebookStrategy = require('passport-facebook').Strategy;\n\npassport.use(new FacebookStrategy({\n    clientID: FACEBOOK_APP_ID,\n    clientSecret: FACEBOOK_APP_SECRET,\n    callbackURL: 'http://localhost:3000/auth/facebook/callback'\n  },\n  function(accessToken, refreshToken, profile, cb) {\n    // Handle the user (create or update)\n    // Then call the callback\n    return cb(err, user);\n  }\n));\n```\n\n## Implementing routes\n\nSome routes need to be implemented in the application. The first one is to trigger authentication instead of directly using the dialog/oauth one, as previously. The second one is the route for the redirect URI that needs to be refactored to use Passport.\n\nThe following snippet describes the implementation of these routes:\n\n```\nconst app = express();\n\n// ...\n\napp.get('/auth/facebook',\n  passport.authenticate('facebook'));\n\napp.get('/auth/facebook/callback',\n  passport.authenticate('facebook', { failureRedirect: '/public/login.html' }),\n  function(req, res) {\n    // Successful authentication, redirect home.\n    res.redirect('/');\n  });\n```","id":"5899df5a16487e0010943688"},"team":{"team":null},"followers_count":3575},"query_params":{},"team":{}};
-</script>
-  <script type="text/javascript">!function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="4.0.0";
-analytics.load('Kur9YbriLVD79lQ525eMm71H9ZEd49dj');
-analytics.page(undefined, undefined, {}, {"integrations":{"Mixpanel":false,"Intercom":{"hideDefaultLauncher":true}}});
-}}();
-</script>
-  <style type="text/css" id="theme-custom"></style>
- </head>
- <body>
-  <div id="hitch-container">
-   <div data-reactroot="" data-reactid="1" data-react-checksum="-113796260">
-    <header class="nav-unauth" data-reactid="2">
-     <div class="main-navbar" data-reactid="3">
-      <div class="container" data-reactid="4">
-       <a href="https://www.hitchhq.com/" class="main-navbar__logo" data-reactid="5"><img src="https://c.hitchhq.net/-/images/20170227/hitch-logo-dark.svg" class="logo-image" data-reactid="6"></a>
-       <div class="user-menu " data-reactid="7">
-        <ul data-reactid="8">
-         <li data-reactid="9"><a href="https://www.hitchhq.com/login" class="" data-reactid="10">Log In</a></li>
-         <li data-reactid="11"><a href="https://www.hitchhq.com/signup" class="" data-reactid="12">Sign Up</a></li>
-        </ul>
-       </div>
-       <ul class="mkt-nav-links undefined" data-reactid="13">
-        <li data-reactid="14"><a href="https://www.hitchhq.com/apis" class="" data-reactid="15">Discover APIs</a></li>
-        <li data-reactid="16"><a href="https://www.hitchhq.com/pricing" class="" data-reactid="17">Pricing</a></li>
-        <li data-reactid="18"><a href="https://www.hitchhq.com/help" class="" data-reactid="19">Help</a></li>
-        <li data-reactid="20"><a href="https://blog.hitchhq.com" target="_blank" data-reactid="21">Blog</a></li>
-       </ul>
-      </div>
-      <div class="main-navbar__search navbar__search-box" data-reactid="22">
-       <div class="container" data-reactid="23">
-        <span class="global-search-input input-group" data-reactid="24">
-         <div class="react-tagsinput" data-reactid="25">
-          <div class="global-search-input__wrapper" data-reactid="26">
-           <div class="global-search-input__tag" data-reactid="27">
-            <!-- react-text: 28 -->api:facebook-graph-api
-            <!-- /react-text -->
-            <a data-reactid="29"></a>
-           </div>
-           <div class="global-search-input-suggestions__container" data-reactid="30">
-            <input type="text" value="" autocomplete="off" role="combobox" aria-autocomplete="list" aria-owns="react-autowhatever-1" aria-expanded="false" aria-haspopup="false" class="global-search-input__input global-search-input__input--with-tag" placeholder="" data-reactid="31">
-            <div id="react-autowhatever-1" class="global-search-input-suggestions__suggestions-container" data-reactid="32"></div>
-           </div>
-          </div>
-         </div><span class="input-group-addon" data-reactid="33"><img class="icon-search" src="https://c.hitchhq.net/-/images/icons/icon-search-mini.svg" data-reactid="34"></span></span>
-       </div>
-      </div>
-     </div>
-     <!-- react-text: 35 -->
-     <!-- /react-text -->
-     <div class="mini-top-header" data-reactid="36">
-      <button class="mini-top-header__menu" data-reactid="37"><img src="https://c.hitchhq.net/-/images/icons/icon-menu-ham.svg" data-reactid="38"></button>
-      <div class="mini-top-header__search" data-reactid="39">
-       <span class="global-search-input input-group" data-reactid="40">
-        <div class="react-tagsinput" data-reactid="41">
-         <div class="global-search-input__wrapper" data-reactid="42">
-          <div class="global-search-input-suggestions__container" data-reactid="43">
-           <input type="text" value="" autocomplete="off" role="combobox" aria-autocomplete="list" aria-owns="react-autowhatever-1" aria-expanded="false" aria-haspopup="false" class="global-search-input__input" placeholder="Search Hitch" data-reactid="44">
-           <div id="react-autowhatever-1" class="global-search-input-suggestions__suggestions-container" data-reactid="45"></div>
-          </div>
-         </div>
-        </div><span class="input-group-addon" data-reactid="46"><img class="icon-search" src="https://c.hitchhq.net/-/images/icons/icon-search-mini.svg" data-reactid="47"></span></span>
-      </div>
-      <a href="https://www.hitchhq.com/" class="mini-top-header__logo" data-reactid="48"><img src="https://c.hitchhq.net/-/images/hitch-logo.svg" data-reactid="49"></a>
-     </div>
-     <div class="mobile-sidebar" data-reactid="50">
-      <span class="mobile-sidebar__close" data-reactid="51"><img src="https://c.hitchhq.net/-/images/icons/icon-cross-white-light.svg" data-reactid="52"></span>
-      <div class="mobile-sidebar__content" data-reactid="53">
-       <div class="mobile-sidebar__content__header" data-reactid="54">
-        <a href="/" data-reactid="55"><img src="https://c.hitchhq.net/-/images/hitch-logo.svg" data-reactid="56"></a>
-        <div class="user-menu user-menu--mobile" data-reactid="57">
-         <ul data-reactid="58">
-          <li data-reactid="59"><a href="https://www.hitchhq.com/login" class="" data-reactid="60">Log In</a></li>
-          <li data-reactid="61"><a href="https://www.hitchhq.com/signup" class="" data-reactid="62">Sign Up</a></li>
-         </ul>
-        </div>
-       </div>
-       <ul class="mkt-nav-links mkt-nav-links--mobile" data-reactid="63">
-        <li data-reactid="64"><a href="/apis" data-reactid="65">All APIs</a></li>
-        <li data-reactid="66"><a href="/pricing" data-reactid="67">Pricing</a></li>
-        <li data-reactid="68"><a href="/help" data-reactid="69">Help</a></li>
-        <li data-reactid="70"><a href="https://blog.hitchhq.com" target="_blank" data-reactid="71">Blog</a></li>
-       </ul>
-      </div>
-      <div class="mobile-sidebar__overlay" data-reactid="72"></div>
-     </div>
-    </header>
-    <!-- react-text: 73 -->
-    <!-- /react-text -->
-    <div class="app-container container" data-reactid="74">
-     <div data-reactid="75">
-      <div class="api-static-doc-page" data-reactid="76">
-       <div class="row" data-reactid="77">
-        <div class="col-md-12" data-reactid="78">
-         <div class="api-badge-wrap" data-reactid="79">
-          <div class="card api-profile-badge--horizontal" data-reactid="80">
-           <div class="card__content " data-reactid="81">
-            <div class="row" data-reactid="82">
-             <div class="col-md-1" data-reactid="83">
-              <span class="card__header-tag" data-reactid="84">
-               <!-- react-empty: 85 -->
-               <!-- react-text: 86 -->API
-               <!-- /react-text --></span>
-             </div>
-             <div class="col-md-1" data-reactid="87">
-              <a href="/facebook-graph-api/" class="" data-reactid="88"><img src="https://c.hitchhq.net/-/logos/5763a90f5ae7e610009bc6b9" class="card__image" data-reactid="89"></a>
-             </div>
-             <div class="col-md-5" data-reactid="90">
-              <h4 class="card__title " data-reactid="91">Facebook Graph API</h4>
-              <div class="card__description " data-reactid="92">
-               Facebook public API
-              </div>
-             </div>
-             <div class="col-md-5" data-reactid="93">
-              <ul class="api-profile-badge--horizontal__follow" data-reactid="94">
-               <li class="api-profile-badge--horizontal__follow__count" data-reactid="95"><a href="/facebook-graph-api/followers" class="" data-reactid="96">
-                 <div class="api-followers-counter" data-reactid="97">
-                  <span class="api-followers-counter__number" data-reactid="98">3575</span>
-                  <div class="api-followers-counter__legend" data-reactid="99">
-                   Followers
-                  </div>
-                 </div></a></li>
-               <li class="api-profile-badge--horizontal__follow__button" data-reactid="100">
-                <!-- react-text: 101 -->
-                <!-- /react-text --><button class="btn api-follow-button btn--inactive" data-reactid="102">
-                 <div class="spinner " data-reactid="103">
-                  <div class="spinner__bounce spinner__bounce--1" data-reactid="104"></div>
-                  <div class="spinner__bounce spinner__bounce--2" data-reactid="105"></div>
-                  <div class="spinner__bounce spinner__bounce--3" data-reactid="106"></div>
-                 </div><img src="https://c.hitchhq.net/-/images/icons/icon-add-white.svg" data-reactid="107"><span data-reactid="108">Follow</span></button></li>
-              </ul>
-             </div>
-            </div>
-           </div>
-          </div>
-          <div data-reactid="109">
-           <div class="tab-menu tab-menu--api" data-reactid="110">
-            <nav class="tab-menu__box-default" data-reactid="111">
-             <ul class="tab-menu__list clearfix" data-reactid="112">
-              <li class="tab-menu__list__current" data-reactid="113"><a href="/facebook-graph-api/documentation" data-reactid="114">Documentation</a></li>
-              <li class="" data-reactid="115"><a href="/facebook-graph-api/reference" data-reactid="116">Reference</a></li>
-              <li class="" data-reactid="117"><a href="/facebook-graph-api/sdks" data-reactid="118">SDKs</a></li>
-              <li class="" data-reactid="119"><a href="/facebook-graph-api/activities" data-reactid="120">Changelog</a></li>
-              <li class="" data-reactid="121"><a href="/facebook-graph-api/followers" data-reactid="122">Followers</a></li>
-              <li class="" data-reactid="123"><a href="/facebook-graph-api/widget" data-reactid="124">Widget</a></li>
-             </ul>
-            </nav>
-           </div>
-          </div>
-         </div>
-         <div class="activity__change activity__change--generic clearfix" data-reactid="125">
-          <ul class="list-inline activity-detail__tool-list pull-right" data-reactid="126">
-           <li data-reactid="127"><a href="/facebook-graph-api.rss" data-reactid="128"><img src="https://c.hitchhq.net/-/images/icons/icon-rss.svg" data-reactid="129">
-             <!-- react-text: 130 -->RSS Feed
-             <!-- /react-text --></a></li>
-           <li data-reactid="131"><a href="/facebook-graph-api.json" data-reactid="132"><img src="https://c.hitchhq.net/-/images/icons/icon-json.svg" data-reactid="133">
-             <!-- react-text: 134 -->JSON
-             <!-- /react-text --></a></li>
-          </ul>
-         </div>
-        </div>
-       </div>
-       <div class="row" data-reactid="135">
-        <div class="col-md-3" data-reactid="136">
-         <div class="documentation-menu" data-reactid="137">
-          <ul class="documentation-menu__overview documentation-menu__overview--l1" data-reactid="138">
-           <li data-reactid="139"><a href="/facebook-graph-api/overview" class="documentation-menu__overview__title" data-reactid="140"><img src="https://c.hitchhq.net/-/images/icons/icon-menu-overview.svg" data-reactid="141"><span data-reactid="142">Overview</span></a></li>
-           <li data-reactid="143"></li>
-          </ul>
-          <div class="documentation-menu__training-list" data-reactid="144">
-           <ul class="documentation-menu__training-list documentation-menu__training-list--l1" data-reactid="145">
-            <li data-reactid="146"><a href="/facebook-graph-api/docs/facebook-authentication" class="documentation-menu__training-list__title" data-reactid="147"><img src="https://c.hitchhq.net/-/images/icons/icon-menu-tutorial.svg" data-reactid="148"><span data-reactid="149">Leveraging Facebook authentication in third-party applications</span></a></li>
-            <li data-reactid="150">
-             <ul class="documentation-menu__dropdown__body documentation-menu__dropdown__body--l2" data-reactid="151">
-              <li class="clearfix" data-reactid="152"><button class="documentation-menu__dropdown__icon" data-reactid="153"><img src="https://c.hitchhq.net/-/images/icons/icon-arrow-dropdown.svg" data-reactid="154"></button><a href="#creating-an-application-9" class="documentation-menu__dropdown__title title-with-icon" data-reactid="155">Creating an application</a>
-               <ul class="documentation-menu__dropdown__body documentation-menu__dropdown__body--l1" data-reactid="156">
-                <li class="documentation-menu__dropdown--leaf" data-reactid="157"><a href="#user-content-adding-a-website-platform" class="documentation-menu__dropdown__title" data-reactid="158">Adding a Website platform</a></li>
-                <li class="documentation-menu__dropdown--leaf" data-reactid="159"><a href="#user-content-adding-a-facebook-login-product" class="documentation-menu__dropdown__title" data-reactid="160">Adding a Facebook Login product</a></li>
-               </ul></li>
-              <li class="clearfix" data-reactid="161"><button class="documentation-menu__dropdown__icon" data-reactid="162"><img src="https://c.hitchhq.net/-/images/icons/icon-arrow-dropdown.svg" data-reactid="163"></button><a href="#using-facebook-authentication-90" class="documentation-menu__dropdown__title title-with-icon" data-reactid="164">Using Facebook authentication</a>
-               <ul class="documentation-menu__dropdown__body documentation-menu__dropdown__body--l2" data-reactid="165">
-                <li class="documentation-menu__dropdown--leaf" data-reactid="166"><a href="#user-content-starting-the-authentication-flow" class="documentation-menu__dropdown__title" data-reactid="167">Starting the authentication flow</a></li>
-                <li class="documentation-menu__dropdown--leaf" data-reactid="168"><a href="#user-content-getting-the-access-token" class="documentation-menu__dropdown__title" data-reactid="169">Getting the access token</a></li>
-                <li class="documentation-menu__dropdown--leaf" data-reactid="170"><a href="#user-content-getting-the-current-user-details" class="documentation-menu__dropdown__title" data-reactid="171">Getting the current user details</a></li>
-               </ul></li>
-              <li class="clearfix" data-reactid="172"><button class="documentation-menu__dropdown__icon" data-reactid="173"><img src="https://c.hitchhq.net/-/images/icons/icon-arrow-dropdown.svg" data-reactid="174"></button><a href="#using-in-a-node-application-with-express-and-passport-223" class="documentation-menu__dropdown__title title-with-icon" data-reactid="175">Using in a Node application with Express and Passport</a>
-               <ul class="documentation-menu__dropdown__body documentation-menu__dropdown__body--l3" data-reactid="176">
-                <li class="documentation-menu__dropdown--leaf" data-reactid="177"><a href="#user-content-configuring-passport-for-facebook" class="documentation-menu__dropdown__title" data-reactid="178">Configuring Passport for Facebook</a></li>
-                <li class="documentation-menu__dropdown--leaf" data-reactid="179"><a href="#user-content-implementing-routes" class="documentation-menu__dropdown__title" data-reactid="180">Implementing routes</a></li>
-               </ul></li>
-             </ul></li>
-           </ul>
-           <ul class="documentation-menu__training-list documentation-menu__training-list--l1" data-reactid="181">
-            <li data-reactid="182"><a href="/facebook-graph-api/docs/getting-started" class="documentation-menu__training-list__title" data-reactid="183"><img src="https://c.hitchhq.net/-/images/icons/icon-menu-tutorial.svg" data-reactid="184"><span data-reactid="185">Getting Started</span></a></li>
-            <li data-reactid="186"></li>
-           </ul>
-           <ul class="documentation-menu__training-list documentation-menu__training-list--l1" data-reactid="187">
-            <li data-reactid="188"><a href="/facebook-graph-api/docs/messenger-bot" class="documentation-menu__training-list__title" data-reactid="189"><img src="https://c.hitchhq.net/-/images/icons/icon-menu-tutorial.svg" data-reactid="190"><span data-reactid="191">Implementing a Messenger Bot</span></a></li>
-            <li data-reactid="192"></li>
-           </ul>
-          </div>
-          <ul class="documentation-menu__faq documentation-menu__faq--l1" data-reactid="193">
-           <li data-reactid="194"><a href="/facebook-graph-api/faqs" class="documentation-menu__faq__title" data-reactid="195"><img src="https://c.hitchhq.net/-/images/icons/icon-menu-faq.svg" data-reactid="196"><span data-reactid="197">Frequently Asked Questions</span></a></li>
-          </ul>
-         </div>
-        </div>
-        <div class="col-md-9" data-reactid="198">
-         <div class="documentation documentation-editor-static" data-reactid="199">
-          <div class="article-author" data-reactid="200">
-           <a href="https://www.hitchhq.com/@templth" class="user-avatar user-avatar--with-link article-author__avatar" data-reactid="201"><img src="https://c.hitchhq.net/-/avatars/57e3fbfbc780cb000fa2aa1d" data-reactid="202"></a>
-           <div data-reactid="203">
-            <a href="https://www.hitchhq.com/@templth" class="user-full-name user-full-name--with-link article-author__full-name" data-reactid="204"><span class="user-full-name" data-reactid="205">Thierry Templier</span></a>
-           </div>
-           <div class="article-author__info" data-reactid="206">
-            <span class="date-time" data-reactid="207">Feb 7 2017</span>
-            <span class="article-author__info__separator" data-reactid="208">·</span>
-            <span class="article-reading-time" data-reactid="209">
-             <!-- react-text: 210 -->7
-             <!-- /react-text -->
-             <!-- react-text: 211 --> 
-             <!-- /react-text -->
-             <!-- react-text: 212 -->mins
-             <!-- /react-text -->
-             <!-- react-text: 213 --> read
-             <!-- /react-text --></span>
-           </div>
-          </div>
-          <h1 class="documentation__title" data-reactid="214">Leveraging Facebook authentication in third-party applications</h1>
-          <div class="documentation__content" data-reactid="215">
-           <p>Apart from being the most popular social network in the world, Facebook also provides support for developers to interact programmatically with its platform. In this guide, we will focus on the user authentication and how to leverage it for third-party applications.</p> 
-           <p>The use case behind this is simple: helping users of your application or website authenticate using their Facebook profile, and prevent newcomers from registering using their email and password. This will make it easier for you to engage your application’s users. Since it delegates the user management to the Facebook platform, it’s only necessary to store user details received from Facebook.</p> 
-           <p>The first step consists of creating an application on the Facebook platform.</p> 
-           <h1><a id="user-content-creating-an-application" class="deep-link" href="#creating-an-application"></a>Creating an application</h1> 
-           <p>Creating an application can be done from the following address by clicking on “Skip and Create App ID” button: <a href="https://developers.facebook.com/quickstarts/?platform=web">https://developers.facebook.com/quickstarts/?platform=web</a>.</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e42f16487e001094368c"></p> 
-           <p>Just fill the fields of the creation form, click on the “Create App ID” button and that’s all. Your application is created.</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e44f16487e001094368d"></p> 
-           <p>By clicking on the "Create App ID", the application is actually created and we have access to its application tokens (<strong>App ID</strong> and <strong>App Secret</strong>). These tokens will be used for requests in the authentication flow.</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e47816487e001094368e"></p> 
-           <p>In our case, we need now to configure a “Website” platform and then a “Facebook Login” product.</p> 
-           <h2><a id="user-content-adding-a-website-platform" class="deep-link" href="#adding-a-website-platform"></a>Adding a Website platform</h2> 
-           <p>Adding a platform can be done from the settings of the application within the Basic tab.</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e4ff16487e001094368f"></p> 
-           <p>After having clicked on the “Add Platform” button, the list of supporting platform is displayed.</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e51516487e0010943690"></p> 
-           <p>Once you’ve selected the "Website" type for the platform, a platform is created and we can set the "Site URL" field. Since the aim of this article is to describe how things work, we will use the localhost domain with the port of our local server.</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e54216487e0010943691"></p> 
-           <p>Now a Website platform is created, we can set the “App Domains” field in the settings.</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e55d16487e0010943692"></p> 
-           <p>Don’t forget to save changes.</p> 
-           <h2><a id="user-content-adding-a-facebook-login-product" class="deep-link" href="#adding-a-facebook-login-product"></a>Adding a Facebook Login product</h2> 
-           <p>To configure the behavior of the authentication and properties related to OAuth, we need to create a product of type "Facebook Login". This can be done from the left menu of the application.</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e59716487e0010943693"></p> 
-           <p>Select then the "Facebook Login" type by clicking on "Getting started".</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e5b516487e0010943694"></p> 
-           <p>The corresponding product is added and we can configure associated properties. After having checked that the "Web OAuth Login" is enabled, add a valid OAuth redirect URI according to our server application. In our case, we will use <strong><a href="http://localhost:3000/auth/facebook/callback">http://localhost:3000/auth/facebook/callback</a></strong>. The latter corresponds to a router in our application that will be called after a user is authenticated.</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e5ef16487e0010943695"></p> 
-           <p>Don’t forget again to save changes.</p> 
-           <p>At this step, the Facebook application is correctly configured to leverage authentication from the Facebook platform. Let’s describe now how to use this authentication.</p> 
-           <h1><a id="user-content-using-facebook-authentication" class="deep-link" href="#using-facebook-authentication"></a>Using Facebook authentication</h1> 
-           <p>To integrate Facebook authentication into our application we’ll need to call different URLs on the Facebook platform with different parameters. At some point, this platform will call us back according to specified redirect URIs.</p> 
-           <p>Within this section, we will use Node to implement a simple server application that leverages Facebook authentication. Below is the skeleton of our application:</p> 
-           <pre><code>'use strict';
+<!--?xml version="1.0" encoding="UTF-8" standalone="no"?--><!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <script type="text/javascript">var NREUMQ=NREUMQ||[];NREUMQ.push(["mark","firstbyte",new Date().getTime()]);</script> 
+  <title>Programming JavaScript Applications</title> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <link href="http://dwn0odqttrkhc.cloudfront.net/assets/book-f1caceafd9c9f3a6ff72d40c54d173ab.css" media="screen" rel="stylesheet" type="text/css"> 
+  <link href="http://dwn0odqttrkhc.cloudfront.net/assets/default-24583441b4f47382b8932338cd56ed23.css" media="screen" rel="stylesheet" type="text/css"> 
+  <script src="http://dwn0odqttrkhc.cloudfront.net/assets/application-47d6ffb0c77b868d29a43eb65e940505.js" type="text/javascript"></script> 
+  <script src="http://dwn0odqttrkhc.cloudfront.net/assets/book-756862b9ed04d945ca53de5b8f106a83.js" type="text/javascript"></script> 
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> 
+  <link href="http://dwn0odqttrkhc.cloudfront.net/assets/janrain-53eb5abed55992e21943b9d3373923e8.css" media="all" rel="stylesheet" type="text/css"> 
+  <meta content="authenticity_token" name="csrf-param"> 
+  <meta content="YE10N0Uv5s8IA9n/0MQL/YghvZPqM/6sGHZ1wnQyw+4=" name="csrf-token"> 
+  <script type="text/javascript" charset="utf-8">
+  	
+		app.data = new classes.Data({"controller":{"controller":"books","action":"html"},"capturable":{"capture_server":"https://oreilly.janraincapture.com","client_id":"6n5q2k9vesqgn93k3mhevka6c3c3rsre","app_url":"https://login.oreilly.com","app_id":"xsnca5wmqe9vxv97ygh5vfejkd","load_js":"d16s8pqtk4uodx.cloudfront.net/login.oreilly.com/load.js"},"user":{"id":null,"account":"LoggedOutAccount","email":"","name":null,"gravatar_url":"http://www.gravatar.com/avatar/d41d8cd98f00b204e9800998ecf8427e?s=40&d=identicon"},"book":{"isbn":"1234000000262","chapter":"ch06.html","toc_url":"/books/1234000000262/toc_html","metadata_url":"http://d4bb7yl96lyl1.cloudfront.net/1234000000262/metadata/metadata_e1aae0072acf90f6575ddcd5fd8a57bf4abe3358.json"},"abilities":{"can_destroy_all_comments":false,"can_create_comments":false},"advertisement":{"body":"<style>      \r\n.ad-profile-image {\r\n  padding: 0;\r\n  margin: 0;\r\n  max-height: 30px;\r\n }\r\n\r\n.top-banner {\r\n  position: absolute;\r\n  right: 0;\r\n  top: 34px;\r\n  z-index: 99999;\r\n}\r\n\r\np.banner-text {\r\n  margin: 0;\r\n  text-align: center;\r\n  padding-right: 10px;\r\n  width: 550px;\r\n}\r\n\r\n@media screen and (max-width: 600px) {\r\n   p.banner-text {\r\n     width: 100%;\r\n     text-align: center;\r\n  }\r\n}\r\n\r\nspan.ebook-advantage {\r\n  font-size: smaller;\r\n  display: block;\r\n}\r\n\r\ndiv.banner-container {\r\n  margin: 0 auto;\r\n}\r\n\r\ndiv.banner-container ul {\r\n  margin: 0 auto;\r\n}\r\n\r\ndiv.topad { padding-bottom: 5px; }\r\n\r\ndiv.banner-container ul li {\r\n  display: inline-block;\r\n  vertical-align: middle;\r\n}\r\n\r\ndiv.banner-container li p {\r\n  padding-top: 0;\r\n  margin-top: 0;\r\n}\r\n\r\ndiv.banner-container li.sponsor {\r\n  border-right: 1px solid rgb(125, 154, 180);\r\n  margin-right: 5px;\r\n  padding-right: 10px;\r\n}\r\n\r\ndiv.banner-container .webbutton {\r\n  background-color: #3994b6;\r\n  display: inline-block;\r\n  padding: 10px;\r\n  -webkit-border-radius: 5px;\r\n  -moz-border-radius: 5px;\r\n  border-radius: 5px;\r\n  color: #FFF;\r\n  text-align: center;\r\n  text-decoration: none;\r\n  font-size: 12px;\r\n  font-weight: bold;\r\n}\r\n\r\n</style>\r\n   \r\n<div style=\"color: rgb(125, 154, 180);\">\r\n\r\n<div class=\"banner-container\">\r\n\r\n<ul>\r\n\r\n<li class=\"sponsor\">\r\n<!--CONFERENCE SPONSOR IMAGE-->\r\n<a href=\"http://www.oscon.com/oscon2014\">\r\n<!--<img src=\"http://orm-other.s3.amazonaws.com/fluent_logo.png\" class=\"ad-profile-image\"/>-->\r\n<img src=\"http://orm-other.s3.amazonaws.com/oscon_logo.png\" class=\"ad-profile-image\"/>\r\n<!--<img src=\"http://orm-other.s3.amazonaws.com/strata_logo.png\" class=\"ad-profile-image\"/>\r\n<img src=\"http://orm-other.s3.amazonaws.com/StrataRx_logo.png\" class=\"ad-profile-image\"/>\r\n<img src=\"http://orm-other.s3.amazonaws.com/velocity_logo.png\" class=\"ad-profile-image\"/>-->\r\n</a>\r\n</li>\r\n\r\n<li>\r\n<!--AD TEXT, 2 LINES, REPLACE LINK URL AS WELL-->\r\n<p class=\"banner-text\">Enjoy this complimentary version of <em>Programming JavaScript Applications</em>.<br/> Purchase and download the DRM-free ebook on <a href=\"http://shop.oreilly.com/product/0636920033141.do\">oreilly.com</a>.<span class=\"ebook-advantage\">Learn more about the O’Reilly <a href=\"http://shop.oreilly.com/category/ebooks.do\">Ebook Advantage</a>.</span></p>\r\n</li>\r\n\r\n<li>\r\n<!--BUY BUTTON-->\r\n<a class=\"webbutton\" href=\"http://shop.oreilly.com/product/0636920033141.do\">Buy the Ebook</a>\r\n</li> \r\n\r\n</ul>\r\n\r\n</div>\r\n\r\n<!--CORNER BANNER (IF NEEDED)-->\r\n<!--<a href=\"http://shop.oreilly.com/product/0636920026365.do\" class=\"top-banner\"><img src=\"http://orm-other.s3.amazonaws.com/banner.png\" /></a>-->\r\n\r\n</div>"}});
 
-const express = require('express');
-const bodyParser = require('body-parser');
-const request = require('request-promise');
+		/* Janrain setup */
+  	var janrainModal = new JanrainView();
+  	$("head").append(janrainModal.render().el);
 
-const app = express();
+  	/* segment.io setup */
+  	var analytics=analytics||[];analytics.load=function(e){var t=document.createElement("script");t.type="text/javascript",t.async=!0,t.src=("https:"===document.location.protocol?"https://":"http://")+"d2dq2ahtl5zl1z.cloudfront.net/analytics.js/v1/"+e+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);var r=function(e){return function(){analytics.push([e].concat(Array.prototype.slice.call(arguments,0)))}},i=["identify","track","trackLink","trackForm","trackClick","trackSubmit","pageview","ab","alias","ready"];for(var s=0;s<i.length;s++)analytics[i[s]]=r(i[s])};
+  	
+  	analytics.load("hg9h6b9pae");
 
-app.use(express.static('public'));
-
-app.get(‘/authenticated’, function(req, res, next) {
-  // ...
-});
-
-app.listen(3000, function () {
-  console.log('Application started');
-});
-</code></pre> 
-           <p>Before digging into the details of Facebook authentication, let’s provide an overview of interactions between the application and the Facebook platform.</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e63016487e0010943696"></p> 
-           <p>Let’s start with the authentication.</p> 
-           <h2><a id="user-content-starting-the-authentication-flow" class="deep-link" href="#starting-the-authentication-flow"></a>Starting the authentication flow</h2> 
-           <p>The step consists of using the following URL: <strong><a href="https://www.facebook.com/v2.8/dialog/oauth">https://www.facebook.com/v2.8/dialog/oauth</a></strong>. This will initiate the authentication flow by providing an authentication and authorization screen. There are several options here. The simplest one is to use this address in a link within an HTML page. Parameters need to be specified at this level: the client_id one corresponding to the App ID and the redirect_uri to the URL to call after authentication.</p> 
-           <p>Here is a sample:</p> 
-           <pre><code>&lt;a href= "https://www.facebook.com/v2.8/dialog/oauth?client_id=1667...&amp;redirect_uri=http%3A%2F%2Flocalhost:3000%2Fauth%2Ffacebook%2Fcallback"&gt;Authenticate with Facebook&lt;/a&gt;
-</code></pre> 
-           <p>Note that this URL could be used from JavaScript into a new window created by using the <code>open</code> method of the <code>window</code> object.</p> 
-           <p>If we aren’t authenticated, Facebook will display a form to log in:</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e68f16487e0010943697"></p> 
-           <p>If the application isn’t authorized for our Facebook user, Facebook will display a screen to ask for our agreement:</p> 
-           <p><img src="https://c.hitchhq.net/-/uploads/docs/images/5899e6a116487e0010943698"></p> 
-           <p>If it’s the first time, the user tries to authenticate for this application, Facebook asks to authorize the application to have access to user public profile and friends.</p> 
-           <p>Note that if you already authorized the application and you’re logged into Facebook, no screen will be displayed and the redirect URI be called.</p> 
-           <p>The redirect URI is then called with the following parameter if the authentication and authorization are successful:</p> 
-           <ul> 
-            <li><strong>code</strong> - corresponds to the access code that can be used with the application secret token to get the corresponding access token</li> 
-           </ul> 
-           <p>If the user cancels the process, other parameters are provided to the redirect URI:</p> 
-           <ul> 
-            <li><strong>error_reason</strong> - contains the reason of the problem, in this case, <strong>user_denied</strong>;</li> 
-            <li><strong>error</strong> - corresponds to the global error, here <strong>access_denied</strong>;</li> 
-            <li><strong>error_description</strong> - corresponds to a readable error message, in this case, "The user denied your request".</li> 
-           </ul> 
-           <h2><a id="user-content-getting-the-access-token" class="deep-link" href="#getting-the-access-token"></a>Getting the access token</h2> 
-           <p>The Facebook provides the <strong>/oauth/access_token</strong> endpoint to get the access token based on the previously received code. The following parameters must be provided when executing a request on this endpoint:</p> 
-           <ul> 
-            <li><strong>code</strong> - the previously received code;</li> 
-            <li><strong>client_id</strong> - the application id;</li> 
-            <li><strong>client_secret</strong> - the application secret token;</li> 
-            <li><strong>redirect_uri</strong> - the redirect URI used in the dialog/oauth request. It internally used by Facebook to check the request but no redirect happens.</li> 
-           </ul> 
-           <p>Here is the way to execute this request in the server application based on the <strong>request-promise</strong> library:</p> 
-           <pre><code>const FACEBOOK_APP_ID = '...';
-const FACEBOOK_APP_SECRET = '...';
-
-app.get('/auth/facebook/callback', function(req, res, next) {
-  request({
-    url: 'https://graph.facebook.com/v2.8/oauth/access_token',
-    qs: {
-      code: req.query.code,
-      redirect_uri: 'http://localhost:3000/authenticated',
-      client_id: FACEBOOK_APP_ID,
-      client_secret: FACEBOOK_APP_SECRET
-    },
-    json: true
-  }).then((payload) =&gt; {
-    // …
-  });
-});
-</code></pre> 
-           <p>The response payload will contain the access token value, the token type and when it will expire:</p> 
-           <pre><code>{
-  "access_token": "EAAXsr727ZBw0BAH…",
-  "token_type": "bearer",
-  "expires_in": 5155952
-}
-</code></pre> 
-           <p>Now we get an access token, we can use the Graph API of Facebook. In our case, we need to get hints about the current user.</p> 
-           <h2><a id="user-content-getting-the-current-user-details" class="deep-link" href="#getting-the-current-user-details"></a>Getting the current user details</h2> 
-           <p>To get the current user details, we can leverage the /me endpoint. To authenticate the corresponding request, we use the Authorization header with the Bearer security scheme. The following code describes to implement this request in our application:</p> 
-           <pre><code>app.get('/auth/facebook/callback', function(req, res, next) {
-  request({
-    url: 'https://graph.facebook.com/v2.8/oauth/access_token',
-    qs: {
-      // ...
-    },
-    json: true
-  }).then((payload) =&gt; {
-    request({
-      url: 'https://graph.facebook.com/v2.5/me',
-      headers: {
-        'Authorization': `Bearer ${payload.access_token}`
-      },
-      json: true
-    }).then((me) =&gt; {
-      // ...
-    });
-  });
-});
-</code></pre> 
-           <p>By default, this request only returns the name and the identifier of the user, as described below:</p> 
-           <pre><code>{
-  "name": "Thierry Templier",
-  "id": "10154931..."
-}
-</code></pre> 
-           <p>In this section, we described the interactions between our application and the Facebook platform to authenticate users. Most of the time, these interactions are hidden within security libraries. That’s the case in Node with the passport library and its integration with Facebook.</p> 
-           <h1><a id="user-content-using-in-a-node-application-with-express-and-passport" class="deep-link" href="#using-in-a-node-application-with-express-and-passport"></a>Using in a Node application with Express and Passport</h1> 
-           <p>As detailed on its website, Passport is an "authentication middleware for Node.js. Extremely flexible and modular, Passport can be unobtrusively dropped into any Express-based web application. It provides a comprehensive set of strategies support authentication using a username and password, Facebook, Twitter, and more."</p> 
-           <p>In addition, it also provides features like session management. The Facebook integration is provided by the passport facebook module.</p> 
-           <p>To install them, just use the command: <strong>npm install passport passport-facebook</strong>.</p> 
-           <h2><a id="user-content-configuring-passport-for-facebook" class="deep-link" href="#configuring-passport-for-facebook"></a>Configuring Passport for Facebook</h2> 
-           <p>To configure the Facebook support for Passport, just configure the corresponding strategy as a middleware in the Express application. This allows us to configure the client ID and client secret tokens with the previous redirect URI called here callback URL.</p> 
-           <p>The following snippet describes how to achieve this:</p> 
-           <pre><code>const passport = require('passport');
-const FacebookStrategy = require('passport-facebook').Strategy;
-
-passport.use(new FacebookStrategy({
-    clientID: FACEBOOK_APP_ID,
-    clientSecret: FACEBOOK_APP_SECRET,
-    callbackURL: 'http://localhost:3000/auth/facebook/callback'
-  },
-  function(accessToken, refreshToken, profile, cb) {
-    // Handle the user (create or update)
-    // Then call the callback
-    return cb(err, user);
-  }
-));
-</code></pre> 
-           <h2><a id="user-content-implementing-routes" class="deep-link" href="#implementing-routes"></a>Implementing routes</h2> 
-           <p>Some routes need to be implemented in the application. The first one is to trigger authentication instead of directly using the dialog/oauth one, as previously. The second one is the route for the redirect URI that needs to be refactored to use Passport.</p> 
-           <p>The following snippet describes the implementation of these routes:</p> 
-           <pre><code>const app = express();
-
-// ...
-
-app.get('/auth/facebook',
-  passport.authenticate('facebook'));
-
-app.get('/auth/facebook/callback',
-  passport.authenticate('facebook', { failureRedirect: '/public/login.html' }),
-  function(req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('/');
-  });
-</code></pre> 
-          </div>
-         </div>
-        </div>
-       </div>
-      </div>
-     </div>
-     <!-- react-empty: 216 -->
-    </div>
-    <footer class="mainfooter" data-reactid="217">
-     <div class="container" data-reactid="218">
-      <div class="row" data-reactid="219">
-       <div class="col-sm-3" data-reactid="220">
-        <a href="https://www.hitchhq.com/about/what-is-hitch" class="mainfooter__title" data-reactid="221">What is hitch?</a>
-        <ul class="mainfooter__mkt-list" data-reactid="222">
-         <li data-reactid="223"><a href="https://www.hitchhq.com/about" target="_blank" class="" data-reactid="224">Our story</a></li>
-         <li data-reactid="225"><a href="https://www.hitchhq.com/jobs" target="_blank" class="" data-reactid="226">Jobs</a></li>
-        </ul>
-       </div>
-       <div class="col-sm-3" data-reactid="227">
-        <a href="https://www.hitchhq.com/about/for-developers" class="mainfooter__title" data-reactid="228">For developers</a>
-        <ul class="mainfooter__mkt-list" data-reactid="229">
-         <li data-reactid="230"><a href="https://www.hitchhq.com/about/manage-your-API-team" class="" data-reactid="231">Manage your API team</a></li>
-        </ul>
-       </div>
-       <div class="col-sm-3" data-reactid="232">
-        <a href="https://www.hitchhq.com/about/hitch-support" class="mainfooter__title" data-reactid="233">API Support</a>
-        <ul class="mainfooter__mkt-list" data-reactid="234">
-         <li data-reactid="235"><a href="https://www.hitchhq.com/about/keep-developers-informed" class="" data-reactid="236">Automated API Changelog</a></li>
-         <li data-reactid="237"><a href="https://www.hitchhq.com/about/hitch-api-assistant" class="" data-reactid="238">API Assistant bot</a></li>
-         <li data-reactid="239"><a href="https://www.hitchhq.com/about/free-developer-portal" class="" data-reactid="240">Get a free developer portal</a></li>
-         <li data-reactid="241"><a href="https://www.hitchhq.com/about/creating-your-swagger-openapi-raml-documentation" class="" data-reactid="242">Creating your swagger/RAML docs</a></li>
-         <li data-reactid="243"><a href="https://www.hitchhq.com/pricing" class="" data-reactid="244">API Support Pricing</a></li>
-        </ul>
-       </div>
-       <div class="col-sm-3" data-reactid="245">
-        <ul class="list-inline mainfooter__social-links pull-right-md" data-reactid="246">
-         <li data-reactid="247"><a href="https://twitter.com/hitchhq" target="_blank" class="social" data-reactid="248"><img src="https://c.hitchhq.net/-/images/icons/icon-social-twitter.svg" alt="Twitter" data-reactid="249"></a></li>
-         <li data-reactid="250"><a href="https://github.com/hitchhq" target="_blank" class="social" data-reactid="251"><img src="https://c.hitchhq.net/-/images/icons/icon-social-github.svg" alt="GitHub" data-reactid="252"></a></li>
-         <li data-reactid="253"><a href="https://www.linkedin.com/company/hitch-hq" target="_blank" class="social" data-reactid="254"><img src="https://c.hitchhq.net/-/images/icons/icon-social-linkedin.svg" alt="Linkedin" data-reactid="255"></a></li>
-         <li data-reactid="256"><a href="https://www.facebook.com/hitchhq/" target="_blank" class="social" data-reactid="257"><img src="https://c.hitchhq.net/-/images/icons/icon-social-facebook-black.svg" alt="Facebook" data-reactid="258"></a></li>
-        </ul>
-       </div>
-      </div>
-      <div class="mainfooter__subfooter row" data-reactid="259">
-       <div class="col-sm-3" data-reactid="260">
-        <a href="https://www.hitchhq.com/about/hitch-enterprise" class="mainfooter__title" data-reactid="261">Hitch for Enterprise</a>
-       </div>
-       <div class="col-sm-3" data-reactid="262">
-        <span data-reactid="263">Learning</span>
-        <ul class="mainfooter__mkt-list" data-reactid="264">
-         <li data-reactid="265"><a href="https://blog.hitchhq.com" target="_blank" data-reactid="266">Blog</a></li>
-         <li data-reactid="267"><a href="https://www.hitchhq.com/help" target="_blank" class="" data-reactid="268">Help</a></li>
-         <li data-reactid="269"><a href="http://feedback.hitchhq.com" title="Ideas forum" target="_blank" data-reactid="270">Ideas forum</a></li>
-        </ul>
-       </div>
-      </div>
-      <div class="mainfooter__terms row" data-reactid="271">
-       <div class="col-sm-12" data-reactid="272">
-        <ul data-reactid="273">
-         <li data-reactid="274">© 2016 API Changelog Ltd.</li>
-         <li data-reactid="275"><a href="https://www.hitchhq.com/help/cookie-policy" target="_blank" class="company" data-reactid="276">Cookie Policy</a></li>
-         <li data-reactid="277"><a href="https://www.hitchhq.com/help/privacy-policy" target="_blank" class="company" data-reactid="278">Privacy Policy</a></li>
-         <li data-reactid="279"><a href="https://www.hitchhq.com/help/developer-terms-of-service" target="_blank" class="company" data-reactid="280">Developer Terms of Service</a></li>
-         <li data-reactid="281"><a href="https://www.hitchhq.com/help/provider-terms-of-service" target="_blank" class="company" data-reactid="282">Provider Terms of Service</a></li>
-        </ul>
-       </div>
-      </div>
-     </div>
-    </footer>
+  	$(function() {
+			app.bookapp = new BookApp();
+		});
+	
+	</script> 
+ </head> 
+ <body> 
+  <div id="menu"> 
+   <ul id="menu-left"> 
+    <li id="home-link"><a href="/"><i class="icon-house"></i></a></li> 
+    <li><a href="/books/1234000000262">Programming JavaScript Applications</a></li> 
+    <div class="clear"></div> 
+   </ul> 
+   <ul id="menu-right"> 
+    <li id="comments-link"><a>&nbsp;</a></li> 
+    <li> <a href="#" class="dropdown-toggle" data-toggle="dropdown">Chapters</a> 
+     <div id="toc-popup" class="dropdown-menu"></div> </li> 
+    <li><a href="#" class="capture_modal_open" id="capture_signin_link">Log In / Sign Up</a></li> 
+    <li id="search-li"> 
+     <form accept-charset="UTF-8" action="/searches" id="search-form" method="get">
+      <div style="margin:0;padding:0;display:inline">
+       <input name="utf8" type="hidden" value="?">
+      </div> 
+      <input name="search[q]" type="text" placeholder="Search book..." id="book-search"> 
+      <input id="search_bookId" name="search[bookId]" type="hidden" value="1234000000262"> 
+      <div style="display:none">
+        sorted by: 
+       <select name="search[sort]"> <option value="relevance">Relevance</option> <option value="authors">Author(s)</option> <option value="title">Title</option> </select> returning 
+       <select name="search[limit]"> <option value="5">5</option> <option value="10">10</option> <option value="20">20</option> <option selected value="50">50</option> <option value="100">100</option> </select> values at a time. 
+      </div> 
+     </form> </li> 
+    <div class="clear"></div> 
+   </ul> 
+   <div class="clear"></div> 
+  </div> 
+  <header>
+   <div class="navheader"> 
+    <table style="width: 100%; "> 
+     <tbody>
+      <tr>
+       <td style="text-align: center; " colspan="3">Chapter&nbsp;6.&nbsp;Access Control</td>
+      </tr> 
+      <tr> 
+       <td style="width: 20%; text-align: left; "> <a accesskey="p" href="ch05.html">Prev</a>&nbsp;</td> 
+       <td style="width: 60%; text-align: center; ">&nbsp;</td> 
+       <td style="width: 20%; text-align: right; ">&nbsp;<a accesskey="n" href="ch07.html">Next</a> </td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <hr> 
    </div>
-  </div>
-  <script src="https://c.hitchhq.net/-/vendor-88e5bc5a7e.js"></script>
-  <script src="https://c.hitchhq.net/-/bundle-441fcab2d8.js"></script>
+  </header>
+  <section class="chapter" data-original-filename="ch06.xml" id="chjxvugoz00005b7r8cm9jo8a">
+   <div class="titlepage">
+    <div>
+     <div>
+      <h1 class="title">Chapter&nbsp;6.&nbsp;Access Control</h1>
+     </div>
+    </div>
+   </div> 
+   <p id="access_control_">Access control models <a id="id453230" class="indexterm"></a>are responsible for granting or restricting access to resources. They depend on two things: user identification (verified by one or more authentication schemes) and feature authorization.</p> 
+   <p id="before_you_gran">Before you grant access to a resource, you need to know that the user is who she claims to be (authentication) and whether or not the user should have access to a given resource (authorization).</p> 
+   <div class="sect1" data-original-filename="ch06.xml" id="authentication"> 
+    <div class="titlepage">
+     <div>
+      <div>
+       <h2 class="title">Authentication</h2>
+      </div>
+     </div>
+    </div> 
+    <p id="authentication_">Authentication is the <a id="ac6.1" class="indexterm"></a><a id="se6.1" class="indexterm"></a><a id="id453291" class="indexterm"></a>mechanism that confirms the identity of users trying to access a system. In order for users to be granted access to a resource, they must first prove that they are who they claim to be. Generally this is handled by passing a key with each request (often called an access token). The server verifies that the access token is genuine, and that the user does indeed have the required privileges to access the requested resource. Only then is the request granted.</p> 
+    <p id="there_are_many__id6">There are many ways to grant a user an access token. The most common is a password challenge.</p> 
+    <div class="sect2" id="passwords"> 
+     <div class="titlepage">
+      <div>
+       <div>
+        <h3 class="title">Passwords</h3>
+       </div>
+      </div>
+     </div> 
+     <p id="passwords_authe">Passwords <a id="au6.1.1" class="indexterm"></a><a id="id453340" class="indexterm"></a>should be stored with a one-way encryption hash, so that even if a malicious intruder obtains access to the user database, he still won't have access to user passwords. The hash should be long enough to prevent an attack from a single machine and to prevent an attack from a large cluster of machines. I recommend 512 bits (64 bytes).</p> 
+     <p id="worms_targeting">Worms targeting vulnerable versions of popular website platforms such as WordPress and Drupal have become common. Once such worm takes control of a website and installs its payload, recruits all of the site's traffic into a JavaScript botnet, and, among other things, uses visitor CPU power to crack stolen password databases that fail to implement the security precautions outlined here.</p> 
+     <p id="there_are_botne">There are botnets that <a id="id453367" class="indexterm"></a>exist today with <a class="ulink" href="http://onforb.es/1pFKBSH" target="_top">over 90,000 nodes</a>. Such botnets could crack MD5 password hashes at a rate of nine billion per second.</p> 
+     <p id="passwords_are_v">Passwords are vulnerable <a id="id453388" class="indexterm"></a>to the following common attacks:</p> 
+     <div class="itemizedlist" id="rainbow_tablesb">
+      <ul class="itemizedlist"> 
+       <li class="listitem"><p id="rainbow_tables">Rainbow tables</p></li> 
+       <li class="listitem"><p id="brute_force">Brute force</p></li> 
+       <li class="listitem"><p id="variable_time_e">Variable time equality</p></li> 
+       <li class="listitem"><p id="passwords_stole">Passwords stolen from third parties</p></li> 
+      </ul>
+     </div> 
+     <div class="sect3" id="rainbow-tables"> 
+      <div class="titlepage">
+       <div>
+        <div>
+         <h4 class="title">Rainbow tables</h4>
+        </div>
+       </div>
+      </div> 
+      <p id="rainbow_tables__id1">Rainbow tables are <a id="pa6.1.1.1" class="indexterm"></a><a id="ra6.1.1.1" class="indexterm"></a>precomputed tables used to look up passwords using stolen hashes. Once bad guys get their hands on user passwords, they'll attempt to attack popular services such as email and bank accounts—which spells very bad PR for your service.</p> 
+      <p id="there_are_rainb">There are <a class="ulink" href="http://bit.ly/1pFKFBT" target="_top">rainbow tables that exist today</a> that can discover almost every possible password up to 14 characters. To prevent password theft by rainbow table, users should choose <a class="ulink" href="http://en.wikipedia.org/wiki/Rainbow_table" target="_top">passwords of at least 14 characters</a>. Sadly, such passwords are definitely not convenient, particularly on mobile devices. In other words, don't trust users to select appropriate passwords.</p> 
+      <p id="rainbow_tables__id2">Rainbow tables can significantly reduce the time it takes to find a password, at the cost of memory, but with terabyte hard drives and gigabytes of RAM, it's a trade-off that is easily made. That said, it is possible to protect your service against rainbow table attacks.</p> 
+      <div class="sect4" id="password-salts"> 
+       <div class="titlepage">
+        <div>
+         <div>
+          <h5 class="title">Password salts</h5>
+         </div>
+        </div>
+       </div> 
+       <p id="one_defense_you">One defense you <a id="id453519" class="indexterm"></a><a id="id453527" class="indexterm"></a><a id="id453533" class="indexterm"></a>can employ against rainbow tables is password salting. A salt is a sequence of random characters that gets paired with a password during the hashing process. Salts should be cryptographically secure random values of a length equal to the hash size. Salts are not secrets and can be safely stored in plain text alongside the user's other credentials.</p> 
+       <p id="salting_can_pro">Salting can protect passwords in a couple of ways:</p> 
+       <p id="first_a_unique">First, a uniquely generated salt can protect your password databases against existing rainbow tables. Using a random salt makes your site immune from these attacks. However, if you use the same salt for every password, a new rainbow table can be generated to attack the password database.</p> 
+       <p id="second_if_two_">Second, if two different users utilize the same password, the compromised password will grant access to both user accounts. To prevent that, you must use a unique salt for each password. Doing so makes a rainbow table attack impractical.</p> 
+       <p id="nodejs_supplie">Node.js supplies a <a id="id453572" class="indexterm"></a><a id="id453580" class="indexterm"></a>suitable random <a id="id453587" class="indexterm"></a>generator called <code class="literal">crypto.randomBytes()</code>. It returns a buffer. Wrap it to get a suitable salt string:</p> 
+       <pre class="programlisting" data-language="javascript" id="_createsal">    <code class="cm">/**</code>
+<code class="cm">     * createSalt(keylength, callback) callback(err, salt)</code>
+<code class="cm">     *</code>
+<code class="cm">     * Generates a cryptographically secure random string for</code>
+<code class="cm">     * use as a password salt using Node's built-in</code>
+<code class="cm">     * crypto.randomBytes().</code>
+<code class="cm">     *</code>
+<code class="cm">     * @param  {Number} keyLength</code>
+<code class="cm">     * @param  {Function} callback </code>
+<code class="cm">     * @return {undefined}</code>
+<code class="cm">     */</code>
+    <code class="kd">var</code> <code class="nx">createSalt</code> <code class="o">=</code> <code class="kd">function</code> <code class="nx">createSalt</code><code class="p">(</code><code class="nx">keyLength</code><code class="p">,</code> <code class="nx">callback</code><code class="p">)</code> <code class="p">{</code>
+      <code class="nx">crypto</code><code class="p">.</code><code class="nx">randomBytes</code><code class="p">(</code><code class="nx">keyLength</code><code class="p">,</code> <code class="kd">function</code> <code class="p">(</code><code class="nx">err</code><code class="p">,</code> <code class="nx">buff</code><code class="p">)</code> <code class="p">{</code>
+        <code class="k">if</code> <code class="p">(</code><code class="nx">err</code><code class="p">)</code> <code class="p">{</code>
+          <code class="k">return</code> <code class="nx">callback</code><code class="p">(</code><code class="nx">err</code><code class="p">);</code>
+        <code class="p">}</code>
+        <code class="nx">callback</code><code class="p">(</code><code class="kc">null</code><code class="p">,</code> <code class="nx">buff</code><code class="p">.</code><code class="nx">toString</code><code class="p">(</code><code class="s1">'base64'</code><code class="p">));</code>
+      <code class="p">});</code>
+    <code class="p">};</code></pre> 
+       <p id="the_operation_i">The operation is asynchronous because the cryptographically secure random-number generator takes time to collect enough entropy to complete the operation.</p> 
+      </div> 
+     </div> 
+     <div class="sect3" id="brute-force"> 
+      <div class="titlepage">
+       <div>
+        <div>
+         <h4 class="title">Brute force</h4>
+        </div>
+       </div>
+      </div> 
+      <p id="rainbow_tables__id3">Rainbow tables <a id="pa6.1.1.2" class="indexterm"></a><a id="br6.1.1.2" class="indexterm"></a>get all the blogger attention, but Moore's law is alive and well, and brute force has become a very real threat. Attackers are employing GPUs, super-computing clusters that cost less than $2,000, and JavaScript <a id="id453945" class="indexterm"></a>botnets comprised of tens of thousands of browsers visiting infected websites.</p> 
+      <p id="a_bruteforce_a">A brute-force attack will attempt to crack a password by seeking a match using every possible character combination. A simple single-iteration hash can be tested at the rate of millions of hashes per second on modern systems.</p> 
+      <p id="one_way_to_thwa">One way to thwart brute-force attacks is to programatically lock a user's account after a handful of failed login attempts. However, that strategy won't protect passwords if an attacker gains access to the password database.</p> 
+      <p id="key_stretching_">Key stretching <a id="id453975" class="indexterm"></a>can make brute-force attacks impractical by increasing the time it takes to hash the password. This can be done by applying the hash function in a loop. The delay will be relatively unnoticed by a user trying to sign in, but will significantly hamper an attacker attempting to discover a password through brute force.</p> 
+      <p id="dont_pick_any_">Don't pick any random hash function and apply it in a loop. You could unwittingly open up attack vectors. Instead, use an established standard for iterative hashing, such as bcrypt or PBKDF2.</p> 
+      <p id="i_discovered_">I discovered 100 hashes in less than 1 ms using a simple MD5 algorithm, and then tried the same thing with Node's <a id="id454000" class="indexterm"></a>built-in <code class="literal">crypto.pbkdf2()</code> function (HMAC-SHA1) set to 80,000 iterations. PBKDF2 took 15.48 seconds. To a user performing a single login attempt per response, the slowdown is barely noticed, but it slows brute force to a crawl.</p> 
+      <p id="usage_is_decept">Usage is deceptively simple:</p> 
+      <pre class="programlisting" data-language="javascript" id="cryptopbkdfp">    <code class="nx">crypto</code><code class="p">.</code><code class="nx">pbkdf2</code><code class="p">(</code><code class="nx">password</code><code class="p">,</code> <code class="nx">salt</code><code class="p">,</code>
+      <code class="nx">iterations</code><code class="p">,</code> <code class="nx">keyLength</code><code class="p">,</code> <code class="kd">function</code> <code class="p">(</code><code class="nx">err</code><code class="p">,</code> <code class="nx">hash</code><code class="p">)</code> <code class="p">{</code>
+        <code class="k">if</code> <code class="p">(</code><code class="nx">err</code><code class="p">)</code> <code class="p">{</code>
+          <code class="k">return</code> <code class="nx">callback</code><code class="p">(</code><code class="nx">err</code><code class="p">);</code>
+        <code class="p">}</code>
+        <code class="nx">callback</code><code class="p">(</code><code class="kc">null</code><code class="p">,</code> <code class="k">new</code> <code class="nx">Buffer</code><code class="p">(</code><code class="nx">hash</code><code class="p">).</code><code class="nx">toString</code><code class="p">(</code><code class="s1">'base64'</code><code class="p">));</code>
+      <code class="p">});</code></pre> 
+      <p id="however_there_">However, there are important considerations that shouldn't be overlooked, such as generating the appropriate unique, crytographically secure random salt of the right length, and calculating the number of iterations in order to balance user experience and <a id="id454247" class="indexterm"></a><a id="id454257" class="indexterm"></a>security.</p> 
+     </div> 
+     <div class="sect3" id="variable-time-equality"> 
+      <div class="titlepage">
+       <div>
+        <div>
+         <h4 class="title">Variable time equality</h4>
+        </div>
+       </div>
+      </div> 
+      <p id="if_it_takes_you">If it takes your <a id="id454282" class="indexterm"></a>service longer to say no to a slightly wrong password than a mostly wrong password, attackers can use that data to guess the password, similar to how you guess a word-playing hangman. You might think that random time delays and network timing jitter would sufficiently mask those timing differences, but it turns out an attacker just needs to take more timing samples to filter out the noise and obtain statistically relevant <a id="id454296" class="indexterm"></a>timing data:</p> 
+      <p id="from_crosby_et_">From Crosby et al. <a class="ulink" href="http://www.cs.rice.edu/~dwallach/pub/crosby-timing2009.pdf" target="_top">"Opportunities And Limits Of Remote Timing Attacks"</a>:</p> 
+      <div class="blockquote">
+       <blockquote class="blockquote">
+        <p id="we_have_shown_t">We have shown that, even though the Internet induces significant timing jitter, we can reliably distinguish remote timing differences as low as 20 µs. A LAN environment has lower timing jitter, allowing us to reliably distinguish remote timing differences as small as 100 ns (possibly even smaller). These precise timing differences can be distinguished with only hundreds or possibly thousands of measurements.</p>
+       </blockquote>
+      </div> 
+      <p id="the_best_way_to_id2">The best way to beat these attacks is to use a <a id="id454337" class="indexterm"></a>constant time hash equality check, rather than an optimized check. That is easily achieved by iterating through the full hash before returning the answer, regardless of how soon the answer is known.</p> 
+      <p id="for_more_inform_id2">For more information, see <a class="ulink" href="http://codahale.com/a-lesson-in-timing-attacks/" target="_top">Coda Hale's "A Lesson in Timing Attacks"</a>.</p> 
+      <p id="here_is_an_exam">Here is an example of a constant time string equality algorithm in JavaScript:</p> 
+      <pre class="programlisting" data-language="javascript" id="_constante">    <code class="cm">/**</code>
+<code class="cm">     * constantEquals(x, y)</code>
+<code class="cm">     *</code>
+<code class="cm">     * Compare two strings, x and y with a constant time</code>
+<code class="cm">     * algorithm to prevent attacks based on timing statistics.</code>
+<code class="cm">     */</code>
+    <code class="nx">constantEquals</code> <code class="o">=</code> <code class="kd">function</code> <code class="nx">constantEquals</code><code class="p">(</code><code class="nx">x</code><code class="p">,</code> <code class="nx">y</code><code class="p">)</code> <code class="p">{</code>
+      <code class="kd">var</code> <code class="nx">result</code> <code class="o">=</code> <code class="kc">true</code><code class="p">,</code>
+        <code class="nx">length</code> <code class="o">=</code> <code class="p">(</code><code class="nx">x</code><code class="p">.</code><code class="nx">length</code> <code class="o">&gt;</code> <code class="nx">y</code><code class="p">.</code><code class="nx">length</code><code class="p">)</code> <code class="o">?</code> <code class="nx">x</code><code class="p">.</code><code class="nx">length</code> <code class="o">:</code> <code class="nx">y</code><code class="p">.</code><code class="nx">length</code><code class="p">,</code>
+        <code class="nx">i</code><code class="p">;</code>
+
+      <code class="k">for</code> <code class="p">(</code><code class="nx">i</code><code class="o">=</code><code class="mi">0</code><code class="p">;</code> <code class="nx">i</code><code class="o">&lt;</code><code class="nx">length</code><code class="p">;</code> <code class="nx">i</code><code class="o">++</code><code class="p">)</code> <code class="p">{</code>
+        <code class="k">if</code> <code class="p">(</code><code class="nx">x</code><code class="p">.</code><code class="nx">charCodeAt</code><code class="p">(</code><code class="nx">i</code><code class="p">)</code> <code class="o">!==</code> <code class="nx">y</code><code class="p">.</code><code class="nx">charCodeAt</code><code class="p">(</code><code class="nx">i</code><code class="p">))</code> <code class="p">{</code>
+          <code class="nx">result</code> <code class="o">=</code> <code class="kc">false</code><code class="p">;</code>
+        <code class="p">}</code>
+      <code class="p">}</code>
+      <code class="k">return</code> <code class="nx">result</code><code class="p">;</code>
+    <code class="p">};</code></pre> 
+     </div> 
+     <div class="sect3" id="stolen-passwords"> 
+      <div class="titlepage">
+       <div>
+        <div>
+         <h4 class="title">Stolen passwords</h4>
+        </div>
+       </div>
+      </div> 
+      <p id="by_far_the_pass">By far the <a id="id454784" class="indexterm"></a><a id="id454793" class="indexterm"></a>biggest threat to password security is the fact that these tactics have already worked against other websites, and users have a tendency to reuse passwords across different sites. Since you don't have access to the user's other accounts for verification, there's little you can do to enforce unique passwords on your website.</p> 
+      <p id="as_you_have_see">As you have seen, passwords alone are an ineffective authentication system, but they can still be useful in combination with other authentication <a id="id454810" class="indexterm"></a>factors.</p> 
+     </div> 
+    </div> 
+    <div class="sect2" id="credential"> 
+     <div class="titlepage">
+      <div>
+       <div>
+        <h3 class="title">Credential</h3>
+       </div>
+      </div>
+     </div> 
+     <p id="i_searched_for_">I searched for a suitable <a id="au6.1.2" class="indexterm"></a><a id="cr6.1.2" class="indexterm"></a>open source password authentication module in npm, but I couldn't find one that met all of the criteria you should consider when you're implementing password authentication in your applications. This is a critical component of your system security, so it's important to get it right. I created a library to make it easy.</p> 
+     <p id="credential_was__id1"></p> 
+     <div class="warning" id="credential_was__id2">
+      <p id="credential_was__id3">Credential was reviewed by a small army of security and JavaScript experts before publishing. Unless you're a security expert with access to a whole lot of other security experts, it's generally a really bad idea to roll your own security library. It's a much better idea to use something that's already well established and well tested.</p>
+     </div> 
+     <p id="install_credent">Install credential:</p> 
+     <pre class="programlisting" id="npm_install__id2">    $ npm install --save credential</pre> 
+     <p id="hash"><code class="literal">.hash()</code>:</p> 
+     <pre class="programlisting" data-language="javascript" id="var_pw__requir_id1">    <code class="kd">var</code> <code class="nx">pw</code> <code class="o">=</code> <code class="nx">require</code><code class="p">(</code><code class="s1">'credential'</code><code class="p">),</code>
+      <code class="nx">newPassword</code> <code class="o">=</code> <code class="s1">'I have a really great password.'</code><code class="p">;</code>
+
+    <code class="nx">pw</code><code class="p">.</code><code class="nx">hash</code><code class="p">(</code><code class="nx">newPassword</code><code class="p">,</code> <code class="kd">function</code> <code class="p">(</code><code class="nx">err</code><code class="p">,</code> <code class="nx">hash</code><code class="p">)</code> <code class="p">{</code>
+      <code class="k">if</code> <code class="p">(</code><code class="nx">err</code><code class="p">)</code> <code class="p">{</code> <code class="k">throw</code> <code class="nx">err</code><code class="p">;</code> <code class="p">}</code>
+      <code class="nx">console</code><code class="p">.</code><code class="nx">log</code><code class="p">(</code><code class="s1">'Store the password hash.'</code><code class="p">,</code> <code class="nx">hash</code><code class="p">);</code>
+    <code class="p">});</code></pre> 
+     <p id="verify"><code class="literal">.verify()</code>:</p> 
+     <pre class="programlisting" data-language="javascript" id="var_pw__requir_id2">    <code class="kd">var</code> <code class="nx">pw</code> <code class="o">=</code> <code class="nx">require</code><code class="p">(</code><code class="s1">'credential'</code><code class="p">),</code>
+      <code class="nx">storedHash</code> <code class="o">=</code> <code class="s1">'{"hash":...'</code><code class="p">,</code> <code class="c1">// truncated to fit on page</code>
+      <code class="nx">userInput</code> <code class="o">=</code> <code class="s1">'I have a really great password.'</code><code class="p">;</code>
+
+    <code class="nx">pw</code><code class="p">.</code><code class="nx">verify</code><code class="p">(</code><code class="nx">storedHash</code><code class="p">,</code> <code class="nx">userInput</code><code class="p">,</code> <code class="kd">function</code> <code class="p">(</code><code class="nx">err</code><code class="p">,</code> <code class="nx">isValid</code><code class="p">)</code> <code class="p">{</code>
+      <code class="kd">var</code> <code class="nx">msg</code><code class="p">;</code>
+      <code class="k">if</code> <code class="p">(</code><code class="nx">err</code><code class="p">)</code> <code class="p">{</code> <code class="k">throw</code> <code class="nx">err</code><code class="p">;</code> <code class="p">}</code>
+      <code class="nx">msg</code> <code class="o">=</code> <code class="nx">isValid</code> <code class="o">?</code> <code class="s1">'Passwords match!'</code> <code class="o">:</code> <code class="s1">'Wrong password.'</code><code class="p">;</code>
+      <code class="nx">console</code><code class="p">.</code><code class="nx">log</code><code class="p">(</code><code class="nx">msg</code><code class="p">);</code>
+    <code class="p">});</code></pre> 
+     <p id="you_can_wrap_th">You can wrap this to supply a simple <code class="literal">verify()</code> function that takes a username and password, and then calls a callback:</p> 
+     <pre class="programlisting" data-language="javascript" id="var_users__req">    <code class="kd">var</code> <code class="nx">users</code> <code class="o">=</code> <code class="nx">require</code><code class="p">(</code><code class="s1">'./users.js'</code><code class="p">);</code>
+
+    <code class="kd">var</code> <code class="nx">verify</code> <code class="o">=</code> <code class="kd">function</code> <code class="nx">verify</code><code class="p">(</code><code class="nx">username</code><code class="p">,</code> <code class="nx">password</code><code class="p">,</code> <code class="nx">verified</code><code class="p">)</code> <code class="p">{</code>
+      <code class="kd">var</code> <code class="nx">user</code> <code class="o">=</code> <code class="nx">users</code><code class="p">.</code><code class="nx">findOne</code><code class="p">(</code><code class="nx">username</code><code class="p">);</code>
+      <code class="k">if</code> <code class="p">(</code><code class="o">!</code><code class="nx">user</code><code class="p">)</code> <code class="p">{</code>
+        <code class="c1">// No unexpected error, no user, reason for failure</code>
+        <code class="k">return</code> <code class="nx">verified</code><code class="p">(</code><code class="kc">null</code><code class="p">,</code> <code class="kc">false</code><code class="p">,</code> <code class="p">{</code>
+          <code class="nx">message</code><code class="o">:</code> <code class="s1">'User not found'</code>
+        <code class="p">});</code>
+      <code class="p">}</code>
+
+      <code class="nx">pw</code><code class="p">.</code><code class="nx">verify</code><code class="p">(</code><code class="nx">user</code><code class="p">.</code><code class="nx">hash</code><code class="p">,</code> <code class="nx">password</code><code class="p">,</code> <code class="kd">function</code> <code class="p">(</code><code class="nx">isValid</code><code class="p">)</code> <code class="p">{</code>
+        <code class="k">if</code> <code class="p">(</code><code class="o">!</code><code class="nx">isValid</code><code class="p">)</code> <code class="p">{</code>
+          <code class="c1">// No unexpected error, no user, reason for failure</code>
+          <code class="k">return</code> <code class="nx">verified</code><code class="p">(</code><code class="kc">null</code><code class="p">,</code> <code class="kc">false</code><code class="p">,</code> <code class="p">{</code>
+            <code class="nx">message</code><code class="o">:</code> <code class="s1">'Incorrect password.'</code>
+          <code class="p">});</code>
+        <code class="p">}</code>
+        <code class="k">return</code> <code class="nx">verified</code><code class="p">(</code><code class="kc">null</code><code class="p">,</code> <code class="nx">user</code><code class="p">);</code>
+      <code class="p">});</code>
+    <code class="p">};</code></pre> 
+     <p id="you_can_then_pl">You can then plug that into something <a id="id455896" class="indexterm"></a><a id="id455906" class="indexterm"></a>like <code class="literal">passport-local</code>:</p> 
+     <pre class="programlisting" data-language="javascript" id="var_express__r_id3">    <code class="kd">var</code> <code class="nx">express</code> <code class="o">=</code> <code class="nx">require</code><code class="p">(</code><code class="s1">'express'</code><code class="p">),</code>
+      <code class="nx">passport</code> <code class="o">=</code> <code class="nx">require</code><code class="p">(</code><code class="s1">'passport'</code><code class="p">),</code>
+      <code class="nx">LocalStrategy</code> <code class="o">=</code> <code class="nx">require</code><code class="p">(</code><code class="s1">'passport-local'</code><code class="p">),</code>
+      <code class="nx">verify</code> <code class="o">=</code> <code class="nx">require</code><code class="p">(</code><code class="s1">'./lib/password-auth.js'</code><code class="p">),</code>
+      <code class="nx">app</code> <code class="o">=</code> <code class="nx">express</code><code class="p">();</code>
+
+    <code class="nx">passport</code><code class="p">.</code><code class="nx">use</code><code class="p">(</code> <code class="k">new</code> <code class="nx">LocalStrategy</code><code class="p">(</code><code class="nx">verify</code><code class="p">)</code> <code class="p">);</code>
+
+    <code class="nx">app</code><code class="p">.</code><code class="nx">post</code><code class="p">(</code><code class="s1">'/login'</code><code class="p">,</code> 
+      <code class="nx">passport</code><code class="p">.</code><code class="nx">authenticate</code><code class="p">(</code><code class="s1">'local'</code><code class="p">,</code> <code class="p">{</code> <code class="nx">failureRedirect</code><code class="o">:</code> <code class="s1">'/login'</code> <code class="p">}),</code>
+      <code class="kd">function</code><code class="p">(</code><code class="nx">req</code><code class="p">,</code> <code class="nx">res</code><code class="p">)</code> <code class="p">{</code>
+        <code class="nx">res</code><code class="p">.</code><code class="nx">redirect</code><code class="p">(</code><code class="s1">'/'</code><code class="p">);</code>
+      <code class="p">});</code>
+
+    <code class="nx">app</code><code class="p">.</code><code class="nx">listen</code><code class="p">(</code><code class="mi">3000</code><code class="p">);</code></pre> 
+    </div> 
+    <div class="sect2" id="multi-factor-authentication"> 
+     <div class="titlepage">
+      <div>
+       <div>
+        <h3 class="title">Multifactor Authentication</h3>
+       </div>
+      </div>
+     </div> 
+     <p id="because_of_the__id1">Because of the threat <a id="au6.1.3" class="indexterm"></a><a id="id456316" class="indexterm"></a>of stolen passwords, any policy that relies solely on password protection is unsafe. In order to protect your system from intruders, another line of defense is necessary.</p> 
+     <p id="multifactor_aut_id1">Multifactor authentication is an authentication strategy that requires the user to present authentication proof from two or more authentication factors: the knowledge factor (something the user knows, like a password); the possession factor (something the user has, like a mobile phone); and the inherence factor (something the user is, like a <span class="keep-together">fingerprint</span>).</p> 
+     <div class="sect3" id="knowledge-factor"> 
+      <div class="titlepage">
+       <div>
+        <div>
+         <h4 class="title">Knowledge factor</h4>
+        </div>
+       </div>
+      </div> 
+      <p id="a_common_second">A common secondary <a id="id456355" class="indexterm"></a><a id="id456363" class="indexterm"></a>security mechanism that was widely implemented in the financial industry just a few years ago are "security questions." Pairing a password with security questions does not qualify as multifactor authentication, though, because you need the user to pass challenges from two or more authentication factors. Using multiple knowledge factor challenges does not prevent a determined snoop from breaking in.</p> 
+      <p id="multifactor_aut_id2">Multifactor authentication means that an attacker would have to be both a snoop and a thief, for instance.</p> 
+     </div> 
+     <div class="sect3" id="possession-factor"> 
+      <div class="titlepage">
+       <div>
+        <div>
+         <h4 class="title">Possession factor</h4>
+        </div>
+       </div>
+      </div> 
+      <p id="for_corporate_a">For corporate and <a id="id456394" class="indexterm"></a><a id="id456402" class="indexterm"></a><a id="id456408" class="indexterm"></a>government intranets, it's common to require some type of physical token or key to grant access to systems. Mechanisms include USB dongles and flash card keys.</p> 
+      <p id="otps_onetime_">OTPs (one-time passwords)<a id="id456422" class="indexterm"></a><a id="id456428" class="indexterm"></a> are short-lived passwords that work only for a single use. They satisfy the possession factor because they're usually generated by a dedicated piece of hardware, or by an app on the user's mobile phone. The device is paired with the service that is being authenticated against in a way that cannot be easily spoofed by impostors.</p> 
+      <p id="google_released">Google released a product called Google Authenticator<a id="id456444" class="indexterm"></a> that generates one time passwords for mobile devices. There is a node <a id="id456452" class="indexterm"></a>module called <code class="literal">speakeasy</code> that lets you take advantage of Google authenticator to authenticate users using the possession factor.</p> 
+      <p id="install_speakea">Install Speakeasy:</p> 
+      <pre class="programlisting" id="npm_install__id3">    $ npm install --save speakeasy</pre> 
+      <p id="then_take_it_fo">Then take it for a spin:</p> 
+      <pre class="programlisting" data-language="javascript" id="var_speakeasy_">    <code class="kd">var</code> <code class="nx">speakeasy</code> <code class="o">=</code> <code class="nx">require</code><code class="p">(</code><code class="s1">'speakeasy'</code><code class="p">);</code>
+
+    <code class="c1">// Returns a key object with ascii, hex, base32, and</code>
+    <code class="c1">// QR code representations (the QR code value is a</code>
+    <code class="c1">// Google image URL):</code>
+    <code class="kd">var</code> <code class="nx">key</code> <code class="o">=</code> <code class="nx">speakeasy</code><code class="p">.</code><code class="nx">generate_key</code><code class="p">({</code>
+      <code class="nx">length</code><code class="o">:</code> <code class="mi">20</code><code class="p">,</code>
+      <code class="nx">google_auth_qr</code><code class="o">:</code> <code class="kc">true</code>
+    <code class="p">});</code>
+
+    <code class="c1">// This should match the number on your phone:</code>
+    <code class="nx">speakeasy</code><code class="p">.</code><code class="nx">time</code><code class="p">({</code><code class="nx">key</code><code class="o">:</code> <code class="nx">key</code><code class="p">.</code><code class="nx">base32</code><code class="p">,</code> <code class="nx">encoding</code><code class="o">:</code> <code class="s1">'base32'</code><code class="p">});</code></pre> 
+      <p id="authy_is_a_auth">Authy is a <a id="id456694" class="indexterm"></a>product similar to Google Authenticator that recently announced support for Bluetooth pairing. If your phone is near your computer, the Authy desktop agent will detect your phone's key over Bluetooth so that you won't have to type the token manually.</p> 
+     </div> 
+     <div class="sect3" id="inherence-factor"> 
+      <div class="titlepage">
+       <div>
+        <div>
+         <h4 class="title">Inherence factor</h4>
+        </div>
+       </div>
+      </div> 
+      <p id="the_inherence_f">The inherence factor is <a id="id456717" class="indexterm"></a><a id="id456725" class="indexterm"></a>something the user is—in other words, some information that discloses some physical property of the user. Common examples include <a id="id456735" class="indexterm"></a><a id="id456740" class="indexterm"></a>fingerprint and retina scanners. While technology does exist to scan fingerprints, retinas, palm prints, and more, it's possible to defeat security devices such as fingerprint scanners if an attacker can convince the scanner that a printed image is actually the user's fingerprint. Printed images have been used to defeat <a id="id456750" class="indexterm"></a>facial recognition and fingerprint scanners in cell phone devices.</p> 
+      <p id="because_of_the__id2">Because of the risk of compromise and a user's inability to change her own fingerprints, security experts like to say that the inherence factor is equivalent to a username, not a password. In other words, inherence can be used to make user recognition more convenient but should not be used to prove the user's identity.</p> 
+      <p id="the_closest_i_h">The closest I have seen to a security-enhancing inherence factor is a process known as <a id="id456773" class="indexterm"></a>geofencing. Geofencing allows you to use location APIs to determine what part of the world the current user is in. Because users travel, geofencing should be used as a warning mechanism. For example, it could be used to trigger an additional authentication using another factor. It's also worth mentioning that geofencing can be defeated by a simple web-proxy mechanism. It may discourage a casual or unsophisticated attacker, but a determined attacker may eventually defeat it.</p> 
+      <p id="you_can_use_the_id2">You can use the new <a id="id456790" class="indexterm"></a><a id="id456796" class="indexterm"></a>HTML Geolocation API to establish compliance the location of the user, provided that the user grants permission. The following function will return the user's geolocation in latitude and longitude:</p> 
+      <pre class="programlisting" data-language="javascript" id="var_getlocation_id1">    <code class="kd">var</code> <code class="nx">getLocation</code> <code class="o">=</code> <code class="kd">function</code> <code class="nx">getLocation</code><code class="p">(</code><code class="nx">cb</code><code class="p">)</code> <code class="p">{</code>
+      <code class="k">if</code> <code class="p">(</code><code class="o">!</code><code class="nx">navigator</code><code class="p">.</code><code class="nx">geolocation</code><code class="p">)</code> <code class="p">{</code>
+        <code class="k">return</code> <code class="nx">cb</code><code class="p">(</code><code class="k">new</code> <code class="nb">Error</code><code class="p">(</code><code class="s1">'Geolocation is not supported by this browser.'</code><code class="p">));</code>
+      <code class="p">}</code>
+      <code class="nx">navigator</code><code class="p">.</code><code class="nx">geolocation</code><code class="p">.</code><code class="nx">getCurrentPosition</code><code class="p">(</code><code class="kd">function</code> <code class="p">(</code><code class="nx">position</code><code class="p">)</code> <code class="p">{</code>
+        <code class="nx">cb</code><code class="p">(</code><code class="kc">null</code><code class="p">,</code> <code class="nx">position</code><code class="p">);</code>
+      <code class="p">});</code>
+    <code class="p">};</code>
+    
+    <code class="nx">getLocation</code><code class="p">(</code><code class="kd">function</code> <code class="p">(</code><code class="nx">err</code><code class="p">,</code> <code class="nx">position</code><code class="p">)</code> <code class="p">{</code>
+      <code class="k">if</code> <code class="p">(</code><code class="nx">err</code><code class="p">)</code> <code class="p">{</code>
+        <code class="k">return</code> <code class="nx">console</code><code class="p">.</code><code class="nx">log</code><code class="p">(</code><code class="nx">err</code><code class="p">);</code>
+      <code class="p">}</code>
+      <code class="nx">console</code><code class="p">.</code><code class="nx">log</code><code class="p">(</code><code class="nx">position</code><code class="p">);</code>
+    <code class="p">});</code></pre> 
+      <p id="to_use_the_data">To use the data for geofencing, simply save users’ preferred locations along with their profile, and ask them to authorize any new locations that they log in from. The size of the geofence perimeter should depend on your particular security needs. For example, a bank may chose a 5-mile radius, whereas a discussion forum may select a 50-mile r<a id="id457175" class="indexterm"></a>adius.</p> 
+     </div> 
+    </div> 
+    <div class="sect2" id="federated-and-delegated-authentication"> 
+     <div class="titlepage">
+      <div>
+       <div>
+        <h3 class="title">Federated and Delegated Authentication</h3>
+       </div>
+      </div>
+     </div> 
+     <p id="federated_authe">Federated <a id="au6.1.4" class="indexterm"></a><a id="fe6.1.4" class="indexterm"></a>authentication is a mechanism that allows users to share their identity across multiple services with a <a id="id457229" class="indexterm"></a><a id="id457235" class="indexterm"></a>single-sign-on (SSO) solution. <a id="id457242" class="indexterm"></a>OpenID is a good example of a federated SSO solution, but it hasn't been widely adopted by users due to usability concerns. That could change soon with OpenID Connect, an identity solution built on top of OAuth 2.0 (similar to Facebook Connect).</p> 
+     <div class="sect3" id="mozilla-persona"> 
+      <div class="titlepage">
+       <div>
+        <div>
+         <h4 class="title">Mozilla Persona</h4>
+        </div>
+       </div>
+      </div> 
+      <p id="mozillas_perso">Mozilla's <a class="ulink" href="http://www.mozilla.org/en-US/persona/" target="_top">Persona</a> is an open source <a id="id457271" class="indexterm"></a><a id="id457276" class="indexterm"></a><a id="id457282" class="indexterm"></a>federated identity system that uses email addresses and short-lived tokens for identification. Persona allows you to add login and logout buttons to your website, and <code class="literal">watch()</code> for login and logout actions. Persona has identity provider bridge support for both Yahoo! and Gmail. Sadly, Persona has failed to catch fire, and Mozilla announced in March 2014 that it would no longer actively develop the service.</p> 
+     </div> 
+     <div class="sect3" id="webid"> 
+      <div class="titlepage">
+       <div>
+        <div>
+         <h4 class="title">WebID</h4>
+        </div>
+       </div>
+      </div> 
+      <p id="webid_is_a_wc">WebID is a W3C-backed <a id="id457314" class="indexterm"></a>federated identity system that works in all current browsers built on top of existing web standards. Unfortunately, it currently relies on certificate selection UIs that are built into browsers—parts of the browser user interface that have long been neglected and are rather ugly and cumbersome for users. Several years after the first WebID specification was published, the UIs have not improved much.</p> 
+      <p id="the_primary_adv">The primary advantages of WebID are that it works over TLS and does not rely on email to prove identity. That said, no website can afford to rely on an authentication mechanism that is unfriendly to its user community.</p> 
+      <p id="for_this_reason">For this reason, I can't recommend WebID for production use today, and neither does the W3C. At the time of this writing, it has not yet evolved into an official working group, and it is probably years from reaching an official recommendation state, if that ever <a id="id457345" class="indexterm"></a><a id="id457355" class="indexterm"></a>happens.</p> 
+     </div> 
+     <div class="sect3" id="delegated-authentication"> 
+      <div class="titlepage">
+       <div>
+        <div>
+         <h4 class="title">Delegated authentication</h4>
+        </div>
+       </div>
+      </div> 
+      <p id="delegated_authe">Delegated authentication<a id="de6.1.4.3" class="indexterm"></a><a id="au6.1.4.3" class="indexterm"></a> allows you to delegate authentication to a specific third-party provider (such as Facebook or Twitter). Unlike federated authentication, delegated authentication systems are not distributed, meaning that there is a single, centralized provider for identity. Your site can implement multiple delegate providers, of course. For example, you can give your users the choice to log in with <a id="id457411" class="indexterm"></a>Twitter or Facebook, but from the perspective of end users, they're presented with a choice of providers, and they are forced to remember which one they use to log in to your site (unless you detect that the accounts belong to the same user and link the accounts).</p> 
+      <p id="a_single_federa">A single federated login mechanism tends to present a better user experience than offering users a choice of mechanisms because the user doesn't have to remember which mechanism they chose. For example, if your site implements Persona, all the user has to remember is his email address.</p> 
+      <p id="facebook_login_">Facebook login <a id="id457437" class="indexterm"></a>is the most successful delegated authentication system as of this writing, by virtue of the size of its user base. It has a huge market saturation, and most users will be familiar with both the branding and the Facebook login and authorization flow.</p> 
+      <p id="to_enable_faceb">To enable Facebook login on your site, first, create a new Facebook app, and then retrieve the app ID and app secret. To create a Facebook app, visit the <a class="ulink" href="https://developers.facebook.com/apps" target="_top">Facebook Apps page</a>.</p> 
+      <p id="facebook_suppli">Facebook supplies a JavaScript SDK to help you interact with their API. Here's the code you need to work with it:</p> 
+      <pre class="programlisting" data-language="javascript" id="div_idfbroo">    <code class="o">&lt;</code><code class="nx">div</code> <code class="nx">id</code><code class="o">=</code><code class="s2">"fb-root"</code><code class="o">&gt;&lt;</code><code class="err">/div&gt;</code>
+    <code class="o">&lt;</code><code class="nx">script</code><code class="o">&gt;</code>
+      <code class="nb">window</code><code class="p">.</code><code class="nx">fbAsyncInit</code> <code class="o">=</code> <code class="kd">function</code><code class="p">()</code> <code class="p">{</code>
+        <code class="nx">FB</code><code class="p">.</code><code class="nx">init</code><code class="p">({</code>
+          <code class="nx">appId</code>      <code class="o">:</code> <code class="s1">'YOUR_APP_ID'</code><code class="p">,</code> <code class="c1">// App ID</code>
+
+          <code class="c1">// Channel File</code>
+          <code class="nx">channelUrl</code> <code class="o">:</code> <code class="s1">'//WWW.YOUR_DOMAIN.COM/channel.html'</code><code class="p">,</code> 
+          <code class="nx">status</code>     <code class="o">:</code> <code class="kc">true</code><code class="p">,</code> <code class="c1">// check login status</code>
+          <code class="c1">// enable cookies to allow the server to access </code>
+          <code class="c1">// the session</code>
+          <code class="nx">cookie</code>     <code class="o">:</code> <code class="kc">true</code><code class="p">,</code> 
+          <code class="nx">xfbml</code>      <code class="o">:</code> <code class="kc">true</code>  <code class="c1">// parse XFBML</code>
+        <code class="p">});</code>
+
+        <code class="c1">// Additional init code here</code>
+
+      <code class="p">};</code>
+
+      <code class="c1">// Load the SDK asynchronously</code>
+      <code class="p">(</code><code class="kd">function</code><code class="p">(</code><code class="nx">d</code><code class="p">){</code>
+         <code class="kd">var</code> <code class="nx">js</code><code class="p">,</code>
+           <code class="nx">id</code> <code class="o">=</code> <code class="s1">'facebook-jssdk'</code><code class="p">,</code>
+           <code class="nx">ref</code> <code class="o">=</code> <code class="nx">d</code><code class="p">.</code><code class="nx">getElementsByTagName</code><code class="p">(</code><code class="s1">'script'</code><code class="p">)[</code><code class="mi">0</code><code class="p">];</code>
+
+         <code class="k">if</code> <code class="p">(</code><code class="nx">d</code><code class="p">.</code><code class="nx">getElementById</code><code class="p">(</code><code class="nx">id</code><code class="p">))</code> <code class="p">{</code><code class="k">return</code><code class="p">;}</code>
+         <code class="nx">js</code> <code class="o">=</code> <code class="nx">d</code><code class="p">.</code><code class="nx">createElement</code><code class="p">(</code><code class="s1">'script'</code><code class="p">);</code>
+         <code class="nx">js</code><code class="p">.</code><code class="nx">id</code> <code class="o">=</code> <code class="nx">id</code><code class="p">;</code>
+         <code class="nx">js</code><code class="p">.</code><code class="nx">async</code> <code class="o">=</code> <code class="kc">true</code><code class="p">;</code>
+         <code class="nx">js</code><code class="p">.</code><code class="nx">src</code> <code class="o">=</code> <code class="s2">"//connect.facebook.net/en_US/all.js"</code><code class="p">;</code>
+         <code class="nx">ref</code><code class="p">.</code><code class="nx">parentNode</code><code class="p">.</code><code class="nx">insertBefore</code><code class="p">(</code><code class="nx">js</code><code class="p">,</code> <code class="nx">ref</code><code class="p">);</code>
+       <code class="p">}(</code><code class="nb">document</code><code class="p">));</code>
+    <code class="o">&lt;</code><code class="err">/script&gt;</code></pre> 
+      <p id="the_channel_fil">The channel file is a single-line file that addresses cross-domain issues in some browsers. It only needs to be one line:</p> 
+      <pre class="programlisting" data-language="html" id="script_src">    <code class="nt">&lt;script </code><code class="na">src=</code><code class="s">"//connect.facebook.net/en_US/all.js"</code><code class="nt">&gt;&lt;/script&gt;</code></pre> 
+      <p id="the_facebook_ap">The Facebook API is notorious for changing. Visit <a class="ulink" href="http://bit.ly/1pFLFWv" target="_top">Facebook's “Getting Started With Facebook Login” webpage</a> for the latest <a id="id458123" class="indexterm"></a><a id="id458134" class="indexterm"></a><a id="id458145" class="indexterm"></a><a id="id458156" class="indexterm"></a>details.</p> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="sect1" data-original-filename="ch06.xml" id="authorization"> 
+    <div class="titlepage">
+     <div>
+      <div>
+       <h2 class="title">Authorization</h2>
+      </div>
+     </div>
+    </div> 
+    <p id="authorization_a">Authorization <a id="ac6.2" class="indexterm"></a><a id="se6.2" class="indexterm"></a><a id="id458212" class="indexterm"></a>ensures that agents (users or applications) have access to only the resources they are allowed to access according to some attributes of the agent; resource policies, such as <a id="id458223" class="indexterm"></a><a id="id458228" class="indexterm"></a>ACLs (access control lists); or both, as in <a id="id458236" class="indexterm"></a><a id="id458242" class="indexterm"></a>MAC (mandatory access control) models.</p> 
+    <p id="an_acl_is_essen">An ACL is essentially a table that lists each user with access to a particular resource. ACLs can be stored at the system level, listing each user and what she can do or see within the system, or they can be stored at the resource level.</p> 
+    <p id="in_a_mac_system">In a MAC system, each resource has an associated minimum trust level, and each user has an associated trust level. If the user is not trusted enough, access to the resource is denied.</p> 
+    <p id="rolebased_acce">Role-based access controls (RBAC) <a id="id458271" class="indexterm"></a><a id="id458277" class="indexterm"></a>allow you to authorize users with specific roles. A user can have any number of roles, and a user is granted privileges based on her role. For example, a blog might have a small number of administrators who can change anything, a larger set of editors who can edit and publish posts, an even larger number of contributors who can contribute blog posts, and an open membership whereby anybody can register to post comments.</p> 
+    <p id="it_is_possible_">It is possible to implement MAC using role-based access controls, and it is also possible to combine the use of RBAC and ACLs.</p> 
+    <p id="protecting_expr">Protecting express resources with an authorization strategy is easy:</p> 
+    <pre class="programlisting" data-language="javascript" id="appputposts">  <code class="nx">app</code><code class="p">.</code><code class="nx">put</code><code class="p">(</code><code class="s1">'/posts/:id'</code><code class="p">,</code> <code class="nx">authorize</code><code class="p">(),</code> <code class="nx">putPost</code><code class="p">);</code></pre> 
+    <p id="the_authorize">The <code class="literal">authorize()</code> function returns a middleware function that can check to see whether or not the user has permission to access the requested resource before the route handler has the chance to run. For example, if you want to ensure that the user is logged in, you can use an authorize function that looks like this:</p> 
+    <pre class="programlisting" data-language="javascript" id="var_authorize_">  <code class="kd">var</code> <code class="nx">authorize</code> <code class="o">=</code> <code class="kd">function</code> <code class="nx">authorize</code><code class="p">(</code><code class="nx">options</code><code class="p">)</code> <code class="p">{</code>
+    <code class="k">return</code> <code class="kd">function</code> <code class="nx">auth</code><code class="p">(</code><code class="nx">req</code><code class="p">,</code> <code class="nx">res</code><code class="p">,</code> <code class="nx">next</code><code class="p">)</code> <code class="p">{</code>
+      <code class="k">if</code> <code class="p">(</code><code class="nx">options</code><code class="p">.</code><code class="nx">requiresAuth</code> <code class="o">&amp;&amp;</code>
+          <code class="o">!</code><code class="p">(</code><code class="nx">req</code><code class="p">.</code><code class="nx">session</code> <code class="o">&amp;&amp;</code> <code class="nx">req</code><code class="p">.</code><code class="nx">session</code><code class="p">.</code><code class="nx">user</code><code class="p">))</code> <code class="p">{</code>
+        <code class="k">return</code> <code class="nx">res</code><code class="p">.</code><code class="nx">send</code><code class="p">(</code><code class="mi">403</code><code class="p">);</code>
+      <code class="p">}</code>
+      <code class="nx">next</code><code class="p">();</code>
+    <code class="p">};</code>
+  <code class="p">};</code></pre> 
+    <div class="sect2" id="authorizing-applications"> 
+     <div class="titlepage">
+      <div>
+       <div>
+        <h3 class="title">Authorizing Applications</h3>
+       </div>
+      </div>
+     </div> 
+     <p id="applications_ca">Applications can <a id="id458635" class="indexterm"></a>act as user agents in order to access a user's data from a third-party system or even perform actions on the user's behalf, such as sharing on social networks or posting content. In order for an app to be granted such access, it must first prove that the user has authorized it. Typically that is accomplished by sending a token along with the request.</p> 
+     <p id="applications_ga">Applications gain the token using an application authorization grant. The user is directed to the target application and presented with an authorization request. If the user grants the requested permissions, a token is set and delivered to the requesting <span class="keep-together">application</span>.</p> 
+     <p id="facebooks_auth">Facebook's authorization is <a id="id458668" class="indexterm"></a>tied to the authentication system (Facebook Login). When a user attempts to log in to your app for the first time with Facebook, he will be presented with an authorization screen which displays the permissions your app asked for (called <code class="literal">scope</code>).</p> 
+     <p id="facebook_recomm">Facebook recommends that you ask for as few permissions as possible upfront. Requesting more than four permissions severely impedes the success rate of the authorization grant. Ask for as few as possible for your app to function properly, and then request additional permissions on an as-needed basis.</p> 
+     <p id="for_example_in">For example, initially you may only want to request access to the user's email and likes. Later on, let user actions trigger permission requests. That way, the user has context and knowledge of why you need that particular permission. Say the user wants to share a photo from your app on her own timeline. You'll want to check to see if you have been granted that permission, and if you haven't yet, ask for the <code class="literal">publish_actions</code> permission in <a id="id458709" class="indexterm"></a>response to her request.</p> 
+     <p id="the_user_is_muc">The user is much more likely to grant permission if you need it to complete an action that she directly requested.</p> 
+     <p id="this_principle_">This principle holds true whether you're dealing with Facebook or any other third-party authorization.</p> 
+    </div> 
+    <div class="sect2" id="oauth-2.0"> 
+     <div class="titlepage">
+      <div>
+       <div>
+        <h3 class="title">OAuth 2.0</h3>
+       </div>
+      </div>
+     </div> 
+     <p id="oauth__is_an">OAuth 2.0 is an <a id="id458743" class="indexterm"></a><a id="id458751" class="indexterm"></a>open standard for application authorization that allows clients to access resources on behalf of the resource owner. Essentially, it allows you to grant applications limited access to your accounts on third-party services. For example, <a id="id458760" class="indexterm"></a>Facebook, Google Docs, and Dropbox all allow you to access resources on behalf of their users via their OAuth 2.0 based public APIs.</p> 
+     <p id="by_way_of_contr">By way of contrast, <a id="id458776" class="indexterm"></a>OpenID provides a means to request the user's identity from a federated ID provider (such as Google). That identity includes details such as the user's name and email address. Google returns proof to the application that the user is who he says he is (the owner of the identity in question).</p> 
+     <p id="oauth__on_t">OAuth 2.0, on the other hand, returns a token that grants the app access to a specific set of API resources. Think of it this way: using an authentication system like OpenID is similar to showing your driver's license or passport. Using OAuth 2.0 is like giving the app a temporary key that it can use to access your resources on another site (but only those resources you have explicitly authorized).</p> 
+     <p id="oauth__is_a_">OAuth 2.0 is a framework that exposes several authorization grant flows. There are specific flows for desktop apps, web apps, native mobile apps, and other devices.</p> 
+     <p id="a_basic_oauth_">A basic OAuth 2.0 flow goes something like this:</p> 
+     <div class="orderedlist" id="client_requests_id1">
+      <ol class="orderedlist" type="1"> 
+       <li class="listitem"><p id="client_requests_id2">Client requests permissions from the user.</p></li> 
+       <li class="listitem"><p id="the_user_is_dir">The user is directed to the third-party service that provides those permissions, where the user is authenticated and the request is granted or rejected.</p></li> 
+       <li class="listitem"><p id="the_grant_is_pa">The grant is passed back to the requesting client.</p></li> 
+       <li class="listitem"><p id="the_client_exch">The client exchanges the grant for an access token.</p></li> 
+       <li class="listitem"><p id="in_subsequent_c">In subsequent calls, the client provides the access token in order to prove that she has permission to access the requested resources.</p></li> 
+       <li class="listitem"><p id="optionally_the">Optionally, the service can implement a token exchange, whereby a client can exchange an expiring token for a fresh token.</p></li> 
+      </ol>
+     </div> 
+     <p id="if_youd_like_y">If you'd like your app to be an OAuth 2.0 provider, check out <a class="ulink" href="https://github.com/jaredhanson/oauth2orize" target="_top">oauth2orize</a>.</p> 
+     <p id="to_verify_issue">To verify issued bearer tokens, you'll also need a strategy to authenticate bearer tokens. Take a look at <a class="ulink" href="https://github.com/jaredhanson/passport-http-bearer" target="_top">passport-http-bearer</a>.</p> 
+     <p id="oauth__has_b">OAuth 2.0 has been the subject of a lot of security criticism. Security experts cite the large attack surface and the difficulty of correct implementation as reasons to avoid using the specification as-is. However, Facebook and other providers offer bounties for users who are able to uncover security vulnerabilities in their implementations, and those bounties have led to vulnerability discoveries and patches.</p> 
+     <p id="despite_securit">Despite security concerns, OAuth 2.0 is currently the dominant form of third-party API authorization. It has the best tooling and community <a id="id458909" class="indexterm"></a><a id="id458919" class="indexterm"></a>support.</p> 
+    </div> 
+   </div> 
+   <div class="sect1" data-original-filename="ch06.xml" id="id_d1e34468"> 
+    <div class="titlepage">
+     <div>
+      <div>
+       <h2 class="title">Conclusion</h2>
+      </div>
+     </div>
+    </div> 
+    <p id="security_is_an_">Security is an <a id="id458946" class="indexterm"></a><a id="id458955" class="indexterm"></a>essential component of your application, and it's very important to get it right. Here are some keys to remember:</p> 
+    <div class="itemizedlist" id="use_a_good_auth_id1">
+     <ul class="itemizedlist"> 
+      <li class="listitem"><p id="use_a_good_auth_id2">Use a good authentication library, such as Credential.</p></li> 
+      <li class="listitem"><p id="passwords_alone">Passwords alone are never secure. Allow multifactor authentication for your app.</p></li> 
+      <li class="listitem"><p id="http_uses_plain">HTTP uses plain-text communication. In order to protect user passwords and data, enable HTTPS site-wide.</p></li> 
+      <li class="listitem"><p id="as_a_general_ru">As a general rule, it's a good idea to use an <code class="code">authorize()</code> middleware for all of your routes.</p></li> 
+      <li class="listitem"><p id="enable_oauth_">Enable OAuth 2.0 support to discourage third-party application vendors from requesting your user's login credentials.</p></li> 
+     </ul>
+    </div> 
+   </div>
+  </section>
+  <footer>
+   <div class="navfooter"> 
+    <hr> 
+    <table style="width: 100%; "> 
+     <tbody>
+      <tr> 
+       <td style="width: 40%; text-align: left; "> <a accesskey="p" href="ch05.html">Prev</a>&nbsp;</td> 
+       <td style="width: 20%; text-align: center; ">&nbsp;</td> 
+       <td style="width: 40%; text-align: right; ">&nbsp;<a accesskey="n" href="ch07.html">Next</a> </td> 
+      </tr> 
+      <tr> 
+       <td style="width: 40%; text-align: left; vertical-align: top; ">Chapter&nbsp;5.&nbsp;Separation of Concerns&nbsp;</td> 
+       <td style="width: 20%; text-align: center; "><a accesskey="h" href="index.html">Home</a></td> 
+       <td style="width: 40%; text-align: right; vertical-align: top; ">&nbsp;Chapter&nbsp;7.&nbsp;Logging</td> 
+      </tr> 
+     </tbody>
+    </table> 
+   </div>
+  </footer> 
+  <div class="extra-footer"> 
+   <p>© 2013, O’Reilly Media, Inc.</p> 
+   <ul> 
+    <li><a href="http://oreilly.com/terms/">Terms of Service</a></li> 
+    <li><a href="http://oreilly.com/oreilly/privacy.csp">Privacy Policy</a></li> 
+    <li>Interested in <a href="mailto:scordesse@oreilly.com">sponsoring content?</a></li> 
+   </ul> 
+  </div> 
+  <script type="text/javascript">if (!NREUMQ.f) { NREUMQ.f=function() {
+NREUMQ.push(["load",new Date().getTime()]);
+var e=document.createElement("script");
+e.type="text/javascript";
+e.src=(("http:"===document.location.protocol)?"http:":"https:") + "//" +
+  "js-agent.newrelic.com/nr-100.js";
+document.body.appendChild(e);
+if(NREUMQ.a)NREUMQ.a();
+};
+NREUMQ.a=window.onload;window.onload=NREUMQ.f;
+};
+NREUMQ.push(["nrfj","bam.nr-data.net","3e361aebcf","2194180","IApbRUBZXg1WEEoHDAwORh5aQl8N",9,62,new Date().getTime(),"","","","",""]);</script> 
  </body>
 </html>

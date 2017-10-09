@@ -1,1178 +1,811 @@
 <!doctype html>
 <html>
  <head> 
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1"> 
-  <meta name="theme-color" content="#375EAB"> 
-  <title>sort - The Go Programming Language</title> 
-  <link type="text/css" rel="stylesheet" href="/lib/godoc/style.css"> 
-  <link rel="search" type="application/opensearchdescription+xml" title="godoc" href="/opensearch.xml"> 
-  <link rel="stylesheet" href="/lib/godoc/jquery.treeview.css"> 
-  <script type="text/javascript">window.initFuncs = [];</script> 
-  <script type="text/javascript">
-var _gaq = _gaq || [];
-_gaq.push(["_setAccount", "UA-11222381-2"]);
-_gaq.push(["b._setAccount", "UA-49880327-6"]);
-window.trackPageview = function() {
-  _gaq.push(["_trackPageview", location.pathname+location.hash]);
-  _gaq.push(["b._trackPageview", location.pathname+location.hash]);
-};
-window.trackPageview();
-window.trackEvent = function(category, action, opt_label, opt_value, opt_noninteraction) {
-  _gaq.push(["_trackEvent", category, action, opt_label, opt_value, opt_noninteraction]);
-  _gaq.push(["b._trackEvent", category, action, opt_label, opt_value, opt_noninteraction]);
-};
-</script> 
+  <meta charset="utf-8"> 
+  <title>sorting</title> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <link rel="stylesheet" type="text/css" href="/~ray/styles/default.css"> 
+  <link rel="stylesheet" type="text/css" href="/~ray/styles/prettify.css"> 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto"> 
+  <script src="/~ray/scripts/prettify.js"></script> 
  </head> 
- <body> 
-  <div id="lowframe" style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
-    ... 
-  </div>
-  <!-- #lowframe --> 
-  <div id="topbar" class="wide">
-   <div class="container"> 
-    <div class="top-heading" id="heading-wide">
-     <a href="/">The Go Programming Language</a>
-    </div> 
-    <div class="top-heading" id="heading-narrow">
-     <a href="/">Go</a>
-    </div> 
-    <a href="#" id="menu-button"><span id="menu-button-arrow">?</span></a> 
-    <form method="GET" action="/search"> 
-     <div id="menu"> 
-      <a href="/doc/">Documents</a> 
-      <a href="/pkg/">Packages</a> 
-      <a href="/project/">The Project</a> 
-      <a href="/help/">Help</a> 
-      <a href="/blog/">Blog</a> 
-      <a id="playgroundButton" href="http://play.golang.org/" title="Show Go Playground">Play</a> 
-      <input type="text" id="search" name="q" class="inactive" value="Search" placeholder="Search"> 
-     </div> 
-    </form> 
-   </div>
-  </div> 
-  <div id="playground" class="play"> 
-   <div class="input">
-    <textarea class="code" spellcheck="false">package main
+ <body class="coursenotes"> 
+  <script>onload = function () {prettyPrint();}</script> 
+  <div class="container"> 
+   <div class="innercontent"> 
+    <h1>Sorting</h1> 
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$']], displaymath: [['$$','$$']]}});</script>
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script> 
+    <header>
+     Ah, sorting. Yep, gotta know it. No way you can pass yourself off as a serious developer or computer scientist without knowing this stuff.
+    </header> 
+    <h2>Demos First</h2> 
+    <p>Some of the classics:</p> 
+    <iframe width="560" height="315" src="//www.youtube.com/embed/kPRA0W1kECg" frameborder="0" allowfullscreen></iframe> 
+    <p>Here is a comparison of nine different algorithms, run against each other, for different distributions:</p> 
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/ZZuD6iUe3Pc" frameborder="0" allowfullscreen></iframe> 
+    <p>Some interactive applets (Java required):</p> 
+    <ul> 
+     <li><a href="http://www.cs.ubc.ca/spider/harrison/Java/sorting-demo.html">Jason Harrison’s</a> </li>
+     <li><a href="http://cg.scs.carleton.ca/~morin/misc/sortalg/">Pat Morin’s</a> </li>
+    </ul> 
+    <h2>Classification of Algorithms</h2> 
+    <p>Actually you can classify sorting algorithms many ways</p> 
+    <ul> 
+     <li>Stable vs. non-stable </li>
+     <li>By time or space complexity </li>
+     <li>Whether it works by comparing items or not </li>
+    </ul> 
+    <p>Here are some characteristics of various sorting algorithms, adapted (er, taken) from the excellent <a href="http://en.wikipedia.org/wiki/Sort_algorithm">Wikipedia page</a> on sorting. ($n$ = number of items to sort, $k$ = number of distinct keys.)</p> 
+    <table class="centered"> 
+     <tbody>
+      <tr> 
+       <th rowspan="2">Algorithm </th>
+       <th rowspan="2">Stable? </th>
+       <th colspan="2">Complexity </th>
+       <th rowspan="2">Mechanism </th>
+      </tr>
+      <tr> 
+       <th>Time </th>
+       <th><em>Extra</em><br>Space </th>
+      </tr>
+      <tr>
+       <td>Selection Sort </td>
+       <td>No </td>
+       <td>$\Theta(n^2)$ </td>
+       <td>- </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Insertion Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(n^2)$ </td>
+       <td>- </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Bubble Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(n^2)$ </td>
+       <td>- </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Cocktail Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(n^2)$ </td>
+       <td>- </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Gnome Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(n^2)$ </td>
+       <td>- </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Shell Sort </td>
+       <td>No </td>
+       <td>Several variants, ranging from slightly worse than $\Theta(n \log n)$ to $\Theta(n^{1.5})$ </td>
+       <td>- </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Comb Sort </td>
+       <td>No </td>
+       <td>$\Theta(n \log n)$ </td>
+       <td>- </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Binary Tree Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(n \log n)$ </td>
+       <td>$\Theta(n)$ </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Merge Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(n \log n)$ </td>
+       <td>$\Theta(n)$ </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Quick Sort </td>
+       <td>No </td>
+       <td>$\Theta(n \log n)$ Worst: $\Theta(n^2)$ </td>
+       <td>$\Theta(\log n)$ </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Heap Sort </td>
+       <td>No </td>
+       <td>$\Theta(n \log n)$ </td>
+       <td>- </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Smooth Sort </td>
+       <td>No </td>
+       <td>$\Theta(n \log n)$ </td>
+       <td>- </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Bucket Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(n)$ </td>
+       <td>$\Theta(n)$ </td>
+       <td>Distribution </td>
+      </tr>
+      <tr>
+       <td>Counting Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(n+k)$ </td>
+       <td>$\Theta(n+k)$ </td>
+       <td>Distribution </td>
+      </tr>
+      <tr>
+       <td>Radix Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(ns)$ where s=key "length" </td>
+       <td>$\Theta(n)$ </td>
+       <td>Distribution </td>
+      </tr>
+      <tr>
+       <td>Pigeonhole Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(n+k)$ </td>
+       <td>$\Theta(k)$ </td>
+       <td>Distribution </td>
+      </tr>
+      <tr>
+       <td>Stupid Sort </td>
+       <td>Yes </td>
+       <td>$\Theta(n^3)$ </td>
+       <td>- </td>
+       <td>Comparison </td>
+      </tr>
+      <tr>
+       <td>Bogo Sort </td>
+       <td>No </td>
+       <td>Expected: $O(n \cdot n!)$. If lucky beyond belief: $O(n)$ . Worst: $O(\infty)$ </td>
+       <td>$\Theta(n)$ </td>
+       <td>Comparison </td>
+      </tr>
+     </tbody>
+    </table> 
+    <p>There are probably hundereds of other sorting algorithms, including some <a href="http://home.tiac.net/~cri_d/cri/2001/badsort.html">extremely inefficient and evil ones.</a></p> 
+    <h2>Sorting in Java</h2> 
+    <p>In Java one would usually use <code>Arrays.sort()</code>. There are two versions</p> 
+    <pre class="code">
+Arrays.sort(array)
 
-import "fmt"
-
-func main() {
-	fmt.Println("Hello, ??")
-}</textarea>
-   </div> 
-   <div class="output"></div> 
-   <div class="buttons"> 
-    <a class="run" title="Run this code [shift-enter]">Run</a> 
-    <a class="fmt" title="Format this code">Format</a> 
-    <a class="share" title="Share this code">Share</a> 
-   </div> 
-  </div> 
-  <div id="page" class="wide"> 
-   <div class="container"> 
-    <h1> Package sort <span class="text-muted"></span> </h1> 
-    <div id="nav"></div> 
-    <!--
-	Copyright 2009 The Go Authors. All rights reserved.
-	Use of this source code is governed by a BSD-style
-	license that can be found in the LICENSE file.
---> 
-    <!--
-	Note: Static (i.e., not template-generated) href and id
-	attributes start with "pkg-" to make it impossible for
-	them to conflict with generated attributes (some of which
-	correspond to Go identifiers).
---> 
-    <script type="text/javascript">
-	document.ANALYSIS_DATA = null;
-	document.CALLGRAPH = null;
-	</script> 
-    <div id="short-nav"> 
-     <dl> 
-      <dd>
-       <code>import "sort"</code>
-      </dd> 
-     </dl> 
-     <dl> 
-      <dd>
-       <a href="#pkg-overview" class="overviewLink">Overview</a>
-      </dd> 
-      <dd>
-       <a href="#pkg-index" class="indexLink">Index</a>
-      </dd> 
-      <dd>
-       <a href="#pkg-examples" class="examplesLink">Examples</a>
-      </dd> 
-     </dl> 
-    </div> 
-    <!-- The package's Name is printed as title by the top-level template --> 
-    <div id="pkg-overview" class="toggleVisible"> 
-     <div class="collapsed"> 
-      <h2 class="toggleButton" title="Click to show Overview section">Overview ?</h2> 
-     </div> 
-     <div class="expanded"> 
-      <h2 class="toggleButton" title="Click to hide Overview section">Overview ?</h2> 
-      <p> Package sort provides primitives for sorting slices and user-defined collections. </p> 
-     </div> 
-    </div> 
-    <div id="example_" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-type Person struct {
-	Name string
-	Age  int
-}
-
-func (p Person) String() string {
-	return fmt.Sprintf("%s: %d", p.Name, p.Age)
-}
-
-// ByAge implements sort.Interface for []Person based on
-// the Age field.
-type ByAge []Person
-
-func (a ByAge) Len() int           { return len(a) }
-func (a ByAge) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByAge) Less(i, j int) bool { return a[i].Age &lt; a[j].Age }
-
-func main() {
-	people := []Person{
-		{"Bob", 31},
-		{"John", 42},
-		{"Michael", 17},
-		{"Jenny", 26},
-	}
-
-	fmt.Println(people)
-	sort.Sort(ByAge(people))
-	fmt.Println(people)
-
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>[Bob: 31 John: 42 Michael: 17 Jenny: 26]
-[Michael: 17 Jenny: 26 Bob: 31 John: 42]
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <div id="example__sortKeys" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example (SortKeys)</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example (SortKeys)</span></p> 
-      <p>ExampleSortKeys demonstrates a technique for sorting a struct type using programmable sort criteria. </p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-// A couple of type definitions to make the units clear.
-type earthMass float64
-type au float64
-
-// A Planet defines the properties of a solar system object.
-type Planet struct {
-	name     string
-	mass     earthMass
-	distance au
-}
-
-// By is the type of a "less" function that defines the ordering of its Planet arguments.
-type By func(p1, p2 *Planet) bool
-
-// Sort is a method on the function type, By, that sorts the argument slice according to the function.
-func (by By) Sort(planets []Planet) {
-	ps := &amp;planetSorter{
-		planets: planets,
-		by:      by, // The Sort method's receiver is the function (closure) that defines the sort order.
-	}
-	sort.Sort(ps)
-}
-
-// planetSorter joins a By function and a slice of Planets to be sorted.
-type planetSorter struct {
-	planets []Planet
-	by      func(p1, p2 *Planet) bool // Closure used in the Less method.
-}
-
-// Len is part of sort.Interface.
-func (s *planetSorter) Len() int {
-	return len(s.planets)
-}
-
-// Swap is part of sort.Interface.
-func (s *planetSorter) Swap(i, j int) {
-	s.planets[i], s.planets[j] = s.planets[j], s.planets[i]
-}
-
-// Less is part of sort.Interface. It is implemented by calling the "by" closure in the sorter.
-func (s *planetSorter) Less(i, j int) bool {
-	return s.by(&amp;s.planets[i], &amp;s.planets[j])
-}
-
-var planets = []Planet{
-	{"Mercury", 0.055, 0.4},
-	{"Venus", 0.815, 0.7},
-	{"Earth", 1.0, 1.0},
-	{"Mars", 0.107, 1.5},
-}
-
-// ExampleSortKeys demonstrates a technique for sorting a struct type using programmable sort criteria.
-func main() {
-	// Closures that order the Planet structure.
-	name := func(p1, p2 *Planet) bool {
-		return p1.name &lt; p2.name
-	}
-	mass := func(p1, p2 *Planet) bool {
-		return p1.mass &lt; p2.mass
-	}
-	distance := func(p1, p2 *Planet) bool {
-		return p1.distance &lt; p2.distance
-	}
-	decreasingDistance := func(p1, p2 *Planet) bool {
-		return !distance(p1, p2)
-	}
-
-	// Sort the planets by the various criteria.
-	By(name).Sort(planets)
-	fmt.Println("By name:", planets)
-
-	By(mass).Sort(planets)
-	fmt.Println("By mass:", planets)
-
-	By(distance).Sort(planets)
-	fmt.Println("By distance:", planets)
-
-	By(decreasingDistance).Sort(planets)
-	fmt.Println("By decreasing distance:", planets)
-
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>By name: [{Earth 1 1} {Mars 0.107 1.5} {Mercury 0.055 0.4} {Venus 0.815 0.7}]
-By mass: [{Mercury 0.055 0.4} {Mars 0.107 1.5} {Venus 0.815 0.7} {Earth 1 1}]
-By distance: [{Mercury 0.055 0.4} {Venus 0.815 0.7} {Earth 1 1} {Mars 0.107 1.5}]
-By decreasing distance: [{Mars 0.107 1.5} {Earth 1 1} {Venus 0.815 0.7} {Mercury 0.055 0.4}]
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <div id="example__sortMultiKeys" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example (SortMultiKeys)</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example (SortMultiKeys)</span></p> 
-      <p>ExampleMultiKeys demonstrates a technique for sorting a struct type using different sets of multiple fields in the comparison. We chain together "Less" functions, each of which compares a single field. </p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-// A Change is a record of source code changes, recording user, language, and delta size.
-type Change struct {
-	user     string
-	language string
-	lines    int
-}
-
-type lessFunc func(p1, p2 *Change) bool
-
-// multiSorter implements the Sort interface, sorting the changes within.
-type multiSorter struct {
-	changes []Change
-	less    []lessFunc
-}
-
-// Sort sorts the argument slice according to the less functions passed to OrderedBy.
-func (ms *multiSorter) Sort(changes []Change) {
-	ms.changes = changes
-	sort.Sort(ms)
-}
-
-// OrderedBy returns a Sorter that sorts using the less functions, in order.
-// Call its Sort method to sort the data.
-func OrderedBy(less ...lessFunc) *multiSorter {
-	return &amp;multiSorter{
-		less: less,
-	}
-}
-
-// Len is part of sort.Interface.
-func (ms *multiSorter) Len() int {
-	return len(ms.changes)
-}
-
-// Swap is part of sort.Interface.
-func (ms *multiSorter) Swap(i, j int) {
-	ms.changes[i], ms.changes[j] = ms.changes[j], ms.changes[i]
-}
-
-// Less is part of sort.Interface. It is implemented by looping along the
-// less functions until it finds a comparison that is either Less or
-// !Less. Note that it can call the less functions twice per call. We
-// could change the functions to return -1, 0, 1 and reduce the
-// number of calls for greater efficiency: an exercise for the reader.
-func (ms *multiSorter) Less(i, j int) bool {
-	p, q := &amp;ms.changes[i], &amp;ms.changes[j]
-	// Try all but the last comparison.
-	var k int
-	for k = 0; k &lt; len(ms.less)-1; k++ {
-		less := ms.less[k]
-		switch {
-		case less(p, q):
-			// p &lt; q, so we have a decision.
-			return true
-		case less(q, p):
-			// p &gt; q, so we have a decision.
-			return false
-		}
-		// p == q; try the next comparison.
-	}
-	// All comparisons to here said "equal", so just return whatever
-	// the final comparison reports.
-	return ms.less[k](p, q)
-}
-
-var changes = []Change{
-	{"gri", "Go", 100},
-	{"ken", "C", 150},
-	{"glenda", "Go", 200},
-	{"rsc", "Go", 200},
-	{"r", "Go", 100},
-	{"ken", "Go", 200},
-	{"dmr", "C", 100},
-	{"r", "C", 150},
-	{"gri", "Smalltalk", 80},
-}
-
-// ExampleMultiKeys demonstrates a technique for sorting a struct type using different
-// sets of multiple fields in the comparison. We chain together "Less" functions, each of
-// which compares a single field.
-func main() {
-	// Closures that order the Change structure.
-	user := func(c1, c2 *Change) bool {
-		return c1.user &lt; c2.user
-	}
-	language := func(c1, c2 *Change) bool {
-		return c1.language &lt; c2.language
-	}
-	increasingLines := func(c1, c2 *Change) bool {
-		return c1.lines &lt; c2.lines
-	}
-	decreasingLines := func(c1, c2 *Change) bool {
-		return c1.lines &gt; c2.lines // Note: &gt; orders downwards.
-	}
-
-	// Simple use: Sort by user.
-	OrderedBy(user).Sort(changes)
-	fmt.Println("By user:", changes)
-
-	// More examples.
-	OrderedBy(user, increasingLines).Sort(changes)
-	fmt.Println("By user,&lt;lines:", changes)
-
-	OrderedBy(user, decreasingLines).Sort(changes)
-	fmt.Println("By user,&gt;lines:", changes)
-
-	OrderedBy(language, increasingLines).Sort(changes)
-	fmt.Println("By language,&lt;lines:", changes)
-
-	OrderedBy(language, increasingLines, user).Sort(changes)
-	fmt.Println("By language,&lt;lines,user:", changes)
-
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>By user: [{dmr C 100} {glenda Go 200} {gri Go 100} {gri Smalltalk 80} {ken C 150} {ken Go 200} {r Go 100} {r C 150} {rsc Go 200}]
-By user,&lt;lines: [{dmr C 100} {glenda Go 200} {gri Smalltalk 80} {gri Go 100} {ken C 150} {ken Go 200} {r Go 100} {r C 150} {rsc Go 200}]
-By user,&gt;lines: [{dmr C 100} {glenda Go 200} {gri Go 100} {gri Smalltalk 80} {ken Go 200} {ken C 150} {r C 150} {r Go 100} {rsc Go 200}]
-By language,&lt;lines: [{dmr C 100} {ken C 150} {r C 150} {r Go 100} {gri Go 100} {ken Go 200} {glenda Go 200} {rsc Go 200} {gri Smalltalk 80}]
-By language,&lt;lines,user: [{dmr C 100} {ken C 150} {r C 150} {gri Go 100} {r Go 100} {glenda Go 200} {ken Go 200} {rsc Go 200} {gri Smalltalk 80}]
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <div id="example__sortWrapper" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example (SortWrapper)</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example (SortWrapper)</span></p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-type Grams int
-
-func (g Grams) String() string { return fmt.Sprintf("%dg", int(g)) }
-
-type Organ struct {
-	Name   string
-	Weight Grams
-}
-
-type Organs []*Organ
-
-func (s Organs) Len() int      { return len(s) }
-func (s Organs) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
-
-// ByName implements sort.Interface by providing Less and using the Len and
-// Swap methods of the embedded Organs value.
-type ByName struct{ Organs }
-
-func (s ByName) Less(i, j int) bool { return s.Organs[i].Name &lt; s.Organs[j].Name }
-
-// ByWeight implements sort.Interface by providing Less and using the Len and
-// Swap methods of the embedded Organs value.
-type ByWeight struct{ Organs }
-
-func (s ByWeight) Less(i, j int) bool { return s.Organs[i].Weight &lt; s.Organs[j].Weight }
-
-func main() {
-	s := []*Organ{
-		{"brain", 1340},
-		{"heart", 290},
-		{"liver", 1494},
-		{"pancreas", 131},
-		{"prostate", 62},
-		{"spleen", 162},
-	}
-
-	sort.Sort(ByWeight{s})
-	fmt.Println("Organs by weight:")
-	printOrgans(s)
-
-	sort.Sort(ByName{s})
-	fmt.Println("Organs by name:")
-	printOrgans(s)
-
-}
-
-func printOrgans(s []*Organ) {
-	for _, o := range s {
-		fmt.Printf("%-8s (%v)\n", o.Name, o.Weight)
-	}
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>Organs by weight:
-prostate (62g)
-pancreas (131g)
-spleen   (162g)
-heart    (290g)
-brain    (1340g)
-liver    (1494g)
-Organs by name:
-brain    (1340g)
-heart    (290g)
-liver    (1494g)
-pancreas (131g)
-prostate (62g)
-spleen   (162g)
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <div id="pkg-index" class="toggleVisible"> 
-     <div class="collapsed"> 
-      <h2 class="toggleButton" title="Click to show Index section">Index ?</h2> 
-     </div> 
-     <div class="expanded"> 
-      <h2 class="toggleButton" title="Click to hide Index section">Index ?</h2> 
-      <!-- Table of contents for API; must be named manual-nav to turn off auto nav. --> 
-      <div id="manual-nav"> 
-       <dl> 
-        <dd>
-         <a href="#Float64s">func Float64s(a []float64)</a>
-        </dd> 
-        <dd>
-         <a href="#Float64sAreSorted">func Float64sAreSorted(a []float64) bool</a>
-        </dd> 
-        <dd>
-         <a href="#Ints">func Ints(a []int)</a>
-        </dd> 
-        <dd>
-         <a href="#IntsAreSorted">func IntsAreSorted(a []int) bool</a>
-        </dd> 
-        <dd>
-         <a href="#IsSorted">func IsSorted(data Interface) bool</a>
-        </dd> 
-        <dd>
-         <a href="#Search">func Search(n int, f func(int) bool) int</a>
-        </dd> 
-        <dd>
-         <a href="#SearchFloat64s">func SearchFloat64s(a []float64, x float64) int</a>
-        </dd> 
-        <dd>
-         <a href="#SearchInts">func SearchInts(a []int, x int) int</a>
-        </dd> 
-        <dd>
-         <a href="#SearchStrings">func SearchStrings(a []string, x string) int</a>
-        </dd> 
-        <dd>
-         <a href="#Slice">func Slice(slice interface{}, less func(i, j int) bool)</a>
-        </dd> 
-        <dd>
-         <a href="#SliceIsSorted">func SliceIsSorted(slice interface{}, less func(i, j int) bool) bool</a>
-        </dd> 
-        <dd>
-         <a href="#SliceStable">func SliceStable(slice interface{}, less func(i, j int) bool)</a>
-        </dd> 
-        <dd>
-         <a href="#Sort">func Sort(data Interface)</a>
-        </dd> 
-        <dd>
-         <a href="#Stable">func Stable(data Interface)</a>
-        </dd> 
-        <dd>
-         <a href="#Strings">func Strings(a []string)</a>
-        </dd> 
-        <dd>
-         <a href="#StringsAreSorted">func StringsAreSorted(a []string) bool</a>
-        </dd> 
-        <dd>
-         <a href="#Float64Slice">type Float64Slice</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#Float64Slice.Len">func (p Float64Slice) Len() int</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#Float64Slice.Less">func (p Float64Slice) Less(i, j int) bool</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#Float64Slice.Search">func (p Float64Slice) Search(x float64) int</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#Float64Slice.Sort">func (p Float64Slice) Sort()</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#Float64Slice.Swap">func (p Float64Slice) Swap(i, j int)</a>
-        </dd> 
-        <dd>
-         <a href="#IntSlice">type IntSlice</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#IntSlice.Len">func (p IntSlice) Len() int</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#IntSlice.Less">func (p IntSlice) Less(i, j int) bool</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#IntSlice.Search">func (p IntSlice) Search(x int) int</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#IntSlice.Sort">func (p IntSlice) Sort()</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#IntSlice.Swap">func (p IntSlice) Swap(i, j int)</a>
-        </dd> 
-        <dd>
-         <a href="#Interface">type Interface</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#Reverse">func Reverse(data Interface) Interface</a>
-        </dd> 
-        <dd>
-         <a href="#StringSlice">type StringSlice</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#StringSlice.Len">func (p StringSlice) Len() int</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#StringSlice.Less">func (p StringSlice) Less(i, j int) bool</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#StringSlice.Search">func (p StringSlice) Search(x string) int</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#StringSlice.Sort">func (p StringSlice) Sort()</a>
-        </dd> 
-        <dd>
-         &nbsp; &nbsp; 
-         <a href="#StringSlice.Swap">func (p StringSlice) Swap(i, j int)</a>
-        </dd> 
-       </dl> 
-      </div>
-      <!-- #manual-nav --> 
-      <div id="pkg-examples"> 
-       <h4>Examples</h4> 
-       <dl> 
-        <dd>
-         <a class="exampleLink" href="#example_">Package</a>
-        </dd> 
-        <dd>
-         <a class="exampleLink" href="#example_Ints">Ints</a>
-        </dd> 
-        <dd>
-         <a class="exampleLink" href="#example_Reverse">Reverse</a>
-        </dd> 
-        <dd>
-         <a class="exampleLink" href="#example_Search">Search</a>
-        </dd> 
-        <dd>
-         <a class="exampleLink" href="#example_Search_descendingOrder">Search (DescendingOrder)</a>
-        </dd> 
-        <dd>
-         <a class="exampleLink" href="#example_Slice">Slice</a>
-        </dd> 
-        <dd>
-         <a class="exampleLink" href="#example_SliceStable">SliceStable</a>
-        </dd> 
-        <dd>
-         <a class="exampleLink" href="#example_Strings">Strings</a>
-        </dd> 
-        <dd>
-         <a class="exampleLink" href="#example__sortKeys">Package (SortKeys)</a>
-        </dd> 
-        <dd>
-         <a class="exampleLink" href="#example__sortMultiKeys">Package (SortMultiKeys)</a>
-        </dd> 
-        <dd>
-         <a class="exampleLink" href="#example__sortWrapper">Package (SortWrapper)</a>
-        </dd> 
-       </dl> 
-      </div> 
-      <h4>Package files</h4> 
-      <p> <span style="font-size:90%"> <a href="/src/sort/search.go">search.go</a> <a href="/src/sort/sort.go">sort.go</a> <a href="/src/sort/zfuncversion.go">zfuncversion.go</a> </span> </p> 
-     </div>
-     <!-- .expanded --> 
+Arrays.sort(array, comparator)
+</pre> 
+    <p>The array can be an array of <code>Object</code>s or an array of one of the primitive types. If the array contains primitives or objects of a class implementing <code>Comparable</code> you can use the simple form of <code>Arrays.sort()</code>. Otherwise a comparator is required.</p> 
+    <div class="filename">
+     <span>BuiltInSortingDemo.java</span>
     </div>
-    <!-- #pkg-index --> 
-    <div id="pkg-callgraph" class="toggle" style="display: none"> 
-     <div class="collapsed"> 
-      <h2 class="toggleButton" title="Click to show Internal Call Graph section">Internal call graph ?</h2> 
-     </div> 
-     <!-- .expanded --> 
-     <div class="expanded"> 
-      <h2 class="toggleButton" title="Click to hide Internal Call Graph section">Internal call graph ?</h2> 
-      <p> In the call graph viewer below, each node is a function belonging to this package and its children are the functions it calls—perhaps dynamically. </p> 
-      <p> The root nodes are the entry points of the package: functions that may be called from outside the package. There may be non-exported or anonymous functions among them if they are called dynamically from another package. </p> 
-      <p> Click a node to visit that function's source code. From there you can visit its callers by clicking its declaring <code>func</code> token. </p> 
-      <p> Functions may be omitted if they were determined to be unreachable in the particular programs or tests that were analyzed. </p> 
-      <!-- Zero means show all package entry points. --> 
-      <ul style="margin-left: 0.5in" id="callgraph-0" class="treeview"></ul> 
-     </div> 
-    </div> 
-    <!-- #pkg-callgraph --> 
-    <h2 id="Float64s">func <a href="/src/sort/sort.go?s=9315:9341#L340">Float64s</a> <a class="permalink" href="#Float64s">¶</a> </h2> 
-    <pre>func Float64s(a []<a href="/pkg/builtin/#float64">float64</a>)</pre> 
-    <p> Float64s sorts a slice of float64s in increasing order (not-a-number values are treated as less than other values). </p> 
-    <h2 id="Float64sAreSorted">func <a href="/src/sort/sort.go?s=9771:9811#L350">Float64sAreSorted</a> <a class="permalink" href="#Float64sAreSorted">¶</a> </h2> 
-    <pre>func Float64sAreSorted(a []<a href="/pkg/builtin/#float64">float64</a>) <a href="/pkg/builtin/#bool">bool</a></pre> 
-    <p> Float64sAreSorted tests whether a slice of float64s is sorted in increasing order (not-a-number values are treated as less than other values). </p> 
-    <h2 id="Ints">func <a href="/src/sort/sort.go?s=9151:9169#L336">Ints</a> <a class="permalink" href="#Ints">¶</a> </h2> 
-    <pre>func Ints(a []<a href="/pkg/builtin/#int">int</a>)</pre> 
-    <p> Ints sorts a slice of ints in increasing order. </p> 
-    <div id="example_Ints" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
+    <pre class="prettyprint">package edu.lmu.cs.sorting;
 
-import (
-	"fmt"
-	"sort"
-)
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Date;
 
-func main() {
-	s := []int{5, 2, 6, 3, 1, 4} // unsorted
-	sort.Ints(s)
-	fmt.Println(s)
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>[1 2 3 4 5 6]
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <h2 id="IntsAreSorted">func <a href="/src/sort/sort.go?s=9555:9587#L346">IntsAreSorted</a> <a class="permalink" href="#IntsAreSorted">¶</a> </h2> 
-    <pre>func IntsAreSorted(a []<a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a></pre> 
-    <p> IntsAreSorted tests whether a slice of ints is sorted in increasing order. </p> 
-    <h2 id="IsSorted">func <a href="/src/sort/sort.go?s=7515:7549#L285">IsSorted</a> <a class="permalink" href="#IsSorted">¶</a> </h2> 
-    <pre>func IsSorted(data <a href="#Interface">Interface</a>) <a href="/pkg/builtin/#bool">bool</a></pre> 
-    <p> IsSorted reports whether data is sorted. </p> 
-    <h2 id="Search">func <a href="/src/sort/search.go?s=2246:2286#L49">Search</a> <a class="permalink" href="#Search">¶</a> </h2> 
-    <pre>func Search(n <a href="/pkg/builtin/#int">int</a>, f func(<a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#int">int</a></pre> 
-    <p> Search uses binary search to find and return the smallest index i in [0, n) at which f(i) is true, assuming that on the range [0, n), f(i) == true implies f(i+1) == true. That is, Search requires that f is false for some (possibly empty) prefix of the input range [0, n) and then true for the (possibly empty) remainder; Search returns the first true index. If there is no such index, Search returns n. (Note that the "not found" return value is not -1 as in, for instance, strings.Index.) Search calls f(i) only for i in the range [0, n). </p> 
-    <p> A common use of Search is to find the index i for a value x in a sorted, indexable data structure such as an array or slice. In this case, the argument f, typically a closure, captures the value to be searched for, and how the data structure is indexed and ordered. </p> 
-    <p> For instance, given a slice data sorted in ascending order, the call Search(len(data), func(i int) bool { return data[i] &gt;= 23 }) returns the smallest index i such that data[i] &gt;= 23. If the caller wants to find whether 23 is in the slice, it must test data[i] == 23 separately. </p> 
-    <p> Searching data sorted in descending order would use the &lt;= operator instead of the &gt;= operator. </p> 
-    <p> To complete the example above, the following code tries to find the value x in an integer slice data sorted in ascending order: </p> 
-    <pre>x := 23
-i := sort.Search(len(data), func(i int) bool { return data[i] &gt;= x })
-if i &lt; len(data) &amp;&amp; data[i] == x {
-	// x is present at data[i]
-} else {
-	// x is not present in data,
-	// but i is the index where it would be inserted.
+import javax.swing.JPanel;
+
+/**
+ * A throwaway example class showing how to use the built-in sorting
+ * methods in java.util.Arrays.
+ */
+public class BuiltInSortingDemo extends JPanel {
+
+    private static class Employee {
+        String id = "";
+        String name = "";
+        String address = "";
+        String phone = "";
+        Date birthday = new Date();
+        BigDecimal salary = new BigDecimal(0);
+    }
+
+    static Comparator&lt;Employee&gt; increasingName = new Comparator&lt;Employee&gt;() {
+        public int compare(Employee e1, Employee e2) {
+            return e1.name.compareTo(e2.name);
+        }
+    };
+
+    static Comparator&lt;Employee&gt; decreasingSalary = new Comparator&lt;Employee&gt;() {
+        public int compare(Employee e1, Employee e2) {
+            return e2.salary.compareTo(e1.salary);
+        }
+    };
+
+    static Employee alice = new Employee();
+    static Employee bob = new Employee();
+
+    public static void main(String[] args) {
+        Arrays.sort(new int[]{3, 5, 1, 2, 4});
+        Arrays.sort(new char[]{'d', 'q', 'a'});
+        Arrays.sort(new byte[]{5, -3});
+        Arrays.sort(new short[]{322, 98, -11111});
+        Arrays.sort(new long[]{234234234, 23435112, 4214124214L});
+        Arrays.sort(new float[]{4.3F});
+        Arrays.sort(new double[]{9.9E-7, Double.MAX_VALUE});
+        Arrays.sort(new String[]{"abc", "abb", "dog"});
+        Arrays.sort(new Date[]{});
+        // Will throw exception --&gt; Arrays.sort(new Employee[]{bob, alice});
+
+        // Comparators are necessary for Employee objects since the
+        // Employee class does not implement Comparable.
+        Arrays.sort(new Employee[]{bob, alice}, increasingName);
+        Arrays.sort(new Employee[]{bob, alice}, decreasingSalary);
+    }
+
 }
 </pre> 
-    <p> As a more whimsical example, this program guesses your number: </p> 
-    <pre>func GuessingGame() {
-	var s string
-	fmt.Printf("Pick an integer from 0 to 100.\n")
-	answer := sort.Search(100, func(i int) bool {
-		fmt.Printf("Is your number &lt;= %d? ", i)
-		fmt.Scanf("%s", &amp;s)
-		return s != "" &amp;&amp; s[0] == 'y'
-	})
-	fmt.Printf("Your number is %d.\n", answer)
+    <h2>Some Algorithms</h2> 
+    <p>Okay, big deal, <code>Arrays.sort()</code> exists. But you still need to study sorting algorithms and implement some yourself because</p> 
+    <ul> 
+     <li>There is no one best algorithm — different algorithms work best in different situations, and a canned library routine might not work in your particular situation. </li>
+     <li>You might find yourself programming in an environment without a sort method in a library. </li>
+    </ul> 
+    <h3>Selection Sort</h3> 
+    <p>First, find the smallest element and swap it with the first. Sort the rest of the list the same way.</p> 
+    <pre class="code">
+for i in 0 .. n-2
+    small := i
+    for j in i+1 .. n-1
+        if (a[j] &lt; a[small]) small := j
+    swap(a[i], a[small])
+</pre> 
+    <p>Sample trace:</p> 
+    <pre class="derivation">
+20 54 16 36 99 11 74 88
+<mark>11</mark> 54 16 36 99 20 74 88
+<mark>11 16</mark> 54 36 99 20 74 88
+<mark>11 16 20</mark> 36 99 54 74 88
+<mark>11 16 20 36</mark> 54 99 74 88
+<mark>11 16 20 36 54</mark> 99 74 88
+<mark>11 16 20 36 54 74</mark> 99 88
+<mark>11 16 20 36 54 74 88</mark> 99
+</pre> 
+    <p>Notes:</p> 
+    <ul> 
+     <li>Quadratic run time </li>
+     <li>No swapping in inner loop </li>
+     <li>After pass $k$, the first $k$ elements are in their final absolute positions </li>
+    </ul> 
+    <h3>Insertion Sort</h3> 
+    <p>For the 2nd, 3rd, 4th, etc. element: slide backwards into proper relative sorted position.</p> 
+    <pre class="code">
+for i in 1 .. n-1
+    current := a[i]
+    j := i
+    while (j &gt; 0 and current &lt; a[j-1])
+        a[j] := a[j-1]
+        j--
+    a[j] = current
+</pre> 
+    <p>Sample trace:</p> 
+    <pre class="derivation">
+<mark>20</mark> 54 16 36 99 11 74 88
+<mark>20 54</mark> 16 36 99 11 74 88
+<mark>16 20 54</mark> 36 99 11 74 88
+<mark>16 20 36 54</mark> 99 11 74 88
+<mark>16 20 36 54 99</mark> 11 74 88
+<mark>11 16 20 36 54 99</mark> 74 88
+<mark>11 16 20 36 54 74 99</mark> 88
+<mark>11 16 20 36 54 74 88 99</mark>
+</pre> 
+    <p>Notes</p> 
+    <ul> 
+     <li>Quadratic run-time on average (though linear if already sorted) </li>
+     <li>After pass $k$, the first $k+1$ elements are in relative sorted order </li>
+     <li>This is the way most people would sort a hand of cards </li>
+     <li>In practice, does far fewer compares than selection sort </li>
+     <li>But has moves in the inner loop </li>
+     <li>If data sorted, or nearly sorted, this algorithm shines </li>
+     <li>If data is reversed, this algorithm is worst </li>
+     <li>Better than selection sort if moves are cheap; worse if expensive. </li>
+    </ul> 
+    <h3>Bubble Sort</h3> 
+    <p>Systematically examine all pairs of adjacent elements, swapping them when they are out of order.</p> 
+    <pre class="code">
+for i in 0 .. n-2
+    for j in i .. n-1
+        if (a[j] &gt; a[j+1]) swap(a[j], a[j+1])
+</pre> 
+    <p>Ack, that examines <em>every pair</em> of elements. We need to stop when we make a pass that doesn’t swap anything.</p> 
+    <pre class="code">
+for i in 0 .. n-2
+    swapped := false
+    for j in i .. n-1
+        if (a[j] &gt; a[j+1])
+            swap(a[j], a[j+1])
+            swapped := true
+    return if not swapped
+</pre> 
+    <p>Notes</p> 
+    <ul> 
+     <li>Exchanges only adjacent elements, which is really slow </li>
+     <li>Doesn’t need a temporary variable; just swap. </li>
+     <li>The swapped flag is important because in practice you often find yourself working on data that is "nearly" sorted. </li>
+     <li>Large elements near the beginning of the array (<b>rabbits</b>) move quickly to the other end, but small elements near the end (<b>turtles</b>) bubble up to the front very, very slowly. </li>
+     <li>Bubblesort basically sucks: “the bubble sort seems to have nothing to recommend it, except a catchy name and the fact that it leads to some interesting theoretical problems.” (D. Knuth) </li>
+    </ul> 
+    <h3>Cocktail Sort</h3> 
+    <p>This is a bidirectional bubble sort. Also called Shaker Sort or Shuttle Sort.</p> 
+    <h3>Shell Sort</h3> 
+    <p>Multiple-pass insertion-sort variant in which items are sifted more than one location at a time at first. The intervals decrease at each pass until they finally get down to one.</p> 
+    <p>Read <a href="http://www.cs.princeton.edu/~rs/shell/paperF.pdf">Sedgewick’s short paper</a> on the complexity of Shellsort.</p> 
+    <h3>Tree Sort</h3> 
+    <p>For each item in the array, add it to a binary search tree. Traverse the tree inorder, writing each item back into the array.</p> 
+    <pre class="code">
+for x in a
+    insert x into binary search tree T
+refill a by traversing T inorder
+</pre> 
+    <p>Notes</p> 
+    <ul> 
+     <li>Will have $\Theta(n^2)$ worst-case complexity unless you use a tree that can balance itself (like a Red-Black) tree, in which case you get the $\Theta(n \log n)$. </li>
+     <li>Needs lots of extra space </li>
+    </ul> 
+    <h3>Quick Sort</h3> 
+    <p>Partition the array so one of the elements is in its final position with smaller elements to its left and larger ones to its right, then (recursively) sort each side.</p> 
+    <p>Notes</p> 
+    <ul> 
+     <li>Fastest known comparison-based sort <strong>on average</strong> </li>
+     <li>Has $\Theta(n^2)$ worst-case complexity, so is <strong>not suitable</strong> as a service to sort user input where users cannot be trusted. </li>
+     <li>Choice of pivot is crucial -- the median would be the best choice but computing it is WAY too expensive! </li>
+     <li>Common choice is median of the first, middle and last elements (called the <em>median-of-three</em>) </li>
+     <li>However, an attacker can still compute a median-of-three killer sequence </li>
+     <li>One way to avoid this is to choose the pivot at random, but median-of-three is still faster.... </li>
+     <li>A common approach is to stop recursing when sublists get small and switch algorithms. Usually the "stopper" was insertion sort and "small" was a constant size like 10 or 15. </li>
+     <li>David Musser’s <strong>Introsort</strong> is better though: it switches to heapsort when the algorithm detects the partitioning is tending toward the nasty quadratic behavior. </li>
+    </ul> 
+    <h3>Heap Sort</h3> 
+    <p>First rearrange the array into a heap by sifting up each element in the latter half of the array one at a time. Then for each element starting at the beginning, sift it down. Voila!</p> 
+    <h3>Merge Sort</h3> 
+    <p>Recursively: split the list in half, sort each half, then merge the sorted halves together.</p> 
+    <p>Sample trace:</p> 
+    <pre class="derivation">
+20 54 16 36 99 11 74 88
+<mark>20 54</mark> <mark>16 36</mark> <mark>11 99</mark> <mark>74 88</mark>
+<mark>16 20 36 54</mark> <mark>11 74 88 99</mark>
+<mark>11 16 20 36 54 74 88 99</mark>
+</pre> 
+    <p>Notes</p> 
+    <ul> 
+     <li>Pretty easy to see that this is $\Theta(n \log n)$ </li>
+     <li>Amenable to parallelism </li>
+     <li>Basic algorithm requires $\Theta(n)$ space, but there does exist an in-place variant. </li>
+    </ul> 
+    <h3>Bucket Sort</h3> 
+    <p>Partition the items into buckets. Sort each bucket. Read items out of buckets into final array.</p> 
+    <h3>Counting Sort</h3> 
+    <p>This one only works when the items to be sorted have fairly small integer keys. Set up an array called <code>frequency</code> whose indices are the range of the values you have to sort. Fill it with zeros. Go through the array you want to sort, incrementing the frequenccy array incrementing the count for each item you see. Then you can read out the sorted array from the frequencies. (Details in the code below.)</p> 
+    <h3>Radix Sort</h3> 
+    <p>This one only works when the items can be expressed as strings of bits, digits, characters, whatever — and these symbols are ordered. The algorithm is to repeatedly place in buckets (labeled with the symbols) from the <strong>least</strong> significant symbol to the most significant.</p> 
+    <p>Example with decimal integers:</p> 
+    <p>Input sequence is 759, 43, 989, 6, 206, 855, 209, 903, 102, 199, 721, 188, 5. First place in buckets on least significant digit.</p> 
+    <pre>
+    0:
+    1:    721
+    2:    102
+    3:    043,903
+    4:
+    5:    855,005
+    6:    006,206
+    7:
+    8:    188
+    9:    759,989,209,199
+</pre> 
+    <p>The go through the buckets <strong>in order</strong>, writing into buckets based on the second digit</p> 
+    <pre>
+    0:    102,903,005,006,206,209
+    1:
+    2:    721
+    3:
+    4:    043
+    5:    855,759
+    6:
+    7:
+    8:    188,989,
+    9:    199
+</pre> 
+    <p>The go through the buckets <strong>in order</strong>, writing into buckets based on the first digit</p> 
+    <pre>
+    0:    005,006,043
+    1:    102,188,199
+    2:    206,209
+    3:
+    4:
+    5:
+    6:
+    7:    721,759
+    8:    855
+    9:    903,989
+</pre> 
+    <p>Now just read them out in order. Note that this is easy for binary numbers and strings, too.</p> 
+    <h2>An Animated Sort Application</h2> 
+    <div class="filename">
+     <span>Sorter.java</span>
+    </div>
+    <pre class="prettyprint">package edu.lmu.cs.sorting;
+
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.Random;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+
+/**
+ * A class containing a number of classic sorting algorithms,
+ * implemented from scratch.  The algorithms each operate on arrays
+ * of ints only, and are animated.
+ */
+public class Sorter extends JPanel {
+
+    private static Random randomizer = new Random();
+    private static final int ARRAY_LENGTH = 600;
+    private static final int MAX_VALUE = 400;
+    private final int[] array = new int[ARRAY_LENGTH];
+    private transient boolean shouldStop = false;
+
+    /**
+     * Swaps a[i] and a[j].
+     */
+    private void swap(int[] a, int i, int j) {
+        int old = a[i];
+        a[i] = a[j];
+        a[j] = old;
+    }
+
+    /**
+     * Fills an array with random values between 0 and MAX_VALUE.
+     */
+    private void reload(int[] a) {
+        for (int i = 0; i &lt; a.length; i++) {
+            a[i] = randomizer.nextInt(MAX_VALUE);
+        }
+    }
+
+    /**
+     * Sorts an array using Selection Sort.  The algorithm is to first
+     * put the smallest item in the first position, then the next
+     * smallest in the second position, and so on.
+     */
+    public void selectionSort(int[] a) {
+        for (int i = 0; i &lt; a.length - 1; i++) {
+            int small = i;
+            for (int j = i + 1; j &lt; a.length; j++) {
+                if (a[j] &lt; a[small]) small = j;
+                PAUSE();
+            }
+            swap(a, i, small);
+        }
+    }
+
+    /**
+     * Sorts an array using Insertion Sort.  The algorithm is to first
+     * slide the second element back as far as it should go, then slide
+     * the third back, and so on.
+     */
+    public void insertionSort(int[] a) {
+        for (int i = 1; i &lt; a.length; i++) {
+            int current = a[i];
+            int j = i;
+            for (; j &gt; 0 &amp;&amp; current &lt; a[j-1]; j--) {
+                a[j] = a[j-1];
+                PAUSE();
+            }
+            a[j] = current;
+        }
+    }
+
+    /**
+     * Sorts an array using Bubble Sort.
+     */
+    public void bubbleSort(int[] a) {
+        for (int i = a.length - 1; i &gt; 0; i--) {
+            for (int j = 0; j &lt; i; j++) {
+                if (a[j] &gt; a[j + 1]) swap(a, j, j + 1);
+                PAUSE();
+            }
+        }
+    }
+
+    /**
+     * Sorts an array using Gnome Sort.
+     */
+    public void gnomeSort(int[] a) {
+        for (int i = 0; i &lt; a.length;) {
+            PAUSE();
+            if (i == 0 || a[i-1] &lt;= a[i]) {
+                i++;
+            } else {
+                swap(a, i, i - 1);
+                i--;
+            }
+        }
+    }
+
+    /**
+     * Sorts an array using Shell Sort.  This is a lousy Shell Sort.
+     * I need to make a new one.
+     */
+    public void shellSort(int[] a) {
+        int distance = a.length / 2;
+        while (distance &gt; 0) {
+            boolean changed = false;
+            for (int i = 0; i &lt; a.length - distance; i++) {
+                if (a[i] &gt; a[i + distance]) {
+                    swap(a, i, i + distance);
+                    changed = true;
+                }
+                PAUSE();
+            }
+            if (!changed) distance /= 2;
+        }
+    }
+
+    /**
+     * Sorts an array using Quick Sort.  This version of quicksort uses
+     * the leftmost item as the pivot, but since this gives disastrous
+     * performance on sorted and nearly sorted arrays, we scramble the
+     * array first.
+     */
+    public void quickSort(int[] a) {
+        // First shuffle (permute) the array
+        for (int i = 0; i &lt; a.length; i++) {
+            swap(a, i, randomizer.nextInt(ARRAY_LENGTH));
+        }
+
+        // Call the recursive helper
+        quickSort(a, 0, a.length - 1);
+    }
+
+    private void quickSort(int[] a, int left, int right) {
+        if (left &lt; right) {
+            int i = left;
+            int j = right;
+            while (i &lt; j) {
+                while (a[j] &gt; a[left]) {j--; PAUSE();}
+                while (i &lt; j &amp;&amp; a[i] &lt;= a[left]) {i++; PAUSE();}
+                if (i &lt; j) swap(a, i, j);
+            }
+            swap(a, left, j);
+            quickSort(a, left, j-1);
+            quickSort(a, j+1, right);
+        }
+    }
+
+    /**
+     * Sorts an array using Heap Sort.
+     */
+    public void heapSort(int[] a) {
+        // Phase 1: make a heap by sifting down all non-leaf
+        // elements, one after another, starting with the last
+        // non-leaf element and going backwards.
+        for (int i = a.length / 2 - 1; i &gt;= 0; i--) {
+            for (int j = i; j * 2 + 1 &lt; a.length;) {
+                PAUSE();
+                int k = j * 2 + 1;
+                if (k + 1 &lt; a.length &amp;&amp; a[k] &lt; a[k + 1]) k++;
+                if (a[j] &lt; a[k]) swap(a, j, k); else break;
+                j = k;
+            }
+        }
+        // Phase 2: Successively place the biggest, then next biggest
+        // items at the end of the array. each time reconstructing the
+        // heap in the slots of the array not yet sorted.
+        for (int i = a.length - 1; i &gt; 0; i--) {
+            swap(a, 0, i);
+            for (int j = 0; j * 2 + 1 &lt; i;) {
+                PAUSE();
+                int k = j * 2 + 1;
+                if (k + 1 &lt; i &amp;&amp; a[k] &lt; a[k + 1]) k++;
+                if (a[j] &lt; a[k]) swap(a, j, k); else break;
+                j = k;
+            }
+        }
+    }
+
+    /**
+     * Sorts an array using merge sort, the classic version with
+     * the extra storage.
+     */
+    public void mergeSort(int[] a) {
+        int[] scratch = new int[a.length];
+        mergeSort(a, 0, a.length - 1, scratch);
+    }
+
+    private void mergeSort(int[] a, int lo, int hi, int[] scratch) {
+        if (lo &gt;= hi) return;
+
+        int mid = (lo + hi) / 2;
+        mergeSort(a, lo, mid, scratch);
+        mergeSort(a, mid + 1, hi, scratch);
+
+        // Merge sorted sublists into temporary storage
+        for (int i = lo, j = mid + 1, k = lo; k &lt;= hi; k++) {
+            if ((i &lt;= mid) &amp;&amp; ((j &gt; hi) || (a[i] &lt; a[j]))) {
+                scratch[k] = a[i++]; PAUSE();
+            } else {
+                scratch[k] = a[j++]; PAUSE();
+            }
+        }
+
+        // Copy back from temporary storage
+        for (int k = lo; k &lt;= hi; k++) {
+            a[k] = scratch[k]; PAUSE();
+        }
+    }
+
+    /**
+     * Sorts an array using counting sort, provided all values in the
+     * array are non-negative.  If there are negative values in the array,
+     * the method will not sort but rather leave the array undefined.
+     * Furthermore, the method will likely throw an OutOfMemoryError
+     * if there are large integers in the array.
+     */
+    public void countingSort(int[] a) {
+        int max = 0;
+        for (int i = 0; i &lt; a.length; i++) {
+            max = Math.max(max, a[i]);
+            PAUSE();
+        }
+        System.out.println(max);
+        int[] counts = new int[max + 1];
+        Arrays.fill(counts, 0);
+        for (int i = 0; i &lt; a.length; i++) {
+            counts[a[i]]++;
+            PAUSE();
+        }
+        for (int i = 0, j = 0; j &lt; counts.length; j++) {
+            for (int k = 0; k &lt; counts[j]; k++) {
+                a[i++] = j;
+                PAUSE();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Sorter sorter = new Sorter();
+        JFrame frame = new JFrame("Sorting");
+        frame.getContentPane().add(sorter.toolbar, "North");
+        frame.getContentPane().add(sorter, "Center");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setVisible(true);
+        sorter.runAnimation();
+    }
+
+    Action startAction = new AbstractAction("Start") {
+        public void actionPerformed(ActionEvent e) {
+            final String methodName = (String)comboBox.getSelectedItem();
+            new Thread(new Runnable() {
+                public void run() {
+                startButton.setEnabled(false);
+                stopButton.setEnabled(true);
+                reload(array);
+                try {
+                    Sorter.class.getMethod(methodName,
+                        new Class[]{array.getClass()})
+                        .invoke(Sorter.this, new Object[]{array});
+                } catch (Exception e) {
+                }
+                stopButton.setEnabled(false);
+                startButton.setEnabled(true);
+            }}
+        ).start();
+    }
+    };
+
+    Action stopAction = new AbstractAction("Stop") {
+        public void actionPerformed(ActionEvent e) {
+            shouldStop = true;
+        }
+    };
+
+    private JToolBar toolbar = new JToolBar();
+    private JButton startButton = new JButton(startAction);
+    private JButton stopButton = new JButton(stopAction);
+    JComboBox comboBox = new JComboBox(new String[]{
+        "selectionSort",
+        "insertionSort",
+        "bubbleSort",
+        "gnomeSort",
+        "shellSort",
+        "quickSort",
+        "mergeSort",
+        "heapSort",
+        "countingSort"
+    });
+
+    public Sorter() {
+        setPreferredSize(new Dimension(ARRAY_LENGTH, MAX_VALUE));
+        setBorder(BorderFactory.createEtchedBorder());
+        toolbar.add(comboBox);
+        toolbar.add(startButton);
+        toolbar.add(stopButton);
+        comboBox.setMaximumRowCount(12);
+    }
+
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        for (int i = 0, n = array.length; i &lt; n; i++) {
+            g.drawLine(i, MAX_VALUE, i, MAX_VALUE - array[i]);
+        }
+    }
+
+    /**
+     * Causes the screen to be repainted every 30 ms or so.
+     */
+    private void runAnimation() {
+        while (true) {
+            repaint();
+            try {Thread.sleep(30);} catch (InterruptedException e) {}
+        }
+    }
+
+    /**
+     * Something to call periodically during sorting.
+     */
+    private void PAUSE() {
+        try {
+            Thread.sleep(1);
+            if (shouldStop) {
+                shouldStop = false;
+                // Can't think of a better way to stop than this
+                throw new RuntimeException();
+            }
+        } catch (InterruptedException e) {
+        }
+    }
 }
 </pre> 
-    <div id="example_Search" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-      <p>This example demonstrates searching a list sorted in ascending order. </p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-func main() {
-	a := []int{1, 3, 6, 10, 15, 21, 28, 36, 45, 55}
-	x := 6
-
-	i := sort.Search(len(a), func(i int) bool { return a[i] &gt;= x })
-	if i &lt; len(a) &amp;&amp; a[i] == x {
-		fmt.Printf("found %d at index %d in %v\n", x, i, a)
-	} else {
-		fmt.Printf("%d not found in %v\n", x, a)
-	}
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>found 6 at index 2 in [1 3 6 10 15 21 28 36 45 55]
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <div id="example_Search_descendingOrder" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example (DescendingOrder)</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example (DescendingOrder)</span></p> 
-      <p>This example demonstrates searching a list sorted in descending order. The approach is the same as searching a list in ascending order, but with the condition inverted. </p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-func main() {
-	a := []int{55, 45, 36, 28, 21, 15, 10, 6, 3, 1}
-	x := 6
-
-	i := sort.Search(len(a), func(i int) bool { return a[i] &lt;= x })
-	if i &lt; len(a) &amp;&amp; a[i] == x {
-		fmt.Printf("found %d at index %d in %v\n", x, i, a)
-	} else {
-		fmt.Printf("%d not found in %v\n", x, a)
-	}
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>found 6 at index 7 in [55 45 36 28 21 15 10 6 3 1]
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <h2 id="SearchFloat64s">func <a href="/src/sort/search.go?s=3317:3364#L82">SearchFloat64s</a> <a class="permalink" href="#SearchFloat64s">¶</a> </h2> 
-    <pre>func SearchFloat64s(a []<a href="/pkg/builtin/#float64">float64</a>, x <a href="/pkg/builtin/#float64">float64</a>) <a href="/pkg/builtin/#int">int</a></pre> 
-    <p> SearchFloat64s searches for x in a sorted slice of float64s and returns the index as specified by Search. The return value is the index to insert x if x is not present (it could be len(a)). The slice must be sorted in ascending order. </p> 
-    <h2 id="SearchInts">func <a href="/src/sort/search.go?s=2964:2999#L73">SearchInts</a> <a class="permalink" href="#SearchInts">¶</a> </h2> 
-    <pre>func SearchInts(a []<a href="/pkg/builtin/#int">int</a>, x <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre> 
-    <p> SearchInts searches for x in a sorted slice of ints and returns the index as specified by Search. The return value is the index to insert x if x is not present (it could be len(a)). The slice must be sorted in ascending order. </p> 
-    <h2 id="SearchStrings">func <a href="/src/sort/search.go?s=3680:3724#L91">SearchStrings</a> <a class="permalink" href="#SearchStrings">¶</a> </h2> 
-    <pre>func SearchStrings(a []<a href="/pkg/builtin/#string">string</a>, x <a href="/pkg/builtin/#string">string</a>) <a href="/pkg/builtin/#int">int</a></pre> 
-    <p> SearchStrings searches for x in a sorted slice of strings and returns the index as specified by Search. The return value is the index to insert x if x is not present (it could be len(a)). The slice must be sorted in ascending order. </p> 
-    <h2 id="Slice">func <a href="/src/sort/sort.go?s=6166:6221#L237">Slice</a> <a class="permalink" href="#Slice">¶</a> </h2> 
-    <pre>func Slice(slice interface{}, less func(i, j <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a>)</pre> 
-    <p> Slice sorts the provided slice given the provided less function. </p> 
-    <p> The sort is not guaranteed to be stable. For a stable sort, use SliceStable. </p> 
-    <p> The function panics if the provided interface is not a slice. </p> 
-    <div id="example_Slice" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-func main() {
-	people := []struct {
-		Name string
-		Age  int
-	}{
-		{"Gopher", 7},
-		{"Alice", 55},
-		{"Vera", 24},
-		{"Bob", 75},
-	}
-	sort.Slice(people, func(i, j int) bool { return people[i].Name &lt; people[j].Name })
-	fmt.Println("By name:", people)
-
-	sort.Slice(people, func(i, j int) bool { return people[i].Age &lt; people[j].Age })
-	fmt.Println("By age:", people)
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>By name: [{Alice 55} {Bob 75} {Gopher 7} {Vera 24}]
-By age: [{Gopher 7} {Vera 24} {Alice 55} {Bob 75}]
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <h2 id="SliceIsSorted">func <a href="/src/sort/sort.go?s=6864:6932#L257">SliceIsSorted</a> <a class="permalink" href="#SliceIsSorted">¶</a> </h2> 
-    <pre>func SliceIsSorted(slice interface{}, less func(i, j <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a>) <a href="/pkg/builtin/#bool">bool</a></pre> 
-    <p> SliceIsSorted tests whether a slice is sorted. </p> 
-    <p> The function panics if the provided interface is not a slice. </p> 
-    <h2 id="SliceStable">func <a href="/src/sort/sort.go?s=6572:6633#L248">SliceStable</a> <a class="permalink" href="#SliceStable">¶</a> </h2> 
-    <pre>func SliceStable(slice interface{}, less func(i, j <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a>)</pre> 
-    <p> SliceStable sorts the provided slice given the provided less function while keeping the original order of equal elements. </p> 
-    <p> The function panics if the provided interface is not a slice. </p> 
-    <div id="example_SliceStable" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-func main() {
-
-	people := []struct {
-		Name string
-		Age  int
-	}{
-		{"Alice", 25},
-		{"Elizabeth", 75},
-		{"Alice", 75},
-		{"Bob", 75},
-		{"Alice", 75},
-		{"Bob", 25},
-		{"Colin", 25},
-		{"Elizabeth", 25},
-	}
-
-	// Sort by name, preserving original order
-	sort.SliceStable(people, func(i, j int) bool { return people[i].Name &lt; people[j].Name })
-	fmt.Println("By name:", people)
-
-	// Sort by age preserving name order
-	sort.SliceStable(people, func(i, j int) bool { return people[i].Age &lt; people[j].Age })
-	fmt.Println("By age,name:", people)
-
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>By name: [{Alice 25} {Alice 75} {Alice 75} {Bob 75} {Bob 25} {Colin 25} {Elizabeth 75} {Elizabeth 25}]
-By age,name: [{Alice 25} {Bob 25} {Colin 25} {Elizabeth 25} {Alice 75} {Alice 75} {Bob 75} {Elizabeth 75}]
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <h2 id="Sort">func <a href="/src/sort/sort.go?s=5432:5457#L208">Sort</a> <a class="permalink" href="#Sort">¶</a> </h2> 
-    <pre>func Sort(data <a href="#Interface">Interface</a>)</pre> 
-    <p> Sort sorts data. It makes one call to data.Len to determine n, and O(n*log(n)) calls to data.Less and data.Swap. The sort is not guaranteed to be stable. </p> 
-    <h2 id="Stable">func <a href="/src/sort/sort.go?s=11737:11764#L385">Stable</a> <a class="permalink" href="#Stable">¶</a> </h2> 
-    <pre>func Stable(data <a href="#Interface">Interface</a>)</pre> 
-    <p> Stable sorts data while keeping the original order of equal elements. </p> 
-    <p> It makes one call to data.Len to determine n, O(n*log(n)) calls to data.Less and O(n*log(n)*log(n)) calls to data.Swap. </p> 
-    <h2 id="Strings">func <a href="/src/sort/sort.go?s=9426:9450#L343">Strings</a> <a class="permalink" href="#Strings">¶</a> </h2> 
-    <pre>func Strings(a []<a href="/pkg/builtin/#string">string</a>)</pre> 
-    <p> Strings sorts a slice of strings in increasing order. </p> 
-    <div id="example_Strings" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-func main() {
-	s := []string{"Go", "Bravo", "Gopher", "Alpha", "Grin", "Delta"}
-	sort.Strings(s)
-	fmt.Println(s)
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>[Alpha Bravo Delta Go Gopher Grin]
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <h2 id="StringsAreSorted">func <a href="/src/sort/sort.go?s=9934:9972#L353">StringsAreSorted</a> <a class="permalink" href="#StringsAreSorted">¶</a> </h2> 
-    <pre>func StringsAreSorted(a []<a href="/pkg/builtin/#string">string</a>) <a href="/pkg/builtin/#bool">bool</a></pre> 
-    <p> StringsAreSorted tests whether a slice of strings is sorted in increasing order. </p> 
-    <h2 id="Float64Slice">type <a href="/src/sort/sort.go?s=8219:8246#L309">Float64Slice</a> <a class="permalink" href="#Float64Slice">¶</a> </h2> 
-    <p> Float64Slice attaches the methods of Interface to []float64, sorting in increasing order (not-a-number values are treated as less than other values). </p> 
-    <pre>type Float64Slice []<a href="/pkg/builtin/#float64">float64</a></pre> 
-    <h3 id="Float64Slice.Len">func (Float64Slice) <a href="/src/sort/sort.go?s=8248:8279#L311">Len</a> <a class="permalink" href="#Float64Slice.Len">¶</a> </h3> 
-    <pre>func (p <a href="#Float64Slice">Float64Slice</a>) Len() <a href="/pkg/builtin/#int">int</a></pre> 
-    <h3 id="Float64Slice.Less">func (Float64Slice) <a href="/src/sort/sort.go?s=8308:8349#L312">Less</a> <a class="permalink" href="#Float64Slice.Less">¶</a> </h3> 
-    <pre>func (p <a href="#Float64Slice">Float64Slice</a>) Less(i, j <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a></pre> 
-    <h3 id="Float64Slice.Search">func (Float64Slice) <a href="/src/sort/search.go?s=4011:4054#L99">Search</a> <a class="permalink" href="#Float64Slice.Search">¶</a> </h3> 
-    <pre>func (p <a href="#Float64Slice">Float64Slice</a>) Search(x <a href="/pkg/builtin/#float64">float64</a>) <a href="/pkg/builtin/#int">int</a></pre> 
-    <p> Search returns the result of applying SearchFloat64s to the receiver and x. </p> 
-    <h3 id="Float64Slice.Sort">func (Float64Slice) <a href="/src/sort/sort.go?s=8631:8659#L321">Sort</a> <a class="permalink" href="#Float64Slice.Sort">¶</a> </h3> 
-    <pre>func (p <a href="#Float64Slice">Float64Slice</a>) Sort()</pre> 
-    <p> Sort is a convenience method. </p> 
-    <h3 id="Float64Slice.Swap">func (Float64Slice) <a href="/src/sort/sort.go?s=8404:8440#L313">Swap</a> <a class="permalink" href="#Float64Slice.Swap">¶</a> </h3> 
-    <pre>func (p <a href="#Float64Slice">Float64Slice</a>) Swap(i, j <a href="/pkg/builtin/#int">int</a>)</pre> 
-    <h2 id="IntSlice">type <a href="/src/sort/sort.go?s=7787:7806#L298">IntSlice</a> <a class="permalink" href="#IntSlice">¶</a> </h2> 
-    <p> IntSlice attaches the methods of Interface to []int, sorting in increasing order. </p> 
-    <pre>type IntSlice []<a href="/pkg/builtin/#int">int</a></pre> 
-    <h3 id="IntSlice.Len">func (IntSlice) <a href="/src/sort/sort.go?s=7808:7835#L300">Len</a> <a class="permalink" href="#IntSlice.Len">¶</a> </h3> 
-    <pre>func (p <a href="#IntSlice">IntSlice</a>) Len() <a href="/pkg/builtin/#int">int</a></pre> 
-    <h3 id="IntSlice.Less">func (IntSlice) <a href="/src/sort/sort.go?s=7864:7901#L301">Less</a> <a class="permalink" href="#IntSlice.Less">¶</a> </h3> 
-    <pre>func (p <a href="#IntSlice">IntSlice</a>) Less(i, j <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a></pre> 
-    <h3 id="IntSlice.Search">func (IntSlice) <a href="/src/sort/search.go?s=3867:3902#L96">Search</a> <a class="permalink" href="#IntSlice.Search">¶</a> </h3> 
-    <pre>func (p <a href="#IntSlice">IntSlice</a>) Search(x <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#int">int</a></pre> 
-    <p> Search returns the result of applying SearchInts to the receiver and x. </p> 
-    <h3 id="IntSlice.Sort">func (IntSlice) <a href="/src/sort/sort.go?s=8025:8049#L305">Sort</a> <a class="permalink" href="#IntSlice.Sort">¶</a> </h3> 
-    <pre>func (p <a href="#IntSlice">IntSlice</a>) Sort()</pre> 
-    <p> Sort is a convenience method. </p> 
-    <h3 id="IntSlice.Swap">func (IntSlice) <a href="/src/sort/sort.go?s=7925:7957#L302">Swap</a> <a class="permalink" href="#IntSlice.Swap">¶</a> </h3> 
-    <pre>func (p <a href="#IntSlice">IntSlice</a>) Swap(i, j <a href="/pkg/builtin/#int">int</a>)</pre> 
-    <h2 id="Interface">type <a href="/src/sort/sort.go?s=523:801#L6">Interface</a> <a class="permalink" href="#Interface">¶</a> </h2> 
-    <p> A type, typically a collection, that satisfies sort.Interface can be sorted by the routines in this package. The methods require that the elements of the collection be enumerated by an integer index. </p> 
-    <pre>type Interface interface {
-        <span class="comment">// Len is the number of elements in the collection.</span>
-        Len() <a href="/pkg/builtin/#int">int</a>
-        <span class="comment">// Less reports whether the element with</span>
-        <span class="comment">// index i should sort before the element with index j.</span>
-        Less(i, j <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a>
-        <span class="comment">// Swap swaps the elements with indexes i and j.</span>
-        Swap(i, j <a href="/pkg/builtin/#int">int</a>)
-}</pre> 
-    <h3 id="Reverse">func <a href="/src/sort/sort.go?s=7404:7442#L280">Reverse</a> <a class="permalink" href="#Reverse">¶</a> </h3> 
-    <pre>func Reverse(data <a href="#Interface">Interface</a>) <a href="#Interface">Interface</a></pre> 
-    <p> Reverse returns the reverse order for data. </p> 
-    <div id="example_Reverse" class="toggle"> 
-     <div class="collapsed"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-     </div> 
-     <div class="expanded"> 
-      <p class="exampleHeading toggleButton">? <span class="text">Example</span></p> 
-      <div class="play"> 
-       <div class="input">
-        <textarea class="code" spellcheck="false">package main
-
-import (
-	"fmt"
-	"sort"
-)
-
-func main() {
-	s := []int{5, 2, 6, 3, 1, 4} // unsorted
-	sort.Sort(sort.Reverse(sort.IntSlice(s)))
-	fmt.Println(s)
-}
-</textarea>
-       </div> 
-       <div class="output">
-        <pre>[6 5 4 3 2 1]
-</pre>
-       </div> 
-       <div class="buttons"> 
-        <a class="run" title="Run this code [shift-enter]">Run</a> 
-        <a class="fmt" title="Format this code">Format</a> 
-        <a class="share" title="Share this code">Share</a> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-    <h2 id="StringSlice">type <a href="/src/sort/sort.go?s=8764:8789#L324">StringSlice</a> <a class="permalink" href="#StringSlice">¶</a> </h2> 
-    <p> StringSlice attaches the methods of Interface to []string, sorting in increasing order. </p> 
-    <pre>type StringSlice []<a href="/pkg/builtin/#string">string</a></pre> 
-    <h3 id="StringSlice.Len">func (StringSlice) <a href="/src/sort/sort.go?s=8791:8821#L326">Len</a> <a class="permalink" href="#StringSlice.Len">¶</a> </h3> 
-    <pre>func (p <a href="#StringSlice">StringSlice</a>) Len() <a href="/pkg/builtin/#int">int</a></pre> 
-    <h3 id="StringSlice.Less">func (StringSlice) <a href="/src/sort/sort.go?s=8850:8890#L327">Less</a> <a class="permalink" href="#StringSlice.Less">¶</a> </h3> 
-    <pre>func (p <a href="#StringSlice">StringSlice</a>) Less(i, j <a href="/pkg/builtin/#int">int</a>) <a href="/pkg/builtin/#bool">bool</a></pre> 
-    <h3 id="StringSlice.Search">func (StringSlice) <a href="/src/sort/search.go?s=4166:4207#L102">Search</a> <a class="permalink" href="#StringSlice.Search">¶</a> </h3> 
-    <pre>func (p <a href="#StringSlice">StringSlice</a>) Search(x <a href="/pkg/builtin/#string">string</a>) <a href="/pkg/builtin/#int">int</a></pre> 
-    <p> Search returns the result of applying SearchStrings to the receiver and x. </p> 
-    <h3 id="StringSlice.Sort">func (StringSlice) <a href="/src/sort/sort.go?s=9017:9044#L331">Sort</a> <a class="permalink" href="#StringSlice.Sort">¶</a> </h3> 
-    <pre>func (p <a href="#StringSlice">StringSlice</a>) Sort()</pre> 
-    <p> Sort is a convenience method. </p> 
-    <h3 id="StringSlice.Swap">func (StringSlice) <a href="/src/sort/sort.go?s=8914:8949#L328">Swap</a> <a class="permalink" href="#StringSlice.Swap">¶</a> </h3> 
-    <pre>func (p <a href="#StringSlice">StringSlice</a>) Swap(i, j <a href="/pkg/builtin/#int">int</a>)</pre> 
-    <div id="footer">
-      Build version go1.9.
-     <br> Except as 
-     <a href="https://developers.google.com/site-policies#restrictions">noted</a>, the content of this page is licensed under the Creative Commons Attribution 3.0 License, and code is licensed under a 
-     <a href="/LICENSE">BSD license</a>.
-     <br> 
-     <a href="/doc/tos.html">Terms of Service</a> | 
-     <a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a> 
-    </div> 
-   </div>
-   <!-- .container --> 
-  </div>
-  <!-- #page --> 
-  <!-- TODO(adonovan): load these from <head> using "defer" attribute? --> 
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script> 
-  <script type="text/javascript" src="/lib/godoc/jquery.treeview.js"></script> 
-  <script type="text/javascript" src="/lib/godoc/jquery.treeview.edit.js"></script> 
-  <script type="text/javascript" src="/lib/godoc/playground.js"></script> 
-  <script>var goVersion = "go1.9";</script> 
-  <script type="text/javascript" src="/lib/godoc/godocs.js"></script> 
-  <script type="text/javascript">
-(function() {
-  var ga = document.createElement("script"); ga.type = "text/javascript"; ga.async = true;
-  ga.src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
-  var s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ga, s);
-})();
-</script>   
+    <h2>Choosing a Sorting Algorithm in Practice</h2> 
+    <p>Which algorithm (or combination of algorithms!) is right for you depends on your particular application. Ask yourself:</p> 
+    <ul> 
+     <li>Are you sorting large or small numbers of items? </li>
+     <li>Are the items themselves large or small? </li>
+     <li>Is the item size fixed? </li>
+     <li>Are there only a small number of possible input values? </li>
+     <li>Are you sorting in-memory or external files? </li>
+     <li>Are you sorting just indices, or must you move data? </li>
+     <li>Is stability a requirement? </li>
+     <li>Is the code running on an embedded device, or a richly endowed system with plenty of extra memory? </li>
+     <li>Do you know what kind of input you are likely to get, for example, is there a good chance the initial data might already be sorted or nearly sorted? </li>
+     <li>Is security an issue, that is, are you sorting user-supplied data which is subject to algorithmic complexity attacks? </li>
+    </ul> 
+   </div> 
+  </div> 
+  <script>
+      var title = document.getElementsByTagName("h1")[0];
+      if (title) document.title = title.innerHTML;
+      var abstract = document.querySelector(".abstract");
+      if (abstract) {
+        var contentsDiv = document.createElement('div');
+        contentsDiv.setAttribute('id', 'contents');
+        var s = Array.from(document.getElementsByTagName("h2")).map(el => el.textContent);
+        contentsDiv.innerHTML = '<div>CONTENTS</b></div><div>' + s.join(' • ') + '</div>';
+        abstract.parentNode.insertBefore(contentsDiv, abstract.nextSibling);
+      }
+    </script>   
  </body>
 </html>

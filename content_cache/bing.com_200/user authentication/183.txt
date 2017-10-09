@@ -1,984 +1,1120 @@
 <!doctype html>
-<html lang="en-US" prefix="og: http://ogp.me/ns#">
+<html lang="en">
  <head> 
-  <meta charset="UTF-8"> 
-  <meta http-equiv="X-UA-Compatible" content="IE=10"> 
-  <title>ASP.NET Identity 2.0 Cookie &amp; Token Authentication - CLE Developer - Justin Hyland</title> 
-  <link rel="profile" href="http://gmpg.org/xfn/11"> 
-  <link rel="pingback" href="http://blog.iteedee.com/xmlrpc.php"> 
-  <!-- This site is optimized with the Yoast WordPress SEO plugin v2.0.1 - https://yoast.com/wordpress/plugins/seo/ --> 
-  <link rel="canonical" href="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/"> 
-  <meta property="og:locale" content="en_US"> 
-  <meta property="og:type" content="article"> 
-  <meta property="og:title" content="ASP.NET Identity 2.0 Cookie &amp; Token Authentication - CLE Developer - Justin Hyland"> 
-  <meta property="og:description" content="This tutorial is centered around building an application that will support multiple platforms. The need to support a web application along with a complement of mobile apps is not uncommon. This tutorial will focus on setting up ASP.NET Identity 2.0 in a ASP.NET MVC application with WebAPI Support. Update: If you are interested in two …"> 
-  <meta property="og:url" content="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/"> 
-  <meta property="og:site_name" content="CLE Developer - Justin Hyland"> 
-  <meta property="article:section" content=".NET"> 
-  <meta property="article:published_time" content="2014-03-02T21:06:26+00:00"> 
-  <meta property="article:modified_time" content="2014-04-13T21:34:55+00:00"> 
-  <meta property="og:updated_time" content="2014-04-13T21:34:55+00:00"> 
-  <meta property="og:image" content="http://blog.iteedee.com/wp-content/uploads/2014/03/ASP_NET_Identity_2_0_Cookie_Token.png"> 
-  <!-- / Yoast WordPress SEO plugin. --> 
-  <link rel="alternate" type="application/rss+xml" title="CLE Developer - Justin Hyland » Feed" href="http://blog.iteedee.com/feed/"> 
-  <link rel="alternate" type="application/rss+xml" title="CLE Developer - Justin Hyland » Comments Feed" href="http://blog.iteedee.com/comments/feed/"> 
-  <link rel="alternate" type="application/rss+xml" title="CLE Developer - Justin Hyland » ASP.NET Identity 2.0 Cookie &amp; Token Authentication Comments Feed" href="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/feed/"> 
-  <script type="text/javascript">
-			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/blog.iteedee.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.9"}};
-			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
-		</script> 
-  <style type="text/css">
-img.wp-smiley,
-img.emoji {
-	display: inline !important;
-	border: none !important;
-	box-shadow: none !important;
-	height: 1em !important;
-	width: 1em !important;
-	margin: 0 .07em !important;
-	vertical-align: -0.1em !important;
-	background: none !important;
-	padding: 0 !important;
-}
-</style> 
-  <link rel="stylesheet" id="siteorigin-panels-front-css" href="http://blog.iteedee.com/wp-content/plugins/siteorigin-panels/css/front.css?ver=2.4.6" type="text/css" media="all"> 
-  <link rel="stylesheet" id="default-icon-styles-css" href="http://blog.iteedee.com/wp-content/plugins/svg-vector-icon-plugin/public/../admin/css/wordpress-svg-icon-plugin-style.min.css?ver=4.5.9" type="text/css" media="all"> 
-  <link rel="stylesheet" id="vantage-style-css" href="http://blog.iteedee.com/wp-content/themes/vantage/style.css?ver=2.1.7" type="text/css" media="all"> 
-  <link rel="stylesheet" id="vantage-fontawesome-css" href="http://blog.iteedee.com/wp-content/themes/vantage/fontawesome/css/font-awesome.css?ver=3.2.1" type="text/css" media="all"> 
-  <link rel="stylesheet" id="siteorigin-mobilenav-css" href="http://blog.iteedee.com/wp-content/themes/vantage/premium/extras/mobilenav/css/mobilenav.css?ver=2.1.7" type="text/css" media="all"> 
-  <link rel="stylesheet" id="wp-markdown-prettify-css" href="http://blog.iteedee.com/wp-content/plugins/wp-markdown/css/prettify.css?ver=1.5.1" type="text/css" media="all"> 
-  <link rel="stylesheet" id="vantage-premium-css" href="http://blog.iteedee.com/wp-content/themes/vantage/premium/style.css?ver=2.1.7" type="text/css" media="all"> 
-  <link rel="stylesheet" id="jetpack_css-css" href="http://blog.iteedee.com/wp-content/plugins/jetpack/css/jetpack.css?ver=3.4.4" type="text/css" media="all"> 
-  <!-- This site uses the Google Analytics by MonsterInsights plugin v5.4.9 - Universal disabled - https://www.monsterinsights.com/ --> 
-  <script type="text/javascript">
-
-	var _gaq = _gaq || [];
-	_gaq.push(['_setAccount', 'UA-47549945-1']);
-	_gaq.push(['_gat._forceSSL']);
-	_gaq.push(['_trackPageview']);
-
-	(function () {
-		var ga = document.createElement('script');
-		ga.type = 'text/javascript';
-		ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0];
-		s.parentNode.insertBefore(ga, s);
-	})();
-
-</script> 
-  <!-- / Google Analytics by MonsterInsights --> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-includes/js/jquery/jquery.js?ver=1.12.4"></script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1"></script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-content/plugins/pippity/js/pippity.js?ver=4.5.9"></script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-content/themes/vantage/js/jquery.flexslider.min.js?ver=2.1"></script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-content/themes/vantage/js/jquery.fitvids.min.js?ver=1.0"></script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-content/themes/vantage/js/jquery.theme-main.min.js?ver=2.1.7"></script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-content/themes/vantage/premium/extras/ajax-comments/ajax-comments.min.js?ver=1.0"></script> 
-  <script type="text/javascript">
-/* <![CDATA[ */
-var mobileNav = {"search":{"url":"http:\/\/blog.iteedee.com","placeholder":"Search"},"text":{"navigate":"Menu","back":"Back","close":"Close"},"nextIconUrl":"http:\/\/blog.iteedee.com\/wp-content\/themes\/vantage\/premium\/extras\/mobilenav\/images\/next.png"};
-/* ]]> */
-</script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-content/themes/vantage/premium/extras/mobilenav/js/mobilenav.min.js?ver=2.1.7"></script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-content/plugins/wp-markdown/js/prettify.min.js?ver=1.5.1"></script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-content/plugins/wp-markdown/js/markdown.min.js?ver=1.5.1"></script> 
-  <link rel="https://api.w.org/" href="http://blog.iteedee.com/wp-json/"> 
-  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://blog.iteedee.com/xmlrpc.php?rsd"> 
-  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://blog.iteedee.com/wp-includes/wlwmanifest.xml"> 
-  <meta name="generator" content="WordPress 4.5.9"> 
-  <link rel="shortlink" href="http://wp.me/p43qBp-6O"> 
-  <link rel="alternate" type="application/json+oembed" href="http://blog.iteedee.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fblog.iteedee.com%2F2014%2F03%2Fasp-net-identity-2-0-cookie-token-authentication%2F"> 
-  <link rel="alternate" type="text/xml+oembed" href="http://blog.iteedee.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fblog.iteedee.com%2F2014%2F03%2Fasp-net-identity-2-0-cookie-token-authentication%2F&amp;format=xml"> 
-  <script type="text/javascript">
-				pippity_globals = function(jQuery){
-				window.$j = jQuery;
-				window.PTY_URL = "http://blog.iteedee.com/wp-content/plugins/pippity";
-				window.PTY_DOM = "blog.iteedee.com";
-				window.PTY_AJAX = "http://blog.iteedee.com/wp-admin/admin-ajax.php";
-				window.PTY_ADM = "http://blog.iteedee.com/wp-admin/admin.php?page=";
-				window.PTY_PAGE = "";
-				window.PTY_ISPOST = true;
-				window.PTY_KEY = "OTIwMzc2MjVkOWI0Mzc0YjllOTU2ZTFhNjkwOWRlZmNhNGY0OTk2ZDlhZTE4ZDlkNTY4YWNkMjA5ZjZmYTdlYWM5YTM5MTQ0ZjRkMTllMWQ=";
-				window.PTY_AFFLINK = "";
-				window.PTY_AFFTEXT = "";
-				window.PTY_NEWPOPUP = "false";
-				
-				}(jQuery)
-			</script> 
-  <!--[if lt IE 9]>
-		<script src="http://blog.iteedee.com/wp-content/themes/vantage/js/html5.js" type="text/javascript"></script>
-	<![endif]--> 
-  <!--[if (gte IE 6)&(lte IE 8)]>
-		<script type="text/javascript" src="http://blog.iteedee.com/wp-content/themes/vantage/js/selectivizr.js"></script>
-	<![endif]--> 
+  <meta charset="utf-8"> 
+  <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1"> 
   <meta name="viewport" content="width=device-width, initial-scale=1"> 
-  <style type="text/css">
-		.so-mobilenav-mobile + * { display: none; }
-		@media screen and (max-width: 480px) { .so-mobilenav-mobile + * { display: block; } .so-mobilenav-standard + * { display: none; } }
-	</style> 
-  <style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style> 
-  <style type="text/css" media="screen">
-		#footer-widgets .widget { width: 100%; }
-		@media screen and (max-width: 640px) {
-			#footer-widgets .widget { width: auto; float: none; }
-		}
-	</style> 
-  <style type="text/css" id="vantage-footer-widgets">#footer-widgets aside { width : 100%; } </style> 
-  <style type="text/css" id="customizer-css"></style>
+  <meta name="description" content="Single sign-on and identity management that&amp;#039;s easy to use. Centralize identity management across Atlassian - providing a seamless login experience."> 
+  <meta name="author" content="Atlassian"> 
+  <link rel="canonical" href="https://www.atlassian.com/software/crowd"> 
+  <title>Crowd | Atlassian</title> 
+  <link rel="stylesheet" href="https://wac-cdn.atlassian.com/assets/build/css/wpl-main.min.css?cdnVersion=hh" id="main-css"> 
+  <link href="https://plus.google.com/+atlassian" rel="publisher"> 
+  <link rel="alternate" href="https://www.atlassian.com/software/crowd" hreflang="en"> 
+  <link rel="alternate" href="https://cn.atlassian.com/software/crowd" hreflang="cn"> 
+  <link rel="alternate" href="https://cs.atlassian.com/software/crowd" hreflang="cs"> 
+  <link rel="alternate" href="https://de.atlassian.com/software/crowd" hreflang="de"> 
+  <link rel="alternate" href="https://nl.atlassian.com/software/crowd" hreflang="nl"> 
+  <link rel="alternate" href="https://es.atlassian.com/software/crowd" hreflang="es"> 
+  <link rel="alternate" href="https://fi.atlassian.com/software/crowd" hreflang="fi"> 
+  <link rel="alternate" href="https://fr.atlassian.com/software/crowd" hreflang="fr"> 
+  <link rel="alternate" href="https://hu.atlassian.com/software/crowd" hreflang="hu"> 
+  <link rel="alternate" href="https://it.atlassian.com/software/crowd" hreflang="it"> 
+  <link rel="alternate" href="https://ja.atlassian.com/software/crowd" hreflang="ja"> 
+  <link rel="alternate" href="https://ko.atlassian.com/software/crowd" hreflang="ko"> 
+  <link rel="alternate" href="https://pl.atlassian.com/software/crowd" hreflang="pl"> 
+  <link rel="alternate" href="https://br.atlassian.com/software/crowd" hreflang="pt-BR"> 
+  <link rel="alternate" href="https://ro.atlassian.com/software/crowd" hreflang="ro"> 
+  <link rel="alternate" href="https://ru.atlassian.com/software/crowd" hreflang="ru"> 
+  <link rel="apple-touch-icon-precomposed" sizes="57x57" href="https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/apple-touch-icon-57x57.png"> 
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/apple-touch-icon-114x114.png"> 
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/apple-touch-icon-72x72.png"> 
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/apple-touch-icon-144x144.png"> 
+  <link rel="apple-touch-icon-precomposed" sizes="120x120" href="https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/apple-touch-icon-120x120.png"> 
+  <link rel="apple-touch-icon-precomposed" sizes="152x152" href="https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/apple-touch-icon-152x152.png"> 
+  <link rel="icon" type="image/png" href="https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/favicon.png" sizes="32x32"> 
+  <link rel="mask-icon" href="https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/safari-pinned-tab.svg" color="#59afe1"> 
+  <meta name="msapplication-TileColor" content="#ffffff"> 
+  <meta name="msapplication-TileImage" content="https://wac-cdn.atlassian.com/assets/img/favicons/atlassian/mstile-144x144.png"> 
+  <meta name="theme-color" content="#205081"> 
+  <meta property="og:title" content="Crowd | Atlassian"> 
+  <meta property="og:description" content="Single sign-on and identity management that&amp;#039;s easy to use. Centralize identity management across Atlassian - providing a seamless login experience."> 
+  <meta property="og:type" content="website"> 
+  <meta property="og:url" content="https://www.atlassian.com/software/crowd"> 
+  <meta property="og:image" content="https://wac-cdn.atlassian.com/dam/jcr:c20cf6d1-9568-4aba-9a16-dba24e1495de/Atlassian-blue-onecolor@2x-rgb.png"> 
+  <meta property="og:image:width" content="1200"> 
+  <meta property="og:image:height" content="630"> 
+  <meta property="og:site_name" content="Atlassian"> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:image" content="https://wac-cdn.atlassian.com/dam/jcr:89e146b4-642e-41fc-8e65-7848337d7bdd/Atlassian-icon-blue-onecolor@2x.png"> 
+  <meta name="twitter:site" content="@Atlassian"> 
+  <script src="https://wac-cdn.atlassian.com/assets/build/js/jquery.min.js?cdnVersion=hh"></script> 
+  <style> .subnav-heading a{ font-size: 24px; color: #205081; margin-top: 5px; } .subnavigation--product .item-1.item-linkButtonImage { margin-right: 15px; margin-top: 7px; } </style> 
+  <script src="//cdn.optimizely.com/js/1096093.js"></script> 
  </head> 
- <body class="single single-post postid-422 single-format-standard siteorigin-panels responsive layout-full no-js has-menu-search mobilenav"> 
-  <div id="page-wrapper"> 
-   <header id="masthead" class="site-header" role="banner"> 
-    <hgroup class="full-container"> 
-     <a href="http://blog.iteedee.com/" title="CLE Developer – Justin Hyland" rel="home" class="logo"><img src="http://blog.iteedee.com/wp-content/uploads/2013/11/Iteedee_web_v5.png" width="300" height="142" alt="CLE Developer - Justin Hyland Logo"></a> 
-     <div class="support-text">
-       Midwest Inspired Enterprise Software Solutions 
+ <body id="crowd" class="wac software crowd"> 
+  <header class="header header--wac"> 
+   <div class="container-fluid global-nav"> 
+    <div class="row"> 
+     <div class="component component--block global-nav__logo"> 
+      <div class="component component--image"> 
+       <a href="/" class="component--image__link"> <img src="https://wac-cdn.atlassian.com/dam/jcr:ffd56b30-ad4d-4cb5-94be-79c1dd68b1fb/Atlassian-horizontal-white-rgb.svg?cdnVersion=hh" alt="Atlassian" class="component__image xs-none-bottom" style="height:24px;"> </a> 
+      </div> 
      </div> 
-    </hgroup>
-    <!-- hgroup.full-container --> 
-    <nav role="navigation" class="site-navigation main-navigation primary use-sticky-menu"> 
-     <div class="full-container"> 
-      <div id="search-icon"> 
-       <div id="search-icon-icon">
-        <div class="icon"></div>
+     <div class="component component--block global-nav__links"> 
+      <div class="component component--block global-nav__link"> 
+       <div class="component component--link-button has-dropdown"> 
+        <a href="#" class="component__link default">Products</a> 
        </div> 
-       <form method="get" class="searchform" action="http://blog.iteedee.com/" role="search"> 
-        <input type="text" class="field" name="s" value=""> 
-       </form> 
+       <div class="container-fluid global-nav__dropdown"> 
+        <div class="row"> 
+         <div class="column column-lg-3"> 
+          <div class="component component--heading-textblock"> 
+           <h2>Products</h2> 
+           <p>Learn how Atlassian products can help your team track projects, collaborate, and build.</p> 
+          </div> 
+          <div class="component component--link-button"> 
+           <a href="/software" class="component__link default">View all products</a> 
+          </div> 
+         </div> 
+         <div class="column column-lg-3"> 
+          <div class="component component--heading"> 
+           <h3 class="eyebrows">Plan, track &amp; support</h3> 
+          </div> 
+          <div class="component component--block product-block" id="jira" data-product="JIRA Software"> 
+           <a href="/software/jira" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 583.68 75.76" height="20">
+             <defs>
+              <style>#jira .cls-1{fill:#253858;}#jira .cls-2{fill:#2684ff;}#jira .cls-3{fill:url(#nav_jira_linear-gradient);}#jira .cls-4{fill:url(#nav_jira_linear-gradient-2);}</style>
+              <lineargradient id="nav_jira_linear-gradient" x1="34.64" y1="15.35" x2="19" y2="30.99" gradientunits="userSpaceOnUse">
+               <stop offset="0.18" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+              <lineargradient id="nav_jira_linear-gradient-2" x1="38.78" y1="60.28" x2="54.39" y2="44.67" xlink:href="#nav_jira_linear-gradient" />
+             </defs>
+             <title>Jira Software-blue</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue">
+               <path class="cls-1" d="M109.28,9h7.92V49.2c0,10.65-4.66,18-15.58,18a28.14,28.14,0,0,1-9.5-1.5V58a22.19,22.19,0,0,0,8.18,1.5c6.69,0,9-4,9-9.77Z" />
+               <path class="cls-1" d="M131.63,5.91a4.94,4.94,0,0,1,5.28,5.28,5.28,5.28,0,1,1-10.56,0A4.94,4.94,0,0,1,131.63,5.91Zm-3.87,16.9h7.57v44h-7.57Z" />
+               <path class="cls-1" d="M146.76,22.8h7.39v7.74c2.55-5.19,7-8.89,15.58-8.36v7.39c-9.68-1-15.58,1.94-15.58,11.26v26h-7.39Z" />
+               <path class="cls-1" d="M205.19,58.88c-2.82,5.81-8.1,8.8-14.87,8.8-11.7,0-17.6-9.94-17.6-22.88,0-12.41,6.16-22.88,18.48-22.88,6.42,0,11.35,2.9,14,8.62V22.8h7.57v44h-7.57Zm-12.85,1.76c6.78,0,12.85-4.31,12.85-14.08V43c0-9.77-5.54-14.08-12-14.08-8.54,0-12.94,5.63-12.94,15.84C180.29,55.36,184.51,60.64,192.35,60.64Z" />
+               <path class="cls-1" d="M257.55,67.68c-11.18,0-16.37-2.2-20.86-4.49V55.1c5.37,2.82,13.64,4.84,21.29,4.84,8.71,0,12-3.43,12-8.54s-3.17-7.83-14.17-10.47c-13-3.17-18.83-7.66-18.83-17.16,0-9,6.86-15.66,20.33-15.66,8.36,0,13.73,2,17.69,4.22v7.92a35.52,35.52,0,0,0-18-4.4c-7.57,0-12.06,2.64-12.06,7.92,0,4.75,3.7,7.13,13.9,9.68,12.23,3.08,19.1,7,19.1,17.42C277.88,60.9,271.9,67.68,257.55,67.68Z" />
+               <path class="cls-1" d="M284.57,44.71c0-13.2,7.74-22.79,20.94-22.79s20.77,9.59,20.77,22.79-7.66,23-20.77,23S284.57,57.91,284.57,44.71Zm7.39,0c0,8.36,4.14,15.93,13.55,15.93s13.38-7.57,13.38-15.93S314.84,29,305.51,29,292,36.35,292,44.71Z" />
+               <path class="cls-1" d="M345.55,22.8H356.9v7H345.55v37h-7.39v-37H331v-7h7.13V18c0-8.18,4.58-13.73,14-13.73a18.19,18.19,0,0,1,5.1.7v7a25,25,0,0,0-4.75-.44c-4.66,0-7,2.73-7,6.69Z" />
+               <path class="cls-1" d="M382.51,59.41a24,24,0,0,0,4.75-.62v7.3a18.15,18.15,0,0,1-5.1.7c-9.42,0-14-5.54-14-13.73V29.84H361v-7h7.13V13.47h7.39V22.8h11.7v7h-11.7V52.9C375.56,56.77,377.85,59.41,382.51,59.41Z" />
+               <path class="cls-1" d="M389.38,22.8h8.36l12.67,37.31L423.25,22.8h7.22l12.85,37.31L456,22.8h8.36l-16.19,44h-9.68l-7.57-21.29-4-13.55-4,13.55L415.25,66.8h-9.68Z" />
+               <path class="cls-1" d="M498.93,58.88c-2.82,5.81-8.1,8.8-14.87,8.8-11.7,0-17.6-9.94-17.6-22.88,0-12.41,6.16-22.88,18.48-22.88,6.42,0,11.35,2.9,14,8.62V22.8h7.57v44h-7.57Zm-12.85,1.76c6.78,0,12.85-4.31,12.85-14.08V43c0-9.77-5.54-14.08-12-14.08C478.43,29,474,34.59,474,44.8,474,55.36,478.25,60.64,486.09,60.64Z" />
+               <path class="cls-1" d="M517.94,22.8h7.39v7.74c2.55-5.19,7-8.89,15.58-8.36v7.39c-9.68-1-15.58,1.94-15.58,11.26v26h-7.39Z" />
+               <path class="cls-1" d="M567.57,67.68c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H551.56c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C577.61,67,572.06,67.68,567.57,67.68Zm-16.1-26H576c-.44-8.18-4.14-12.85-11.7-12.85C556.31,28.79,552.26,34,551.47,41.63Z" />
+               <path class="cls-2" d="M72.4,35.76,39.8,3.16,36.64,0h0L12.1,24.54h0L.88,35.76A3,3,0,0,0,.88,40L23.3,62.42,36.64,75.76,61.18,51.22l.38-.38L72.4,40A3,3,0,0,0,72.4,35.76ZM36.64,49.08l-11.2-11.2,11.2-11.2,11.2,11.2Z" />
+               <path class="cls-3" d="M36.64,26.68A18.86,18.86,0,0,1,36.56.09L12.05,24.59,25.39,37.93,36.64,26.68Z" />
+               <path class="cls-4" d="M47.87,37.85,36.64,49.08a18.86,18.86,0,0,1,0,26.68h0L61.21,51.19Z" />
+              </g>
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>Project and issue tracking</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block product-block" id="jira-servicedesk" data-product="JIRA Service Desk"> 
+           <a href="/software/jira/service-desk" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 704.21 75.76" height="20">
+             <defs>
+              <style>#jira-servicedesk .cls-1{fill:#253858;}#jira-servicedesk .cls-2{fill:url(#linear-gradient);}#jira-servicedesk .cls-3{fill:#2684ff;}</style>
+              <lineargradient id="linear-gradient" x1="36.5" y1="34.28" x2="45.33" y2="60.42" gradienttransform="translate(-1.77 -1.54) rotate(0.35)" gradientunits="userSpaceOnUse">
+               <stop offset="0" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+             </defs>
+             <title>Jira Service Desk-blue</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue">
+               <path class="cls-1" d="M102.21,9h7.92V49.2c0,10.65-4.66,18-15.58,18a28.14,28.14,0,0,1-9.5-1.5V58a22.21,22.21,0,0,0,8.18,1.5c6.69,0,9-4,9-9.77Z" />
+               <path class="cls-1" d="M124.56,5.91a4.94,4.94,0,0,1,5.28,5.28,5.28,5.28,0,0,1-10.56,0A4.94,4.94,0,0,1,124.56,5.91Zm-3.87,16.9h7.57v44h-7.57Z" />
+               <path class="cls-1" d="M139.7,22.8h7.39v7.74c2.55-5.19,7-8.89,15.58-8.36v7.39c-9.68-1-15.58,1.94-15.58,11.26v26H139.7Z" />
+               <path class="cls-1" d="M198.13,58.88c-2.82,5.81-8.1,8.8-14.87,8.8-11.7,0-17.6-9.94-17.6-22.88,0-12.41,6.16-22.88,18.48-22.88,6.42,0,11.35,2.9,14,8.62V22.8h7.57v44h-7.57Zm-12.85,1.76c6.78,0,12.85-4.31,12.85-14.08V43c0-9.77-5.54-14.08-12-14.08-8.54,0-12.94,5.63-12.94,15.84C173.23,55.36,177.45,60.64,185.28,60.64Z" />
+               <path class="cls-1" d="M250.49,67.68c-11.18,0-16.37-2.2-20.86-4.49V55.1c5.37,2.82,13.64,4.84,21.29,4.84,8.71,0,12-3.43,12-8.54s-3.17-7.83-14.17-10.47c-13-3.17-18.83-7.66-18.83-17.16,0-9,6.86-15.66,20.33-15.66,8.36,0,13.73,2,17.69,4.22v7.92a35.53,35.53,0,0,0-18-4.4c-7.57,0-12.06,2.64-12.06,7.92,0,4.75,3.7,7.13,13.9,9.68,12.23,3.08,19.1,7,19.1,17.42C270.82,60.9,264.83,67.68,250.49,67.68Z" />
+               <path class="cls-1" d="M301.18,67.68c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H285.16c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C311.21,67,305.67,67.68,301.18,67.68Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C289.91,28.78,285.87,34,285.07,41.63Z" />
+               <path class="cls-1" d="M326.26,22.8h7.39v7.74c2.55-5.19,7-8.89,15.58-8.36v7.39c-9.68-1-15.58,1.94-15.58,11.26v26h-7.39Z" />
+               <path class="cls-1" d="M350.81,22.8h7.92L373,60.38,387.15,22.8h7.92L378,66.8H367.88Z" />
+               <path class="cls-1" d="M405.46,5.91a4.94,4.94,0,0,1,5.28,5.28,5.28,5.28,0,0,1-10.56,0A4.94,4.94,0,0,1,405.46,5.91Zm-3.87,16.9h7.57v44h-7.57Z" />
+               <path class="cls-1" d="M451.65,65.66c-2.64,1.41-6.69,2-10.74,2-15.66,0-23-9.5-23-23,0-13.29,7.3-22.79,23-22.79A23.26,23.26,0,0,1,451.39,24v7A22.18,22.18,0,0,0,441.45,29c-11.44,0-16.1,7.22-16.1,15.75s4.75,15.75,16.28,15.75a27.8,27.8,0,0,0,10-1.58Z" />
+               <path class="cls-1" d="M481.31,67.68c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H465.29c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C491.34,67,485.8,67.68,481.31,67.68Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C470,28.78,466,34,465.21,41.63Z" />
+               <path class="cls-1" d="M544.76,9c18.74,0,27.81,11.7,27.81,29s-9.15,28.69-27.81,28.69H531.38v.09h-7.92V9Zm-13.38,7.57V59.14h13.46q19.8,0,19.8-20.86c0-14.08-6.25-21.74-20.24-21.74Z" />
+               <path class="cls-1" d="M602.83,67.68c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H586.82c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C612.87,67,607.32,67.68,602.83,67.68Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C591.57,28.78,587.52,34,586.73,41.63Z" />
+               <path class="cls-1" d="M641.73,67.68a33.9,33.9,0,0,1-15.31-3.26v-8a34.39,34.39,0,0,0,15.66,4.31c5.81,0,8.8-2.38,8.8-5.81s-2.55-5.28-10.91-7.3c-9.77-2.38-13.9-6.16-13.9-13.38,0-7.66,5.9-12.32,15.93-12.32a31.24,31.24,0,0,1,14.17,3.17v7.83c-5.28-2.64-9.59-4-14.26-4-5.54,0-8.54,1.94-8.54,5.37,0,3.08,2.11,5,10.21,7,9.77,2.38,14.7,6,14.7,13.64C658.27,62.14,653.52,67.68,641.73,67.68Z" />
+               <path class="cls-1" d="M667,66.8V4.41h7.57v39L693.47,22.8h9.86L682.65,44.45,704.21,66.8H693.91L674.55,46.21V66.8Z" />
+               <path class="cls-2" d="M35.34,29.92,55.95,30a3.21,3.21,0,0,1,2.55,5.14L28.08,75.76a21.61,21.61,0,0,1-4.38-30.25Z" />
+               <path class="cls-3" d="M23.69,45.51,3.2,45.38A3.21,3.21,0,0,1,.65,40.24L30.77,0a21.61,21.61,0,0,1,4.38,30.25Z" />
+              </g>
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>IT service desk and customer service</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block product-block" id="jira-core" data-product="JIRA Core"> 
+           <a href="/software/jira/core" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 397.12 66" height="18">
+             <defs>
+              <style>#jira-core .cls-1{fill:#253858;}#jira-core .cls-2{fill:url(#linear-gradient);}#jira-core .cls-3{fill:#2684ff;}</style>
+              <lineargradient id="linear-gradient" x1="37.13" y1="31.71" x2="52.42" y2="46.24" gradientunits="userSpaceOnUse">
+               <stop offset="0.17" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+             </defs>
+             <title>Jira Core-blue</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue">
+               <path class="cls-1" d="M103,4.11H111V44.32c0,10.65-4.66,18-15.58,18a28.14,28.14,0,0,1-9.5-1.5V53.12a22.21,22.21,0,0,0,8.18,1.5c6.69,0,9-4,9-9.77Z" />
+               <path class="cls-1" d="M125.39,1a4.94,4.94,0,0,1,5.28,5.28,5.28,5.28,0,0,1-10.56,0A4.94,4.94,0,0,1,125.39,1Zm-3.87,16.9h7.57v44h-7.57Z" />
+               <path class="cls-1" d="M140.52,17.92h7.39v7.74c2.55-5.19,7-8.89,15.58-8.36V24.7c-9.68-1-15.58,1.94-15.58,11.26v26h-7.39Z" />
+               <path class="cls-1" d="M199,54c-2.82,5.81-8.1,8.8-14.87,8.8-11.7,0-17.6-9.94-17.6-22.88C166.48,27.51,172.64,17,185,17c6.42,0,11.35,2.9,14,8.62V17.92h7.57v44H199Zm-12.85,1.76c6.78,0,12.85-4.31,12.85-14.08V38.16c0-9.77-5.54-14.08-12-14.08-8.54,0-12.94,5.63-12.94,15.84C174,50.48,178.27,55.76,186.11,55.76Z" />
+               <path class="cls-1" d="M275.33,59.37C271.73,61.74,266,62.8,260,62.8c-19,0-29.74-11.44-29.74-29.66,0-17.6,10.74-29.92,29.57-29.92,5.63,0,11.26,1.06,15.4,4v7.66c-4.14-2.64-8.71-4-15.4-4-13.55,0-21.65,9-21.65,22.26s8.36,22.09,22.09,22.09a32.46,32.46,0,0,0,15-3.52Z" />
+               <path class="cls-1" d="M280.88,39.83c0-13.2,7.74-22.79,20.94-22.79s20.77,9.59,20.77,22.79-7.66,23-20.77,23S280.88,53,280.88,39.83Zm7.39,0c0,8.36,4.14,15.93,13.55,15.93s13.38-7.57,13.38-15.93-4-15.75-13.37-15.75S288.27,31.47,288.27,39.83Z" />
+               <path class="cls-1" d="M331.39,17.92h7.39v7.74c2.55-5.19,7-8.89,15.58-8.36V24.7c-9.68-1-15.58,1.94-15.58,11.26v26h-7.39Z" />
+               <path class="cls-1" d="M381,62.8c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H365c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C391.05,62.1,385.51,62.8,381,62.8Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C369.76,23.9,365.71,29.1,364.92,36.75Z" />
+               <path class="cls-2" d="M33.43,44.48A21.52,21.52,0,0,0,54.95,66h0V23.12L33.43,37.86Z" />
+               <path class="cls-3" d="M54.95,23.12V3.21a3.2,3.2,0,0,0-5-2.64L0,34.67a21.52,21.52,0,0,0,29.89,5.69Z" />
+              </g>
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>Essential business management</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block product-block" id="statuspage" data-product="StatusPage"> 
+           <a href="/software/statuspage" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 527.16 76.38" height="20">
+             <defs>
+              <style>#statuspage .cls-1{fill:#253858;}#statuspage .cls-2{fill:url(#linear-gradient);}#statuspage .cls-3{fill:#2684ff;}</style>
+              <lineargradient id="linear-gradient" x1="37.31" y1="52.67" x2="37.31" y2="21.72" gradientunits="userSpaceOnUse">
+               <stop offset="0" stop-color="#2684ff" />
+               <stop offset="0.82" stop-color="#0052cc" />
+              </lineargradient>
+             </defs>
+             <title>Statuspage-blue</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue">
+               <path class="cls-1" d="M116.38,59.57c-11.18,0-16.37-2.2-20.86-4.49V47c5.37,2.82,13.64,4.84,21.29,4.84,8.71,0,12-3.43,12-8.54s-3.17-7.83-14.17-10.47c-13-3.17-18.83-7.66-18.83-17.16,0-9,6.86-15.66,20.33-15.66,8.36,0,13.73,2,17.69,4.22v7.92a35.53,35.53,0,0,0-18-4.4c-7.57,0-12.06,2.64-12.06,7.92,0,4.75,3.7,7.13,13.9,9.68,12.23,3.08,19.1,7,19.1,17.42C136.71,52.8,130.72,59.57,116.38,59.57Z" />
+               <path class="cls-1" d="M163.46,51.3a24,24,0,0,0,4.75-.62V58a18.19,18.19,0,0,1-5.1.7c-9.42,0-14-5.54-14-13.73V21.74H142v-7h7.13V5.37h7.39V14.7h11.7v7h-11.7V44.79C156.51,48.66,158.8,51.3,163.46,51.3Z" />
+               <path class="cls-1" d="M206,50.77c-2.82,5.81-8.1,8.8-14.87,8.8-11.7,0-17.6-9.94-17.6-22.88,0-12.41,6.16-22.88,18.48-22.88,6.42,0,11.35,2.9,14,8.62V14.7h7.57v44H206Zm-12.85,1.76c6.78,0,12.85-4.31,12.85-14.08V34.93c0-9.77-5.54-14.08-12-14.08-8.54,0-12.94,5.63-12.94,15.84C181.06,47.25,185.28,52.53,193.12,52.53Z" />
+               <path class="cls-1" d="M242.4,51.3a24,24,0,0,0,4.75-.62V58a18.19,18.19,0,0,1-5.1.7c-9.42,0-14-5.54-14-13.73V21.74h-7.13v-7h7.13V5.37h7.39V14.7h11.7v7h-11.7V44.79C235.44,48.66,237.73,51.3,242.4,51.3Z" />
+               <path class="cls-1" d="M255.95,14.7h7.57V41.27c0,7.92,3.17,11.44,10.38,11.44,7,0,11.88-4.66,11.88-13.55V14.7h7.57v44h-7.57V51.48a15.43,15.43,0,0,1-13.9,8.1c-10.12,0-15.93-7-15.93-19.1Z" />
+               <path class="cls-1" d="M318.6,59.57a33.9,33.9,0,0,1-15.31-3.26v-8A34.39,34.39,0,0,0,319,52.62c5.81,0,8.8-2.38,8.8-5.81s-2.55-5.28-10.91-7.3c-9.77-2.38-13.9-6.16-13.9-13.38,0-7.66,5.9-12.32,15.93-12.32A31.24,31.24,0,0,1,333,17v7.83c-5.28-2.64-9.59-4-14.25-4-5.54,0-8.54,1.94-8.54,5.37,0,3.08,2.11,5,10.21,7,9.77,2.38,14.7,6,14.7,13.64C335.15,54,330.4,59.57,318.6,59.57Z" />
+               <path class="cls-1" d="M351.43,51v24.9h-7.57V14.7h7.57v7.92c2.82-5.81,8.1-8.8,14.87-8.8,11.7,0,17.6,9.94,17.6,22.88,0,12.41-6.16,22.88-18.48,22.88C359,59.57,354.07,56.67,351.43,51Zm12.85-30.09c-6.78,0-12.85,4.31-12.85,14.08v3.52c0,9.77,5.54,14.08,12,14.08,8.54,0,12.94-5.63,12.94-15.84C376.33,26.13,372.11,20.86,364.27,20.86Z" />
+               <path class="cls-1" d="M422.53,50.77c-2.82,5.81-8.1,8.8-14.87,8.8-11.7,0-17.6-9.94-17.6-22.88,0-12.41,6.16-22.88,18.48-22.88,6.42,0,11.35,2.9,14,8.62V14.7h7.57v44h-7.57Zm-12.85,1.76c6.78,0,12.85-4.31,12.85-14.08V34.93c0-9.77-5.54-14.08-12-14.08-8.54,0-12.94,5.63-12.94,15.84C397.63,47.25,401.85,52.53,409.68,52.53Z" />
+               <path class="cls-1" d="M471.19,50.77c-2.82,5.81-8.1,8.8-14.87,8.8-11.62,0-17.42-9.94-17.42-22.88,0-12.41,6.07-22.88,18.3-22.88,6.42,0,11.35,2.9,14,8.62V14.7h7.39v40c0,12.94-6.07,21.65-21.82,21.65A44.31,44.31,0,0,1,441.1,74V66.61a48.61,48.61,0,0,0,15.31,2.64c11,0,14.78-5.9,14.78-14.08Zm-12.85,1.76c6.78,0,12.85-4.31,12.85-14.08V34.93c0-9.77-5.54-14.08-12-14.08-8.54,0-12.94,5.63-12.94,15.84C446.29,47.25,450.51,52.53,458.35,52.53Z" />
+               <path class="cls-1" d="M511.06,59.57c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79V40H495c1.06,7.48,5.9,12.32,16.28,12.32A39,39,0,0,0,524.7,50v7C521.09,58.87,515.54,59.57,511.06,59.57Zm-16.1-26H519.5c-.44-8.18-4.14-12.85-11.7-12.85C499.79,20.68,495.75,25.87,495,33.53Z" />
+               <circle class="cls-2" cx="37.31" cy="41.21" r="17.47" />
+               <path class="cls-3" d="M.47,21,9.85,32.11a2,2,0,0,0,2.84.21c15.19-13.62,34-13.62,49.23,0a2,2,0,0,0,2.84-.21L74.15,21a2,2,0,0,0-.23-2.81C51.87-1.1,22.74-1.1.7,18.19A2,2,0,0,0,.47,21Z" />
+              </g>
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>Incident communication</p> 
+            </div> </a> 
+          </div> 
+         </div> 
+         <div class="column column-lg-3 clear-md"> 
+          <div class="component component--heading"> 
+           <h3 class="eyebrows">Collaborate &amp; chat</h3> 
+          </div> 
+          <div class="component component--block product-block" id="confluence" data-product="Confluence"> 
+           <a href="/software/confluence" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 510.31 63.83" height="18">
+             <defs>
+              <style>#confluence .cls-1{fill:#253858;}#confluence .cls-2{fill:url(#linear-gradient);}#confluence .cls-3{fill:url(#linear-gradient-2);}</style>
+              <lineargradient id="linear-gradient" x1="59.68" y1="67.65" x2="20.35" y2="45.05" gradientunits="userSpaceOnUse">
+               <stop offset="0.18" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+              <lineargradient id="linear-gradient-2" x1="279.76" y1="-1616.34" x2="240.42" y2="-1638.95" gradientTransform="translate(282.83 -1616.71) rotate(180)" xlink:href="#linear-gradient" />
+             </defs>
+             <title>Confluence-blue</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue">
+               <path class="cls-1" d="M134.47,60c-3.61,2.38-9.33,3.43-15.31,3.43-19,0-29.74-11.44-29.74-29.65,0-17.6,10.74-29.92,29.57-29.92,5.63,0,11.26,1.06,15.4,4v7.66c-4.14-2.64-8.71-4-15.4-4-13.55,0-21.65,9-21.65,22.26s8.36,22.09,22.09,22.09a32.46,32.46,0,0,0,15-3.52Z" />
+               <path class="cls-1" d="M140,40.48c0-13.2,7.74-22.79,20.94-22.79s20.77,9.59,20.77,22.79-7.66,23-20.77,23S140,53.68,140,40.48Zm7.39,0c0,8.36,4.14,15.93,13.55,15.93s13.38-7.57,13.38-15.93-4-15.75-13.37-15.75S147.41,32.12,147.41,40.48Z" />
+               <path class="cls-1" d="M227.93,62.57h-7.57V36c0-7.92-3.17-11.44-10.38-11.44-7,0-11.88,4.66-11.88,13.55V62.57h-7.57v-44h7.57v7.22a15.42,15.42,0,0,1,13.9-8.1c10.12,0,15.93,7,15.93,19.1Z" />
+               <path class="cls-1" d="M249,18.57h11.35v7H249v37h-7.39v-37h-7.13v-7h7.13V13.73c0-8.18,4.58-13.73,14-13.73a18.19,18.19,0,0,1,5.1.7v7a25,25,0,0,0-4.75-.44c-4.66,0-7,2.73-7,6.69Z" />
+               <path class="cls-1" d="M280.29,62.83c-7.22,0-11.79-3.43-11.79-11.53V.18h7.57V50.42c0,4,2.64,5.37,5.9,5.37a19.17,19.17,0,0,0,2.2-.09v6.78A16.11,16.11,0,0,1,280.29,62.83Z" />
+               <path class="cls-1" d="M290.58,18.57h7.57V45.14c0,7.92,3.17,11.44,10.38,11.44,7,0,11.88-4.66,11.88-13.55V18.57H328v44h-7.57V55.35a15.42,15.42,0,0,1-13.9,8.1c-10.12,0-15.93-7-15.93-19.09Z" />
+               <path class="cls-1" d="M360.45,63.45c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H344.44c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C370.48,62.74,364.94,63.45,360.45,63.45Zm-16.1-26H368.9c-.44-8.18-4.14-12.85-11.7-12.85C349.19,24.55,345.14,29.74,344.35,37.4Z" />
+               <path class="cls-1" d="M422.93,62.57h-7.57V36c0-7.92-3.17-11.44-10.38-11.44-7,0-11.88,4.66-11.88,13.55V62.57h-7.57v-44h7.57v7.22a15.42,15.42,0,0,1,13.9-8.1c10.12,0,15.93,7,15.93,19.1Z" />
+               <path class="cls-1" d="M464.56,61.42c-2.64,1.41-6.69,2-10.74,2-15.66,0-23-9.5-23-23,0-13.29,7.3-22.79,23-22.79a23.26,23.26,0,0,1,10.47,2.11v7a22.18,22.18,0,0,0-9.94-2.11c-11.44,0-16.1,7.22-16.1,15.75S443,56.23,454.52,56.23a27.8,27.8,0,0,0,10-1.58Z" />
+               <path class="cls-1" d="M494.21,63.45c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H478.19c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C504.24,62.74,498.7,63.45,494.21,63.45Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C482.95,24.55,478.9,29.74,478.11,37.4Z" />
+               <path class="cls-2" d="M2.23,49.53c-.65,1.06-1.38,2.29-2,3.27a2,2,0,0,0,.67,2.72l13,8a2,2,0,0,0,2.77-.68c.52-.87,1.19-2,1.92-3.21,5.15-8.5,10.33-7.46,19.67-3l12.89,6.13a2,2,0,0,0,2.69-1l6.19-14a2,2,0,0,0-1-2.62c-2.72-1.28-8.13-3.83-13-6.18C28.51,30.45,13.62,31,2.23,49.53Z" />
+               <path class="cls-3" d="M60.52,17.76c.65-1.06,1.38-2.29,2-3.27a2,2,0,0,0-.67-2.72l-13-8A2,2,0,0,0,46,4.43c-.52.87-1.19,2-1.92,3.21-5.15,8.5-10.33,7.46-19.67,3L11.56,4.54a2,2,0,0,0-2.69,1l-6.19,14a2,2,0,0,0,1,2.62c2.72,1.28,8.13,3.83,13,6.18C34.24,36.84,49.13,36.27,60.52,17.76Z" />
+              </g>
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>Document collaboration</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block product-block" id="trello" data-product="Trello"> 
+           <a href="/software/trello" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 293.29 64.56" height="18" style="margin-top:2px; margin-bottom:2px;">
+             <defs>
+              <style>#trello .cls-1{fill:#253858;} #trello .cls-2{fill:url(#New_Gradient_Swatch_1);}</style>
+              <lineargradient id="New_Gradient_Swatch_1" x1="31.52" y1="-6412.98" x2="31.52" y2="-6349.93" gradienttransform="matrix(1, 0, 0, -1, 0, -6348.42)" gradientunits="userSpaceOnUse">
+               <stop offset="0.18" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+             </defs>
+             <title>Trello-icon-blue-white</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue">
+               <path class="cls-1" d="M130.14,4.58v7.57H111V62.39h-7.92V12.14H86.84V4.58Z" />
+               <path class="cls-1" d="M134,18.39h7.39v7.74c2.55-5.19,7-8.89,15.58-8.36v7.39c-9.68-1-15.58,1.94-15.58,11.26v26H134Z" />
+               <path class="cls-1" d="M183.64,63.27c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H167.63c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C193.68,62.57,188.13,63.27,183.64,63.27Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C172.38,24.38,168.33,29.57,167.54,37.22Z" />
+               <path class="cls-1" d="M220.52,62.65c-7.22,0-11.79-3.43-11.79-11.53V0h7.57V50.25c0,4,2.64,5.37,5.9,5.37a19.17,19.17,0,0,0,2.2-.09V62.3A16.11,16.11,0,0,1,220.52,62.65Z" />
+               <path class="cls-1" d="M243.48,62.65c-7.22,0-11.79-3.43-11.79-11.53V0h7.57V50.25c0,4,2.64,5.37,5.9,5.37a19.17,19.17,0,0,0,2.2-.09V62.3A16.11,16.11,0,0,1,243.48,62.65Z" />
+               <path class="cls-1" d="M251.58,40.3c0-13.2,7.74-22.79,20.94-22.79s20.77,9.59,20.77,22.79-7.66,23-20.77,23S251.58,53.5,251.58,40.3Zm7.39,0c0,8.36,4.14,15.93,13.55,15.93S285.9,48.66,285.9,40.3s-4-15.75-13.37-15.75S259,31.94,259,40.3Z" />
+               <g id="Layer_2-2" data-name="Layer 2">
+                <g id="Layer_1-2" data-name="Layer 1-2">
+                 <path class="cls-2" d="M55.16,1.51H7.88A7.88,7.88,0,0,0,0,9.39V56.67a7.88,7.88,0,0,0,7.88,7.88H55.16A7.88,7.88,0,0,0,63,56.67V9.39A7.88,7.88,0,0,0,55.16,1.51ZM27.42,49.26A3.78,3.78,0,0,1,23.64,53H12A3.78,3.78,0,0,1,8.2,49.26h0V13.49A3.78,3.78,0,0,1,12,9.71H23.64a3.78,3.78,0,0,1,3.78,3.78ZM54.85,33.5a3.78,3.78,0,0,1-3.78,3.78H39.4a3.78,3.78,0,0,1-3.78-3.78v-20A3.78,3.78,0,0,1,39.4,9.71H51.07a3.78,3.78,0,0,1,3.78,3.78h0Z" />
+                </g>
+               </g>
+              </g>
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>Collaborate visually on any project</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block product-block" id="stride" data-product="Stride"> 
+           <a href="https://www.stride.com" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 309.17 63.27" height="18">
+             <defs>
+              <style>#stride .cls-1{fill:#253858;} #stride .cls-2{fill:url(#New_Gradient_Swatch_1);} #stride .cls-3{fill:#2684ff;}</style>
+              <lineargradient id="New_Gradient_Swatch_1" x1="31.3" y1="24.34" x2="1.32" y2="46.28" gradientunits="userSpaceOnUse">
+               <stop offset="0.18" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+             </defs>
+             <title>Stride-blue</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue" class="header-product">
+               <path class="cls-1" d="M113.2,63.27c-11.18,0-16.37-2.2-20.86-4.49v-8.1c5.37,2.82,13.64,4.84,21.29,4.84,8.71,0,12-3.43,12-8.54s-3.17-7.83-14.17-10.47c-13-3.17-18.83-7.66-18.83-17.16,0-9,6.86-15.66,20.33-15.66,8.36,0,13.73,2,17.69,4.22v7.92a35.53,35.53,0,0,0-18-4.4c-7.57,0-12.06,2.64-12.06,7.92,0,4.75,3.7,7.13,13.9,9.68,12.23,3.08,19.1,7,19.1,17.42C133.52,56.49,127.54,63.27,113.2,63.27Z" />
+               <path class="cls-1" d="M160.28,55a24,24,0,0,0,4.75-.62v7.3a18.19,18.19,0,0,1-5.1.7c-9.42,0-14-5.54-14-13.73V25.43H138.8v-7h7.13V9.06h7.39v9.33H165v7h-11.7V48.49C153.32,52.36,155.61,55,160.28,55Z" />
+               <path class="cls-1" d="M174.71,18.39h7.39v7.74c2.55-5.19,7-8.89,15.58-8.36v7.39c-9.68-1-15.58,1.94-15.58,11.26v26h-7.39Z" />
+               <path class="cls-1" d="M208.06,1.5a4.94,4.94,0,0,1,5.28,5.28,5.28,5.28,0,0,1-10.56,0A4.94,4.94,0,0,1,208.06,1.5Zm-3.87,16.9h7.57v44h-7.57Z" />
+               <path class="cls-1" d="M253,54.47c-2.82,5.81-8.1,8.8-14.87,8.8-11.7,0-17.6-9.94-17.6-22.88,0-12.41,6.16-22.88,18.48-22.88,6.42,0,11.35,2.9,14,8.62V0h7.57V62.39H253Zm-12.85,1.76C247,56.23,253,51.92,253,42.15V38.63c0-9.77-5.54-14.08-12-14.08-8.54,0-12.94,5.63-12.94,15.84C228.12,51,232.35,56.23,240.18,56.23Z" />
+               <path class="cls-1" d="M293.06,63.27c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H277c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C303.1,62.57,297.55,63.27,293.06,63.27Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C281.8,24.38,277.75,29.57,277,37.22Z" />
+              </g>
+              <path class="cls-2" d="M19.16,7.39v11c0,15.26-7.63,21.14-17.35,22.06a2,2,0,0,0-1.8,2c0,4.1,0,13.79,0,18a2,2,0,0,0,2.11,2c24.34-1.24,39-19,39-41.05h.07v-14Z" />
+              <path class="cls-3" d="M68,59.5,42.23,7.39H19.16L46.38,60.75a3,3,0,0,0,2.67,1.64H66.23A2,2,0,0,0,68,59.5Z" />
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>Team communication</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block product-block" id="hipchat" data-product="HipChat"> 
+           <a href="/software/hipchat" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 381.64 79.55" height="20">
+             <defs>
+              <style> #hipchat .cls-1{fill:#253858;} #hipchat .cls-2{fill:url(#New_Gradient_Swatch_1);}</style>
+              <lineargradient id="New_Gradient_Swatch_1" x1="32.77" y1="68.57" x2="32.77" y2="26.58" gradientunits="userSpaceOnUse">
+               <stop offset="0.18" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+             </defs>
+             <title>Hipchat-blue</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue">
+               <path class="cls-1" d="M104,4.58V30.71h30.45V4.58h7.92V62.39h-7.92V38.28H104V62.39H96.08V4.58Z" />
+               <path class="cls-1" d="M158.92,1.5a4.94,4.94,0,0,1,5.28,5.28,5.28,5.28,0,0,1-10.56,0A4.94,4.94,0,0,1,158.92,1.5ZM155,18.39h7.57v44H155Z" />
+               <path class="cls-1" d="M181.62,54.65v24.9h-7.57V18.39h7.57v7.92c2.82-5.81,8.1-8.8,14.87-8.8,11.7,0,17.6,9.94,17.6,22.88,0,12.41-6.16,22.88-18.48,22.88C189.19,63.27,184.26,60.37,181.62,54.65Zm12.85-30.1c-6.78,0-12.85,4.31-12.85,14.08v3.52c0,9.77,5.54,14.08,12,14.08,8.54,0,12.94-5.63,12.94-15.84C206.52,29.83,202.3,24.55,194.47,24.55Z" />
+               <path class="cls-1" d="M254,61.25c-2.64,1.41-6.69,2-10.74,2-15.66,0-23-9.5-23-23,0-13.29,7.3-22.79,23-22.79a23.26,23.26,0,0,1,10.47,2.11v7a22.18,22.18,0,0,0-9.94-2.11c-11.44,0-16.1,7.22-16.1,15.75s4.75,15.75,16.28,15.75a27.8,27.8,0,0,0,10-1.58Z" />
+               <path class="cls-1" d="M300,62.39h-7.57V37.93c0-9.06-3.17-13.55-10.38-13.55-7,0-11.88,4.66-11.88,13.55V62.39h-7.57V0h7.57V25.7a16.07,16.07,0,0,1,14.52-8.18c9.86,0,15.31,6.69,15.31,19.1Z" />
+               <path class="cls-1" d="M340.46,54.47c-2.82,5.81-8.1,8.8-14.87,8.8-11.7,0-17.6-9.94-17.6-22.88,0-12.41,6.16-22.88,18.48-22.88,6.42,0,11.35,2.9,14,8.62V18.39H348v44h-7.57Zm-12.85,1.76c6.78,0,12.85-4.31,12.85-14.08V38.63c0-9.77-5.54-14.08-12-14.08-8.54,0-12.94,5.63-12.94,15.84C315.55,51,319.78,56.23,327.61,56.23Z" />
+               <path class="cls-1" d="M376.89,55a24,24,0,0,0,4.75-.62v7.3a18.19,18.19,0,0,1-5.1.7c-9.42,0-14-5.54-14-13.73V25.43h-7.13v-7h7.13V9.06h7.39v9.33h11.7v7h-11.7V48.49C369.94,52.36,372.23,55,376.89,55Z" />
+               <path class="cls-2" d="M53.9,52.74s.28-.19.74-.55c6.7-5.18,10.91-12.7,10.91-21.07,0-15.61-14.67-28.27-32.77-28.27S0,15.51,0,31.12,14.67,59.41,32.77,59.41a37.93,37.93,0,0,0,6.89-.63l.71-.13c4.61,3,11.31,5.44,17.17,5.44,1.83,0,2.68-1.49,1.52-3C57.29,58.9,54.85,55.42,53.9,52.74Zm-4-12.36c-1.95,2.92-8,7.89-17.08,7.89H32.7c-9.09,0-15.14-5-17.08-7.89a3.05,3.05,0,0,1-.74-1.57,1.33,1.33,0,0,1,1.28-1.44,1.63,1.63,0,0,1,.89.3,25,25,0,0,0,15.72,5.61h0A24,24,0,0,0,48.5,37.66a1.28,1.28,0,0,1,.86-.33,1.31,1.31,0,0,1,1.31,1.3A3.57,3.57,0,0,1,49.93,40.38Z" />
+              </g>
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>Self-hosted group chat and video</p> 
+            </div> </a> 
+          </div> 
+         </div> 
+         <div class="column column-lg-3"> 
+          <div class="component component--heading"> 
+           <h3 class="eyebrows">Code, build &amp; ship</h3> 
+          </div> 
+          <div class="component component--block product-block" id="nav-bitbucket" data-product="Bitbucket"> 
+           <a href="/software/bitbucket" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 443.43 63.27" height="18">
+             <defs>
+              <style> #nav-bitbucket .cls-1{fill:#253858;} #nav-bitbucket .cls-2{fill:none;} #nav-bitbucket .cls-3{fill:#2684ff;} #nav-bitbucket .cls-4{fill:url(#New_Gradient_Swatch_1);}</style>
+              <lineargradient id="New_Gradient_Swatch_1" x1="64.01" y1="30.27" x2="32.99" y2="54.48" gradientunits="userSpaceOnUse">
+               <stop offset="0.18" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+             </defs>
+             <title>Bitbucket-blue</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue">
+               <path class="cls-1" d="M116.87,4.58c11.79,0,17.51,5.81,17.51,15.14,0,7-3.17,11.26-9.68,12.85,8.54,1.41,12.76,6.07,12.76,14.25,0,9.24-6.25,15.58-19.18,15.58H94.43V4.58Zm-14.52,7.57V29.39h13.46c7.48,0,10.56-3.43,10.56-9s-3.34-8.27-10.56-8.27Zm0,24.29v18h16.19c7.57,0,11-2.73,11-8.54,0-6.16-3.26-9.5-11.17-9.5Z" />
+               <path class="cls-1" d="M150.4,1.5a4.94,4.94,0,0,1,5.28,5.28,5.28,5.28,0,0,1-10.56,0A4.94,4.94,0,0,1,150.4,1.5Zm-3.87,16.9h7.57v44h-7.57Z" />
+               <path class="cls-1" d="M183,55a24,24,0,0,0,4.75-.62v7.3a18.19,18.19,0,0,1-5.1.7c-9.42,0-14-5.54-14-13.73V25.43h-7.13v-7h7.13V9.06H176v9.33h11.7v7H176V48.49C176,52.36,178.29,55,183,55Z" />
+               <path class="cls-1" d="M218.95,63.27c-6.42,0-11.35-2.9-14-8.62v7.74h-7.57V0H205V26.31c2.82-5.81,8.1-8.8,14.87-8.8,11.7,0,17.6,9.94,17.6,22.88C237.43,52.8,231.27,63.27,218.95,63.27ZM217.8,24.55C211,24.55,205,28.86,205,38.63v3.52c0,9.77,5.54,14.08,12,14.08,8.54,0,12.94-5.63,12.94-15.84C229.86,29.83,225.64,24.55,217.8,24.55Z" />
+               <path class="cls-1" d="M245.35,18.39h7.57V45c0,7.92,3.17,11.44,10.38,11.44,7,0,11.88-4.66,11.88-13.55V18.39h7.57v44h-7.57V55.17a15.43,15.43,0,0,1-13.9,8.1c-10.12,0-15.93-7-15.93-19.1Z" />
+               <path class="cls-1" d="M325.25,61.25c-2.64,1.41-6.69,2-10.74,2-15.66,0-23-9.5-23-23,0-13.29,7.3-22.79,23-22.79A23.26,23.26,0,0,1,325,19.62v7A22.17,22.17,0,0,0,315,24.55c-11.44,0-16.1,7.21-16.1,15.75s4.75,15.75,16.28,15.75a27.78,27.78,0,0,0,10-1.58Z" />
+               <path class="cls-1" d="M333.88,62.39V0h7.57V39l18.92-20.59h9.86L349.54,40,371.1,62.39H360.8L341.44,41.8V62.39Z" />
+               <path class="cls-1" d="M396.18,63.27c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H380.16c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.37v7C406.21,62.57,400.67,63.27,396.18,63.27Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C384.91,24.38,380.87,29.57,380.08,37.22Z" />
+               <path class="cls-1" d="M438.68,55a24,24,0,0,0,4.75-.62v7.3a18.19,18.19,0,0,1-5.1.7c-9.42,0-14-5.54-14-13.73V25.43h-7.13v-7h7.13V9.06h7.39v9.33h11.7v7h-11.7V48.49C431.73,52.36,434,55,438.68,55Z" />
+               <polygon class="cls-2" points="24.7 43.51 37.75 43.51 40.9 25.12 21.23 25.12 24.7 43.51" />
+               <path class="cls-3" d="M2,6.26A2,2,0,0,0,0,8.58L8.49,60.12a2.72,2.72,0,0,0,2.66,2.27H51.88a2,2,0,0,0,2-1.68L62.37,8.59a2,2,0,0,0-2-2.32ZM37.75,43.51h-13L21.23,25.12H40.9Z" />
+               <path class="cls-4" d="M59.67,25.12H40.9L37.75,43.51h-13L9.4,61.73a2.71,2.71,0,0,0,1.75.66H51.89a2,2,0,0,0,2-1.68Z" />
+              </g>
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>Git code management</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block product-block" id="sourcetree" data-product="SourceTree"> 
+           <a href="/software/sourcetree" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 491.1 71.76" height="20" style="margin-bottom:1px;">
+             <defs>
+              <style>#sourcetree .cls-1{fill:#253858;} #sourcetree .cls-2{fill:url(#linear-gradient);} #sourcetree .cls-3{fill:#2684ff;} #sourcetree .cls-4{fill:url(#New_Gradient_Swatch_1);}</style>
+              <lineargradient id="linear-gradient" x1="28.44" y1="0.12" x2="28.44" y2="0.12" gradientunits="userSpaceOnUse">
+               <stop offset="0" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+              <lineargradient id="New_Gradient_Swatch_1" x1="42.66" y1="50.35" x2="42.66" y2="20.14" gradientunits="userSpaceOnUse">
+               <stop offset="0.18" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+             </defs>
+             <title>Sourcetree-blue</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue">
+               <path class="cls-1" d="M107.51,65.68c-11.18,0-16.37-2.2-20.86-4.49V53.1C92,55.91,100.3,57.94,108,57.94c8.71,0,12-3.43,12-8.54s-3.17-7.83-14.17-10.47c-13-3.17-18.83-7.66-18.83-17.16,0-9,6.86-15.66,20.33-15.66,8.36,0,13.73,2,17.69,4.22v7.92a35.53,35.53,0,0,0-18-4.4c-7.57,0-12.06,2.64-12.06,7.92,0,4.75,3.7,7.13,13.9,9.68,12.23,3.08,19.1,7,19.1,17.42C127.84,58.91,121.85,65.68,107.51,65.68Z" />
+               <path class="cls-1" d="M134.53,42.71c0-13.2,7.74-22.79,20.94-22.79s20.77,9.59,20.77,22.79-7.66,23-20.77,23S134.53,55.91,134.53,42.71Zm7.39,0c0,8.36,4.14,15.93,13.55,15.93s13.38-7.57,13.38-15.93S164.8,27,155.47,27,141.92,34.36,141.92,42.71Z" />
+               <path class="cls-1" d="M184.16,20.8h7.57V47.38c0,7.92,3.17,11.44,10.38,11.44,7,0,11.88-4.66,11.88-13.55V20.8h7.57v44H214V57.59a15.43,15.43,0,0,1-13.9,8.1c-10.12,0-15.93-7-15.93-19.1Z" />
+               <path class="cls-1" d="M233,20.8h7.39v7.74c2.55-5.19,7-8.89,15.58-8.36v7.39c-9.68-1-15.58,1.94-15.58,11.26v26H233Z" />
+               <path class="cls-1" d="M292.66,63.66c-2.64,1.41-6.69,2-10.74,2-15.66,0-23-9.5-23-23,0-13.29,7.3-22.79,23-22.79A23.26,23.26,0,0,1,292.4,22v7A22.18,22.18,0,0,0,282.45,27c-11.44,0-16.1,7.22-16.1,15.75s4.75,15.75,16.28,15.75a27.8,27.8,0,0,0,10-1.58Z" />
+               <path class="cls-1" d="M322.32,65.68c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H306.3c1.06,7.48,5.9,12.32,16.28,12.32A39,39,0,0,0,336,56.09v7C332.35,65,326.8,65.68,322.32,65.68Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C311.05,26.79,307,32,306.21,39.63Z" />
+               <path class="cls-1" d="M364.82,57.41a24,24,0,0,0,4.75-.62v7.3a18.19,18.19,0,0,1-5.1.7c-9.42,0-14-5.54-14-13.73V27.84h-7.13v-7h7.13V11.48h7.39V20.8h11.7v7h-11.7V50.9C357.87,54.77,360.16,57.41,364.82,57.41Z" />
+               <path class="cls-1" d="M379.25,20.8h7.39v7.74c2.55-5.19,7-8.89,15.58-8.36v7.39c-9.68-1-15.58,1.94-15.58,11.26v26h-7.39Z" />
+               <path class="cls-1" d="M428.88,65.68c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H412.87c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C438.92,65,433.37,65.68,428.88,65.68Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C417.62,26.79,413.57,32,412.78,39.63Z" />
+               <path class="cls-1" d="M475,65.68c-16.46,0-23.67-9.5-23.67-23,0-13.29,7.39-22.79,20.77-22.79,13.55,0,19,9.42,19,22.79v3.43H459c1.06,7.48,5.9,12.32,16.28,12.32a39,39,0,0,0,13.38-2.38v7C485,65,479.48,65.68,475,65.68Zm-16.1-26h24.55c-.44-8.18-4.14-12.85-11.7-12.85C463.73,26.79,459.68,32,458.89,39.63Z" />
+               <polygon class="cls-2" points="28.44 0.12 28.44 0.12 28.44 0.12 28.44 0.12" />
+               <path class="cls-3" d="M56.88,28.44A28.44,28.44,0,0,0,28.44,0h0a28.43,28.43,0,0,0-8.79,55.48V69.73a2,2,0,0,0,2,2h13.5a2,2,0,0,0,2-2V55.49A28.45,28.45,0,0,0,56.88,28.44ZM28.44,38.05h0a9.61,9.61,0,1,1,0-19.23h0a9.61,9.61,0,0,1,0,19.23Z" />
+               <path class="cls-4" d="M28.44,0V18.83h0a9.61,9.61,0,0,1,0,19.23h0a8.79,8.79,0,0,1,8.79,8.79v8.65A28.44,28.44,0,0,0,28.44,0Z" />
+              </g>
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>Git and Mercurial desktop client</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block product-block" id="bamboo" data-product="Bamboo"> 
+           <a href="/software/bamboo" class="component--block__link"> 
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewbox="0 0 409.6 73.55" height="20" style="margin-bottom:-2px;">
+             <defs>
+              <style> #bamboo .cls-1{fill:#253858;} #bamboo .cls-2{fill:#2684ff;} #bamboo .cls-3{fill:url(#linear-gradient);} #bamboo .cls-4{fill:url(#linear-gradient-2);}</style>
+              <lineargradient id="linear-gradient" x1="16.06" y1="10.61" x2="16.06" y2="53.94" gradientunits="userSpaceOnUse">
+               <stop offset="0" stop-color="#0052cc" />
+               <stop offset="1" stop-color="#2684ff" />
+              </lineargradient>
+              <lineargradient id="linear-gradient-2" x1="15.91" y1="10.61" x2="15.91" y2="53.94" xlink:href="#linear-gradient" />
+             </defs>
+             <title>Bamboo-blue</title>
+             <g id="Layer_2" data-name="Layer 2">
+              <g id="Blue">
+               <path class="cls-1" d="M117.53,7.88C129.32,7.88,135,13.69,135,23c0,7-3.17,11.26-9.68,12.85,8.54,1.41,12.76,6.07,12.76,14.25,0,9.24-6.25,15.58-19.18,15.58H95.09V7.88ZM103,15.45V32.7h13.46c7.48,0,10.56-3.43,10.56-9s-3.34-8.27-10.56-8.27Zm0,24.29v18H119.2c7.57,0,11-2.73,11-8.54,0-6.16-3.26-9.5-11.17-9.5Z" />
+               <path class="cls-1" d="M177,57.78c-2.82,5.81-8.1,8.8-14.87,8.8-11.7,0-17.6-9.94-17.6-22.88,0-12.41,6.16-22.88,18.48-22.88,6.42,0,11.35,2.9,14,8.62V21.7h7.57v44H177Zm-12.85,1.76c6.78,0,12.85-4.31,12.85-14.08V41.94c0-9.77-5.54-14.08-12-14.08-8.54,0-12.94,5.63-12.94,15.84C152.11,54.26,156.34,59.54,164.17,59.54Z" />
+               <path class="cls-1" d="M233.43,65.7h-7.57V39.12c0-7.92-3.17-11.44-10.38-11.44-7,0-11.88,4.66-11.88,13.55V65.7H196v-44h7.57v7.22a15.42,15.42,0,0,1,13.9-8.1c7.48,0,12.58,3.78,14.78,10.74,2.46-6.78,8.36-10.74,15.66-10.74,9.86,0,15.31,6.69,15.31,19.1V65.7h-7.57V41.23c0-9.06-3.17-13.55-10.38-13.55-7,0-11.88,4.66-11.88,13.55Z" />
+               <path class="cls-1" d="M295.38,66.58c-6.42,0-11.35-2.9-14-8.62V65.7h-7.57V3.31h7.57V29.62c2.82-5.81,8.1-8.8,14.87-8.8,11.7,0,17.6,9.94,17.6,22.88C313.86,56.1,307.7,66.58,295.38,66.58Zm-1.14-38.72c-6.78,0-12.85,4.31-12.85,14.08v3.52c0,9.77,5.54,14.08,12,14.08,8.54,0,12.94-5.63,12.94-15.84C306.29,33.14,302.06,27.86,294.23,27.86Z" />
+               <path class="cls-1" d="M320,43.61c0-13.2,7.74-22.79,20.94-22.79s20.77,9.59,20.77,22.79-7.66,23-20.77,23S320,56.81,320,43.61Zm7.39,0c0,8.36,4.14,15.93,13.55,15.93S354.34,52,354.34,43.61s-4-15.75-13.37-15.75S327.41,35.25,327.41,43.61Z" />
+               <path class="cls-1" d="M367.89,43.61c0-13.2,7.74-22.79,20.94-22.79s20.77,9.59,20.77,22.79-7.66,23-20.77,23S367.89,56.81,367.89,43.61Zm7.39,0c0,8.36,4.14,15.93,13.55,15.93S402.21,52,402.21,43.61s-4-15.75-13.37-15.75S375.28,35.25,375.28,43.61Z" />
+               <path class="cls-2" d="M61.56,41.81H46.27a2,2,0,0,0-2,1.7A12.57,12.57,0,0,1,31.81,54.34l4.14,18.91A31.81,31.81,0,0,0,63.56,43.95,2,2,0,0,0,61.56,41.81Z" />
+               <path class="cls-2" d="M35.1,41.33l22-18.91a2,2,0,0,0,0-3L35.1.48A2,2,0,0,0,31.81,2V39.81A2,2,0,0,0,35.1,41.33Z" />
+               <path class="cls-3" d="M.3,45.94A31.81,31.81,0,0,0,31.81,73.55V54.34A12.56,12.56,0,0,1,19.25,41.81Z" />
+               <path class="cls-4" d="M0,41.51v.3H19.25A12.56,12.56,0,0,1,31.81,29.28L27.68,10.37A31.79,31.79,0,0,0,0,41.51" />
+              </g>
+             </g>
+            </svg> 
+            <div class="component component--textblock"> 
+             <p>Integration and release management</p> 
+            </div> </a> 
+          </div> 
+         </div> 
+         <div class="component component--block gn_1_75-subnav-cta-block"> 
+          <div class="component--block__background b50"> 
+           <div class="container-fluid"> 
+            <div class="row"> 
+             <div class="column"> 
+              <div class="component component--image-heading-textblock"> 
+               <div class="component__image component__image--left"> 
+                <img src="https://wac-cdn.atlassian.com/dam/jcr:84145e0e-1cc9-4c01-b893-7df2ed62c74c/marketplace-icon.svg?cdnVersion=hh" class="component__image" style="width:25px;"> 
+               </div> 
+               <div class="component__heading-textblock component__heading-textblock--right" style="padding-left:25px;"> 
+                <h4>Atlassian Marketplace</h4> 
+                <p>Customize and extend products with add-ons &amp; plug-ins in the&nbsp;<a href="https://www.atlassian.com/wac/software/marketplace">Atlassian Marketplace</a></p> 
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
       </div> 
-      <div id="so-mobilenav-standard-1" data-id="1" class="so-mobilenav-standard"></div>
-      <div class="menu-home-container">
-       <ul id="menu-home" class="menu">
-        <li id="menu-item-62" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-62"><a href="http://blog.iteedee.com/"><span class="icon"></span>Home</a></li> 
-        <li id="menu-item-16" class="menu-item menu-item-type-post_type menu-item-object-page current_page_parent menu-item-16"><a href="http://blog.iteedee.com/blog/">Blog</a></li> 
-        <li id="menu-item-482" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-482"><a href="http://blog.iteedee.com/projects/">Projects</a> 
-         <ul class="sub-menu"> 
-          <li id="menu-item-512" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-512"><a href="http://blog.iteedee.com/projects/beta-depot/">Beta Depot</a></li> 
-          <li id="menu-item-637" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-637"><a href="http://www.knowvent.com" onclick="_gaq.push(['_trackEvent', 'outbound-widget', 'http://www.knowvent.com', 'Knowvent']);" target="_blank"><span class="icon"></span>Knowvent</a></li> 
-         </ul> </li> 
-        <li id="menu-item-61" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-61"><a href="http://blog.iteedee.com/about/">About</a></li> 
-       </ul>
-      </div>
-      <div id="so-mobilenav-mobile-1" data-id="1" class="so-mobilenav-mobile"></div>
-      <div class="menu-mobilenav-container">
-       <ul id="mobile-nav-item-wrap-1" class="menu">
-        <li><a href="#" class="mobilenav-main-link" data-id="1"><span class="mobile-nav-icon"></span>Menu</a></li>
-       </ul>
+      <div class="component component--block global-nav__link"> 
+       <div class="component component--link-button has-dropdown"> 
+        <a href="#" class="component__link default">Teams</a> 
+       </div> 
+       <div class="container-fluid global-nav__dropdown"> 
+        <div class="row"> 
+         <div class="column column-lg-3"> 
+          <div class="component component--heading-textblock"> 
+           <h2>For teams</h2> 
+           <p>Atlassian offers solutions that work for every team, no matter the size or function.</p> 
+          </div> 
+          <div class="component component--link-button"> 
+           <a href="/software" class="component__link default">View all products</a> 
+          </div> 
+         </div> 
+         <div class="column column-lg-3"> 
+          <div class="component component--heading"> 
+           <h3 class="eyebrows">By team size</h3> 
+          </div> 
+          <div class="component component--block"> 
+           <a href="/software/startups" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Startups</h4> 
+             <p>Great for startups, from incubator to IPO</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block"> 
+           <a href="/software/small-business" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Small Business</h4> 
+             <p>Get the right tools for your growing business</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block"> 
+           <a href="/enterprise" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Enterprise</h4> 
+             <p>Learn how we make big teams successful</p> 
+            </div> </a> 
+          </div> 
+         </div> 
+         <div class="column column-lg-6"> 
+          <div class="component component--heading"> 
+           <h3 class="eyebrows">By team function</h3> 
+          </div> 
+          <div class="container-fluid"> 
+           <div class="row"> 
+            <div class="column column-lg-6"> 
+             <div class="component component--block"> 
+              <a href="/teams/software" class="component--block__link"> 
+               <div class="component component--heading-textblock"> 
+                <h4>Software</h4> 
+                <p>Plan, build, &amp; ship quality products</p> 
+               </div> </a> 
+             </div> 
+             <div class="component component--block"> 
+              <a href="/teams/marketing" class="component--block__link"> 
+               <div class="component component--heading-textblock"> 
+                <h4>Marketing</h4> 
+                <p>Bring together a winning strategy</p> 
+               </div> </a> 
+             </div> 
+             <div class="component component--block"> 
+              <a href="/teams/hr" class="component--block__link"> 
+               <div class="component component--heading-textblock"> 
+                <h4>HR</h4> 
+                <p>Streamline people management</p> 
+               </div> </a> 
+             </div> 
+             <div class="component component--block"> 
+              <a href="/teams/legal" class="component--block__link"> 
+               <div class="component component--heading-textblock"> 
+                <h4>Legal</h4> 
+                <p>Operate securely and reliably&nbsp;</p> 
+               </div> </a> 
+             </div> 
+            </div> 
+            <div class="column column-lg-6"> 
+             <div class="component component--block"> 
+              <a href="/teams/operations" class="component--block__link"> 
+               <div class="component component--heading-textblock"> 
+                <h4>Operations</h4> 
+                <p>Run your business efficiently</p> 
+               </div> </a> 
+             </div> 
+             <div class="component component--block"> 
+              <a href="/teams/it" class="component--block__link"> 
+               <div class="component component--heading-textblock"> 
+                <h4>IT</h4> 
+                <p>Provide great service and support</p> 
+               </div> </a> 
+             </div> 
+             <div class="component component--block"> 
+              <a href="/teams/finance" class="component--block__link"> 
+               <div class="component component--heading-textblock"> 
+                <h4>Finance</h4> 
+                <p>Simplify all finance processes</p> 
+               </div> </a> 
+             </div> 
+             <div class="component component--block"> 
+              <a href="/software" class="component--block__link"> 
+               <div class="component component--heading-textblock"> 
+                <h4>Other</h4> 
+                <p>Deliver smart and fast in any team</p> 
+               </div> </a> 
+             </div> 
+            </div> 
+           </div> 
+          </div> 
+         </div> 
+         <div class="component component--block gn_1_75-subnav-cta-block"> 
+          <div class="component--block__background b50"> 
+           <div class="container-fluid"> 
+            <div class="row"> 
+             <div class="column"> 
+              <div class="component component--image-heading-textblock"> 
+               <div class="component__image component__image--left"> 
+                <img src="https://wac-cdn.atlassian.com/dam/jcr:14e9e83b-e608-461c-8f55-15a9351ac8a8/teams-nav.svg?cdnVersion=hh" class="component__image" style="width:25px;"> 
+               </div> 
+               <div class="component__heading-textblock component__heading-textblock--right" style="padding-left:25px;"> 
+                <h4> Get started for free</h4> 
+                <p>Atlassian products are <a href="https://www.atlassian.com/try">free to try</a>, easy to setup, and work seamlessly together</p> 
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="component component--block global-nav__link"> 
+       <div class="component component--link-button has-dropdown"> 
+        <a href="#" class="component__link default">Support</a> 
+       </div> 
+       <div class="container-fluid global-nav__dropdown"> 
+        <div class="row"> 
+         <div class="column column-lg-3"> 
+          <div class="component component--heading-textblock"> 
+           <h2>Support</h2> 
+           <p>Get technical help, learn more about our products, and expand your knowledge of Atlassian.</p> 
+          </div> 
+          <div class="component component--link-button"> 
+           <a href="/resources" class="component__link default">View all resources</a> 
+          </div> 
+         </div> 
+         <div class="column column-lg-3"> 
+          <div class="component component--heading"> 
+           <h3 class="eyebrows">Atlassian support</h3> 
+          </div> 
+          <div class="component component--block external-link"> 
+           <a href="https://support.atlassian.com/help" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Technical support</h4> 
+             <p>Raise a support ticket</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block"> 
+           <a href="/licensing/purchase-licensing" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Purchasing &amp; licensing</h4> 
+             <p>Help on pricing or your account</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block"> 
+           <a href="/enterprise/services" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Enterprise Services</h4> 
+             <p>Support for large teams</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block external-link"> 
+           <a href="https://support.atlassian.com/help" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Documentation</h4> 
+             <p>Guides to all of our products</p> 
+            </div> </a> 
+          </div> 
+         </div> 
+         <div class="column column-lg-3"> 
+          <div class="component component--heading"> 
+           <h3 class="eyebrows">Resources</h3> 
+          </div> 
+          <div class="component component--block"> 
+           <a href="/partners" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Atlassian Partners</h4> 
+             <p>Custom professional services</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block external-link"> 
+           <a href="https://answers.atlassian.com/" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Community Answers</h4> 
+             <p>Community Q&amp;A forum</p> 
+            </div> </a> 
+          </div> 
+         </div> 
+         <div class="column column-lg-3"> 
+          <div class="component component--heading"> 
+           <h3 class="eyebrows">Learn &amp; connect</h3> 
+          </div> 
+          <div class="component component--block"> 
+           <a href="/company" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>About us</h4> 
+             <p>Learn about our company</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block"> 
+           <a href="/company/careers" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Careers</h4> 
+             <p>Search our latest job openings</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block"> 
+           <a href="/university" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>University</h4> 
+             <p>Self-paced and live training</p> 
+            </div> </a> 
+          </div> 
+          <div class="component component--block external-link"> 
+           <a href="https://blogs.atlassian.com/" class="component--block__link"> 
+            <div class="component component--heading-textblock"> 
+             <h4>Blogs</h4> 
+             <p>Thought leadership on all topics</p> 
+            </div> </a> 
+          </div> 
+         </div> 
+         <div class="component component--block gn_1_75-subnav-cta-block"> 
+          <div class="component--block__background b50"> 
+           <div class="container-fluid"> 
+            <div class="row"> 
+             <div class="column"> 
+              <div class="component component--image-heading-textblock"> 
+               <div class="component__image component__image--left"> 
+                <img src="https://wac-cdn.atlassian.com/dam/jcr:f7a206f0-b4b4-4d1c-a17b-50ea9d96890d/technical-support.svg?cdnVersion=hh" class="component__image" style="width:25px;"> 
+               </div> 
+               <div class="component__heading-textblock component__heading-textblock--right" style="padding-left:25px;"> 
+                <h4> Atlassian Community</h4> 
+                <p>Connect, share, and learn with other users in the new <a href="https://community.atlassian.com/">Atlassian Community</a></p> 
+               </div> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <div class="component component--block pull-right-lg pull-right-xl buy-try"> 
+       <div class="component component--block global-nav__link try-button"> 
+        <div class="component component--link-button"> 
+         <a href="/try" class="component__link button button--two button--regular button--primary">Try free</a> 
+        </div> 
+       </div> 
+       <div class="component component--block global-nav__link buy-button"> 
+        <div class="component component--link-button"> 
+         <a href="/buy" class="component__link link-button">Buy Now</a> 
+        </div> 
+       </div> 
+       <div class="component component--search"> 
+        <form class="component--search__form" action="/search" method="GET"> 
+         <div class="component--search__input-container"> 
+          <input name="query" class="component--search__input" type="text" autocomplete="off" placeholder="Search"> 
+          <input type="submit" class="component--search__submit" value="Search"> 
+         </div> 
+        </form> 
+       </div> 
+      </div> 
+      <div class="component component--block try-buy--mobile"> 
+       <div class="component component--block visible-xs-block visible-sm-block visible-md-block"> 
+        <a href="/try" class="component--block__link"> 
+         <div class="component component--heading-textblock"> 
+          <span>Try</span> 
+          <p>Try our cloud and server products for free.</p> 
+         </div> </a> 
+       </div> 
+       <div class="component component--block visible-xs-block visible-sm-block visible-md-block"> 
+        <a href="/try" class="component--block__link"> 
+         <div class="component component--heading-textblock"> 
+          <span>Buy</span> 
+          <p>Know what you want? Buy our server products.</p> 
+         </div> </a> 
+       </div> 
+      </div> 
+      <div class="component component--block mobile-links visible-xs-block visible-sm-block visible-md-block"> 
+       <div class="component component--link-button"> 
+        <a href="https://my.atlassian.com" class="component__link default">My Account</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/company/events" class="component__link default">Community</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://marketplace.atlassian.com/" class="component__link default">Marketplace</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/company" class="component__link default">Company</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/company/careers" class="component__link default">Careers</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/company/contact" class="component__link default">Contact us</a> 
+       </div> 
       </div> 
      </div> 
-    </nav>
-    <!-- .site-navigation .main-navigation --> 
-   </header>
-   <!-- #masthead .site-header --> 
-   <div id="main" class="site-main"> 
-    <div class="full-container"> 
-     <div id="primary" class="content-area"> 
-      <div id="content" class="site-content" role="main"> 
-       <article id="post-422" class="post post-422 type-post status-publish format-standard has-post-thumbnail hentry category-net category-api category-mvc category-security category-uncategorized"> 
-        <div class="entry-main"> 
-         <header class="entry-header"> 
-          <div class="entry-thumbnail">
-           <img width="720" height="380" src="http://blog.iteedee.com/wp-content/uploads/2014/03/ASP_NET_Identity_2_0_Cookie_Token.png" class="attachment-post-thumbnail size-post-thumbnail wp-post-image" alt="ASP.NET Identity 2.9 Cookie &amp; Token" srcset="http://blog.iteedee.com/wp-content/uploads/2014/03/ASP_NET_Identity_2_0_Cookie_Token.png 720w, http://blog.iteedee.com/wp-content/uploads/2014/03/ASP_NET_Identity_2_0_Cookie_Token-300x158.png 300w" sizes="(max-width: 720px) 100vw, 720px">
-          </div> 
-          <h1 class="entry-title"><a href="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/" title="Permalink to ASP.NET Identity 2.0 Cookie &amp; Token Authentication" rel="bookmark">ASP.NET Identity 2.0 Cookie &amp; Token Authentication</a></h1> 
-          <div class="entry-meta">
-            Posted on 
-           <a href="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/" title="9:06 pm" rel="bookmark"><time class="entry-date updated" datetime="2014-03-02T21:06:26+00:00">March 2, 2014</time></a> 
-           <span class="byline"> by <span class="author vcard"><a class="url fn n" href="http://blog.iteedee.com/author/hylander0/" title="View all posts by Justin Hyland" rel="author">Justin Hyland</a></span></span> 
-          </div>
-          <!-- .entry-meta --> 
-         </header>
-         <!-- .entry-header --> 
-         <div class="entry-content"> 
-          <div style="text-align: center; " class="iteed-before-post-long" id="iteed-1398338869">
-           <p><a href="http://www.knowvent.com"><img class="alignnone wp-image-676 " src="http://blog.iteedee.com/wp-content/uploads/2015/03/knowventBanner.jpg" alt="knowventBanner" width="673" height="83" srcset="http://blog.iteedee.com/wp-content/uploads/2015/03/knowventBanner.jpg 600w, http://blog.iteedee.com/wp-content/uploads/2015/03/knowventBanner-300x37.jpg 300w" sizes="(max-width: 673px) 100vw, 673px"></a></p> 
-          </div>
-          <p>This tutorial is centered around building an application that will support multiple platforms. The need to support a web application along with a complement of mobile apps is not uncommon. This tutorial will focus on setting up ASP.NET Identity 2.0 in a ASP.NET MVC application with WebAPI Support.</p> 
-          <blockquote> 
-           <p><strong>Update:</strong> If you are interested in two factor authentication then check out my new article on <a href="http://blog.iteedee.com/2014/04/asp-net-identity-2-0-two-factor-authentication/">ASP.NET Identity 2.0 Two Factor Authentication</a></p> 
-          </blockquote> 
-          <h2>Use Case</h2> 
-          <p>The need for an authentication solution what will support both web and a native mobile application is a real need. One user store multiple authentication methods. We will need the web application to authentication using cookies and the mobile counterpart will need to use a token-based authentication.</p> 
-          <h2>What We Are Using?</h2> 
-          <ul> 
-           <li><strong>Visual Studio 2013 – MVC/Individual Authentication project Template</strong></li> 
-           <li><strong>ASP.NET Identity 2.0 (Pre-release)</strong></li> 
-           <li><strong>ASP.NET MVC 5 &amp; WebAPI</strong></li> 
-           <li><strong>OWIN Identity Middleware</strong></li> 
-          </ul> 
-          <h2>Install Prerequisites</h2> 
-          <p>I am using a ASP.NET MVC template with <em>Individual Authenication</em> found in the Visual Studio 2013 project setup. At the time this article was written, ASP.NET Identity 2.0 was still in pre-release. To demo the ASP.NET Identity 2.0 I updated my Nuget Identity packages to the pre-release versions. I have listed below the details of the packages used (some are defaults of the Visual Studio project initialization).</p> 
-          <pre><code>Id                             Version              Description/Release Notes                                                                                                                 
---                             -------              -------------------------                                                                                                                 
-Antlr                          3.4.1.9004           ANother Tool for Language Recognition, is a language tool that provides a framework for constructing recognizers, interpreters, compile...
-bootstrap                      3.0.0                Sleek, intuitive, and powerful front-end framework for faster and easier web development.                                                 
-EntityFramework                6.1.0-beta1          Entity Framework is Microsoft's recommended data access technology for new applications.                                                  
-jQuery                         1.10.2               jQuery is a new kind of JavaScript Library....                                                                                            
-jQuery.Validation              1.11.1               This jQuery plugin makes simple clientside form validation trivial, while offering lots of option for customization. That makes a good ...
-Microsoft.AspNet.Identity.Core 2.0.0-beta1          Core interfaces for ASP.NET Identity.                                                                                                     
-Microsoft.AspNet.Identity.E... 2.0.0-beta1          ASP.NET Identity providers that use Entity Framework.                                                                                     
-Microsoft.AspNet.Identity.Owin 2.0.0-beta1          Owin implementation for ASP.NET Identity.                                                                                                 
-Microsoft.AspNet.Mvc           5.0.0                This package contains the runtime assemblies for ASP.NET MVC. ASP.NET MVC gives you a powerful, patterns-based way to build dynamic web...
-Microsoft.AspNet.Razor         3.0.0                This package contains the runtime assemblies for ASP.NET Web Pages. ASP.NET Web Pages and the new Razor syntax provide a fast, terse, c...
-Microsoft.AspNet.Web.Optimi... 1.1.1                ASP.NET Optimization introduces a way to bundle and optimize CSS and JavaScript files.                                                    
-Microsoft.AspNet.WebApi        5.0.0                This package contains everything you need to host ASP.NET Web API on IIS. ASP.NET Web API is a framework that makes it easy to build HT...
-Microsoft.AspNet.WebApi.Client 5.0.0                This package adds support for formatting and content negotiation to System.Net.Http. It includes support for JSON, XML, and form URL en...
-Microsoft.AspNet.WebApi.Core   5.0.0                This package contains the core runtime assemblies for ASP.NET Web API. This package is used by hosts of the ASP.NET Web API runtime. To...
-Microsoft.AspNet.WebApi.Web... 5.0.0                This package contains everything you need to host ASP.NET Web API on IIS. ASP.NET Web API is a framework that makes it easy to build HT...
-Microsoft.AspNet.WebPages      3.0.0                This package contains core runtime assemblies shared between ASP.NET MVC and ASP.NET Web Pages.                                           
-Microsoft.jQuery.Unobtrusiv... 3.0.0                jQuery plugin that unobtrusively sets up jQuery.Validation.                                                                               
-Microsoft.Owin                 2.0.2                Provides a set of helper types and abstractions for simplifying the creation of OWIN components.                                          
-Microsoft.Owin.Host.SystemWeb  2.0.0                OWIN server that enables OWIN-based applications to run on IIS using the ASP.NET request pipeline.                                        
-Microsoft.Owin.Security        2.0.2                Common types which are shared by the various authentication middleware components.                                                        
-Microsoft.Owin.Security.Coo... 2.0.2                Middleware that enables an application to use cookie based authentication, similar to ASP.NET's forms authentication.                     
-Microsoft.Owin.Security.Fac... 2.0.0                Middleware that enables an application to support Facebook's OAuth 2.0 authentication workflow.                                           
-Microsoft.Owin.Security.Google 2.0.0                Middleware that enables an application to support Google's OpenId authentication workflow.                                                
-Microsoft.Owin.Security.Mic... 2.0.0                Middleware that enables an application to support the Microsoft Account authentication workflow.                                          
-Microsoft.Owin.Security.OAuth  2.0.2                Middleware that enables an application to support any standard OAuth 2.0 authentication workflow.                                         
-Microsoft.Owin.Security.Twi... 2.0.0                Middleware that enables an application to support Twitter's OAuth 2.0 authentication workflow.                                            
-Microsoft.Web.Infrastructure   1.0.0.0              This package contains the Microsoft.Web.Infrastructure assembly that lets you dynamically register HTTP modules at run time.              
-Modernizr                      2.6.2                Modernizr adds classes to the &lt;html&gt; element which allow you to target specific browser functionality in your stylesheet. You don't act...
-Newtonsoft.Json                5.0.6                Json.NET is a popular high-performance JSON framework for .NET                                                                            
-Owin                           1.0                  OWIN IAppBuilder startup interface                                                                                                        
-Respond                        1.2.0                The goal of this script is to provide a fast and lightweight (3kb minified / 1kb gzipped) script to enable responsive web designs in br...
-WebGrease                      1.5.2                Web Grease is a suite of tools for optimizing javascript, css files and images. 
-</code></pre> 
-          <hr> 
-          <h2>Some New Patterns with ASP.NET Identity 2.0</h2> 
-          <p>If you are not familiar with <a href="http://owin.org/" onclick="_gaq.push(['_trackEvent', 'outbound-article', 'http://owin.org/', 'OWIN']);" rel="external nofollow" title="" class="ext-link" data-wpel-target="_blank">OWIN</a> this is a effort by Microsoft to create more modular, decoupled software with quicker release cycles. MVC 5 and ASP.NET Identity uses many different OWIN <a href="http://www.asp.net/aspnet/overview/owin-and-katana/owin-middleware-in-the-iis-integrated-pipeline" onclick="_gaq.push(['_trackEvent', 'outbound-article', 'http://www.asp.net/aspnet/overview/owin-and-katana/owin-middleware-in-the-iis-integrated-pipeline', 'middle']);" rel="external nofollow" title="" class="ext-link" data-wpel-target="_blank">middle</a> components. If you would like to get more information about OWN you can <a href="http://www.asp.net/vnext/overview/owin-and-katana" onclick="_gaq.push(['_trackEvent', 'outbound-article', 'http://www.asp.net/vnext/overview/owin-and-katana', 'read more about it here']);" rel="external nofollow" title="" class="ext-link" data-wpel-target="_blank">read more about it here</a>.</p> 
-          <p>The ASP.NET Identity includes support for creating a single instance of a the <code>UserManager</code> and the identity <code>DBContext</code> per application request. To support this pattern use the follow extension methods per the <code>IAppBuilder</code> object:</p> 
-          <pre><code>app.CreatePerOwinContext&lt;AppUserIdentityDbContext&gt;(AppUserIdentityDbContext.Create);
-app.CreatePerOwinContext&lt;AppUserManager&gt;(AppUserManager.Create);
-</code></pre> 
-          <p>Here is the AppManager Class:</p> 
-          <pre><code>public class AppUserManager : UserManager&lt;AppUserIdentity&gt;
-{
-    public AppUserManager(IUserStore&lt;AppUserIdentity&gt; store)
-        : base(store) { }
-
-    public static AppUserManager Create(IdentityFactoryOptions&lt;AppUserManager&gt; options, IOwinContext context)
-    {
-        var manager = new AppUserManager(new UserStore&lt;AppUserIdentity&gt;(context.Get&lt;AppUserIdentityDbContext&gt;()));
-        return manager;
-    }
-
-}
-</code></pre> 
-          <p>To get the <code>AppManager</code> object during a MVC Controller execution:</p> 
-          <pre><code>private AppUserManager _userManager;
-public AppUserManager UserManager
-{
-    get
-    {
-        return _userManager ?? HttpContext.GetOwinContext().GetUserManager&lt;AppUserManager&gt;();
-    }
-    private set
-    {
-        _userManager = value;
-    }
-} 
-</code></pre> 
-          <hr> 
-          <h2>How to Setup ASP.NET Identity 2.0 to Support Cookie and Bearer Token Authentication</h2> 
-          <p>Like I mention above, there is a real world need to have an application support both web-based and native mobile applications. This requires two authentication modes: Cookie Authentication for your web-based application and the token authentication for mobile/rich client scenarios.</p> 
-          <blockquote> 
-           <p>Since the Visual Studio 2013 project setup supports Cookie authentication out of the box. So, this article will focus primarily on how to dovetail WebAPI and Token Authentication to use the same User Store.</p> 
-          </blockquote> 
-          <h3>Setup WebAPIConfig</h3> 
-          <p>The first task is setting up the <code>Startup</code> class:</p> 
-          <pre><code>    public static OAuthBearerAuthenticationOptions OAuthBearerOptions { get; private set; }
-
-    public void ConfigureAuth(IAppBuilder app)
-    {
-        app.CreatePerOwinContext&lt;AppUserIdentityDbContext&gt;(AppUserIdentityDbContext.Create);
-        app.CreatePerOwinContext&lt;AppUserManager&gt;(AppUserManager.Create);
-
-        OAuthBearerOptions = new OAuthBearerAuthenticationOptions();
-        app.UseOAuthBearerAuthentication(OAuthBearerOptions);
-
-        //...Cookie Auth Setup here...//
-    }
-</code></pre> 
-          <p>Here we are setup the context singleton for the DBContext and UserManager (as mention above). The important part of this snippet for authentication is initializing the bearer options object and adding the <code>UseOAuthBearerAuthentication</code> middle ware authentication to the pipeline. This will enable the app to use Bearer Tokens for authentication.</p> 
-          <hr> 
-          <p>The next task required to support WebAPI auth is to suppress cookie authentication on API requests. This is done by added in the following code to the WebApiConfig <code>Register</code> method.</p> 
-          <pre><code>public static void Register(HttpConfiguration config)
-{
-    //...Route Registration...///
-
-    config.SuppressDefaultHostAuthentication();
-    config.Filters.Add(new HostAuthenticationFilter("Bearer"));
-}
-</code></pre> 
-          <p>The first method tells the pipeline authentication to fall through to the request handler. The second adds an authentication handler that will validate the authentication HTTP host headers. This configuration tells the handler to look at the <code>Authorization</code> Header value of <em>“Bearer abcedefghijklmnopqrstuvwxyz1234567890”</em> as the token. <em>More on this later.</em></p> 
-          <p>Do <strong>Note</strong> the two methods used are extension methods found in a OWIN package. If these methods can’t be resolved you will probably need to install the following <a href="https://www.nuget.org/packages/Microsoft.AspNet.WebApi.Owin" onclick="_gaq.push(['_trackEvent', 'outbound-article', 'https://www.nuget.org/packages/Microsoft.AspNet.WebApi.Owin', 'package']);" rel="external nofollow" title="" class="ext-link" data-wpel-target="_blank">package</a>:</p> 
-          <pre><code>`Install-Package Microsoft.AspNet.WebApi.Owin`  
-</code></pre> 
-          <hr> 
-          <h3>Get Your Token</h3> 
-          <p>The HostAuthenticationFilter will look for an authorization header for all <code>[Authorize]</code> annotated controllers/method. This requires an authentication process that returns a bearer token. The <strong>Microsoft.Owin.Security</strong> will come in to play here. The code below shows how to create a ticket based on the user’s claims Identity and generated a token based on the security ticket. It returns a token that will expire in 30 minutes.</p> 
-          <pre><code>public String Authenticate(string user, string password)
-{
-
-    if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(password))
-        return "failed";
-    var userIdentity = UserManager.FindAsync(user, password).Result;
-    if (userIdentity != null)
-    {
-        var identity = new ClaimsIdentity(Startup.OAuthBearerOptions.AuthenticationType);
-        identity.AddClaim(new Claim(ClaimTypes.Name, user));
-        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userIdentity.Id));
-        AuthenticationTicket ticket = new AuthenticationTicket(identity, new AuthenticationProperties());
-        var currentUtc = new SystemClock().UtcNow;
-        ticket.Properties.IssuedUtc = currentUtc;
-        ticket.Properties.ExpiresUtc = currentUtc.Add(TimeSpan.FromMinutes(30));
-        string AccessToken = Startup.OAuthBearerOptions.AccessTokenFormat.Protect(ticket);
-        return AccessToken;
-    }
-    return "failed";
-}
-</code></pre> 
-          <p>When successfully authenticated you will get a token like <code>hBJi26lVQwUJF6f7roDy-oVnV_VeX20m52xL2dzF1q5IQPkt3n30610UbpFl9JV75.......</code>. Passing this in with each request’s authorization header is all that is needed to authenticate the request. Be sure to include the ‘Bearer’ designation along with the token like <code>Bearer hBJi26lVQwUJF6f7roDy-oVnV_VeX20m52xL2dzF1q5IQPkt3n30610UbpFl9JV75.......</code></p> 
-          <hr> 
-          <p>You will now be able execute the following method that will return the userId and User name.</p> 
-          <pre><code>[Authorize]
-[HttpGet]
-[ActionName("ValidateToken")]
-public String ValidateToken()
-{
-    var user = this.User.Identity;
-    if (user != null)
-        return string.Format("{0} - {1}", user.GetUserId(), user.GetUserName());
-    else
-        return "Unable to resolve user id";
-
-}
-</code></pre> 
-          <p>Feel free to download the <a href="https://github.com/hylander0/MasterKeyAuthentication" onclick="_gaq.push(['_trackEvent', 'outbound-article', 'https://github.com/hylander0/MasterKeyAuthentication', 'GitHub source code']);" rel="external nofollow" title="" class="ext-link" data-wpel-target="_blank">GitHub source code</a> (or <a href="https://github.com/hylander0/MasterKeyAuthentication/archive/master.zip" onclick="_gaq.push(['_trackEvent','download','https://github.com/hylander0/MasterKeyAuthentication/archive/master.zip']);" rel="external nofollow" title="" class="ext-link" data-wpel-target="_blank">Zip</a>) that goes along with this article.</p> 
-          <h4>Let us know if this help you.</h4> 
-          <span id="pty_trigger"></span> 
-         </div>
-         <!-- .entry-content --> 
-         <div class="entry-categories">
-           Posted in 
-          <a href="http://blog.iteedee.com/category/net/" rel="category tag">.NET</a>, 
-          <a href="http://blog.iteedee.com/category/api/" rel="category tag">API</a>, 
-          <a href="http://blog.iteedee.com/category/net/mvc/" rel="category tag">MVC</a>, 
-          <a href="http://blog.iteedee.com/category/security/" rel="category tag">Security</a>, 
-          <a href="http://blog.iteedee.com/category/uncategorized/" rel="category tag">Uncategorized</a>. 
+    </div> 
+    <script type="text/x-component"> { "type":"imkt.wpl.v1_75_globalNavigation", "params": { } } </script>
+   </div> 
+  </header> 
+  <main> 
+   <div class="display-none hide-all"> 
+    <style> .wac-main-global-header .icon.atlassian-logo-and-text { background-image: url(https://wac-cdn.atlassian.com/dam/jcr:5a60e496-a6e8-4327-9f46-aa374dc11796/atlassian-logo-and-text.svg?cdnVersion=gg); } @media only screen and (min-width: 641px) { header .logo.home { left: 0px; } } </style> 
+   </div> 
+   <nav class="imkt-navbar imkt-navbar__default imkt-sticky"> 
+    <div class="container-fluid imkt-navbar__main-section"> 
+     <div class="row"> 
+      <div class="column"> 
+       <div class="imkt-navbar__title-wrapper"> 
+        <a href="/software/crowd" class="imkt-navbar__title-link"> <img src="https://wac-cdn.atlassian.com/dam/jcr:fd5bfb32-1640-4806-add6-760d7c33b57c/Crowd@2x-blue.png?cdnVersion=hh" height="25px" alt="logo" class="imkt-navbar__title-logo"> </a> 
+        <button id="jsToggleNavbarMenu" class="aui-icon aui-icon-small aui-iconfont-arrow-down">Open and close the navigation menu</button> 
+       </div> 
+       <ul class="imkt-navbar__link-list"> 
+        <li> <a href="/software/crowd/enterprise/data-center" class="imkt-navbar__link-list-link">Enterprise</a> </li> 
+        <li> <a href="/software/crowd/pricing" class="imkt-navbar__link-list-link">Pricing</a> </li> 
+       </ul> 
+       <a href="/software/crowd/download" class="component__link button button--one button--small button--secondary button--primary__on-stuck">Try it free</a> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="container-fluid imkt-navbar__collapsed-section"> 
+     <div class="row"> 
+      <div class="column"> 
+       <ul class="imkt-navbar__collapsed-link-list"> 
+        <li> <a href="/software/crowd/enterprise/data-center" class="imkt-navbar__collapsed-link-list-link">Enterprise</a> </li> 
+        <li> <a href="/software/crowd/pricing" class="imkt-navbar__collapsed-link-list-link">Pricing</a> </li> 
+       </ul> 
+      </div> 
+     </div> 
+    </div> 
+    <script type="text/x-component"> { "type":"imkt.ui.Navbar", "params": { "hasCharlie":"false" } } </script>
+   </nav> 
+   <div class="container-fluid md-cozy n20"> 
+    <div class="row flex-container reduced-row"> 
+     <div class="column column-sm-12 column-md-6"> 
+      <div class="component component--image"> 
+       <img src="https://wac-cdn.atlassian.com/dam/jcr:d61657bf-e35c-47e4-a1ca-d26a067aa1a9/hero-Atlassian-Crowd.svg?cdnVersion=hh" alt="Atlassian Crowd" class="component__image"> 
+      </div> 
+     </div> 
+     <div class="column column-sm-12 column-md-5"> 
+      <div class="component component--heading-textblock"> 
+       <h1>Single sign-on and user identity that's easy to use</h1> 
+      </div> 
+      <div class="component component--link-button"> 
+       <a href="/software/crowd/download" class="component__link button button--one button--regular button--primary">Try it free</a> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="container-fluid md-cozy n0"> 
+    <div class="row flex-container reduced-row"> 
+     <div class="column column-md-8 column-md-offset-2 text-center"> 
+      <div class="component component--heading-textblock"> 
+       <h2>Centralized identity management</h2> 
+       <p>Manage users from multiple directories -&nbsp;Active Directory, LDAP, OpenLDAP or Microsoft Azure AD - and control&nbsp;application authentication permissions&nbsp;in one single location.</p> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="container-fluid md-cozy n0"> 
+    <div class="row flex-container reduced-row"> 
+     <div class="column column-sm-12 column-md-5 column-md-push-1 column-md-order-0 column-xs-order-1 vertical-middle"> 
+      <div class="component component--heading-textblock text-oversized"> 
+       <h2>Single sign-on (SSO)</h2> 
+       <p>Make life easy for your users by giving them one username and password to log in to all the applications they need access to. Seamlessly integrate all your Atlassian products - like Jira, Confluence, and Bitbucket- to give your users one simple single sign-on (SSO) experience.</p> 
+      </div> 
+     </div> 
+     <div class="column column-sm-12 column-md-3 column-md-push-2 column-md-order-1 text-center vertical-middle"> 
+      <div class="component component--image"> 
+       <img src="https://wac-cdn.atlassian.com/dam/jcr:cf61fbf4-223a-4a2f-bea9-6e60fd14d5a2/spot-single_sign_on.svg?cdnVersion=hh" alt="SSO" class="component__image" style="width:166px;height:206px;"> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="container-fluid"> 
+    <div class="row reduced-row"> 
+     <div class="column column-md-10 column-md-push-1 column-md-pull-1"> 
+      <hr> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="container-fluid md-cozy n0"> 
+    <div class="row flex-container reduced-row"> 
+     <div class="column column-sm-12 column-md-3 column-md-push-1 text-center vertical-middle"> 
+      <div class="component component--image"> 
+       <img src="https://wac-cdn.atlassian.com/dam/jcr:b44a387f-eaa5-4811-9a74-0f2cea176cd5/spot-centralized_directories.svg?cdnVersion=hh" alt="Multiple directories" class="component__image" style="width:221px;height:175px;"> 
+      </div> 
+     </div> 
+     <div class="column column-sm-12 column-md-5 column-md-push-3 column-md-order-0 vertical-middle"> 
+      <div class="component component--heading-textblock text-oversized"> 
+       <h2>Centralize multiple directories</h2> 
+       <p>Map any combination of directories to a single application – perfect for managing users not in your main directory - and&nbsp;manage authentication permissions in the same place.&nbsp;Get started with connectors for AD,&nbsp;LDAP, Microsoft Azure AD,&nbsp;Novell&nbsp;eDirectory, and more. You can&nbsp;even create your own custom connector.&nbsp;</p> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="container-fluid"> 
+    <div class="row flex-container reduced-row"> 
+     <div class="column column-md-4" style="display:flex;"> 
+      <div class="component component--block md-outerspace-bottom cards" style="border:1px solid #C1C7D0;border-radius:4px;overflow:hidden;"> 
+       <div class="component--block__background n0"> 
+        <div class="component component--image-heading-textblock"> 
+         <div class="component__image"> 
+          <img src="https://wac-cdn.atlassian.com/dam/jcr:57e2365e-fbdd-49be-b5f9-e1c34ea9ec5b/security-lock.svg?cdnVersion=hh" class="component__image md-outerspace-bottom" style="height:30px;"> 
          </div> 
-         <div id="fb-root"></div> 
-         <script type="text/javascript">
-			(function(d, s, id) {
-		  var js, fjs = d.getElementsByTagName(s)[0];
-		  if (d.getElementById(id)) return;
-		  js = d.createElement(s); js.id = id;
-		  js.src = "//connect.facebook.net/en_GB/all.js#xfbml=1";
-		  fjs.parentNode.insertBefore(js, fjs);
-		}(document, 'script', 'facebook-jssdk'));
-		</script> 
-         <script type="text/javascript">
-			// Google Plus One
-			(function () {
-				var po = document.createElement( 'script' );
-				po.type = 'text/javascript';
-				po.async = true;
-				po.src = 'https://apis.google.com/js/plusone.js';
-				var s = document.getElementsByTagName( 'script' )[0];
-				s.parentNode.insertBefore( po, s );
-			})();
-		</script> 
-         <ul class="share-buttons"> 
-          <li class="network facebook" style="width:90px"> 
-           <div class="fb-like" data-href="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/" data-width="90" data-layout="button_count" data-send="false" data-height="21" data-show-faces="false" data-action="like"></div> </li> 
-          <li class="network twitter" style="width:90px"> <iframe allowtransparency="true" frameborder="0" scrolling="no" src="http://platform.twitter.com/widgets/tweet_button.html?url=http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/&amp;text=ASP.NET Identity 2.0 Cookie &amp; Token Authentication&amp;related" style="width:90px; height:20px;"></iframe> </li> 
-          <li class="network plusone" style="width:90px"> 
-           <div class="g-plusone" data-size="medium" data-width="160"></div> </li> 
+         <div class="component__heading-textblock"> 
+          <h4>Govern group permissions</h4> 
+          <p>Can't make group changes in your directory? Keep your users in LDAP and define their authentication permissions in Crowd. Save time by setting up new users to be automatically added to specified groups.</p> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="column column-md-4" style="display:flex;"> 
+      <div class="component component--block md-outerspace-bottom" style="border:1px solid #C1C7D0;border-radius:4px;overflow:hidden;"> 
+       <div class="component--block__background n0"> 
+        <div class="component component--image-heading-textblock"> 
+         <div class="component__image"> 
+          <img src="https://wac-cdn.atlassian.com/dam/jcr:4f6548d4-6244-437d-8090-bfc62c33562f/organize-node.svg?cdnVersion=hh" class="component__image md-outerspace-bottom" style="height:30px;"> 
+         </div> 
+         <div class="component__heading-textblock"> 
+          <h4>Integrate with your existing infrastructure</h4> 
+          <p>Easily integrate with your current identity infrastructure using built-in integrations like Microsoft Azure AD support, Google Apps and other 3rd party add-ons. Give developers one REST interface to build custom integrations – no need to learn LDAPv3. Change directories without impacting your applications.</p> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="column column-md-4" style="display:flex;"> 
+      <div class="component component--block md-outerspace-bottom" style="border:1px solid #C1C7D0;border-radius:4px;overflow:hidden;"> 
+       <div class="component--block__background n0"> 
+        <div class="component component--image-heading-textblock"> 
+         <div class="component__image"> 
+          <img src="https://wac-cdn.atlassian.com/dam/jcr:c74d1d5a-e4e7-471f-97fd-8985cc9deda7/security-shield%20check.svg?cdnVersion=hh" class="component__image md-outerspace-bottom" style="height:30px;"> 
+         </div> 
+         <div class="component__heading-textblock"> 
+          <h4>Meet compliance and security requirements</h4> 
+          <p>Crowd's built-in audit log improves control over your setup by tracking configuration changes, providing an additional layer of security. Integrate with 3rd party tools to report audit entries into Crowd via REST API and get an overview of every change made across your entire ecosystem.</p> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="container-fluid md-cozy n30"> 
+    <div class="row flex-container reduced-row"> 
+     <div class="column column-md-8 column-md-offset-2 text-center"> 
+      <div class="component component--heading-textblock"> 
+       <h2>Atlassian Enterprise</h2> 
+       <p>The business critical products and strategic services to help you scale and get the most out of your Atlassian applications.</p> 
+      </div> 
+      <div class="component component--link-button"> 
+       <a href="/software/crowd/enterprise/data-center" class="component__link button button--one button--regular button--primary">Learn more</a> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="container-fluid md-cozy n0"> 
+    <div class="row flex-container reduced-row"> 
+     <div class="column column-sm-12 column-md-6 column-md-order-0 column-xs-order-1 vertical-middle"> 
+      <div class="component component--heading-textblock text-oversized"> 
+       <h2>Try Crowd Free for 30 days</h2> 
+       <p>Single sign-on and user management that's easy to use</p> 
+      </div> 
+      <div class="component component--link-button"> 
+       <a href="/software/crowd/download" class="component__link button button--one button--regular button--primary">Try it free</a> 
+      </div> 
+     </div> 
+     <div class="column column-sm-12 column-md-6 column-md-order-1 text-center vertical-middle"> 
+      <div class="component component--image"> 
+       <img src="https://wac-cdn.atlassian.com/dam/jcr:7c5a2543-481e-4f45-b957-8c5290f0f760/illo-id_badge.svg?cdnVersion=hh" alt="Try Crowd free" class="component__image" style="width:363px;height:285px;"> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+  </main> 
+  <footer class="footer footer--wac"> 
+   <div class="container-fluid xs-none-bottom n20"> 
+    <div class="container-fluid xs-none-top"> 
+     <div class="row"> 
+      <div class="column column-lg-2 column-lg-offset-1"> 
+       <div class="component component--image"> 
+        <img src="https://wac-cdn.atlassian.com/dam/jcr:bec8148d-b7dc-493f-bbba-7519b0637581/Atlassian-horizontal-neutral-rgb.svg?cdnVersion=hh" alt="Atlassian" class="component__image" style="width:125px;"> 
+       </div> 
+      </div> 
+      <div class="column column-md-3 column-lg-2 column-xs-6"> 
+       <div class="component component--heading"> 
+        <h3 class="h5">Products</h3> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/software/jira" class="component__link default">Jira Software</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/software/jira/service-desk" class="component__link default">Jira Service Desk</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/software/confluence" class="component__link default">Confluence</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://www.trello.com/home" class="component__link default">Trello</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="http://stride.com/" class="component__link default">Stride</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/software/bitbucket" class="component__link default">Bitbucket</a> 
+       </div> 
+       <div class="component component--link-button footer-view-all"> 
+        <a href="/software" class="component__link default">View all products</a> 
+       </div> 
+      </div> 
+      <div class="column column-md-3 column-lg-2 column-xs-6"> 
+       <div class="component component--heading"> 
+        <h3 class="h5">Resources</h3> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://support.atlassian.com/customer/servicedesk-portal" class="component__link default">Technical Support</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/licensing/purchase-licensing" class="component__link default">Purchasing &amp; licensing</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://community.atlassian.com" class="component__link default">Atlassian Community</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://confluence.atlassian.com/kb" class="component__link default">Knowledge base</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://marketplace.atlassian.com/" class="component__link default">Marketplace</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://my.atlassian.com/products/index" class="component__link default">My Account</a> 
+       </div> 
+       <div class="component component--link-button footer-view-all"> 
+        <a href="https://support.atlassian.com/customer/servicedesk-portal" class="component__link default">Create support ticket</a> 
+       </div> 
+      </div> 
+      <div class="column column-md-3 column-lg-2 column-xs-6"> 
+       <div class="component component--heading"> 
+        <h3 class="h5">Expand &amp; Learn</h3> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/partners" class="component__link default">Partners</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/university" class="component__link default">University</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://confluence.atlassian.com/display/ALLDOC/Atlassian+Documentation" class="component__link default">Documentation</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://developer.atlassian.com/" class="component__link default">Developer Resources</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://www.atlassian.com/licensing/purchase-licensing" class="component__link default">Purchasing FAQ</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/enterprise/services" class="component__link default">Enterprise services</a> 
+       </div> 
+       <div class="component component--link-button footer-view-all"> 
+        <a href="/resources" class="component__link default">View all resources</a> 
+       </div> 
+      </div> 
+      <div class="column column-md-3 column-lg-2 column-xs-6"> 
+       <div class="component component--heading"> 
+        <h3 class="h5">About Atlassian</h3> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/company" class="component__link default">Company</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/company/careers" class="component__link default">Careers</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/company/events" class="component__link default">Events</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://www.atlassian.com/blog" class="component__link default">Blogs</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="https://investors.atlassian.com/" class="component__link default">Investor Relations</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/trust" class="component__link default">Trust &amp; Security</a> 
+       </div> 
+       <div class="component component--link-button footer-view-all"> 
+        <a href="/company/contact" class="component__link default">Contact us</a> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="container-fluid xs-none footer--wac__copyright"> 
+     <div class="row"> 
+      <div class="column column-lg-10 column-lg-offset-1 flex-container"> 
+       <div class="language-selector"> 
+        <a href="#">Languages</a> 
+        <form action="#" method="GET"> 
+         <select option="language-selector" name="url"> <option disabled selected>Choose your language</option> <option aria-label="??" label="??" lang="zh-CN" class="notranslate SL_opaque" value="https://cn.atlassian.com/software/crowd">??</option> <option aria-label="?eština" label="?eština" lang="cs" class="notranslate SL_opaque" value="https://cs.atlassian.com/software/crowd">?eština</option> <option aria-label="Deutsch" label="Deutsch" lang="de" class="notranslate SL_opaque" value="https://de.atlassian.com/software/crowd">Deutsch</option> <option aria-label="English" label="English" lang="en" class="notranslate SL_opaque" value="https://www.atlassian.com/software/crowd">English</option> <option aria-label="Español" label="Español" lang="es" class="notranslate SL_opaque" value="https://es.atlassian.com/software/crowd">Español</option> <option aria-label="Français" label="Français" lang="fr" class="notranslate SL_opaque" value="https://fr.atlassian.com/software/crowd">Français</option> <option aria-label="Italiano" label="Italiano" lang="it" class="notranslate SL_opaque" value="https://it.atlassian.com/software/crowd">Italiano</option> <option aria-label="???" label="???" lang="ko" class="notranslate SL_opaque" value="https://ko.atlassian.com/software/crowd">???</option> <option aria-label="Magyar" label="Magyar" lang="hu" class="notranslate SL_opaque" value="https://hu.atlassian.com/software/crowd">Magyar</option> <option aria-label="Nederlands" label="Nederlands" lang="nl" class="notranslate SL_opaque" value="https://nl.atlassian.com/software/crowd">Nederlands</option> <option aria-label="???" label="???" lang="ja" class="notranslate SL_opaque" value="https://ja.atlassian.com/software/crowd">???</option> <option aria-label="Polski" label="Polski" lang="pl" class="notranslate SL_opaque" value="https://pl.atlassian.com/software/crowd">Polski</option> <option aria-label="Português" label="Português" lang="pt-BR" class="notranslate SL_opaque" value="https://br.atlassian.com/software/crowd">Português</option> <option aria-label="Român?" label="Român?" lang="ro" class="notranslate SL_opaque" value="https://ro.atlassian.com/software/crowd">Român?</option> <option aria-label="Suomi" label="Suomi" lang="fi" class="notranslate SL_opaque" value="https://fi.atlassian.com/software/crowd">Suomi</option> <option aria-label="???????" label="???????" lang="ru" class="notranslate SL_opaque" value="https://ru.atlassian.com/software/crowd">???????</option> </select> 
+         <script type="text/x-component"> { "type":"imkt.common.LanguageSelector", "params": { } } </script>
+        </form> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/legal/privacy-policy" class="component__link default">Privacy policy</a> 
+       </div> 
+       <div class="component component--link-button"> 
+        <a href="/legal/customer-agreement" class="component__link default">Terms of use</a> 
+       </div> 
+       <div class="component component--copyright"> 
+        <p>Copyright © 2017 Atlassian</p> 
+       </div> 
+       <div class="imkt-social-buttons-group"> 
+        <div class="imkt-social-buttons standard"> 
+         <ul> 
+          <li class="imkt-social-button social-code facebook"> <a href="https://www.facebook.com/Atlassian" title="Atlassian on Facebook"></a> </li> 
+          <li class="imkt-social-button social-code twitter"> <a href="https://twitter.com/atlassian" title="Follow us on Twitter"></a> </li> 
+          <li class="imkt-social-button social-code linked-in"> <a href="https://www.linkedin.com/company/atlassian" title="Atlassian on LinkedIn"></a> </li> 
+          <li class="imkt-social-button social-code youtube"> <a href="https://www.youtube.com/user/GoAtlassian" title="Atlassian on YouTube"></a> </li> 
          </ul> 
         </div> 
-       </article>
-       <!-- #post-422 --> 
-       <nav role="navigation" id="nav-below" class="site-navigation post-navigation"> 
-        <h1 class="assistive-text">Post navigation</h1> 
-        <div class="single-nav-wrapper"> 
-         <div class="nav-previous">
-          <a href="http://blog.iteedee.com/2014/02/snapchat-went-wrong/" rel="prev"><span class="meta-nav">?</span> Where Snapchat’s Security Went Wrong</a>
-         </div> 
-         <div class="nav-next">
-          <a href="http://blog.iteedee.com/2014/03/parse-apk-manifest-with-c-net/" rel="next">Parse APK Manifest with C# .NET <span class="meta-nav">?</span></a>
-         </div> 
-        </div> 
-       </nav>
-       <!-- #nav-below --> 
-       <div id="single-comments-wrapper"> 
-        <div id="disqus_thread"> 
-         <div id="dsq-content"> 
-          <ul id="dsq-comments"> 
-           <li class="comment even thread-even depth-1" id="dsq-comment-86"> 
-            <div id="dsq-comment-header-86" class="dsq-comment-header"> 
-             <cite id="dsq-cite-86"> <span id="dsq-author-user-86">khurram</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-86" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-86" class="dsq-comment-message">
-              <p>IdentityFactoryOptions is giveing me error</p> 
-             </div> 
-            </div> 
-            <ul class="children"> 
-             <li class="comment odd alt depth-2" id="dsq-comment-87"> 
-              <div id="dsq-comment-header-87" class="dsq-comment-header"> 
-               <cite id="dsq-cite-87"> <span id="dsq-author-user-87">Justin Hyland</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-87" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-87" class="dsq-comment-message">
-                <p>I imagine you are getting an invalid reference to the IdentityFactoryOptions object. The is part of the Owin identity package. Make sure your project has the Microsoft.AspNet.Identity.Owin Nuget package installed (prerelease 2.0 beta-1). You should see a project reference to Microsoft.AspNet.Identity.Owin library.</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-            </ul>
-            <!-- .children --> </li>
-           <!-- #comment-## --> 
-           <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-90"> 
-            <div id="dsq-comment-header-90" class="dsq-comment-header"> 
-             <cite id="dsq-cite-90"> <span id="dsq-author-user-90">arecoba</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-90" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-90" class="dsq-comment-message">
-              <p>Thank you, but I want to use this solution using MongoDB.AspNet.Identity. Can you help me ?<br> I have probleme to convert Entity Framework class.</p> 
-              <p>Thanks in advance</p> 
-             </div> 
-            </div> 
-            <ul class="children"> 
-             <li class="comment odd alt depth-2" id="dsq-comment-91"> 
-              <div id="dsq-comment-header-91" class="dsq-comment-header"> 
-               <cite id="dsq-cite-91"> <span id="dsq-author-user-91">Justin Hyland</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-91" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-91" class="dsq-comment-message">
-                <p>@arecoba:disqus<br> There is an article that details how to achieve this except they are targeting the Identity 1.0 version. <a href="http://devblog.wesmcclure.com/posts/building-a-mongodb-provider-for-the-new-asp.net-identity-framework-part-1" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'http://devblog.wesmcclure.com/posts/building-a-mongodb-provider-for-the-new-asp.net-identity-framework-part-1', 'http://devblog.wesmcclure.com/posts/building-a-mongodb-provider-for-the-new-asp.net-identity-framework-part-1']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">http://devblog.wesmcclure.com/posts/building-a-mongodb-provider-for-the-new-asp.net-identity-framework-part-1</a></p> 
-                <p>The contributor of the nuget package that adds MongoDB support has indicated that they will be working to support the 2.0 version of Identity:<br> <a href="https://www.nuget.org/packages/MongoDB.AspNet.Identity/" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'https://www.nuget.org/packages/MongoDB.AspNet.Identity/', 'https://www.nuget.org/packages/MongoDB.AspNet.Identity/']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">https://www.nuget.org/packages/MongoDB.AspNet.Identity/</a></p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-             <li class="comment even depth-2" id="dsq-comment-111"> 
-              <div id="dsq-comment-header-111" class="dsq-comment-header"> 
-               <cite id="dsq-cite-111"> <span id="dsq-author-user-111">arecoba</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-111" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-111" class="dsq-comment-message">
-                <p>Thanks a lot</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-            </ul>
-            <!-- .children --> </li>
-           <!-- #comment-## --> 
-           <li class="comment odd alt thread-even depth-1" id="dsq-comment-93"> 
-            <div id="dsq-comment-header-93" class="dsq-comment-header"> 
-             <cite id="dsq-cite-93"> <span id="dsq-author-user-93">Valentino Rijhen</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-93" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-93" class="dsq-comment-message">
-              <p>Nice project, but I cannot run it. Does it have to do with a missing MasterKey database? Do you already have an example? Where can I find this? Thanks in advance.</p> 
-             </div> 
-            </div> 
-            <ul class="children"> 
-             <li class="comment even depth-2" id="dsq-comment-94"> 
-              <div id="dsq-comment-header-94" class="dsq-comment-header"> 
-               <cite id="dsq-cite-94"> <span id="dsq-author-user-94">Justin Hyland</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-94" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-94" class="dsq-comment-message">
-                <p>I guess if you had a specific error I could speak to your issue. The<br> Identity database will be automatically created on the localDB SQL<br> instance when application first runs.</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-            </ul>
-            <!-- .children --> </li>
-           <!-- #comment-## --> 
-           <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-96"> 
-            <div id="dsq-comment-header-96" class="dsq-comment-header"> 
-             <cite id="dsq-cite-96"> <span id="dsq-author-user-96">mikeysee</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-96" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-96" class="dsq-comment-message">
-              <p>Hi Justin,</p> 
-              <p>Good article. Im confused however. What happens if you are running a native mobile app with the Facebook SDK for example. FB will just return you an access token, how do you then use that to authenticate the user using WebAPI?</p> 
-              <p>Cheers,<br> Mike</p> 
-             </div> 
-            </div> 
-            <ul class="children"> 
-             <li class="comment even depth-2" id="dsq-comment-97"> 
-              <div id="dsq-comment-header-97" class="dsq-comment-header"> 
-               <cite id="dsq-cite-97"> <span id="dsq-author-user-97">Justin Hyland</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-97" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-97" class="dsq-comment-message">
-                <p>Mike,</p> 
-                <p>Thanks for reading. This article maintains that you will use ASP.NET identity 2.0 User provider (its own user name and passwords). Facebook’s authentication tokens don’t really do much good with anything but Facebook and their services.</p> 
-                <p>It is difficult to tell what your authentication workflow needs to be. If want to share FB authentication you will need to “Test” the access token on your server for each request made to the WebAPI. This falls outside of the ASP.NET Identity 2.0 discussion since you don’t need a identity provider or a token service (your using Facebooks)</p> 
-                <p>You can find a good example in one of my projects where I validated WebAPI requests based on a token passed in: <a href="https://github.com/hylander0/WebApiSoup" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'https://github.com/hylander0/WebApiSoup', 'https://github.com/hylander0/WebApiSoup']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">https://github.com/hylander0/WebApiSoup</a></p> 
-                <p>Basically, you will need to setup a custom Auth MessageHandler where you will get the access token and Facebook user id and test it (good examples here: <a href="http://stackoverflow.com/questions/5406859/facebook-access-token-server-side-validation-for-iphone-app" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'http://stackoverflow.com/questions/5406859/facebook-access-token-server-side-validation-for-iphone-app', 'http://stackoverflow.com/questions/5406859/facebook-access-token-server-side-validation-for-iphone-app']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">http://stackoverflow.com/questions/5406859/facebook-access-token-server-side-validation-for-iphone-app</a>). If Facebook says it is a valid token then they are good to go and let them use the WebAPI. If not then reject the request.</p> 
-                <p>I hope that helps.</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-             <li class="comment odd alt depth-2" id="dsq-comment-98"> 
-              <div id="dsq-comment-header-98" class="dsq-comment-header"> 
-               <cite id="dsq-cite-98"> <span id="dsq-author-user-98">mikeysee</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-98" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-98" class="dsq-comment-message">
-                <p>Thanks for your reply Justin. </p> 
-                <p>I think the way I need to do it based on what this guys is talking about: <a href="https://thewayofcode.wordpress.com/2014/03/01/asp-net-webapi-identity-system-how-to-login-with-facebook-access-token/#comments" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'https://thewayofcode.wordpress.com/2014/03/01/asp-net-webapi-identity-system-how-to-login-with-facebook-access-token/#comments', 'https://thewayofcode.wordpress.com/2014/03/01/asp-net-webapi-identity-system-how-to-login-with-facebook-access-token/#comments']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">https://thewayofcode.wordpress.com/2014/03/01/asp-net-webapi-identity-system-how-to-login-with-facebook-access-token/#comments</a></p> 
-                <p>Unfortunately I think his example is using an older version of WebAPI, I guess ill just have to try hacking around until I can get it to work.</p> 
-                <p>Its strange that Microsoft dont include an example for this which seems like a very common use scenario.</p> 
-                <p>Mike</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-            </ul>
-            <!-- .children --> </li>
-           <!-- #comment-## --> 
-           <li class="comment even thread-even depth-1" id="dsq-comment-102"> 
-            <div id="dsq-comment-header-102" class="dsq-comment-header"> 
-             <cite id="dsq-cite-102"> <span id="dsq-author-user-102">Richard</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-102" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-102" class="dsq-comment-message">
-              <p>Hi Justin,</p> 
-              <p>I implemented Identity the way you described it. I just can’t find out how to request a token from my webinterface. I have a WPF application and the old way I used client.PostAsync. What should I use now?</p> 
-              <p>Thx,<br> Richard</p> 
-             </div> 
-            </div> </li>
-           <!-- #comment-## --> 
-           <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-103"> 
-            <div id="dsq-comment-header-103" class="dsq-comment-header"> 
-             <cite id="dsq-cite-103"> <span id="dsq-author-user-103">Richard</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-103" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-103" class="dsq-comment-message">
-              <p>Hi Justing,</p> 
-              <p>I created my webapp with identity the way you describe it. In the past I worked with the provider and used client.PostAsync to login from my WPF app to my webapp. How does it work with the code you described above?</p> 
-              <p>Thx,<br> Richard</p> 
-             </div> 
-            </div> 
-            <ul class="children"> 
-             <li class="comment even depth-2" id="dsq-comment-104"> 
-              <div id="dsq-comment-header-104" class="dsq-comment-header"> 
-               <cite id="dsq-cite-104"> <span id="dsq-author-user-104">Justin Hyland</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-104" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-104" class="dsq-comment-message">
-                <p>Richard,</p> 
-                <p>I did notice something with the sample project since you<br> brought this up. The Authenticate action<br> in the API controller was accepting a GET rather than a POST (since GET expose<br> you to Cross-site scripting attack). I<br> have changed this and pushed up the changes.</p> 
-                <p>Regardless, I will go through the step to implement your solution. Using the Sample application that goes along<br> with this article your process will look something like this:</p> 
-                <p>1) WPF app Collects the User name and password</p> 
-                <p>2) The WPF app will executes a client.POSTAsync (HTTP POST) to url <a href="http://localhost/api/Account/Authenticate?user=Admin&amp;password=123456" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'http://localhost/api/Account/Authenticate?user=Admin&amp;password=123456', 'http://localhost/api/Account/Authenticate?user=Admin&amp;password=123456']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">http://localhost/api/Account/Authenticate?user=Admin&amp;password=123456</a></p> 
-                <p>3) Grab the TOKEN. The response body will contain the token<br> used for further, authenticated requests in the WPF app</p> 
-                <p>4) All subsequent requests should pass the token like “Bearer<br> {TOKEN}” via the HTTP authorization header. Here is<br> an example of adding a header to a client request: <a href="http://stackoverflow.com/questions/12022965/adding-http-headers-to-httpclient-asp-net-web-api" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'http://stackoverflow.com/questions/12022965/adding-http-headers-to-httpclient-asp-net-web-api', 'http://stackoverflow.com/questions/12022965/adding-http-headers-to-httpclient-asp-net-web-api']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">http://stackoverflow.com/questions/12022965/adding-http-headers-to-httpclient-asp-net-web-api</a></p> 
-                <p>Let me know if that helps.</p> 
-                <p>~~</p> 
-                <p>Justin</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-            </ul>
-            <!-- .children --> </li>
-           <!-- #comment-## --> 
-           <li class="comment odd alt thread-even depth-1" id="dsq-comment-110"> 
-            <div id="dsq-comment-header-110" class="dsq-comment-header"> 
-             <cite id="dsq-cite-110"> <span id="dsq-author-user-110">khasi asmarani</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-110" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-110" class="dsq-comment-message">
-              <p>I not see a kind of authorization in your example.</p> 
-             </div> 
-            </div> </li>
-           <!-- #comment-## --> 
-           <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-127"> 
-            <div id="dsq-comment-header-127" class="dsq-comment-header"> 
-             <cite id="dsq-cite-127"> <span id="dsq-author-user-127">Ricky</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-127" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-127" class="dsq-comment-message">
-              <p>Hi,<br> Great article. I downloaded the source code, The remember me (cookie authentication) works fine in localhost, however, when I deploy to a web server, it doesn’t seems to work. Can you point me to right direction? Thanks</p> 
-             </div> 
-            </div> 
-            <ul class="children"> 
-             <li class="comment odd alt depth-2" id="dsq-comment-128"> 
-              <div id="dsq-comment-header-128" class="dsq-comment-header"> 
-               <cite id="dsq-cite-128"> <span id="dsq-author-user-128">Justin Hyland</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-128" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-128" class="dsq-comment-message">
-                <p>I would check to make sure your other server time matches your browsers machine time. Here is a stackoverfkow article detailing your same problem:<a href="http://stackoverflow.com/questions/1241151/asp-net-mvc-remember-me-works-only-on-localhost" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'http://stackoverflow.com/questions/1241151/asp-net-mvc-remember-me-works-only-on-localhost', 'http://stackoverflow.com/questions/1241151/asp-net-mvc-remember-me-works-only-on-localhost']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">http://stackoverflow.com/questions/1241151/asp-net-mvc-remember-me-works-only-on-localhost</a><br> Let me know if you are still having issues.</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-            </ul>
-            <!-- .children --> </li>
-           <!-- #comment-## --> 
-           <li class="comment even thread-even depth-1" id="dsq-comment-130"> 
-            <div id="dsq-comment-header-130" class="dsq-comment-header"> 
-             <cite id="dsq-cite-130"> <span id="dsq-author-user-130">Alberto Ruiz</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-130" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-130" class="dsq-comment-message">
-              <p>Would you be kind and post an example request made from fiddler, I have been trying to test the Authenticate method but always get a 404 not found. Great article!</p> 
-             </div> 
-            </div> </li>
-           <!-- #comment-## --> 
-           <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-139"> 
-            <div id="dsq-comment-header-139" class="dsq-comment-header"> 
-             <cite id="dsq-cite-139"> <span id="dsq-author-user-139">Raj</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-139" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-139" class="dsq-comment-message">
-              <p>Hi</p> 
-              <p>referring to this line</p> 
-              <p>var user = this.User.Identity;</p> 
-              <p>I have a business layer in my app where I want to move all this logic to about getting User details etc. Is this possible?</p> 
-             </div> 
-            </div> 
-            <ul class="children"> 
-             <li class="comment even depth-2" id="dsq-comment-141"> 
-              <div id="dsq-comment-header-141" class="dsq-comment-header"> 
-               <cite id="dsq-cite-141"> <span id="dsq-author-user-141">Justin Hyland</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-141" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-141" class="dsq-comment-message">
-                <p>Sorry for the delay. As long as the business layer is running under the same app domain context as the asp.net application you can gain access to the user name and claims. ASP.NET identity uses the CurrentPrincipal.Identity object (<a href="http://msdn.microsoft.com/en-us/library/system.threading.thread.currentprincipal(v=vs.110)" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'http://msdn.microsoft.com/en-us/library/system.threading.thread.currentprincipal(v=vs.110)', 'http://msdn.microsoft.com/en-us/library/system.threading.thread.currentprincipal(v=vs.110)']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">http://msdn.microsoft.com/en-us/library/system.threading.thread.currentprincipal(v=vs.110)</a>.aspx). You will not have access to the identity manager object unless you pass the object to the business layer or implement Dependency injection.</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-            </ul>
-            <!-- .children --> </li>
-           <!-- #comment-## --> 
-           <li class="comment odd alt thread-even depth-1" id="dsq-comment-143"> 
-            <div id="dsq-comment-header-143" class="dsq-comment-header"> 
-             <cite id="dsq-cite-143"> <span id="dsq-author-user-143">Justin Hyland</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-143" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-143" class="dsq-comment-message">
-              <p>Lyle, Make sure you are passing the token back to the server when you are calling the validate or any other secured API call. The token must be supplied in the header name “Authorization” and the value of the header should be formatted like “Bearer abcedefghijklmnopqrstuvwxyz1234567890”.<br> Your token value must start with word “Bearer” and include your take afterwords. </p> 
-              <p>Also, make sure you are executing the correct http method on each API request. The ValidateToken requires the request to be an HTTPGET</p> 
-             </div> 
-            </div> </li>
-           <!-- #comment-## --> 
-           <li class="comment even thread-odd thread-alt depth-1" id="dsq-comment-144"> 
-            <div id="dsq-comment-header-144" class="dsq-comment-header"> 
-             <cite id="dsq-cite-144"> <span id="dsq-author-user-144">Naunihal Sidhu</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-144" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-144" class="dsq-comment-message">
-              <p>How do you Invalidate the Token at Server(kind of SignOut) ?<br> Also how do you extend the timeout on the Ticket ?</p> 
-             </div> 
-            </div> 
-            <ul class="children"> 
-             <li class="comment odd alt depth-2" id="dsq-comment-149"> 
-              <div id="dsq-comment-header-149" class="dsq-comment-header"> 
-               <cite id="dsq-cite-149"> <span id="dsq-author-user-149">Justin Hyland</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-149" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-149" class="dsq-comment-message">
-                <p>Naunihal Sidhu Sorry for the delay getting back to you. </p> 
-                <p>By default, the tokens have their expiration date build in when they are created. The only way to invalidate Tokens is to change the user’s security stamp via UserManager.UpdateSecurityStampAsync(userId); This will cause all cookie based sessions and/or issued tokens to no longer be valid. Basically, just makes it so the user has to sign in to everything again.</p> 
-                <p>There is no way to “signout” a token individually you have to wait for them to expire (this is why some say bearer tokens are a bad idea). </p> 
-                <p>I hope that helps.</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-            </ul>
-            <!-- .children --> </li>
-           <!-- #comment-## --> 
-           <li class="comment even thread-even depth-1" id="dsq-comment-150"> 
-            <div id="dsq-comment-header-150" class="dsq-comment-header"> 
-             <cite id="dsq-cite-150"> <span id="dsq-author-user-150">Justin Hyland</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-150" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-150" class="dsq-comment-message">
-              <p>Kiriz refering to the MasterKeyAuthentication Project. The very first thing you need to do is get a token. Call the method String Authenticate(string user, string password) by executing a GET against URL <a href="http://" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'http://', 'http://']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">http://</a>{YOUR_SERVER}/API/Account/Authenticate?user={USERNAME}&amp;password={PASSWORD}</p> 
-              <p>This will return a string in the response body. That will be your token.</p> 
-              <p>The ValidateToken is just a test method I created in the project as an example authorized call. To call ValidateToken execute a GET with the HTTP Header –&gt; Key: “authorization” Value: “Bearer {BEARER_TOKEN_RECEIVED}” against URL <a href="http://" onclick="_gaq.push(['_trackEvent', 'outbound-comment', 'http://', 'http://']);" rel="nofollow external" title="" class="ext-link" data-wpel-target="_blank">http://</a>{YOUR_SERVER}/API/Account/ValidateToken. ASP.NET will look at the authorization header value. If is it a valid token (and the call is constructed correctly) you will get your login user info returned in there response body.</p> 
-             </div> 
-            </div> </li>
-           <!-- #comment-## --> 
-           <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-163"> 
-            <div id="dsq-comment-header-163" class="dsq-comment-header"> 
-             <cite id="dsq-cite-163"> <span id="dsq-author-user-163">Daskul</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-163" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-163" class="dsq-comment-message">
-              <p>is there a way to automatically retrieve and pass the token on each request if its not present? most of the examples I’ve seen, they are passing the token manually on each request. What I want is, if I have two projects. ASP MVC 5 WebAPI and ASP MVC 5 webclient. The user will login to the webclient, then everytime the webclient request to the webapi, it automatically pass the token to the webapi or else the webclient will redirect the user to the login page to request credentials to be used to retrieve the token.</p> 
-             </div> 
-            </div> 
-            <ul class="children"> 
-             <li class="comment even depth-2" id="dsq-comment-164"> 
-              <div id="dsq-comment-header-164" class="dsq-comment-header"> 
-               <cite id="dsq-cite-164"> <span id="dsq-author-user-164">Justin Hyland</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-164" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-164" class="dsq-comment-message">
-                <p>@daskul:disqus I assume the webclient you describe is a browser client. That is a good question and a valid use case. You will need to register Cookie Auth for browser based auth. This is done in the StartUp class via IAppBuilder like: </p> 
-                <p> app.UseCookieAuthentication(new CookieAuthenticationOptions<br> {<br> AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,<br> LoginPath = new PathString(“/Account/SignIn”)<br> });</p> 
-                <p>Including both UseOAuthBearerAuthentication &amp; UseCookieAuthentication configurations will allow your WebApi methods to be authenticated against both methods. </p> 
-                <p>Do that address your question?</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-             <li class="comment odd alt depth-2" id="dsq-comment-165"> 
-              <div id="dsq-comment-header-165" class="dsq-comment-header"> 
-               <cite id="dsq-cite-165"> <span id="dsq-author-user-165">Daskul</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-165" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-165" class="dsq-comment-message">
-                <p>I will try this one and give you feedback with the results. Thank you!</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-             <li class="comment even depth-2" id="dsq-comment-171"> 
-              <div id="dsq-comment-header-171" class="dsq-comment-header"> 
-               <cite id="dsq-cite-171"> <span id="dsq-author-user-171">kalyan kankala</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-171" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-171" class="dsq-comment-message">
-                <p>Daskul, where you able to achieve this? I’m working on similar scenario with web api as authentication service and I want to use web api to make sure the user is authenticated before making any calls to mvc (use authenticated token). But how mvc will know the token and have it pass around until user is logged in.</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-             <li class="comment odd alt depth-2" id="dsq-comment-173"> 
-              <div id="dsq-comment-header-173" class="dsq-comment-header"> 
-               <cite id="dsq-cite-173"> <span id="dsq-author-user-173">Daskul</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-173" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-173" class="dsq-comment-message">
-                <p>I haven’t tried it yet. I am working on different project</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-             <li class="comment even depth-2" id="dsq-comment-174"> 
-              <div id="dsq-comment-header-174" class="dsq-comment-header"> 
-               <cite id="dsq-cite-174"> <span id="dsq-author-user-174">Justin Hyland</span> </cite> 
-              </div> 
-              <div id="dsq-comment-body-174" class="dsq-comment-body"> 
-               <div id="dsq-comment-message-174" class="dsq-comment-message">
-                <p>Approved</p> 
-               </div> 
-              </div> </li>
-             <!-- #comment-## --> 
-            </ul>
-            <!-- .children --> </li>
-           <!-- #comment-## --> 
-           <li class="comment odd alt thread-even depth-1" id="dsq-comment-172"> 
-            <div id="dsq-comment-header-172" class="dsq-comment-header"> 
-             <cite id="dsq-cite-172"> <span id="dsq-author-user-172">kalyan kankala</span> </cite> 
-            </div> 
-            <div id="dsq-comment-body-172" class="dsq-comment-body"> 
-             <div id="dsq-comment-message-172" class="dsq-comment-message">
-              <p>can you post link to github plz? thanks!</p> 
-             </div> 
-            </div> </li>
-           <!-- #comment-## --> 
-          </ul> 
-         </div> 
-        </div> 
-        <script type="text/javascript">
-var disqus_url = 'http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/';
-var disqus_identifier = '422 http://blog.iteedee.com/?p=422';
-var disqus_container_id = 'disqus_thread';
-var disqus_shortname = 'cledeveloper';
-var disqus_title = "ASP.NET Identity 2.0 Cookie &#038; Token Authentication";
-var disqus_config_custom = window.disqus_config;
-var disqus_config = function () {
-    /*
-    All currently supported events:
-    onReady: fires when everything is ready,
-    onNewComment: fires when a new comment is posted,
-    onIdentify: fires when user is authenticated
-    */
-    
-    
-    this.language = '';
-        this.callbacks.onReady.push(function () {
-
-        // sync comments in the background so we don't block the page
-        var script = document.createElement('script');
-        script.async = true;
-        script.src = '?cf_action=sync_comments&post_id=422';
-
-        var firstScript = document.getElementsByTagName('script')[0];
-        firstScript.parentNode.insertBefore(script, firstScript);
-    });
-    
-    if (disqus_config_custom) {
-        disqus_config_custom.call(this);
-    }
-};
-
-(function() {
-    var dsq = document.createElement('script'); dsq.type = 'text/javascript';
-    dsq.async = true;
-    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-})();
-</script> 
        </div> 
-      </div>
-      <!-- #content .site-content --> 
-     </div>
-     <!-- #primary .content-area --> 
-     <div id="secondary" class="widget-area" role="complementary"> 
-      <aside id="text-2" class="widget widget_text">
-       <h3 class="widget-title">Follow Justin Hyland</h3> 
-       <div class="textwidget">
-        <a href="http://www.linkedin.com/in/justinhyland1" onclick="_gaq.push(['_trackEvent', 'outbound-widget', 'http://www.linkedin.com/in/justinhyland1', '']);" rel="external nofollow" title="" class="ext-link" data-wpel-target="_blank"><img src="http://blog.iteedee.com/wp-content/uploads/2013/10/linkedin.png" alt="LinkedIn"></a> 
-        <a href="https://twitter.com/CleDeveloper" onclick="_gaq.push(['_trackEvent', 'outbound-widget', 'https://twitter.com/CleDeveloper', '']);" rel="external nofollow" title="" class="ext-link" data-wpel-target="_blank"><img src="http://blog.iteedee.com/wp-content/uploads/2013/10/twitter.png" alt="Twitter"></a> 
-        <a href="https://plus.google.com/114703423528636842276" onclick="_gaq.push(['_trackEvent', 'outbound-widget', 'https://plus.google.com/114703423528636842276', '']);" rel="publisher external nofollow" title="" class="ext-link" data-wpel-target="_blank"><img src="http://blog.iteedee.com/wp-content/uploads/2013/10/googleplus.png" alt="GooglePlus"></a> 
-        <a target="_blank" href="http://blog.iteedee.com/feed/"><img src="http://blog.iteedee.com/wp-content/uploads/2013/10/rss.png" alt="RSS"></a> 
-        <a href="https://github.com/hylander0" onclick="_gaq.push(['_trackEvent', 'outbound-widget', 'https://github.com/hylander0', '']);" rel="external nofollow" title="" class="ext-link" data-wpel-target="_blank"><img src="http://blog.iteedee.com/wp-content/uploads/2013/10/github-e1382471941957.png" alt="Github"></a>
-       </div> 
-      </aside> 
-      <aside id="recent-posts-2" class="widget widget_recent_entries"> 
-       <h3 class="widget-title">Recent Posts</h3> 
-       <ul> 
-        <li> <a href="http://blog.iteedee.com/2015/08/parse-csv-comma-or-pipe-delimited-file-with-linq/">Parse CSV Comma or Pipe Delimited File with Linq</a> </li> 
-        <li> <a href="http://blog.iteedee.com/2015/06/log4net-notification-appender/">Log4Net Notification Appender</a> </li> 
-        <li> <a href="http://blog.iteedee.com/2015/05/monitor-net-windows-service-in-3-easy-steps/">Monitor .Net Windows Service in 3 Easy Steps</a> </li> 
-        <li> <a href="http://blog.iteedee.com/2015/05/publish-a-nuget-package-3-easy-steps/">Publish a Nuget Package – 3 Easy Steps</a> </li> 
-        <li> <a href="http://blog.iteedee.com/2015/03/getting-started-with-stripe-net-example/">Getting Started with Stripe .NET example</a> </li> 
-       </ul> 
-      </aside> 
-      <aside id="recent-comments-2" class="widget widget_recent_comments">
-       <h3 class="widget-title">Recent Comments</h3>
-       <ul id="recentcomments">
-        <li class="recentcomments"><span class="comment-author-link">Justin Hyland</span> on <a href="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/#comment-174">ASP.NET Identity 2.0 Cookie &amp; Token Authentication</a></li>
-        <li class="recentcomments"><span class="comment-author-link">Daskul</span> on <a href="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/#comment-173">ASP.NET Identity 2.0 Cookie &amp; Token Authentication</a></li>
-        <li class="recentcomments"><span class="comment-author-link">kalyan kankala</span> on <a href="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/#comment-172">ASP.NET Identity 2.0 Cookie &amp; Token Authentication</a></li>
-        <li class="recentcomments"><span class="comment-author-link">kalyan kankala</span> on <a href="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/#comment-171">ASP.NET Identity 2.0 Cookie &amp; Token Authentication</a></li>
-        <li class="recentcomments"><span class="comment-author-link">Daskul</span> on <a href="http://blog.iteedee.com/2014/03/asp-net-identity-2-0-cookie-token-authentication/#comment-165">ASP.NET Identity 2.0 Cookie &amp; Token Authentication</a></li>
-       </ul>
-      </aside>
-      <aside id="archives-2" class="widget widget_archive">
-       <h3 class="widget-title">Archives</h3> 
-       <ul> 
-        <li><a href="http://blog.iteedee.com/2015/08/">August 2015</a></li> 
-        <li><a href="http://blog.iteedee.com/2015/06/">June 2015</a></li> 
-        <li><a href="http://blog.iteedee.com/2015/05/">May 2015</a></li> 
-        <li><a href="http://blog.iteedee.com/2015/03/">March 2015</a></li> 
-        <li><a href="http://blog.iteedee.com/2014/11/">November 2014</a></li> 
-        <li><a href="http://blog.iteedee.com/2014/10/">October 2014</a></li> 
-        <li><a href="http://blog.iteedee.com/2014/09/">September 2014</a></li> 
-        <li><a href="http://blog.iteedee.com/2014/06/">June 2014</a></li> 
-        <li><a href="http://blog.iteedee.com/2014/04/">April 2014</a></li> 
-        <li><a href="http://blog.iteedee.com/2014/03/">March 2014</a></li> 
-        <li><a href="http://blog.iteedee.com/2014/02/">February 2014</a></li> 
-        <li><a href="http://blog.iteedee.com/2014/01/">January 2014</a></li> 
-        <li><a href="http://blog.iteedee.com/2013/12/">December 2013</a></li> 
-        <li><a href="http://blog.iteedee.com/2013/11/">November 2013</a></li> 
-        <li><a href="http://blog.iteedee.com/2013/10/">October 2013</a></li> 
-       </ul> 
-      </aside>
-      <aside id="categories-2" class="widget widget_categories">
-       <h3 class="widget-title">Categories</h3> 
-       <ul> 
-        <li class="cat-item cat-item-10"><a href="http://blog.iteedee.com/category/net/">.NET</a> </li> 
-        <li class="cat-item cat-item-8"><a href="http://blog.iteedee.com/category/android/">Android</a> </li> 
-        <li class="cat-item cat-item-123"><a href="http://blog.iteedee.com/category/api/">API</a> </li> 
-        <li class="cat-item cat-item-34"><a href="http://blog.iteedee.com/category/azure/">Azure</a> </li> 
-        <li class="cat-item cat-item-32"><a href="http://blog.iteedee.com/category/business-process-management/">Business Process Management</a> </li> 
-        <li class="cat-item cat-item-28"><a href="http://blog.iteedee.com/category/security/central-station-alarm/">Central Station Alarm</a> </li> 
-        <li class="cat-item cat-item-62"><a href="http://blog.iteedee.com/category/continuous-integration/">Continuous Integration</a> </li> 
-        <li class="cat-item cat-item-39"><a href="http://blog.iteedee.com/category/database/">Database</a> </li> 
-        <li class="cat-item cat-item-47"><a href="http://blog.iteedee.com/category/entrepreneurship/">Entrepreneurship</a> </li> 
-        <li class="cat-item cat-item-33"><a href="http://blog.iteedee.com/category/infrastructure/">Infrastructure</a> </li> 
-        <li class="cat-item cat-item-3"><a href="http://blog.iteedee.com/category/ios/" title="objective-c development in the iOS platform">iOS</a> </li> 
-        <li class="cat-item cat-item-20"><a href="http://blog.iteedee.com/category/iot/">IoT</a> </li> 
-        <li class="cat-item cat-item-48"><a href="http://blog.iteedee.com/category/java/">Java</a> </li> 
-        <li class="cat-item cat-item-21"><a href="http://blog.iteedee.com/category/json/">JSON</a> </li> 
-        <li class="cat-item cat-item-127"><a href="http://blog.iteedee.com/category/knockout/">Knockout</a> </li> 
-        <li class="cat-item cat-item-115"><a href="http://blog.iteedee.com/category/knowvent/">Knowvent</a> </li> 
-        <li class="cat-item cat-item-76"><a href="http://blog.iteedee.com/category/mac/">Mac</a> </li> 
-        <li class="cat-item cat-item-55"><a href="http://blog.iteedee.com/category/mobile/">Mobile</a> </li> 
-        <li class="cat-item cat-item-18"><a href="http://blog.iteedee.com/category/net/mvc/">MVC</a> </li> 
-        <li class="cat-item cat-item-38"><a href="http://blog.iteedee.com/category/programming/">Programming</a> </li> 
-        <li class="cat-item cat-item-78"><a href="http://blog.iteedee.com/category/project-management/">Project Management</a> </li> 
-        <li class="cat-item cat-item-16"><a href="http://blog.iteedee.com/category/restful/">RESTful</a> </li> 
-        <li class="cat-item cat-item-27"><a href="http://blog.iteedee.com/category/security/">Security</a> </li> 
-        <li class="cat-item cat-item-19"><a href="http://blog.iteedee.com/category/soa/">SOA</a> </li> 
-        <li class="cat-item cat-item-40"><a href="http://blog.iteedee.com/category/sql/">SQL</a> </li> 
-        <li class="cat-item cat-item-1"><a href="http://blog.iteedee.com/category/uncategorized/">Uncategorized</a> </li> 
-        <li class="cat-item cat-item-17"><a href="http://blog.iteedee.com/category/net/webapi/">WebApi</a> </li> 
-       </ul> 
-      </aside>
-      <aside id="text-4" class="widget widget_text">
-       <h3 class="widget-title">Links</h3> 
-       <div class="textwidget">
-        <a target="_blank" href="http://www.iteedee.com"><img src="http://blog.iteedee.com/wp-content/uploads/2013/11/liteedee_thumbnail.png" alt="Iteedee"></a> 
-        <br> 
-        <a href="http://www.knowvent.com" onclick="_gaq.push(['_trackEvent', 'outbound-widget', 'http://www.knowvent.com', '']);" target="_blank"><img src="http://blog.iteedee.com/wp-content/uploads/2014/11/Knovent_Logo.png" height="50" alt="Cloud Logging Notification API"></a>
-       </div> 
-      </aside> 
-     </div>
-     <!-- #secondary .widget-area --> 
-    </div>
-    <!-- .full-container --> 
-   </div>
-   <!-- #main .site-main --> 
-   <footer id="colophon" class="site-footer" role="contentinfo"> 
-    <div id="footer-widgets" class="full-container"> 
-     <aside id="text-3" class="widget widget_text"> 
-      <div class="textwidget">
-       © 2013
       </div> 
-     </aside> 
-    </div>
-    <!-- #footer-widgets --> 
-   </footer>
-   <!-- #colophon .site-footer --> 
-  </div>
-  <!-- #page-wrapper --> 
-  <script type="text/javascript">
-        // <![CDATA[
-        var disqus_shortname = 'cledeveloper';
-        (function () {
-            var nodes = document.getElementsByTagName('span');
-            for (var i = 0, url; i < nodes.length; i++) {
-                if (nodes[i].className.indexOf('dsq-postid') != -1) {
-                    nodes[i].parentNode.setAttribute('data-disqus-identifier', nodes[i].getAttribute('data-dsqidentifier'));
-                    url = nodes[i].parentNode.href.split('#', 1);
-                    if (url.length == 1) { url = url[0]; }
-                    else { url = url[1]; }
-                    nodes[i].parentNode.href = url + '#disqus_thread';
-                }
-            }
-            var s = document.createElement('script');
-            s.async = true;
-            s.type = 'text/javascript';
-            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-        }());
-        // ]]>
-        </script> 
-  <div style="display:none"> 
-  </div> 
-  <a href="#" id="scroll-to-top"></a>
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-content/plugins/wp-external-links/js/wp-external-links.js?ver=1.60"></script> 
-  <script type="text/javascript" src="http://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201737"></script> 
-  <script type="text/javascript" src="http://s.gravatar.com/js/gprofiles.js?ver=2017Sepaa"></script> 
-  <script type="text/javascript">
-/* <![CDATA[ */
-var WPGroHo = {"my_hash":""};
-/* ]]> */
-</script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-content/plugins/jetpack/modules/wpgroho.js?ver=4.5.9"></script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-includes/js/comment-reply.min.js?ver=4.5.9"></script> 
-  <script type="text/javascript" src="http://blog.iteedee.com/wp-includes/js/wp-embed.min.js?ver=4.5.9"></script> 
-  <script type="text/javascript" src="http://stats.wp.com/e-201737.js" async defer></script> 
-  <script type="text/javascript">
-	_stq = window._stq || [];
-	_stq.push([ 'view', {v:'ext',j:'1:3.4.4',blog:'59922591',post:'422',tz:'-4'} ]);
-	_stq.push([ 'clickTrackerInit', '59922591', '422' ]);
-</script>  
+     </div> 
+    </div> 
+   </div> 
+  </footer> 
+  <script type="text/javascript" src="https://wac-cdn.atlassian.com/assets/build/js/wpl-main.min.js?cdnVersion=hh"></script> 
+  <script type="text/javascript"> (function(){ var imkt = window.imkt || (window.imkt = {}); imkt.isEditMode = false; imkt.isProduction = true; imkt.constants = imkt.constants || {}; imkt.constants.rootPath = "/"; imkt.constants.assetPath = "https://wac-cdn.atlassian.com" + "/assets/"; imkt.constants.libPath = imkt.constants.assetPath + "bower_components/"; imkt.constants.cdnVersionQuery = "?cdnVersion=hh"; imkt.constants.isDevUser = false; imkt.constants.mobileBreakpoint = 640; })(); </script> 
+  <script type="text/x-component"> { "type":"imkt.pages.WACPage", "params": { } } </script> 
+  <script src="https://ace-cdn.atlassian.com/stp/current/analytics/js/atl-analytics.min.js"></script> 
+  <script>ace.analytics.Initializer.initWithPageAnalytics('kiv6wyh2nw');</script>  
+  <!-- LastRendered: Sep 15, 2017 11:44:25 PM --> 
  </body>
 </html>

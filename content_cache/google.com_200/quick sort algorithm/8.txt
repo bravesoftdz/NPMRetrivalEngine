@@ -1,532 +1,336 @@
 <!doctype html>
-<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
-<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
-<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js" lang="en">
- <!--<![endif]-->
+<html lang="en" prefix="og: http://ogp.me/ns#">
  <head> 
   <meta charset="utf-8"> 
-  <title>Looking for performance? Probably you should NOT use [].sort (V8) – Minko Gechev's blog</title> 
-  <meta name="description" content="A few days ago, I’ve created a GitHub repository. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:
-
-"> 
-  <meta name="keywords" content="Algorithms, Development, Heapsort, JavaScript, Mergesort, performance, Programming, Quicksort, Sorting"> 
-  <!-- Twitter Cards --> 
-  <meta name="twitter:title" content="Looking for performance? Probably you should NOT use [].sort (V8)"> 
-  <meta name="twitter:description" content="A few days ago, I’ve created a GitHub repository. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:
-
-"> 
-  <meta name="twitter:site" content="@mgechev"> 
-  <meta name="twitter:creator" content="@mgechev"> 
+  <title>quick-sort</title> 
+  <meta name="description" content="Quick sort"> 
+  <meta property="og:description" content="Quick sort"> 
+  <meta property="og:title" content="quick-sort"> 
+  <meta property="og:url" content="https://www.npmjs.com/package/quick-sort"> 
+  <meta property="og:site_name" content="npm"> 
+  <meta name="keywords" content="sort,algorithm,quick sort"> 
   <meta name="twitter:card" content="summary"> 
-  <meta name="twitter:image" content="//blog.mgechev.com/images/default-thumb.png"> 
-  <!-- Open Graph --> 
-  <meta property="og:locale" content="en_US"> 
-  <meta property="og:type" content="article"> 
-  <meta property="og:title" content="Looking for performance? Probably you should NOT use [].sort (V8)"> 
-  <meta property="og:description" content="A few days ago, I’ve created a GitHub repository. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:
-
-"> 
-  <meta property="og:url" content="//blog.mgechev.com/2012/11/24/javascript-sorting-performance-quicksort-v8/"> 
-  <meta property="og:site_name" content="Minko Gechev's blog"> 
-  <link rel="canonical" href="//blog.mgechev.com/2012/11/24/javascript-sorting-performance-quicksort-v8/"> 
-  <link href="//blog.mgechev.com/feed.xml" type="application/atom+xml" rel="alternate" title="Minko Gechev's blog Feed"> 
-  <!-- http://t.co/dKP3o1e --> 
-  <meta name="HandheldFriendly" content="True"> 
-  <meta name="MobileOptimized" content="320"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.min.css"> 
-  <!--[if lt IE 9]>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-fork-ribbon-css/0.2.0/gh-fork-ribbon.ie.min.css"/>
-<![endif]--> 
-  <!-- For all browsers --> 
-  <link rel="stylesheet" href="//blog.mgechev.com/assets/css/main.css"> 
+  <meta name="twitter:url" content="https://www.npmjs.com/package/quick-sort"> 
+  <meta name="twitter:title" content="npm: quick-sort"> 
+  <meta name="twitter:description" content="Quick sort"> 
   <meta http-equiv="cleartype" content="on"> 
-  <!-- HTML5 Shiv and Media Query Support --> 
+  <meta name="apple-mobile-web-app-capable" content="no"> 
+  <meta name="viewport" content="width=device-width,minimum-scale=1.0,initial-scale=1,user-scalable=yes"> 
+  <meta name="x-npm:ga:id" content="UA-47041310-1"> 
+  <meta name="x-npm:ga:dimensions" content="{&quot;aboveChrome&quot;:&quot;dimension1&quot;,&quot;belowHeader&quot;:&quot;dimension3&quot;,&quot;packagePage&quot;:&quot;dimension2&quot;}"> 
+  <link rel="canonical" href="https://www.npmjs.com/package/quick-sort"> 
+  <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="npm"> 
+  <link rel="stylesheet" media="all" href="/static/css/index.css?last-changed=6ce127b3f2f1d381a89d0ac9646eaa04"> 
   <!--[if lt IE 9]>
-	<script src="//blog.mgechev.com/assets/js/vendor/html5shiv.min.js"></script>
-	<script src="//blog.mgechev.com/assets/js/vendor/respond.min.js"></script>
-<![endif]--> 
-  <!-- Modernizr --> 
-  <script src="//blog.mgechev.com/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script> 
-  <link href="//fonts.googleapis.com/css?family=PT+Sans+Narrow:400,700|PT+Serif:400,700,400italic" rel="stylesheet" type="text/css"> 
-  <!-- Icons --> 
-  <!-- 16x16 --> 
-  <link rel="shortcut icon" href="//blog.mgechev.com/favicon.ico"> 
-  <!-- 32x32 --> 
-  <link rel="shortcut icon" href="//blog.mgechev.com/favicon.png"> 
-  <script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-    var disqus_shortname = 'mgechev'; // required: replace example with your forum shortname
-
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-</script> 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <![endif]--> 
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700"> 
+  <script src="/static/js/index.min.js?last-changed=804eef6a8969a48ed62dc89e2bb9ce65"></script> 
+  <style>
+      .marketing {
+  margin: 0px;
+  margin-left: -10px;
+  margin-bottom: 40px;
+  padding: 0px 0px;
+  font-size: 15px;
+  font-style: normal;
+  fond-variant: normal;
+  fort-weight: normal;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+  letter-spacing: -0.03em;
+  line-height: 22.5px;
+  }
+  
+  .marketing a {
+  font-weight: 400;
+  text-decoration: none;
+  color: #cb3837;
+  }
+  
+  .marketing h3 {
+  display: block;
+  margin: 0;
+  padding: 20px 0 10px 0;
+  font-size: 20px;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 400;
+  line-height: 22px;
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.8);
+  }
+  
+  .marketing h3 a {
+  color: rgba(0, 0, 0, 0.8);
+  }
+  
+  .marketing h3 a:hover {
+  color: #cb3837;
+  }
+  
+  .marketing p {
+  line-height: 22.5px;
+  margin-left: 10px;
+  margin-right: 10px;
+  }
+  
+  .marketing p a {
+  white-space: nowrap;
+  }
+  
+  #marketing-texthed {
+  margin-left: 10px;
+  }
+    </style> 
+  <link rel="apple-touch-icon" sizes="57x57" href="/static/images/touch-icons/apple-touch-icon-57x57.png"> 
+  <link rel="apple-touch-icon" sizes="60x60" href="/static/images/touch-icons/apple-touch-icon-60x60.png"> 
+  <link rel="apple-touch-icon" sizes="72x72" href="/static/images/touch-icons/apple-touch-icon-72x72.png"> 
+  <link rel="apple-touch-icon" sizes="76x76" href="/static/images/touch-icons/apple-touch-icon-76x76.png"> 
+  <link rel="apple-touch-icon" sizes="114x114" href="/static/images/touch-icons/apple-touch-icon-114x114.png"> 
+  <link rel="apple-touch-icon" sizes="120x120" href="/static/images/touch-icons/apple-touch-icon-120x120.png"> 
+  <link rel="apple-touch-icon" sizes="144x144" href="/static/images/touch-icons/apple-touch-icon-144x144.png"> 
+  <link rel="apple-touch-icon" sizes="152x152" href="/static/images/touch-icons/apple-touch-icon-152x152.png"> 
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/images/touch-icons/apple-touch-icon-180x180.png"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/favicon-32x32.png" sizes="32x32"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/favicon-230x230.png" sizes="230x230"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/favicon-96x96.png" sizes="96x96"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/android-chrome-192x192.png" sizes="192x192"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/coast-228x228.png" sizes="228x228"> 
+  <link rel="icon" type="image/png" href="/static/images/touch-icons/favicon-16x16.png" sizes="16x16"> 
+  <link rel="manifest" href="/static/images/touch-icons/manifest.json"> 
+  <link rel="yandex-tableau-widget" href="/static/images/touch-icons/yandex-browser-manifest.json"> 
+  <meta property="og:image" content="https://www.npmjs.com/static/images/touch-icons/open-graph.png"> 
+  <meta name="apple-mobile-web-app-capable" content="yes"> 
+  <meta name="msapplication-TileColor" content="#cb3837"> 
+  <meta name="msapplication-TileImage" content="/static/images/touch-icons/mstile-144x144.png"> 
+  <meta name="msapplication-config" content="/static/images/touch-icons/browserconfig.xml"> 
+  <meta name="theme-color" content="#cb3837"> 
  </head> 
- <body class="post"> 
-  <!--[if lt IE 9]><div class="browser-upgrade alert alert-info">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</div><![endif]--> 
-  <div class="navigation-wrapper"> 
-   <div class="site-name"> 
-    <a href="//blog.mgechev.com">Minko Gechev's blog</a> 
-   </div>
-   <!-- /.site-name --> 
-   <div class="top-navigation"> 
-    <nav role="navigation" id="site-nav" class="nav"> 
-     <ul> 
-      <li><a href="//blog.mgechev.com/posts/">Posts</a></li> 
-      <li><a href="//blog.mgechev.com/about/">About</a></li> 
-      <li><a href="//blog.mgechev.com/talks/">Talks</a></li> 
-     </ul> 
-    </nav> 
-   </div>
-   <!-- /.top-navigation --> 
-  </div>
-  <!-- /.navigation-wrapper --> 
-  <a class="github-fork-ribbon" href="https://github.com/mgechev" title="Fork me on GitHub">Fork me on GitHub</a> 
-  <div id="main" role="main"> 
-   <div class="article-author-side"> 
-    <a href="/about"><img src="//blog.mgechev.com/images/me.jpg" class="bio-photo" alt="Minko Gechev bio photo"></a> 
-    <h3>Minko Gechev</h3> 
-    <p>CTO at Rhyme.com</p> 
-    <a href="http://twitter.com/mgechev" class="author-social" target="_blank"><i class="fa fa-twitter-square"></i> Twitter</a> 
-    <a href="http://github.com/mgechev" class="author-social" target="_blank"><i class="fa fa-github"></i> GitHub</a> 
-    <a href="http://stackoverflow.com/users/1106382/minko-gechev" class="author-social" target="_blank"><i class="fa fa-stack-overflow"></i> StackOverflow</a> 
-   </div> 
-   <article> 
-    <div class="headline-wrap"> 
-     <h1><a href="//blog.mgechev.com/2012/11/24/javascript-sorting-performance-quicksort-v8/" rel="bookmark" title="Looking for performance? Probably you should NOT use [].sort (V8)">Looking for performance? Probably you should NOT use [].sort (V8)</a></h1> 
-    </div>
-    <!--/ .headline-wrap --> 
-    <div class="post-toolbar"> 
-     <a style="margin-right: 10px; position: relative; top: -4px" href="https://github.com/mgechev/blog.mgechev.com/tree/gh-pages/_posts/2012-11-24-javascript-sorting-performance-quicksort-v8.md"><i class="fa fa-pencil-square-o"></i> Edit</a> 
-     <a href="https://twitter.com/mgechev" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a>
-     <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script> 
+ <body itemscope itemtype="http://schema.org/WebSite" data-crumb="j-RmmH0TVe4q1uigNIESGBZzLshM53OcL89TxpcnMoB"> 
+  <meta itemprop="url" content="https://www.npmjs.com/"> 
+  <header class="anonymous   "> 
+   <!-- logo --> 
+   <div class="header-item brand-container"> 
+    <div class="logo-container" id="npm-logo"> 
+     <a href="/">
+      <svg viewbox="0 0 18 7"> 
+       <path fill="#CB3837" d="M0,0v6h5v1h4v-1h9v-6" /> 
+       <path fill="#FFF" d="M1,1v4h2v-3h1v3h1v-4h1v5h2v-4h1v2h-1v1h2v-4h1v4h2v-3h1v3h1v-3h1v3h1v-4" /> 
+      </svg></a> 
     </div> 
-    <div class="article-wrap"> 
-     <p>A few days ago, I’ve created a <a title="Algorithms implemented in JavaScript" href="https://github.com/mgechev/javascript-algorithms" target="_blank">GitHub repository</a>. It’s main goal was to collect different algorithms with implementations in JavaScript. I started with basic ones – sorting (insertion, selection, bubble sort..). After that I implemented few “more advance” like marge, quick and heap sort. It was interesting to me how much slower my implementation will be compared to the default sort. It was so interesting because of:</p> 
-     <figure class="highlight">
-      <pre><code class="language-javascript" data-lang="javascript"><span class="kd">function</span> <span class="nx">sort</span><span class="p">()</span> <span class="p">{</span> <span class="p">[</span><span class="kr">native</span> <span class="nx">code</span><span class="p">]</span> <span class="p">}</span></code></pre>
-     </figure> 
-     <p>That’s why I’ve wrote not optimized version of mergesort and I’ve run it with generated array with 500k elements. I waited…waited…and at last, after about 15 minutes the array was sorted. It was quite disappointing. I decided that it was so slow because of the recursion inside it. I have had bad experience with DFS using recursion for manipulating the DOM tree. The result for the default sort was about 0.5 seconds. For that test I’ve used nodejs (<a href="https://en.wikipedia.org/wiki/Nodejs" target="_blank">it uses Google’s V8 engine</a>). After merge sort I’ve implemented heap sort. Also not bad algorithm with complexity O(nlog(n)). I though that it will be faster in Node.js because in my opinion that the recursion was the thing that made the mergesort so slow. I’ve generated another array with 500k elements using a simple perl script. The result was very interesting…In the chart below you can see mergesort compared to heapsort for array with 50k elements.</p> 
-     <div id="attachment_237" style="width: 683px" class="wp-caption alignnone"> 
-      <a href="http://blog.mgechev.com/wp-content/uploads/2012/11/50k-heap-vs-merge.png"><img class="size-full wp-image-237 " title="Heapsort vs Mergesort 50k" src="http://blog.mgechev.com/wp-content/uploads/2012/11/50k-heap-vs-merge.png" alt="" width="673" height="385"></a>
-      <p class="wp-caption-text"> Heapsort vs Mergesort 50k elements </p> 
+   </div> 
+   <!-- /logo --> 
+   <!-- search --> 
+   <div class="header-item header-search-container"> 
+    <form class="site-search" id="npm-search" action="/search" method="get" itemprop="potentialAction" itemscope itemtype="http://schema.org/SearchAction"> 
+     <meta itemprop="target" content="https://www.npmjs.com/search?q={q}"> 
+     <div id="site-search-container"> 
+      <input name="q" value="" type="search" id="site-search" placeholder="find packages" tabindex="1" autocorrect="off" autocapitalize="off" itemprop="query-input"> 
      </div> 
-     <p>In the X-axis it’s an attempt number, the Y-axis is the time required for the algorithm to finish (in seconds).</p> 
-     <p>Here is the implementation of the Mergesort:</p> 
-     <figure class="highlight">
-      <pre><code class="language-javascript" data-lang="javascript"><span class="cm">/* Mergesort */</span>
-<span class="kd">var</span> <span class="nx">mergeSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="kd">function</span> <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">end</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">end</span> <span class="o">-</span> <span class="nx">start</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">return</span> <span class="p">[];</span>
-        <span class="p">}</span>
-        <span class="kd">var</span> <span class="nx">middle</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">((</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">end</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
-
-        <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">middle</span><span class="p">);</span>
-        <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">middle</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
-
-        <span class="k">return</span> <span class="nx">merge</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">middle</span><span class="p">,</span> <span class="nx">end</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="nx">merge</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">start</span><span class="p">,</span> <span class="nx">middle</span><span class="p">,</span> <span class="nx">end</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">left</span> <span class="o">=</span> <span class="p">[],</span>
-            <span class="nx">right</span> <span class="o">=</span> <span class="p">[],</span>
-            <span class="nx">leftSize</span> <span class="o">=</span> <span class="nx">middle</span> <span class="o">-</span> <span class="nx">start</span><span class="p">,</span>
-            <span class="nx">rightSize</span> <span class="o">=</span> <span class="nx">end</span> <span class="o">-</span> <span class="nx">middle</span><span class="p">,</span>
-            <span class="nx">maxSize</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">leftSize</span><span class="p">,</span> <span class="nx">rightSize</span><span class="p">),</span>
-            <span class="nx">size</span> <span class="o">=</span> <span class="nx">end</span> <span class="o">-</span> <span class="nx">start</span><span class="p">,</span>
-            <span class="nx">i</span><span class="p">;</span>
-
-        <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">maxSize</span><span class="p">;</span> <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">leftSize</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">left</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">];</span>
-            <span class="p">}</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">rightSize</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">right</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">middle</span> <span class="o">+</span> <span class="nx">i</span><span class="p">];</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-        <span class="k">while</span> <span class="p">(</span><span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">size</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">left</span><span class="p">.</span><span class="nx">length</span> <span class="o">&amp;&amp;</span> <span class="nx">right</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nx">left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="nx">right</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="p">{</span>
-                    <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">right</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                    <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">left</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
-                <span class="p">}</span>
-            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">left</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">left</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
-            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                <span class="nx">array</span><span class="p">[</span><span class="nx">start</span> <span class="o">+</span> <span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">right</span><span class="p">.</span><span class="nx">shift</span><span class="p">();</span>
-            <span class="p">}</span>
-            <span class="nx">i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">merger</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
-    <span class="p">}</span>
-
-<span class="p">}());</span></code></pre>
-     </figure> 
-     <p>And the heapsort:</p> 
-     <figure class="highlight">
-      <pre><code class="language-javascript" data-lang="javascript"><span class="cm">/* Heapsort */</span>
-<span class="kd">var</span> <span class="nx">heapSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="kd">function</span> <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">index</span><span class="p">,</span> <span class="nx">heapSize</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">left</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="nx">right</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="nx">largest</span> <span class="o">=</span> <span class="nx">index</span><span class="p">;</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nx">left</span> <span class="o">&lt;</span> <span class="nx">heapSize</span> <span class="o">&amp;&amp;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">left</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">index</span><span class="p">])</span>
-            <span class="nx">largest</span> <span class="o">=</span> <span class="nx">left</span><span class="p">;</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nx">right</span> <span class="o">&lt;</span> <span class="nx">heapSize</span> <span class="o">&amp;&amp;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">right</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nx">array</span><span class="p">[</span><span class="nx">largest</span><span class="p">])</span>
-            <span class="nx">largest</span> <span class="o">=</span> <span class="nx">right</span><span class="p">;</span>
-
-        <span class="k">if</span> <span class="p">(</span><span class="nx">largest</span> <span class="o">!==</span> <span class="nx">index</span><span class="p">)</span> <span class="p">{</span>
-            <span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">index</span><span class="p">];</span>
-            <span class="nx">array</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">largest</span><span class="p">];</span>
-            <span class="nx">array</span><span class="p">[</span><span class="nx">largest</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
-            <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">largest</span><span class="p">,</span> <span class="nx">heapSize</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="nx">buildMaxHeap</span><span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">array</span><span class="p">.</span><span class="nx">length</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">size</span> <span class="o">=</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">,</span>
-            <span class="nx">temp</span><span class="p">;</span>
-        <span class="nx">buildMaxHeap</span><span class="p">(</span><span class="nx">array</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nx">temp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-            <span class="nx">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-            <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
-            <span class="nx">size</span> <span class="o">-=</span> <span class="mi">1</span><span class="p">;</span>
-            <span class="nx">heapify</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">size</span><span class="p">);</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
-    <span class="p">};</span>
-<span class="p">}());</span></code></pre>
-     </figure> 
-     <p>If you find any mistakes in any of the implementations I’ll be glad to know and fix them. In the script above I use simple closure to hide the methods which are not useful for the public API. After I’ve made the test between merge and heap sorts I noticed that there’s a quite big difference…So that’s why I started heap vs the default sort to see how faster the native sort will be:</p> 
-     <div id="attachment_239" style="width: 683px" class="wp-caption alignnone"> 
-      <a href="http://blog.mgechev.com/wp-content/uploads/2012/11/500k-heap-vs-default.png"><img class="size-full wp-image-239" title="Heapsort vs the default sort 500k elements" src="http://blog.mgechev.com/wp-content/uploads/2012/11/500k-heap-vs-default.png" alt="" width="673" height="385"></a>
-      <p class="wp-caption-text"> Heapsort vs the default sort 500k elements </p> 
+     <button tabindex="2" type="submit"> <span class="a11y-only">Search</span> 
+      <svg viewbox="0 0 34 34" fill="none" stroke="currentColor"> 
+       <ellipse stroke-width="3" cx="16" cy="15" rx="12" ry="12" /> 
+       <path d="M26 26 l 8 8" stroke-width="3" stroke-linecap="square" /> 
+      </svg> </button> 
+    </form> 
+   </div> 
+   <!-- menu 1 --> 
+   <div class="header-item user-info-container"> 
+    <div class="user-info"> 
+     <ul class="user-info-salutation single"> 
+      <li><a href="/signup">sign up</a> or <a href="/login">log in</a></li> 
+      <li><a href="/login"><span class="a11y-only">log in</span>
+        <svg viewbox="-2765 2857 1080 1080"> 
+         <path fill="#986844" d="M-1811.2 3598.5c-.1-4.3-.3-11.3-.8-20.3-.9-15.8-2.7-40.9-6.6-70.7-6.9-52.6-21.6-130.1-52.6-200.4-22.3-50.4-53.5-97.1-90.3-135.2-4.4-20.5-16.7-66.5-43.5-104.8l-5-7.2-54 35.5c-44.5-22.4-91-33.7-138.6-33.7-47.5 0-94.1 11.3-138.6 33.7l-54-35.5-5 7.2c-26.8 38.3-39 84.3-43.5 104.8-36.8 38.1-68 84.8-90.3 135.3-31.1 70.3-45.8 147.8-52.6 200.4-6.1 46.6-7.2 81.6-7.5 93.8 16.6 14 31.3 29.8 46.9 45 17.2 16.7 39.4 28.2 59.1 41.6 1.7 1.1 3.1 2.6 4.2 4.1 15.7 10.4 31 15.4 50.2 19.5 19.2 4.1 35.6 5.6 55.6 7.3 38.7 3.2 77 7.7 115.5 12.6 43.1 5.4 86.5 11.5 130 13.1 41.6 1.5 81.8-9 121.8-19.3 8.9-2.3 17.9-4.5 26.8-6.8.6-4.2 3-8.1 6.7-10.4 40.1-25 81.2-48.2 122-72 5.9-3.5 13.7-1.9 17.9 3.3 9-8.9 17.1-18.2 24.3-27.9l.2-.2.2-.2c1.7-2.6 1.8-2.7 1.5-12.6z" /> 
+         <path fill="#FFF" d="M-1808.7 3494.8c-6.9-53.2-21.8-131.7-53.4-203.2-22.3-50.5-53.5-97.5-90.3-136.1-5.5-24.4-18.2-68.2-44.5-105.7l-10.6-15.1-57.3 37.7c-44.3-21.4-90.6-32.2-137.9-32.2-47.2 0-93.6 10.8-137.9 32.2l-57.3-37.7-10.6 15.1c-26.2 37.5-39 81.2-44.5 105.7-36.7 38.5-67.9 85.5-90.3 136.1-31.6 71.4-46.5 149.9-53.4 203.2-7.5 57.7-7.6 98-7.6 99.7v6.3l3.8 5.1c26 35 62.9 64.7 109.6 88.3 36.9 18.6 80 33.6 128.3 44.4 82.2 18.5 151.8 19 159.5 19h.6c7.7 0 77.3-.5 159.5-19 48.3-10.8 91.4-25.8 128.3-44.4 46.7-23.6 83.6-53.3 109.6-88.3l3.7-5v-6.3c.4-1.8.2-42.3-7.3-99.8zm-118.3 174.3c-34.8 17.6-75.8 31.8-121.8 42.1-80.7 18.1-150.4 18.3-153.4 18.3h-.6c-2.9 0-72.7-.2-153.4-18.3-46-10.3-87-24.5-121.8-42.1-41.7-21.1-74.7-47.2-98-77.6.4-22.5 5.1-167.5 58.6-288.5 21.8-49.3 52.4-94.9 88.5-131.8l1.8-1.9.5-2.6c2.7-13.1 12.9-56.4 36.3-93.4l37.2 24.5-7.3 16.6 22.8-11.9c43.3-22.6 88.7-34.1 135-34.1s91.7 11.5 135 34.1l22.8 11.9-7.3-16.6 37.2-24.5c23.4 37 33.6 80.4 36.3 93.4l.5 2.6 1.8 1.9c36.1 36.9 66.7 82.5 88.5 131.8 53.5 121 58.2 266.1 58.6 288.5-23.2 30.4-56.1 56.5-97.8 77.6zm-163-13c0 30.1-50.4 54.4-112.5 54.4s-112.5-24.4-112.5-54.4c0-30.1 50.4-54.4 112.5-54.4s112.5 24.3 112.5 54.4zm-223.5-65.3c0 12.3-10 22.3-22.3 22.3s-22.3-10-22.3-22.3 10-22.3 22.3-22.3c12.3-.1 22.3 9.9 22.3 22.3zm267.8 0c0 12.3-10 22.3-22.3 22.3s-22.3-10-22.3-22.3 10-22.3 22.3-22.3c12.3-.1 22.3 9.9 22.3 22.3z" /> 
+        </svg></a></li> 
+     </ul> 
+    </div> 
+    <!-- .user-info --> 
+   </div> 
+   <!-- /menu 1 --> 
+   <!-- menu 2 --> 
+   <div class="header-item header-nav-menu-container"> 
+    <a href="#" id="npm-expansions" class="npm-expansions" data-event-trigger="click" data-event-name="npm-expansions">node package manager</a> 
+    <div class="nav-menu-container" role="navigation"> 
+     <a class="nav-toggle drop-down-menu-toggle" href="#product-navigation"><span class="a11y-only">Toggle Navigation</span> 
+      <svg viewbox="0 0 44 44"> 
+       <rect x="4" y="12" fill="currentColor" width="36" height="2" /> 
+       <rect x="4" y="20" fill="currentColor" width="36" height="2" /> 
+       <rect x="4" y="28" fill="currentColor" width="36" height="2" /> 
+      </svg> </a> 
+     <div class="drop-down-menu-container" role="menu"> 
+      <nav id="product-navigation" class="product-navigation drop-down-menu"> 
+       <ul class="drop-down-menu-section products-list"> 
+        <li><a id="nav-enterprise-link" href="/npm/enterprise">npm Enterprise</a></li> 
+        <li><a id="nav-features-link" href="/features" data-event-trigger="click" data-event-name="features-nav-link">features</a></li> 
+        <li><a id="nav-pricing-link" href="/pricing">pricing</a></li> 
+        <li><a id="nav-docs-link" href="https://docs.npmjs.com">documentation</a></li> 
+        <li><a id="nav-support-link" href="/support">support</a></li> 
+       </ul> 
+      </nav> 
      </div> 
-     <p>As you see the result is quite unexpected…I’ve checked my algorithm many times because I thought that it isn’t correct…In more than half of the cases (because as you might see there are 50 tests) heapsort is faster than the default sort. The default sort is some kind of optimized quicksort mixed with insertion sort for small arrays.&nbsp;The exact implementation of the V8 sort can be found <a href="https://github.com/v8/v8" target="_blank">somewhere here</a>.</p> 
-     <p>That is the perl script which I used for the test:</p> 
-     <figure class="highlight">
-      <pre><code class="language-perl" data-lang="perl"><span class="c1">#!/usr/bin/perl</span>
-
-<span class="k">use</span> <span class="nv">strict</span><span class="p">;</span>
-<span class="k">use</span> <span class="nv">warnings</span><span class="p">;</span>
-<span class="k">use</span> <span class="nn">Time::</span><span class="nv">HiRes</span> <span class="sx">qw/time/</span><span class="p">;</span>
-
-<span class="k">my</span> <span class="nv">%sorts</span> <span class="o">=</span> <span class="p">();</span>
-<span class="k">my</span> <span class="nv">%algorithm_source</span> <span class="o">=</span> <span class="p">();</span>
-
-<span class="c1">#Generates JavaScript array with defined size and maximum size of it's elements</span>
-<span class="k">sub </span><span class="nf">generate_js_array</span><span class="p">($ $) {</span>
-    <span class="k">my</span> <span class="p">(</span><span class="nv">$size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">$array</span> <span class="o">=</span> <span class="s">'var array = ['</span><span class="p">;</span>
-    <span class="nb">map</span> <span class="p">{</span> <span class="nv">$array</span> <span class="o">.=</span> <span class="nb">rand</span><span class="p">(</span><span class="nv">$max</span><span class="p">)</span> <span class="o">.</span> <span class="s">",\n"</span> <span class="p">}</span> <span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="nv">$size</span><span class="p">);</span>
-    <span class="nb">chop</span><span class="p">(</span><span class="nv">$array</span><span class="p">);</span>
-    <span class="nb">chop</span><span class="p">(</span><span class="nv">$array</span><span class="p">);</span>
-    <span class="nv">$array</span> <span class="o">.=</span> <span class="s">'];'</span><span class="p">;</span>
-    <span class="k">return</span> <span class="nv">$array</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">#Creates a new test for given sort type and array</span>
-<span class="k">sub </span><span class="nf">create_test</span><span class="p">($ $) {</span>
-    <span class="k">my</span> <span class="p">(</span><span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$array</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">$sort_algorithm</span> <span class="o">=</span> <span class="nv">$algorithm_source</span><span class="p">{</span><span class="nv">$sort_type</span><span class="p">};</span>
-    <span class="k">my</span> <span class="nv">$test_case</span> <span class="o">=</span> <span class="s">"$array\n$sort_algorithm"</span><span class="p">;</span>
-    <span class="k">return</span> <span class="nv">$test_case</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">#Saves the test in a file into the temp directory</span>
-<span class="k">sub </span><span class="nf">save_test_case</span><span class="p">($ $ $) {</span>
-    <span class="k">my</span> <span class="p">(</span><span class="nv">$test_case</span><span class="p">,</span> <span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$i</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">$filename</span> <span class="o">=</span> <span class="s">"./temp/$sort_type-$i.js"</span><span class="p">;</span>
-    <span class="nb">open</span><span class="p">(</span><span class="nv">FH</span><span class="p">,</span> <span class="s">"&gt;$filename"</span><span class="p">);</span>
-    <span class="k">print</span> <span class="nv">FH</span> <span class="nv">$test_case</span><span class="p">;</span>
-    <span class="nb">close</span><span class="p">(</span><span class="nv">FH</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nv">$filename</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">#Runs the test and measures the runtime</span>
-<span class="k">sub </span><span class="nf">run_test_case</span><span class="p">($)</span> <span class="p">{</span>
-    <span class="k">my</span> <span class="nv">$filename</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">$time</span> <span class="o">=</span> <span class="nb">time</span><span class="p">();</span>
-    <span class="sb">`d8 $filename`</span><span class="p">;</span>
-    <span class="k">return</span> <span class="nb">time</span><span class="p">()</span> <span class="o">-</span> <span class="nv">$time</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">#Tests an algorithm with given array</span>
-<span class="k">sub </span><span class="nf">test_algorithm</span><span class="p">($ $ $) {</span>
-    <span class="k">my</span> <span class="p">(</span><span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$array</span><span class="p">,</span> <span class="nv">$test_count</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-    <span class="k">my</span> <span class="p">(</span><span class="nv">$test_case</span><span class="p">,</span> <span class="nv">$filename</span><span class="p">,</span> <span class="nv">$performance</span><span class="p">);</span>
-    <span class="nv">$test_case</span> <span class="o">=</span> <span class="nv">create_test</span><span class="p">(</span><span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$array</span><span class="p">);</span>
-    <span class="nv">$filename</span> <span class="o">=</span> <span class="nv">save_test_case</span><span class="p">(</span><span class="nv">$test_case</span><span class="p">,</span> <span class="nv">$sort_type</span><span class="p">,</span> <span class="nv">$test_count</span><span class="p">);</span>
-    <span class="k">print</span> <span class="s">"Running the test case...\n"</span><span class="p">;</span>
-    <span class="nv">$performance</span> <span class="o">=</span> <span class="nv">run_test_case</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
-    <span class="c1">#unlink($filename);</span>
-    <span class="k">print</span> <span class="s">"Cleaning the trash...\n"</span><span class="p">;</span>
-    <span class="k">return</span> <span class="nv">$performance</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">#Gets the source of an algorithm from the algorithms folder</span>
-<span class="k">sub </span><span class="nf">get_algorithm</span><span class="p">($)</span> <span class="p">{</span>
-    <span class="k">my</span> <span class="nv">$sort_type</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">$file</span> <span class="o">=</span> <span class="nv">$sorts</span><span class="p">{</span><span class="nv">$sort_type</span><span class="p">};</span>
-    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="s">''</span><span class="p">;</span>
-    <span class="nb">open</span><span class="p">(</span><span class="nv">FH</span><span class="p">,</span> <span class="s">"&lt;./algorithms/$file"</span><span class="p">);</span>
-    <span class="k">while</span> <span class="p">(</span><span class="sr">&lt;FH&gt;</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$result</span> <span class="o">.=</span> <span class="nv">$_</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="nb">close</span><span class="p">(</span><span class="nv">FH</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">#Caches all algorithms into a hash with keys the algorithm name and value the algorithm</span>
-<span class="k">sub </span><span class="nf">cache_algorithms_source</span> <span class="p">{</span>
-    <span class="k">for</span> <span class="k">my</span> <span class="nv">$algorithm</span> <span class="p">(</span><span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="p">{</span>
-        <span class="nv">$algorithm_source</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">}</span> <span class="o">=</span> <span class="nv">get_algorithm</span><span class="p">(</span><span class="nv">$algorithm</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">#Tests all algorithms with different arrays and tests count</span>
-<span class="k">sub </span><span class="nf">test_algorithms</span><span class="p">($ $ $) {</span>
-    <span class="k">my</span> <span class="p">(</span><span class="nv">$tests_count</span><span class="p">,</span> <span class="nv">$size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">%result</span> <span class="o">=</span> <span class="p">();</span>
-    <span class="k">my</span> <span class="p">(</span><span class="nv">$array</span><span class="p">,</span> <span class="nv">$count</span><span class="p">);</span>
-    <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nv">$tests_count</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$array</span> <span class="o">=</span> <span class="nv">generate_js_array</span><span class="p">(</span><span class="nv">$size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">);</span>
-        <span class="nv">$count</span> <span class="o">=</span> <span class="nv">$i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
-        <span class="k">for</span> <span class="k">my</span> <span class="nv">$algorithm</span> <span class="p">(</span><span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="p">{</span>
-            <span class="k">print</span> <span class="s">"Running $algorithm test number $count...\n"</span><span class="p">;</span>
-            <span class="nv">$result</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">}</span> <span class="o">=</span> <span class="o">[]</span> <span class="k">unless</span> <span class="nb">defined</span><span class="p">(</span><span class="nv">$result</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">});</span>
-            <span class="nb">push</span><span class="p">(</span><span class="nv">@</span><span class="p">{</span><span class="nv">$result</span><span class="p">{</span><span class="nv">$algorithm</span><span class="p">}},</span> <span class="nv">test_algorithm</span><span class="p">(</span><span class="nv">$algorithm</span><span class="p">,</span> <span class="nv">$array</span><span class="p">,</span> <span class="nv">$i</span><span class="p">));</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="o">\</span><span class="nv">%result</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">#Builds a CSV string from the results</span>
-<span class="k">sub </span><span class="nf">build_csv</span><span class="p">($)</span> <span class="p">{</span>
-    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="nb">shift</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">%result</span> <span class="o">=</span> <span class="nv">%$result</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">@algorithms</span> <span class="o">=</span> <span class="nb">keys</span><span class="p">(</span><span class="nv">%result</span><span class="p">);</span>
-    <span class="k">my</span> <span class="nv">$current</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">@current_result</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">$data</span> <span class="o">=</span> <span class="s">''</span><span class="p">;</span>
-    <span class="k">print</span> <span class="s">"Building a CSV statistics...\n"</span><span class="p">;</span>
-    <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$i</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@algorithms</span><span class="p">);</span> <span class="nv">$i</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nv">$current</span> <span class="o">=</span> <span class="nv">$algorithms</span><span class="p">[</span><span class="nv">$i</span><span class="p">];</span>
-        <span class="nv">$data</span> <span class="o">.=</span> <span class="nv">$current</span> <span class="o">.</span> <span class="s">','</span><span class="p">;</span>
-        <span class="nv">@current_result</span> <span class="o">=</span> <span class="nv">@</span><span class="p">{</span><span class="nv">$result</span><span class="p">{</span><span class="nv">$current</span><span class="p">}};</span>
-        <span class="k">for</span> <span class="p">(</span><span class="k">my</span> <span class="nv">$j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$j</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@current_result</span><span class="p">);</span> <span class="nv">$j</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="nv">$data</span> <span class="o">.=</span> <span class="nv">$current_result</span><span class="p">[</span><span class="nv">$j</span><span class="p">];</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nv">$j</span> <span class="o">&lt;</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@current_result</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nv">$data</span> <span class="o">.=</span> <span class="s">','</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="nv">$data</span> <span class="o">.=</span> <span class="s">"\n"</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nv">$data</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="nv">MAIN:</span> <span class="p">{</span>
-    <span class="k">my</span> <span class="nv">$max</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">$array_size</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">my</span> <span class="nv">$tests_count</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-    <span class="k">print</span> <span class="s">"Starting $tests_count test cases for all algorithms ("</span> <span class="o">.</span> <span class="nb">join</span><span class="p">(</span><span class="s">', '</span><span class="p">,</span> <span class="nb">keys</span><span class="p">(</span><span class="nv">%sorts</span><span class="p">))</span> <span class="o">.</span> <span class="s">") with parementers: arrays with size $array_size, maximum size of each element $max.\n"</span><span class="p">;</span>
-
-    <span class="nv">cache_algorithms_source</span><span class="p">();</span>
-    <span class="k">my</span> <span class="nv">$result</span> <span class="o">=</span> <span class="nv">test_algorithms</span><span class="p">(</span><span class="nv">$tests_count</span><span class="p">,</span> <span class="nv">$array_size</span><span class="p">,</span> <span class="nv">$max</span><span class="p">);</span>
-    <span class="k">my</span> <span class="nv">$csv_result</span> <span class="o">=</span> <span class="nv">build_csv</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
-
-    <span class="nb">open</span><span class="p">(</span><span class="nv">FH</span><span class="p">,</span> <span class="s">'&gt;result.csv'</span><span class="p">);</span>
-    <span class="k">print</span> <span class="nv">FH</span> <span class="nv">$csv_result</span><span class="p">;</span>
-    <span class="nb">close</span><span class="p">(</span><span class="nv">FH</span><span class="p">);</span>
-    <span class="k">print</span> <span class="s">"Exiting\n"</span><span class="p">;</span>
-<span class="p">}</span></code></pre>
-     </figure> 
-     <p>If you find any issue in the script please let me know, I’ll fix it as soon as possible. For the test cases I used both – different arrays for each algorithm in each test and the same array for each algorithm in each test. I didn’t found any difference between both alternatives that’s why I choose to generate a single array for each test (for faster testing).</p> 
-     <p>So let me tell you few words about the script because not everyone is familiar with perl and it’s syntax. I have three configuration variables: $max, $array_size and $tests_count. $max defines the maximum size of the array’s elements, $array_size is the size of the arrays we want to test with and $tests_count is the count of the tests we want to run for each algorithm. For %sorts I set value like: ( Heapsort =&gt; ‘heapsort.js’, Default =&gt; ‘default.js’ ) which means that I want to test Heapsort with filename heapsort.js and the Default sort with script name default.js. For each test case the script generates new array and tests each algorithm with it. Each test is combination of generated array and JavaScript file which contains the sorting algorithm and a line in which the sorting function is being called. In the given script I use Nodejs v0.8.12. In the next cases I’ll use the V8 JavaScript engine (V8 version 3.10.8) from the v8 fedora package (except if I haven’t mentioned explicitly&nbsp;that I use something different). In all test cases I’ll use CPU Intel Corei7 3610QM, 2.3 GHz (except if I haven’t mentioned explicity different CPU) with Fedora 18, x86_64. The content of default.js is:</p> 
-     <figure class="highlight">
-      <pre><code class="language-javascript" data-lang="javascript"><span class="nx">array</span><span class="p">.</span><span class="nx">sort</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span>
-<span class="p">});</span></code></pre>
-     </figure> 
-     <p>Let start… In the charts below there’s a statistic for Selection sort, Insertion sort, Bubble sort, Heapsort, Mergesort and the Default sort (Quick/Insertion).</p> 
-     <div id="attachment_240" style="width: 683px" class="wp-caption alignnone"> 
-      <a href="http://blog.mgechev.com/wp-content/uploads/2012/11/100-all.png"><img class="size-full wp-image-240" title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 100 elements" src="http://blog.mgechev.com/wp-content/uploads/2012/11/100-all.png" alt="" width="673" height="385"></a>
-      <p class="wp-caption-text"> All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with arrays with 100 elements </p> 
+    </div> 
+   </div> 
+   <!-- /menu 2 --> 
+  </header> 
+  <div class="container content"> 
+   <div class="content-column"> 
+    <h1 class="package-name"> <a href="/package/quick-sort">quick-sort</a> <i class="icon-public"></i> </h1> 
+    <form class="star"> 
+     <input type="hidden" name="name" value="quick-sort"> 
+     <input id="star-input" type="checkbox" name="isStarred" value="true"> 
+     <label for="star-input" class="icon-star"></label> 
+     <input type="hidden" name="crumb" value="j-RmmH0TVe4q1uigNIESGBZzLshM53OcL89TxpcnMoB"> 
+    </form> 
+    <div id="readme" class="markdown"> 
+     <h1 class="package-name-redundant package-description-redundant"><a id="user-content-quick-sort" class="deep-link" href="#quick-sort">
+       <svg aria-hidden="true" class="deep-link-icon" height="16" version="1.1" width="16">
+        <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+       </svg></a>quick-sort</h1> 
+     <p><em>Stability: 1 - <a href="https://github.com/tristanls/stability-index#stability-1---experimental">Experimental</a></em></p> 
+     <p>Quick sort.</p> 
+     <h2><a id="user-content-usage" class="deep-link" href="#usage">
+       <svg aria-hidden="true" class="deep-link-icon" height="16" version="1.1" width="16">
+        <path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+       </svg></a>Usage</h2> 
+     <div class="highlight javascript">
+      <pre class="editor editor-colors">
+       <div class="line">
+        <span class="source js"><span class="storage type js"><span>var</span></span><span>&nbsp;quickSort&nbsp;</span><span class="keyword operator assignment js"><span>=</span></span><span>&nbsp;</span><span class="meta function-call js"><span class="support function js"><span>require</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span class="string quoted single js"><span class="punctuation definition string begin js"><span>'</span></span><span>quick-sort</span><span class="punctuation definition string end js"><span>'</span></span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="keyword operator js"><span>...</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="storage type js"><span>var</span></span><span>&nbsp;ascending&nbsp;&nbsp;</span><span class="keyword operator assignment js"><span>=</span></span><span>&nbsp;</span><span class="meta function-call js"><span class="entity name function js"><span>quickSort</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>array</span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;sort&nbsp;ascending</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="storage type js"><span>var</span></span><span>&nbsp;descending&nbsp;</span><span class="keyword operator assignment js"><span>=</span></span><span>&nbsp;</span><span class="meta function-call js"><span class="entity name function js"><span>quickSort</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>array</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language js"><span>undefined</span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language js"><span>undefined</span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language boolean false js"><span>false</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span><span>&nbsp;</span><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;sort&nbsp;descending</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;sort&nbsp;ascending&nbsp;using&nbsp;randomized&nbsp;partitioning</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="storage type js"><span>var</span></span><span>&nbsp;ascending&nbsp;&nbsp;</span><span class="keyword operator assignment js"><span>=</span></span><span>&nbsp;</span><span class="meta function-call js"><span class="entity name function js"><span>quickSort</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>array</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language js"><span>undefined</span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language js"><span>undefined</span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language boolean true js"><span>true</span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language boolean true js"><span>true</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span><span>&nbsp;&nbsp;</span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="comment line double-slash js"><span class="punctuation definition comment js"><span>//</span></span><span>&nbsp;sort&nbsp;descending&nbsp;using&nbsp;randomized&nbsp;partitioning</span><span>&nbsp;</span></span></span>
+       </div>
+       <div class="line">
+        <span class="source js"><span class="storage type js"><span>var</span></span><span>&nbsp;descending&nbsp;</span><span class="keyword operator assignment js"><span>=</span></span><span>&nbsp;</span><span class="meta function-call js"><span class="entity name function js"><span>quickSort</span></span><span class="meta js"><span class="punctuation definition begin round js"><span>(</span></span><span>array</span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language js"><span>undefined</span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language js"><span>undefined</span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language boolean false js"><span>false</span></span><span class="meta delimiter object comma js"><span>,</span></span><span>&nbsp;</span><span class="constant language boolean true js"><span>true</span></span><span class="punctuation definition end round js"><span>)</span></span></span></span><span class="punctuation terminator statement js"><span>;</span></span><span>&nbsp;</span></span>
+       </div></pre>
      </div> 
-     <p>In this first chart there’s a statistic with 100 elements. In this case there’s almost no difference. The lines are very intertwined but we can see that all sorts have almost the same level of performance.</p> 
-     <div id="attachment_241" style="width: 683px" class="wp-caption alignnone"> 
-      <a href="http://blog.mgechev.com/wp-content/uploads/2012/11/10k-all.png"><img class="size-full wp-image-241 " title="All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 10k elements" src="http://blog.mgechev.com/wp-content/uploads/2012/11/10k-all.png" alt="" width="673" height="385"></a>
-      <p class="wp-caption-text"> All sort algorithms (selection sort, insertion sort, bubble sort, heapsort, mergesort, quicksort, the default sort) with array with 10k elements </p> 
-     </div> 
-     <p>In the chart above the leaders are almost clear. The default sort is with speed like the mergesort, the heapsort is the fastest. But let’s increase the array…Let’s try with 250k elements:</p> 
-     <div id="attachment_242" style="width: 683px" class="wp-caption alignnone"> 
-      <a href="http://blog.mgechev.com/wp-content/uploads/2012/11/250k-heap-merge-default.png"><img class="size-full wp-image-242" title="Heapsort vs mergesort vs the default sort 250k elements" src="http://blog.mgechev.com/wp-content/uploads/2012/11/250k-heap-merge-default.png" alt="" width="673" height="385"></a>
-      <p class="wp-caption-text"> Heapsort vs mergesort vs the default sort 250k elements </p> 
-     </div> 
-     <p>From the chart it’s easy to see that the default sort is slower than the merge and the heap sorts…It’s very unusual. If you’ve ever tried to beat the default sort in Java or STL…well it’s <del datetime="2012-11-24T17:41:13+00:00">almost</del> impossible. If we increase the array to more than 300k elements mergesort’s performance becomes&nbsp;very bad (more than 10 minutes) so I’ll just exclude the mergesort from the next tests.</p> 
-     <p>Let me include one more algorithm implementation. It will be quicksort. Its’ implementation is like taken from a book, nothing special:</p> 
-     <figure class="highlight">
-      <pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">quickSort</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-
-    <span class="kd">function</span> <span class="nx">partition</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">cmp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">right</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span>
-            <span class="nx">minEnd</span> <span class="o">=</span> <span class="nx">left</span><span class="p">,</span>
-            <span class="nx">maxEnd</span><span class="p">;</span>
-        <span class="k">for</span> <span class="p">(</span><span class="nx">maxEnd</span> <span class="o">=</span> <span class="nx">left</span><span class="p">;</span> <span class="nx">maxEnd</span> <span class="o">&lt;</span> <span class="nx">right</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">maxEnd</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">array</span><span class="p">[</span><span class="nx">maxEnd</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="nx">cmp</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">swap</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">maxEnd</span><span class="p">,</span> <span class="nx">minEnd</span><span class="p">);</span>
-                <span class="nx">minEnd</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-        <span class="nx">swap</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">minEnd</span><span class="p">,</span> <span class="nx">right</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nx">minEnd</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="nx">swap</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">j</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
-        <span class="nx">array</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">array</span><span class="p">[</span><span class="nx">j</span><span class="p">];</span>
-        <span class="nx">array</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">=</span> <span class="nx">temp</span><span class="p">;</span>
-        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="kd">function</span> <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">left</span> <span class="o">&lt;</span> <span class="nx">right</span><span class="p">)</span> <span class="p">{</span>
-            <span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">partition</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">right</span><span class="p">);</span>
-            <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">left</span><span class="p">,</span> <span class="nx">p</span><span class="p">);</span>
-            <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">right</span><span class="p">);</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="nx">array</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">array</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">quickSort</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">array</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
-    <span class="p">};</span>
-<span class="p">}());</span></code></pre>
-     </figure> 
-     <p>I’ll start the test again. The array size will be 500k. The competitors will be quicksort, heapsort and the default sort:</p> 
-     <div id="attachment_243" style="width: 683px" class="wp-caption alignnone"> 
-      <a href="http://blog.mgechev.com/wp-content/uploads/2012/11/500k-quick-heap-default.png"><img class="size-full wp-image-243" title="Heapsort vs mergesort vs quicksort vs the default sort 500k elements" src="http://blog.mgechev.com/wp-content/uploads/2012/11/500k-quick-heap-default.png" alt="" width="673" height="385"></a>
-      <p class="wp-caption-text"> Heapsort vs mergesort vs quicksort vs the default sort 500k elements </p> 
-     </div> 
-     <p>Here is something logical. Quicksort beats heapsort, but the custom (not optimized) quicksort implementation is almost 5 times faster than the default. I guess there’s something wrong and maybe the V8 profiler will tell us. I tried to start the native sorting algorithm multiple times with different generated arrays, in a single JavaScript file, because of possible optimizations by the interpreter. The result quicksort vs native with 2 arrays, 1 million elements each, was the same as 2 million elements arrays. So there’s not any noticeable optimization.</p> 
-     <p>Here is the last statistic with V8 v3.10.8. The array size this time will be 2 million.</p> 
-     <div id="attachment_244" style="width: 683px" class="wp-caption alignnone"> 
-      <a href="http://blog.mgechev.com/wp-content/uploads/2012/11/2m-quick-heap-default.png"><img class="size-full wp-image-244" title="Heapsort vs mergesort vs quicksort vs the default sort 2m elements (V8 version 3.10.8)" src="http://blog.mgechev.com/wp-content/uploads/2012/11/2m-quick-heap-default.png" alt="" width="673" height="385"></a>
-      <p class="wp-caption-text"> Heapsort vs mergesort vs quicksort vs the default sort 2m elements (V8 version 3.10.8) </p> 
-     </div> 
-     <p>The default sort is more than 5 times slower… In the next chart there’s statistics with the V8 engine used by node v0.8.12.</p> 
-     <div id="attachment_245" style="width: 683px" class="wp-caption alignnone"> 
-      <a href="http://blog.mgechev.com/wp-content/uploads/2012/11/2m-quick-heap-default-node.png"><img class="size-full wp-image-245" title="Heapsort vs mergesort vs quicksort vs the default sort 2m elements (node v0.8.12)" src="http://blog.mgechev.com/wp-content/uploads/2012/11/2m-quick-heap-default-node.png" alt="" width="673" height="385"></a>
-      <p class="wp-caption-text"> Heapsort vs mergesort vs quicksort vs the default sort 2m elements (node v0.8.12) </p> 
-     </div> 
-     <p>In the chart above the quicksort custom implementation is again the fastest. The difference is less because of poor performance of the custom implementation of quicksort and faster default sort… If you’re interested about the tests with other CPU types please send me a message and I’ll post them. The difference is not impressive. With Core2Duo Heapsort’s performance is poor than the default sort but quicksort is again almost 1.5 seconds faster, when sorting array with 2 million items (node v0.8.14, under Windows 7).</p> 
-     <p>Lesson learned is that you should not use the default sort in the Google’s V8 engine for large arrays of data and multiples sorts. What will be an eventual drawback. Imagine you have a high traffic website. There’s large amount of data which you receive each 10 seconds. You need to sort it and process it in any way. Let’s say that the data is with 2m records. If you use the default sort you’ll loose 5 seconds on each sort, so for two minutes you’ll lose 1 minute only for sorting. If you use your custom quicksort implementation each sort will lose about 1 second. For two minutes you’re going to lose 12 seconds. For small amount of data it’s not a big deal what kind of sorting algorithm you’re going to use…Even, I think that the default will be more readable and error&nbsp;resistant.</p> 
-     <p>All files used for the test (except the generated ones) can be found <a href="https://github.com/mgechev/v8-sorting-test" target="_blank">here</a>.</p> 
-     <hr> 
-     <footer role="contentinfo"> 
-      <div class="article-author-bottom"> 
-       <a href="/about"><img src="//blog.mgechev.com/images/me.jpg" class="bio-photo" alt="Minko Gechev bio photo"></a> 
-       <h3>Minko Gechev</h3> 
-       <p>CTO at Rhyme.com</p> 
-       <a href="http://twitter.com/mgechev" class="author-social" target="_blank"><i class="fa fa-twitter-square"></i> Twitter</a> 
-       <a href="http://github.com/mgechev" class="author-social" target="_blank"><i class="fa fa-github"></i> GitHub</a> 
-       <a href="http://stackoverflow.com/users/1106382/minko-gechev" class="author-social" target="_blank"><i class="fa fa-stack-overflow"></i> StackOverflow</a> 
-      </div> 
-      <a href="https://twitter.com/mgechev" class="twitter-follow-button" data-show-count="true">Follow @mgechev</a>
-      <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script> 
-      <p class="byline"><strong>Looking for performance? Probably you should NOT use [].sort (V8)</strong> was published on <time datetime="2012-11-24T00:00:00+00:00">November 24, 2012</time>.</p> 
-     </footer> 
-    </div>
-    <!-- /.article-wrap --> 
-    <section id="disqus_thread"></section>
-    <!-- /#disqus_thread --> 
-   </article> 
-  </div>
-  <!-- /#main --> 
-  <div class="footer-wrap"> 
-   <div class="related-articles"> 
-    <h4>You might also enjoy <small class="pull-right">(<a href="//blog.mgechev.com/posts/">View all posts</a>)</small></h4> 
-    <ul> 
+     <p><em>yes, the descending case is sort of crappy usage, I doubt anyone will use this code though :)</em></p> 
+    </div> 
+   </div> 
+   <div class="sidebar"> 
+    <div class="promotion" data-promotion-id="549" data-promotion-spot="packagePage">
+     <div class="marketing"> 
+      <h3 id="marketing-texthed"><a href="https://www.npmjs.com/features?utm_source=house&amp;utm_medium=package%20page&amp;utm_term=Private%20packages%20for%20the%20whole%20team&amp;utm_content=hed&amp;utm_campaign=orgs#features-plans-and-enterprise-pane" title="Private Packages and Organizations">Private packages for the whole team</a></h3> 
+      <p>It’s never been easier to manage developer teams with varying permissions and multiple projects. <a style="white-space: normal;" href="https://www.npmjs.com/features?utm_source=house&amp;utm_medium=package%20page&amp;utm_term=Private%20packages%20for%20the%20whole%20team&amp;utm_content=body&amp;utm_campaign=orgs#features-plans-and-enterprise-pane" title="Private Packages and Organizations">Learn more about Private Packages and Organizations…</a></p>
+     </div>
+    </div> 
+    <div class="autoselect-wrapper npm-install icon-download"> 
+     <input type="text" value="npm install quick-sort" readonly> 
+     <p><a href="/package/quick-sort/tutorial">how? learn more</a></p> 
+    </div> 
+    <ul class="box"> 
+     <li class="last-publisher"> <a href="/~tristanls"> <img src="https://s.gravatar.com/avatar/a97b2b78094e9fa7680d0d05ce1be945?size=100&amp;default=retro" alt="tristanls"> <span>tristanls</span> </a> published <span data-date="2013-07-22T23:40:18.086Z" data-date-format="relative"> 2013-07-22T23:40:18.086Z </span> </li> 
+     <li> <strong>0.2.1</strong> is the latest of 4 releases </li> 
+     <li> <a href="https://github.com/tristanls/node-quick-sort">github.com/tristanls/node-quick-sort</a> </li> 
+     <li> <a href="http://spdx.org/licenses/MIT.html">MIT</a> <img class="osi" alt="Licensed on OSI-approved terms" src="/static/images/osi.svg">® </li> 
     </ul> 
-    <hr> 
-   </div>
-   <!-- /.related-articles --> 
-   <footer> 
-    <div class="google-ads"> 
-     <!-- 320 x 50 ad --> 
-     <ins class="adsbygoogle" style="display:inline-block;width:320px;height:50px" data-ad-client="" data-ad-slot=""></ins> 
-    </div>
-    <!-- /.google-ads --> 
-    <span>© 2017 Minko Gechev</span> 
-   </footer> 
-  </div>
-  <!-- /.footer-wrap --> 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> 
-  <script>window.jQuery || document.write('<script src="//blog.mgechev.com/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script> 
-  <script src="//blog.mgechev.com/assets/js/scripts.min.js"></script> 
-  <!-- Asynchronous Google Analytics snippet --> 
-  <script>
-  var _gaq = _gaq || [];
-  var pluginUrl = 
- '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
-  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
-  _gaq.push(['_setAccount', 'UA-18060688-3']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-</script> 
-  <script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-    var disqus_shortname = 'mgechev'; // required: replace example with your forum shortname
-
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function () {
-        var s = document.createElement('script'); s.async = true;
-        s.type = 'text/javascript';
-        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-</script>  
+    <h3 title="collaborators"> Collaborators <small><a href="/package/quick-sort/access">list</a></small> </h3> 
+    <ul class="humans collaborators"> 
+     <li> <a href="/~tristanls" rel="tipsy" title="tristanls"> <img src="https://s.gravatar.com/avatar/a97b2b78094e9fa7680d0d05ce1be945?size=100&amp;default=retro" alt="tristanls"> </a> </li> 
+    </ul> 
+    <h3>Stats</h3> 
+    <ul class="box"> 
+     <li> <strong class="pretty-number daily-downloads">0</strong> downloads in the last day </li> 
+     <li> <strong class="pretty-number weekly-downloads">1</strong> download in the last week </li> 
+     <li> <strong class="pretty-number monthly-downloads">59</strong> downloads in the last month </li> 
+     <li id="issues" data-ghapi="https://api.github.com/repos/tristanls/node-quick-sort"> <span class="original">Have an issue? <a href="https://github.com/tristanls/node-quick-sort/issues">File it.</a></span> <span class="enhanced" style="display:none"> <a href="https://github.com/tristanls/node-quick-sort/issues"></a> on GitHub </span> </li> 
+     <li id="pull_requests" style="display:none"> <a href="https://github.com/tristanls/node-quick-sort/pulls"></a> on GitHub </li> 
+    </ul> 
+    <h3>Try it out</h3> 
+    <ul class="box"> 
+     <li class="runkit"><a href="https://runkit.com/npm/quick-sort" target="_blank">Test quick-sort in your browser.</a></li> 
+    </ul> 
+    <h3>Keywords</h3> 
+    <p class="list-of-links"> <a href="/browse/keyword/sort">sort</a>, <a href="/browse/keyword/algorithm">algorithm</a>, <a href="/browse/keyword/quick sort">quick sort</a> </p> 
+    <h3>Dependencies </h3> 
+    <p class="list-of-links"> None </p> 
+    <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "quick-sort",
+      "description": "Quick sort",
+      "url": "https://www.npmjs.com/package/quick-sort",
+      "keywords": "sort,algorithm,quick sort",
+      "applicationCategory": "DeveloperApplication",
+      "offers": {
+         "@type": "Offer",
+         "price": "0.00"
+      }
+    }
+  </script> 
+    <div class="hiring-container" data-template="sidebar"></div> 
+   </div> 
+  </div> 
+  <footer class="pane bg-npm-navy-1"> 
+   <div class="container"> 
+    <div class="row"> 
+     <div class="col-md-6 col-md-offset-3"> 
+      <h3 class="h4 type-npm-pastel-3">You Need Help</h3> 
+      <hr class="divider-1"> 
+      <ul class="list-unstyled h6 em-default"> 
+       <li class="pbl"><a class="type-neutral-11" href="https://docs.npmjs.com">Documentation</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/support">Support / Contact Us</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="http://status.npmjs.org/">Registry Status</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="https://github.com/npm/www/issues">Website Issues</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="https://github.com/npm/npm/issues">CLI Issues</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/security">Security</a></li> 
+      </ul> 
+     </div> 
+     <div class="col-md-6 col-md-offset-1"> 
+      <h3 class="h4 type-npm-pastel-3">About npm</h3> 
+      <hr class="divider-1"> 
+      <ul class="list-unstyled h6 em-default"> 
+       <li class="pbl"><a class="type-neutral-11" href="/about">About npm, Inc</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/jobs">Jobs</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/npm-weekly">npm Weekly</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="http://blog.npmjs.org">Blog</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="https://twitter.com/npmjs">Twitter</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="https://github.com/npm">GitHub</a></li> 
+      </ul> 
+     </div> 
+     <div class="col-md-6 col-md-offset-1"> 
+      <h3 class="h4 type-npm-pastel-3">Legal Stuff</h3> 
+      <hr class="divider-1"> 
+      <ul class="list-unstyled h6 em-default"> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/terms">Terms of Use</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/conduct">Code of Conduct</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/disputes">Package Name Disputes</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/privacy">Privacy Policy</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/receiving-reports">Reporting Abuse</a></li> 
+       <li class="pbl"><a class="type-neutral-11" href="/policies/">Other policies</a></li> 
+      </ul> 
+     </div> 
+    </div> 
+   </div> 
+   <div class="txt-c container"> 
+    <a class="npm-loves-you type-neutral-11" href="/"> npm loves you </a> 
+   </div> 
+  </footer> 
+  <script defer async src="https://cdn.optimizely.com/js/3318080746.js"></script> 
+  <script defer async src="//img.en25.com/i/elqCfg.min.js"></script>
+  <!-- Eloqua -->   
+  <!-- pid&#x3D;12952 d2bb1d5ce18a409301499285a5c4b1741714dca6 https://www.npmjs.com www-18-west.internal.npmjs.com  --> 
  </body>
 </html>

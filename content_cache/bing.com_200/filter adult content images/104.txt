@@ -1,704 +1,782 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head> 
-  <title>Image Filtering</title> 
-  <meta content="text/html; charset=us-ascii" http-equiv="content-type"> 
-  <link rel="stylesheet" type="text/css" href="stylesheet.css"> 
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+  <title>Tomcat's Java Servlet Examples Explained</title> 
+  <link href="../css/programming_notes_v1.css" rel="stylesheet" type="text/css"> 
+  <script type="text/javascript" src="../scripts/programming_notes_v1.js"></script> 
+  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
  </head> 
  <body> 
-  <h1>Lode's Computer Graphics Tutorial</h1> 
-  <h1>Image Filtering</h1> 
-  <h2>Table of Contents</h2> 
-  <ul> 
-   <li><a href="#Introduction_">Introduction</a></li> 
-   <li><a href="#Convolution">Convolution</a></li> 
-   <li><a href="#Blur">Blur</a></li> 
-   <li><a href="#Motion_Blur_">Motion Blur</a></li> 
-   <li><a href="#Find_Edges_">Find Edges</a></li> 
-   <li><a href="#Sharpen">Sharpen</a></li> 
-   <li><a href="#Emboss">Emboss</a></li> 
-   <li><a href="#Median">Mean and Median Filter</a></li> 
-   <li><a href="#Conclusion">Conclusion</a></li> 
-  </ul> 
-  <a href="index.html">Back to index</a>
-  <br> 
-  <h2><a name="Introduction_" id="Introduction_"></a>Introduction<br></h2> Image filtering allows you to apply various effects on photos. The type of image filtering described here uses a 2D filter similar to the one included in Paint Shop Pro as User Defined Filter and in Photoshop as Custom Filter.
-  <br> 
-  <h2><a name="Convolution" id="Convolution"></a>Convolution</h2> The trick of image filtering is that you have a 2D filter matrix, and the 2D image. Then, for every pixel of the image, take the sum of products. Each product is the color value of the current pixel or a neighbor of it, with the corresponding value of the filter matrix. The center of the filter matrix has to be multiplied with the current pixel, the other elements of the filter matrix with corresponding neighbor pixels.
-  <br> 
-  <br> This operation where you take the sum of products of elements from two 2D functions, where you let one of the two functions move over every element of the other function, is called Convolution or Correlation. The difference between Convolution and Correlation is that for Convolution you have to mirror the filter matrix, but usually it's symmetrical anyway so there's no difference.
-  <br> 
-  <br> The filters with convolution are relatively simple. More complex filters, that can use more fancy functions, exist as well, and can do much more complex things (for example the Colored Pencil filter in Photoshop), but such filters aren't discussed here.
-  <br> 
-  <br> The 2D convolution operation requires a 4-double loop, so it isn't extremely fast, unless you use small filters. Here we'll usually be using 3x3 or 5x5 filters.
-  <br> 
-  <br> There are a few rules about the filter:
-  <br> 
-  <ul> 
-   <li>Its size has to be uneven, so that it has a center, for example 3x3, 5x5 and 7x7 are ok.</li> 
-   <li>It doesn't have to, but the sum of all elements of the filter should be 1 if you want the resulting image to have the same brightness as the original.</li> 
-   <li>If the sum of the elements is larger than 1, the result will be a brighter image, and if it's smaller than 1, a darker image. If the sum is 0, the resulting image isn't necessarily completely black, but it'll be very dark.</li> 
-  </ul> The image has finite dimensions, and if you're for example calculating a pixel on the left side, there are no more pixels to the left of it while these are required for the convolution. You can either use value 0 here, or wrap around to the other side of the image. In this tutorial, the wrapping around is chosen because it can easily be done with a modulo division.
-  <br> 
-  <br> The resulting pixel values after applying the filter can be negative or larger than 255, if that happens you can truncate them so that values smaller than 0 are made 0 and values larger than 255 are set to 255. For negative values, you can also take the absolute value instead.
-  <br> 
-  <br> In the Fourier Domain or Frequency Domain, the convolution operation becomes a multiplication instead, which is faster. In the Fourier Domain, much more powerful and bigger filters can be applied faster, especially if you use the Fast Fourier Transform. More about this is in the Fourier Transform article. In this article, we'll look at a few very typical small filters, such as blur, edge detection and emboss.
-  <br> 
-  <br> Image filters aren't feasible for real time applications and games yet, but they're useful in image processing.
-  <br> 
-  <br> Digital audio and electronic filters work with convolution as well, but in 1D.
-  <br> 
-  <br> Here's the code that'll be used to try out different filters. Apart from using a filter matrix, it also has a multiplier factor and a bias. After applying the filter, the factor will be multiplied with the result, and the bias added to it. So if you have a filter with an element 0.25 in it, but the factor is set to 2, all elements of the filter are in theory multiplied by two so that element 0.25 is actually 0.5. The bias can be used if you want to make the resulting image brighter.
-  <br> 
-  <br> The result of one pixel is stored in floats red, green and blue, before converting it to the integer value in the result buffer. 
-  <br> 
-  <br> The filter calculation itself is a 4-double loop that has to go through every pixel of the image, and then through every element of the filter matrix. The location imageX and imageY is calculated so that for the center element of the filter it'll be x, y, but for the other elements it'll be a pixel from the image to the left, right, top or bottom of x, y. Its modulo divided through the width (w) or height (h) of the image so that pixels outside the image will be wrapped around. Before modulo dividing it, w or h are also added to it, because this modulo division doesn't work correctly for negative values. Now, pixel (-1, -1) will correctly become pixel (w-1, h-1).
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 3
-#define filterHeight 3
+  <div id="wrap-outer"> 
+   <!-- header filled by JavaScript --> 
+   <div id="header" class="header-footer">
+    <p>&nbsp;</p>
+   </div> 
+   <div id="wrap-inner"> 
+    <div id="wrap-toc"> 
+     <h5>TABLE OF CONTENTS <a id="show-toc" href="#show-toc">(HIDE)</a></h5> 
+     <div id="toc"></div> 
+     <!-- for showing the "Table of Content" --> 
+    </div> 
+    <div id="content-header"> 
+     <h1>Java Server-Side Programming</h1> 
+     <h2>Tomcat's Java Servlet Examples Explained</h2> 
+    </div> 
+    <div id="content-main"> 
+     <p>Tomcat provides a number of excellent servlet examples in "<code>&lt;CATALINA_HOME&gt;\webapps\examples</code>". The servlet source files are kept under "<code>&lt;CATALINA_HOME&gt;\webapps\examples\WEB-INF\classes</code>", together with the compiled classes. To run the examples, start Tomcat server. Issue URL <code>http://localhost:8080/examples</code>.</p> 
+     <p>Let's study these examples. I made some modifications to suit my programming style.</p> 
+     <h3 id="ServletExample_Hello">Hello-world Example</h3> 
+     <p>Prints "Hello, world!" in response to a client's request.</p> 
+     <h5><span class="font-code">HelloWorldExample.java</span></h5> 
+     <table class="table-program"> 
+      <colgroup>
+       <col class="col-line-number"> 
+       <col class="col-program"> 
+      </colgroup>
+      <tbody> 
+       <tr> 
+        <td> <pre class="text-right">
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</pre> </td> 
+        <td> <pre>
+<span class="color-comment">// To save as "&lt;CATALINA_HOME&gt;\webapps\helloservlet\WEB-INF\src\mypkg\HelloWorldExample.java"</span>
+package mypkg;
+ 
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+ 
+public class <strong>HelloWorldExample</strong> extends HttpServlet {
+   @Override
+   public void doGet(HttpServletRequest request, HttpServletResponse response)
+               throws IOException, ServletException {
+      <span class="color-comment">// Set the response message's MIME type.</span>
+      response.setContentType("text/html;charset=UTF-8");
+      <span class="color-comment">// Allocate a output writer to write the response message into the network socket.</span>
+      PrintWriter out = response.getWriter();
+ 
+      <span class="color-comment">// Use a ResourceBundle for localized string in "LocalStrings_xx.properties" for i18n.</span>
+      <span class="color-comment">// The request.getLocale() sets the locale based on the "Accept-Language" request header.</span>
+      <strong>ResourceBundle rb = ResourceBundle.getBundle("LocalStrings", request.getLocale());</strong>
+      <span class="color-comment">// To test other locales.</span>
+      <span class="color-comment">//ResourceBundle rb = ResourceBundle.getBundle("LocalStrings", new Locale("fr"));</span>
+ 
+      <span class="color-comment">// Write the response message, in an HTML document.</span>
+      try {
+         out.println("&lt;!DOCTYPE html&gt;");  <span class="color-comment">// HTML 5</span>
+         out.println("&lt;html&gt;&lt;head&gt;");
+         out.println("&lt;meta http-equiv='Content-Type' content='text/html; charset=UTF-8'&gt;");
+         String title = <strong>rb.getString("helloworld.title")</strong>;
+         out.println("&lt;title&gt;" + title + "&lt;/title&gt;&lt;/head&gt;");
+         out.println("&lt;body&gt;");
+         out.println("&lt;h1&gt;" + title + "&lt;/h1&gt;");  <span class="color-comment">// Prints "Hello, world!"</span>
+         <span class="color-comment">// Set a hyperlink image to refresh this page</span>
+         out.println("&lt;a href='" + request.getRequestURI() + "'&gt;&lt;img src='images/return.gif'&gt;&lt;/a&gt;");
+         out.println("&lt;/body&gt;&lt;/html&gt;");
+      } finally {
+         out.close();  <span class="color-comment">// Always close the output writer</span>
+      }
+   }
+}</pre> </td> 
+       </tr> 
+      </tbody> 
+     </table> 
+     <h5>Dissecting the "<span class="font-code">HelloWorldExample.java</span>"</h5> 
+     <ul> 
+      <li>We shall use the web context "<code>helloservlet</code>" created earlier to deploy this servlet (Read "<a href="JavaServlets.html#helloservlet">Create a new Webapp</a>").</li> 
+      <li>Servlets have to be kept in a named package for deployment, instead of the default no-name package. I place this servlet in package <code>mypkg</code>, and save as "<code>&lt;CATALINA_HOME&gt;\webapps\helloservlet\WEB-INF\src\mypkg\HelloWorldExample.java</code>".</li> 
+      <li>Compile the servlet. Use <code>-d</code> option (destination) to place the resultant class in directory "<code>helloservlet\WEB-INF\classes\mypkg</code>". <pre class="color-command">D:...&gt; <strong>cd \&lt;CATALINA_HOME&gt;\webapps\helloservlet\WEB-INF</strong>
+D:\&lt;CATALINA_HOME&gt;\webapps\helloservlet\WEB-INF&gt; <strong>javac -d classes src\mypkg\HelloWorldExample.java</strong></pre> </li> 
+      <li>This example supports locale text strings for i18n (internationalization). The <code>request.getLocale()</code> is used to get the locale of the client, based on the "<code>Accept-Language</code>" request header sent by the client in the request message. We build a <code>ResourceBundle</code> on property files "<code>LocalStrings_xx.properties</code>", where <code>xx</code> are the locale language code. Copy all the "<code>examples\WEB-INF\classes\LocalStrings_xx.properties</code>" into "<code>helloservlet\WEB-INF\classes</code>". To try another locale, such as "<code>fr</code>", change the <code>request.getLocale()</code> to <code>new Locale("fr")</code>. A property file comprises "key=value" pairs. The message "Hello world!" is kept in a key called "<code>helloworld.title</code>".</li> 
+      <li>For convenience, use single-quote for HTML tag attribute's value, instead of double quote which requires escape sequence <code>'\"'</code>.</li> 
+      <li>The example uses an image "<code>return.gif</code>" as a hyperlink to refresh the page. Copy this image from "<code>examples\servlets\images</code>" into "<code>helloservlet\images</code>". We can get the URL of the current page via <code>request.getRequestURI()</code>.</li> 
+     </ul> 
+     <h5>Write the Deployment Descriptor in <span class="font-code">"web.xml</span>"</h5> 
+     <pre class="color-example">
+......
+&lt;servlet&gt;
+    &lt;servlet-name&gt;<strong>TomcatHelloWorldExample</strong>&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;<strong>mypkg.HelloWorldExample</strong>&lt;/servlet-class&gt;
+&lt;/servlet&gt;
+......
+......
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;<strong>TomcatHelloWorldExample</strong>&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;<strong>/hello_example</strong>&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+......</pre> 
+     <h5>Run the Servlet</h5> 
+     <p>To run the servlet, issue URL <code>http://localhost:8080/helloservlet/hello_example</code>.</p> 
+     <h3 id="ServletExample_RequestHeader">Request Information Example</h3> 
+     <p>Prints the request information in the request headers of the request message, such as protocol, method, uri, path info, and SSL cyber suites.</p> 
+     <h5><span class="font-code">RequestInfoExample.java</span></h5> 
+     <pre class="color-example">
+<span class="color-comment">// To save as "&lt;CATALINA_HOME&gt;\webapps\helloservlet\WEB-INF\src\mypkg\RequestInfoExample.java"</span>
+package mypkg;
+ 
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import myutil.HtmlFilter;   <span class="color-comment">// Utilities</span>
+ 
+public class <strong>RequestInfoExample</strong> extends HttpServlet {
+   @Override
+   public void <strong>doGet</strong>(HttpServletRequest request, HttpServletResponse response)
+               throws IOException, ServletException {
+      <span class="color-comment">// Set the response message's MIME type</span>
+      response.setContentType("text/html;charset=UTF-8");
+      <span class="color-comment">// Allocate a output writer to write the response message into the network socket</span>
+      PrintWriter out = response.getWriter();
+ 
+      <span class="color-comment">// Use ResourceBundle to keep localized string in "LocalStrings_xx.properties"</span>
+      ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",  request.getLocale());
+ 
+      <span class="color-comment">// Write the response message, in an HTML page</span>
+      try {
+         out.println("&lt;!DOCTYPE html");  <span class="color-comment">// HTML 5</span>
+         out.println("&lt;html&gt;&lt;head&gt;");
+         out.println("&lt;meta http-equiv='Content-Type' content='text/html; charset=UTF-8'&gt;");
+         String title = rb.getString("requestinfo.title");
+         out.println("&lt;head&gt;&lt;title&gt;" + title + "&lt;/title&gt;&lt;/head&gt;");
+         out.println("&lt;body&gt;");
+         out.println("&lt;h3&gt;" + title + "&lt;/h3&gt;");
+ 
+         <span class="color-comment">// Tabulate the request information</span> 
+         out.println("&lt;table&gt;");
+         out.println("&lt;tr&gt;&lt;td&gt;" + rb.getString("requestinfo.label.protocol") + "&lt;/td&gt;");
+         out.println("&lt;td&gt;" + <strong>request.getProtocol()</strong> + "&lt;/td&gt;&lt;/tr&gt;");
+         out.println("&lt;tr&gt;&lt;td&gt;" + rb.getString("requestinfo.label.method") + "&lt;/td&gt;");
+         out.println("&lt;td&gt;" + <strong>request.getMethod()</strong> + "&lt;/td&gt;&lt;/tr&gt;");
+         out.println("&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;");
+         out.println("&lt;tr&gt;&lt;td&gt;" + rb.getString("requestinfo.label.requesturi") + "&lt;/td&gt;");
+         out.println("&lt;td&gt;" + <strong>HtmlFilter.filter(request.getRequestURI())</strong> + "&lt;/td&gt;&lt;/tr&gt;");
+         out.println("&lt;tr&gt;&lt;td&gt;" + rb.getString("requestinfo.label.pathinfo") + "&lt;/td&gt;");
+         out.println("&lt;td&gt;" + <strong>HtmlFilter.filter(request.getPathInfo())</strong> + "&lt;/td&gt;&lt;/tr&gt;");
+         out.println("&lt;tr&gt;&lt;td&gt;Path Translated:&lt;/td&gt;");
+         out.println("&lt;td&gt;" + <strong>request.getPathTranslated()</strong> + "&lt;/td&gt;&lt;/tr&gt;");
+         out.println("&lt;tr&gt;&lt;td&gt;" + rb.getString("requestinfo.label.remoteaddr") + "&lt;/td&gt;");
+         out.println("&lt;td&gt;" + <strong>request.getRemoteAddr()</strong> + "&lt;/td&gt;&lt;/tr&gt;");
+ 
+         <span class="color-comment">// SSL (HTTPS) Cipher suites</span>
+         String cipherSuite =  (String)<strong>request.getAttribute("javax.servlet.request.cipher_suite")</strong>;
+         if (cipherSuite != null) {
+            out.println("&lt;tr&gt;&lt;td&gt;SSLCipherSuite:&lt;/td&gt;");
+            out.println("&lt;td&gt;" + cipherSuite + "&lt;/td&gt;&lt;/tr&gt;");
+         }
+          out.println("&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;");
+      } finally {
+         out.close();  <span class="color-comment">// Always close the output writer</span>
+      }
+   }
+ 
+   <span class="color-comment">// Do the same thing for GET and POST requests</span>
+   @Override
+   public void <strong>doPost</strong>(HttpServletRequest request, HttpServletResponse response)
+         throws IOException, ServletException {
+      doGet(request, response);
+   }
+}</pre> 
+     <h5>Dissecting the "<span class="font-code">RequestInfoExample.java</span>"</h5> 
+     <ul> 
+      <li>Similar to the previous example, we keep this servlet in a package <code>mypkg</code>, and save the source file as "<code>helloservlet\WEB-INF\src\mypkg\RequestInfoExample.java</code>". A <code>ResourceBundle</code> was used to provide localized string labels retrieved from "<code>LocalStrings_xx.properties</code>".</li> 
+      <li>In this example, a utility called <code>HtmlFilter</code> (below) is used to filter the strings submitted by the client, in <code>requestUri</code> and <code>pathInfo</code>. It replaces <code>'&lt;'</code>, <code>'&gt;'</code>, <code>'"'</code> and <code>'&amp;'</code> by the HTML escape sequences "<code>&amp;lt;</code>", "<code>&amp;gt;</code>", "<code>&amp;quot;</code>" and "<code>&amp;amp;</code>" respectively. This is to prevent malicious user from place program codes (such as JavaScript) into the request message (known as "Command Injection" attack). There is no needed to filter <code>protocol</code> and <code>method</code> as they could not contain malicious codes.</li> 
+     </ul> 
+     <h5><span class="font-code">myutil.HtmlFilter.java</span></h5> 
+     <pre class="color-example">
+<span class="color-comment">// To save as "&lt;CATALINA_HOME&gt;\webapps\helloservlet\WEB-INF\src\myutil\HtmlFilter.java"</span>
+package myutil;
+ 
+public final class HtmlFilter {
+   <span class="color-comment">/**
+    * Filter the specified message string for characters that are sensitive
+    * in HTML.  This avoids potential attacks caused by including JavaScript
+    * codes in the request URL that is often reported in error messages.
+    */</span>
+   public static String filter(String message) {
+      if (message == null) return null;
+      int len = message.length();
+      StringBuffer result = new StringBuffer(len + 20);
+      char aChar;
+  
+      for (int i = 0; i &lt; len; ++i) {
+         aChar = message.charAt(i);
+         switch (aChar) {
+            case '&lt;': result.append("&amp;lt;"); break;
+            case '&gt;': result.append("&amp;gt;"); break;
+            case '&amp;': result.append("&amp;amp;"); break;
+            case '"': result.append("&amp;quot;"); break;
+            default:  result.append(aChar);
+         }
+      }
+      return (result.toString());
+   }
+}</pre> 
+     <h5>Write the Deployment Descriptor in "<span class="font-code">web.xml</span>"</h5> 
+     <pre class="color-example">
+......
+&lt;servlet&gt;
+   &lt;servlet-name&gt;TomcatRequestInfoExample&lt;/servlet-name&gt;
+   &lt;servlet-class&gt;<strong>mypkg.RequestInfoExample</strong>&lt;/servlet-class&gt;
+&lt;/servlet&gt;
+......
+......
+&lt;servlet-mapping&gt;
+   &lt;servlet-name&gt;TomcatRequestInfoExample&lt;/servlet-name&gt;
+   &lt;url-pattern&gt;<strong>/request_info_example/*</strong>&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+......</pre> 
+     <h5>Run the Servlet</h5> 
+     <ul> 
+      <li>The URL mapping is "<code>/request_info_example/*</code>". That is, it matches all sub-paths under "<code>/request_info_example</code>".</li> 
+      <li>To understand the different between <code>getRequestURI()</code>, <code>getPathInfo()</code>, <code>getPathTranslated()</code>, try these request URLs: <pre class="color-command">
+http://localhost:8080/helloservlet/request_info_example
+http://localhost:8080/helloservlet/request_info_example/
+http://localhost:8080/helloservlet/request_info_example/apple+orange
+http://localhost:8080/helloservlet/request_info_example/apple+orange?param=zzz
+http://localhost:8080/helloservlet/request_info_example/&lt;apple+orange&gt;?param=&lt;zzz&gt;</pre></li> 
+      <li>To display the SSL cyber suites, you need to enable SSL in Tomcat (read "<a href="../howto/Tomcat_More.html">Tomcat with SSL</a>"), and issue URL: <pre class="color-command">
+<strong>https</strong>://localhost:<strong>8443</strong>/helloservlet/request_info_example.</pre> </li> 
+     </ul> 
+     <h3>Request Headers Example</h3> 
+     <p>Prints the <em>request headers </em>in the <em>request message</em> sent by the client.</p> 
+     <h5><span class="font-code">RequestHeaderExample.java</span></h5> 
+     <pre class="color-example">
+<span class="color-comment">// To save as "&lt;CATALINA_HOME&gt;\webapps\helloservlet\WEB-INF\src\mypkg\RequestHeaderExample.java"</span>
+package mypkg;
 
-double filter[filterHeight][filterWidth] =
-{
-   0, 0, 0,
-   0, 1, 0,
-   0, 0, 0
-};
-
-double factor = 1.0;
-double bias = 0.0;
-
-int main(int argc, char *argv[])
-{
-  //load the image into the buffer
-  unsigned long w = 0, h = 0;
-  std::vector&lt;ColorRGB&gt; image;
-  loadImage(image, w, h, "pics/photo3.png");
-  std::vector&lt;ColorRGB&gt; result(image.size());
-
-  //set up the screen
-  screen(w, h, 0, "Filters");
-
-  ColorRGB color; //the color for the pixels
-
-  //apply the filter
-  for(int x = 0; x &lt; w; x++)
-  for(int y = 0; y &lt; h; y++)
-  {
-    double red = 0.0, green = 0.0, blue = 0.0;
-
-    //multiply every value of the filter with corresponding image pixel
-    for(int filterY = 0; filterY &lt; filterHeight; filterY++)
-    for(int filterX = 0; filterX &lt; filterWidth; filterX++)
-    {
-      int imageX = (x - filterWidth / 2 + filterX + w) % w;
-      int imageY = (y - filterHeight / 2 + filterY + h) % h;
-      red += image[imageY * w + imageX].r * filter[filterY][filterX];
-      green += image[imageY * w + imageX].g * filter[filterY][filterX];
-      blue += image[imageY * w + imageX].b * filter[filterY][filterX];
-    }
-
-    //truncate values smaller than zero and larger than 255
-    result[y * w + x].r = min(max(int(factor * red + bias), 0), 255);
-    result[y * w + x].g = min(max(int(factor * green + bias), 0), 255);
-    result[y * w + x].b = min(max(int(factor * blue + bias), 0), 255);
-  }
-
-  //draw the result buffer to the screen
-  for(int y = 0; y &lt; h; y++)
-  for(int x = 0; x &lt; w; x++)
-  {
-    pset(x, y, result[y * w + x]);
-  }
-
-  //redraw &amp; sleep
-  redraw();
-  sleep();
-}</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> If you want to take the absolute value of values smaller than zero instead of truncating it, use this code instead:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">    //take absolute value and truncate to 255
-    result[y * w + x].r = min(abs(int(factor * red + bias)), 255);
-    result[y * w + x].g = min(abs(int(factor * green + bias)), 255);
-    result[y * w + x].b = min(abs(int(factor * blue + bias)), 255);</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> The filter filled in currently,
-  <br> 
-  <br> 
-  <tt>[ 0 0 0 ]<br> [ 0 1 0 ]<br> [ 0 0 0 ],</tt>
-  <br> 
-  <br> does nothing more than returning the original image, since only the center value is 1 so every pixel is multiplied with 1.
-  <br> 
-  <br> The code tries to load the image "pics/photo3.bmp". This image can be downloaded 
-  <a href="files/photos.zip">here</a>.
-  <br> 
-  <br> The original image looks like this:
-  <br> 
-  <br> 
-  <img alt="" src="images/photo3.jpg" style="width: 320px; height: 240px;">
-  <br> 
-  <br> Now we'll apply several filters to the image by changing the definition of the filter array and running the code.
-  <br> 
-  <h2><a name="Blur" id="Blur"></a>Blur</h2> Blurring is done for example by taking the average of the current pixel and its 4 neighbors. Take the sum of the current pixel and its 4 neighbors, and divide it through 5, or thus fill in 5 times the value 0.2 in the filter:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 3
-#define filterHeight 3
-
-double filter[filterHeight][filterWidth] =
-{
-   0.0, 0.2,  0.0,
-   0.2, 0.2,  0.2,
-   0.0, 0.2,  0.0
-};
-
-double factor = 1.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> With such a small filter matrix, this gives only a very soft blur:
-  <br> 
-  <br> 
-  <img alt="" src="images/filterblur.jpg" style="width: 320px; height: 238px;">
-  <br> 
-  <br> With a bigger filter you can blur it a bit more (don't forget to change the filterWidth and filterHeight values):
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 5
-#define filterHeight 5
-
-double filter[filterHeight][filterWidth] =
-{
-  0, 0, 1, 0, 0,
-  0, 1, 1, 1, 0,
-  1, 1, 1, 1, 1,
-  0, 1, 1, 1, 0,
-  0, 0, 1, 0, 0,
-};
-
-double factor = 1.0 / 13.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> The sum of all elements of the filter should be 1, but instead of filling in some floating point value inside the filter, instead the factor is divided through the sum of all elements, which is 13.
-  <br> 
-  <br> This blurs it a bit more already:
-  <br> 
-  <br> 
-  <img alt="" src="images/filterblurmore.jpg" style="width: 318px; height: 238px;">
-  <br> 
-  <br> The more blur you want, the bigger the filter has to be, or you can apply the same small blur filter multiple times.
-  <br> 
-  <h2><a name="Motion_Blur_" id="Motion_Blur_"></a>Motion Blur<br></h2> Motion blur is achieved by blurring in only 1 direction. Here's a 9x9 motion blur filter:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 9
-#define filterHeight 9
-
-double filter[filterHeight][filterWidth] =
-{
-  <b>1</b>, 0, 0, 0, 0, 0, 0, 0, 0,
-  0, <b>1</b>, 0, 0, 0, 0, 0, 0, 0,
-  0, 0, <b>1</b>, 0, 0, 0, 0, 0, 0,
-  0, 0, 0, <b>1</b>, 0, 0, 0, 0, 0,
-  0, 0, 0, 0, <b>1</b>, 0, 0, 0, 0,
-  0, 0, 0, 0, 0, <b>1</b>, 0, 0, 0,
-  0, 0, 0, 0, 0, 0, <b>1</b>, 0, 0,
-  0, 0, 0, 0, 0, 0, 0, <b>1</b>, 0,
-  0, 0, 0, 0, 0, 0, 0, 0, <b>1</b>,
-};
-
-double factor = 1.0 / 9.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> 
-  <img alt="" src="images/filtermotionblur.jpg" style="width: 317px; height: 238px;">
-  <br> 
-  <br> It's as if the camera is moving from the top left to the bottom right, hence the name.
-  <br> 
-  <h2><a name="Find_Edges_" id="Find_Edges_"></a>Find Edges<br></h2> A filter to find the horizontal edges can look like this:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 5
-#define filterHeight 5
-
-double filter[filterHeight][filterWidth] =
-{
-   0,  0, -1,  0,  0,
-   0,  0, -1,  0,  0,
-   0,  0,  2,  0,  0,
-   0,  0,  0,  0,  0,
-   0,  0,  0,  0,  0,
-};
-
-double factor = 1.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> A filter of 5x5 instead of 3x3 was chosen, because the result of a 3x3 filter is too dark on the current image. Note that the sum of all the elements is 0 now, which will result in a very dark image where only the edges it detected are colored.
-  <br> 
-  <br> 
-  <img alt="" src="images/filterhoredge.jpg" style="width: 319px; height: 239px;">
-  <br> 
-  <br> The reason why this filter can find horizontal edges, is that the convolution operation with this filter can be seen as a sort of discrete version of the derivative: you take the current pixel and subtract the value of the previous one from it, so you get a value that represents the difference between those two or the slope of the function.
-  <br> 
-  <br> Here's a filter that'll find vertical edges instead, and uses both pixel values below and above the current pixel:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 5
-#define filterHeight 5
-
-double filter[filterHeight][filterWidth] =
-{
-   0,  0, -1,  0,  0,
-   0,  0, -1,  0,  0,
-   0,  0,  4,  0,  0,
-   0,  0, -1,  0,  0,
-   0,  0, -1,  0,  0,
-};
-
-double factor = 1.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> 
-  <img alt="" src="images/filterveredge.jpg" style="width: 318px; height: 238px;">
-  <br> 
-  <br> Here's yet another possible filter, one that's good at finding edges of 45&deg;. The values '-2' were chosen for no particular reason at all, just make sure the sum of the values is 0.
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 5
-#define filterHeight 5
-
-double filter[filterHeight][filterWidth] =
-{
-  -1,  0,  0,  0,  0,
-   0, -2,  0,  0,  0,
-   0,  0,  6,  0,  0,
-   0,  0,  0, -2,  0,
-   0,  0,  0,  0, -1,
-};
-
-double factor = 1.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> 
-  <img alt="" src="images/filterslopededge.jpg" style="width: 318px; height: 237px;">
-  <br> 
-  <br> And here's a simple edge detection filter that detects edges in all directions:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 3
-#define filterHeight 3
-
-double filter[filterHeight][filterWidth] =
-{
-  -1, -1, -1,
-  -1,  8, -1,
-  -1, -1, -1
-};
-
-double factor = 1.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> 
-  <img alt="" src="images/filteredge.jpg" style="width: 319px; height: 236px;">
-  <br> 
-  <br> 
-  <h2><a name="Sharpen" id="Sharpen"></a>Sharpen</h2> To sharpen the image is very similar to finding edges, add the original image, and the image after the edge detection to each other, and the result will be a new image where the edges are enhanced, making it look sharper. Adding those two images is done by taking the edge detection filter from the previous example, and incrementing the center value of it with 1. Now the sum of the filter elements is 1 and the result will be an image with the same brightness as the original, but sharper.
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 3
-#define filterHeight 3
-
-double filter[filterHeight][filterWidth] =
-{
-  -1, -1, -1,
-  -1,  9, -1,
-  -1, -1, -1
-};
-
-double factor = 1.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> 
-  <img alt="" src="images/filtersharp.jpg" style="width: 318px; height: 238px;">
-  <br> 
-  <br> Here's a more subtle sharpen filter:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 5
-#define filterHeight 5
-
-double filter[filterHeight][filterWidth] =
-{
-  -1, -1, -1, -1, -1,
-  -1,  2,  2,  2, -1,
-  -1,  2,  8,  2, -1,
-  -1,  2,  2,  2, -1,
-  -1, -1, -1, -1, -1,
-};
-
-double factor = 1.0 / 8.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> 
-  <img alt="" src="images/filtersharpen2.jpg" style="width: 318px; height: 238px;">
-  <br> 
-  <br> Here's a filter that shows the edges excessively:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 3
-#define filterHeight 3
-
-double filter[filterHeight][filterWidth] =
-{
-   1,  1,  1,
-   1, -7,  1,
-   1,  1,  1
-};
-
-double factor = 1.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> 
-  <img alt="" src="images/filternotsharpen.jpg" style="width: 316px; height: 237px;">
-  <br> 
-  <h2><a name="Emboss" id="Emboss"></a>Emboss</h2> An emboss filter gives a 3D shadow effect to the image, the result is very useful for a bumpmap of the image. It can be achieved by taking a pixel on one side of the center, and subtracting one of the other side from it. Pixels can get either a positive or a negative result. To use the negative pixels as shadow and positive ones as light, for a bumpmap, a bias of 128 is added to the image. Now, most parts of the image will be gray, and the sides will be either dark gray/black or bright gray/white.
-  <br> 
-  <br> For example here's an emboss filter with an angle of 45&deg;:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 3
-#define filterHeight 3
-
-double filter[filterHeight][filterWidth] =
-{
-  -1, -1,  0,
-  -1,  0,  1,
-   0,  1,  1
-};
-
-double factor = 1.0;
-double bias = 128.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> 
-  <img alt="" src="images/filteremboss.jpg" style="width: 315px; height: 239px;">
-  <br> 
-  <br> If you really want to use it as bumpmap, grayscale it:
-  <br> 
-  <br> 
-  <img alt="" src="images/filterembossgrey.jpg" style="width: 315px; height: 239px;">
-  <br> 
-  <br> Here's a much more exaggerated emboss filter:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 5
-#define filterHeight 5
-
-double filter[filterHeight][filterWidth] =
-{
-  -1, -1, -1, -1,  0,
-  -1, -1, -1,  0,  1,
-  -1, -1,  0,  1,  1,
-  -1,  0,  1,  1,  1,
-   0,  1,  1,  1,  1
-};
-
-double factor = 1.0;
-double bias = 128.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> 
-  <img alt="" src="images/filteremboss2.jpg" style="width: 314px; height: 236px;">
-  <br> 
-  <h2><a name="Median" id="Median"></a>Mean and Median Filter</h2> Both the Mean Filter and the Median Filter can be used to remove noise from an image. A Mean Filter is a filter that takes the average of the current pixel and its neighbors, for example if you use its 8 neighbors it becomes the filter with kernel:
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 3
-#define filterHeight 3
-
-double filter[filterHeight][filterWidth] =
-{
-  1, 1, 1,
-  1, 1, 1,
-  1, 1, 1
-};
-
-double factor = 1.0 / 9.0;
-double bias = 0.0;</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> This is an ordinary blur filter. We can test it on the following image with so called "Salt and Pepper" Noise:
-  <br> 
-  <br> 
-  <img alt="" src="images/horsesnoise.png" style="width: 319px; height: 239px;">
-  <br> 
-  <br> When applied, it gives a blurry result:
-  <br> 
-  <br> 
-  <img alt="" src="images/filtermean.jpg" style="width: 315px; height: 239px;">
-  <br> 
-  <br> The Median Filter does somewhat the same, but, instead of taking the mean or average, it takes the median. The median is gotten by sorting all the values from low to high, and then taking the value in the center. If there are two values in the center, the average of these two is taken. A median filter gives better results to remove salt and pepper noise, because it completely eliminates the the noise. With an average filter, the color value of the noise particles are still used in the average calculations, when taking the median you only keep the color value of one or two healthy pixels. The median filter also reduces the image quality however.
-  <br> 
-  <br> Such a median filter can't be done with a convolution, and a sorting algorithm is needed, in this case combsort was chosen, which is a relatively fast sorting algorithm.
-  <br> 
-  <br> To get the median of the current pixel and its 8 neighbors, set filterWidth and filterHeight to 3, but you can also make it higher to remove larger noise particles.
-  <br> 
-  <br>The arrays red, green and blue will contain the values of the current pixel and all of its neighbors, and these are the arrays that'll be sorted by the sorting algorithm to be able to take the median value. The main function applies the filter, calculates the medians and then draws the result.
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">#define filterWidth 3
-#define filterHeight 3
-
-//color arrays
-int red[filterWidth * filterHeight];
-int green[filterWidth * filterHeight];
-int blue[filterWidth * filterHeight];
-
-int selectKth(int* data, int s, int e, int k);
-
-int main(int argc, char *argv[])
-{
-  //load the image into the buffer
-  unsigned long w = 0, h = 0;
-  std::vector&lt;ColorRGB&gt; image;
-  loadImage(image, w, h, "pics/noise.png");
-  std::vector&lt;ColorRGB&gt; result(image.size());
-
-  //set up the screen
-  screen(w, h, 0, "Median Filter");
-
-  ColorRGB color; //the color for the pixels
-
-  //apply the filter
-  for(int y = 0; y &lt; h; y++)
-  for(int x = 0; x &lt; w; x++)
-  {
-    int n = 0;
-    //set the color values in the arrays
-    for(int filterY = 0; filterY &lt; filterHeight; filterY++)
-    for(int filterX = 0; filterX &lt; filterWidth; filterX++)
-    {
-      int imageX = (x - filterWidth / 2 + filterX + w) % w;
-      int imageY = (y - filterHeight / 2 + filterY + h) % h;
-      red[n] = image[imageY * w + imageX].r;
-      green[n] = image[imageY * w + imageX].g;
-      blue[n] = image[imageY * w + imageX].b;
-      n++;
-    }
-
-    int filterSize = filterWidth * filterHeight;
-    result[y * w + x].r = red[selectKth(red, 0, filterSize, filterSize / 2)];
-    result[y * w + x].g = green[selectKth(green, 0, filterSize, filterSize / 2)];
-    result[y * w + x].b = blue[selectKth(blue, 0, filterSize, filterSize / 2)];
-  }
-
-  //draw the result buffer to the screen
-  for(int y = 0; y &lt; h; y++)
-  for(int x = 0; x &lt; w; x++)
-  {
-    pset(x, y, result[y * w + x]);
-  }
-
-  //redraw &amp; sleep
-  redraw();
-  sleep();
-}</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> The array contains the value of every color in the rectangular area you're working on, but it's not sorted so you can't immediatly take the median of it. Sorting it and taking the center element is one way, but it's in theory faster to use a selection algorithm to select the k-th largest element, with k = size / 2. This is implemented below with a very simple selection algorithm. It's possible to use the standard C++ function nth_element instead, which would be simpler and faster, but we're implementing all algorithms ourselves in this tutorial. Note that, unlike the statistical definition of median this will not take the average of two elements in case of even array but just take one of them.
-  <br> 
-  <br> 
-  <center> 
-   <table class="codetable"> 
-    <tbody>
-     <tr> 
-      <td style="vertical-align: top;"> <pre>
-<span class="code">// selects the k-th largest element from the data between start and end (end exclusive)
-int selectKth(int* data, int s, int e, int k)
-{
-  // 5 or less elements: do a small insertion sort
-  if(e - s &lt;= 5)
-  {
-    for(int i = s + 1; i &lt; e; i++)
-      for(int j = i; j &gt; 0 &amp;&amp; data[j - 1] &gt; data[j]; j--) std::swap(data[j], data[j - 1]);
-    return s + k;
-  }
-
-  int p = (s + e) / 2; // choose simply center element as pivot
-
-  // partition around pivot into smaller and larger elements
-  std::swap(data[p], data[e - 1]); // temporarily move pivot to the end
-  int j = s;  // new pivot location to be calculated
-  for(int i = s; i + 1 &lt; e; i++)
-    if(data[i] &lt; data[e - 1]) std::swap(data[i], data[j++]);
-  std::swap(data[j], data[e - 1]);
-
-  // recurse into the applicable partition
-  if(k == j - s) return s + k;
-  else if(k &lt; j - s) return selectKth(data, s, j, k);
-  else return selectKth(data, j + 1, e, k - j + s - 1); // subtract amount of smaller elements from k
-}</span></pre> </td> 
-     </tr> 
-    </tbody>
-   </table> 
-  </center> 
-  <br> Here's again the noisy image:
-  <br> 
-  <br> 
-  <img alt="" src="images/horsesnoise.png" style="width: 319px; height: 239px;">
-  <br> 
-  <br> The 3x3 median filter removes its noise:
-  <br> 
-  <br> 
-  <img alt="" src="images/filtermedian3.jpg" style="width: 320px; height: 240px;">
-  <br> 
-  <br> Higher sizes of filters go pretty slow, because the code is very unoptimized. More specialized, much faster algorithms for 2D median filter exists but that's beyond the scope of this tutorial. The results of higher sizes are somewhat artistic, so here is the result of different sizes:
-  <br> 
-  <br> 5x5: 
-  <br> 
-  <img alt="" src="images/filtermedian5.jpg" style="width: 320px; height: 240px;">
-  <br> 
-  <br> 9x9: 
-  <br> 
-  <img alt="" src="images/filtermedian9.jpg" style="width: 320px; height: 240px;">
-  <br> 
-  <br> 15x15: 
-  <br> 
-  <img alt="" src="images/filtermedian15.jpg" style="width: 320px; height: 240px;">
-  <br> 
-  <br> 
-  <h2><a name="Conclusion" id="Conclusion"></a>Conclusion</h2> This article contained code to apply convolution filters on images, and showed a few different filters and their result. These are only the very basics of image filtering, with bigger filters and a lot of tweaking you can get much better filters.
-  <br> 
-  <br> The Fourier Transform article shows a different way to filter images, in the frequency domain. There Low Pass, High Pass and Band Pass filters are discussed.
-  <br> 
-  <hr> Last edited: 2004 
-  <br>
-  <br> Copyright (c) 2004-2007 by Lode Vandevenne. All rights reserved. 
-  <script language="javascript" src="colorcode.js"></script>   
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import myutil.HtmlFilter;
+ 
+public class <strong>RequestHeaderExample</strong> extends HttpServlet {
+   @Override
+   public void <strong>doGet</strong>(HttpServletRequest request, HttpServletResponse response)
+               throws IOException, ServletException {
+      <span class="color-comment">// Set the response message's MIME type</span>
+      response.setContentType("text/html;charset=UTF-8");
+      <span class="color-comment">// Allocate a output writer to write the response message into the network socket</span>
+      PrintWriter out = response.getWriter();
+ 
+      <span class="color-comment">// Use ResourceBundle to keep localized string in "LocalStrings_xx.properties"</span>
+      ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",  request.getLocale());
+ 
+      <span class="color-comment">// Write the response message, in an HTML page</span>
+      try {
+         out.println("&lt;!DOCTYPE html");  <span class="color-comment">// HTML 5</span>
+         out.println("&lt;html&gt;&lt;head&gt;");
+         out.println("&lt;meta http-equiv='Content-Type' content='text/html; charset=UTF-8'&gt;");
+         String title = rb.getString("requestheader.title");
+         out.println("&lt;head&gt;&lt;title&gt;" + title + "&lt;/title&gt;&lt;/head&gt;");
+         out.println("&lt;body&gt;");
+         out.println("&lt;h3&gt;" + title + "&lt;/h3&gt;");
+ 
+         <span class="color-comment">// Display all the request headers from the request message</span>
+         out.println("&lt;table&gt;");
+         Enumeration e = <strong>request.getHeaderNames()</strong>;
+         while (e.hasMoreElements()) {
+            String headerName = (String)e.nextElement();
+            String headerValue = request.getHeader(headerName);
+            out.println("&lt;tr&gt;&lt;td&gt;" + HtmlFilter.filter(headerName) + "&lt;/td&gt;");
+            out.println("&lt;td&gt;" + HtmlFilter.filter(headerValue) + "&lt;/td&gt;&lt;/tr&gt;");
+         }
+         out.println("&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;");
+      } finally {
+         out.close();  <span class="color-comment">// Always close the output writer</span>
+      }
+   }
+ 
+   <span class="color-comment">// Do the same thing for GET and POST requests</span>
+   @Override
+   public void <strong>doPost</strong>(HttpServletRequest request, HttpServletResponse response)
+         throws IOException, ServletException {
+      doGet(request, response);
+   }
+}</pre> 
+     <h5>Dissecting the "<span class="font-code">RequestHeaderExample.java</span>"</h5> 
+     <ul> 
+      <li>Recall that <code>request headers</code> are name-value pairs. This example uses <code>request.getHeaderNames()</code> to retrieve all the header names and stored in a <code>Enumeration</code>. It then uses <code>request.getHeader(<em>headerName</em>)</code> to retrieve the value of each of the header name.</li> 
+      <li> Again, it uses the <code>HtmlFilter</code> to replace special characters, to prevent command injection.</li> 
+     </ul> 
+     <h5>Deployment Descriptor in "<code>web.xml</code>"</h5> 
+     <pre class="color-example">
+......
+&lt;servlet&gt;
+    &lt;servlet-name&gt;TomcatRequestHeaderExample&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;<strong>mypkg.RequestHeaderExample</strong>&lt;/servlet-class&gt;
+&lt;/servlet&gt;
+......
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;TomcatRequestHeaderExample&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;<strong>/request_header_example</strong>&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;</pre> 
+     <h3 id="ServletExample_RequestParam">Request Parameter Example</h3> 
+     <h5><span class="font-code">RequestParamExample.java</span></h5> 
+     <table class="table-program"> 
+      <colgroup>
+       <col class="col-line-number"> 
+       <col class="col-program"> 
+      </colgroup>
+      <tbody> 
+       <tr> 
+        <td> <pre class="text-right">
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74</pre> </td> 
+        <td> <pre>
+<span class="color-comment">// To save as "&lt;CATALINA_HOME&gt;\webapps\helloservlet\WEB-INF\src\mypkg\RequestParamExample.java"</span>
+package mypkg;
+ 
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import myutil.HtmlFilter;
+ 
+public class <strong>RequestParamExample</strong> extends HttpServlet {
+   @Override
+   public void doGet(HttpServletRequest request, HttpServletResponse response)
+               throws IOException, ServletException {
+      <span class="color-comment">// Set the response message's MIME type</span>
+      response.setContentType("text/html;charset=UTF-8");
+      <span class="color-comment">// Allocate a output writer to write the response message into the network socket</span>
+      PrintWriter out = response.getWriter();
+ 
+      <span class="color-comment">// Use ResourceBundle to keep localized string in "LocalStrings_xx.properties"</span>
+      ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",  request.getLocale());
+ 
+      <span class="color-comment">// Write the response message, in an HTML page</span>
+      try {
+         out.println("&lt;!DOCTYPE html");  <span class="color-comment">// HTML 5</span>
+         out.println("&lt;html&gt;&lt;head&gt;");
+         out.println("&lt;meta http-equiv='Content-Type' content='text/html; charset=UTF-8'&gt;");
+         String title = rb.getString("requestparams.title");
+         out.println("&lt;head&gt;&lt;title&gt;" + title + "&lt;/title&gt;&lt;/head&gt;");
+         out.println("&lt;body&gt;");
+         out.println("&lt;h3&gt;" + title + "&lt;/h3&gt;");
+ 
+         <span class="color-comment">// Display the request parameters. Trim and discard empty string.</span>
+         out.println(rb.getString("requestparams.params-in-req") + "&lt;br /&gt;");
+         boolean noParam = true;
+         String firstName = <strong>request.getParameter("firstname")</strong>;
+         if (firstName != null &amp;&amp; (firstName = firstName.trim()).length() != 0) {
+            out.println(rb.getString("requestparams.firstname"));
+            out.println(" = " + HtmlFilter.filter(firstName) + "&lt;br /&gt;");
+            noParam = false;
+         }
+ 
+         String lastName = <strong>request.getParameter("lastname")</strong>;
+         if (lastName != null &amp;&amp; (lastName = lastName.trim()).length() != 0) {
+            out.println(rb.getString("requestparams.lastname"));
+            out.println(" = " + HtmlFilter.filter(lastName));
+            noParam = false;
+         }
+ 
+         if (noParam) {
+            out.println(rb.getString("requestparams.no-params"));
+         }
+         out.println("&lt;br /&gt;&lt;br /&gt;");
+ 
+         <span class="color-comment">// Display a form to prompt user for parameters.</span>
+         <span class="color-comment">// Use default "action" to the current page</span>
+         out.println("&lt;form method='get'&gt;");
+         out.println(rb.getString("requestparams.firstname"));
+         out.println("&lt;input type='text' name='firstname'&gt;&lt;br /&gt;");
+         out.println(rb.getString("requestparams.lastname"));
+         out.println("&lt;input type='text' name='lastname'&gt;&lt;br /&gt;");
+         out.println("&lt;input type='submit' value='SEND'&gt;");
+         out.println("&lt;/form&gt;&lt;/body&gt;&lt;/html&gt;");
+      } finally {
+         out.close();  <span class="color-comment">// Always close the output writer</span>
+      }
+   }
+ 
+   <span class="color-comment">// Do the same thing for GET and POST requests</span>
+   @Override
+   public void doPost(HttpServletRequest request, HttpServletResponse response)
+         throws IOException, ServletException {
+      doGet(request, response);
+   }
+}</pre> </td> 
+       </tr> 
+      </tbody> 
+     </table> 
+     <h5>Dissecting the "<span class="font-code">RequestParamExample.java</span>"</h5> 
+     <ul> 
+      <li>I use "GET" method to inspect the query string in the URL. Use "POST" method for production.</li> 
+      <li>No "<code>action</code>" attribute is specified in the <code>&lt;form&gt;</code> tag. The default "<code>action</code>" is the current page.</li> 
+      <li>The query string comprising <code><em>name=value</em></code> pairs (URL-encoded). <code>request.getParameter(<em>name</em>)</code> can be used to retrieve the <em><code>value</code></em> of the parameter <code><em>name</em></code>. It returns <code>null</code> if the parameter is not present in the query string. It returns the first value if multiple values present.</li> 
+      <li>It is a good practice to trim the leading and trailing white spaces of the request parameter values.</li> 
+     </ul> 
+     <h5>Deployment Descriptor in "<span class="font-code">web.xml</span>"</h5> 
+     <pre class="color-example">
+&lt;servlet&gt;
+    &lt;servlet-name&gt;TomcatRequestParamExample&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;<strong>mypkg.RequestParamExample</strong>&lt;/servlet-class&gt;
+&lt;/servlet&gt;
+.......
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;TomcatRequestParamExample&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;<strong>/request_param_example</strong>&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;</pre> 
+     <p>To understand the purpose of <code>HtmlFilter</code>, try removing the filter and putting a JavaScript or program codes in the request. Also try to send a large chunk of data.</p> 
+     <h3 id="ServletExample_Cookie">Cookies Example</h3> 
+     <p>Demonstrates cookies. Read "<a href="../webprogramming/HTTP_StateManagement.html">HTTP state and session management</a>" to understand cookie.</p> 
+     <h5><span class="font-code">CookieExample.java</span></h5> 
+     <pre class="color-example">
+<span class="color-comment">// To save as "&lt;CATALINA_HOME&gt;\webapps\helloservlet\WEB-INF\src\mypkg\CookieExample.java"</span>
+package mypkg;
+ 
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import myutil.HtmlFilter;
+ 
+public class <strong>CookieExample</strong> extends HttpServlet {
+   @Override
+   public void <strong>doGet</strong>(HttpServletRequest request, HttpServletResponse response)
+               throws IOException, ServletException {
+      <span class="color-comment">// Set the response message's MIME type</span>
+      response.setContentType("text/html;charset=UTF-8");
+      <span class="color-comment">// Allocate a output writer to write the response message into the network socket</span>
+      PrintWriter out = response.getWriter();
+ 
+      <span class="color-comment">// Use ResourceBundle to keep localized string in "LocalStrings_xx.properties"</span>
+      ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",  request.getLocale());
+ 
+      <span class="color-comment">// Write the response message, in an HTML page</span>
+      try {
+         out.println("&lt;!DOCTYPE html");  <span class="color-comment">// HTML 5</span>
+         out.println("&lt;html&gt;&lt;head&gt;");
+         out.println("&lt;meta http-equiv='Content-Type' content='text/html; charset=UTF-8'&gt;");
+         String title = rb.getString("cookies.title");
+         out.println("&lt;head&gt;&lt;title&gt;" + title + "&lt;/title&gt;&lt;/head&gt;");
+         out.println("&lt;body&gt;");
+         out.println("&lt;h3&gt;" + title + "&lt;/h3&gt;");
+ 
+         <span class="color-comment">// Display the cookies returned by the client</span>
+         <strong>Cookie[] cookies = request.getCookies();</strong>
+         if ((cookies != null) &amp;&amp; (cookies.length &gt; 0)) {
+            out.println(rb.getString("cookies.cookies") + "&lt;br /&gt;");
+            for (Cookie cookie : cookies) {
+               out.println("Cookie Name: " + HtmlFilter.filter(<strong>cookie.getName()</strong>) + "&lt;br /&gt;");
+               out.println("Cookie Value: " + HtmlFilter.filter(<strong>cookie.getValue()</strong>) + "&lt;br /&gt;");
+            }
+         } else {
+            out.println(rb.getString("cookies.no-cookies") + "&lt;br /&gt;");
+         }
+         out.println("&lt;br /&gt;");
+ 
+         <span class="color-comment">// Create a new cookie if cookiename and cookievalue present in the request</span>
+         String cookieName = request.getParameter("cookiename");
+         if (cookieName != null) cookieName = cookieName.trim();
+         String cookieValue = request.getParameter("cookievalue");
+         if (cookieValue != null) cookieValue = cookieValue.trim();
+         if (cookieName != null &amp;&amp; !cookieName.equals("")
+               &amp;&amp; cookieValue != null &amp;&amp; !cookieValue.equals("")) {
+            <strong>Cookie cookie = new Cookie(cookieName, cookieValue);</strong>
+            <strong>response.addCookie(cookie);</strong>
+            out.println(rb.getString("cookies.set") + "&lt;br /&gt;");
+            out.print(rb.getString("cookies.name") + "  "
+                      + HtmlFilter.filter(cookieName) + "&lt;br /&gt;");
+            out.print(rb.getString("cookies.value") + "  "
+                      + HtmlFilter.filter(cookieValue));
+         }
+         out.println("&lt;br /&gt;&lt;br /&gt;");
+ 
+         <span class="color-comment">// Display a form to prompt the user to create a new cookie</span>
+         out.println(rb.getString("cookies.make-cookie") + "&lt;br /&gt;");
+         out.print("&lt;form method='get'&gt;");
+         out.print(rb.getString("cookies.name"));
+         out.println("&lt;input type='text' name='cookiename'&gt;&lt;br /&gt;");
+         out.print(rb.getString("cookies.value"));
+         out.println("&lt;input type='text' name='cookievalue'&gt;&lt;br /&gt;");
+         out.println("&lt;input type='submit' value='SEND'&gt;");
+         out.println("&lt;/form&gt;&lt;/body&gt;&lt;/html&gt;");
+      } finally {
+         out.close();  <span class="color-comment">// Always close the output writer</span>
+      }
+   }
+ 
+   <span class="color-comment">// Do the same thing for GET and POST requests</span>
+   @Override
+   public void <strong>doPost</strong>(HttpServletRequest request, HttpServletResponse response)
+         throws IOException, ServletException {
+      doGet(request, response);
+   }
+}</pre> 
+     <h5>Deployment Descriptor in "<span class="font-code">web.xml</span>"</h5> 
+     <pre class="color-example">
+&lt;servlet&gt;
+    &lt;servlet-name&gt;TomcatCookieExample&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;<strong>mypkg.CookieExample</strong>&lt;/servlet-class&gt;
+&lt;/servlet&gt;
+......
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;TomcatCookieExample&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;<strong>/cookie_example</strong>&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;</pre> 
+     <h5>Run the Servlet</h5> 
+     <ol> 
+      <li>Issue URL <code>http://localhost:8080/helloservlet/cookie_example</code>. In the very first request, no cookie is sent from the client to the server, as no cookie has been set.</li> 
+      <li>Create a new cookie "<code>c1=1111111</code>", and submit. The server create a new cookie "<code>c1=1111111</code>" and send to the client. The client stores this new cookie. Firefox cookie manager shows the cookie: <img class="image-center" src="images/Servlet_CookieExample1.png" alt="Servlet_CookieExample1.png"> </li> 
+      <li>Create the second cookie "<code>c2=22222222</code>", and submit. In this request, the previous cookie "<code>c1=11111111</code>" is sent together with the request. The server create the second cookie "<code>c2=22222222</code>" and send to the client. The client stores this cookie. The firefox cookie manager shows: <img class="image-center" src="images/Servlet_CookieExample2.png" alt="Servlet_CookieExample2.png"> </li> 
+     </ol> 
+     <h3 id="ServletExample_Session">Session Example</h3> 
+     <h5><span class="font-code">SessionExample.java</span></h5> 
+     <pre class="color-example">
+<span class="color-comment">// To save as "&lt;CATALINA_HOME&gt;\webapps\helloservlet\WEB-INF\src\mypkg\SessionExample.java"</span>
+package mypkg;
+ 
+import java.io.*;
+import java.util.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import myutil.HtmlFilter;
+ 
+public class <strong>SessionExample</strong> extends HttpServlet {
+   @Override
+   public void <strong>doGet</strong>(HttpServletRequest request, HttpServletResponse response)
+               throws IOException, ServletException {
+      <span class="color-comment">// Set the response message's MIME type</span>
+      response.setContentType("text/html;charset=UTF-8");
+      <span class="color-comment">// Allocate a output writer to write the response message into the network socket</span>
+      PrintWriter out = response.getWriter();
+ 
+      <span class="color-comment">// Use ResourceBundle to keep localized string in "LocalStrings_xx.properties"</span>
+      ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",  request.getLocale());
+ 
+      <span class="color-comment">// Write the response message, in an HTML page</span>
+      try {
+         out.println("&lt;!DOCTYPE html");  <span class="color-comment">// HTML 5</span>
+         out.println("&lt;html&gt;&lt;head&gt;");
+         out.println("&lt;meta http-equiv='Content-Type' content='text/html; charset=UTF-8'&gt;");
+         String title = rb.getString("sessions.title");
+         out.println("&lt;head&gt;&lt;title&gt;" + title + "&lt;/title&gt;&lt;/head&gt;");
+         out.println("&lt;body&gt;");
+         out.println("&lt;h3&gt;" + title + "&lt;/h3&gt;");
+ 
+         <span class="color-comment">// Return the existing session if there is one. Otherwise, create a new session</span>
+         <strong>HttpSession session = request.getSession();</strong>
+ 
+         <span class="color-comment">// Display session information</span>
+         out.println(rb.getString("sessions.id") + " " + <strong>session.getId()</strong> + "&lt;br /&gt;");
+         out.println(rb.getString("sessions.created") + " ");
+         out.println(new Date(<strong>session.getCreationTime()</strong>) + "&lt;br /&gt;");
+         out.println(rb.getString("sessions.lastaccessed") + " ");
+         out.println(new Date(<strong>session.getLastAccessedTime()</strong>) + "&lt;br /&gt;&lt;br /&gt;");
+ 
+         <span class="color-comment">// Set an attribute (name-value pair) if present in the request</span>
+         String attName = request.getParameter("attribute_name");
+         if (attName != null) attName = attName.trim();
+         String attValue = request.getParameter("attribute_value");
+         if (attValue != null) attValue = attValue.trim();
+         if (attName != null &amp;&amp; !attName.equals("")
+               &amp;&amp; attValue != null &amp;&amp; !attValue.equals("") ) {
+            <span class="color-comment">// synchronized session object to prevent concurrent update</span>
+            <strong>synchronized(session) {
+               session.setAttribute(attName, attValue);
+            }</strong>
+         }
+ 
+         <span class="color-comment">// Display the attributes (name-value pairs) stored in this session</span>
+         out.println(rb.getString("sessions.data") + "&lt;br&gt;");
+         Enumeration names = <strong>session.getAttributeNames()</strong>;
+         while (names.hasMoreElements()) {
+             String name = (String) names.nextElement();
+             String value = <strong>session.getAttribute(name)</strong>.toString();
+             out.println(HtmlFilter.filter(name) + " = "
+                   + HtmlFilter.filter(value) + "&lt;br&gt;");
+         }
+         out.println("&lt;br /&gt;");
+ 
+         <span class="color-comment">// Display a form to prompt user to create session attribute</span>
+         out.println("&lt;form method='get'&gt;");
+         out.println(rb.getString("sessions.dataname"));
+         out.println("&lt;input type='text' name='attribute_name'&gt;&lt;br /&gt;");
+         out.println(rb.getString("sessions.datavalue"));
+         out.println("&lt;input type='text' name='attribute_value'&gt;&lt;br /&gt;");
+         out.println("&lt;input type='submit' value='SEND'&gt;");
+         out.println("&lt;/form&gt;&lt;br /&gt;");
+ 
+         out.print("&lt;a href='");
+         <span class="color-comment">// Encode URL by including the session ID (URL-rewriting)</span>
+         out.print(response.encodeURL(request.getRequestURI() + "?attribute_name=foo&amp;attribute_value=bar"));
+         out.println("'&gt;Encode URL with session ID (URL re-writing)&lt;/a&gt;");
+         out.println("&lt;/body&gt;&lt;/html&gt;");
+      } finally {
+         out.close();  <span class="color-comment">// Always close the output writer</span>
+      }
+   }
+ 
+   <span class="color-comment">// Do the same thing for GET and POST requests</span>
+   @Override
+   public void doPost(HttpServletRequest request, HttpServletResponse response)
+         throws IOException, ServletException {
+      doGet(request, response);
+   }
+}</pre> 
+     <h5>Deployment Descriptor in "<span class="font-code">web.xml</span>"</h5> 
+     <pre class="color-example">
+&lt;servlet&gt;
+    &lt;servlet-name&gt;TomcatSessionExample&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;<strong>mypkg.SessionExample</strong>&lt;/servlet-class&gt;
+&lt;/servlet&gt;
+......
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;TomcatSessionExample&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;<strong>/session_example</strong>&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;</pre> 
+     <h5>Running the Servlet</h5> 
+     <p>Issue URL <code>http://localhost:8080/helloservlet/session_example</code>. The first access create a <code>HttpSession</code> object, with a unique session ID (<code>jsessionId</code>).</p> 
+     <img class="image-center" src="images/Servlet_SessionExample1.png" alt="Servlet_SessionExample1.png"> 
+     <p>By default, <code>HttpSession</code> uses cookie to exchange the <code>jsessionid</code>. The firefox cookie manager shows the following cookie. Take note that the value of the <code>jsessionid</code> is the same as the <code>HttpSession</code>'s <code>getId()</code>.</p> 
+     <img class="image-center" src="images/Servlet_SessionExample2.png" alt="Servlet_SessionExample2.png"> 
+     <p>The method <code>response.encodeURL(url)</code> can be used to re-write the URL to include the session ID. Try the hyperlink.</p> 
+     <h3>More Examples</h3> 
+     <p>[TODO]</p> 
+     <p class="references">REFERENCES &amp; RESOURCES</p> 
+     <ol> 
+      <li>Java Servlets Home Page @ <a href="http://java.sun.com/products/servlet/">http://java.sun.com/products/servlet</a>. Servlet Developers @ <a href="http://java.net/projects/servlet/">http://java.net/projects/servlet/</a>.</li> 
+      <li>Java Servlet 2.2, 2.3, 2.4, 2.5, 3.0 API Specifications.</li> 
+      <li>Apache Tomcat Server @ <a href="http://tomcat.apache.org/">http://tomcat.apache.org</a>.</li> 
+      <li>RFC2616 "Hypertext Transfer Protocol HTTP 1.1", W3C, June 1999.</li> 
+      <li>HTML 4.01 Specification, W3C Recommendation, 24 Dec 1999 @ <a href="http://www.w3.org/TR/html401/">http://www.w3.org/TR/html401</a>, and HTML 5 Draft Specification @ <a href="http://www.w3.org/TR/html5/">http://www.w3.org/TR/html5</a>.</li> 
+      <li>The Java EE 6 Tutorial, Chapter 10 Java Servlet Technology, December 2009 @ <a href="http://java.sun.com/javaee/6/docs/tutorial/doc/bnafd.html">http://java.sun.com/javaee/6/docs/tutorial/doc/bnafd.html</a>.</li> 
+      <li>The Java EE 5 Tutorial, Chapter 4 Java Servlet Technology, October 2008 @ <a href="http://java.sun.com/javaee/5/docs/tutorial/doc/bnafd.html">http://java.sun.com/javaee/5/docs/tutorial/doc/bnafd.html</a>.</li> 
+      <li>The J2EE 1.4 Tutorial, Chapter 11 Java Servlet Technology, December, 2005 @ <a href="http://java.sun.com/j2ee/1.4/docs/tutorial/doc/">http://java.sun.com/j2ee/1.4/docs/tutorial/doc/</a>.</li> 
+      <li>The J2EE 1.3 Tutorial "Java Servlet Technology" @ <a href="http://java.sun.com/j2ee/tutorial/1_3-fcs/doc/Servlets.html">http://java.sun.com/j2ee/tutorial/1_3-fcs/doc/Servlets.html</a>.</li> 
+      <li>Java EE 6 Technologies @ <a href="http://www.oracle.com/technetwork/java/javaee/tech/index-jsp-142185.html">http://www.oracle.com/technetwork/java/javaee/tech/index-jsp-142185.html</a>.</li> 
+      <li>Java EE 5 Technologies @ <a href="http://www.oracle.com/technetwork/java/javaee/tech/javaee5-jsp-135162.html">http://www.oracle.com/technetwork/java/javaee/tech/javaee5-jsp-135162.html</a>.</li> 
+      <li>Marty Hall, "Core Servlets and JavaServer Pages", vol.1 (2nd eds, 2003) and vol. 2 (2nd eds, 2006), Prentice Hall.</li> 
+      <li>java.net - The Source for Java Technology Collaboration @ <a href="http://www.java.net">http://www.java.net</a>.</li> 
+     </ol> 
+    </div> 
+    <!-- End the content-main division --> 
+    <div id="content-footer"> 
+     <p>Latest version tested: JDK 1.7.0_07, Tomcat 7.0.32, NetBeans 7.2<br> Last modified: October, 2012</p> 
+    </div> 
+   </div> 
+   <!-- End the wrap-inner division --> 
+   <!-- footer filled by JavaScript --> 
+   <div id="footer" class="header-footer">
+    <p>&nbsp;</p>
+   </div> 
+  </div> 
+  <!-- End the wrap-outer division -->   
  </body>
 </html>

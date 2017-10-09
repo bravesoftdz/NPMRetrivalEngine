@@ -1,458 +1,341 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head> 
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
-  <title>Playing Sound in Java</title> 
-  <link href="../css/programming_notes.css" rel="stylesheet" type="text/css"> 
-  <link rel="shortcut icon" href="../favicon.ico" type="image/x-icon">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"> 
+  <link rel="stylesheet" type="text/css" media="all" href="../default.css"> 
+  <title>Developing Games in Java</title> 
+  <style type="text/css">
+.yes {color: #33aa33; }
+.no {color: #ee3333; }
+</style> 
  </head> 
  <body> 
-  <!-- Begin the outermost container division --> 
-  <div id="container"> 
-   <!-- print header --> 
-   <script type="text/javascript" src="../scripts/header.js"></script> 
-   <!-- begin main content division --> 
+  <div id="page"> 
+   <div id="nav"> 
+    <a href="../"><img src="../images/logo.png" alt="David Brackeen"></a> 
+   </div> 
    <div id="content"> 
-    <h1>Java Game Programming</h1> 
-    <h2>Playing Sound</h2> 
-    <p>JavaSE, via Java Sound API (in packages <code>javax.sound</code>), supports two types of audio:</p> 
+    <h1>Developing Games in Java</h1> 
     <ul> 
-     <li>Sampled Audio: Sampled audio is represented as a sequence of time-sampled data of the amplitude of sound wave. It is supported in package <code>javax.sound.sampled</code>. The supported file formats are: "wav", "au" and "aiff". The samples can be either 8-bit or 16-bit, with sampling rate from 8 kHz to 48 kHz.</li> 
-     <li>Musical Instrument Digital Interface (MIDI): MIDI music is <em>synthesized</em> from musical notes and special sound effects, instead of time-sampled, like a <em>recipe</em> for creating musical sound. MIDI is supported in package <code>javax.sound.midi</code>.</li> 
+     <li><a href="#get">Get the book</a></li> 
+     <li><a href="#play">Play the example game</a></li> 
+     <li><a href="#download">Download the source</a></li> 
+     <li><a href="#errata">View the notes &amp; errata</a></li> 
+     <li><a href="#new">What's happened since the book was released?</a></li> 
+     <li><a href="#license">View source code license</a></li> 
     </ul> 
-    <p>Java Sound API also include a software sound mixer that supports up to 64 channels for sound effect and background music.</p> 
-    <p>Java Media Framework (JMF), which is not part of JavaSE, is needed to support MP3 and advanced features. JOAL (Java Bindings on OpenAL) supports 3D sound effect.</p> 
-    <h3>Sampled Audio</h3> 
-    <p>To play sampled audio, you create an instance of a <code>SourceDataLine</code> or a <code>Clip</code>, which acts as a <em>source</em> to the software audio <em>mixer</em>. Audio samples are then loaded into it, and delivered to the mixer. The mixer may mix the samples with those from other sources and then deliver the mix to a target (usually an audio output device on a sound card).</p> 
-    <h4><code>javax.sound.Clip</code></h4> 
-    <p><strong>Code Example</strong>:</p> 
-    <pre class="code-listing">
-import java.io.*;
-import java.net.URL;
-import javax.sound.sampled.*;
-import javax.swing.*;
-   
-<span class="code-comment">// To play sound using Clip, the process need to be alive.
-// Hence, we use a Swing application.</span>
-public class SoundClipTest extends JFrame {
-   
-   <span class="code-comment">// Constructor</span>
-   public SoundClipTest() {
-      this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      this.setTitle("Test Sound Clip");
-      this.setSize(300, 200);
-      this.setVisible(true);
-   
-      try {
-         <span class="code-comment">// Open an audio input stream.</span>
-         URL url = this.getClass().getClassLoader().getResource("gameover.wav");
-         AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
-         <span class="code-comment">// Get a sound clip resource.</span>
-         Clip clip = AudioSystem.getClip();
-         <span class="code-comment">// Open audio clip and load samples from the audio input stream.</span>
-         clip.open(audioIn);
-         clip.start();
-      } catch (UnsupportedAudioFileException e) {
-         e.printStackTrace();
-      } catch (IOException e) {
-         e.printStackTrace();
-      } catch (LineUnavailableException e) {
-         e.printStackTrace();
-      }
-   }
-   
-   public static void main(String[] args) {
-      new SoundClipTest();
-   }
-}
-</pre> 
-    <p>The steps of playing sounds via <code>Clip</code> are:</p> 
-    <ol> 
-     <li>Allocate a <code>AudioInputStream</code> piped from a file or URL, e.g., <pre class="code-example">
-<span class="code-comment">// from a wave File</span>
-File soundFile = new File("eatfood.wav");
-AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
-<span class="code-comment">// from a URL</span>
-URL url = new URL("http://www.zzz.com/eatfood.wav");
-AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
-<span class="code-comment">// can read from a disk file and also a file contained inside a JAR (used for distribution)</span><span class="code-comment">
-// recommended</span>
-URL url = this.getClass().getClassLoader().getResource("eatfood.wav");
-AudioInputStream audioIn = AudioSystem.getAudioInputStream(url);
-</pre> </li> 
-     <li>Allocate a sound <code>Clip</code> resource via the static method <code>AudioSystem.getClip()</code>: <pre class="code-example">
-Clip clip = AudioSystem.getClip();
-</pre> </li> 
-     <li>Open the clip to load sound samples from the audio input stream opened earlier: <pre class="code-example">
-clip.open(audioIn);
-<span class="code-comment">// For small-size file only. Do not use this to open a large file over slow network, as it blocks.</span>
-</pre> </li> 
-     <li>You can now play the clip by invoking either the <code>start()</code> or <code>loop()</code> method <pre class="code-example">
-<span class="code-comment">// start()</span>
-clip.start();  <span class="code-comment">// play once</span>
-<span class="code-comment">// Loop()</span>
-clip.loop(0);  <span class="code-comment">// repeat none (play once), can be used in place of start().</span>
-clip.loop(5);  <span class="code-comment">// repeat 5 times (play 6 times)</span>
-clip.loop(Clip.LOOP_CONTINUOUSLY);  <span class="code-comment">// repeat forever</span>
-</pre> </li> 
-     <li>You can stop the player by invoking <code>stop()</code>, which may be useful to stop a continuous <code>loop()</code>. <pre class="code-example">
-if (clip.isRunning()) clip.stop();
-</pre> </li> 
-    </ol> 
-    <h4>Playing Sound Effects for Java Games</h4> 
-    <p>A typical game requires various sound effects, e.g., move, eat, shoot, kill, gameover, and etc. The following enumeration encapsulates all the sound effects in a single class, to simplify game programming.</p> 
-    <pre class="code-listing">
-import java.io.*;
-import java.net.URL;
-import javax.sound.sampled.*;
-   
-<span class="code-comment">/**
- * This enum encapsulates all the sound effects of a game, so as to separate the sound playing
- * codes from the game codes.
- * 1. Define all your sound effect names and the associated wave file.
- * 2. To play a specific sound, simply invoke SoundEffect.SOUND_NAME.play().
- * 3. You might optionally invoke the static method SoundEffect.init() to pre-load all the
- *    sound files, so that the play is not paused while loading the file for the first time.
- * 4. You can use the static variable SoundEffect.volume to mute the sound.
- */</span>
-public enum SoundEffect {
-   EXPLODE("explode.wav"),   <span class="code-comment">// explosion</span>
-   GONG("gong.wav"),         <span class="code-comment">// gong</span>
-   SHOOT("shoot.wav");       <span class="code-comment">// bullet</span>
-   
-   <span class="code-comment">// Nested class for specifying volume</span>
-   public static enum Volume {
-      MUTE, LOW, MEDIUM, HIGH
-   }
-   
-   public static Volume volume = Volume.LOW;
-   
-   <span class="code-comment">// Each sound effect has its own clip, loaded with its own sound file.</span>
-   private Clip clip;
-   
-   <span class="code-comment">// Constructor to construct each element of the enum with its own sound file.</span>
-   SoundEffect(String soundFileName) {
-      try {
-         <span class="code-comment">// Use URL (instead of File) to read from disk and JAR.</span>
-         URL url = this.getClass().getClassLoader().getResource(soundFileName);
-         <span class="code-comment">// Set up an audio input stream piped from the sound file.</span>
-         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url);
-         <span class="code-comment">// Get a clip resource.</span>
-         clip = AudioSystem.getClip();
-         <span class="code-comment">// Open audio clip and load samples from the audio input stream.</span>
-         clip.open(audioInputStream);
-      } catch (UnsupportedAudioFileException e) {
-         e.printStackTrace();
-      } catch (IOException e) {
-         e.printStackTrace();
-      } catch (LineUnavailableException e) {
-         e.printStackTrace();
-      }
-   }
-   
-   <span class="code-comment">// Play or Re-play the sound effect from the beginning, by rewinding.</span>
-   public void play() {
-      if (volume != Volume.MUTE) {
-         if (clip.isRunning())
-            clip.stop();   <span class="code-comment">// Stop the player if it is still running</span>
-         clip.setFramePosition(0); <span class="code-comment">// rewind to the beginning</span>
-         clip.start();     <span class="code-comment">// Start playing</span>
-      }
-   }
-   
-   <span class="code-comment">// Optional static method to pre-load all the sound files.</span>
-   static void init() {
-      values(); <span class="code-comment">// calls the constructor for all the elements</span>
-   }
-}
-</pre> 
-    <p><strong>Dissecting the Program</strong></p> 
-    <p>[PENDING]</p> 
-    <img class="image-center" src="images/Game_SoundEffectDemo.png"> 
-    <pre class="code-listing">
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-   
-<span class="code-comment">// Testing the SoundEffect enum in a Swing application</span>
-public class SoundEffectDemo extends JFrame {
-   
-   <span class="code-comment">// Constructor</span>
-   public SoundEffectDemo() {
-      <span class="code-comment">// Pre-load all the sound files</span>
-      SoundEffect.init();
-      SoundEffect.volume = SoundEffect.Volume.LOW;  <span class="code-comment">// un-mute</span>
-   
-      <span class="code-comment">// Set up UI components</span>
-      Container cp = this.getContentPane();
-      cp.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-      JButton btnSound1 = new JButton("Sound 1");
-      btnSound1.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            SoundEffect.EXPLODE.play();
-         }
-      });
-      cp.add(btnSound1);
-      JButton btnSound2 = new JButton("Sound 2");
-      btnSound2.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            SoundEffect.GONG.play();
-         }
-      });
-      cp.add(btnSound2);
-      JButton btnSound3 = new JButton("Sound 3");
-      btnSound3.addActionListener(new ActionListener() {
-         @Override
-         public void actionPerformed(ActionEvent e) {
-            SoundEffect.SHOOT.play();
-         }
-      });
-      cp.add(btnSound3);
-      this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      this.setTitle("Test SoundEffct");
-      this.pack();
-      this.setVisible(true);
-   }
-   
-   public static void main(String[] args) {
-      new SoundEffectDemo();
-   }
-}
-</pre> 
-    <p><strong>Dissecting the Program</strong></p> 
-    <p>[PENDING]</p> 
-    <h4>(optional) <code>javax.sound.SourceDataLine</code></h4> 
-    <p>A source data line acts as a source to the audio mixer. Unlike Clip (which pre-load the audio samples), an application writes audio samples to a source data line, which handles the buffering of the bytes and delivers them to the mixer, in a <em>streaming</em> manner.</p> 
-    <pre class="code-listing">
-import java.io.*;
-import javax.sound.sampled.*;
-<span class="code-comment">/**
- * Use SourceDataLine to read line-by-line from the external sound file.
- * For computer game, use Clip to pre-load short-duration sound files.
- */</span>
-public class SoundLineTest {
-   public static void main(String[] args) {
-      SourceDataLine soundLine = null;
-      int BUFFER_SIZE = 64*1024;  <span class="code-comment">// 64 KB</span>
-   
-      <span class="code-comment">// Set up an audio input stream piped from the sound file.</span>
-      try {
-         File soundFile = new File("gameover.wav");
-         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(soundFile);
-         AudioFormat audioFormat = audioInputStream.getFormat();
-         DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
-         soundLine = (SourceDataLine) AudioSystem.getLine(info);
-         soundLine.open(audioFormat);
-         soundLine.start();
-         int nBytesRead = 0;
-         byte[] sampledData = new byte[BUFFER_SIZE];
-         while (nBytesRead != -1) {
-            nBytesRead = audioInputStream.read(sampledData, 0, sampledData.length);
-            if (nBytesRead &gt;= 0) {
-               <span class="code-comment">// Writes audio data to the mixer via this source data line.</span>
-               soundLine.write(sampledData, 0, nBytesRead);
-            }
-         }
-      } catch (UnsupportedAudioFileException ex) {
-         ex.printStackTrace();
-      } catch (IOException ex) {
-         ex.printStackTrace();
-      } catch (LineUnavailableException ex) {
-         ex.printStackTrace();
-      } finally {
-         soundLine.drain();
-         soundLine.close();
-      }
-   }
-}
-</pre> 
-    <h3>MIDI Synthesized Sound</h3> 
-    <p>In a computer game, MIDI can be used for providing the background music, as it save you quite a bit of bandwidth if you are downloading the file from a slow connection. Java Sound API supports three types of MIDI: MIDI Type 1, MIDI Type 2 and Rich Music Format (RMF).</p> 
-    <p>The steps are:</p> 
-    <ol> 
-     <li>Allocate a Sequence piped from a MIDI file: <pre class="code-example">
-Sequence song = MidiSystem.getSequence(new File("song.mid"));
-</pre> </li> 
-     <li>Allocate a Sequencer to play a MIDI sequence: <pre class="code-example">
-Sequencer player = MidiSystem.getSequencer();
-</pre> </li> 
-     <li>Set the current sequence for the sequencer to play: <pre class="code-example">
-player.setSequence(song);
-</pre> </li> 
-     <li>Open the sequencer to load the sequence: <pre class="code-example">
-player.open();
-</pre> </li> 
-     <li>You could set the loop count via <code>setLoopCount()</code> and start playing the music by invoking <code>start()</code>: <pre class="code-example">
-player.setLoopCount(0);  <span class="code-comment">// repeat 0 times (play once)</span>
-player.setLoopCount(Sequencer.LOOP_CONTINUOUSLY);  <span class="code-comment">// repeat forever</span>
-player.start();
-</pre> </li> 
-     <li>You can set the tempo (rate of play) via <code>setTempoFactor()</code>, which is useful in a computer game when the difficulty level is increased. <pre class="code-example">
-player.setTempoFactor(1.0F);  <span class="code-comment">// takes a factor (in float) - normal tempo</span>
-player.setTempoFactor(1.5F);  <span class="code-comment">// faster by 50%</span>
-</pre> </li> 
-     <li>You can stop the play via <code>stop()</code>: <pre class="code-example">
-if (player.isRunning()) player.stop();
-</pre> </li> 
-    </ol> 
-    <p><strong>Code Example</strong></p> 
-    <p>The method is declared <code>static</code>, as we only need one global copy, and no instance variable involved in the operation.</p> 
-    <table class="table-program"> 
+    <a name="get"></a>
+    <h2>Get the book</h2> 
+    <!-- Start: amazon ad --> 
+    <iframe src="http://rcm-na.amazon-adsystem.com/e/cm?t=brackeencom-20&amp;o=1&amp;p=8&amp;l=as1&amp;asins=1592730051&amp;fc1=000000&amp;IS2=1&amp;lt1=_blank&amp;lc1=0000ff&amp;bc1=000000&amp;bg1=ffffff&amp;f=ifr" style="width:120px;height:240px;" scrolling="no" marginwidth="0" marginheight="0" frameborder="0"></iframe> 
+    <!-- End: amazon ad --> 
+    <p>Amazon: <a href="http://www.amazon.com/gp/product/1592730051/ref=as_li_tf_tl?ie=UTF8&amp;camp=1789&amp;creative=9325&amp;creativeASIN=1592730051&amp;linkCode=as2&amp;tag=brackeencom-20">Developing Games in Java</a><img src="http://www.assoc-amazon.com/e/ir?t=brackeencom-20&amp;l=as2&amp;o=1&amp;a=1592730051" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;"> </p> 
+    <a name="play"></a>
+    <h2>Play example game</h2> 
+    <p>Requires <a href="http://www.java.com/">Java 1.4.2</a> or newer. Warning: rumors are, the demo may not work correctly on Java 7!</p> 
+    <p><a href="tilegame.jnlp"><img src="javagamebook-screenshot.jpg" alt="" style="border: 1px solid black"></a></p> 
+    <p><a href="tilegame.jnlp">Play Now!</a></p> 
+    <p> This game demonstrates: </p> 
+    <ul> 
+     <li>Thread pools (in the sound manager) - Chapter 1.</li> 
+     <li>Full screen mode, hardware-accelerated graphics, animation, and sprites - Chapter 2.</li> 
+     <li>Keyboard input and mapping multiple keys to the same action - Chapter 3.</li> 
+     <li>Sound, music, and sound filters - Chapter 4.</li> 
+     <li>Paralax scrolling, tile-based maps, gravity, jumping, and bounding-box collisions - Chapter 5.</li> 
+     <li>Simulated timer accuracy - Chapter 16.</li> 
+     <li>Art and sound creation techniques - Chapter 17.</li> 
+     <li>Game states (loading, intro sequence, main game) - Chapter 18.</li> 
+     <li>Deployment using Java Web Start (JNLP files) and loading media from jar files - Chapter 18.</li> 
+    </ul> 
+    <a name="download"></a>
+    <h2>Download source code</h2> 
+    <p>These packages include source code and any resources (graphics, sounds, scripts, etc) needed to run the examples.</p> 
+    <p>Requires <a href="http://ant.apache.org/">Apache Ant 1.5</a> to compile. Ant is either directly integrated or available as a plugin for several free/open source editors and IDEs, including <a href="http://www.jedit.org/">jEdit</a>, <a href="http://www.netbeans.org/">NetBeans</a>, and <a href="http://www.eclipse.org/">Eclipse</a>.</p> 
+    <p>If you use Apache Ant, everything compiles error-free! See the errata below for any issues.</p> 
+    <table> 
      <tbody>
-      <tr> 
-       <td class="code-line-number-width"> <pre class="code-line-number">
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-</pre> </td> 
-       <td> <pre class="code-listing">
-import java.io.*;
-import javax.sound.midi.*;
-   
-public class MidiSoundTest {
-   private static Sequencer midiPlayer;
-   
-   <span class="code-comment">// testing main method</span>
-   public static void main(String[] args) {
-      startMidi("song1.mid");     <span class="code-comment">// start the midi player</span>
-      try {
-         Thread.sleep(10000);   <span class="code-comment">// delay</span>
-      } catch (InterruptedException e) { }
-      System.out.println("faster");
-      midiPlayer.setTempoFactor(2.0F);   <span class="code-comment">// &gt;1 to speed up the tempo
-</span>      try {
-         Thread.sleep(10000);   <span class="code-comment">// delay</span>
-      } catch (InterruptedException e) { }
-   
-      <span class="code-comment">// Do this on every move step, you could change to another song</span>
-      if (!midiPlayer.isRunning()) {  <span class="code-comment">// previous song finished</span>
-         <span class="code-comment">// reset midi player and start a new song</span>
-         midiPlayer.stop();
-         midiPlayer.close();
-         startMidi("song2.mid");
-      }
-   }
-   
-   public static void startMidi(String midFilename) {
-      try {
-         File midiFile = new File(midFilename);
-         Sequence song = MidiSystem.getSequence(midiFile);
-         midiPlayer = MidiSystem.getSequencer();
-         midiPlayer.open();
-         midiPlayer.setSequence(song);
-         midiPlayer.setLoopCount(0); <span class="code-comment">// repeat 0 times (play once)</span>
-         midiPlayer.start();
-      } catch (MidiUnavailableException e) {
-         e.printStackTrace();
-      } catch (InvalidMidiDataException e) {
-         e.printStackTrace();
-      } catch (IOException e) {
-         e.printStackTrace();
-      }
-   }
-}
-</pre></td> 
+      <tr>
+       <th>Description</th>
+       <th>Download</th>
+      </tr> 
+      <tr>
+       <td style="background: #E0E0E0">All source code</td>
+       <td align="right" style="background: #E0E0E0"><a href="allsrc.zip">allsrc.zip</a> (4.3MB)</td>
+      </tr> 
+      <tr>
+       <td>Chapter 1, "Java Threads"</td>
+       <td><a href="ch01src.zip">ch01src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 2, "2D Graphics and Animation"</td>
+       <td><a href="ch02src.zip">ch02src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 3, "Interactivity and User Interfaces"</td>
+       <td><a href="ch03src.zip">ch03src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 4, "Sound Effects and Music"</td>
+       <td><a href="ch04src.zip">ch04src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 5, "Creating a 2D Platform Game"</td>
+       <td><a href="ch05src.zip">ch05src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 6, "Multi-Player Games" (By Bret Barker)</td>
+       <td><a href="ch06src.zip">ch06src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 7, "3D Graphics"</td>
+       <td><a href="ch07src.zip">ch07src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 8, "Texture Mapping and Lighting"</td>
+       <td><a href="ch08src.zip">ch08src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 9, "3D Objects"</td>
+       <td><a href="ch09src.zip">ch09src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 10, "3D Scene Management Using BSP Trees"</td>
+       <td><a href="ch10src.zip">ch10src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 11, "Collision Detection"</td>
+       <td><a href="ch11src.zip">ch11src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 12, "Path Finding"</td>
+       <td><a href="ch12src.zip">ch12src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 13, "Artificial Intelligence"</td>
+       <td><a href="ch13src.zip">ch13src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 14, "Game Scripting"</td>
+       <td><a href="ch14src.zip">ch14src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 15, "Persistence - Saving the Game" (By Laurence Vanhelsuwé)</td>
+       <td><a href="ch15src.zip">ch15src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 16, "Optimization Techniques"</td>
+       <td><a href="ch16src.zip">ch16src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 17, "Creating Game Art and Sounds"</td>
+       <td><a href="ch17src.zip">ch17src.zip</a></td>
+      </tr> 
+      <tr>
+       <td>Chapter 18, "Game Design and the Last 10%"</td>
+       <td><a href="ch18src.zip">ch18src.zip</a></td>
       </tr> 
      </tbody>
     </table> 
-    <p><strong>Notes</strong>: Windows Vista seems to have lot of problems with Midi.</p> 
-    <h3>MP3 &amp; Java Media Framework (JMF)</h3> 
-    <p>Java Media Framework (JMF) is not part of JavaSE, but can be downloaded from <a href="http://java.sun.com/javase/technologies/desktop/media/jmf/">http://java.sun.com/javase/technologies/desktop/media/jmf</a>. JMF, among other things, provides support for playing MP3, AAC music. Download JMF and run the installation. Check to ensure that "<code>jmf.jar</code>" is installed into "<code>$JAVA_HOME\jre\lib\ext</code>".</p> 
-    <p><strong>Example</strong>: Playing MP3 Music</p> 
-    <pre class="code-listing">
-import javax.media.*;
-import java.net.URL;
-   
-public class Mp3PlayerDemo extends Thread {
-   
-   private String filename;
-   Player player;
-   
-   public Mp3PlayerDemo(String mp3Filename) {
-      this.filename = mp3Filename;
-   }
-   
-   public void run() {
-      try {
-         URL url = this.getClass().getClassLoader().getResource(filename);
-         MediaLocator locator = new MediaLocator(url);
-         player = Manager.createPlayer(locator);
-         player.addControllerListener(new ControllerListener() {
-            public void controllerUpdate(ControllerEvent event) {
-               if (event instanceof EndOfMediaEvent) {
-                  player.stop();
-                  player.close();
-               }
-            }
-         });
-         player.realize();
-         player.start();
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-   }
-   
-   public static void main(String[] args) {
-      new Mp3PlayerDemo("song.mp3").start();
-   }
+    <a name="errata"></a>
+    <h2>Errata</h2> 
+    <p>Here are a few source code notes based on reader comments.</p> 
+    <h3>Loading Images (relative path issues)</h3> 
+    <p>Some chapters contain both code and images, but don't use jar files. Thus, images are loaded via relative paths like "../images/background.jpg" with the idea that you'll run the code from the chapter's "build" directory. You'll need to change the paths if you run the code from a different directory. </p> 
+    <h3>Sound Issues in Java 5 and Java 6.</h3> 
+    <div>
+      Sun updated the sound engine in Java 5 which led to a few problems. Here are the fixes: 
+     <ol> 
+      <li>MIDI music doesn't loop. Add this line (in <b>bold</b>) in MidiPlayer.java:<pre>
+public void meta(MetaMessage event) {
+    if (event.getType() == END_OF_TRACK_MESSAGE) {
+       if (sequencer != null &amp;&amp; sequencer.isOpen() &amp;&amp; loop) {
+           <b>sequencer.setTickPosition(0);</b>
+           sequencer.start();
+       }
+    }
 }
+</pre> Thanks to Brian Bishop for the fix.<br><br> </li> 
+      <li>Sounds don't play. Change these lines (in <b>bold</b>) in SoundManager.java:<pre>
+public static int getMaxSimultaneousSounds(AudioFormat playbackFormat) {
+    DataLine.Info lineInfo = new DataLine.Info(
+        SourceDataLine.class, playbackFormat);
+    Mixer mixer = AudioSystem.getMixer(null);
+    <b>int maxLines = mixer.getMaxLines(lineInfo);
+    if (maxLines == AudioSystem.NOT_SPECIFIED) {
+        maxLines = 32;
+    }
+    return maxLines;</b>
+}
+</pre></li>
+     </ol> 
+     <i>Note: these changes are not yet added to the source downloads or the example game.</i>
+    </div> 
+    <h3>Swing integration</h3> 
+    <p>Eric Berry writes of a solution of integrating Swing components on Mac OS X:</p> 
+    <blockquote> 
+     <p>The fix consisted of basically 2 things. First, I had to set ignore repaint to true on everything. This includes the frame itself, the content pane and the layered pane of the frame. Secondly I had to put the call to paintComponents in a SwingUtilities.invokeAndWait() call. </p>
+     <pre>
+SwingUtilities.invokeAndWait(new Runnable() {
+        public void run() {
+            paintComponents(graphics);
+        }
+});
 </pre> 
-    <p>[TODO] To be continued...</p> 
-    <p>&nbsp;</p> 
-    <h4>REFERENCES &amp; RESOURCES</h4> 
-    <ul> 
-     <li>TODO</li> 
-    </ul> 
-    <p class="p-last-modified">Latest version tested: JDK 1.6<br> Last modified: September 4, 2008</p> 
+     <p>This means making the graphics object final in the draw method sig. but that's about it.</p> 
+     <p>Now using the text field doesn't freeze the entire application. </p> 
+     <p>There doesn't seem to be very much drawback and I did find that the invokeAndWait was all that was absolutely necessary to make it work. However, making sure everything had ignore repaint set to true improved performance slightly (a few milliseconds). There is a performance hit with adding the invoke and wait, but it doesn't seem that bad. Without it I was getting refresh rate of about 16-20 ms, after it went from 22-26 (depending on if I was using the text field or not).</p> 
+     <p></p> 
+    </blockquote> 
+    <h3>Mouselook (chapter 3)</h3> 
+    <p>Olli Aalto (using Gentoo Linux, J2SE 1.4.2) suggests this fix for mouselook (commenting out a couple lines):</p> 
+    <pre>
+// from the MouseMotionListener interface
+public synchronized void mouseMoved(MouseEvent e) {
+    // this event is from re-centering the mouse - ignore it
+    if (isRecentering) //&amp;&amp;
+        //centerLocation.x == e.getX() &amp;&amp;
+        //centerLocation.y == e.getY())
+    {
+        isRecentering = false;
+    }
+</pre> 
+    <p>The original code works correctly on Windows, so this appears to be a Linux-only fix.</p> 
+    <a name="new"></a>
+    <h2>What's happened since...?</h2> 
+    <p>In chapter 19, "The Future", several things were mentioned that could make things better for Java game programmers. Java 5, Java 6, and Java 7 have been released since the book came out, but how do they stack up?</p> 
+    <table> 
+     <tbody>
+      <tr> 
+       <th>Feature</th>
+       <th>Included in Java 5.0</th>
+       <th>Included in Java 6.0</th>
+       <th>Notes</th> 
+      </tr> 
+      <tr> 
+       <td>New Java language features (Generics, Enumerations, Static import, Enhanced for loop, etc.)</td> 
+       <td class="yes">Yes</td> 
+       <td class="yes">Yes</td> 
+       <td>See <a href="http://java.sun.com/developer/technicalArticles/releases/j2se15/">J2SE 1.5 in a Nutshell</a>.</td> 
+      </tr> 
+      <tr> 
+       <td>Compiler API (JSR 199)</td> 
+       <td class="no">No</td> 
+       <td class="yes">Yes</td> 
+       <td>Not crucial for most game programmers.</td> 
+      </tr> 
+      <tr> 
+       <td>Network Transfer Format (JSR 200)</td> 
+       <td class="yes">Yes</td> 
+       <td class="yes">Yes</td> 
+       <td>See the <a href="http://java.sun.com/javase/6/docs/api/java/util/jar/Pack200.html">Pack200</a> class.</td> 
+      </tr> 
+      <tr> 
+       <td>Shared VM (JSR 121)</td> 
+       <td class="yes">Yes and No</td> 
+       <td class="yes">Yes and No</td> 
+       <td>The VM isn't shared, but <a href="http://java.sun.com/j2se/1.5.0/docs/guide/vm/class-data-sharing.html">class data sharing</a> was implemented in Java 5.0.</td> 
+      </tr> 
+      <tr> 
+       <td>Input polling (Bug ID <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4083501">4083501</a>)</td> 
+       <td class="no">Mostly No</td> 
+       <td class="no">No</td> 
+       <td><a href="http://java.sun.com/j2se/1.5.0/docs/api/java/awt/MouseInfo.html">Mouse position polling</a> is implemented, but you can't poll the mouse buttons, the mouse wheel, the relative position, the keyboard, or the joystick. The bug evaluation currently states "Given a low priority by Tiger planning," probably because of the presence of the <a href="https://jinput.dev.java.net/">jinput</a> project. </td> 
+      </tr> 
+      <tr> 
+       <td>Disabling the mouse cursor (Bug ID <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4526950">4526950</a>)</td> 
+       <td class="no">No</td> 
+       <td class="no">No</td> 
+       <td>The bug evaluation currently states this bug will be considered for Dolphin (Java 7). As mentioned in the book, creating an invisible cursor isn't perfect on all platforms, and we need a way to disable the cursor.</td> 
+      </tr> 
+      <tr> 
+       <td>Higher resolution timer</td> 
+       <td class="yes">Yes</td> 
+       <td class="yes">Yes</td> 
+       <td>See <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/lang/System.html#nanoTime()">System.nanoTime()</a>.</td> 
+      </tr> 
+      <tr> 
+       <td>Hardware-accelerated translucent images (Bug ID <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5002129">5002129</a>)</td> 
+       <td class="no">No</td> 
+       <td class="yes">Yes</td> 
+       <td>New methods have been added to support translucent VolatileImages, so we will probably see this in a subsequent 1.5 release.</td> 
+      </tr> 
+      <tr> 
+       <td>Hardware-accelerated graphics on Linux</td> 
+       <td class="yes">Yes</td> 
+       <td class="yes">Yes</td> 
+       <td>&nbsp;</td> 
+      </tr> 
+      <tr> 
+       <td>Hardware-accelerated 3D included in the runtime</td> 
+       <td class="no">No</td> 
+       <td class="no">No</td> 
+       <td>&nbsp;</td> 
+      </tr> 
+      <tr> 
+       <td>Option to turn off vertical sync</td> 
+       <td class="no">No</td> 
+       <td class="no">No</td> 
+       <td>&nbsp;</td> 
+      </tr> 
+      <tr> 
+       <td>HotSpot SIMD operations</td> 
+       <td>?</td> 
+       <td>?</td> 
+       <td>&nbsp;</td> 
+      </tr> 
+      <tr> 
+       <td>OGG support (Bug ID <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4671067">4671067</a>)</td> 
+       <td class="no">No</td> 
+       <td class="no">No</td> 
+       <td>&nbsp;</td> 
+      </tr> 
+      <tr> 
+       <td>Sub-pixel anti-aliased text support - AKA ClearType (Bug IDs <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4726365">4726365</a> and <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4502804">4502804</a>)</td> 
+       <td class="no">No</td> 
+       <td class="yes">Yes</td>
+       <td>&nbsp;</td> 
+      </tr> 
+     </tbody>
+    </table> 
+    <p>The new higher-resolution timer is a very welcome addition, and implementing hardware-accelerated graphics on Linux is fantastic. However we still need a for more things: For game programming, hardware-accelerated translucent images is the single most important feature that needs to be implemented. Next, we need an option to disable the mouse cursor. Finally, we need input polling.</p> 
+    <p>There are lots of other features added to J2SE 1.5.0, including some full-screen fixes, sound fixes, JNLP (web start) updates, Swing updates, concurrency utilities, and bit-manipulation operations. Check out Sun's list of <a href="http://java.sun.com/j2se/1.5.0/docs/relnotes/features.html">new features</a>.</p> 
+    <a name="license"></a>
+    <h2>License</h2> 
+    <p>The source code for the book has a BSD-style license. The new license makes it easier to include the code in commercial games.</p> 
+    <pre style="white-space: normal">
+Copyright (c) 2003, David Brackeen<br>
+All rights reserved.<br>
+<br>
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+     <ul>
+
+      <li>Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</li>
+
+      <li>Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</li>
+
+      <li>Neither the name of David Brackeen nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</li>
+
+     </ul>
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</pre> 
    </div> 
-   <!-- End the content division --> 
-   <!-- print footer --> 
-   <script type="text/javascript" src="../scripts/footer.js"></script> 
+   <div id="footer"> 
+    <hr> 
+    <div>
+     &nbsp;
+    </div> 
+   </div> 
   </div> 
-  <!-- End the container division -->   
+  <script src="/js/gatag.js" type="text/javascript"></script> 
+  <script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script> 
+  <script type="text/javascript">
+try {
+var pageTracker = _gat._getTracker("UA-2564393-3");
+pageTracker._trackPageview();
+} catch(err) {}</script>   
  </body>
 </html>

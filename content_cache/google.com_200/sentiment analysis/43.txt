@@ -1,435 +1,1652 @@
 <!doctype html>
-<html lang="en">
+<!--[if IE 8]>    <html class="ie8" lang="en"> <![endif]-->
+<!--[if IE 9]>    <html class="ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
+ <!--<![endif]-->
  <head> 
-  <meta charset="utf-8"> 
+  <title>Twitter Sentiment Analysis Demo Sample App Code</title> 
+  <meta charset="UTF-8"> 
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-  <meta name="description" content="Adil Moujahid, Data Analytics and more"> 
-  <title>An Introduction to Text Mining using Twitter Streaming API and Python // Adil Moujahid // Data Analytics and more</title> 
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css"> 
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css"> 
-  <link rel="stylesheet" href="../../../../theme/css/pure.css"> 
-  <link rel="stylesheet" href="../../../../theme/css/pygments.css"> 
-  <link rel="stylesheet" href="../../../../theme/css/custom.css"> 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script> 
+  <link rel="pingback" href="https://blog.rackspace.com/xmlrpc.php"> 
+  <meta property="og:image" content="https://blog.rackspace.com/wp-content/uploads/2015/10/13.jpg">
+  <link rel="icon" type="image/png" href="https://blog.rackspace.com/favicon.ico"> 
+  <!-- This site is optimized with the Yoast SEO plugin v5.4 - https://yoast.com/wordpress/plugins/seo/ --> 
+  <meta name="description" content="Today's&nbsp;article is a deep dive into the code behind&nbsp;our Sentiment Analysis Sample application and how to get the app running.&nbsp;"> 
+  <link rel="canonical" href="https://blog.rackspace.com/behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="Twitter Sentiment Analysis Demo Sample App Code"> 
+  <meta property="og:description" content="Today's&nbsp;article is a deep dive into the code behind&nbsp;our Sentiment Analysis Sample application and how to get the app running.&nbsp;"> 
+  <meta property="og:url" content="https://blog.rackspace.com/behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code"> 
+  <meta property="og:site_name" content="The Official Rackspace Blog"> 
+  <meta property="article:publisher" content="https://www.facebook.com/rackspace"> 
+  <meta property="article:tag" content="Spark"> 
+  <meta property="article:section" content="Cloud Insights"> 
+  <meta property="article:published_time" content="2016-02-25T10:00:23+00:00"> 
+  <meta property="article:modified_time" content="2016-03-04T18:35:28+00:00"> 
+  <meta property="og:updated_time" content="2016-03-04T18:35:28+00:00"> 
+  <meta property="og:image" content="https://blog.rackspace.com/wp-content/uploads/2015/10/13.jpg"> 
+  <meta property="og:image:secure_url" content="https://blog.rackspace.com/wp-content/uploads/2015/10/13.jpg"> 
+  <meta property="og:image:width" content="800"> 
+  <meta property="og:image:height" content="533"> 
+  <meta name="twitter:card" content="summary_large_image"> 
+  <meta name="twitter:description" content="Today's&nbsp;article is a deep dive into the code behind&nbsp;our Sentiment Analysis Sample application and how to get the app running.&nbsp;"> 
+  <meta name="twitter:title" content="Twitter Sentiment Analysis Demo Sample App Code"> 
+  <meta name="twitter:site" content="@rackspace"> 
+  <meta name="twitter:image" content="https://blog.rackspace.com/wp-content/uploads/2015/10/13.jpg"> 
+  <meta name="twitter:creator" content="@rackspace"> 
+  <script type="application/ld+json">{"@context":"http:\/\/schema.org","@type":"WebSite","@id":"#website","url":"https:\/\/blog.rackspace.com\/","name":"The Official Rackspace Blog","potentialAction":{"@type":"SearchAction","target":"https:\/\/blog.rackspace.com\/?s={search_term_string}","query-input":"required name=search_term_string"}}</script> 
+  <!-- / Yoast SEO plugin. --> 
+  <link rel="dns-prefetch" href="//s0.wp.com"> 
+  <link rel="dns-prefetch" href="//fonts.googleapis.com"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="The Official Rackspace Blog » Feed" href="https://blog.rackspace.com/feed"> 
+  <link rel="alternate" type="application/rss+xml" title="The Official Rackspace Blog » Comments Feed" href="https://blog.rackspace.com/comments/feed"> 
+  <link rel="alternate" type="application/rss+xml" title="The Official Rackspace Blog » Behind the Curtain: Twitter Sentiment Analysis Demo Sample App Code Comments Feed" href="https://blog.rackspace.com/behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code/feed"> 
+  <script type="text/javascript">
+var dataLayer = [{"content_section":"rackspace","page_name":"www:blog:behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code"}];
+</script> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/blog.rackspace.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.8.2"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,56826,8203,55356,56819),0,0),c=j.toDataURL(),b!==c&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55358,56794,8205,9794,65039),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55358,56794,8203,9794,65039),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <link rel="stylesheet" id="rs-plugin-settings-css" href="https://blog.rackspace.com/wp-content/plugins/revslider/rs-plugin/css/settings.css?ver=4.6.93" type="text/css" media="all"> 
+  <style id="rs-plugin-settings-inline-css" type="text/css">
+.tp-caption a{color:#ff7302;text-shadow:none;-webkit-transition:all 0.2s ease-out;-moz-transition:all 0.2s ease-out;-o-transition:all 0.2s ease-out;-ms-transition:all 0.2s ease-out}.tp-caption a:hover{color:#ffa902}.tp-caption a{color:#ff7302;text-shadow:none;-webkit-transition:all 0.2s ease-out;-moz-transition:all 0.2s ease-out;-o-transition:all 0.2s ease-out;-ms-transition:all 0.2s ease-out}.tp-caption a:hover{color:#ffa902}.tp-caption a{color:#ff7302;text-shadow:none;-webkit-transition:all 0.2s ease-out;-moz-transition:all 0.2s ease-out;-o-transition:all 0.2s ease-out;-ms-transition:all 0.2s ease-out}.tp-caption a:hover{color:#ffa902}.tp-caption a{color:#ff7302;text-shadow:none;-webkit-transition:all 0.2s ease-out;-moz-transition:all 0.2s ease-out;-o-transition:all 0.2s ease-out;-ms-transition:all 0.2s ease-out}.tp-caption a:hover{color:#ffa902}.tp-caption a{color:#ff7302;text-shadow:none;-webkit-transition:all 0.2s ease-out;-moz-transition:all 0.2s ease-out;-o-transition:all 0.2s ease-out;-ms-transition:all 0.2s ease-out}.tp-caption a:hover{color:#ffa902}.tp-caption a{color:#ff7302;text-shadow:none;-webkit-transition:all 0.2s ease-out;-moz-transition:all 0.2s ease-out;-o-transition:all 0.2s ease-out;-ms-transition:all 0.2s ease-out}.tp-caption a:hover{color:#ffa902}
+</style> 
+  <link rel="stylesheet" id="responsive-lightbox-swipebox-css" href="https://blog.rackspace.com/wp-content/plugins/responsive-lightbox/assets/swipebox/css/swipebox.min.css?ver=1.7.2" type="text/css" media="all"> 
+  <link rel="stylesheet" id="google-fonts-style-css" href="https://fonts.googleapis.com/css?family=Montserrat%3A400%7COpen+Sans%3A300italic%2C400%2C400italic%2C600%2C600italic%2C700%7CQuicksand%3A400%7CRoboto%3A300%2C400%2C400italic%2C500%2C500italic%2C700%2C900&amp;ver=8.1" type="text/css" media="all"> 
+  <link rel="stylesheet" id="js_composer_front-css" href="https://blog.rackspace.com/wp-content/plugins/js_composer/assets/css/js_composer.css?ver=4.7.4" type="text/css" media="all"> 
+  <link rel="stylesheet" id="td-theme-css" href="https://blog.rackspace.com/wp-content/themes/Newspaper-child/style.css?ver=8.1" type="text/css" media="all"> 
+  <link rel="stylesheet" id="td-theme-demo-style-css" href="https://blog.rackspace.com/wp-content/themes/Newspaper/includes/demos/tech/demo_style.css?ver=8.1" type="text/css" media="all"> 
+  <link rel="stylesheet" id="social-logos-css" href="https://blog.rackspace.com/wp-content/plugins/jetpack/_inc/social-logos/social-logos.min.css?ver=1" type="text/css" media="all"> 
+  <link rel="stylesheet" id="jetpack_css-css" href="https://blog.rackspace.com/wp-content/plugins/jetpack/css/jetpack.css?ver=5.3" type="text/css" media="all"> 
+  <script type="text/javascript" src="https://blog.rackspace.com/wp-includes/js/jquery/jquery.js?ver=1.12.4"></script> 
+  <script type="text/javascript" src="https://blog.rackspace.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1"></script> 
+  <script type="text/javascript" src="https://blog.rackspace.com/wp-content/plugins/revslider/rs-plugin/js/jquery.themepunch.tools.min.js?ver=4.6.93"></script> 
+  <script type="text/javascript" src="https://blog.rackspace.com/wp-content/plugins/revslider/rs-plugin/js/jquery.themepunch.revolution.min.js?ver=4.6.93"></script> 
+  <script type="text/javascript" src="https://blog.rackspace.com/wp-content/plugins/responsive-lightbox/assets/swipebox/js/jquery.swipebox.min.js?ver=1.7.2"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var rlArgs = {"script":"swipebox","selector":"lightbox","customEvents":"","activeGalleries":"1","animation":"1","hideCloseButtonOnMobile":"0","removeBarsOnMobile":"0","hideBars":"1","hideBarsDelay":"5000","videoMaxWidth":"1080","useSVG":"1","loopAtEnd":"0","woocommerce_gallery":"0"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://blog.rackspace.com/wp-content/plugins/responsive-lightbox/js/front.js?ver=1.7.2"></script> 
+  <link rel="https://api.w.org/" href="https://blog.rackspace.com/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://blog.rackspace.com/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://blog.rackspace.com/wp-includes/wlwmanifest.xml"> 
+  <link rel="shortlink" href="https://blog.rackspace.com/?p=40120"> 
+  <link rel="alternate" type="application/json+oembed" href="https://blog.rackspace.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblog.rackspace.com%2Fbehind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code"> 
+  <link rel="alternate" type="text/xml+oembed" href="https://blog.rackspace.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblog.rackspace.com%2Fbehind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code&amp;format=xml"> 
+  <!-- Google Tag Manager --> 
+  <noscript> &lt;iframe src="//www.googletagmanager.com/ns.html?id=GTM-M8LWJF" height="0" width="0" style="display:none;visibility:hidden"&gt; 
+  </noscript> 
+  <script type="text/javascript">
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-M8LWJF');
+</script> 
+  <script type="text/javascript">
+			jQuery(document).ready(function() {
+				// CUSTOM AJAX CONTENT LOADING FUNCTION
+				var ajaxRevslider = function(obj) {
+				
+					// obj.type : Post Type
+					// obj.id : ID of Content to Load
+					// obj.aspectratio : The Aspect Ratio of the Container / Media
+					// obj.selector : The Container Selector where the Content of Ajax will be injected. It is done via the Essential Grid on Return of Content
+					
+					var content = "";
+
+					data = {};
+					
+					data.action = 'revslider_ajax_call_front';
+					data.client_action = 'get_slider_html';
+					data.token = '0669f60458';
+					data.type = obj.type;
+					data.id = obj.id;
+					data.aspectratio = obj.aspectratio;
+					
+					// SYNC AJAX REQUEST
+					jQuery.ajax({
+						type:"post",
+						url:"https://blog.rackspace.com/wp-admin/admin-ajax.php",
+						dataType: 'json',
+						data:data,
+						async:false,
+						success: function(ret, textStatus, XMLHttpRequest) {
+							if(ret.success == true)
+								content = ret.data;								
+						},
+						error: function(e) {
+							console.log(e);
+						}
+					});
+					
+					 // FIRST RETURN THE CONTENT WHEN IT IS LOADED !!
+					 return content;						 
+				};
+				
+				// CUSTOM AJAX FUNCTION TO REMOVE THE SLIDER
+				var ajaxRemoveRevslider = function(obj) {
+					return jQuery(obj.selector+" .rev_slider").revkill();
+				};
+
+				// EXTEND THE AJAX CONTENT LOADING TYPES WITH TYPE AND FUNCTION
+				var extendessential = setInterval(function() {
+					if (jQuery.fn.tpessential != undefined) {
+						clearInterval(extendessential);
+						if(typeof(jQuery.fn.tpessential.defaults) !== 'undefined') {
+							jQuery.fn.tpessential.defaults.ajaxTypes.push({type:"revslider",func:ajaxRevslider,killfunc:ajaxRemoveRevslider,openAnimationSpeed:0.3});   
+							// type:  Name of the Post to load via Ajax into the Essential Grid Ajax Container
+							// func: the Function Name which is Called once the Item with the Post Type has been clicked
+							// killfunc: function to kill in case the Ajax Window going to be removed (before Remove function !
+							// openAnimationSpeed: how quick the Ajax Content window should be animated (default is 0.3)
+						}
+					}
+				},30);
+			});
+		</script> 
+  <style id="tdw-css-placeholder"></style> 
   <script>
-        $(document).ready(function(){
-            $(".content").fitVids();
-        });
-    </script> 
-  <script src="//load.sumome.com/" data-sumo-site-id="4ce3990f4d6fb482b4d97fa9208bd2242f7bb8c711ce30290794390dbe7ed180" async></script> 
- </head> 
- <body> 
-  <div class="pure-g-r" id="layout"> 
-   <div class="sidebar sidebar-article pure-u"> 
-    <header class="header-article"> 
-     <hgroup> 
-      <a href="../../../../author/adil-moujahid.html" title="See posts by Adil Moujahid"> <img class="avatar" alt="Adil Moujahid" src="http://www.gravatar.com/avatar/2ac2a00f5911cc8234778be41c835e13"> </a> 
-      <h2 class="article-info">Adil Moujahid</h2> 
-      <small class="about-author"></small> 
-      <div> 
-       <a href="https://twitter.com/AdilMouja" class="twitter-follow-button" data-show-count="false"> Follow @AdilMouja </a> 
-       <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script> 
-      </div> 
-      <h5>Published</h5> 
-      <p>Mon 21 July 2014</p> 
-      <a href="/">?Home</a> 
-     </hgroup> 
-    </header> 
-   </div> 
-   <div class="pure-u"> 
-    <div class="content"> 
-     <section class="post"> 
-      <header class="post-header"> 
-       <h1>An Introduction to Text Mining using Twitter Streaming API and Python</h1> 
-       <p class="post-meta"> // tags <a class="post-category" href="../../../../tag/python/">python</a> <a class="post-category" href="../../../../tag/pandas/">pandas</a> <a class="post-category" href="../../../../tag/text-mining/">text mining</a> <a class="post-category" href="../../../../tag/matplotlib/">matplotlib</a> <a class="post-category" href="../../../../tag/twitter/">twitter</a> <a class="post-category" href="../../../../tag/api/">api</a> </p> 
-      </header> 
-     </section> 
-     <p>Text mining is the application of natural language processing techniques and analytical methods to text data in order to derive relevant information. Text mining is getting a lot attention these last years, due to an exponential increase in digital text data from web pages, google's projects such as <a href="http://books.google.com/">google books</a> and <a href="https://books.google.com/ngrams">google ngram</a>, and social media services such as Twitter. Twitter data constitutes a rich source that can be used for capturing information about any topic imaginable. This data can be used in different use cases such as finding trends related to a specific keyword, measuring brand sentiment, and gathering feedback about new products and services.</p> 
-     <p>In this tutorial, I will use Twitter data to compare the popularity of 3 programming languages: Python, Javascript and Ruby, and to retrieve links to programming tutorials. In the first paragraph, I will explaing how to connect to Twitter Streaming API and how to get the data. In the second paragraph, I will explain how to structure the data for analysis, and in the last paragraph, I will explain how to filter the data and extract links from tweets.</p> 
-     <p>Using only 2 days worth of Twitter data, I could retrieve 644 links to python tutorials, 413 to javascript tutorials and 136 to ruby tutorials. Furthermore, I could confirm that python is 1.5 times more popular than javascript and 4 times more popular than ruby.</p> 
-     <div style="text-align:center"> 
-      <p><img alt="Alt Text" src="/images/Twitter-analytics.png"></p> 
-     </div> 
-     <h1>1. Getting Data from Twitter Streaming API</h1> 
-     <p>API stands for Application Programming Interface. It is a tool that makes the interaction with computer programs and web services easy. Many web services provides APIs to developers to interact with their services and to access data in programmatic way. For this tutorial, we will use Twitter Streaming API to download tweets related to 3 keywords: "python", "javascript", and "ruby".</p> 
-     <h2>Step 1: Getting Twitter API keys</h2> 
-     <p>In order to access Twitter Streaming API, we need to get 4 pieces of information from Twitter: API key, API secret, Access token and Access token secret. Follow the steps below to get all 4 elements:</p> 
-     <ul> 
-      <li>Create a twitter account if you do not already have one.</li> 
-      <li>Go to https://apps.twitter.com/ and log in with your twitter credentials.</li> 
-      <li>Click "Create New App"</li> 
-      <li>Fill out the form, agree to the terms, and click "Create your Twitter application"</li> 
-      <li>In the next page, click on "API keys" tab, and copy your "API key" and "API secret".</li> 
-      <li>Scroll down and click "Create my access token", and copy your "Access token" and "Access token secret".</li> 
-     </ul> 
-     <h2>Step 2: Connecting to Twitter Streaming API and downloading data</h2> 
-     <p>We will be using a Python library called <code>Tweepy</code> to connect to Twitter Streaming API and downloading the data. If you don't have <code>Tweepy</code> installed in your machine, go to this <a href="https://github.com/tweepy/tweepy">link</a>, and follow the installation instructions.</p> 
-     <p>Next create, a file called <code>twitter_streaming.py</code>, and copy into it the code below. Make sure to enter your credentials into <code>access_token</code>, <code>access_token_secret</code>, <code>consumer_key</code>, and <code>consumer_secret</code>.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="c1">#Import the necessary methods from tweepy library</span>
-<span class="kn">from</span> <span class="nn">tweepy.streaming</span> <span class="kn">import</span> <span class="n">StreamListener</span>
-<span class="kn">from</span> <span class="nn">tweepy</span> <span class="kn">import</span> <span class="n">OAuthHandler</span>
-<span class="kn">from</span> <span class="nn">tweepy</span> <span class="kn">import</span> <span class="n">Stream</span>
+				window.tdwGlobal = {"adminUrl":"https:\/\/blog.rackspace.com\/wp-admin\/","wpRestNonce":"ad2c32e007","wpRestUrl":"https:\/\/blog.rackspace.com\/wp-json\/","permalinkStructure":"\/%postname%"};
+			</script> 
+  <!--[if lt IE 9]><script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]--> 
+  <meta name="generator" content="Powered by Visual Composer - drag and drop page builder for WordPress."> 
+  <!--[if lte IE 9]><link rel="stylesheet" type="text/css" href="https://blog.rackspace.com/wp-content/plugins/js_composer/assets/css/vc_lte_ie9.css" media="screen"><![endif]-->
+  <!--[if IE  8]><link rel="stylesheet" type="text/css" href="https://blog.rackspace.com/wp-content/plugins/js_composer/assets/css/vc-ie8.css" media="screen"><![endif]--> 
+  <!-- JS generated by theme --> 
+  <script>
+    
+    
 
-<span class="c1">#Variables that contains the user credentials to access Twitter API </span>
-<span class="n">access_token</span> <span class="o">=</span> <span class="s2">"ENTER YOUR ACCESS TOKEN"</span>
-<span class="n">access_token_secret</span> <span class="o">=</span> <span class="s2">"ENTER YOUR ACCESS TOKEN SECRET"</span>
-<span class="n">consumer_key</span> <span class="o">=</span> <span class="s2">"ENTER YOUR API KEY"</span>
-<span class="n">consumer_secret</span> <span class="o">=</span> <span class="s2">"ENTER YOUR API SECRET"</span>
+	    var tdBlocksArray = []; //here we store all the items for the current page
+
+	    //td_block class - each ajax block uses a object of this class for requests
+	    function tdBlock() {
+		    this.id = '';
+		    this.block_type = 1; //block type id (1-234 etc)
+		    this.atts = '';
+		    this.td_column_number = '';
+		    this.td_current_page = 1; //
+		    this.post_count = 0; //from wp
+		    this.found_posts = 0; //from wp
+		    this.max_num_pages = 0; //from wp
+		    this.td_filter_value = ''; //current live filter value
+		    this.is_ajax_running = false;
+		    this.td_user_action = ''; // load more or infinite loader (used by the animation)
+		    this.header_color = '';
+		    this.ajax_pagination_infinite_stop = ''; //show load more at page x
+	    }
 
 
-<span class="c1">#This is a basic listener that just prints received tweets to stdout.</span>
-<span class="k">class</span> <span class="nc">StdOutListener</span><span class="p">(</span><span class="n">StreamListener</span><span class="p">):</span>
+        // td_js_generator - mini detector
+        (function(){
+            var htmlTag = document.getElementsByTagName("html")[0];
 
-    <span class="k">def</span> <span class="nf">on_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="k">print</span> <span class="n">data</span>
-        <span class="k">return</span> <span class="bp">True</span>
+            if ( navigator.userAgent.indexOf("MSIE 10.0") > -1 ) {
+                htmlTag.className += ' ie10';
+            }
 
-    <span class="k">def</span> <span class="nf">on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">):</span>
-        <span class="k">print</span> <span class="n">status</span>
+            if ( !!navigator.userAgent.match(/Trident.*rv\:11\./) ) {
+                htmlTag.className += ' ie11';
+            }
 
+            if ( /(iPad|iPhone|iPod)/g.test(navigator.userAgent) ) {
+                htmlTag.className += ' td-md-is-ios';
+            }
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+            var user_agent = navigator.userAgent.toLowerCase();
+            if ( user_agent.indexOf("android") > -1 ) {
+                htmlTag.className += ' td-md-is-android';
+            }
 
-    <span class="c1">#This handles Twitter authetification and the connection to Twitter Streaming API</span>
-    <span class="n">l</span> <span class="o">=</span> <span class="n">StdOutListener</span><span class="p">()</span>
-    <span class="n">auth</span> <span class="o">=</span> <span class="n">OAuthHandler</span><span class="p">(</span><span class="n">consumer_key</span><span class="p">,</span> <span class="n">consumer_secret</span><span class="p">)</span>
-    <span class="n">auth</span><span class="o">.</span><span class="n">set_access_token</span><span class="p">(</span><span class="n">access_token</span><span class="p">,</span> <span class="n">access_token_secret</span><span class="p">)</span>
-    <span class="n">stream</span> <span class="o">=</span> <span class="n">Stream</span><span class="p">(</span><span class="n">auth</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+            if ( -1 !== navigator.userAgent.indexOf('Mac OS X')  ) {
+                htmlTag.className += ' td-md-is-os-x';
+            }
 
-    <span class="c1">#This line filter Twitter Streams to capture data by the keywords: 'python', 'javascript', 'ruby'</span>
-    <span class="n">stream</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">track</span><span class="o">=</span><span class="p">[</span><span class="s1">'python'</span><span class="p">,</span> <span class="s1">'javascript'</span><span class="p">,</span> <span class="s1">'ruby'</span><span class="p">])</span>
-</pre>
-     </div> 
-     <p>If you run the program from your terminal using the command: <code>python twitter_streaming.py</code>, you will see data flowing like the picture below.</p> 
-     <div style="text-align:center"> 
-      <p><img alt="Alt Text" src="/images/twitter_streaming.jpg"></p> 
-     </div> 
-     <p>You can stop the program by pressing Ctrl-C.</p> 
-     <p>We want to capture this data into a file that we will use later for the analysis. You can do so by piping the output to a file using the following command: <code>python twitter_streaming.py &gt; twitter_data.txt</code>.</p> 
-     <p>I run the program for 2 days (from 2014/07/15 till 2014/07/17) to get a meaningful data sample. This file size is 242 MB.</p> 
-     <h1>2. Reading and Understanding the data</h1> 
-     <p>The data that we stored <code>twitter_data.txt</code> is in JSON format. JSON stands for JavaScript Object Notation. This format makes it easy to humans to read the data, and for machines to parse it. Below is an example for one tweet in JSON format. You can see that the tweet contains additional information in addition to the main text which in this example: <code>"Yaayyy I learned some JavaScript today! #thatwasntsohard #yesitwas #stoptalkingtoyourself #hashbrown #hashtag"</code>. </p> 
-     <div class="highlight">
-      <pre><span></span><span class="p">{</span><span class="nt">"created_at"</span><span class="p">:</span><span class="s2">"Tue Jul 15 14:19:30 +0000 2014"</span><span class="p">,</span><span class="nt">"id"</span><span class="p">:</span><span class="mi">489051636304990208</span><span class="p">,</span><span class="nt">"id_str"</span><span class="p">:</span><span class="s2">"489051636304990208"</span><span class="p">,</span><span class="nt">"text"</span><span class="p">:</span><span class="s2">"Yaayyy I learned some JavaScript today! #thatwasntsohard #yesitwas #stoptalkingtoyourself #hashbrown #hashtag"</span><span class="p">,</span><span class="nt">"source"</span><span class="p">:</span><span class="s2">"\u003ca href=\"http:\/\/twitter.com\/download\/iphone\" rel=\"nofollow\"\u003eTwitter for iPhone\u003c\/a\u003e"</span><span class="p">,</span><span class="nt">"truncated"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"in_reply_to_status_id"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"in_reply_to_status_id_str"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"in_reply_to_user_id"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"in_reply_to_user_id_str"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"in_reply_to_screen_name"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"user"</span><span class="p">:{</span><span class="nt">"id"</span><span class="p">:</span><span class="mi">2301702187</span><span class="p">,</span><span class="nt">"id_str"</span><span class="p">:</span><span class="s2">"2301702187"</span><span class="p">,</span><span class="nt">"name"</span><span class="p">:</span><span class="s2">"Toni Barlettano"</span><span class="p">,</span><span class="nt">"screen_name"</span><span class="p">:</span><span class="s2">"itsmetonib"</span><span class="p">,</span><span class="nt">"location"</span><span class="p">:</span><span class="s2">"Greater NYC Area"</span><span class="p">,</span><span class="nt">"url"</span><span class="p">:</span><span class="s2">"http:\/\/www.tonib.me"</span><span class="p">,</span><span class="nt">"description"</span><span class="p">:</span><span class="s2">"So Full of Art   |   \nToni Barlettano Creative Media + Design"</span><span class="p">,</span><span class="nt">"protected"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"followers_count"</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span><span class="nt">"friends_count"</span><span class="p">:</span><span class="mi">25</span><span class="p">,</span><span class="nt">"listed_count"</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">"created_at"</span><span class="p">:</span><span class="s2">"Mon Jan 20 16:49:46 +0000 2014"</span><span class="p">,</span><span class="nt">"favourites_count"</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span><span class="nt">"utc_offset"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"time_zone"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"geo_enabled"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"verified"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"statuses_count"</span><span class="p">:</span><span class="mi">20</span><span class="p">,</span><span class="nt">"lang"</span><span class="p">:</span><span class="s2">"en"</span><span class="p">,</span><span class="nt">"contributors_enabled"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"is_translator"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"is_translation_enabled"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"profile_background_color"</span><span class="p">:</span><span class="s2">"C0DEED"</span><span class="p">,</span><span class="nt">"profile_background_image_url"</span><span class="p">:</span><span class="s2">"http:\/\/abs.twimg.com\/images\/themes\/theme1\/bg.png"</span><span class="p">,</span><span class="nt">"profile_background_image_url_https"</span><span class="p">:</span><span class="s2">"https:\/\/abs.twimg.com\/images\/themes\/theme1\/bg.png"</span><span class="p">,</span><span class="nt">"profile_background_tile"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"profile_image_url"</span><span class="p">:</span><span class="s2">"http:\/\/pbs.twimg.com\/profile_images\/425313048320958464\/Z2GcderW_normal.jpeg"</span><span class="p">,</span><span class="nt">"profile_image_url_https"</span><span class="p">:</span><span class="s2">"https:\/\/pbs.twimg.com\/profile_images\/425313048320958464\/Z2GcderW_normal.jpeg"</span><span class="p">,</span><span class="nt">"profile_link_color"</span><span class="p">:</span><span class="s2">"0084B4"</span><span class="p">,</span><span class="nt">"profile_sidebar_border_color"</span><span class="p">:</span><span class="s2">"C0DEED"</span><span class="p">,</span><span class="nt">"profile_sidebar_fill_color"</span><span class="p">:</span><span class="s2">"DDEEF6"</span><span class="p">,</span><span class="nt">"profile_text_color"</span><span class="p">:</span><span class="s2">"333333"</span><span class="p">,</span><span class="nt">"profile_use_background_image"</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">"default_profile"</span><span class="p">:</span><span class="kc">true</span><span class="p">,</span><span class="nt">"default_profile_image"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"following"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"follow_request_sent"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"notifications"</span><span class="p">:</span><span class="kc">null</span><span class="p">},</span><span class="nt">"geo"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"coordinates"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"place"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"contributors"</span><span class="p">:</span><span class="kc">null</span><span class="p">,</span><span class="nt">"retweet_count"</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">"favorite_count"</span><span class="p">:</span><span class="mi">0</span><span class="p">,</span><span class="nt">"entities"</span><span class="p">:{</span><span class="nt">"hashtags"</span><span class="p">:[{</span><span class="nt">"text"</span><span class="p">:</span><span class="s2">"thatwasntsohard"</span><span class="p">,</span><span class="nt">"indices"</span><span class="p">:[</span><span class="mi">40</span><span class="p">,</span><span class="mi">56</span><span class="p">]},{</span><span class="nt">"text"</span><span class="p">:</span><span class="s2">"yesitwas"</span><span class="p">,</span><span class="nt">"indices"</span><span class="p">:[</span><span class="mi">57</span><span class="p">,</span><span class="mi">66</span><span class="p">]},{</span><span class="nt">"text"</span><span class="p">:</span><span class="s2">"stoptalkingtoyourself"</span><span class="p">,</span><span class="nt">"indices"</span><span class="p">:[</span><span class="mi">67</span><span class="p">,</span><span class="mi">89</span><span class="p">]},{</span><span class="nt">"text"</span><span class="p">:</span><span class="s2">"hashbrown"</span><span class="p">,</span><span class="nt">"indices"</span><span class="p">:[</span><span class="mi">90</span><span class="p">,</span><span class="mi">100</span><span class="p">]},{</span><span class="nt">"text"</span><span class="p">:</span><span class="s2">"hashtag"</span><span class="p">,</span><span class="nt">"indices"</span><span class="p">:[</span><span class="mi">101</span><span class="p">,</span><span class="mi">109</span><span class="p">]}],</span><span class="nt">"symbols"</span><span class="p">:[],</span><span class="nt">"urls"</span><span class="p">:[],</span><span class="nt">"user_mentions"</span><span class="p">:[]},</span><span class="nt">"favorited"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"retweeted"</span><span class="p">:</span><span class="kc">false</span><span class="p">,</span><span class="nt">"filter_level"</span><span class="p">:</span><span class="s2">"medium"</span><span class="p">,</span><span class="nt">"lang"</span><span class="p">:</span><span class="s2">"en"</span><span class="p">}</span>
-</pre>
-     </div> 
-     <p>For the remaining of this tutorial, we will be using 4 Python libraries <code>json</code> for parsing the data, <code>pandas</code> for data manipulation, <code>matplotlib</code> for creating charts, adn <code>re</code> for regular expressions. The <code>json</code> and <code>re</code> libraries are installed by default in Python. You should install <code>pandas</code> and <code>matplotlib</code> if you don't have them in your machine.</p> 
-     <p>We will start first by uploading <code>json</code> and <code>pandas</code> using the commands below:</p> 
-     <div class="highlight">
-      <pre><span></span><span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-</pre>
-     </div> 
-     <p>Next we will read the data in into an array that we call <code>tweets</code>.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets_data_path</span> <span class="o">=</span> <span class="s1">'../data/twitter_data.txt'</span>
+            if ( /chrom(e|ium)/.test(navigator.userAgent.toLowerCase()) ) {
+               htmlTag.className += ' td-md-is-chrome';
+            }
 
-<span class="n">tweets_data</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">tweets_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">tweets_data_path</span><span class="p">,</span> <span class="s2">"r"</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">tweets_file</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">tweet</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-        <span class="n">tweets_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tweet</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="k">continue</span>
-</pre>
-     </div> 
-     <p>We can print the number of tweets using the command below. For the dataset that I prepared, the number is 71238.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="k">print</span> <span class="nb">len</span><span class="p">(</span><span class="n">tweets_data</span><span class="p">)</span>
-</pre>
-     </div> 
-     <p>Next, we will structure the tweets data into a pandas DataFrame to simplify the data manipulation. We will start by creating an empty DataFrame called <code>tweets</code> using the following command.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
-</pre>
-     </div> 
-     <p>Next, we will add 3 columns to the <code>tweets</code> DataFrame called <code>text</code>, <code>lang</code>, and <code>country</code>. <code>text</code> column contains the tweet, <code>lang</code> column contains the language in which the tweet was written, and <code>country</code> the country from which the tweet was sent.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tweet</span><span class="p">:</span> <span class="n">tweet</span><span class="p">[</span><span class="s1">'text'</span><span class="p">],</span> <span class="n">tweets_data</span><span class="p">)</span>
-<span class="n">tweets</span><span class="p">[</span><span class="s1">'lang'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tweet</span><span class="p">:</span> <span class="n">tweet</span><span class="p">[</span><span class="s1">'lang'</span><span class="p">],</span> <span class="n">tweets_data</span><span class="p">)</span>
-<span class="n">tweets</span><span class="p">[</span><span class="s1">'country'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tweet</span><span class="p">:</span> <span class="n">tweet</span><span class="p">[</span><span class="s1">'place'</span><span class="p">][</span><span class="s1">'country'</span><span class="p">]</span> <span class="k">if</span> <span class="n">tweet</span><span class="p">[</span><span class="s1">'place'</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">None</span> <span class="k">else</span> <span class="bp">None</span><span class="p">,</span> <span class="n">tweets_data</span><span class="p">)</span>
-</pre>
-     </div> 
-     <p>Next, we will create 2 charts: The first one describing the Top 5 languages in which the tweets were written, and the second the Top 5 countries from which the tweets were sent.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets_by_lang</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'lang'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+            if ( -1 !== navigator.userAgent.indexOf('Firefox') ) {
+                htmlTag.className += ' td-md-is-firefox';
+            }
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">'x'</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">'y'</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Languages'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Number of tweets'</span> <span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Top 5 languages'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
-<span class="n">tweets_by_lang</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">'bar'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'red'</span><span class="p">)</span>
-</pre>
-     </div> 
-     <div style="text-align:center"> 
-      <p><img alt="Alt Text" src="/images/tweets_top_langs.png"></p> 
-     </div> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets_by_country</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'country'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+            if ( -1 !== navigator.userAgent.indexOf('Safari') && -1 === navigator.userAgent.indexOf('Chrome') ) {
+                htmlTag.className += ' td-md-is-safari';
+            }
 
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">'x'</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">'y'</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Countries'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Number of tweets'</span> <span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Top 5 countries'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
-<span class="n">tweets_by_country</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">'bar'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'blue'</span><span class="p">)</span>
-</pre>
-     </div> 
-     <div style="text-align:center"> 
-      <p><img alt="Alt Text" src="/images/tweets_top_countries.png"></p> 
-     </div> 
-     <h1>3. Mining the tweets</h1> 
-     <p>Our main goals in these text mining tasks are: compare the popularity of Python, Ruby and Javascript programming languages and to retrieve programming tutorial links. We will do this in 3 steps:</p> 
-     <ul> 
-      <li>We will add tags to our <code>tweets</code> DataFrame in order to be able to manipualte the data easily.</li> 
-      <li>Target tweets that have "pogramming" or "tutorial" keywords.</li> 
-      <li>Extract links from the relevants tweets</li> 
-     </ul> 
-     <h2>Adding Python, Ruby, and Javascript tags</h2> 
-     <p>First, we will create a function that checks if a specific keyword is present in a text. We will do this by using <a href="http://en.wikipedia.org/wiki/Regular_expression">regular expressions</a>. Python provides a library for regular expression called <code>re</code>. We will start by importing this library</p> 
-     <div class="highlight">
-      <pre><span></span><span class="kn">import</span> <span class="nn">re</span>
-</pre>
-     </div> 
-     <p>Next we will create a function called <code>word_in_text(word, text)</code>. This function return <code>True</code> if a <code>word</code> is found in <code>text</code>, otherwise it returns <code>False</code>.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="k">def</span> <span class="nf">word_in_text</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
-    <span class="n">word</span> <span class="o">=</span> <span class="n">word</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">True</span>
-    <span class="k">return</span> <span class="bp">False</span>
-</pre>
-     </div> 
-     <p>Next, we will add 3 columns to our <code>tweets</code> DataFrame. </p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets</span><span class="p">[</span><span class="s1">'python'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tweet</span><span class="p">:</span> <span class="n">word_in_text</span><span class="p">(</span><span class="s1">'python'</span><span class="p">,</span> <span class="n">tweet</span><span class="p">))</span>
-<span class="n">tweets</span><span class="p">[</span><span class="s1">'javascript'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tweet</span><span class="p">:</span> <span class="n">word_in_text</span><span class="p">(</span><span class="s1">'javascript'</span><span class="p">,</span> <span class="n">tweet</span><span class="p">))</span>
-<span class="n">tweets</span><span class="p">[</span><span class="s1">'ruby'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tweet</span><span class="p">:</span> <span class="n">word_in_text</span><span class="p">(</span><span class="s1">'ruby'</span><span class="p">,</span> <span class="n">tweet</span><span class="p">))</span>
-</pre>
-     </div> 
-     <p>We can calculate the number of tweets for each programming language as follows:</p> 
-     <div class="highlight">
-      <pre><span></span><span class="k">print</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'python'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]</span>
-<span class="k">print</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'javascript'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]</span>
-<span class="k">print</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'ruby'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]</span>
-</pre>
-     </div> 
-     <p>This returns: 21839 for python, 16154 for javascript and 31410 for ruby. We can make a simple comparaison chart by executing the following: </p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">prg_langs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'python'</span><span class="p">,</span> <span class="s1">'javascript'</span><span class="p">,</span> <span class="s1">'ruby'</span><span class="p">]</span>
-<span class="n">tweets_by_prg_lang</span> <span class="o">=</span> <span class="p">[</span><span class="n">tweets</span><span class="p">[</span><span class="s1">'python'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">],</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'javascript'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">],</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'ruby'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]]</span>
+            if( -1 !== navigator.userAgent.indexOf('IEMobile') ){
+                htmlTag.className += ' td-md-is-iemobile';
+            }
 
-<span class="n">x_pos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prg_langs</span><span class="p">)))</span>
-<span class="n">width</span> <span class="o">=</span> <span class="mf">0.8</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x_pos</span><span class="p">,</span> <span class="n">tweets_by_prg_lang</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'g'</span><span class="p">)</span>
-
-<span class="c1"># Setting axis labels and ticks</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Number of tweets'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Ranking: python vs. javascript vs. ruby (Raw data)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">p</span> <span class="o">+</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">width</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">x_pos</span><span class="p">])</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">prg_langs</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
-</pre>
-     </div> 
-     <div style="text-align:center"> 
-      <p><img alt="Alt Text" src="/images/top_prg_lang_raw.png"></p> 
-     </div> 
-     <p>This shows, that the keyword <code>ruby</code> is the most popular, followed by <code>python</code> then <code>javascript</code>. However, the <code>tweets</code> DataFrame contains information about all tweets that contains one of the 3 keywords and doesn't restrict the information to the programming languages. For example, there are a lot tweets that contains the keyword <code>ruby</code> and that are related to a political scandal called <a href="http://en.wikipedia.org/wiki/Rubygate">Rubygate</a>. In the next section, we will filter the tweets and re-run the analysis to make a more accurate comparison.</p> 
-     <h2>Targeting relevant tweets</h2> 
-     <p>We are intersted in targetting tweets that are related to programming languages. Such tweets often have one of the 2 keywords: "programming" or "tutorial". We will create 2 additional columns to our <code>tweets</code> DataFrame where we will add this information.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets</span><span class="p">[</span><span class="s1">'programming'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tweet</span><span class="p">:</span> <span class="n">word_in_text</span><span class="p">(</span><span class="s1">'programming'</span><span class="p">,</span> <span class="n">tweet</span><span class="p">))</span>
-<span class="n">tweets</span><span class="p">[</span><span class="s1">'tutorial'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tweet</span><span class="p">:</span> <span class="n">word_in_text</span><span class="p">(</span><span class="s1">'tutorial'</span><span class="p">,</span> <span class="n">tweet</span><span class="p">))</span>
-</pre>
-     </div> 
-     <p>We will add an additional column called <code>relevant</code> that take value <code>True</code> if the tweet has either "programming" or "tutorial" keyword, otherwise it takes value <code>False</code>.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets</span><span class="p">[</span><span class="s1">'relevant'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tweet</span><span class="p">:</span> <span class="n">word_in_text</span><span class="p">(</span><span class="s1">'programming'</span><span class="p">,</span> <span class="n">tweet</span><span class="p">)</span> <span class="ow">or</span> <span class="n">word_in_text</span><span class="p">(</span><span class="s1">'tutorial'</span><span class="p">,</span> <span class="n">tweet</span><span class="p">))</span>
-</pre>
-     </div> 
-     <p>We can print the counts of relevant tweet by executing the commands below.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="k">print</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'programming'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]</span>
-<span class="k">print</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'tutorial'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]</span>
-<span class="k">print</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'relevant'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]</span>
-</pre>
-     </div> 
-     <p>This returns, 871 for <code>programming</code> column, 511 for <code>tutorial</code> column, and 1356 for <code>relevant</code> column.</p> 
-     <p>We can compare now the popularity of the programming languages by executing the commands below. </p> 
-     <div class="highlight">
-      <pre><span></span><span class="k">print</span> <span class="n">tweets</span><span class="p">[</span><span class="n">tweets</span><span class="p">[</span><span class="s1">'relevant'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">][</span><span class="s1">'python'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]</span>
-<span class="k">print</span> <span class="n">tweets</span><span class="p">[</span><span class="n">tweets</span><span class="p">[</span><span class="s1">'relevant'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">][</span><span class="s1">'javascript'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]</span>
-<span class="k">print</span> <span class="n">tweets</span><span class="p">[</span><span class="n">tweets</span><span class="p">[</span><span class="s1">'relevant'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">][</span><span class="s1">'ruby'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]</span>
-</pre>
-     </div> 
-     <p>Python is the most popular with a count of 732, followed by javascript by a count of 473, and ruby by a count of 185. We can make a comparaison graph by executing the commands below:</p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets_by_prg_lang</span> <span class="o">=</span> <span class="p">[</span><span class="n">tweets</span><span class="p">[</span><span class="n">tweets</span><span class="p">[</span><span class="s1">'relevant'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">][</span><span class="s1">'python'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">],</span> 
-                      <span class="n">tweets</span><span class="p">[</span><span class="n">tweets</span><span class="p">[</span><span class="s1">'relevant'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">][</span><span class="s1">'javascript'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">],</span> 
-                      <span class="n">tweets</span><span class="p">[</span><span class="n">tweets</span><span class="p">[</span><span class="s1">'relevant'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">][</span><span class="s1">'ruby'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()[</span><span class="bp">True</span><span class="p">]]</span>
-<span class="n">x_pos</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">prg_langs</span><span class="p">)))</span>
-<span class="n">width</span> <span class="o">=</span> <span class="mf">0.8</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x_pos</span><span class="p">,</span> <span class="n">tweets_by_prg_lang</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">'g'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Number of tweets'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Ranking: python vs. javascript vs. ruby (Relevant data)'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">'bold'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="n">p</span> <span class="o">+</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">width</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">x_pos</span><span class="p">])</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">prg_langs</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
-</pre>
-     </div> 
-     <div style="text-align:center"> 
-      <p><img alt="Alt Text" src="/images/top_prg_lang_relevant.png"></p> 
-     </div> 
-     <h2>Extracting links from the relevants tweets</h2> 
-     <p>Now that we extracted the relevant tweets, we want to retrieve links to programming tutorials. We will start by creating a function that uses regular expressions for retrieving link that start with "http://" or "https://" from a text. This function will return the url if found, otherwise it returns an empty string.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="k">def</span> <span class="nf">extract_link</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-    <span class="n">regex</span> <span class="o">=</span> <span class="s1">r'https?://[^\s&lt;&gt;"]+|www\.[^\s&lt;&gt;"]+'</span>
-    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>
-    <span class="k">return</span> <span class="s1">''</span>
-</pre>
-     </div> 
-     <p>Next, we will add a column called <code>link</code> to our <code>tweets</code> DataFrame. This column will contain the urls information.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets</span><span class="p">[</span><span class="s1">'link'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s1">'text'</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">tweet</span><span class="p">:</span> <span class="n">extract_link</span><span class="p">(</span><span class="n">tweet</span><span class="p">))</span>
-</pre>
-     </div> 
-     <p>Next we will create a new DataFrame called <code>tweets_relevant_with_link</code>. This DataFrame is a subset of <code>tweets</code> DataFrame and contains all relevant tweets that have a link.</p> 
-     <div class="highlight">
-      <pre><span></span><span class="n">tweets_relevant</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="n">tweets</span><span class="p">[</span><span class="s1">'relevant'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">]</span>
-<span class="n">tweets_relevant_with_link</span> <span class="o">=</span> <span class="n">tweets_relevant</span><span class="p">[</span><span class="n">tweets_relevant</span><span class="p">[</span><span class="s1">'link'</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">''</span><span class="p">]</span>
-</pre>
-     </div> 
-     <p>We can now print out all links for <code>python</code>, <code>javascript</code>, and <code>ruby</code> by executing the commands below:</p> 
-     <div class="highlight">
-      <pre><span></span><span class="k">print</span> <span class="n">tweets_relevant_with_link</span><span class="p">[</span><span class="n">tweets_relevant_with_link</span><span class="p">[</span><span class="s1">'python'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">][</span><span class="s1">'link'</span><span class="p">]</span>
-<span class="k">print</span> <span class="n">tweets_relevant_with_link</span><span class="p">[</span><span class="n">tweets_relevant_with_link</span><span class="p">[</span><span class="s1">'javascript'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">][</span><span class="s1">'link'</span><span class="p">]</span>
-<span class="k">print</span> <span class="n">tweets_relevant_with_link</span><span class="p">[</span><span class="n">tweets_relevant_with_link</span><span class="p">[</span><span class="s1">'ruby'</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">][</span><span class="s1">'link'</span><span class="p">]</span>
-</pre>
-     </div> 
-     <p>This returns 644 links for python, 413 links for javascript, and 136 for ruby. Below are some python related links</p> 
-     <ul> 
-      <li><a href="http://t.co/WmTccp3rb1">http://t.co/WmTccp3rb1</a></li> 
-      <li><a href="http://t.co/5qE3vPAy7N">http://t.co/5qE3vPAy7N</a></li> 
-      <li><a href="http://t.co/1rvmhqPsXD">http://t.co/1rvmhqPsXD</a></li> 
-      <li><a href="http://t.co/S9aq2AahjH">http://t.co/S9aq2AahjH</a></li> 
-      <li><a href="http://t.co/ORg6IL8qXT">http://t.co/ORg6IL8qXT</a></li> 
-      <li><a href="http://t.co/EnK2UlDcJ8">http://t.co/EnK2UlDcJ8</a></li> 
-      <li><a href="http://t.co/gtu9WVQCLK">http://t.co/gtu9WVQCLK</a></li> 
-      <li><a href="http://t.co/xvMTzqLGg0">http://t.co/xvMTzqLGg0</a></li> 
-      <li><a href="http://t.co/bgMZ0jIpA7">http://t.co/bgMZ0jIpA7</a></li> 
-      <li><a href="http://t.co/O03VrRyEAb">http://t.co/O03VrRyEAb</a></li> 
-      <li><a href="http://t.co/CfWYefZML7">http://t.co/CfWYefZML7</a></li> 
-      <li><a href="http://t.co/N3iU2ZYa2z">http://t.co/N3iU2ZYa2z</a></li> 
-      <li><a href="http://t.co/S9aq2AahjH">http://t.co/S9aq2AahjH</a></li> 
-      <li><a href="http://t.co/ytms7bcsQV">http://t.co/ytms7bcsQV</a></li> 
-     </ul> 
-     <h1>Conclusion</h1> 
-     <p>In this tutorial, we covered many techniques used in text mining. The code provide in this post could be modified to create a deeper analysis or could be adapted to another use case. For those who want to go further in text mining, I recommend to follow up by studying regular expressions.</p> 
-     <p>You can find the source code from this tutorial in this github repository <a href="https://github.com/adilmoujahid/Twitter_Analytics">github link</a>. </p> 
-     <h1>references</h1> 
-     <ul> 
-      <li>http://en.wikipedia.org/wiki/Text_mining</li> 
-      <li>http://en.wikipedia.org/wiki/Word-sense_disambiguation</li> 
-      <li>http://en.wikipedia.org/wiki/Regular_expression</li> 
-     </ul> 
-     <div class="hr"></div> 
-     <!-- Begin MailChimp Signup Form --> 
-     <link href="//cdn-images.mailchimp.com/embedcode/slim-081711.css" rel="stylesheet" type="text/css"> 
-     <style type="text/css">
-                #mc_embed_signup{background:#F1F3F3; clear:left; font:14px Helvetica,Arial,sans-serif; }
-                #mc-embedded-subscribe.button{background-color: #0f52ba;}
-                /* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
-                   We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
-            </style> 
-     <div id="mc_embed_signup"> 
-      <form action="//adilmoujahid.us10.list-manage.com/subscribe/post?u=28846a375fbf5c13a93712283&amp;id=a45c6ff723" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate> 
-       <div id="mc_embed_signup_scroll"> 
-        <label for="mce-EMAIL">Subscribe to my Data in Practice Newsletter</label> 
-        <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required> 
-        <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups--> 
-        <div style="position: absolute; left: -5000px;">
-         <input type="text" name="b_28846a375fbf5c13a93712283_a45c6ff723" tabindex="-1" value="">
-        </div> 
-        <div class="clear">
-         <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
-        </div> 
-       </div> 
-      </form> 
-     </div> 
-     <!--End mc_embed_signup--> 
-     <a href="#" class="go-top">Go Top</a> 
-     <div class="comments"> 
-      <div id="disqus_thread"></div> 
-      <script type="text/javascript">
-        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-        var disqus_shortname = "adilmoujahid"; // required: replace example with your forum shortname
-
-        /* * * DON'T EDIT BELOW THIS LINE * * */
-        (function() {
-            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-            dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
         })();
-    </script> 
-      <noscript>
-       Please enable JavaScript to view the 
-       <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
-      </noscript> 
-      <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a> 
-     </div>
-     <footer class="footer"> 
-      <p>© Adil Moujahid – Built with <a href="https://github.com/PurePelicanTheme/pure">Pure Theme</a> for <a href="http://blog.getpelican.com/">Pelican</a> </p> 
-     </footer> 
+
+
+
+
+        var tdLocalCache = {};
+
+        ( function () {
+            "use strict";
+
+            tdLocalCache = {
+                data: {},
+                remove: function (resource_id) {
+                    delete tdLocalCache.data[resource_id];
+                },
+                exist: function (resource_id) {
+                    return tdLocalCache.data.hasOwnProperty(resource_id) && tdLocalCache.data[resource_id] !== null;
+                },
+                get: function (resource_id) {
+                    return tdLocalCache.data[resource_id];
+                },
+                set: function (resource_id, cachedData) {
+                    tdLocalCache.remove(resource_id);
+                    tdLocalCache.data[resource_id] = cachedData;
+                }
+            };
+        })();
+
+    
+    
+var td_viewport_interval_list=[{"limitBottom":767,"sidebarWidth":228},{"limitBottom":1018,"sidebarWidth":300},{"limitBottom":1140,"sidebarWidth":324}];
+var td_animation_stack_effect="type0";
+var tds_animation_stack=true;
+var td_animation_stack_specific_selectors=".entry-thumb, img";
+var td_animation_stack_general_selectors=".td-animation-stack img, .td-animation-stack .entry-thumb, .post img";
+var td_ajax_url="https:\/\/blog.rackspace.com\/wp-admin\/admin-ajax.php?td_theme_name=Newspaper&v=8.1";
+var td_get_template_directory_uri="https:\/\/blog.rackspace.com\/wp-content\/themes\/Newspaper";
+var tds_snap_menu="smart_snap_always";
+var tds_logo_on_sticky="show_header_logo";
+var tds_header_style="5";
+var td_please_wait="Please wait...";
+var td_email_user_pass_incorrect="User or password incorrect!";
+var td_email_user_incorrect="Email or username incorrect!";
+var td_email_incorrect="Email incorrect!";
+var tds_more_articles_on_post_enable="";
+var tds_more_articles_on_post_time_to_wait="";
+var tds_more_articles_on_post_pages_distance_from_top=0;
+var tds_theme_color_site_wide="#c40022";
+var tds_smart_sidebar="enabled";
+var tdThemeName="Newspaper";
+var td_magnific_popup_translation_tPrev="Previous (Left arrow key)";
+var td_magnific_popup_translation_tNext="Next (Right arrow key)";
+var td_magnific_popup_translation_tCounter="%curr% of %total%";
+var td_magnific_popup_translation_ajax_tError="The content from %url% could not be loaded.";
+var td_magnific_popup_translation_image_tError="The image #%curr% could not be loaded.";
+var td_ad_background_click_link="";
+var td_ad_background_click_target="";
+</script> 
+  <!-- Header style compiled by theme --> 
+  <style>
+    
+.td-header-wrap .black-menu .sf-menu > .current-menu-item > a,
+    .td-header-wrap .black-menu .sf-menu > .current-menu-ancestor > a,
+    .td-header-wrap .black-menu .sf-menu > .current-category-ancestor > a,
+    .td-header-wrap .black-menu .sf-menu > li > a:hover,
+    .td-header-wrap .black-menu .sf-menu > .sfHover > a,
+    .td-header-style-12 .td-header-menu-wrap-full,
+    .sf-menu > .current-menu-item > a:after,
+    .sf-menu > .current-menu-ancestor > a:after,
+    .sf-menu > .current-category-ancestor > a:after,
+    .sf-menu > li:hover > a:after,
+    .sf-menu > .sfHover > a:after,
+    .sf-menu ul .td-menu-item > a:hover,
+    .sf-menu ul .sfHover > a,
+    .sf-menu ul .current-menu-ancestor > a,
+    .sf-menu ul .current-category-ancestor > a,
+    .sf-menu ul .current-menu-item > a,
+    .td-header-style-12 .td-affix,
+    .header-search-wrap .td-drop-down-search:after,
+    .header-search-wrap .td-drop-down-search .btn:hover,
+    input[type=submit]:hover,
+    .td-read-more a,
+    .td-post-category:hover,
+    .td-grid-style-1.td-hover-1 .td-big-grid-post:hover .td-post-category,
+    .td-grid-style-5.td-hover-1 .td-big-grid-post:hover .td-post-category,
+    .td_top_authors .td-active .td-author-post-count,
+    .td_top_authors .td-active .td-author-comments-count,
+    .td_top_authors .td_mod_wrap:hover .td-author-post-count,
+    .td_top_authors .td_mod_wrap:hover .td-author-comments-count,
+    .td-404-sub-sub-title a:hover,
+    .td-search-form-widget .wpb_button:hover,
+    .td-rating-bar-wrap div,
+    .td_category_template_3 .td-current-sub-category,
+    .td-login-wrap .btn,
+    .td_display_err,
+    .td_display_msg_ok,
+    .dropcap,
+    .td_wrapper_video_playlist .td_video_controls_playlist_wrapper,
+    .wpb_default,
+    .wpb_default:hover,
+    .td-left-smart-list:hover,
+    .td-right-smart-list:hover,
+    .woocommerce-checkout .woocommerce input.button:hover,
+    .woocommerce-page .woocommerce a.button:hover,
+    .woocommerce-account div.woocommerce .button:hover,
+    #bbpress-forums button:hover,
+    .bbp_widget_login .button:hover,
+    .td-footer-wrapper .td-post-category,
+    .td-footer-wrapper .widget_product_search input[type="submit"]:hover,
+    .woocommerce .product a.button:hover,
+    .woocommerce .product #respond input#submit:hover,
+    .woocommerce .checkout input#place_order:hover,
+    .woocommerce .woocommerce.widget .button:hover,
+    .single-product .product .summary .cart .button:hover,
+    .woocommerce-cart .woocommerce table.cart .button:hover,
+    .woocommerce-cart .woocommerce .shipping-calculator-form .button:hover,
+    .td-next-prev-wrap a:hover,
+    .td-load-more-wrap a:hover,
+    .td-post-small-box a:hover,
+    .page-nav .current,
+    .page-nav:first-child > div,
+    .td_category_template_8 .td-category-header .td-category a.td-current-sub-category,
+    .td_category_template_4 .td-category-siblings .td-category a:hover,
+    #bbpress-forums .bbp-pagination .current,
+    #bbpress-forums #bbp-single-user-details #bbp-user-navigation li.current a,
+    .td-theme-slider:hover .slide-meta-cat a,
+    a.vc_btn-black:hover,
+    .td-trending-now-wrapper:hover .td-trending-now-title,
+    .td-scroll-up-visible,
+    .td-mobile-close a,
+    .td-smart-list-button:hover {
+        background-color: #c40022;
+    }
+
+    .woocommerce .woocommerce-message .button:hover,
+    .woocommerce .woocommerce-error .button:hover,
+    .woocommerce .woocommerce-info .button:hover {
+        background-color: #c40022 !important;
+    }
+
+    .woocommerce .product .onsale,
+    .woocommerce.widget .ui-slider .ui-slider-handle {
+        background: none #c40022;
+    }
+
+    .woocommerce.widget.widget_layered_nav_filters ul li a {
+        background: none repeat scroll 0 0 #c40022 !important;
+    }
+
+    a,
+    cite a:hover,
+    .td_mega_menu_sub_cats .cur-sub-cat,
+    .td-mega-span h3 a:hover,
+    .td_mod_mega_menu:hover .entry-title a,
+    .header-search-wrap .result-msg a:hover,
+    .top-header-menu li a:hover,
+    .top-header-menu .current-menu-item > a,
+    .top-header-menu .current-menu-ancestor > a,
+    .top-header-menu .current-category-ancestor > a,
+    .td-social-icon-wrap > a:hover,
+    .td-header-sp-top-widget .td-social-icon-wrap a:hover,
+    .td-page-content blockquote p,
+    .td-post-content blockquote p,
+    .mce-content-body blockquote p,
+    .comment-content blockquote p,
+    .wpb_text_column blockquote p,
+    .td_block_text_with_title blockquote p,
+    .td_module_wrap:hover .entry-title a,
+    .td-subcat-filter .td-subcat-list a:hover,
+    .td-subcat-filter .td-subcat-dropdown a:hover,
+    .td_quote_on_blocks,
+    .dropcap2,
+    .dropcap3,
+    .td_top_authors .td-active .td-authors-name a,
+    .td_top_authors .td_mod_wrap:hover .td-authors-name a,
+    .td-post-next-prev-content a:hover,
+    .author-box-wrap .td-author-social a:hover,
+    .td-author-name a:hover,
+    .td-author-url a:hover,
+    .td_mod_related_posts:hover h3 > a,
+    .td-post-template-11 .td-related-title .td-related-left:hover,
+    .td-post-template-11 .td-related-title .td-related-right:hover,
+    .td-post-template-11 .td-related-title .td-cur-simple-item,
+    .td-post-template-11 .td_block_related_posts .td-next-prev-wrap a:hover,
+    .comment-reply-link:hover,
+    .logged-in-as a:hover,
+    #cancel-comment-reply-link:hover,
+    .td-search-query,
+    .td-category-header .td-pulldown-category-filter-link:hover,
+    .td-category-siblings .td-subcat-dropdown a:hover,
+    .td-category-siblings .td-subcat-dropdown a.td-current-sub-category,
+    .td-login-wrap .td-login-info-text a:hover,
+    .widget a:hover,
+    .widget_calendar tfoot a:hover,
+    .woocommerce a.added_to_cart:hover,
+    #bbpress-forums li.bbp-header .bbp-reply-content span a:hover,
+    #bbpress-forums .bbp-forum-freshness a:hover,
+    #bbpress-forums .bbp-topic-freshness a:hover,
+    #bbpress-forums .bbp-forums-list li a:hover,
+    #bbpress-forums .bbp-forum-title:hover,
+    #bbpress-forums .bbp-topic-permalink:hover,
+    #bbpress-forums .bbp-topic-started-by a:hover,
+    #bbpress-forums .bbp-topic-started-in a:hover,
+    #bbpress-forums .bbp-body .super-sticky li.bbp-topic-title .bbp-topic-permalink,
+    #bbpress-forums .bbp-body .sticky li.bbp-topic-title .bbp-topic-permalink,
+    .widget_display_replies .bbp-author-name,
+    .widget_display_topics .bbp-author-name,
+    .footer-email-wrap a,
+    .td-subfooter-menu li a:hover,
+    .footer-social-wrap a:hover,
+    a.vc_btn-black:hover,
+    .td-mobile-content li a:hover,
+    .td-mobile-content .sfHover > a,
+    .td-mobile-content .current-menu-item > a,
+    .td-mobile-content .current-menu-ancestor > a,
+    .td-mobile-content .current-category-ancestor > a,
+    .td-smart-list-dropdown-wrap .td-smart-list-button:hover {
+        color: #c40022;
+    }
+
+    .td_login_tab_focus,
+    a.vc_btn-black.vc_btn_square_outlined:hover,
+    a.vc_btn-black.vc_btn_outlined:hover,
+    .td-mega-menu-page .wpb_content_element ul li a:hover {
+        color: #c40022 !important;
+    }
+
+    .td-next-prev-wrap a:hover,
+    .td-load-more-wrap a:hover,
+    .td-post-small-box a:hover,
+    .page-nav .current,
+    .page-nav:first-child > div,
+    .td_category_template_8 .td-category-header .td-category a.td-current-sub-category,
+    .td_category_template_4 .td-category-siblings .td-category a:hover,
+    #bbpress-forums .bbp-pagination .current,
+    .td-login-panel-title,
+    .post .td_quote_box,
+    .page .td_quote_box,
+    a.vc_btn-black:hover {
+        border-color: #c40022;
+    }
+
+    .td_wrapper_video_playlist .td_video_currently_playing:after {
+        border-color: #c40022 !important;
+    }
+
+    .header-search-wrap .td-drop-down-search:before {
+        border-color: transparent transparent #c40022 transparent;
+    }
+
+    .block-title > span,
+    .block-title > a,
+    .block-title > label,
+    .widgettitle,
+    .widgettitle:after,
+    .td-trending-now-title,
+    .td-trending-now-wrapper:hover .td-trending-now-title,
+    .wpb_tabs li.ui-tabs-active a,
+    .wpb_tabs li:hover a,
+    .vc_tta-container .vc_tta-color-grey.vc_tta-tabs-position-top.vc_tta-style-classic .vc_tta-tabs-container .vc_tta-tab.vc_active > a,
+    .vc_tta-container .vc_tta-color-grey.vc_tta-tabs-position-top.vc_tta-style-classic .vc_tta-tabs-container .vc_tta-tab:hover > a,
+    .td-related-title .td-cur-simple-item,
+    .woocommerce .product .products h2,
+    .td-subcat-filter .td-subcat-dropdown:hover .td-subcat-more {
+    	background-color: #c40022;
+    }
+
+    .woocommerce div.product .woocommerce-tabs ul.tabs li.active {
+    	background-color: #c40022 !important;
+    }
+
+    .block-title,
+    .td-related-title,
+    .wpb_tabs .wpb_tabs_nav,
+    .vc_tta-container .vc_tta-color-grey.vc_tta-tabs-position-top.vc_tta-style-classic .vc_tta-tabs-container,
+    .woocommerce div.product .woocommerce-tabs ul.tabs:before {
+        border-color: #c40022;
+    }
+    .td_block_wrap .td-subcat-item .td-cur-simple-item {
+	    color: #c40022;
+	}
+
+
+    
+    .td-grid-style-4 .entry-title
+    {
+        background-color: rgba(196, 0, 34, 0.7);
+    }
+
+    
+    .block-title > span,
+    .block-title > a,
+    .block-title > label,
+    .widgettitle,
+    .widgettitle:after,
+    .td-trending-now-title,
+    .td-trending-now-wrapper:hover .td-trending-now-title,
+    .wpb_tabs li.ui-tabs-active a,
+    .wpb_tabs li:hover a,
+    .vc_tta-container .vc_tta-color-grey.vc_tta-tabs-position-top.vc_tta-style-classic .vc_tta-tabs-container .vc_tta-tab.vc_active > a,
+    .vc_tta-container .vc_tta-color-grey.vc_tta-tabs-position-top.vc_tta-style-classic .vc_tta-tabs-container .vc_tta-tab:hover > a,
+    .td-related-title .td-cur-simple-item,
+    .woocommerce .product .products h2,
+    .td-subcat-filter .td-subcat-dropdown:hover .td-subcat-more {
+        background-color: #000000;
+    }
+
+    .woocommerce div.product .woocommerce-tabs ul.tabs li.active {
+    	background-color: #000000 !important;
+    }
+
+    .block-title,
+    .td-related-title,
+    .wpb_tabs .wpb_tabs_nav,
+    .vc_tta-container .vc_tta-color-grey.vc_tta-tabs-position-top.vc_tta-style-classic .vc_tta-tabs-container,
+    .woocommerce div.product .woocommerce-tabs ul.tabs:before {
+        border-color: #000000;
+    }
+
+    
+    .td-banner-wrap-full,
+    .td-header-style-11 .td-logo-wrap-full {
+        background-color: #f7f7f7;
+    }
+
+    .td-header-style-11 .td-logo-wrap-full {
+        border-bottom: 0;
+    }
+
+    @media (min-width: 1019px) {
+        .td-header-style-2 .td-header-sp-recs,
+        .td-header-style-5 .td-a-rec-id-header > div,
+        .td-header-style-5 .td-g-rec-id-header > .adsbygoogle,
+        .td-header-style-6 .td-a-rec-id-header > div,
+        .td-header-style-6 .td-g-rec-id-header > .adsbygoogle,
+        .td-header-style-7 .td-a-rec-id-header > div,
+        .td-header-style-7 .td-g-rec-id-header > .adsbygoogle,
+        .td-header-style-8 .td-a-rec-id-header > div,
+        .td-header-style-8 .td-g-rec-id-header > .adsbygoogle,
+        .td-header-style-12 .td-a-rec-id-header > div,
+        .td-header-style-12 .td-g-rec-id-header > .adsbygoogle {
+            margin-bottom: 24px !important;
+        }
+    }
+
+    @media (min-width: 768px) and (max-width: 1018px) {
+        .td-header-style-2 .td-header-sp-recs,
+        .td-header-style-5 .td-a-rec-id-header > div,
+        .td-header-style-5 .td-g-rec-id-header > .adsbygoogle,
+        .td-header-style-6 .td-a-rec-id-header > div,
+        .td-header-style-6 .td-g-rec-id-header > .adsbygoogle,
+        .td-header-style-7 .td-a-rec-id-header > div,
+        .td-header-style-7 .td-g-rec-id-header > .adsbygoogle,
+        .td-header-style-8 .td-a-rec-id-header > div,
+        .td-header-style-8 .td-g-rec-id-header > .adsbygoogle,
+        .td-header-style-12 .td-a-rec-id-header > div,
+        .td-header-style-12 .td-g-rec-id-header > .adsbygoogle {
+            margin-bottom: 14px !important;
+        }
+    }
+
+
+
+
+    
+    .td-footer-wrapper {
+        background-color: #2a2a2a;
+    }
+
+    
+    .td-sub-footer-container {
+        background-color: #000000;
+    }
+
+    
+    .td-sub-footer-container,
+    .td-subfooter-menu li a {
+        color: #ffffff;
+    }
+
+
+    
+    .post .td-post-header .entry-title {
+        color: #10141a;
+    }
+
+    
+    .td-module-meta-info .td-post-author-name a {
+    	color: #c40022;
+    }
+
+    
+    .td-post-content,
+    .td-post-content p {
+    	color: #4c5056;
+    }
+
+    
+    .td-post-content h1,
+    .td-post-content h2,
+    .td-post-content h3,
+    .td-post-content h4,
+    .td-post-content h5,
+    .td-post-content h6 {
+    	color: #10141a;
+    }
+
+    
+    .post blockquote p,
+    .page blockquote p {
+    	color: #4c5056;
+    }
+    .post .td_quote_box,
+    .page .td_quote_box {
+        border-color: #4c5056;
+    }
+
+
+    
+    .td-page-header h1,
+    .woocommerce-page .page-title {
+    	color: #10141a;
+    }
+
+    
+    .td-page-content p,
+    .td-page-content .td_block_text_with_title,
+    .woocommerce-page .page-description > p {
+    	color: #4c5056;
+    }
+
+    
+    .td-page-content h1,
+    .td-page-content h2,
+    .td-page-content h3,
+    .td-page-content h4,
+    .td-page-content h5,
+    .td-page-content h6 {
+    	color: #10141a;
+    }
+
+    .td-page-content .widgettitle {
+        color: #fff;
+    }
+
+
+
+    
+    .top-header-menu > li > a,
+    .td-header-sp-top-menu .td_data_time {
+        font-family:Montserrat;
+	font-size:11px;
+	
+    }
+    
+    .top-header-menu .menu-item-has-children li a {
+    	font-family:Montserrat;
+	
+    }
+    
+    ul.sf-menu > .td-menu-item > a {
+        font-family:Montserrat;
+	font-size:14px;
+	
+    }
+    
+    .block-title > span,
+    .block-title > a,
+    .widgettitle,
+    .wpb_tabs li a,
+    .vc_tta-container .vc_tta-color-grey.vc_tta-tabs-position-top.vc_tta-style-classic .vc_tta-tabs-container .vc_tta-tab > a,
+    .td-related-title a,
+    .woocommerce div.product .woocommerce-tabs ul.tabs li a,
+    .woocommerce .product .products h2 {
+        font-family:Montserrat;
+	
+    }
+    
+    .td-excerpt {
+        font-family:"Open Sans";
+	font-size:13px;
+	line-height:21px;
+	
+    }
+
+
+	
+	.td_module_wrap .td-module-title {
+		font-family:Montserrat;
+	
+	}
+     
+	.post .td-post-header .entry-title {
+		font-family:Montserrat;
+	
+	}
+    
+    .td-post-template-5 .td-post-header .entry-title {
+        font-family:Montserrat;
+	font-size:15px;
+	line-height:22px;
+	font-style:normal;
+	font-weight:normal;
+	
+    }
+    
+    .td-post-content p,
+    .td-post-content {
+        font-family:"Open Sans";
+	
+    }
+    
+    .post blockquote p,
+    .page blockquote p,
+    .td-post-text-content blockquote p {
+        font-family:"Open Sans";
+	font-size:15px;
+	line-height:26px;
+	text-transform:none;
+	
+    }
+    
+    .post .td_quote_box p,
+    .page .td_quote_box p {
+        font-family:Quicksand;
+	text-transform:uppercase;
+	
+    }
+    
+    .td-post-content h1 {
+        font-family:Quicksand;
+	font-style:normal;
+	font-weight:bold;
+	text-transform:uppercase;
+	
+    }
+    
+    .td-post-content h2 {
+        font-family:Quicksand;
+	font-weight:bold;
+	text-transform:uppercase;
+	
+    }
+    
+    .td-page-title,
+    .woocommerce-page .page-title,
+    .td-category-title-holder .td-page-title {
+    	font-family:"Open Sans";
+	
+    }
+    
+	.td-sub-footer-menu ul li a {
+		font-family:Montserrat;
+	
+	}
+</style> 
+  <script type="application/ld+json">
+                        {
+                            "@context": "http://schema.org",
+                            "@type": "BreadcrumbList",
+                            "itemListElement": [{
+                            "@type": "ListItem",
+                            "position": 1,
+                                "item": {
+                                "@type": "WebSite",
+                                "@id": "https://blog.rackspace.com/",
+                                "name": "Home"                                               
+                            }
+                        },{
+                            "@type": "ListItem",
+                            "position": 2,
+                                "item": {
+                                "@type": "WebPage",
+                                "@id": "https://blog.rackspace.com/category/cloud-insights",
+                                "name": "Cloud Insights"
+                            }
+                        },{
+                            "@type": "ListItem",
+                            "position": 3,
+                                "item": {
+                                "@type": "WebPage",
+                                "@id": "https://blog.rackspace.com/behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code",
+                                "name": "Behind the Curtain: Twitter Sentiment Analysis Demo Sample App Code"                                
+                            }
+                        }    ]
+                        }
+                       </script>
+  <noscript>
+   <style> .wpb_animate_when_almost_visible { opacity: 1; }</style>
+  </noscript> 
+  <link rel="stylesheet" href="/wp-content/themes/Newspaper-child/includes/fontawesome.css"> 
+ </head> 
+ <body class="post-template-default single single-post postid-40120 single-format-standard behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code global-block-template-1 single_template_1 wpb-js-composer js-comp-ver-4.7.4 vc_responsive td-animation-stack-type0 td-full-layout" itemscope itemtype="https://schema.org/WebPage"> 
+  <div class="td-scroll-up">
+   <i class="td-icon-menu-up"></i>
+  </div> 
+  <div id="td-outer-wrap"> 
+   <div class="td-transition-content-and-menu td-mobile-nav-wrap"> 
+    <div class="td-menu-background"></div> 
+    <div id="td-mobile-nav"> 
+     <div class="td-mobile-container"> 
+      <!-- mobile menu top section --> 
+      <div class="td-menu-socials-wrap"> 
+       <!-- socials --> 
+       <div class="td-menu-socials"> 
+        <span class="td-social-icon-wrap"> <a target="_blank" href="https://www.facebook.com/rackspace/" title="Facebook"> <i class="td-icon-font td-icon-facebook"></i> </a> </span> 
+        <span class="td-social-icon-wrap"> <a target="_blank" href="https://plus.google.com/+Rackspace" title="Google+"> <i class="td-icon-font td-icon-googleplus"></i> </a> </span> 
+        <span class="td-social-icon-wrap"> <a target="_blank" href="https://www.linkedin.com/company/rackspace-hosting" title="Linkedin"> <i class="td-icon-font td-icon-linkedin"></i> </a> </span> 
+        <span class="td-social-icon-wrap"> <a target="_blank" href="https://twitter.com/Rackspace" title="Twitter"> <i class="td-icon-font td-icon-twitter"></i> </a> </span> 
+        <span class="td-social-icon-wrap"> <a target="_blank" href="https://www.youtube.com/user/RackspaceHosting" title="Youtube"> <i class="td-icon-font td-icon-youtube"></i> </a> </span> 
+       </div> 
+       <!-- close button --> 
+       <div class="td-mobile-close"> 
+        <a href="#"><i class="td-icon-close-mobile"></i></a> 
+       </div> 
+      </div> 
+      <!-- login section --> 
+      <!-- menu section --> 
+      <div class="td-mobile-content"> 
+       <div class="menu-top-nav-container">
+        <ul id="menu-top-nav" class="td-mobile-main-menu">
+         <li id="menu-item-40821" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-first menu-item-40821"><a href="https://blog.rackspace.com/category/cloud-insights">Cloud Insights</a></li> 
+         <li id="menu-item-40028" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-40028"><a href="https://blog.rackspace.com/category/products">Products<i class="td-icon-menu-right td-element-after"></i></a> 
+          <ul class="sub-menu"> 
+           <li id="menu-item-42331" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-42331"><a href="https://blog.rackspace.com/tag/managed-hosting">Managed Hosting</a></li> 
+           <li id="menu-item-42333" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-42333"><a href="https://blog.rackspace.com/tag/vmware">VMware</a></li> 
+           <li id="menu-item-42326" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-42326"><a href="https://blog.rackspace.com/tag/fanatical-support-for-aws">Fanatical Support for AWS</a></li> 
+           <li id="menu-item-42330" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-42330"><a href="https://blog.rackspace.com/tag/fanatical-support-for-azure">Fanatical Support for Azure</a></li> 
+           <li id="menu-item-42329" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-42329"><a href="https://blog.rackspace.com/tag/fanatical-support-for-office-365">Fanatical Support for Office 365</a></li> 
+           <li id="menu-item-42327" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-42327"><a href="https://blog.rackspace.com/tag/openstack-private-cloud">OpenStack Private Cloud</a></li> 
+           <li id="menu-item-42328" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-42328"><a href="https://blog.rackspace.com/tag/openstack-public-cloud">OpenStack Public Cloud</a></li> 
+           <li id="menu-item-42332" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-42332"><a href="https://blog.rackspace.com/tag/security">Security</a></li> 
+          </ul> </li> 
+         <li id="menu-item-40026" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-40026"><a href="https://blog.rackspace.com/category/newsroom">Newsroom</a></li> 
+         <li id="menu-item-40225" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-40225"><a href="https://blog.rackspace.com/category/racker-culture">Racker Culture</a></li> 
+         <li id="menu-item-43672" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-43672"><a href="https://www.rackspace.com">Rackspace.com</a></li> 
+        </ul>
+       </div> 
+      </div> 
+     </div> 
+     <!-- register/login section --> 
     </div> 
    </div> 
-  </div> 
-  <script>
-        var $top = $('.go-top');
+   <div class="td-transition-content-and-menu td-content-wrap"> 
+    <!--
+Header style 5
+--> 
+    <div class="td-header-wrap td-header-style-5"> 
+     <div class="td-header-top-menu-wrap-full"> 
+      <div class="td-header-menu-wrap utility"> 
+       <div class="td-container td-header-row td-header-top-menu"> 
+        <div class="top-bar-style-1"> 
+         <div class="td-header-sp-top-menu"> 
+          <div class="menu-top-container">
+           <ul id="menu-utility-nav" class="top-header-menu">
+            <li id="menu-item-39882" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-first td-menu-item td-normal-menu menu-item-39882"><a>SUPPORT: 1-800-961-4454</a></li> 
+            <li id="menu-item-39883" class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-39883"><a>SALES: <span class="InfinityNumber">1-800-961-2888</span></a></li> 
+            <li id="menu-item-39880" class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-39880"><a href="https://www.rackspace.com/information/contactus#form">Email Us</a></li> 
+            <li id="menu-item-39881" class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-39881"><a href="#chat">Sales Chat</a></li> 
+           </ul>
+          </div>
+         </div> 
+         <div class="td-header-sp-top-widget"> 
+          <div class="menu-utility-nav-right-container">
+           <ul id="menu-utility-nav-right" class="top-header-menu">
+            <li id="menu-item-40000" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-first td-menu-item td-normal-menu menu-item-40000"><a href="https://developer.rackspace.com/">Developers</a></li> 
+            <li id="menu-item-40001" class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-40001"><a href="https://partners.rackspace.com/English/">Partners</a></li> 
+            <li id="menu-item-40002" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children td-menu-item td-normal-menu menu-item-40002"><a href="#"><button>SIGN UP</button></a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-40003" class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-40003"><a href="https://cart.rackspace.com/cloud">Rackspace Cloud</a></li> 
+              <li id="menu-item-40004" class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-40004"><a href="https://cart.rackspace.com/cloud/sites">Cloud Sites</a></li> 
+              <li id="menu-item-40005" class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-40005"><a href="https://cart.rackspace.com/apps">Email &amp; Apps</a></li> 
+              <li id="menu-item-40006" class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-40006"><a href="https://cart.rackspace.com/aws">Support for AWS</a></li> 
+              <li id="menu-item-40055" class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-40055"><a href="https://cart.rackspace.com/office365">Office 365</a></li> 
+             </ul> </li> 
+           </ul>
+          </div>
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="td-header-menu-wrap-full"> 
+      <div class="td-header-menu-wrap main-nav"> 
+       <div class="td-container td-header-row td-header-main-menu black-menu"> 
+        <div id="td-header-menu" role="navigation" itemscope itemtype="https://schema.org/SiteNavigationElement"> 
+         <div id="td-top-mobile-toggle">
+          <a href="#"><i class="td-icon-font td-icon-mobile"></i></a>
+         </div> 
+         <div class="td-main-menu-logo"> 
+          <a class="td-main-logo" href="https://blog.rackspace.com/"> <img class="td-retina-data" data-retina="/wp-content/uploads/2016/01/rs-blog-logo.svg" src="/wp-content/uploads/2016/01/rs-blog-logo.svg" alt="Rackspace Blog" title="Rackspace"> </a> 
+         </div> 
+         <div class="menu-top-nav-container">
+          <ul id="menu-top-nav-1" class="sf-menu">
+           <li class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-first td-menu-item td-normal-menu menu-item-40821"><a href="https://blog.rackspace.com/category/cloud-insights">Cloud Insights</a></li> 
+           <li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children td-menu-item td-normal-menu menu-item-40028"><a href="https://blog.rackspace.com/category/products">Products</a> 
+            <ul class="sub-menu"> 
+             <li class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-42331"><a href="https://blog.rackspace.com/tag/managed-hosting">Managed Hosting</a></li> 
+             <li class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-42333"><a href="https://blog.rackspace.com/tag/vmware">VMware</a></li> 
+             <li class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-42326"><a href="https://blog.rackspace.com/tag/fanatical-support-for-aws">Fanatical Support for AWS</a></li> 
+             <li class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-42330"><a href="https://blog.rackspace.com/tag/fanatical-support-for-azure">Fanatical Support for Azure</a></li> 
+             <li class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-42329"><a href="https://blog.rackspace.com/tag/fanatical-support-for-office-365">Fanatical Support for Office 365</a></li> 
+             <li class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-42327"><a href="https://blog.rackspace.com/tag/openstack-private-cloud">OpenStack Private Cloud</a></li> 
+             <li class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-42328"><a href="https://blog.rackspace.com/tag/openstack-public-cloud">OpenStack Public Cloud</a></li> 
+             <li class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-42332"><a href="https://blog.rackspace.com/tag/security">Security</a></li> 
+            </ul> </li> 
+           <li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-40026"><a href="https://blog.rackspace.com/category/newsroom">Newsroom</a></li> 
+           <li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-40225"><a href="https://blog.rackspace.com/category/racker-culture">Racker Culture</a></li> 
+           <li class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-43672"><a href="https://www.rackspace.com">Rackspace.com</a></li> 
+          </ul>
+         </div>
+        </div> 
+        <div class="td-search-wrapper"> 
+         <div id="td-top-search"> 
+          <div class="header-search-wrap"> 
+           <div class="dropdown header-search"> 
+            <a id="td-header-search-button" href="#" role="button" class="dropdown-toggle " data-toggle="dropdown"><i class="td-icon-search"></i></a> 
+           </div> 
+          </div> 
+         </div> 
+        </div> 
+        <div class="header-search-wrap"> 
+         <div class="dropdown header-search"> 
+          <div class="td-drop-down-search" aria-labelledby="td-header-search-button"> 
+           <form role="search" method="get" class="td-search-form" action="https://blog.rackspace.com/"> 
+            <div class="td-head-form-search-wrap"> 
+             <input id="td-header-search" type="text" value="" name="s" autocomplete="off">
+             <input class="wpb_button wpb_btn-inverse btn" type="submit" id="td-header-search-top" value="Search"> 
+            </div> 
+           </form> 
+           <div id="td-aj-search"></div> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <div class="td-banner-wrap-full"> 
+      <div class="td-header-container td-header-row td-header-header"> 
+       <div class="td-header-sp-recs"> 
+        <div class="td-header-rec-wrap"> 
+         <div class="td-a-rec td-a-rec-id-header  td-rec-hide-on-m td-rec-hide-on-tl td-rec-hide-on-tp td-rec-hide-on-p td_uid_1_59d37d3f31896_rand td_block_template_1">
+          <div class="td-all-devices">
+           <a href="#"><img src="https://blog.rackspace.com/wp-content/uploads/2015/10/rec728.jpg"></a>
+          </div>
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </div>
+    <div class="td-main-content-wrap td-container-wrap"> 
+     <div class="td-container td-post-template-1 "> 
+      <div class="td-crumb-container">
+       <div class="entry-crumbs">
+        <span><a title="" class="entry-crumb" href="https://blog.rackspace.com/">Home</a></span> 
+        <i class="td-icon-right td-bread-sep"></i> 
+        <span><a title="View all posts in Cloud Insights" class="entry-crumb" href="https://blog.rackspace.com/category/cloud-insights">Cloud Insights</a></span> 
+        <i class="td-icon-right td-bread-sep td-bred-no-url-last"></i> 
+        <span class="td-bred-no-url-last">Behind the Curtain: Twitter Sentiment Analysis Demo Sample App Code</span>
+       </div>
+      </div> 
+      <div class="td-pb-row"> 
+       <div class="td-pb-span8 td-main-content" role="main"> 
+        <div class="td-ss-main-content"> 
+         <article id="post-40120" class="post-40120 post type-post status-publish format-standard has-post-thumbnail hentry category-cloud-insights tag-spark" itemscope itemtype="https://schema.org/Article"> 
+          <div class="td-post-header"> 
+           <ul class="td-category">
+            <li class="entry-category"><a href="https://blog.rackspace.com/category/cloud-insights">Cloud Insights</a></li>
+           </ul> 
+           <header class="td-post-title"> 
+            <h1 class="entry-title">Behind the Curtain: Twitter Sentiment Analysis Demo Sample App Code</h1> 
+            <div class="td-module-meta-info"> 
+             <div class="td-post-author-name">
+              By 
+              <a itemprop="author" href="https://blog.rackspace.com/author/greghill">Greg Hill</a> - 
+             </div> 
+             <span class="td-post-date"><time class="entry-date updated td-module-date" datetime="2016-02-25T10:00:23+00:00">February 25, 2016</time></span> 
+            </div> 
+           </header> 
+          </div> 
+          <div class="td-post-content"> 
+           <div class="td-featured-image-rec"> 
+            <div class="td-post-featured-image">
+             <a href="https://blog.rackspace.com/wp-content/uploads/2015/10/13.jpg" data-caption=""><img width="696" height="464" itemprop="image" class="entry-thumb td-modal-image" src="https://blog.rackspace.com/wp-content/uploads/2015/10/13-696x464.jpg" alt="" title="Apple products on a wooden table with cappuccino from 2015"></a>
+            </div> 
+           </div> 
+           <p>On Tuesday, we <a href="http://blog.rackspace.com/how-to-twitter-sentiment-analysis-demo-on-rackspace-cloud-big-data/" target="_blank">walked through</a> how to build a cluster with our Sentiment Analysis Sample application and how to get the app running. Today’s&nbsp;article is a deep dive into the code behind the app, and gives some basic pointers on how to use Spark to build applications like this easily. Tomorrow, we’ll&nbsp;dive into the frontend code to see how to consume the data we produced here and how to make it useful to the end user.</p> 
+           <p>Our demo app consists of only a few pieces of technology: Apache Spark Streaming, Apache Kafka and js.</p> 
+           <p>We take advantage of Spark’s bundled Twitter Streaming library to stream new tweets from Twitter’s API as they come in, analyze them using the algorithm we’ll go into in a minute, then post those scored tweets to a topic on an Apache Kafka message queue running in the cluster. From there, the node.js application simply monitors that topic in Kafka and streams the data to the website, which in turn generates a real-time graph as data is received.</p> 
+           <h3>Spark Streaming</h3> 
+           <p>If you strip the streaming code down to the core important bits, it’s relatively easy to follow. You can follow along with <a href="https://github.com/rackerlabs/cloudbigdata-extras/blob/master/examples/twitter_sentiment_v2/backend/src/main/scala/com/rackspace/spark/Sentiment.scala" target="_blank">the source code on github</a>.</p> 
+           <p>We’ll walk through the code, bit by bit now. The code in this document isn’t necessarily in the same order as on github; it’s been reformatted and regrouped so it makes sense for explanation. The actual code is unchanged, but where it makes sense to show a function next to invocation of that function, the code has been reorganized, for example.</p> 
+           <p>First, convert the keyword list to a token set using the same algorithm that will be used to tokenize incoming tweets into words. A tokenizer is just a generic name for an algorithm that breaks down a larger piece of text into individual pieces, or tokens, that are&nbsp;used to analyze text. Things like frequency of occurrence, co-occurrence (i.e. two words seen together), etc., can impact the results of the algorithm. Here’s our basic tokenizer:</p> 
+           <p>This tokenizer is pretty bare-bones and could be vastly improved if we had a specific case we were trying to write this for. But since it’s just a generic sample app, we kept it as broad as possible, meaning it does an okay job for a lot of use cases, but not a great job for any particular one. We simply convert the text to individual English words using an analyzer from the Lucene project. If we wanted to improve it, we could parse out specific emoticons, give extra weight to particular punctuation (like exclamation marks), try to handle other languages, etc. All of these affect performance, so you have to tweak and iterate until you hit the sweet spot for your application.</p> 
+           <p>Stemming is a process of converting related words into a common stem. So things like ran, running and run all become ‘run.’ This is a common technique used in search engines, although the major search engines have many more tricks up their sleeves these days. Here we convert the words we got back into their stems, and then generate a map of stem to keyword.</p> 
+           <p>Since we used the stems as the keys, we convert that list of keys into a set to get a list of unique tokens. We’re doing this with the list of keywords we configured in the application in <a href="http://ddf912383141a8d7bbe4-e053e711fc85de3290f121ef0f0e3a1f.r87.cf1.rackcdn.com/Cloud%20Big%20Data15.png" target="_blank" data-rel="lightbox-0" title="">our previous&nbsp;article</a>, so we have a group of keyword stems to compare incoming tweets against. That way, we know which group to show the scores under in the graph. We can give Twitter a list of keywords to match against, but they don’t tell us which one(s) were matched to the tweets they stream to us, so we have to figure that out ourselves.</p> 
+           <p>The next step is to prepare and train the data model that will compare incoming tweets to. We gathered a couple of public data sets that have been pre-categorized as having a positive or negative sentiment, and make those available inside your cluster as part of the post-init script we installed as part of the cluster create in the previous article.</p> 
+           <p>We simply load the existing tweet data (from CSV files) into a SQL Context. This is one of the powerful things about Spark. We have CSV data, but we can now execute SQL queries against it without any ETL conversions. We simply tell Spark to generate a schema from the header row in the CSV file, register that as a ‘temp’ table (i.e. in-memory) and then it will process individual rows of the file as separate records in the table, in parallel, across your cluster.</p> 
+           <p>We now run the actual SQL query against our CSV data and get two data frame objects representing each data set. In the first query we select *, but we know from the second that our columns are id, sentiment, query and text. We really only care about sentiment and text. Since both data frames have the same schema, we can combine them into a single data frame using unionAll().</p> 
+           <p>Now we convert that combined Data Frame into an RDD of tuples, each containing the sentiment score and the tweet associated with that score. If you recall from above, columns 1 and 3 are ‘sentiment’ and ‘text.’ Columns are 0-indexed, like arrays, so column 1 is really the 2<sup>nd</sup> entry in the row, and 3 is the 4<sup>th</sup>.</p> 
+           <p>Transform the RDD so the sentiment score is an integer value, and break the tweet into individual tokens (words) with the same algorithm we are using everywhere else to convert text into tokens.</p> 
+           <p>The HashingTF() is an object that transforms strings into hashes. TF is short for Transform, iirc. Think of this as basically an md5sum object. We’re going to hash all the tokens to train the model. We’ll do the same with incoming tweets to do predictions against the model.</p> 
+           <p>We now generate a LabeledPoint object using our ‘label’ (i.e. positive or negative sentiment, represented by 1 and 0, respectively) and the hashed list of word stems that we generated from the text of the tweet. The prediction algorithm we use next knows how to read this format and do something useful with it. The important part to remember is that the ‘label’ can really be anything, but for our case, it’s just the positive or negative sentiment that we’re looking for.</p> 
+           <p>This is the only really complicated part of the whole job, and I’ll be a bit hand-wavey because I don’t personally fully understand how the classifier algorithm works. What this basically does is train our model using a NaiveBayes classifier, telling it which keywords are associated most commonly with each sentiment so that when we feed it the incoming tweets later, it has a good reference point to compare them to. This is the bulk of the work for Sentiment Analysis, and also the area where we rely most heavily on Spark MLLib as we aren’t experts in this domain.</p> 
+           <p>This little bit of code isn’t strictly necessary. It was added in during testing to verify that the model training was successful by taking a subset of the data (30 percent of it) and using our algorithm to generate a new score for that data, then compare it to the known scores. We will likely remove this in the future as it just adds startup time costs with no real-time benefit, since we’ve already verified the algorithm produces predictions that match known data.</p> 
+           <p>This does two things: prepare the model using the function above, and broadcast that trained model.</p> 
+           <p>Establish the Spark Streaming Context from Twitter:</p> 
+           <p>These credentials need to be configured in the config file for the application. We touched on this briefly in the <a href="http://ddf912383141a8d7bbe4-e053e711fc85de3290f121ef0f0e3a1f.r87.cf1.rackcdn.com/Cloud%20Big%20Data15.png" target="_blank" data-rel="lightbox-1" title="">last article</a>, but there is also more info in the <a href="https://github.com/rackerlabs/cloudbigdata-extras/blob/master/examples/twitter_sentiment_v2/README.md">README</a>.</p> 
+           <p>The ‘twitterRefresh’ variable controls how many seconds worth of tweets to gather in each iteration. Basically it buffers for this long, then sends that data to Spark as a group of partitions that contain a number of individual tweets.</p> 
+           <p>This is a comma-separated list of keywords we want to watch for on Twitter. We covered the bit where we generate the token list from these keywords, this is just how we pass that list to Twitter.</p> 
+           <p>This causes Spark Streaming to listen for incoming tweets from the Twitter Streaming API, and then gracefully shutdown if a kill signal is received or the streaming job exits for any reason. This is boilerplate setup/teardown for any Spark Streaming job.</p> 
+           <p>Stream the tweets using Spark Streaming:</p> 
+           <p>The actual inner loop functionality is elided here to showcase how the loop works. This breaks down the Twitter Stream RDD into individual partitions. By default, Spark Streaming will convert the Twitter stream into partitions of a particular chunk size and process them separately in individual executors in order to parallelize the load. Each iteration of foreachPartition() will be executed in an executor process. If the number of partitions exceeds the number of executors, then the extra partitions will queue up until an executor is freed. Here we establish some partition-level variables that get shared in-memory in each executor process. Think of these as process globals for the executor processes:</p> 
+           <p>We don’t want to create the KafkaProducer object every time we process a tweet, but rather once per partition of data received. It’s a minor optimization, but a useful one.</p> 
+           <p>Again, the main body of code is elided to show the loop structure on its own. When we loop the partition RDD we get the individual <a href="http://twitter4j.org/javadoc/twitter4j/Status.html">Twitter4J.Status</a> objects to process. This wasn’t obvious to me at first. I expected there to be only be two loops, one for looping through the StreamRDD and then through the individual tweets. I didn’t expect the partitions abstraction to be there. That’s something to be aware of if you’re building a streaming application. The incoming stream RDD is made up of partitions, which are in turn made up of individual items.</p> 
+           <p>Next, convert the tweet to a set of words for comparison to the model we built earlier:</p> 
+           <p>We convert the incoming tweet to a list of tokens (word stems) and then get the intersection of those with the keywords we’re watching to determine which keywords apply to this tweet. This is not bulletproof, as Twitter is smarter about including tweets in the list if they link to an article that references the keyword we’re watching for, or if that word is used in hashtags, etc. We could definitely make this smarter if we were doing this for real, or Twitter could actually tell us which keywords were matched in the tweets, since they already have that data.</p> 
+           <p>Now it’s time to score the incoming tweet and generate a JSON document of the tweet details and the score. You’ll notice we apply the same hashing algorithm to the incoming tweet tokens.</p> 
+           <p>This is what determines the sentiment of the incoming tweet as compared to the trained model we produced earlier from the pre-categorized data sets. You’ll notice we use broadcastedModel.value to get the underlying NaiveBayesModel object rather than the wrapper object that sc.broadcast() produced. If we had not done a sc.broadcast() the model would only be available here if it implemented the Java Serializable interface, and it would be sent across the network on every iteration of the streaming loop, which would be super inefficient as it’s a rather large object. Since that model is trained on the sample data we loaded from HDFS, we now just call model.predict() on it to predict the sentiment of the incoming tweet.</p> 
+           <p>Now on to the JSON document generation. This basically converts the Twitter4J.Status object to a JSON object that we can send to Kafka. Kafka doesn’t know JSON; it takes in raw bytes of whatever. We do have to convert the object to a JSON string first, and then decode it on the other end. We could use any serialization format, but we chose JSON because the other end is a Javascript app.</p> 
+           <p>We originally planned to include a heat map in the UI, to show where on the map the tweets were coming from. So we added the geolocation data to the outgoing JSON. But, as we discovered in our testing, something like maybe 1 percent of tweets include this data, so we ended up discarding the heatmap from the UI. The remaining bits are all fairly self-explanatory, I think.</p> 
+           <p>Now we have a JSONObject representing the tweet, with the ‘score’ and ‘keywords’ added. We’ll convert it to raw text when we push it to Kafka later.</p> 
+           <p>Next, send that JSON document to Kafka to be picked up by the node.js app:</p> 
+           <p>The bit with the counter and determining the partition manually is due to the default Kafka behavior not aligning with our use-case. Kafka will automatically pick a partition for you if you don’t send it one, but the way it load-balances this is to round-robin based on how long the KafkaProducer object has been alive. Since this gets re-recreated on each partition, we end up hitting one partition a lot more frequently than the others. So instead, we round-robin the partitions per incoming tweet.</p> 
+           <p>This actually sends the JSON text to Kafka. From there, it’s all up to node.js to show the information to the end-user. That’s the end of the Spark Streaming application. Besides having to know enough about ML to know which algorithms to use and how to prepare the data for that algorithm, it’s really not that complicated. Getting really accurate results would take a bit more work and a lot of domain knowledge to know how to better tokenize the tweets and train the model for your use case.</p> 
+           <p><span style="font-size: 16px;">And there you have it. That’s all there is to analyzing the incoming data and putting it into a format that’s consumable by a frontend application.&nbsp;<span style="color: #333333; font-family: Georgia, 'Times New Roman', 'Bitstream Charter', Times, serif;">I realize I kind of skimmed the surface in a few places</span>,&nbsp;but I hope this helps show how the Sentiment Analysis Sample Application works, and given some insight in general about how Spark works and how to architect applications of this sort.&nbsp;&nbsp;</span></p> 
+           <p><span style="font-size: 16px;">Tune back in tomorrow, when we’ll&nbsp;unpack&nbsp;the frontend code, showing how to consume the data we produced here and make it useful to the end user.</span></p> 
+           <div class="sharedaddy sd-sharing-enabled">
+            <div class="robots-nocontent sd-block sd-social sd-social-official sd-sharing">
+             <h3 class="sd-title">Share this post:</h3>
+             <div class="sd-content">
+              <ul>
+               <li class="share-twitter"><a href="https://twitter.com/share" class="twitter-share-button" data-url="https://blog.rackspace.com/behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code" data-text="Behind the Curtain: Twitter Sentiment Analysis Demo Sample App Code" data-via="Rackspace">Tweet</a></li>
+               <li class="share-facebook">
+                <div class="fb-share-button" data-href="https://blog.rackspace.com/behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code" data-layout="button_count"></div></li>
+               <li class="share-linkedin">
+                <div class="linkedin_button">
+                 <script type="in/share" data-url="https://blog.rackspace.com/behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code" data-counter="right"></script>
+                </div></li>
+               <li class="share-end"></li>
+              </ul>
+             </div>
+            </div>
+           </div> 
+          </div> 
+          <footer> 
+           <div class="td-post-source-tags"> 
+            <ul class="td-tags td-post-small-box clearfix">
+             <li><span>TAGS</span></li>
+             <li><a href="https://blog.rackspace.com/tag/spark">Spark</a></li>
+            </ul> 
+           </div> 
+           <div class="author-box-wrap">
+            <a itemprop="author" href="https://blog.rackspace.com/author/greghill"><img alt="mm" src="http://ddf912383141a8d7bbe4-e053e711fc85de3290f121ef0f0e3a1f.r87.cf1.rackcdn.com/blogger_images/greg-hill-avatar.jpg" class="avatar avatar-96 photo" height="96" width="96"></a>
+            <div class="desc">
+             <div class="td-author-name vcard author">
+              <span class="fn"><a itemprop="author" href="https://blog.rackspace.com/author/greghill">Greg Hill</a></span>
+             </div>
+             <div class="td-author-description">
+              Greg has 15 years of industry experience as a software developer. He was a core contributor to LiquidWeb's cloud product, Storm On Demand. He has extensive experience across the entire web development stack, all the way from writing HTML and CSS to doing devops and system administration automation. He likes Perl more than Python, despite being heckled mercilessly. He now works on the Cloud Big Data product at Rackspace, which provisions and manages Hadoop clusters on the Rackspace Cloud.
+             </div>
+             <div class="td-author-social"></div>
+             <div class="clearfix"></div>
+            </div>
+           </div> 
+          </footer> 
+         </article> 
+         <!-- /.post --> 
+         <div class="comments" id="comments"> 
+          <div id="respond" class="comment-respond"> 
+           <h3 id="reply-title" class="comment-reply-title">LEAVE A REPLY <small><a rel="nofollow" id="cancel-comment-reply-link" href="/behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code#respond" style="display:none;">Cancel reply</a></small></h3> 
+           <form action="https://blog.rackspace.com/wp-comments-post.php?wpe-comment-post=rsblogdev" method="post" id="commentform" class="comment-form" novalidate> 
+            <div class="clearfix"></div> 
+            <div class="comment-form-input-wrap td-form-comment"> 
+             <textarea placeholder="Comment:" id="comment" name="comment" cols="45" rows="8" aria-required="true"></textarea> 
+             <div class="td-warning-comment">
+              Please enter your comment!
+             </div> 
+            </div> 
+            <div class="comment-form-input-wrap td-form-author"> 
+             <input class="" id="author" name="author" placeholder="Name:*" type="text" value="" size="30" aria-required="true"> 
+             <div class="td-warning-author">
+              Please enter your name here
+             </div> 
+            </div> 
+            <div class="comment-form-input-wrap td-form-email"> 
+             <input class="" id="email" name="email" placeholder="Email:*" type="text" value="" size="30" aria-required="true"> 
+             <div class="td-warning-email-error">
+              You have entered an incorrect email address!
+             </div> 
+             <div class="td-warning-email">
+              Please enter your email address here
+             </div> 
+            </div> 
+            <div class="comment-form-input-wrap td-form-url"> 
+             <input class="" id="url" name="url" placeholder="Website:" type="text" value="" size="30"> 
+            </div> 
+            <p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="40120" id="comment_post_ID"> <input type="hidden" name="comment_parent" id="comment_parent" value="0"> </p>
+            <p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="1a2c4bfa2a"></p>
+            <p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="95"></p> 
+           </form> 
+          </div>
+          <!-- #respond --> 
+         </div> 
+         <!-- /.content --> 
+        </div> 
+       </div> 
+       <div class="td-pb-span4 td-main-sidebar" role="complementary"> 
+        <div class="td-ss-main-sidebar"> 
+         <div class="td_block_wrap td_block_1 td_block_widget td_uid_3_59d37d3f3fc71_rand td-pb-border-top td_block_template_1 td-column-1" data-td-block-uid="td_uid_3_59d37d3f3fc71">
+          <script>var block_td_uid_3_59d37d3f3fc71 = new tdBlock();
+block_td_uid_3_59d37d3f3fc71.id = "td_uid_3_59d37d3f3fc71";
+block_td_uid_3_59d37d3f3fc71.atts = '{"limit":"5","sort":"","post_ids":"","tag_slug":"","autors_id":"","installed_post_types":"","category_id":"","category_ids":"-2409","custom_title":"Recent Posts","custom_url":"","show_child_cat":"","sub_cat_ajax":"","ajax_pagination":"","header_color":"#","header_text_color":"#","ajax_pagination_infinite_stop":"","td_column_number":1,"td_ajax_preloading":"","td_ajax_filter_type":"","td_ajax_filter_ids":"","td_filter_default_txt":"All","color_preset":"","border_top":"","class":"td_block_widget td_uid_3_59d37d3f3fc71_rand","el_class":"","offset":"","css":"","tdc_css":"","tdc_css_class":"td_uid_3_59d37d3f3fc71_rand","tdc_css_class_style":"td_uid_3_59d37d3f3fc71_rand_style","live_filter":"","live_filter_cur_post_id":"","live_filter_cur_post_author":"","block_template_id":""}';
+block_td_uid_3_59d37d3f3fc71.td_column_number = "1";
+block_td_uid_3_59d37d3f3fc71.block_type = "td_block_1";
+block_td_uid_3_59d37d3f3fc71.post_count = "5";
+block_td_uid_3_59d37d3f3fc71.found_posts = "4526";
+block_td_uid_3_59d37d3f3fc71.header_color = "#";
+block_td_uid_3_59d37d3f3fc71.ajax_pagination_infinite_stop = "";
+block_td_uid_3_59d37d3f3fc71.max_num_pages = "906";
+tdBlocksArray.push(block_td_uid_3_59d37d3f3fc71);
+</script>
+          <div class="td-block-title-wrap">
+           <h4 class="block-title"><span class="td-pulldown-size">Recent Posts</span></h4>
+          </div>
+          <div id="td_uid_3_59d37d3f3fc71" class="td_block_inner"> 
+           <div class="td-block-span12"> 
+            <div class="td_module_4 td_module_wrap td-animation-stack"> 
+             <div class="td-module-image"> 
+              <div class="td-module-thumb">
+               <a href="https://blog.rackspace.com/report-rackspace-named-top-player-cloud-business-email" rel="bookmark" title="Report: Rackspace Named a Top Player in Cloud Business Email"><img width="324" height="235" class="entry-thumb" src="https://blog.rackspace.com/wp-content/uploads/2016/10/have_office_issues_blog_header-324x235.jpg" alt="" title="Report: Rackspace Named a Top Player in Cloud Business Email"></a>
+              </div> 
+              <a href="https://blog.rackspace.com/category/cloud-insights" class="td-post-category">Cloud Insights</a> 
+             </div> 
+             <h3 class="entry-title td-module-title"><a href="https://blog.rackspace.com/report-rackspace-named-top-player-cloud-business-email" rel="bookmark" title="Report: Rackspace Named a Top Player in Cloud Business Email">Report: Rackspace Named a Top Player in Cloud Business Email</a></h3> 
+             <div class="td-module-meta-info"> 
+              <span class="td-post-author-name"><a href="https://blog.rackspace.com/author/kacelacombe">Kacie LaCombe</a> <span>-</span> </span> 
+              <span class="td-post-date"><time class="entry-date updated td-module-date" datetime="2017-10-03T06:00:55+00:00">October 3, 2017</time></span> 
+              <div class="td-module-comments">
+               <a href="https://blog.rackspace.com/report-rackspace-named-top-player-cloud-business-email#respond">0</a>
+              </div> 
+             </div> 
+             <div class="td-excerpt">
+               For the second year in a row, The Radicati Group has named Rackspace a Cloud Business Email market “Top Player” in the 2017 Market... 
+             </div> 
+            </div> 
+           </div> 
+           <!-- ./td-block-span12 --> 
+           <div class="td-block-span12"> 
+            <div class="td_module_6 td_module_wrap td-animation-stack"> 
+             <div class="td-module-thumb">
+              <a href="https://blog.rackspace.com/a-users-look-at-openstack-networking-part-2" rel="bookmark" title="A User’s Look at OpenStack Networking, Part 2"><img width="100" height="70" class="entry-thumb" src="https://blog.rackspace.com/wp-content/uploads/2017/09/virtual-network-100x70.jpg" srcset="https://blog.rackspace.com/wp-content/uploads/2017/09/virtual-network-100x70.jpg 100w, https://blog.rackspace.com/wp-content/uploads/2017/09/virtual-network-218x150.jpg 218w" sizes="(max-width: 100px) 100vw, 100px" alt="" title="A User’s Look at OpenStack Networking, Part 2"></a>
+             </div> 
+             <div class="item-details"> 
+              <h3 class="entry-title td-module-title"><a href="https://blog.rackspace.com/a-users-look-at-openstack-networking-part-2" rel="bookmark" title="A User’s Look at OpenStack Networking, Part 2">A User’s Look at OpenStack Networking, Part 2</a></h3> 
+              <div class="td-module-meta-info"> 
+               <span class="td-post-date"><time class="entry-date updated td-module-date" datetime="2017-10-03T06:00:02+00:00">October 3, 2017</time></span> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <!-- ./td-block-span12 --> 
+           <div class="td-block-span12"> 
+            <div class="td_module_6 td_module_wrap td-animation-stack"> 
+             <div class="td-module-thumb">
+              <a href="https://blog.rackspace.com/data-governance-components-keep-data-secure" rel="bookmark" title="Data Governance: What Are the Components to Keep Data Secure?"><img width="100" height="70" class="entry-thumb" src="https://blog.rackspace.com/wp-content/uploads/2016/10/data-security-100x70.jpg" srcset="https://blog.rackspace.com/wp-content/uploads/2016/10/data-security-100x70.jpg 100w, https://blog.rackspace.com/wp-content/uploads/2016/10/data-security-218x150.jpg 218w" sizes="(max-width: 100px) 100vw, 100px" alt="data security" title="Data Governance: What Are the Components to Keep Data Secure?"></a>
+             </div> 
+             <div class="item-details"> 
+              <h3 class="entry-title td-module-title"><a href="https://blog.rackspace.com/data-governance-components-keep-data-secure" rel="bookmark" title="Data Governance: What Are the Components to Keep Data Secure?">Data Governance: What Are the Components to Keep Data Secure?</a></h3> 
+              <div class="td-module-meta-info"> 
+               <span class="td-post-date"><time class="entry-date updated td-module-date" datetime="2017-10-02T06:30:04+00:00">October 2, 2017</time></span> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <!-- ./td-block-span12 --> 
+           <div class="td-block-span12"> 
+            <div class="td_module_6 td_module_wrap td-animation-stack"> 
+             <div class="td-module-thumb">
+              <a href="https://blog.rackspace.com/cloudchat-recap-exploring-private-cloud" rel="bookmark" title="#cloudchat Recap: Exploring Private Cloud"><img width="100" height="70" class="entry-thumb" src="https://blog.rackspace.com/wp-content/uploads/2017/09/Blog-cloudchat-11—Exploring-Private-Cloud-100x70.jpg" srcset="https://blog.rackspace.com/wp-content/uploads/2017/09/Blog-cloudchat-11—Exploring-Private-Cloud-100x70.jpg 100w, https://blog.rackspace.com/wp-content/uploads/2017/09/Blog-cloudchat-11—Exploring-Private-Cloud-218x150.jpg 218w" sizes="(max-width: 100px) 100vw, 100px" alt="" title="#cloudchat Recap: Exploring Private Cloud"></a>
+             </div> 
+             <div class="item-details"> 
+              <h3 class="entry-title td-module-title"><a href="https://blog.rackspace.com/cloudchat-recap-exploring-private-cloud" rel="bookmark" title="#cloudchat Recap: Exploring Private Cloud">#cloudchat Recap: Exploring Private Cloud</a></h3> 
+              <div class="td-module-meta-info"> 
+               <span class="td-post-date"><time class="entry-date updated td-module-date" datetime="2017-10-02T06:10:13+00:00">October 2, 2017</time></span> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <!-- ./td-block-span12 --> 
+           <div class="td-block-span12"> 
+            <div class="td_module_6 td_module_wrap td-animation-stack"> 
+             <div class="td-module-thumb">
+              <a href="https://blog.rackspace.com/kick-off-cybersecurity-awareness-month-with-rackspace" rel="bookmark" title="Kicking Off Cybersecurity Awareness Month with Rackspace"><img width="100" height="70" class="entry-thumb" src="https://blog.rackspace.com/wp-content/uploads/2017/09/shutterstock_651476311-100x70.jpg" srcset="https://blog.rackspace.com/wp-content/uploads/2017/09/shutterstock_651476311-100x70.jpg 100w, https://blog.rackspace.com/wp-content/uploads/2017/09/shutterstock_651476311-218x150.jpg 218w" sizes="(max-width: 100px) 100vw, 100px" alt="" title="Kicking Off Cybersecurity Awareness Month with Rackspace"></a>
+             </div> 
+             <div class="item-details"> 
+              <h3 class="entry-title td-module-title"><a href="https://blog.rackspace.com/kick-off-cybersecurity-awareness-month-with-rackspace" rel="bookmark" title="Kicking Off Cybersecurity Awareness Month with Rackspace">Kicking Off Cybersecurity Awareness Month with Rackspace</a></h3> 
+              <div class="td-module-meta-info"> 
+               <span class="td-post-date"><time class="entry-date updated td-module-date" datetime="2017-09-29T11:01:45+00:00">September 29, 2017</time></span> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <!-- ./td-block-span12 -->
+          </div>
+         </div> 
+         <!-- ./block --> 
+        </div> 
+       </div> 
+      </div> 
+      <!-- /.td-pb-row --> 
+     </div> 
+     <!-- /.td-container --> 
+    </div> 
+    <!-- /.td-main-content-wrap --> 
+    <!-- Instagram --> 
+    <!-- Footer --> 
+    <div class="td-footer-contact"> 
+     <div class="td-container"> 
+      <div class="td-pb-row"> 
+       <div class="td-pb-span3 td-pb-span12-large"> 
+        <ul> 
+         <li>We've got your back</li> 
+         <li class="fa-2x">24x7x365</li> 
+        </ul> 
+       </div> 
+       <div class="td-pb-span3 hide-small"> 
+        <i class="fa fa-mobile fa-4x" style="float: left;"></i> 
+        <ul> 
+         <div class="menu-rug-support-and-sales-container">
+          <ul id="menu-rug-support-and-sales" class="rug-menu-contact">
+           <li id="menu-item-42472" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-first td-menu-item td-normal-menu menu-item-42472"><a class="white">
+             <div class="InfinityNumber" style="display:inline;">
+              1-800-961-2888
+             </div> Sales</a></li> 
+           <li id="menu-item-42473" class="menu-item menu-item-type-custom menu-item-object-custom td-menu-item td-normal-menu menu-item-42473"><a class="white">1-800-961-4454 Support</a></li> 
+          </ul>
+         </div> 
+        </ul> 
+       </div> 
+       <div class="td-pb-span3 hide-small"> 
+        <i class="fa fa-comments fa-3x"></i> 
+        <a class="white" href="#chat"><span>Live Sales Chat</span></a> 
+       </div> 
+       <div class="td-pb-span3 hide-small"> 
+        <i class="fa fa-envelope-o fa-3x"></i> 
+        <a class="white" href="https://www.rackspace.com/information/contactus#form"><span>Email Us</span></a> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="td-footer-wrapper"> 
+     <div class="td-container"> 
+      <div class="td-pb-row"> 
+       <div class="td-pb-span6 col-3"> 
+        <aside class="td_block_template_1 widget widget_text">
+         <h4 class="block-title"><span>About Rackspace</span></h4> 
+         <div class="textwidget">
+          <li><a href="http://www.rackspace.com/about">Our Story</a></li> 
+          <li><a href="http://www.rackspace.com/events">Events</a></li> 
+          <li><a href="http://www.rackspace.com/blog/newsroom/">News</a></li> 
+          <li><a href="http://www.rackspace.com/about/leadership">Leadership</a></li> 
+          <li><a href="http://stories.rackspace.com/">Customer Stories</a></li> 
+          <li><a href="http://ir.rackspace.com/phoenix.zhtml?c=221673&amp;p=irol-irhome">Investors</a></li> 
+          <li><a href="http://www.rackspace.com/information/legal">Legal</a></li> 
+          <li><a href="http://talent.rackspace.com/">Careers</a></li> 
+          <li><a href="http://www.rackspace.com/information/contactus">Contact Information</a></li> 
+          <li><a href="http://www.rackspace.com/programs">Programs</a></li>
+         </div> 
+        </aside> 
+       </div> 
+       <div class="td-pb-span2 col-1"> 
+        <aside class="td_block_template_1 widget widget_text">
+         <h4 class="block-title"><span>Blogs</span></h4> 
+         <div class="textwidget">
+          <li><a href="http://blog.rackspace.com/">The Rackspace Blog</a></li> 
+          <li><a href="http://blog.rackspace.com/es">Español Blog</a></li> 
+          <li><a href="https://developer.rackspace.com/blog/">Developer Blog</a></li>
+         </div> 
+        </aside> 
+       </div> 
+       <div class="td-pb-span4 col-2"> 
+        <aside class="td_block_template_1 widget widget_text">
+         <h4 class="block-title"><span>Support</span></h4> 
+         <div class="textwidget">
+          <li><a href="http://rackspace.com/knowledge_center/">How-To</a></li> 
+          <li><a href="http://developer.rackspace.com/docs">API Docs</a></li> 
+          <li><a href="http://support.rackspace.com/">Support </a></li> 
+          <li><a href="http://developer.rackspace.com/">Developers</a></li> 
+          <li><a href="http://www.rackspace.com/information/legal/privacystatement">Privacy</a></li> 
+          <li><a href="http://www.rackspace.com/information/legal/websiteterms">Terms</a></li> 
+          <li><a href="http://www.rackspace.com/information/legal/copyrights_trademarks">Trademarks</a></li> 
+          <li><a href="https://community.rackspace.com/">Support Forums</a></li>
+         </div> 
+        </aside> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+    <!-- Sub Footer --> 
+    <div class="td-sub-footer-container td-container-wrap "> 
+     <div class="td-container"> 
+      <div class="td-pb-row"> 
+       <div class="td-pb-span td-sub-footer-menu"> 
+       </div> 
+       <div class="td-pb-span td-sub-footer-copy">
+         © 2017 Rackspace US, Inc. 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+   </div>
+   <!--close td-outer-wrap--> 
+   <script type="text/javascript">
+jQuery(document).ready(function(){
+  jQuery('#commentform').on('submit', function(e) {
+   if (window.hasOwnProperty('dataLayer')) {
+    dataLayer.push({event: 'raxFormSubmit'});
+   }
+  });
+});
+</script> 
+   <!--
 
-        // Show or hide the sticky footer button
-        $(window).scroll(function() {
-            if ($(this).scrollTop() > 200) {
-                $top.fadeIn(200);
-            } else {
-                $top.fadeOut(200);
-            }
-        });
+        Theme: Newspaper by tagDiv.com 2017
+        Version: 8.1 (rara)
+        Deploy mode: deploy
+        
+        uid: 59d37d3f5d815
+    --> 
+   <!-- Custom css form theme panel --> 
+   <style type="text/css" media="screen">
+/* custom css theme panel */
+    #contentFrame {
+      position: relative;
+      display: block;
+      width: 600px;
+      height: 800px;
+      margin: 0 auto 0 auto;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+    }
+       
+        @media (max-width: 599px) {
+               #contentFrame{
+                       width: 320px;
+                       height: 535px;
+               }
+        }
+</style> 
+   <script type="text/javascript">
+		window.WPCOM_sharing_counts = {"https:\/\/blog.rackspace.com\/behind-the-curtain-twitter-sentiment-analysis-demo-sample-app-code":40120};
+	</script> 
+   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script> 
+   <div id="fb-root"></div> 
+   <script>(function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&appId=249643311490&version=v2.3'; fjs.parentNode.insertBefore(js, fjs); }(document, 'script', 'facebook-jssdk'));</script> 
+   <script>
+			jQuery( document.body ).on( 'post-load', function() {
+				if ( 'undefined' !== typeof FB ) {
+					FB.XFBML.parse();
+				}
+			} );
+			</script> 
+   <script type="text/javascript">
+			jQuery( document ).ready( function() {
+				jQuery.getScript( 'https://platform.linkedin.com/in.js?async=true', function success() {
+					IN.init();
+				});
+			});
+			jQuery( document.body ).on( 'post-load', function() {
+				if ( typeof IN != 'undefined' )
+					IN.parse();
+			});
+			</script>
+   <script type="text/javascript" src="https://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201740"></script> 
+   <script type="text/javascript" src="https://blog.rackspace.com/wp-content/themes/Newspaper/js/tagdiv_theme.min.js?ver=8.1"></script> 
+   <script type="text/javascript" src="https://blog.rackspace.com/wp-includes/js/comment-reply.min.js?ver=4.8.2"></script> 
+   <script type="text/javascript" src="https://blog.rackspace.com/wp-includes/js/wp-embed.min.js?ver=4.8.2"></script> 
+   <script type="text/javascript" src="https://blog.rackspace.com/wp-content/plugins/akismet/_inc/form.js?ver=4.0"></script> 
+   <script type="text/javascript">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1"};
+/* ]]> */
+</script> 
+   <script type="text/javascript" src="https://blog.rackspace.com/wp-content/plugins/jetpack/modules/sharedaddy/sharing.js?ver=5.3"></script> 
+   <script type="text/javascript">
+var windowOpen;
+			jQuery( document.body ).on( 'click', 'a.share-facebook', function() {
+				// If there's another sharing window open, close it.
+				if ( 'undefined' !== typeof windowOpen ) {
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery( this ).attr( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+				return false;
+			});
+</script> 
+   <!-- JS generated by theme --> 
+   <script>
+    
 
-        // Animate the scroll to top
-        $top.click(function(event) {
-            event.preventDefault();
-            $('html, body').animate({scrollTop: 0}, 300);
-        })
+	
 
-        // Makes sure that the href="#" attached to the <a> elements
-        // don't scroll you back up the page.
-        $('body').on('click', 'a[href="#"]', function(event) {
-            event.preventDefault();
-        });
-    </script> 
-  <script type="text/javascript">
-        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-    </script> 
-  <script type="text/javascript">
-        try {
-            var pageTracker = _gat._getTracker("UA-52651211-1");
-            pageTracker._trackPageview();
-            } catch(err) {}
-    </script>  
+		(function(){
+			var html_jquery_obj = jQuery('html');
+
+			if (html_jquery_obj.length && (html_jquery_obj.is('.ie8') || html_jquery_obj.is('.ie9'))) {
+
+				var path = 'https://blog.rackspace.com/wp-content/themes/Newspaper-child/style.css';
+
+				jQuery.get(path, function(data) {
+
+					var str_split_separator = '#td_css_split_separator';
+					var arr_splits = data.split(str_split_separator);
+					var arr_length = arr_splits.length;
+
+					if (arr_length > 1) {
+
+						var dir_path = 'https://blog.rackspace.com/wp-content/themes/Newspaper';
+						var splited_css = '';
+
+						for (var i = 0; i < arr_length; i++) {
+							if (i > 0) {
+								arr_splits[i] = str_split_separator + ' ' + arr_splits[i];
+							}
+							//jQuery('head').append('<style>' + arr_splits[i] + '</style>');
+
+							var formated_str = arr_splits[i].replace(/\surl\(\'(?!data\:)/gi, function regex_function(str) {
+								return ' url(\'' + dir_path + '/' + str.replace(/url\(\'/gi, '').replace(/^\s+|\s+$/gm,'');
+							});
+
+							splited_css += "<style>" + formated_str + "</style>";
+						}
+
+						var td_theme_css = jQuery('link#td-theme-css');
+
+						if (td_theme_css.length) {
+							td_theme_css.after(splited_css);
+						}
+					}
+				});
+			}
+		})();
+
+	
+	
+</script> 
+   <script type="text/javascript" src="https://stats.wp.com/e-201740.js" async defer></script> 
+   <script type="text/javascript">
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:5.3',blog:'112608594',post:'40120',tz:'-5',srv:'blog.rackspace.com'} ]);
+	_stq.push([ 'clickTrackerInit', '112608594', '40120' ]);
+</script> 
+   <div id="tdw-css-writer" style="display: none" class="tdw-drag-dialog tdc-window-sidebar"> 
+    <header> 
+     <a title="Editor" class="tdw-tab tdc-tab-active" href="#" data-tab-content="tdw-tab-editor">Edit with Live CSS</a> 
+     <div class="tdw-less-info" title="This will be red when errors are detected in your CSS and LESS"></div> 
+    </header> 
+    <div class="tdw-content"> 
+     <div class="tdw-tabs-content tdw-tab-editor tdc-tab-content-active"> 
+      <script>
+
+							(function(jQuery, undefined) {
+
+								jQuery(window).ready(function() {
+
+									if ( 'undefined' !== typeof tdcAdminIFrameUI ) {
+										var $liveIframe  = tdcAdminIFrameUI.getLiveIframe();
+
+										if ( $liveIframe.length ) {
+											$liveIframe.load(function() {
+												$liveIframe.contents().find( 'body').append( '<textarea class="tdw-css-writer-editor" style="display: none"></textarea>' );
+											});
+										}
+									}
+
+								});
+
+							})(jQuery);
+
+						</script> 
+      <textarea class="tdw-css-writer-editor td_live_css_uid_1_59d37d3f5e717"></textarea> 
+      <div id="td_live_css_uid_1_59d37d3f5e717" class="td-code-editor"></div> 
+      <script>
+							jQuery(window).load(function (){
+
+								if ( 'undefined' !== typeof tdLiveCssInject ) {
+
+									tdLiveCssInject.init();
+
+
+									var editor_textarea = jQuery('.td_live_css_uid_1_59d37d3f5e717');
+									var languageTools = ace.require("ace/ext/language_tools");
+									var tdcCompleter = {
+										getCompletions: function (editor, session, pos, prefix, callback) {
+											if (prefix.length === 0) {
+												callback(null, []);
+												return
+											}
+
+											if ('undefined' !== typeof tdcAdminIFrameUI) {
+
+												var data = {
+													error: undefined,
+													getShortcode: ''
+												};
+
+												tdcIFrameData.getShortcodeFromData(data);
+
+												if (!_.isUndefined(data.error)) {
+													tdcDebug.log(data.error);
+												}
+
+												if (!_.isUndefined(data.getShortcode)) {
+
+													var regex = /el_class=\"([A-Za-z0-9_-]*\s*)+\"/g,
+														results = data.getShortcode.match(regex);
+
+													var elClasses = {};
+
+													for (var i = 0; i < results.length; i++) {
+														var currentClasses = results[i]
+															.replace('el_class="', '')
+															.replace('"', '')
+															.split(' ');
+
+														for (var j = 0; j < currentClasses.length; j++) {
+															if (_.isUndefined(elClasses[currentClasses[j]])) {
+																elClasses[currentClasses[j]] = '';
+															}
+														}
+													}
+
+													var arrElClasses = [];
+
+													for (var prop in elClasses) {
+														arrElClasses.push(prop);
+													}
+
+													callback(null, arrElClasses.map(function (item) {
+														return {
+															name: item,
+															value: item,
+															meta: 'in_page'
+														}
+													}));
+												}
+											}
+										}
+									};
+									languageTools.addCompleter(tdcCompleter);
+
+									window.editor = ace.edit("td_live_css_uid_1_59d37d3f5e717");
+
+									// 'change' handler is written as function because it's called by tdc_on_add_css_live_components (of wp_footer hook)
+									// We did it to reattach the existing compiled css to the new content received from server.
+									window.editorChangeHandler = function () {
+										//tdwState.lessWasEdited = true;
+
+										window.onbeforeunload = function () {
+											if (tdwState.lessWasEdited) {
+												return "You have attempted to leave this page. Are you sure?";
+											}
+											return false;
+										};
+
+										var editorValue = editor.getSession().getValue();
+
+										editor_textarea.val(editorValue);
+
+										if ('undefined' !== typeof tdcAdminIFrameUI) {
+											tdcAdminIFrameUI.getLiveIframe().contents().find('.tdw-css-writer-editor:first').val(editorValue);
+
+											// Mark the content as modified
+											// This is important for showing info when composer closes
+                                            tdcMain.setContentModified();
+										}
+
+										tdLiveCssInject.less();
+									};
+
+									editor.getSession().setValue(editor_textarea.val());
+									editor.getSession().on('change', editorChangeHandler);
+
+									editor.setTheme("ace/theme/textmate");
+									editor.setShowPrintMargin(false);
+									editor.getSession().setMode("ace/mode/less");
+									editor.setOptions({
+										enableBasicAutocompletion: true,
+										enableSnippets: true,
+										enableLiveAutocompletion: false
+									});
+
+								}
+
+							});
+						</script> 
+     </div> 
+    </div> 
+    <footer> 
+     <a href="#" class="tdw-save-css">Save</a> 
+     <div class="tdw-more-info-text">
+      Write CSS OR LESS and hit save. CTRL + SPACE for auto-complete.
+     </div> 
+     <div class="tdw-resize"></div> 
+    </footer> 
+   </div>  
+  </div>
  </body>
 </html>

@@ -1,934 +1,431 @@
-<!doctype html>
-<html data-clipboard-buttons="" data-code-prettify="" data-code-sidebar="" data-hide-show-guide="" data-sts-import="" data-mobile-support="" data-search="">
- <head> 
-  <title>Getting Started · Authenticating a User with LDAP</title> 
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1, user-scalable=no" id="Viewport" name="viewport"> 
-  <link rel="shortcut icon" type="image/x-icon" href="/img/favicon-ca31b78daf0dd9a106bbf3c6d87d4ec7.png"> 
-  <link href="https://fonts.googleapis.com/css?family=Varela+Round|Montserrat:400,700" rel="stylesheet" type="text/css"> 
-  <link rel="stylesheet" type="text/css" href="/css/main-7d508c9e3a2dee2227a0f9f7fbec06d1.css"> 
-  <script src="/jspm_packages/system-eccc019329febb5a1b06bde008ca5614.js"></script> 
-  <script>
-    System.config({baseURL: "/0f30a77"});
-  </script> 
-  <script src="/config-5a675c9cddea3a5f55b71416e67d47d6.js"></script> 
-  <script>
-      System.import('app/main.js')
-  </script> 
-  <meta content="7qGntFPD9lWAVCtUu5U77v4l68PsTHf6xpzgjQv2j2M" name="google-site-verification"> 
-  <script>
-    //
-      var _gaq = _gaq || [];
-      var pluginUrl =
-       '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
-      _gaq.push(
-        ['_require', 'inpage_linkid', pluginUrl],
-        ['_setAccount', 'UA-2728886-20'],
-        ['_trackPageview'],
-        ['b._require', 'inpage_linkid', pluginUrl],
-        ['b._setAccount', 'UA-2728886-19'],
-        ['b._trackPageview']
-      );
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US" xml:lang="en-US">
+ <head profile="http://gmpg.org/xfn/11"> 
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+  <title>NTLM Authentication in Java | Luigi Dragone</title> 
+  <link rel="stylesheet" href="http://www.luigidragone.com/wp-content/themes/blue-and-grey/style.css" type="text/css" media="screen"> 
+  <!--[if lt ie 8]><link rel="stylesheet" href="http://www.luigidragone.com/wp-content/themes/blue-and-grey/styles/ie7.css" type="text/css" /><![endif]--> 
+  <!--[if lt ie 7]><link rel="stylesheet" href="http://www.luigidragone.com/wp-content/themes/blue-and-grey/styles/ie6.css" type="text/css" /><![endif]--> 
+  <link rel="pingback" href="http://www.luigidragone.com/xmlrpc.php"> 
+  <!-- Scroll Gallery 2 - Version 2.0.0 --> 
+  <meta name="description" content="100% Pure Java implementation of NTLM authentication protocol"> 
+  <meta name="keywords" content="NTLM,Java,security,proxy,authentication,JCE,Web Services,CORBA,SOAP,HTTP,DES,MD4,firewall,Microsoft,Luigi Dragone"> 
+  <link rel="alternate" type="application/rss+xml" title="Luigi Dragone » Feed" href="http://www.luigidragone.com/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Luigi Dragone » Comments Feed" href="http://www.luigidragone.com/comments/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Luigi Dragone » NTLM Authentication in Java Comments Feed" href="http://www.luigidragone.com/software/ntlm-authentication-in-java/feed/"> 
+  <link rel="stylesheet" id="NextGEN-css" href="http://www.luigidragone.com/wp-content/plugins/nextgen-gallery/css/hovereffect.css?ver=1.0.0" type="text/css" media="screen"> 
+  <link rel="stylesheet" id="thickbox-css" href="http://www.luigidragone.com/wp-includes/js/thickbox/thickbox.css?ver=20090514" type="text/css" media="all"> 
+  <link rel="stylesheet" id="scrollGallery2-css" href="http://www.luigidragone.com/wp-content/plugins/nextgen-scrollgallery/scrollGallery/css/scrollGallery.css?ver=2.0.0" type="text/css" media="screen"> 
+  <link rel="stylesheet" id="scrollGallery2Design-css" href="http://www.luigidragone.com/wp-content/plugins/nextgen-scrollgallery/scrollGallery/css/?ver=2.0.0" type="text/css" media="screen"> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-includes/js/l10n.js?ver=20101110"></script> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-includes/js/prototype.js?ver=1.6.1"></script> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-includes/js/scriptaculous/wp-scriptaculous.js?ver=1.8.3"></script> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-includes/js/scriptaculous/effects.js?ver=1.8.3"></script> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-content/plugins/lightbox-2/lightbox.js?ver=1.8"></script> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-includes/js/jquery/jquery.js?ver=1.6.1"></script> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-includes/js/swfobject.js?ver=2.2"></script> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-includes/js/comment-reply.js?ver=20090102"></script> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.luigidragone.com/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.luigidragone.com/wp-includes/wlwmanifest.xml"> 
+  <link rel="index" title="Luigi Dragone" href="http://www.luigidragone.com/"> 
+  <link rel="up" title="Software" href="http://www.luigidragone.com/software/"> 
+  <link rel="prev" title="Papers" href="http://www.luigidragone.com/paper/"> 
+  <link rel="next" title="Spectral Clusterer for WEKA" href="http://www.luigidragone.com/software/spectral-clusterer-for-weka/"> 
+  <meta name="generator" content="WordPress 3.2.1"> 
+  <link rel="canonical" href="http://www.luigidragone.com/software/ntlm-authentication-in-java/"> 
+  <style type="text/css" media="screen">
+  #cookie-law {  
+  position: fixed;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index:9999; 
+}
 
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-  </script> 
-  <link rel="stylesheet" type="text/css" href="/css/gsguide-cce08ab7a9f46db88819a14148e45bad.css"> 
-  <meta property="og:title" content="Authenticating a User with LDAP"> 
-  <meta property="og:image" content="/img/spring-by-pivotal-9066b55828deb3c10e27e609af322c40.png"> 
-  <meta property="og:description" content="this guide is designed to get you productive as quickly as possible and using the latest Spring project releases and techniques as recommended by the Spring team"> 
- </head> 
- <body> 
+#cookie-law > div {  
+  background:#fff; 
+  opacity:0.95; 
+  width:75% !important;
+  padding:20px;
+  max-width: 600px;
+  margin:auto;
+  display: inline-block;
+  text-align: left !important;
+  border-radius:5px 5px 0 0;
+  -moz-border-radius:5px 5px 0 0;
+  -webkit-border-radius:5px 5px 0 0;
+  -o-border-radius:5px 5px 0 0;
+  box-shadow: 0px 0px 20px #A1A1A1;
+  -webkit-box-shadow: 0px 0px 20px #A1A1A1;
+  -moz-box-shadow: 0px 0px 20px #A1A1A1;
+  -o-box-shadow: 0px 0px 20px #A1A1A1; 
+  position:relative;
+}
+
+#cookie-law h4 { padding: 0 !important; margin:0 0 8px !important; text-align:left !important; font-size:13px !important; color:#444; 
+}
+#cookie-law p { padding: 0 !important; margin:0 !important; text-align:left !important; font-size:12px !important; line-height: 18px !important; color:#888;
+}
+
+a.close-cookie-banner {
+  position: absolute;
+  top:0px;
+  right:0px;
+  margin:10px;
+  display:block;
+  width:20px;
+  height:20px;
+  background:url(http://www.luigidragone.com/wp-content/plugins/creare-eu-cookie-law-banner/images/close.png) no-repeat;
+  background-size: 20px !important;
+}
+
+a.close-cookie-banner span {
+  display:none !important;
+}</style> 
+  <meta property="fb:admins" content="671511358"> 
+  <meta property="og:site_name" content="Luigi Dragone"> 
+  <meta property="og:type" content="blog"> 
+  <meta property="og:image" content="http://www.luigidragone.com/wp-content/themes/blue-and-grey/images/logo.png"> 
+  <meta property="og:title" content="NTLM Authentication in Java"> 
+  <meta property="og:url" content="http://www.luigidragone.com/software/ntlm-authentication-in-java/"> 
   <script type="text/javascript">
-    // Work around Google font rendering issues in webkit browsers on Windows 7
-    if (navigator.userAgent.indexOf("NT 6.1") != -1) {
-      document.body.style.WebkitTextStroke = "0.5px";
-    }
-  </script> 
-  <div class="viewport"> 
-   <header class="navbar header--navbar desktop-only"> 
-    <div class="navbar-inner"> 
-     <div class="container-fluid"> 
-      <div class="spring-logo--container"> 
-       <a class="spring-logo" href="/"><span></span></a> 
-      </div> 
-      <ul class="nav pull-right"> 
-       <li class="navbar-link"> <a href="/docs">Docs</a> </li> 
-       <li class="navbar-link active"> <a href="/guides">Guides</a> </li> 
-       <li class="navbar-link"> <a href="/projects">Projects</a> </li> 
-       <li class="navbar-link"> <a href="/blog">Blog</a> </li> 
-       <li class="navbar-link"> <a href="/questions">Questions</a> </li> 
-       <li class="navbar-link nav-search"> <i class="icon-search navbar-search--icon js-search-input-open"></i> 
-        <div class="search-input-close js-search-input-close">
-         x
-        </div> </li> 
+var g_hanaFlash = false;
+try {
+  var fo = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+  if(fo) g_hanaFlash = true;
+}catch(e){
+  if(navigator.mimeTypes ['application/x-shockwave-flash'] != undefined) g_hanaFlash = true;
+}
+function hanaTrackEvents(arg1,arg2,arg3,arg4) { if ( typeof( pageTracker ) !=='undefined') { pageTracker._trackEvent(arg1, arg2, arg3, arg4);} else if ( typeof(_gaq) !=='undefined'){  _gaq.push(['_trackEvent', arg1, arg2, arg3, arg4]);}}
+function hana_check_mobile_device(){ if(navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/iPad/i)  || navigator.userAgent.match(/Android/i)) { return true; }else return false; }
+</script> 
+  <!-- begin lightbox scripts --> 
+  <script type="text/javascript">
+    //<![CDATA[
+    document.write('<link rel="stylesheet" href="http://www.luigidragone.com/wp-content/plugins/lightbox-2/Themes/Grey/lightbox.css" type="text/css" media="screen" />');
+    //]]>
+    </script> 
+  <!-- end lightbox scripts --> 
+  <!-- <meta name="NextGEN" version="1.9.3" /> --> 
+  <link id="MediaRSS" rel="alternate" type="application/rss+xml" title="NextGEN Gallery RSS Feed" href="http://www.luigidragone.com/wp-content/plugins/nextgen-gallery/xml/media-rss.php"> 
+  <!-- All in one Favicon 4.3 -->
+  <link rel="shortcut icon" href="http://www.luigidragone.com/wp-content/uploads/2011/06/myicon.ico"> 
+ </head> 
+ <body class="page page-id-19 page-child parent-pageid-8 page-template page-template-single-page-template-php"> 
+  <div class="header"> 
+   <p class="logo"><a href="http://www.luigidragone.com/"><img src="http://www.luigidragone.com/wp-content/themes/blue-and-grey/images/logo.png" alt="Luigi Dragone"> Luigi Dragone</a> Luigi Dragone's Home Page</p> 
+   <form method="get" class="searchform" action="http://www.luigidragone.com/"> 
+    <fieldset> 
+     <input type="text" value="" name="s" id="s"> 
+     <button type="submit" id="searchsubmit" value="Search">Search</button> 
+    </fieldset> 
+   </form> 
+   <div class="header-menu"> 
+    <div class="menu-pages-container">
+     <ul id="menu-pages" class="menu">
+      <li id="menu-item-89" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-89"><a href="http://www.luigidragone.com/"><span><span>Welcome</span></span></a></li> 
+      <li id="menu-item-60" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-60"><a href="http://www.luigidragone.com/news/"><span><span>News</span></span></a></li> 
+      <li id="menu-item-61" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-61"><a href="http://www.luigidragone.com/guestbook/"><span><span>Guestbook</span></span></a></li> 
+      <li id="menu-item-78" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-78"><a href="http://www.luigidragone.com/photos/"><span><span>Photos</span></span></a></li> 
+      <li id="menu-item-62" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-62"><a href="http://www.luigidragone.com/paper/"><span><span>Papers</span></span></a></li> 
+      <li id="menu-item-63" class="menu-item menu-item-type-post_type menu-item-object-page current-page-ancestor menu-item-63"><a href="http://www.luigidragone.com/software/"><span><span>Software</span></span></a></li> 
+      <li id="menu-item-194" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-194"><a href="http://it.wikiloc.com/wikiloc/user.do?name=luigid75"><span><span>Tracks and Waypoints</span></span></a></li> 
+     </ul>
+    </div> 
+   </div> 
+  </div> 
+  <div class="content"> 
+   <div class="main"> 
+    <div class="post-19 page type-page status-publish hentry" id="post-19"> 
+     <h1 class="content-title">NTLM Authentication in Java</h1> 
+     <div class="page-restrict-output">
+      <div id="fb_share_1" style=";width: 55px;" name="fb_share">
+       <div id="fb-root"></div>
+       <script src="http://connect.facebook.net/en_US/all.js#appId=125029517579627&amp;xfbml=1"></script>
+       <fb:like href="http://www.luigidragone.com/software/ntlm-authentication-in-java/" send="true" layout="button_count" width="55" show_faces="false" font="arial"></fb:like>
+      </div>
+      <ul> 
+       <li><a href="#overview">Overview</a></li> 
+       <li><a href="#change-log">Change log</a></li> 
+       <li><a href="#ntlm">The NTLM Authentication Protocol</a></li> 
+       <li><a href="#relaese-notes">Release Notes</a></li> 
+       <li><a href="#system-requirements">System requirements</a></li> 
+       <li><a href="#download">Download</a></li> 
+       <li><a href="#instructions">Instructions</a></li> 
+       <li><a href="#links">Links</a></li> 
+      </ul> 
+      <h2><a name="overview">Overview</a></h2> 
+      <p>This is “100% Pure Java” implementation of the MS NTLM authentication protocol.</p> 
+      <p>NTLM is a proprietary protocol employed by many Microsoft products to perform challenge response authentication and it is the default authentication scheme used by Microsoft firewall and proxy server products.</p> 
+      <p>This software has been developed to issue the problem of work with Java technologies in strongly Microsoft oriented environments. Since it not relies over any official protocol specification there are any warranties that it works correctly in every situation. It has been on same Windows installation, where it worked fine.</p> 
+      <p>This software is released under GNU General Public License. It can be freely used, modified and distributed in conformity with the GNU General Public License. The License Agreement is available <a href="http://www.gnu.org/licenses/gpl-2.0.html">here</a>.<br> For any information about the GNU GPL and its implications please refer to <a href="http://www.gnu.org/licenses/licenses.html#GPL">GNU site</a>.</p> 
+      <p>The content of this site is provided “AS IS” without warranties of any kind either express or implied. Please send me any comment or suggestion and report me any bug you notice.</p> 
+      <h2><a name="change-log">Change log</a></h2> 
+      <ul> 
+       <li> Release 1.1c 27 Oct 2002<br> Problem on exception raising in method <code>NTLMAuthorizationHandler.fixupAuthorizationInfo()</code> was fixed.</li> 
+       <li> Release 1.1b 5 Oct 2002<br> Problem on invalid invocation of method <code>NTLM.getNonce()</code> was fixed.</li> 
+       <li> Release 1.1a 2 Sep 2002<br> Problem on computing Lan Man password was fixed.</li> 
+       <li>Release 1.1 29 Mar 2002<br> Added new class <code>NTLMTestClient</code></li> 
+       <li>Release 1.0a 21 Mar 2002<br> Problem on <code>NTLM.computeNTLMResponse()</code> method was fixed.</li> 
+       <li>First release (1.0) 3 Feb 2002</li> 
+      </ul> 
+      <h2><a name="ntlm">The NTLM Authentication Protocol</a></h2> 
+      <p>Since there is any official specification of the NTLM protocol publicly available the only products that support it are released by Microsoft itself (e.g., Internet Explorer, Windows OSs family). As consequence, in Microsoft oriented network environment nearly all non-MS products have a lot of troubles to perform their tasks correctly.</p> 
+      <p>For example, Netscape Navigator and other common Internet browser do not support NTLM authentication scheme, thus they can not access to the Internet through a Microsoft proxy server or firewall. The only browser that can do this is, evidently, Internet Explorer.</p> 
+      <p>Software development environments suffer from the aforementioned problem, there is not any library that implements this authentication scheme except these ones bundled in Windows OS. In the Open Source community there are many projects focused on the implementation of this protocol, but any of these has Java as target environment.</p> 
+      <p>The lack of the availability of this authentication scheme in the Java platform could be a serious trouble in the development and deployment of cooperative applications based on technologies like SOAP Web Services, that rely on HTTP protocol. Take into account that spreading of CORBA technology has been definitively halted by its problems to work with firewalls and proxies.</p> 
+      <p>To perform a NTLM authentication in Java there are two main alternatives:</p> 
+      <ol> 
+       <li>employ the class <code>com.ms.net.wininet.WininetStreamHandlerFactory</code>, provided by Microsoft Java VM;</li> 
+       <li>employ a native OpenSource implemenation of NTLM by JNI;</li> 
+      </ol> 
+      <p>The first solution requires to work with Microsoft Java VM exclusively, since the class <code>com.ms.net.wininet.WininetStreamHandlerFactory</code> is a wrapper of some native functions in <code>Wininet.dll</code>, but the calling convention is not JNI compatible, but it is performed by the stub<br> <code>javart.dll</code> according to the proprietary Microsoft J/Direct interface.<br> The other is not obviously “100% Pure Java”, because it requires native code.</p> 
+      <p>Since NTLM is finally a weak protocol (it is more safe than basic authentication, but it is not strong as the digest authentication), there are many cracking tools and many security issues related to it. It has been replaced by a new version in the SP3 of NT and by the Kerberos protocol in Windows 2000, but it is the only protocol supported by Windows 95/Windows 98 clients.</p> 
+      <p>Descriptions of the protocol are available on the following sites:</p> 
+      <ul> 
+       <li><a href="http://www.innovation.ch/java/ntlm.html">www.innovation.ch</a></li> 
+       <li><a href="http://www.l0pht.com/">www.l0pht.com</a></li> 
+      </ul> 
+      <p>Please notice that they are obtained from an analysis of sniffed packets.</p> 
+      <h2><a name="release-notes">Release Notes</a></h2> 
+      <p>This package contains three classes:</p> 
+      <ol> 
+       <li><code>NTLM</code> that implements all the computation required by the protocol;</li> 
+       <li><code>NTLMAuthorizationHandler</code> that implements NTLM authentication over HTTP;</li> 
+       <li><code>NTLMTestClient</code> that is command line tool that shows how to use this library.</li> 
+      </ol> 
+      <p>It requires a JCE compatible MD4 hash algorithm implementation and DES with no-padding ECB cipher to compute the requested value.<br> An Open Source JCE compatible library is Cryptix JCE and it is available at <a href="http://www.cryptix.org/">Cryptix</a>. Notice that the Sun JCE implementation provides the DES cipher but does not provide the MD4 hashing (it is a weak hashing algorithm, definitively).</p> 
+      <p>The HTTP authentication component is a module for the HTTPClient library.<br> HTTPClient is an Open Source HTTP client written by Ronald Tschalär,<br> released under the GNU LGPL and it is available at <a href="http://www.innovation.ch/">www.innovation.ch</a>.<br> It can be configured to replace the standard Sun HTTP client completely.</p> 
+      <p>To perform NTLM authentication over a protocol different from HTTP (e.g., FTP or Telnet) you need to write the required code employing functions implemented in <code>NTLM</code>.</p> 
+      <p>Notice that NTLM is not a proxyable protocol, it can be used to authenticate a client against a proxy or a web site, but not both at the same time.</p> 
+      <h2><a name="system-requirements">System requirements</a></h2> 
+      <p>This library requires the following components completely installed to work properly:</p> 
+      <ul> 
+       <li>a JCE-compliant implementation that provides MD4 hashing and DES chiper (e.g.,<a href="http://www.cryptix.org/">Cryptix JCE</a>);</li> 
+       <li><a href="http://www.innovation.ch/">HTTPClient</a> to perform the NTLM authentication over HTTP.</li> 
+      </ul> 
+      <h2><a name="download">Download</a></h2> 
+      <p>The latest version is available <a href="http://www.luigidragone.com/wp-content/uploads/2011/09/ntlm.zip">here</a>.<br> The zipped file contains source code, compiled byte code and documentation.</p> 
+      <h2><a name="instructions">Instructions</a></h2> 
+      <p>In this sections we explain how to use this library to perform an NTLM authentication over HTTP using the HTTPClient and JCE compliant library.</p> 
+      <p>Set the <var>CLASSPATH</var> accordingly to contains:</p> 
+      <ul> 
+       <li>the classes of this package;</li> 
+       <li>the HTTPClient library;</li> 
+       <li>the JCE compliant library.</li> 
+      </ul> 
+      <p>To use these classes you need to put the file <code>ntlm.jar</code> in the <var>CLASSPATH</var>, see thier own instructions to install the other elements. To perform an authentication the following information are needed:</p> 
+      <ul> 
+       <li>the host name (with its own domain);</li> 
+       <li>the user name (with its own domain);</li> 
+       <li>the user password.</li> 
+      </ul> 
+      <p>Alternatively, the user password can be replaced with its Lan Manager and NT hashed versions. On a Windows system these can be collected in the registry (with a bit of JNI, so), otherwise can be extracted from a SAMBA password file. Notice that the host and user domain could not be the same.<br> As first step you need to register the JCE compliant components. Each library defines its own provider, e.g., if you use Cryptix JCE you need to execute the following instruction:</p> 
+      <pre>      Security.addProvider(new cryptix.jce.provider.CryptixCrypto());</pre> 
+      <p>This task can be performed in the static initializer of the main class. Use these data as argument to class constructor to create a new authorisation object:</p> 
+      <pre>	HTTPClient.AuthorizationHandler ntlm = new NTLMAuthorizationHandler(host,
+		hostDomain, user, userDomain, password);
+	HTTPClient.AuthorizationInfo.setAuthHandler(ntlm);</pre> 
+      <p>If the client is behind a proxy server, set accordingly the Java system properties <var>http.proxyHost</var> and <var>http.proxyPort</var>.<br> The authorisation handler must be set before opening any connection, thus it could be done in a (static or instance) initializer or in a constructor. After the setting of the authorisation handler HTTP connections can be used as usual.</p> 
+      <p>It is also possible store authentication information in the following system properties:</p> 
+      <ul> 
+       <li><var>com.luigidragone.net.ntlm.host</var>;</li> 
+       <li><var>com.luigidragone.net.ntlm.user</var>;</li> 
+       <li><var>com.luigidragone.net.ntlm.hostDomain</var>;</li> 
+       <li><var>com.luigidragone.net.ntlm.userDomain</var>;</li> 
+       <li><var>com.luigidragone.net.ntlm.password</var>.</li> 
+      </ul> 
+      <p>Then use the parameter-less constructor to obtain a new authorization handler.</p> 
+      <p>The HTTPClient can override the standard Sun HTTP protocol handler, in this case all existing programs that rely on this one can work with this new component without any adjustment. It is enough to set the Java system property <var>java.protocol.handler.pkgs</var> to the value <code>HTTPClient</code>.</p> 
+      <p>See class documentation and links at the bottom of the page to more information.</p> 
+      <h2><a name="links">Links</a></h2> 
+      <ul> 
+       <li><a href="http://www.innovation.ch/java/ntlm.html">NTLM Authentication Scheme for HTTP</a></li> 
+       <li><a href="http://www.innovation.ch/">HTTPClient</a></li> 
+       <li><a href="http://www.ietf.org/rfc/rfc2616.txt">Hypertext Transfer Protocol — HTTP/1.1</a></li> 
+       <li><a href="http://www.ietf.org/rfc/rfc2617.txt">HTTP Authentication: Basic and Digest Access Authentication</a></li> 
+       <li><a href="ftp://ftp.samba.org/pub/samba/docs/textdocs/ENCRYPTION.txt">LanMan and NT Password Encryption in Samba 2.x</a></li> 
+       <li><a href="http://www.cacr.math.uwaterloo.ca/hac/">“Handbook of Applied Cryptography”</a></li> 
+       <li><a href="http://java.sun.com/products/jce/">JCE</a></li> 
+       <li><a href="http://www.cryptix.org/">Cryptix</a></li> 
       </ul> 
      </div> 
+     <div class="clear"></div> 
     </div> 
-    <div class="search-dropdown--container js-search-dropdown"> 
-     <div class="container-fluid"> 
-      <div class="search-form--container"> 
-       <form action="/search" class="form-inline form-search" method="get"> 
-        <input class="search-query search-form--form js-search-input" name="q" placeholder="Search for documentation, guides, and posts..." type="text" value=""> 
-        <button class="search-form--submit" type="submit"><i class="icon-search"></i></button> 
-       </form> 
+    <!-- You can start editing here. --> 
+    <h3 id="comments">4 Responses to “NTLM Authentication in Java”</h3> 
+    <ul class="commentlist"> 
+     <li class="comment even thread-even depth-1" id="comment-330"> 
+      <div id="div-comment-330" class="comment-body"> 
+       <div class="comment-author vcard"> 
+        <img alt="" src="http://1.gravatar.com/avatar/74b320743aa89bafb58a43cc5e08123b?s=32&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D32&amp;r=G" class="avatar avatar-32 photo" height="32" width="32"> 
+        <cite class="fn">Amit</cite> 
+        <span class="says">says:</span> 
+       </div> 
+       <div class="comment-meta commentmetadata">
+        <a href="http://www.luigidragone.com/software/ntlm-authentication-in-java/#comment-330"> 22/08/2011 at 17:44</a> 
+       </div> 
+       <p>It would be great if you could detail out the differences between your implementation of NTLM protocol and commons http client 3.1.<br> I am currently facing an issue on one of the windows machine where the commons-http-client implementation fails but the implementation you provided succeeds. The server uses NTLM v1 (I am aware of the fact that commons http client 3.1 implementation does not support NTLM v2)</p> 
+       <div class="reply"> 
+        <a class="comment-reply-link" href="/software/ntlm-authentication-in-java/?replytocom=330#respond" onclick="return addComment.moveForm(&quot;div-comment-330&quot;, &quot;330&quot;, &quot;respond&quot;, &quot;19&quot;)">Reply</a> 
+       </div> 
+      </div> </li> 
+     <li class="comment odd alt thread-odd thread-alt depth-1" id="comment-3895"> 
+      <div id="div-comment-3895" class="comment-body"> 
+       <div class="comment-author vcard"> 
+        <img alt="" src="http://1.gravatar.com/avatar/f3938317892519c6f5f66d207fb815e9?s=32&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D32&amp;r=G" class="avatar avatar-32 photo" height="32" width="32"> 
+        <cite class="fn">Martin Flower</cite> 
+        <span class="says">says:</span> 
+       </div> 
+       <div class="comment-meta commentmetadata">
+        <a href="http://www.luigidragone.com/software/ntlm-authentication-in-java/#comment-3895"> 14/03/2012 at 09:01</a> 
+       </div> 
+       <p>It would be helpful to update the page with the date. The contents of the distribution date from 2002.</p> 
+       <div class="reply"> 
+        <a class="comment-reply-link" href="/software/ntlm-authentication-in-java/?replytocom=3895#respond" onclick="return addComment.moveForm(&quot;div-comment-3895&quot;, &quot;3895&quot;, &quot;respond&quot;, &quot;19&quot;)">Reply</a> 
+       </div> 
+      </div> </li> 
+     <li class="comment even thread-even depth-1 parent" id="comment-26221"> 
+      <div id="div-comment-26221" class="comment-body"> 
+       <div class="comment-author vcard"> 
+        <img alt="" src="http://0.gravatar.com/avatar/64ed985a3bfca5ae70be64fb382f1b35?s=32&amp;d=http%3A%2F%2F0.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D32&amp;r=G" class="avatar avatar-32 photo" height="32" width="32"> 
+        <cite class="fn">dave</cite> 
+        <span class="says">says:</span> 
+       </div> 
+       <div class="comment-meta commentmetadata">
+        <a href="http://www.luigidragone.com/software/ntlm-authentication-in-java/#comment-26221"> 16/03/2013 at 13:18</a> 
+       </div> 
+       <p>does this solution support NTLMv2 ?</p> 
+       <div class="reply"> 
+        <a class="comment-reply-link" href="/software/ntlm-authentication-in-java/?replytocom=26221#respond" onclick="return addComment.moveForm(&quot;div-comment-26221&quot;, &quot;26221&quot;, &quot;respond&quot;, &quot;19&quot;)">Reply</a> 
+       </div> 
       </div> 
-     </div> 
-    </div> 
-   </header> 
-   <div> 
-    <div class="mobile-navigation--wrapper mobile-only"> 
-     <div class="navigation-drawer--container"> 
-      <div class="mobile-search--container"> 
-       <form action="/search" class="form-inline form-search" method="get"> 
-        <button class="search-form--submit" type="submit"><i class="icon-search"></i></button> 
-        <input class="search-query search-form--form js-search-input" name="q" placeholder="Search..." type="text" value=""> 
-       </form> 
-      </div> 
-      <div class="navigation-item-list"> 
-       <div class="navbar-link"> 
-        <a href="/"> Home <i class="icon-chevron-right pull-right"></i> </a> 
-       </div> 
-       <div class="navbar-link"> 
-        <a href="/docs"> Docs <i class="icon-chevron-right pull-right"></i> </a> 
-       </div> 
-       <div class="navbar-link active"> 
-        <a href="/guides"> Guides <i class="icon-chevron-right pull-right"></i> </a> 
-       </div> 
-       <div class="navbar-link"> 
-        <a href="/projects"> Projects <i class="icon-chevron-right pull-right"></i> </a> 
-       </div> 
-       <div class="navbar-link"> 
-        <a href="/blog"> Blog <i class="icon-chevron-right pull-right"></i> </a> 
-       </div> 
-       <div class="navbar-link"> 
-        <a href="/questions"> Questions <i class="icon-chevron-right pull-right"></i> </a> 
-       </div> 
-      </div> 
-     </div> 
-     <div class="mobile-nav"> 
-      <div class="nav-icon js-open-nav-drawer"> 
-       <i class="icon-reorder"></i> 
-      </div> 
-      <div class="header-center-icon"> 
-       <a href="/"> 
-        <div class="icon icon-spring-logo-mobile"></div> </a> 
-      </div> 
-     </div> 
-    </div> 
+      <ul class="children"> 
+       <li class="comment byuser comment-author-wpmaster bypostauthor odd alt depth-2" id="comment-28491"> 
+        <div id="div-comment-28491" class="comment-body"> 
+         <div class="comment-author vcard"> 
+          <img alt="" src="http://1.gravatar.com/avatar/7d959dfa3f80a1eafb357b18812cea08?s=32&amp;d=http%3A%2F%2F1.gravatar.com%2Favatar%2Fad516503a11cd5ca435acc9bb6523536%3Fs%3D32&amp;r=G" class="avatar avatar-32 photo" height="32" width="32"> 
+          <cite class="fn"><a href="http://www.luigidragone.com" rel="external nofollow" class="url">Luigi</a></cite> 
+          <span class="says">says:</span> 
+         </div> 
+         <div class="comment-meta commentmetadata">
+          <a href="http://www.luigidragone.com/software/ntlm-authentication-in-java/#comment-28491"> 05/05/2013 at 05:56</a> 
+         </div> 
+         <p>No, it has been designed for NTLM.</p> 
+         <div class="reply"> 
+          <a class="comment-reply-link" href="/software/ntlm-authentication-in-java/?replytocom=28491#respond" onclick="return addComment.moveForm(&quot;div-comment-28491&quot;, &quot;28491&quot;, &quot;respond&quot;, &quot;19&quot;)">Reply</a> 
+         </div> 
+        </div> </li> 
+      </ul> </li> 
+    </ul> 
+    <p></p> 
+    <br> 
+    <div id="respond"> 
+     <h3 id="reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/software/ntlm-authentication-in-java/#respond" style="display:none;">Cancel reply</a></small></h3> 
+     <form action="http://www.luigidragone.com/wp-comments-post.php" method="post" id="commentform"> 
+      <p class="comment-notes">Your email address will not be published. Required fields are marked <span class="required">*</span></p> 
+      <p class="comment-form-author"><label for="author">Name</label> <span class="required">*</span><input id="author" name="author" type="text" value="" size="30" aria-required="true"></p> 
+      <p class="comment-form-email"><label for="email">Email</label> <span class="required">*</span><input id="email" name="email" type="text" value="" size="30" aria-required="true"></p> 
+      <p class="comment-form-url"><label for="url">Website</label><input id="url" name="url" type="text" value="" size="30"></p> 
+      <p class="comment-form-comment"><label for="comment">Comment</label><textarea id="comment" name="comment" cols="45" rows="8" aria-required="true"></textarea></p> 
+      <p class="form-allowed-tags">You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: <code>&lt;a href="" title=""&gt; &lt;abbr title=""&gt; &lt;acronym title=""&gt; &lt;b&gt; &lt;blockquote cite=""&gt; &lt;cite&gt; &lt;code&gt; &lt;del datetime=""&gt; &lt;em&gt; &lt;i&gt; &lt;q cite=""&gt; &lt;strike&gt; &lt;strong&gt; </code></p> 
+      <p class="form-submit"> <input name="submit" type="submit" id="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="19" id="comment_post_ID"> <input type="hidden" name="comment_parent" id="comment_parent" value="0"> </p> 
+      <p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="b87fd23530"></p>
+      <p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="86"></p> 
+     </form> 
+    </div>
+    <!-- #respond --> 
    </div> 
-   <div class="header--container"></div> 
-   <div class="container-fluid"></div> 
-   <div></div> 
-   <div class="container-fluid"> 
-    <main class="main-body--wrapper"> 
-     <div class="row-fluid"> 
-      <div class="span8 mobile-left-pane"> 
-       <div class="content--title desktop-only">
-        Getting Started
+   <div class="sidebar"> 
+    <ul> 
+     <li><h2>Blogroll</h2> 
+      <ul class="xoxo blogroll"> 
+       <li><a href="http://caccio.blogdns.net">caccio's blog</a></li> 
+       <li><a href="http://www.cilentoverde.com/">Cooperativa Nuovo Cilento</a></li> 
+       <li><a href="http://www.erfabber.com/">Faber's Home Page</a></li> 
+       <li><a href="http://giuseppecilento.wordpress.com/">Giuseppe Cilento</a></li> 
+       <li><a href="https://www.flickr.com/photos/37425957@N04">Massimo Burchielli</a></li> 
+       <li><a href="http://www.percorsiphotografici.com/">Percorsi Photografici</a></li> 
+       <li><a href="http://tavoleromane.wordpress.com/">Tavole Romane</a></li> 
+       <li><a href="http://web.tiscalinet.it/francescodamato/">www.Francesco D'Amato.it</a></li> 
+      </ul> </li> 
+     <li> 
+      <div class="hslice" id="ngg-webslice"> 
+       <h2>Gallery</h2> 
+       <div class="ngg-widget entry-content"> 
+        <a href="http://www.luigidragone.com/wp-content/gallery/molpa/img_4514.jpg" title="Scoglio del Coniglio" class="thickbox" rel="ngg-images-4"><img src="http://www.luigidragone.com/wp-content/gallery/molpa/thumbs/thumbs_img_4514.jpg" width="75" height="50" title="Scoglio del Coniglio" alt="Scoglio del Coniglio"></a> 
+        <a href="http://www.luigidragone.com/wp-content/gallery/presepe-vivente-2012/crw_5978.jpg" title="" class="thickbox" rel="ngg-images-4"><img src="http://www.luigidragone.com/wp-content/gallery/presepe-vivente-2012/thumbs/thumbs_crw_5978.jpg" width="75" height="50" title="crw_5978" alt="crw_5978"></a> 
+        <a href="http://www.luigidragone.com/wp-content/gallery/certosa-padula/dscn1213.jpg" title="" class="thickbox" rel="ngg-images-4"><img src="http://www.luigidragone.com/wp-content/gallery/certosa-padula/thumbs/thumbs_dscn1213.jpg" width="75" height="50" title="dscn1213" alt="dscn1213"></a> 
        </div> 
-       <article class="content--container"> 
-        <h1 class="title">Authenticating a User with LDAP</h1> 
-        <div class="article-body">
-         <div class="paragraph"> 
-          <p>This guide walks you through the process creating an application and securing it with the <a href="http://projects.spring.io/spring-security/">Spring Security</a> LDAP module.</p> 
-         </div> 
-         <div class="sect1"> 
-          <h2 id="_what_you_ll_build">What you’ll build</h2> 
-          <div class="sectionbody"> 
-           <div class="paragraph"> 
-            <p>You’ll build a simple web application that is secured by Spring Security’s embedded Java-based LDAP server. You’ll load the LDAP server with a data file containing a set of users.</p> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1"> 
-          <h2 id="_what_you_ll_need">What you’ll need</h2> 
-          <div class="sectionbody"> 
-           <div class="ulist"> 
-            <ul> 
-             <li> <p>About 15 minutes</p> </li> 
-             <li> <p>A favorite text editor or IDE</p> </li> 
-             <li> <p><a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">JDK 1.8</a> or later</p> </li> 
-             <li> <p><a href="http://www.gradle.org/downloads">Gradle 2.3+</a> or <a href="https://maven.apache.org/download.cgi">Maven 3.0+</a></p> </li> 
-             <li> <p>You can also import the code straight into your IDE:</p> 
-              <div class="ulist"> 
-               <ul> 
-                <li> <p><a href="/guides/gs/sts">Spring Tool Suite (STS)</a></p> </li> 
-                <li> <p><a href="/guides/gs/intellij-idea/">IntelliJ IDEA</a></p> </li> 
-               </ul> 
-              </div> </li> 
-            </ul> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1"> 
-          <h2 id="_how_to_complete_this_guide">How to complete this guide</h2> 
-          <div class="sectionbody"> 
-           <div class="paragraph"> 
-            <p>Like most Spring <a href="/guides">Getting Started guides</a>, you can start from scratch and complete each step, or you can bypass basic setup steps that are already familiar to you. Either way, you end up with working code.</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p>To <strong>start from scratch</strong>, move on to <a href="#scratch">Build with Gradle</a>.</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p>To <strong>skip the basics</strong>, do the following:</p> 
-           </div> 
-           <div class="ulist"> 
-            <ul> 
-             <li> <p><a href="https://github.com/spring-guides/gs-authenticating-ldap/archive/master.zip">Download</a> and unzip the source repository for this guide, or clone it using <a href="/understanding/Git">Git</a>: <code>git clone <a href="https://github.com/spring-guides/gs-authenticating-ldap.git" class="bare">https://github.com/spring-guides/gs-authenticating-ldap.git</a></code></p> </li> 
-             <li> <p>cd into <code>gs-authenticating-ldap/initial</code></p> </li> 
-             <li> <p>Jump ahead to <a href="#initial">Create a simple web controller</a>.</p> </li> 
-            </ul> 
-           </div> 
-           <div class="paragraph"> 
-            <p><strong>When you’re finished</strong>, you can check your results against the code in <code>gs-authenticating-ldap/complete</code>.</p> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1 reveal-gradle"> 
-          <h2 id="reveal-gradle">Build with Gradle</h2> 
-          <div class="sectionbody"> 
-          </div> 
-         </div> 
-         <div class="sect1 use-gradle"> 
-          <h2 id="scratch">Build with Gradle</h2> 
-          <div class="sectionbody"> 
-           <div class="paragraph"> 
-            <p>First you set up a basic build script. You can use any build system you like when building apps with Spring, but the code you need to work with <a href="http://gradle.org">Gradle</a> and <a href="https://maven.apache.org">Maven</a> is included here. If you’re not familiar with either, refer to <a href="/guides/gs/gradle">Building Java Projects with Gradle</a> or <a href="/guides/gs/maven">Building Java Projects with Maven</a>.</p> 
-           </div> 
-           <div class="sect2"> 
-            <h3 id="_create_the_directory_structure">Create the directory structure</h3> 
-            <div class="paragraph"> 
-             <p>In a project directory of your choosing, create the following subdirectory structure; for example, with <code>mkdir -p src/main/java/hello</code> on *nix systems:</p> 
-            </div> 
-            <div class="literalblock"> 
-             <div class="content"> 
-              <pre>??? src
-    ??? main
-        ??? java
-            ??? hello</pre> 
-             </div> 
-            </div> 
-           </div> 
-           <div class="sect2"> 
-            <h3 id="_create_a_gradle_build_file">Create a Gradle build file</h3> 
-            <div class="paragraph"> 
-             <p>Below is the <a href="https://github.com/spring-guides/gs-authenticating-ldap/blob/master/initial/build.gradle">initial Gradle build file</a>.</p> 
-            </div> 
-            <div class="paragraph"> 
-             <p><code>build.gradle</code></p> 
-            </div> 
-            <div class="listingblock"> 
-             <div class="content"> 
-              <pre class="prettyprint highlight"><code class="language-java" data-lang="java">buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.7.RELEASE")
-    }
-}
-
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-apply plugin: 'org.springframework.boot'
-
-jar {
-    baseName = 'gs-authenticating-ldap'
-    version =  '0.1.0'
-}
-
-repositories {
-    mavenCentral()
-}
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-// tag::security[]
-dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
-    testCompile("org.springframework.boot:spring-boot-starter-test")
-}
-// end::security[]</code></pre> 
-             </div> 
-            </div> 
-            <div class="paragraph"> 
-             <p>The <a href="https://github.com/spring-projects/spring-boot/tree/master/spring-boot-tools/spring-boot-gradle-plugin">Spring Boot gradle plugin</a> provides many convenient features:</p> 
-            </div> 
-            <div class="ulist"> 
-             <ul> 
-              <li> <p>It collects all the jars on the classpath and builds a single, runnable "über-jar", which makes it more convenient to execute and transport your service.</p> </li> 
-              <li> <p>It searches for the <code>public static void main()</code> method to flag as a runnable class.</p> </li> 
-              <li> <p>It provides a built-in dependency resolver that sets the version number to match <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-dependencies/pom.xml">Spring Boot dependencies</a>. You can override any version you wish, but it will default to Boot’s chosen set of versions.</p> </li> 
-             </ul> 
-            </div> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1 reveal-maven"> 
-          <h2 id="reveal-maven">Build with Maven</h2> 
-          <div class="sectionbody"> 
-          </div> 
-         </div> 
-         <div class="sect1 use-maven"> 
-          <h2 id="use-maven">Build with Maven</h2> 
-          <div class="sectionbody"> 
-           <div class="paragraph"> 
-            <p>First you set up a basic build script. You can use any build system you like when building apps with Spring, but the code you need to work with <a href="https://maven.apache.org">Maven</a> is included here. If you’re not familiar with Maven, refer to <a href="/guides/gs/maven">Building Java Projects with Maven</a>.</p> 
-           </div> 
-           <div class="sect2"> 
-            <h3 id="_create_the_directory_structure_2">Create the directory structure</h3> 
-            <div class="paragraph"> 
-             <p>In a project directory of your choosing, create the following subdirectory structure; for example, with <code>mkdir -p src/main/java/hello</code> on *nix systems:</p> 
-            </div> 
-            <div class="literalblock"> 
-             <div class="content"> 
-              <pre>??? src
-    ??? main
-        ??? java
-            ??? hello</pre> 
-             </div> 
-            </div> 
-            <div class="paragraph"> 
-             <p><code>pom.xml</code></p> 
-            </div> 
-            <div class="listingblock"> 
-             <div class="content"> 
-              <pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
-    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
-
-    &lt;groupId&gt;org.springframework&lt;/groupId&gt;
-    &lt;artifactId&gt;gs-authenticating-ldap&lt;/artifactId&gt;
-    &lt;version&gt;0.1.0&lt;/version&gt;
-
-    &lt;parent&gt;
-        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-        &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
-        &lt;version&gt;1.5.7.RELEASE&lt;/version&gt;
-    &lt;/parent&gt;
-
-    &lt;properties&gt;
-        &lt;java.version&gt;1.8&lt;/java.version&gt;
-    &lt;/properties&gt;
-
-    &lt;!-- tag::security[] --&gt;
-    &lt;dependencies&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
-        &lt;/dependency&gt;
-        &lt;dependency&gt;
-            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-            &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
-            &lt;scope&gt;test&lt;/scope&gt;
-        &lt;/dependency&gt;
-    &lt;/dependencies&gt;
-    &lt;!-- end::security[] --&gt;
-
-    &lt;build&gt;
-        &lt;plugins&gt;
-            &lt;plugin&gt;
-                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-            &lt;/plugin&gt;
-        &lt;/plugins&gt;
-    &lt;/build&gt;
-
-
-&lt;/project&gt;</code></pre> 
-             </div> 
-            </div> 
-            <div class="paragraph"> 
-             <p>The <a href="https://github.com/spring-projects/spring-boot/tree/master/spring-boot-tools/spring-boot-maven-plugin">Spring Boot Maven plugin</a> provides many convenient features:</p> 
-            </div> 
-            <div class="ulist"> 
-             <ul> 
-              <li> <p>It collects all the jars on the classpath and builds a single, runnable "über-jar", which makes it more convenient to execute and transport your service.</p> </li> 
-              <li> <p>It searches for the <code>public static void main()</code> method to flag as a runnable class.</p> </li> 
-              <li> <p>It provides a built-in dependency resolver that sets the version number to match <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-dependencies/pom.xml">Spring Boot dependencies</a>. You can override any version you wish, but it will default to Boot’s chosen set of versions.</p> </li> 
-             </ul> 
-            </div> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1 reveal-sts"> 
-          <h2 id="reveal-sts">Build with your IDE</h2> 
-          <div class="sectionbody"> 
-          </div> 
-         </div> 
-         <div class="sect1 use-sts"> 
-          <h2 id="use-sts">Build with your IDE</h2> 
-          <div class="sectionbody"> 
-           <div class="ulist"> 
-            <ul> 
-             <li> <p>Read how to import this guide straight into <a href="/guides/gs/sts/">Spring Tool Suite</a>.</p> </li> 
-             <li> <p>Read how to work with this guide in <a href="/guides/gs/intellij-idea">IntelliJ IDEA</a>.</p> </li> 
-            </ul> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1"> 
-          <h2 id="initial">Create a simple web controller</h2> 
-          <div class="sectionbody"> 
-           <div class="paragraph"> 
-            <p>In Spring, REST endpoints are just Spring MVC controllers. The following Spring MVC controller handles a <code>GET /</code> request by returning a simple message:</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p><code>src/main/java/hello/HomeController.java</code></p> 
-           </div> 
-           <div class="listingblock"> 
-            <div class="content"> 
-             <pre class="prettyprint highlight"><code class="language-java" data-lang="java">package hello;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-public class HomeController {
-
-    @GetMapping("/")
-    public String index() {
-        return "Welcome to the home page!";
-    }
-}</code></pre> 
-            </div> 
-           </div> 
-           <div class="paragraph"> 
-            <p>The entire class is marked up with <code>@RestController</code> so Spring MVC can autodetect the controller using it’s built-in scanning features and automatically configure web routes.</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p>The method is tagged with <code>@RequestMapping</code> to flag the path and the REST action. In this case, <code>GET</code> is the default behavior; it returns a message indicating that you are on the home page.</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p><code>@RestController</code> also tells Spring MVC to write the text directly into the HTTP response body, because there aren’t any views. Instead, when you visit the page, you’ll get a simple message in the browser as the focus of this guide is securing the page with LDAP.</p> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1"> 
-          <h2 id="_build_the_unsecured_web_application">Build the unsecured web application</h2> 
-          <div class="sectionbody"> 
-           <div class="paragraph"> 
-            <p>Before you secure the web application, verify that it works. To do that, you need to define some key beans. To do that, create an <code>Application</code> class.</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p><code>src/main/java/hello/Application.java</code></p> 
-           </div> 
-           <div class="listingblock"> 
-            <div class="content"> 
-             <pre class="prettyprint highlight"><code class="language-java" data-lang="java">package hello;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class Application {
-
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-
-}</code></pre> 
-            </div> 
-           </div> 
-           <div class="paragraph"> 
-            <p><code>@SpringBootApplication</code> is a convenience annotation that adds all of the following:</p> 
-           </div> 
-           <div class="ulist"> 
-            <ul> 
-             <li> <p><code>@Configuration</code> tags the class as a source of bean definitions for the application context.</p> </li> 
-             <li> <p><code>@EnableAutoConfiguration</code> tells Spring Boot to start adding beans based on classpath settings, other beans, and various property settings.</p> </li> 
-             <li> <p>Normally you would add <code>@EnableWebMvc</code> for a Spring MVC app, but Spring Boot adds it automatically when it sees <strong>spring-webmvc</strong> on the classpath. This flags the application as a web application and activates key behaviors such as setting up a <code>DispatcherServlet</code>.</p> </li> 
-             <li> <p><code>@ComponentScan</code> tells Spring to look for other components, configurations, and services in the <code>hello</code> package, allowing it to find the controllers.</p> </li> 
-            </ul> 
-           </div> 
-           <div class="paragraph"> 
-            <p>The <code>main()</code> method uses Spring Boot’s <code>SpringApplication.run()</code> method to launch an application. Did you notice that there wasn’t a single line of XML? No <strong>web.xml</strong> file either. This web application is 100% pure Java and you didn’t have to deal with configuring any plumbing or infrastructure.</p> 
-           </div> 
-           <div class="sect2"> 
-            <h3 id="_build_an_executable_jar">Build an executable JAR</h3> 
-            <div class="paragraph"> 
-             <p>You can run the application from the command line with Gradle or Maven. Or you can build a single executable JAR file that contains all the necessary dependencies, classes, and resources, and run that. This makes it easy to ship, version, and deploy the service as an application throughout the development lifecycle, across different environments, and so forth.</p> 
-            </div> 
-            <div class="paragraph"> 
-             <p>If you are using Gradle, you can run the application using <code>./gradlew bootRun</code>. Or you can build the JAR file using <code>./gradlew build</code>. Then you can run the JAR file:</p> 
-            </div> 
-            <div class="literalblock has-copy-button"> 
-             <div class="content"> 
-              <pre>java -jar build/libs/gs-authenticating-ldap-0.1.0.jar</pre> 
-             </div> 
-            </div> 
-            <div class="paragraph"> 
-             <p>If you are using Maven, you can run the application using <code>./mvnw spring-boot:run</code>. Or you can build the JAR file with <code>./mvnw clean package</code>. Then you can run the JAR file:</p> 
-            </div> 
-            <div class="literalblock has-copy-button"> 
-             <div class="content"> 
-              <pre>java -jar target/gs-authenticating-ldap-0.1.0.jar</pre> 
-             </div> 
-            </div> 
-            <div class="admonitionblock note"> 
-             <table> 
-              <tbody> 
-               <tr> 
-                <td class="icon"> <i class="fa icon-note" title="Note"></i> </td> 
-                <td class="content"> The procedure above will create a runnable JAR. You can also opt to <a href="/guides/gs/convert-jar-to-war/">build a classic WAR file</a> instead. </td> 
-               </tr> 
-              </tbody> 
-             </table> 
-            </div> 
-            <div class="paragraph"> 
-             <p>If you open your browser and visit <a href="http://localhost:8080" class="bare">http://localhost:8080</a>, you should see the following plain text:</p> 
-            </div> 
-            <div class="literalblock"> 
-             <div class="content"> 
-              <pre>Welcome to the home page!</pre> 
-             </div> 
-            </div> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1"> 
-          <h2 id="_set_up_spring_security">Set up Spring Security</h2> 
-          <div class="sectionbody"> 
-           <div class="paragraph"> 
-            <p>To configure Spring Security, you first need to add some extra dependencies to your build.</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p>For a Gradle-based build:</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p><code>build.gradle</code></p> 
-           </div> 
-           <div class="listingblock"> 
-            <div class="content"> 
-             <pre class="prettyprint highlight"><code class="language-java" data-lang="java">dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
-    compile("org.springframework.boot:spring-boot-starter-security")
-    compile("org.springframework.ldap:spring-ldap-core")
-    compile("org.springframework.security:spring-security-ldap")
-    compile("org.springframework:spring-tx")
-    compile("com.unboundid:unboundid-ldapsdk")
-    testCompile("org.springframework.boot:spring-boot-starter-test")
-    testCompile("org.springframework.security:spring-security-test")
-}</code></pre> 
-            </div> 
-           </div> 
-           <div class="admonitionblock note"> 
-            <table> 
-             <tbody> 
-              <tr> 
-               <td class="icon"> <i class="fa icon-note" title="Note"></i> </td> 
-               <td class="content"> Due to a artifact resolution issue with Gradle, <strong>spring-tx</strong> must be pulled in or Gradle will fetch an older one that doesn’t work. </td> 
-              </tr> 
-             </tbody> 
-            </table> 
-           </div> 
-           <div class="paragraph"> 
-            <p>For a Maven-based build:</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p><code>pom.xml</code></p> 
-           </div> 
-           <div class="listingblock"> 
-            <div class="content"> 
-             <pre class="prettyprint highlight"><code class="language-xml" data-lang="xml">&lt;dependencies&gt;
-    &lt;dependency&gt;
-        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-        &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-        &lt;groupId&gt;org.springframework.ldap&lt;/groupId&gt;
-        &lt;artifactId&gt;spring-ldap-core&lt;/artifactId&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-        &lt;groupId&gt;org.springframework.security&lt;/groupId&gt;
-        &lt;artifactId&gt;spring-security-ldap&lt;/artifactId&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-        &lt;groupId&gt;com.unboundid&lt;/groupId&gt;
-        &lt;artifactId&gt;unboundid-ldapsdk&lt;/artifactId&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
-        &lt;scope&gt;test&lt;/scope&gt;
-    &lt;/dependency&gt;
-    &lt;dependency&gt;
-        &lt;groupId&gt;org.springframework.security&lt;/groupId&gt;
-        &lt;artifactId&gt;spring-security-test&lt;/artifactId&gt;
-        &lt;scope&gt;test&lt;/scope&gt;
-    &lt;/dependency&gt;
-&lt;/dependencies&gt;</code></pre> 
-            </div> 
-           </div> 
-           <div class="paragraph"> 
-            <p>These dependencies add Spring Security and UnboundId, an open source LDAP server. With that in place, you can then use pure Java to configure your security policy.</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p><code>src/main/java/hello/WebSecurityConfig.java</code></p> 
-           </div> 
-           <div class="listingblock"> 
-            <div class="content"> 
-             <pre class="prettyprint highlight"><code class="language-java" data-lang="java">package hello;
-
-import java.util.Arrays;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.encoding.LdapShaPasswordEncoder;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
-
-@Configuration
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http
-			.authorizeRequests()
-				.anyRequest().fullyAuthenticated()
-				.and()
-			.formLogin();
-	}
-
-	@Override
-	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth
-			.ldapAuthentication()
-				.userDnPatterns("uid={0},ou=people")
-				.groupSearchBase("ou=groups")
-				.contextSource(contextSource())
-				.passwordCompare()
-					.passwordEncoder(new LdapShaPasswordEncoder())
-					.passwordAttribute("userPassword");
-	}
-
-	@Bean
-	public DefaultSpringSecurityContextSource contextSource() {
-		return  new DefaultSpringSecurityContextSource(Arrays.asList("ldap://localhost:8389/"), "dc=springframework,dc=org");
-	}
-
-}</code></pre> 
-            </div> 
-           </div> 
-           <div class="paragraph"> 
-            <p>The <code>@EnableWebSecurity</code> turns on a variety of beans needed to use Spring Security.</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p>You also need an LDAP server. Spring Boot’s provides autoconfiguration for an embedded server written in pure Java, which is being used for this guide. The <code>ldapAuthentication()</code> method configures things where the username at the login form is plugged into <code>{0}</code> such that it searches <code>uid={0},ou=people,dc=springframework,dc=org</code> in the LDAP server. Also, the <code>passwordCompare()</code> method configures the encoder and the name of the password’s attribute.</p> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1"> 
-          <h2 id="_set_up_user_data">Set up user data</h2> 
-          <div class="sectionbody"> 
-           <div class="paragraph"> 
-            <p>LDAP servers can use LDIF (LDAP Data Interchange Format) files to exchange user data. The <code>spring.ldap.embedded.ldif</code> property inside <code>application.properties</code> allow to Spring Boot pulls in an LDIF data file. This makes it easy to pre-load demonstration data.</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p><code>src/main/resources/test-server.ldif</code></p> 
-           </div> 
-           <div class="listingblock"> 
-            <div class="content"> 
-             <pre class="prettyprint highlight"><code class="language-ldif" data-lang="ldif">dn: dc=springframework,dc=org
-objectclass: top
-objectclass: domain
-objectclass: extensibleObject
-dc: springframework
-
-dn: ou=groups,dc=springframework,dc=org
-objectclass: top
-objectclass: organizationalUnit
-ou: groups
-
-dn: ou=subgroups,ou=groups,dc=springframework,dc=org
-objectclass: top
-objectclass: organizationalUnit
-ou: subgroups
-
-dn: ou=people,dc=springframework,dc=org
-objectclass: top
-objectclass: organizationalUnit
-ou: people
-
-dn: ou=space cadets,dc=springframework,dc=org
-objectclass: top
-objectclass: organizationalUnit
-ou: space cadets
-
-dn: ou=\"quoted people\",dc=springframework,dc=org
-objectclass: top
-objectclass: organizationalUnit
-ou: "quoted people"
-
-dn: ou=otherpeople,dc=springframework,dc=org
-objectclass: top
-objectclass: organizationalUnit
-ou: otherpeople
-
-dn: uid=ben,ou=people,dc=springframework,dc=org
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-cn: Ben Alex
-sn: Alex
-uid: ben
-userPassword: {SHA}nFCebWjxfaLbHHG1Qk5UU4trbvQ=
-
-dn: uid=bob,ou=people,dc=springframework,dc=org
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-cn: Bob Hamilton
-sn: Hamilton
-uid: bob
-userPassword: bobspassword
-
-dn: uid=joe,ou=otherpeople,dc=springframework,dc=org
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-cn: Joe Smeth
-sn: Smeth
-uid: joe
-userPassword: joespassword
-
-dn: cn=mouse\, jerry,ou=people,dc=springframework,dc=org
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-cn: Mouse, Jerry
-sn: Mouse
-uid: jerry
-userPassword: jerryspassword
-
-dn: cn=slash/guy,ou=people,dc=springframework,dc=org
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-cn: slash/guy
-sn: Slash
-uid: slashguy
-userPassword: slashguyspassword
-
-dn: cn=quote\"guy,ou=\"quoted people\",dc=springframework,dc=org
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-cn: quote\"guy
-sn: Quote
-uid: quoteguy
-userPassword: quoteguyspassword
-
-dn: uid=space cadet,ou=space cadets,dc=springframework,dc=org
-objectclass: top
-objectclass: person
-objectclass: organizationalPerson
-objectclass: inetOrgPerson
-cn: Space Cadet
-sn: Cadet
-uid: space cadet
-userPassword: spacecadetspassword
-
-
-
-dn: cn=developers,ou=groups,dc=springframework,dc=org
-objectclass: top
-objectclass: groupOfUniqueNames
-cn: developers
-ou: developer
-uniqueMember: uid=ben,ou=people,dc=springframework,dc=org
-uniqueMember: uid=bob,ou=people,dc=springframework,dc=org
-
-dn: cn=managers,ou=groups,dc=springframework,dc=org
-objectclass: top
-objectclass: groupOfUniqueNames
-cn: managers
-ou: manager
-uniqueMember: uid=ben,ou=people,dc=springframework,dc=org
-uniqueMember: cn=mouse\, jerry,ou=people,dc=springframework,dc=org
-
-dn: cn=submanagers,ou=subgroups,ou=groups,dc=springframework,dc=org
-objectclass: top
-objectclass: groupOfUniqueNames
-cn: submanagers
-ou: submanager
-uniqueMember: uid=ben,ou=people,dc=springframework,dc=org</code></pre> 
-            </div> 
-           </div> 
-           <div class="admonitionblock note"> 
-            <table> 
-             <tbody> 
-              <tr> 
-               <td class="icon"> <i class="fa icon-note" title="Note"></i> </td> 
-               <td class="content"> Using an LDIF file isn’t standard configuration for a production system. However, it’s very useful for testing purposes or guides. </td> 
-              </tr> 
-             </tbody> 
-            </table> 
-           </div> 
-           <div class="paragraph"> 
-            <p>If you visit the site at <a href="http://localhost:8080" class="bare">http://localhost:8080</a>, you should be redirected to a login page provided by Spring Security.</p> 
-           </div> 
-           <div class="paragraph"> 
-            <p>Enter username <strong>ben</strong> and password <strong>benspassword</strong>. You should see this message in your browser:</p> 
-           </div> 
-           <div class="literalblock"> 
-            <div class="content"> 
-             <pre>Welcome to the home page!</pre> 
-            </div> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1"> 
-          <h2 id="_summary">Summary</h2> 
-          <div class="sectionbody"> 
-           <div class="paragraph"> 
-            <p>Congratulations! You have just written a web application and secured it with <a href="http://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/">Spring Security</a>. In this case, you used an <a href="http://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#ldap">LDAP-based user store</a>.</p> 
-           </div> 
-          </div> 
-         </div> 
-         <div class="sect1"> 
-          <h2 id="_see_also">See Also</h2> 
-          <div class="sectionbody"> 
-           <div class="paragraph"> 
-            <p>The following guide may also be helpful:</p> 
-           </div> 
-           <div class="ulist"> 
-            <ul> 
-             <li> <p><a href="https://spring.io/guides/gs/spring-boot/">Building an Application with Spring Boot</a></p> </li> 
-            </ul> 
-           </div> 
-           <div class="paragraph"> 
-            <p>Want to write a new guide or contribute to an existing one? Check out our <a href="https://github.com/spring-guides/getting-started-guides/wiki">contribution guidelines</a>.</p> 
-           </div> 
-           <div class="admonitionblock important"> 
-            <table> 
-             <tbody> 
-              <tr> 
-               <td class="icon"> <i class="fa icon-important" title="Important"></i> </td> 
-               <td class="content"> All guides are released with an ASLv2 license for the code, and an <a href="https://creativecommons.org/licenses/by-nd/3.0/">Attribution, NoDerivatives creative commons license</a> for the writing. </td> 
-              </tr> 
-             </tbody> 
-            </table> 
-           </div> 
-          </div> 
-         </div>
-        </div> 
-       </article> 
-      </div> 
-      <aside class="span4 content-right-pane--container mobile-left-pane" id="sidebar"> 
-       <a class="ci-status desktop-only" href="https://travis-ci.org/spring-guides/gs-authenticating-ldap"> <img src="https://travis-ci.org/spring-guides/gs-authenticating-ldap.svg?branch=master"> </a> 
-       <div class="right-pane-widget--container desktop-only"> 
-        <div class="github-actions https"> 
-         <h2>Get the Code</h2> 
-         <div class="btn-group"> 
-          <button class="btn" data-protocol="https">HTTPS</button> 
-          <button class="btn" data-protocol="ssh">SSH</button> 
-          <button class="btn" data-protocol="subversion">Subversion</button> 
-         </div> 
-         <div class="clone-url https"> 
-          <input id="clone-url-https" readonly type="text" value="https://github.com/spring-guides/gs-authenticating-ldap.git"> 
-          <button class="copy-button github" data-toggle="tooltip" data-clipboard-text="https://github.com/spring-guides/gs-authenticating-ldap.git"></button> 
-         </div> 
-         <div class="clone-url ssh"> 
-          <input id="clone-url-ssh" readonly type="text" value="git@github.com:spring-guides/gs-authenticating-ldap.git"> 
-          <button class="copy-button github" data-toggle="tooltip" data-clipboard-text="git@github.com:spring-guides/gs-authenticating-ldap.git"></button> 
-         </div> 
-         <div class="clone-url subversion"> 
-          <input id="clone-url-subversion" readonly type="text" value="https://github.com/spring-guides/gs-authenticating-ldap"> 
-          <button class="copy-button github" data-toggle="tooltip" data-clipboard-text="https://github.com/spring-guides/gs-authenticating-ldap"></button> 
-         </div> 
-         <a class="github_download btn btn-black uppercase" href="https://github.com/spring-guides/gs-authenticating-ldap/archive/master.zip">Download ZIP</a> 
-         <a class="gs-guide-import" href="https://github.com/spring-guides/gs-authenticating-ldap">Import into STS</a> 
-         <div class="go-to-repo--container"> 
-          <a href="https://github.com/spring-guides/gs-authenticating-ldap"> <i class="icon-github"></i> Go To Repo </a> 
-         </div> 
-        </div> 
-       </div> 
-       <div>
-        <div class="right-pane-widget--container"> 
-         <div class="related_resources"> 
-          <h3><a name="table-of-contents" class="anchor" href="#table-of-contents"></a>Table of contents</h3> 
-          <ul class="sectlevel1"> 
-           <li><a href="#_what_you_ll_build">What you’ll build</a></li> 
-           <li><a href="#_what_you_ll_need">What you’ll need</a></li> 
-           <li><a href="#_how_to_complete_this_guide">How to complete this guide</a></li> 
-           <li><a href="#scratch">Build with Gradle</a> </li> 
-           <li><a href="#use-maven">Build with Maven</a> </li> 
-           <li><a href="#use-sts">Build with your IDE</a></li> 
-           <li><a href="#initial">Create a simple web controller</a></li> 
-           <li><a href="#_build_the_unsecured_web_application">Build the unsecured web application</a> </li> 
-           <li><a href="#_set_up_spring_security">Set up Spring Security</a></li> 
-           <li><a href="#_set_up_user_data">Set up user data</a></li> 
-           <li><a href="#_summary">Summary</a></li> 
-           <li><a href="#_see_also">See Also</a></li> 
-          </ul>
-         </div> 
-        </div> 
-        <div class="right-pane-widget--container"> 
-         <div class="related_resources"> 
-          <h3><a name="tags" class="anchor" href="#tags"></a>Tags</h3>
-          <ul class="inline"> 
-           <li><a href="/guides?filter=security">security</a></li> 
-           <li><a href="/guides?filter=ldap">ldap</a></li> 
-          </ul>
-          <h3><a name="projects" class="anchor" href="#projects"></a>Projects</h3> 
-          <ul> 
-           <li><a href="http://projects.spring.io/spring-ldap">Spring LDAP</a></li> 
-           <li><a href="http://projects.spring.io/spring-security">Spring Security</a></li> 
-          </ul> 
-          <h3><a name="concepts-and-technologies" class="anchor" href="#concepts-and-technologies"></a>Concepts and technologies</h3> 
-          <ul> 
-           <li><a href="/understanding/Git">Git</a></li> 
-          </ul> 
-         </div> 
-        </div>
-       </div> 
-      </aside> 
-     </div> 
-    </main> 
+      </div> </li> 
+    </ul> 
    </div> 
-   <footer class="footer"> 
-    <div class="container-fluid"> 
-     <div class="row-fluid"> 
-      <div class="span12"> 
-       <div class="navbar"> 
-        <div class="container"> 
-         <ul class="nav"> 
-          <li><a href="/team">Team</a></li> 
-          <li><a href="/services">Services</a></li> 
-          <li><a href="/tools">Tools</a></li> 
-          <li><a href="https://store.spring.io">Store</a></li> 
-         </ul> 
-        </div> 
-       </div> © 
-       <span>2017</span> 
-       <a href="https://www.pivotal.io/">Pivotal Software</a>, Inc. All Rights Reserved. 
-       <a href="https://www.pivotal.io/terms-of-use">Terms of Use</a>, 
-       <a href="https://www.pivotal.io/privacy-policy">Privacy</a> and 
-       <a href="/trademarks">Trademark Guidelines</a> 
-      </div> 
-     </div> 
-    </div> 
-   </footer> 
-   <div id="scrim"></div> 
   </div> 
+  <div class="footer"> 
+   <p><span>Luigi Dragone</span></p> 
+  </div> 
+  <div id="design">
+   Powered by 
+   <a href="http://wordpress.org/">WordPress</a>. Designed by 
+   <a href="http://elogi.se/">elogi</a>.
+  </div> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-content/plugins/simple-mail-address-encoder/smae.js?ver=1.0.0"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var SlimStatParams = {
+	ajaxurl: "http://www.luigidragone.com/wp-admin/admin-ajax.php",
+	ci: "YTo0OntzOjEyOiJjb250ZW50X3R5cGUiO3M6NDoicGFnZSI7czo4OiJjYXRlZ29yeSI7czowOiIiO3M6MTA6ImNvbnRlbnRfaWQiO2k6MTk7czo2OiJhdXRob3IiO3M6ODoid3BtYXN0ZXIiO30=.582539b77319729fe424b8fe22d22a96"
+};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-content/plugins/wp-slimstat/wp-slimstat.js"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var thickboxL10n = {
+	next: "Next &gt;",
+	prev: "&lt; Prev",
+	image: "Image",
+	of: "of",
+	close: "Close",
+	noiframes: "This feature requires inline frames. You have iframes disabled or your browser does not support them.",
+	loadingAnimation: "http://www.luigidragone.com/wp-includes/js/thickbox/loadingAnimation.gif",
+	closeImage: "http://www.luigidragone.com/wp-includes/js/thickbox/tb-close.png"
+};
+try{convertEntities(thickboxL10n);}catch(e){};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-includes/js/thickbox/thickbox.js?ver=3.1-20110528"></script> 
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-content/plugins/creare-eu-cookie-law-banner/js/eu-cookie-law.js"></script> 
+  <script type="text/javascript">
+  var dropCookie = true;
+  var cookieDuration = 14; 
+  var cookieName = 'complianceCookie';
+  var cookieValue = 'on';
+    var privacyMessage = "";
+
+  jQuery(document).ready(function($) {
+    privacyMessage = jQuery('#hidden-cookie-message').html();
+      	if(checkCookie(window.cookieName) != window.cookieValue){
+  		createDiv(true); 
+  		window.setTimeout(function() {
+      		$('#cookie-law').fadeOut();
+  		}, 5000);
+  	}
+  });
+</script> 
+  <div id="hidden-cookie-message" style="display:none;"> 
+   <div> 
+    <h4>Luigi Dragone Cookies Policy</h4> 
+    <p>Our Website uses cookies to improve your experience. Please visit our <a rel="nofollow" href="http://www.luigidragone.com/cookie-policy/">Cookie Policy</a> page for more information about cookies and how we use them.</p> 
+    <a class="close-cookie-banner" href="javascript:void(0);" onclick="jQuery(this).parent().parent().hide();"><span>Close</span></a> 
+   </div> 
+  </div> 
+  <div id="su-footer-links" style="text-align: center;"></div>
+  <script type="text/javascript" src="http://www.luigidragone.com/wp-content/plugins/akismet/_inc/form.js?ver=3.1.11"></script> 
+  <script type="text/javascript">tb_pathToImage = "http://www.luigidragone.com/wp-includes/js/thickbox/loadingAnimation.gif";tb_closeImage = "http://www.luigidragone.com/wp-includes/js/thickbox/tb-close.png";</script> 
+  <script type="text/javascript">
+		  			window.addEvent('domready', function() {		});
+			  </script> 
  </body>
 </html>

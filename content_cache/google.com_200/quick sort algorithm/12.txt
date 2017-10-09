@@ -1,2171 +1,596 @@
 <!doctype html>
-<html itemscope itemtype="http://schema.org/QAPage">
+<!--[if IE 7]>
+<html class="ie ie7" lang="en-US">
+<![endif]-->
+<!--[if IE 8]>
+<html class="ie ie8" lang="en-US">
+<![endif]-->
+<!--[if !(IE 7) & !(IE 8)]><!-->
+<html lang="en-US">
+ <!--<![endif]-->
  <head> 
-  <title>JavaScript quicksort - Stack Overflow</title> 
-  <link rel="shortcut icon" href="https://cdn.sstatic.net/Sites/stackoverflow/img/favicon.ico?v=4f32ecc8f43d"> 
-  <link rel="apple-touch-icon image_src" href="https://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon.png?v=c78bd457575a"> 
-  <link rel="search" type="application/opensearchdescription+xml" title="Stack Overflow" href="/opensearch.xml"> 
-  <meta property="og:type" content="website"> 
-  <meta name="twitter:card" content="summary"> 
-  <meta name="twitter:domain" content="stackoverflow.com"> 
-  <meta property="og:image" itemprop="image primaryImageOfPage" content="https://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon@2.png?v=73d79a89bded"> 
-  <meta name="twitter:title" property="og:title" itemprop="title name" content="JavaScript quicksort"> 
-  <meta name="twitter:description" property="og:description" itemprop="description" content="I have been looking around the web for a while and I am wondering if there is a 'stable' defacto implementation of quicksort that is generally used?  I can write my own but why reinvent the wheel..."> 
-  <meta property="og:url" content="https://stackoverflow.com/questions/5185864/javascript-quicksort"> 
-  <link rel="canonical" href="https://stackoverflow.com/questions/5185864/javascript-quicksort"> 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
-  <script src="https://cdn.sstatic.net/Js/stub.en.js?v=68aca3c2e951"></script> 
-  <link rel="stylesheet" type="text/css" href="https://cdn.sstatic.net/Sites/stackoverflow/all.css?v=415cca2eddbc"> 
-  <link rel="alternate" type="application/atom+xml" title="Feed for question 'JavaScript quicksort'" href="/feeds/question/5185864"> 
-  <meta name="twitter:app:country" content="US"> 
-  <meta name="twitter:app:name:iphone" content="Stack Exchange iOS"> 
-  <meta name="twitter:app:id:iphone" content="871299723"> 
-  <meta name="twitter:app:url:iphone" content="se-zaphod://stackoverflow.com/questions/5185864/javascript-quicksort"> 
-  <meta name="twitter:app:name:ipad" content="Stack Exchange iOS"> 
-  <meta name="twitter:app:id:ipad" content="871299723"> 
-  <meta name="twitter:app:url:ipad" content="se-zaphod://stackoverflow.com/questions/5185864/javascript-quicksort"> 
-  <meta name="twitter:app:name:googleplay" content="Stack Exchange Android"> 
-  <meta name="twitter:app:url:googleplay" content="http://stackoverflow.com/questions/5185864/javascript-quicksort"> 
-  <meta name="twitter:app:id:googleplay" content="com.stackexchange.marvin"> 
-  <script>
-        
-            StackExchange.ready(function () {
-                                    
-                    StackExchange.using("snippets", function () {
-                        StackExchange.snippets.initSnippetRenderer();
-                    });
-                    
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width"> 
+  <!--<title>Friday Algorithms: JavaScript Merge Sort</title>--> 
+  <title>stoimen's web log</title> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="pingback" href="http://www.stoimen.com/blog/xmlrpc.php"> 
+  <!--[if lt IE 9]>
+	<script src="http://www.stoimen.com/blog/wp-content/themes/twentythirteen/js/html5.js"></script>
+	<![endif]--> 
+  <!-- All in One SEO Pack 2.3.16 by Michael Torbert of Semper Fi Web Design[314,386] --> 
+  <meta name="description" content="Merge Sort This week I'm going to cover one very popular sorting algorithm - the merge sort. It's very intuitive and simple as it's described in Wikipedia"> 
+  <meta name="keywords" content="algorithm,computer science,computing,firebug,javascript,mathematics,merge sort,sorting algorithms,technology/internet"> 
+  <link rel="canonical" href="http://www.stoimen.com/blog/2010/07/02/friday-algorithms-javascript-merge-sort/"> 
+  <!-- /all in one seo pack --> 
+  <link rel="dns-prefetch" href="//fonts.googleapis.com"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="stoimen's web log » Feed" href="http://www.stoimen.com/blog/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="stoimen's web log » Comments Feed" href="http://www.stoimen.com/blog/comments/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="stoimen's web log » Friday Algorithms: JavaScript Merge Sort Comments Feed" href="http://www.stoimen.com/blog/2010/07/02/friday-algorithms-javascript-merge-sort/feed/"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"wpemoji":"http:\/\/www.stoimen.com\/blog\/wp-includes\/js\/wp-emoji.js?ver=4.8.1","twemoji":"http:\/\/www.stoimen.com\/blog\/wp-includes\/js\/twemoji.js?ver=4.8.1"}};
+			( function( window, document, settings ) {
+	var src, ready, ii, tests;
 
-                StackExchange.using("postValidation", function () {
-                    StackExchange.postValidation.initOnBlurAndSubmit($('#post-form'), 2, 'answer');
-                });
+	/*
+	 * Create a canvas element for testing native browser support
+	 * of emoji.
+	 */
+	var canvas = document.createElement( 'canvas' );
+	var context = canvas.getContext && canvas.getContext( '2d' );
 
-                
-                StackExchange.question.init({showAnswerHelp:true,totalCommentCount:7,shownCommentCount:5,highlightColor:'#F4A83D',backgroundColor:'#FFF',questionId:5185864});
+	/**
+	 * Detect if the browser supports rendering emoji or flag emoji. Flag emoji are a single glyph
+	 * made of two characters, so some browsers (notably, Firefox OS X) don't support them.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param type {String} Whether to test for support of "flag" or "emoji4" emoji.
+	 * @return {Boolean} True if the browser can render emoji, false if it cannot.
+	 */
+	function browserSupportsEmoji( type ) {
+		var stringFromCharCode = String.fromCharCode,
+			flag, flag2, emoji41, emoji42;
 
-                styleCode();
+		if ( ! context || ! context.fillText ) {
+			return false;
+		}
 
-                    StackExchange.realtime.subscribeToQuestion('1', '5185864');
-                                                                    StackExchange.using("gps", function () { StackExchange.gps.trackOutboundClicks('#content', '.post-text', true); });
+		// Cleanup from previous test.
+		context.clearRect( 0, 0, canvas.width, canvas.height );
 
-            });
-        </script> 
-  <script>
-        StackExchange.init({"locale":"en","stackAuthUrl":"https://stackauth.com","networkMetaHostname":"meta.stackexchange.com","serverTime":1505672387,"routeName":"Questions/Show","site":{"name":"Stack Overflow","description":"Q&A for professional and enthusiast programmers","isNoticesTabEnabled":true,"recaptchaPublicKey":"6LdchgIAAAAAAJwGpIzRQSOFaO0pU6s44Xt8aTwc","recaptchaAudioLang":"en","enableNewTagCreationWarning":true,"insertSpaceAfterNameTabCompletion":false,"id":1,"enableInsertDocLinkDialog":false,"childUrl":"https://meta.stackoverflow.com","enableSocialMediaInSharePopup":true,"protocol":"https"},"user":{"fkey":"5076de860a8440948661b4667474561c","rep":0,"isAnonymous":true,"isAnonymousNetworkWide":true,"canSeeNewHeaderDesign":true,"ab":{"review_queue_danger_status":{"v":"b","g":2}}},"events":{"postType":{"question":1},"postEditionSection":{"title":1,"body":2,"tags":3}},"story":{"minCompleteBodyLength":75,"likedTagsMaxLength":300,"dislikedTagsMaxLength":300},"jobPreferences":{"maxNumDeveloperRoles":2,"maxNumIndustries":4}}, {"site":{"allowImageUploads":true,"enableUserHovercards":true,"styleCode":true,"enableImgurHttps":true,"forceHttpsImages":true},"comments":{},"userProfile":{"openGraphAPIKey":"58740831ad23540e00c58987"},"tags":{},"accounts":{"currentPasswordRequiredForChangingStackIdPassword":true},"flags":{"allowRetractingFlags":true},"snippets":{"snippetsEnabled":true,"renderDomain":"stacksnippets.net"},"markdown":{"asteriskIntraWordEmphasis":true},"monitoring":{"clientTimingsAbsoluteTimeout":30000,"clientTimingsDebounceTimeout":1000}});
-        StackExchange.using.setCacheBreakers({"js/prettify-full.en.js":"8e8d8adeda88","js/moderator.en.js":"8a3680841e92","js/full-anon.en.js":"3b6080890c63","js/full.en.js":"593ea32cfba0","js/wmd.en.js":"7055b076e307","js/third-party/jquery.autocomplete.min.js":"d3b8fa7fdf74","js/third-party/jquery.autocomplete.min.en.js":"","js/mobile.en.js":"ed529b11d30c","js/help.en.js":"a56fdf9b9ff2","js/tageditor.en.js":"20a10d959738","js/tageditornew.en.js":"6a342dd25bcd","js/inline-tag-editing.en.js":"7581a98341e4","js/revisions.en.js":"2faaeaae2529","js/review.en.js":"464958debccf","js/tagsuggestions.en.js":"ddb0e41afe26","js/post-validation.en.js":"75de882d1ce1","js/explore-qlist.en.js":"e71f14781288","js/events.en.js":"0710c2dd5214","js/keyboard-shortcuts.en.js":"359605bd6070","js/external-editor.en.js":"3e5baf662544","js/adops.en.js":"9a6a7812a212","js/external-editor.en.js":"3e5baf662544","js/snippet-javascript.en.js":"8d068c60f98a","js/snippet-javascript-codemirror.en.js":"fb90d3dd4c00"});
-        StackExchange.using("gps", function() {
-             StackExchange.gps.init(true);
-        });
-    </script> 
-  <script>
-            StackExchange.ready(function () {
-                $('#nav-tour').click(function () {
-                    StackExchange.using("gps", function() {
-                        StackExchange.gps.track("aboutpage.click", { aboutclick_location: "headermain" }, true);
-                    });
-                });
-            });
-        </script> 
-  <noscript id="noscript-css">
-   <style type="text/css">body,.so-header{margin-top:1.9em}</style>
-  </noscript> 
- </head> 
- <body class="question-page new-topbar"> 
-  <script>(function () { var old = $.fn.contents; $.fn.contents = function () { try { return old.apply(this, arguments); } catch (e) { return $([]); } } })()</script> 
-  <iframe id="adzerk-user-match" width="0" height="0" frameborder="0" scrolling="no" onload="window.AUMIframeDone=true" src="https://ssum-sec.casalemedia.com/usermatch?s=183712&amp;cb=https%3A%2F%2Fengine.adzerk.net%2Fudb%2F22%2Fsync%2Fi.gif%3FpartnerId%3D1%26userId%3D" style="display: none;" marginheight="0" marginwidth="0"></iframe> 
-  <div id="notify-container"></div> 
-  <div id="custom-header"></div> 
-  <header class="so-header js-so-header _fixed"> 
-   <div class="-container"> 
-    <div class="-main"> 
-     <a href="https://stackoverflow.com" class="-logo js-gps-track " data-gps-track="top_nav.click({is_current:false, location:2, destination:8})"> <span class="-img">Stack Overflow</span> </a> 
-     <nav class="navigation" role="navigation" aria-label="site navigation"> 
-      <ol class="-list"> 
-       <li class="-item _current"> <a id="nav-questions" href="/questions" class="-link js-gps-track" data-gps-track="top_nav.click({is_current:true, location:2, destination:1})">Questions</a> </li> 
-       <li class="-item"> <a id="nav-jobs" href="/jobs?med=site-ui&amp;ref=jobs-tab" class="-link js-gps-track" data-gps-track="top_nav.click({is_current:false, location:2, destination:6})">Developer Jobs</a> </li> 
-       <li class="-item"> <a id="nav-tags" href="/tags" class="-link js-gps-track" data-gps-track="top_nav.click({is_current:false, location:2, destination:2})">Tags</a> </li> 
-       <li class="-item"> <a id="nav-users" href="/users" class="-link js-gps-track" data-gps-track="top_nav.click({is_current:false, location:2, destination:3})">Users</a> </li> 
-      </ol> 
-     </nav> 
-     <form id="search" action="/search" method="get" class="searchbar" autocomplete="off" role="search"> 
-      <svg aria-hidden="true" class="svg-icon iconSearch" width="18" height="18" viewbox="0 0 18 18">
-       <path d="M12.86 11.32L18 16.5 16.5 18l-5.18-5.14v-.35a7 7 0 1 1 1.19-1.19h.35zM7 12A5 5 0 1 0 7 2a5 5 0 0 0 0 10z" />
-      </svg> 
-      <input name="q" type="text" placeholder="Search..." value="" tabindex="1" autocomplete="off" maxlength="240" class="f-input js-search-field"> 
-      <button type="submit" class="btn js-search-submit"> 
-       <svg aria-hidden="true" class="svg-icon iconSearch" width="18" height="18" viewbox="0 0 18 18">
-        <path d="M12.86 11.32L18 16.5 16.5 18l-5.18-5.14v-.35a7 7 0 1 1 1.19-1.19h.35zM7 12A5 5 0 1 0 7 2a5 5 0 0 0 0 10z" />
-       </svg> </button> 
-     </form> 
-    </div> 
-    <div class="-actions"> 
-     <nav class="secondary-nav"> 
-      <div class="-dialog-container js-topbar-dialog-corral"> 
-       <div class="topbar-dialog siteSwitcher-dialog dno"> 
-        <div class="header"> 
-         <h3><a href="https://stackoverflow.com">current community</a> </h3> 
-        </div> 
-        <div class="modal-content current-site-container"> 
-         <ul class="current-site"> 
-          <li> 
-           <div class="related-links"> 
-            <a href="https://stackoverflow.com/help" class="js-gps-track" data-gps-track="site_switcher.click({ item_type:14 })">help</a> 
-            <a href="https://chat.stackoverflow.com" class="js-gps-track" data-gps-track="site_switcher.click({ item_type:6 })">chat</a> 
-           </div> <a href="https://stackoverflow.com" class="current-site-link site-link js-gps-track" data-id="1" data-gps-track="site_switcher.click({ item_type:3 })"> 
-            <div class="site-icon favicon favicon-stackoverflow" title="Stack Overflow"></div> Stack Overflow </a> </li> 
-          <li class="related-site"> 
-           <div class="L-shaped-icon-container"> 
-            <span class="L-shaped-icon"></span> 
-           </div> <a href="https://meta.stackoverflow.com" class="site-link js-gps-track" data-id="552" data-gps-track="site.switch({ target_site:552, item_type:3 }),site_switcher.click({ item_type:4 })"> 
-            <div class="site-icon favicon favicon-stackoverflowmeta" title="Meta Stack Overflow"></div> Meta Stack Overflow </a> </li> 
-         </ul> 
-        </div> 
-        <div class="header" id="your-communities-header"> 
-         <h3> your communities </h3> 
-        </div> 
-        <div class="modal-content" id="your-communities-section"> 
-         <div class="call-to-login"> 
-          <a href="https://stackoverflow.com/users/signup?ssrc=site_switcher&amp;returnurl=%2fusers%2fstory%2fcurrent&amp;amp;utm_source=stackoverflow.com&amp;amp;utm_medium=dev-story&amp;amp;utm_campaign=signup-redirect" class="login-link js-gps-track" data-gps-track="site_switcher.click({ item_type:10 })">Sign up</a> or 
-          <a href="https://stackoverflow.com/users/login?ssrc=site_switcher&amp;returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f5185864%2fjavascript-quicksort" class="login-link js-gps-track" data-gps-track="site_switcher.click({ item_type:11 })">log in</a> to customize your list. 
-         </div> 
-        </div> 
-        <div class="header"> 
-         <h3><a href="https://stackexchange.com/sites">more stack exchange communities</a> </h3> 
-         <a href="https://stackoverflow.blog" class="fr">company blog</a> 
-        </div> 
-        <div class="modal-content"> 
-         <div class="child-content"></div> 
-        </div> 
-       </div> 
-       <div class="topbar-dialog help-dialog js-help-dialog dno"> 
-        <div class="modal-content"> 
-         <ul> 
-          <li> <a href="/tour" class="js-gps-track" data-gps-track="help_popup.click({ item_type:1 })"> Tour <span class="item-summary"> Start here for a quick overview of the site </span> </a> </li> 
-          <li> <a href="/help" class="js-gps-track" data-gps-track="help_popup.click({ item_type:4 })"> Help Center <span class="item-summary"> Detailed answers to any questions you might have </span> </a> </li> 
-          <li> <a href="https://meta.stackoverflow.com" class="js-gps-track" data-gps-track="help_popup.click({ item_type:2 })"> Meta <span class="item-summary"> Discuss the workings and policies of this site </span> </a> </li> 
-          <li> <a href="https://stackoverflow.com/company/about" class="js-gps-track" data-gps-track="help_popup.click({ item_type:6 })"> About Us <span class="item-summary"> Learn more about Stack Overflow the company </span> </a> </li> 
-          <li> <a href="https://www.stackoverflowbusiness.com/?ref=topbar_help" class="js-gps-track" data-gps-track="help_popup.click({ item_type:7 })"> Business <span class="item-summary"> Learn more about hiring developers or posting ads with us </span> </a> </li> 
-         </ul> 
-        </div> 
-       </div> 
-      </div> 
-      <ol class="-list"> 
-       <li class="-item"><a href="#" class="-link js-help-button" title="Help Center and other resources"> 
-         <svg aria-hidden="true" class="svg-icon iconHelp" width="18" height="18" viewbox="0 0 18 18">
-          <path d="M9 1a8 8 0 1 0 0 16A8 8 0 0 0 9 1zm.81 12.13c-.02.71-.55 1.15-1.24 1.13-.66-.02-1.17-.49-1.15-1.2.02-.72.56-1.18 1.22-1.16.7.03 1.2.51 1.17 1.23zM11.77 8a5.8 5.8 0 0 1-1.02.91l-.53.37c-.26.2-.42.43-.5.69a4 4 0 0 0-.09.75c0 .05-.03.16-.18.16H7.88c-.16 0-.18-.1-.18-.15.03-.66.12-1.21.4-1.66a5.29 5.29 0 0 1 1.43-1.22c.16-.12.28-.25.38-.39a1.34 1.34 0 0 0 .02-1.71c-.24-.31-.51-.46-1.03-.46-.51 0-.8.26-1.02.6-.21.33-.18.73-.18 1.1H5.75c0-1.38.35-2.25 1.1-2.76.52-.35 1.17-.5 1.93-.5 1 0 1.79.18 2.49.71.64.5.98 1.18.98 2.12 0 .57-.2 1.05-.48 1.44z" />
-         </svg> </a></li> 
-       <li class="-item"> <a href="https://stackexchange.com" class="-link js-site-switcher-button js-gps-track" data-gps-track="site_switcher.show" title="A list of all 171 Stack Exchange sites"> 
-         <svg aria-hidden="true" class="svg-icon iconStackExchange" width="18" height="18" viewbox="0 0 18 18">
-          <path d="M1 13c0 1.1.9 2 2 2h8v3l3-3h1a2 2 0 0 0 2-2v-2H1v2zM15 1H3a2 2 0 0 0-2 2v2h16V3a2 2 0 0 0-2-2zM1 6h16v4H1V6z" />
-         </svg> </a> </li> 
-      </ol> 
-     </nav> 
-     <div class="-ctas"> 
-      <a href="https://stackoverflow.com/users/login?ssrc=head&amp;returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f5185864%2fjavascript-quicksort" class="login-link btn-clear" rel="nofollow">Log In</a> 
-      <a href="https://stackoverflow.com/users/signup?ssrc=head&amp;returnurl=%2fusers%2fstory%2fcurrent&amp;utm_source=stackoverflow.com&amp;utm_medium=dev-story&amp;utm_campaign=signup-redirect" class="login-link btn" rel="nofollow">Sign Up</a> 
-     </div> 
-    </div> 
-   </div> 
-  </header> 
-  <script>
-        StackExchange.ready(function () { StackExchange.topbar.init(); });
-            StackExchange.scrollPadding.setPaddingTop(60, 10);     </script> 
-  <div class="container  "> 
-   <div id="content" class="snippet-hidden"> 
-    <div itemscope itemtype="http://schema.org/Question"> 
-     <link itemprop="image" href="https://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon.png?v=c78bd457575a"> 
-     <div id="herobox" class="alternate hero-container"> 
-      <div class="test"></div> 
-      <div id="close"> 
-       <a title="click to minimize"><span>x</span> Dismiss</a> 
-      </div> 
-      <div class="content"> 
-       <b>Join the Stack Overflow Community</b> 
-       <div class="separator"></div> 
-       <div class="blurb">
-         Stack Overflow is a community of 7.7 million programmers, just like you, helping each other. 
-        <br> Join them; it only takes a minute: 
-        <br> 
-       </div> 
-       <a href="/users/signup?ssrc=hero&amp;returnurl=%2fusers%2fstory%2fcurrent&amp;amp;utm_source=stackoverflow.com&amp;amp;utm_medium=dev-story&amp;amp;utm_campaign=signup-redirect" id="tell-me-more" class="button">Sign up</a> 
-      </div> 
-     </div> 
-     <script>
-    StackExchange.ready(function () {
+		/*
+		 * Chrome on OS X added native emoji rendering in M41. Unfortunately,
+		 * it doesn't work when the font is bolder than 500 weight. So, we
+		 * check for bold rendering support to avoid invisible emoji in Chrome.
+		 */
+		context.textBaseline = 'top';
+		context.font = '600 32px Arial';
 
-        var location = 0;
-        if ($("body").hasClass("questions-page")) {
-            location = 1;
-        } else if ($("body").hasClass("question-page")) {
-            location = 1;
-        } else if ($("body").hasClass("faq-page")) {
-            location = 5;
-        } else if ($("body").hasClass("home-page")) {
-            location = 3;
-        }
-        
-        $('#tell-me-more').click(function () {
-            StackExchange.using("gps", function () {
-                StackExchange.gps.track("hero.action", { hero_action_type: 'cta', location: location }, true);
-            });
-        });
-        
-        $('.hero-container #close').click(function () {
-            StackExchange.using("gps", function () {
-                StackExchange.gps.track("hero.action", { hero_action_type: "minimize", location: location }, true);
-            });
-            
-            $.cookie("hero", "mini", { path: "/", expires: 365 });
-            $.ajax({
-                url: "/hero-mini",
-                success: function (data) {
-                    $(".hero-container").fadeOut("fast", function () {
-                        $(".hero-container").replaceWith(data);
-                        $("#herobox-mini").fadeIn("fast");
-                    });
-                }
-            });
-            return false;
-        });
-    });
+		switch ( type ) {
+			case 'flag':
+				/*
+				 * Test for UN flag compatibility. This is the least supported of the letter locale flags,
+				 * so gives us an easy test for full support.
+				 *
+				 * To test for support, we try to render it, and compare the rendering to how it would look if
+				 * the browser doesn't render it correctly ([U] + [N]).
+				 */
+				context.fillText( stringFromCharCode( 55356, 56826, 55356, 56819 ), 0, 0 );
+				flag = canvas.toDataURL();
 
-</script> 
-     <div class="inner-content"> 
-      <div id="question-header"> 
-       <h1 itemprop="name"><a href="/questions/5185864/javascript-quicksort" class="question-hyperlink">JavaScript quicksort</a></h1> 
-       <div class="aside-cta" role="navigation" aria-label="ask new question"> 
-        <a href="/questions/ask" class="btn-outlined">Ask Question</a> 
-       </div> 
-      </div> 
-      <div id="mainbar" role="main" aria-label="question and answers"> 
-       <div class="question" data-questionid="5185864" id="question"> 
-        <script>
-                    var ados = ados || {}; ados.run = ados.run || [];
-                    ados.run.push(function () { ados_add_placement(22,8277,"adzerk592732200",4).setZone(43); });
-                </script> 
-        <div class="everyonelovesstackoverflow" id="adzerk592732200"></div> 
-        <div id="dfp-tlb" class="dfpad"></div> 
-        <table> 
-         <tbody>
-          <tr> 
-           <td class="votecell"> 
-            <div class="vote"> 
-             <input type="hidden" name="_id_" value="5185864"> 
-             <a class="vote-up-off" title="This question shows research effort; it is useful and clear">up vote</a> 
-             <span itemprop="upvoteCount" class="vote-count-post ">14</span> 
-             <a class="vote-down-off" title="This question does not show any research effort; it is unclear or not useful">down vote</a> 
-             <a class="star-off" href="#">favorite</a> 
-             <div class="favoritecount">
-              <b>6</b>
-             </div> 
-            </div> </td> 
-           <td class="postcell"> 
-            <div> 
-             <div class="post-text" itemprop="text"> 
-              <p>I have been looking around the web for a while and I am wondering if there is a 'stable' defacto implementation of quicksort that is generally used? I can write my own but why reinvent the wheel...</p> 
-             </div> 
-             <div class="post-taglist"> 
-              <a href="/questions/tagged/javascript" class="post-tag" title="show questions tagged 'javascript'" rel="tag">javascript</a> 
-              <a href="/questions/tagged/quicksort" class="post-tag" title="show questions tagged 'quicksort'" rel="tag">quicksort</a> 
-             </div> 
-             <table class="fw"> 
-              <tbody>
-               <tr> 
-                <td class="vt"> 
-                 <div class="post-menu">
-                  <a href="/q/5185864" title="short permalink to this question" class="short-link" id="link-post-5185864">share</a>
-                  <span class="lsep">|</span>
-                  <a href="/posts/5185864/edit" class="suggest-edit-post" title="">improve this question</a>
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info user-hover"> 
-                  <div class="user-action-time"> 
-                   <a href="/posts/5185864/revisions" title="show all edits to this post">edited <span title="2012-04-16 12:56:02Z" class="relativetime">Apr 16 '12 at 12:56</span></a> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/31671/alex">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://i.stack.imgur.com/xEJu4.jpg?s=32&amp;g=1" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/31671/alex">alex</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score 298,109" dir="ltr">298k</span>
-                    <span title="148 gold badges"><span class="badge1"></span><span class="badgecount">148</span></span>
-                    <span title="704 silver badges"><span class="badge2"></span><span class="badgecount">704</span></span>
-                    <span title="866 bronze badges"><span class="badge3"></span><span class="badgecount">866</span></span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-                <td class="post-signature owner"> 
-                 <div class="user-info "> 
-                  <div class="user-action-time">
-                    asked 
-                   <span title="2011-03-03 19:59:55Z" class="relativetime">Mar 3 '11 at 19:59</span> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/109614/flavour404">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://www.gravatar.com/avatar/e65fadf372a1d3a462ec412475662267?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/109614/flavour404">flavour404</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score " dir="ltr">2,381</span>
-                    <span title="21 gold badges"><span class="badge1"></span><span class="badgecount">21</span></span>
-                    <span title="77 silver badges"><span class="badge2"></span><span class="badgecount">77</span></span>
-                    <span title="125 bronze badges"><span class="badge3"></span><span class="badgecount">125</span></span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-               </tr> 
-              </tbody>
-             </table> 
-            </div> </td> 
-          </tr> 
-          <tr> 
-           <td class="votecell"></td> 
-           <td> 
-            <div id="comments-5185864" class="comments "> 
-             <table> 
-              <tbody data-remaining-comments-count="2" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true"> 
-               <tr id="comment-5827306" class="comment "> 
-                <td> 
-                 <table> 
-                  <tbody> 
-                   <tr> 
-                    <td class=" comment-score"> &nbsp;&nbsp; </td> 
-                    <td> &nbsp; </td> 
-                   </tr> 
-                  </tbody> 
-                 </table> </td> 
-                <td class="comment-text"> 
-                 <div style="display: block;" class="comment-body"> 
-                  <span class="comment-copy">be careful using the JavaScript .Sort(); ECMAscript standard does not specify which sort algorithm is to be used, so different browsers implement different sort algorithms</span> –&nbsp;
-                  <a href="/users/374804/kris-ivanov" title="7,784 reputation" class="comment-user">Kris Ivanov</a> 
-                  <span class="comment-date" dir="ltr"><span title="2011-03-03 20:07:03Z" class="relativetime-clean">Mar 3 '11 at 20:07</span></span> 
-                 </div> </td> 
-               </tr> 
-               <tr id="comment-5827321" class="comment "> 
-                <td> 
-                 <table> 
-                  <tbody> 
-                   <tr> 
-                    <td class=" comment-score"> &nbsp;&nbsp; </td> 
-                    <td> &nbsp; </td> 
-                   </tr> 
-                  </tbody> 
-                 </table> </td> 
-                <td class="comment-text"> 
-                 <div style="display: block;" class="comment-body"> 
-                  <span class="comment-copy">Indeed which was why i was going to write my own.</span> –&nbsp;
-                  <a href="/users/109614/flavour404" title="2,381 reputation" class="comment-user owner">flavour404</a> 
-                  <span class="comment-date" dir="ltr"><span title="2011-03-03 20:08:32Z" class="relativetime-clean">Mar 3 '11 at 20:08</span></span> 
-                 </div> </td> 
-               </tr> 
-               <tr id="comment-5827413" class="comment "> 
-                <td class="comment-actions"> 
-                 <table> 
-                  <tbody> 
-                   <tr> 
-                    <td class=" comment-score"> <span title="number of 'useful comment' votes received" class="cool">2</span> </td> 
-                    <td> &nbsp; </td> 
-                   </tr> 
-                  </tbody> 
-                 </table> </td> 
-                <td class="comment-text"> 
-                 <div style="display: block;" class="comment-body"> 
-                  <span class="comment-copy">Just FYI, if you write your own it will be definitely a lot slower than a native method. Do you absolutely need stable sorting?</span> –&nbsp;
-                  <a href="/users/26192/adamjlev" title="8,627 reputation" class="comment-user">adamJLev</a> 
-                  <span class="comment-date" dir="ltr"><span title="2011-03-03 20:15:23Z" class="relativetime-clean">Mar 3 '11 at 20:15</span></span> 
-                 </div> </td> 
-               </tr> 
-               <tr id="comment-5827415" class="comment "> 
-                <td class="comment-actions"> 
-                 <table> 
-                  <tbody> 
-                   <tr> 
-                    <td class=" comment-score"> <span title="number of 'useful comment' votes received" class="cool">2</span> </td> 
-                    <td> &nbsp; </td> 
-                   </tr> 
-                  </tbody> 
-                 </table> </td> 
-                <td class="comment-text"> 
-                 <div style="display: block;" class="comment-body"> 
-                  <span class="comment-copy">BTW, you ask for a "stable" implementation of quicksort, but quicksort is not an inherently stable sort. Efficient implementations will not be stable.</span> –&nbsp;
-                  <a href="/users/139010/matt-ball" title="252,481 reputation" class="comment-user">Matt Ball</a> 
-                  <span class="comment-date" dir="ltr"><span title="2011-03-03 20:15:26Z" class="relativetime-clean">Mar 3 '11 at 20:15</span></span> 
-                  <span class="edited-yes" title="this comment was edited 2 times"></span> 
-                 </div> </td> 
-               </tr> 
-               <tr id="comment-5827518" class="comment "> 
-                <td> 
-                 <table> 
-                  <tbody> 
-                   <tr> 
-                    <td class=" comment-score"> &nbsp;&nbsp; </td> 
-                    <td> &nbsp; </td> 
-                   </tr> 
-                  </tbody> 
-                 </table> </td> 
-                <td class="comment-text"> 
-                 <div style="display: block;" class="comment-body"> 
-                  <span class="comment-copy">Also why do you care if it's quicksort or not? Looks like merge sort is becoming the defacto <a href="http://en.wikipedia.org/wiki/Merge_sort#Comparison_with_other_sort_algorithms" rel="nofollow noreferrer">en.wikipedia.org/wiki/…</a></span> –&nbsp;
-                  <a href="/users/26192/adamjlev" title="8,627 reputation" class="comment-user">adamJLev</a> 
-                  <span class="comment-date" dir="ltr"><span title="2011-03-03 20:21:57Z" class="relativetime-clean">Mar 3 '11 at 20:21</span></span> 
-                  <span class="edited-yes" title="this comment was edited 4 times"></span> 
-                 </div> </td> 
-               </tr> 
-              </tbody> 
-             </table> 
-            </div> 
-            <div id="comments-link-5185864" data-rep="50" data-anon="true"> 
-             <a class="js-add-link comments-link  dno" title="Use comments to ask for more information or suggest improvements. Avoid answering questions in comments."></a>
-             <span class="js-link-separator dno">&nbsp;|&nbsp;</span> 
-             <a class="js-show-link comments-link " title="expand to show all comments on this post" href="#" onclick="">show <b>2</b> more comments</a> 
-            </div> </td> 
-          </tr> 
-         </tbody>
-        </table> 
-       </div> 
-       <div id="answers"> 
-        <a name="tab-top"></a> 
-        <div id="answers-header"> 
-         <div class="subheader answers-subheader"> 
-          <h2> 8 Answers <span style="display:none;" itemprop="answerCount">8</span> </h2> 
-          <div> 
-           <div id="tabs"> 
-            <a href="/questions/5185864/javascript-quicksort?answertab=active#tab-top" data-nav-xhref="" title="Answers with the latest activity first" data-value="active" data-shortcut="A"> active</a> 
-            <a href="/questions/5185864/javascript-quicksort?answertab=oldest#tab-top" data-nav-xhref="" title="Answers in the order they were provided" data-value="oldest" data-shortcut="O"> oldest</a> 
-            <a class="youarehere" href="/questions/5185864/javascript-quicksort?answertab=votes#tab-top" data-nav-xhref="" title="Answers with the highest score first" data-value="votes" data-shortcut="V"> votes</a> 
-           </div> 
-          </div> 
-         </div> 
-        </div> 
-        <a name="5186021"></a> 
-        <div id="answer-5186021" class="answer accepted-answer" data-answerid="5186021" itemscope itemtype="http://schema.org/Answer" itemprop="acceptedAnswer"> 
-         <table> 
-          <tbody>
-           <tr> 
-            <td class="votecell"> 
-             <div class="vote"> 
-              <input type="hidden" name="_id_" value="5186021"> 
-              <a class="vote-up-off" title="This answer is useful">up vote</a> 
-              <span itemprop="upvoteCount" class="vote-count-post ">12</span> 
-              <a class="vote-down-off" title="This answer is not useful">down vote</a> 
-              <span class="vote-accepted-on load-accepted-answer-date" title="loading when this answer was accepted...">accepted</span> 
-             </div> </td> 
-            <td class="answercell"> 
-             <div class="post-text" itemprop="text"> 
-              <p>You can easily "stabilize" an unstable sort using a decorate-sort-undecorate pattern</p> 
-              <pre><code>function stableSort(v, f)
-{
-    if (f === undefined) {
-        f = function(a, b) {
-            a = ""+a; b = ""+b;
-            return a &lt; b ? -1 : (a &gt; b ? 1 : 0);
-        }
-    }
-    var dv = [];
-    for (var i=0; i&lt;v.length; i++) {
-        dv[i] = [v[i], i];
-    }
-    dv.sort(function(a, b){
-              return f(a[0], b[0]) || (a[1] - b[1]);
-            });
-    for (var i=0; i&lt;v.length; i++) {
-        v[i] = dv[i][0];
-    }
-}
-</code></pre> 
-              <p>the idea is to add the index as last sorting term so that no two elements are now "the same" and if everything else is the same the original index will be the discriminating factor.</p> 
-             </div> 
-             <table class="fw"> 
-              <tbody>
-               <tr> 
-                <td class="vt"> 
-                 <div class="post-menu">
-                  <a href="/a/5186021" title="short permalink to this answer" class="short-link" id="link-post-5186021">share</a>
-                  <span class="lsep">|</span>
-                  <a href="/posts/5186021/edit" class="suggest-edit-post" title="">improve this answer</a>
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info "> 
-                  <div class="user-action-time"> 
-                   <a href="/posts/5186021/revisions" title="show all edits to this post">edited <span title="2016-03-10 08:13:44Z" class="relativetime">Mar 10 '16 at 8:13</span></a> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                  </div> 
-                  <div class="user-details"> 
-                   <div class="-flair"> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info user-hover"> 
-                  <div class="user-action-time">
-                    answered 
-                   <span title="2011-03-03 20:14:11Z" class="relativetime">Mar 3 '11 at 20:14</span> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/320726/6502">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://www.gravatar.com/avatar/02041b18199678d1f02e6d5040dbb907?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/320726/6502">6502</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score 77,054" dir="ltr">77.1k</span>
-                    <span title="10 gold badges"><span class="badge1"></span><span class="badgecount">10</span></span>
-                    <span title="97 silver badges"><span class="badge2"></span><span class="badgecount">97</span></span>
-                    <span title="180 bronze badges"><span class="badge3"></span><span class="badgecount">180</span></span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-               </tr> 
-              </tbody>
-             </table> </td> 
-           </tr> 
-           <tr> 
-            <td class="votecell"></td> 
-            <td> 
-             <div id="comments-5186021" class="comments "> 
-              <table> 
-               <tbody data-remaining-comments-count="0" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true"> 
-                <tr id="comment-5827452" class="comment "> 
-                 <td class="comment-actions"> 
-                  <table> 
-                   <tbody> 
-                    <tr> 
-                     <td class=" comment-score"> <span title="number of 'useful comment' votes received" class="cool">1</span> </td> 
-                     <td> &nbsp; </td> 
-                    </tr> 
-                   </tbody> 
-                  </table> </td> 
-                 <td class="comment-text"> 
-                  <div style="display: block;" class="comment-body"> 
-                   <span class="comment-copy">+1, not a bad suggestion at all.</span> –&nbsp;
-                   <a href="/users/139010/matt-ball" title="252,481 reputation" class="comment-user">Matt Ball</a> 
-                   <span class="comment-date" dir="ltr"><span title="2011-03-03 20:18:05Z" class="relativetime-clean">Mar 3 '11 at 20:18</span></span> 
-                  </div> </td> 
-                </tr> 
-                <tr id="comment-5827632" class="comment "> 
-                 <td> 
-                  <table> 
-                   <tbody> 
-                    <tr> 
-                     <td class=" comment-score"> &nbsp;&nbsp; </td> 
-                     <td> &nbsp; </td> 
-                    </tr> 
-                   </tbody> 
-                  </table> </td> 
-                 <td class="comment-text"> 
-                  <div style="display: block;" class="comment-body"> 
-                   <span class="comment-copy">...Though this could be more space-efficient by pushing/popping elements, and just storing <code>i</code> separately.</span> –&nbsp;
-                   <a href="/users/139010/matt-ball" title="252,481 reputation" class="comment-user">Matt Ball</a> 
-                   <span class="comment-date" dir="ltr"><span title="2011-03-03 20:30:07Z" class="relativetime-clean">Mar 3 '11 at 20:30</span></span> 
-                   <span class="edited-yes" title="this comment was edited 1 time"></span> 
-                  </div> </td> 
-                </tr> 
-                <tr id="comment-25676742" class="comment "> 
-                 <td> 
-                  <table> 
-                   <tbody> 
-                    <tr> 
-                     <td class=" comment-score"> &nbsp;&nbsp; </td> 
-                     <td> &nbsp; </td> 
-                    </tr> 
-                   </tbody> 
-                  </table> </td> 
-                 <td class="comment-text"> 
-                  <div style="display: block;" class="comment-body"> 
-                   <span class="comment-copy">This is far slower than this <a href="https://rawgithub.com/escherba/algorithms-in-javascript/master/src/quickmiddle-sort.js" rel="nofollow noreferrer">rawgithub.com/escherba/algorithms-in-javascript/master/src/…</a></span> –&nbsp;
-                   <a href="/users/340760/brunolm" title="48,684 reputation" class="comment-user">BrunoLM</a> 
-                   <span class="comment-date" dir="ltr"><span title="2013-07-13 22:31:27Z" class="relativetime-clean">Jul 13 '13 at 22:31</span></span> 
-                  </div> </td> 
-                </tr> 
-               </tbody> 
-              </table> 
-             </div> 
-             <div id="comments-link-5186021" data-rep="50" data-anon="true"> 
-              <a class="js-add-link comments-link disabled-link " title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add a comment</a>
-              <span class="js-link-separator dno">&nbsp;|&nbsp;</span> 
-              <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href="#" onclick=""></a> 
-             </div> </td> 
-           </tr> 
-          </tbody>
-         </table> 
-        </div> 
-        <script>
-                    var ados = ados || {}; ados.run = ados.run || [];
-                    ados.run.push(function () { ados_add_placement(22,8277,"adzerk265213009",4).setZone(44); });
-                </script> 
-        <div class="everyonelovesstackoverflow" id="adzerk265213009"></div> 
-        <div id="dfp-mlb" class="dfpad"></div> 
-        <a name="5185884"></a> 
-        <div id="answer-5185884" class="answer" data-answerid="5185884" itemscope itemtype="http://schema.org/Answer"> 
-         <table> 
-          <tbody>
-           <tr> 
-            <td class="votecell"> 
-             <div class="vote"> 
-              <input type="hidden" name="_id_" value="5185884"> 
-              <a class="vote-up-off" title="This answer is useful">up vote</a> 
-              <span itemprop="upvoteCount" class="vote-count-post ">13</span> 
-              <a class="vote-down-off" title="This answer is not useful">down vote</a> 
-             </div> </td> 
-            <td class="answercell"> 
-             <div class="post-text" itemprop="text"> 
-              <ol> 
-               <li>Put your objects into an array.</li> 
-               <li><p>Call <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/sort"><code>Array.sort()</code></a>. It's very fast.</p> <pre><code>var array = [3,7,2,8,2,782,7,29,1,3,0,34];
-array.sort();
-console.log(array); // prints [0, 1, 2, 2, 29, 3, 3, 34, 7, 7, 782, 8]
-</code></pre></li> 
-              </ol> 
-              <p>Why does that print in lexicographic order? That's how <code>array.sort()</code> works by default, e.g. <strong>if you don't provide a comparator function.</strong> Let's fix this.</p> 
-              <pre><code>    var array = [3,7,2,8,2,782,7,29,1,3,0,34];
-    array.sort(function (a, b)
-    {
-        return a-b;
-    });
-    console.log(array); // prints [0, 1, 2, 2, 3, 3, 7, 7, 8, 29, 34, 782]
-</code></pre> 
-             </div> 
-             <table class="fw"> 
-              <tbody>
-               <tr> 
-                <td class="vt"> 
-                 <div class="post-menu">
-                  <a href="/a/5185884" title="short permalink to this answer" class="short-link" id="link-post-5185884">share</a>
-                  <span class="lsep">|</span>
-                  <a href="/posts/5185884/edit" class="suggest-edit-post" title="">improve this answer</a>
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info user-hover"> 
-                  <div class="user-action-time">
-                    answered 
-                   <span title="2011-03-03 20:01:16Z" class="relativetime">Mar 3 '11 at 20:01</span> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/139010/matt-ball">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://www.gravatar.com/avatar/0df2f3c2d3b43605889eb90231fb6884?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/139010/matt-ball">Matt Ball</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score 252,481" dir="ltr">252k</span>
-                    <span title="63 gold badges"><span class="badge1"></span><span class="badgecount">63</span></span>
-                    <span title="507 silver badges"><span class="badge2"></span><span class="badgecount">507</span></span>
-                    <span title="569 bronze badges"><span class="badge3"></span><span class="badgecount">569</span></span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-               </tr> 
-              </tbody>
-             </table> </td> 
-           </tr> 
-           <tr> 
-            <td class="votecell"></td> 
-            <td> 
-             <div id="comments-5185884" class="comments "> 
-              <table> 
-               <tbody data-remaining-comments-count="7" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true"> 
-                <tr id="comment-5827243" class="comment "> 
-                 <td class="comment-actions"> 
-                  <table> 
-                   <tbody> 
-                    <tr> 
-                     <td class=" comment-score"> <span title="number of 'useful comment' votes received" class="cool">2</span> </td> 
-                     <td> &nbsp; </td> 
-                    </tr> 
-                   </tbody> 
-                  </table> </td> 
-                 <td class="comment-text"> 
-                  <div style="display: block;" class="comment-body"> 
-                   <span class="comment-copy">call <code>Array.sort(function (a, b){return a - b;});</code> to sort numerically.</span> –&nbsp;
-                   <a href="/users/497418/zzzzbov" title="112,756 reputation" class="comment-user">zzzzBov</a> 
-                   <span class="comment-date" dir="ltr"><span title="2011-03-03 20:02:59Z" class="relativetime-clean">Mar 3 '11 at 20:02</span></span> 
-                  </div> </td> 
-                </tr> 
-                <tr id="comment-5827281" class="comment "> 
-                 <td class="comment-actions"> 
-                  <table> 
-                   <tbody> 
-                    <tr> 
-                     <td class=" comment-score"> <span title="number of 'useful comment' votes received" class="cool">1</span> </td> 
-                     <td> &nbsp; </td> 
-                    </tr> 
-                   </tbody> 
-                  </table> </td> 
-                 <td class="comment-text"> 
-                  <div style="display: block;" class="comment-body"> 
-                   <span class="comment-copy">this is not guaranteed stable sort, it is browser implementation specific</span> –&nbsp;
-                   <a href="/users/374804/kris-ivanov" title="7,784 reputation" class="comment-user">Kris Ivanov</a> 
-                   <span class="comment-date" dir="ltr"><span title="2011-03-03 20:05:29Z" class="relativetime-clean">Mar 3 '11 at 20:05</span></span> 
-                  </div> </td> 
-                </tr> 
-                <tr id="comment-5827341" class="comment "> 
-                 <td> 
-                  <table> 
-                   <tbody> 
-                    <tr> 
-                     <td class=" comment-score"> &nbsp;&nbsp; </td> 
-                     <td> &nbsp; </td> 
-                    </tr> 
-                   </tbody> 
-                  </table> </td> 
-                 <td class="comment-text"> 
-                  <div style="display: block;" class="comment-body"> 
-                   <span class="comment-copy">Matt, as K Ivanov stated array.sort is browser dependent and cannot be guaranteed. I was looking for some code that I would have complete control over.</span> –&nbsp;
-                   <a href="/users/109614/flavour404" title="2,381 reputation" class="comment-user owner">flavour404</a> 
-                   <span class="comment-date" dir="ltr"><span title="2011-03-03 20:09:57Z" class="relativetime-clean">Mar 3 '11 at 20:09</span></span> 
-                   <span class="edited-yes" title="this comment was edited 1 time"></span> 
-                  </div> </td> 
-                </tr> 
-                <tr id="comment-5827394" class="comment "> 
-                 <td class="comment-actions"> 
-                  <table> 
-                   <tbody> 
-                    <tr> 
-                     <td class=" comment-score"> <span title="number of 'useful comment' votes received" class="cool">1</span> </td> 
-                     <td> &nbsp; </td> 
-                    </tr> 
-                   </tbody> 
-                  </table> </td> 
-                 <td class="comment-text"> 
-                  <div style="display: block;" class="comment-body"> 
-                   <span class="comment-copy">@flavour404: If you want to have complete control, write your own function.</span> –&nbsp;
-                   <a href="/users/218196/felix-kling" title="457,538 reputation" class="comment-user">Felix Kling</a> 
-                   <span class="comment-date" dir="ltr"><span title="2011-03-03 20:13:42Z" class="relativetime-clean">Mar 3 '11 at 20:13</span></span> 
-                  </div> </td> 
-                </tr> 
-                <tr id="comment-5827483" class="comment "> 
-                 <td class="comment-actions"> 
-                  <table> 
-                   <tbody> 
-                    <tr> 
-                     <td class=" comment-score"> <span title="number of 'useful comment' votes received" class="cool">1</span> </td> 
-                     <td> &nbsp; </td> 
-                    </tr> 
-                   </tbody> 
-                  </table> </td> 
-                 <td class="comment-text"> 
-                  <div style="display: block;" class="comment-body"> 
-                   <span class="comment-copy">Btw Wikipedia says: <i>Quicksort (also known as "partition-exchange sort") is a comparison sort and, in efficient implementations, is not a stable sort.</i> (<i>edit:</i> just saw that you also commented this on the OP's question ;))</span> –&nbsp;
-                   <a href="/users/218196/felix-kling" title="457,538 reputation" class="comment-user">Felix Kling</a> 
-                   <span class="comment-date" dir="ltr"><span title="2011-03-03 20:20:11Z" class="relativetime-clean">Mar 3 '11 at 20:20</span></span> 
-                   <span class="edited-yes" title="this comment was edited 1 time"></span> 
-                  </div> </td> 
-                </tr> 
-               </tbody> 
-              </table> 
-             </div> 
-             <div id="comments-link-5185884" data-rep="50" data-anon="true"> 
-              <a class="js-add-link comments-link  dno" title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."></a>
-              <span class="js-link-separator dno">&nbsp;|&nbsp;</span> 
-              <a class="js-show-link comments-link " title="expand to show all comments on this post" href="#" onclick="">show <b>7</b> more comments</a> 
-             </div> </td> 
-           </tr> 
-          </tbody>
-         </table> 
-        </div> 
-        <a name="17759206"></a> 
-        <div id="answer-17759206" class="answer" data-answerid="17759206" itemscope itemtype="http://schema.org/Answer"> 
-         <table> 
-          <tbody>
-           <tr> 
-            <td class="votecell"> 
-             <div class="vote"> 
-              <input type="hidden" name="_id_" value="17759206"> 
-              <a class="vote-up-off" title="This answer is useful">up vote</a> 
-              <span itemprop="upvoteCount" class="vote-count-post ">6</span> 
-              <a class="vote-down-off" title="This answer is not useful">down vote</a> 
-             </div> </td> 
-            <td class="answercell"> 
-             <div class="post-text" itemprop="text"> 
-              <p>In this blog <a href="http://www.nczonline.net/blog/2012/11/27/computer-science-in-javascript-quicksort/" rel="noreferrer">http://www.nczonline.net/blog/2012/11/27/computer-science-in-javascript-quicksort/</a> which has pointed out that Array.sort is implemented in quicksort or merge sort internaly.</p> 
-              <blockquote> 
-               <p>Quicksort is generally considered to be efficient and fast and so is used by V8 as the implementation for Array.prototype.sort() on arrays with more than 23 items. For less than 23 items, V8 uses insertion sort[2]. Merge sort is a competitor of quicksort as it is also efficient and fast but has the added benefit of being stable. This is why Mozilla and Safari use it for their implementation of Array.prototype.sort().</p> 
-              </blockquote> 
-              <p>and when using Array.sort,you should return -1 0 1 instead of true or false in Chrome. </p> 
-              <pre><code>arr.sort(function(a,b){
-  return a&lt;b;
-});
-// maybe--&gt; [21, 0, 3, 11, 4, 5, 6, 7, 8, 9, 10, 1, 2, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22]
-arr.sort(function(a,b){
-  return a &gt; b ? -1 : a &lt; b ? 1 : 0;
-});
-// --&gt; [22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
-</code></pre> 
-             </div> 
-             <table class="fw"> 
-              <tbody>
-               <tr> 
-                <td class="vt"> 
-                 <div class="post-menu">
-                  <a href="/a/17759206" title="short permalink to this answer" class="short-link" id="link-post-17759206">share</a>
-                  <span class="lsep">|</span>
-                  <a href="/posts/17759206/edit" class="suggest-edit-post" title="">improve this answer</a>
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info "> 
-                  <div class="user-action-time"> 
-                   <a href="/posts/17759206/revisions" title="show all edits to this post">edited <span title="2013-07-20 06:13:59Z" class="relativetime">Jul 20 '13 at 6:13</span></a> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                  </div> 
-                  <div class="user-details"> 
-                   <div class="-flair"> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info "> 
-                  <div class="user-action-time">
-                    answered 
-                   <span title="2013-07-20 05:59:24Z" class="relativetime">Jul 20 '13 at 5:59</span> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/873669/jinwei">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://www.gravatar.com/avatar/8cf354b32dda921b6e32cbd9452f0672?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/873669/jinwei">jinwei</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score " dir="ltr">526</span>
-                    <span title="6 silver badges"><span class="badge2"></span><span class="badgecount">6</span></span>
-                    <span title="5 bronze badges"><span class="badge3"></span><span class="badgecount">5</span></span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-               </tr> 
-              </tbody>
-             </table> </td> 
-           </tr> 
-           <tr> 
-            <td class="votecell"></td> 
-            <td> 
-             <div id="comments-17759206" class="comments "> 
-              <table> 
-               <tbody data-remaining-comments-count="0" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true"> 
-                <tr id="comment-26331132" class="comment "> 
-                 <td class="comment-actions"> 
-                  <table> 
-                   <tbody> 
-                    <tr> 
-                     <td class=" comment-score"> <span title="number of 'useful comment' votes received" class="cool">2</span> </td> 
-                     <td> &nbsp; </td> 
-                    </tr> 
-                   </tbody> 
-                  </table> </td> 
-                 <td class="comment-text"> 
-                  <div style="display: block;" class="comment-body"> 
-                   <span class="comment-copy">returning b-a or a-b is even faster, since Array.sort use a compare to 0 then the only the sign of the returned value (<a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort" rel="nofollow noreferrer">developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/…</a>??) .</span> –&nbsp;
-                   <a href="/users/856501/gamealchemist" title="14,504 reputation" class="comment-user">GameAlchemist</a> 
-                   <span class="comment-date" dir="ltr"><span title="2013-08-01 22:46:41Z" class="relativetime-clean">Aug 1 '13 at 22:46</span></span> 
-                   <span class="edited-yes" title="this comment was edited 1 time"></span> 
-                  </div> </td> 
-                </tr> 
-               </tbody> 
-              </table> 
-             </div> 
-             <div id="comments-link-17759206" data-rep="50" data-anon="true"> 
-              <a class="js-add-link comments-link disabled-link " title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add a comment</a>
-              <span class="js-link-separator dno">&nbsp;|&nbsp;</span> 
-              <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href="#" onclick=""></a> 
-             </div> </td> 
-           </tr> 
-          </tbody>
-         </table> 
-        </div> 
-        <a name="21143908"></a> 
-        <div id="answer-21143908" class="answer" data-answerid="21143908" itemscope itemtype="http://schema.org/Answer"> 
-         <table> 
-          <tbody>
-           <tr> 
-            <td class="votecell"> 
-             <div class="vote"> 
-              <input type="hidden" name="_id_" value="21143908"> 
-              <a class="vote-up-off" title="This answer is useful">up vote</a> 
-              <span itemprop="upvoteCount" class="vote-count-post ">4</span> 
-              <a class="vote-down-off" title="This answer is not useful">down vote</a> 
-             </div> </td> 
-            <td class="answercell"> 
-             <div class="post-text" itemprop="text"> 
-              <p></p>
-              <div class="snippet" data-lang="js" data-hide="false"> 
-               <div class="snippet-code"> 
-                <pre class="snippet-code-js lang-js prettyprint-override"><code>var array = [8, 2, 5, 7, 4, 3, 12, 6, 19, 11, 10, 13, 9];
-quickSort(array, 0, array.length -1);
-document.write(array);
+				context.clearRect( 0, 0, canvas.width, canvas.height );
 
+				// Add a zero width space between the characters, to force rendering as characters.
+				context.fillText( stringFromCharCode( 55356, 56826, 8203, 55356, 56819 ), 0, 0 );
+				flag2 = canvas.toDataURL();
 
-function  quickSort(arr, left, right)
-{
-	var i = left;
-	var j = right;
-	var tmp;
-	pivotidx = (left + right) / 2; 
-	var pivot = parseInt(arr[pivotidx.toFixed()]);  
-	/* partition */
-	while (i &lt;= j)
-	{
-		while (parseInt(arr[i]) &lt; pivot)
-		i++;
-		while (parseInt(arr[j]) &gt; pivot)
-			j--;
-		if (i &lt;= j)
-		{
-			tmp = arr[i];
-			arr[i] = arr[j];
-			arr[j] = tmp;
-			i++;
-			j--;
+				if ( flag !== flag2 ) {
+					return false;
+				}
+
+				/*
+				 * Test for English flag compatibility. England is a country in the United Kingdom, it
+				 * does not have a two letter locale code but rather an five letter sub-division code.
+				 *
+				 * To test for support, we try to render it, and compare the rendering to how it would look if
+				 * the browser doesn't render it correctly (black flag emoji + [G] + [B] + [E] + [N] + [G]).
+				 */
+				// Cleanup from previous test.
+				context.clearRect( 0, 0, canvas.width, canvas.height );
+
+				context.fillText( stringFromCharCode( 55356, 57332, 56128, 56423, 56128, 56418, 56128, 56421, 56128, 56430, 56128, 56423, 56128, 56447 ), 0, 0 );
+				flag = canvas.toDataURL();
+
+				context.clearRect( 0, 0, canvas.width, canvas.height );
+
+				context.fillText( stringFromCharCode( 55356, 57332, 8203, 56128, 56423, 8203, 56128, 56418, 8203, 56128, 56421, 8203, 56128, 56430, 8203, 56128, 56423, 8203, 56128, 56447 ), 0, 0 );
+				flag2 = canvas.toDataURL();
+
+				return flag !== flag2;
+			case 'emoji4':
+				/*
+				 * Emoji 5 has faries of all genders.
+				 *
+				 * To test for support, try to render a new emoji (fairy, male), then compares
+				 * it to how it would look if the browser doesn't render it correctly
+				 * (fairy + male sign).
+				 */
+				context.fillText( stringFromCharCode( 55358, 56794, 8205, 9794, 65039 ), 0, 0 );
+				emoji41 = canvas.toDataURL();
+
+				context.clearRect( 0, 0, canvas.width, canvas.height );
+
+				context.fillText( stringFromCharCode( 55358, 56794, 8203, 9794, 65039 ), 0, 0 );
+				emoji42 = canvas.toDataURL();
+
+				return emoji41 !== emoji42;
+		}
+
+		return false;
+	}
+
+	function addScript( src ) {
+		var script = document.createElement( 'script' );
+
+		script.src = src;
+		script.defer = script.type = 'text/javascript';
+		document.getElementsByTagName( 'head' )[0].appendChild( script );
+	}
+
+	tests = Array( 'flag', 'emoji4' );
+
+	settings.supports = {
+		everything: true,
+		everythingExceptFlag: true
+	};
+
+	for( ii = 0; ii < tests.length; ii++ ) {
+		settings.supports[ tests[ ii ] ] = browserSupportsEmoji( tests[ ii ] );
+
+		settings.supports.everything = settings.supports.everything && settings.supports[ tests[ ii ] ];
+
+		if ( 'flag' !== tests[ ii ] ) {
+			settings.supports.everythingExceptFlag = settings.supports.everythingExceptFlag && settings.supports[ tests[ ii ] ];
 		}
 	}
 
-	/* recursion */
-	if (left &lt; j)
-		quickSort(arr, left, j);
-	if (i &lt; right)
-		quickSort(arr, i, right);
-	return arr;
-}</code></pre> 
-               </div> 
-              </div> 
-              <p></p> 
-             </div> 
-             <table class="fw"> 
-              <tbody>
-               <tr> 
-                <td class="vt"> 
-                 <div class="post-menu">
-                  <a href="/a/21143908" title="short permalink to this answer" class="short-link" id="link-post-21143908">share</a>
-                  <span class="lsep">|</span>
-                  <a href="/posts/21143908/edit" class="suggest-edit-post" title="">improve this answer</a>
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info "> 
-                  <div class="user-action-time"> 
-                   <a href="/posts/21143908/revisions" title="show all edits to this post">edited <span title="2016-03-10 06:08:36Z" class="relativetime">Mar 10 '16 at 6:08</span></a> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/2193439/abrar-jahin">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://i.stack.imgur.com/mhLWP.jpg?s=32&amp;g=1" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/2193439/abrar-jahin">Abrar Jahin</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score " dir="ltr">1</span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info "> 
-                  <div class="user-action-time">
-                    answered 
-                   <span title="2014-01-15 17:12:23Z" class="relativetime">Jan 15 '14 at 17:12</span> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/3199219/andriy">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://www.gravatar.com/avatar/229225cee66d26c9767ae95140e29d02?s=32&amp;d=identicon&amp;r=PG&amp;f=1" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/3199219/andriy">Andriy</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score " dir="ltr">71</span>
-                    <span title="2 bronze badges"><span class="badge3"></span><span class="badgecount">2</span></span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-               </tr> 
-              </tbody>
-             </table> </td> 
-           </tr> 
-           <tr> 
-            <td class="votecell"></td> 
-            <td> 
-             <div id="comments-21143908" class="comments  dno"> 
-              <table> 
-               <tbody data-remaining-comments-count="0" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true"> 
-                <tr>
-                 <td></td>
-                 <td></td>
-                </tr> 
-               </tbody> 
-              </table> 
-             </div> 
-             <div id="comments-link-21143908" data-rep="50" data-anon="true"> 
-              <a class="js-add-link comments-link disabled-link " title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add a comment</a>
-              <span class="js-link-separator dno">&nbsp;|&nbsp;</span> 
-              <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href="#" onclick=""></a> 
-             </div> </td> 
-           </tr> 
-          </tbody>
-         </table> 
-        </div> 
-        <a name="39627599"></a> 
-        <div id="answer-39627599" class="answer" data-answerid="39627599" itemscope itemtype="http://schema.org/Answer"> 
-         <table> 
-          <tbody>
-           <tr> 
-            <td class="votecell"> 
-             <div class="vote"> 
-              <input type="hidden" name="_id_" value="39627599"> 
-              <a class="vote-up-off" title="This answer is useful">up vote</a> 
-              <span itemprop="upvoteCount" class="vote-count-post ">4</span> 
-              <a class="vote-down-off" title="This answer is not useful">down vote</a> 
-             </div> </td> 
-            <td class="answercell"> 
-             <div class="post-text" itemprop="text"> 
-              <p><strong>Quicksort (recursive)</strong></p> 
-              <p></p>
-              <div class="snippet" data-lang="js" data-hide="false" data-console="true" data-babel="false"> 
-               <div class="snippet-code"> 
-                <pre class="snippet-code-js lang-js prettyprint-override"><code>function quicksort(array) {
-  if (array.length &lt;= 1) {
-    return array;
-  }
+	settings.supports.everythingExceptFlag = settings.supports.everythingExceptFlag && ! settings.supports.flag;
 
-  var pivot = array[0];
-  
-  var left = []; 
-  var right = [];
+	settings.DOMReady = false;
+	settings.readyCallback = function() {
+		settings.DOMReady = true;
+	};
 
-  for (var i = 1; i &lt; array.length; i++) {
-    array[i] &lt; pivot ? left.push(array[i]) : right.push(array[i]);
-  }
+	if ( ! settings.supports.everything ) {
+		ready = function() {
+			settings.readyCallback();
+		};
 
-  return quicksort(left).concat(pivot, quicksort(right));
-};
+		if ( document.addEventListener ) {
+			document.addEventListener( 'DOMContentLoaded', ready, false );
+			window.addEventListener( 'load', ready, false );
+		} else {
+			window.attachEvent( 'onload', ready );
+			document.attachEvent( 'onreadystatechange', function() {
+				if ( 'complete' === document.readyState ) {
+					settings.readyCallback();
+				}
+			} );
+		}
 
-var unsorted = [23, 45, 16, 37, 3, 99, 22];
-var sorted = quicksort(unsorted);
+		src = settings.source || {};
 
-console.log('Sorted array', sorted);</code></pre> 
-               </div> 
-              </div> 
-              <p></p> 
-             </div> 
-             <table class="fw"> 
-              <tbody>
-               <tr> 
-                <td class="vt"> 
-                 <div class="post-menu">
-                  <a href="/a/39627599" title="short permalink to this answer" class="short-link" id="link-post-39627599">share</a>
-                  <span class="lsep">|</span>
-                  <a href="/posts/39627599/edit" class="suggest-edit-post" title="">improve this answer</a>
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info user-hover"> 
-                  <div class="user-action-time">
-                    answered 
-                   <span title="2016-09-21 22:40:16Z" class="relativetime">Sep 21 '16 at 22:40</span> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/451634/benny-neugebauer">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://www.gravatar.com/avatar/360ebfce7ad37f53a1302f8e68843139?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/451634/benny-neugebauer">Benny Neugebauer</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score 18,881" dir="ltr">18.9k</span>
-                    <span title="14 gold badges"><span class="badge1"></span><span class="badgecount">14</span></span>
-                    <span title="114 silver badges"><span class="badge2"></span><span class="badgecount">114</span></span>
-                    <span title="113 bronze badges"><span class="badge3"></span><span class="badgecount">113</span></span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-               </tr> 
-              </tbody>
-             </table> </td> 
-           </tr> 
-           <tr> 
-            <td class="votecell"></td> 
-            <td> 
-             <div id="comments-39627599" class="comments  dno"> 
-              <table> 
-               <tbody data-remaining-comments-count="0" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true"> 
-                <tr>
-                 <td></td>
-                 <td></td>
-                </tr> 
-               </tbody> 
-              </table> 
-             </div> 
-             <div id="comments-link-39627599" data-rep="50" data-anon="true"> 
-              <a class="js-add-link comments-link disabled-link " title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add a comment</a>
-              <span class="js-link-separator dno">&nbsp;|&nbsp;</span> 
-              <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href="#" onclick=""></a> 
-             </div> </td> 
-           </tr> 
-          </tbody>
-         </table> 
-        </div> 
-        <a name="37189412"></a> 
-        <div id="answer-37189412" class="answer" data-answerid="37189412" itemscope itemtype="http://schema.org/Answer"> 
-         <table> 
-          <tbody>
-           <tr> 
-            <td class="votecell"> 
-             <div class="vote"> 
-              <input type="hidden" name="_id_" value="37189412"> 
-              <a class="vote-up-off" title="This answer is useful">up vote</a> 
-              <span itemprop="upvoteCount" class="vote-count-post ">1</span> 
-              <a class="vote-down-off" title="This answer is not useful">down vote</a> 
-             </div> </td> 
-            <td class="answercell"> 
-             <div class="post-text" itemprop="text"> 
-              <p>This algorithm work almost as fast as the default implementation of Array.prototype.sort in chrome.</p> 
-              <pre><code>function quickSort(t){
-    _quickSort(t,0,t.length-1,0,t.length-1);
+		if ( src.concatemoji ) {
+			addScript( src.concatemoji );
+		} else if ( src.wpemoji && src.twemoji ) {
+			addScript( src.twemoji );
+			addScript( src.wpemoji );
+		}
+	}
+
+} )( window, document, window._wpemojiSettings );
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
 }
+</style> 
+  <link rel="stylesheet" id="yarppWidgetCss-css" href="http://www.stoimen.com/blog/wp-content/plugins/yet-another-related-posts-plugin/style/widget.css?ver=4.8.1" type="text/css" media="all"> 
+  <link rel="stylesheet" id="wp-syntax-css-css" href="http://www.stoimen.com/blog/wp-content/plugins/wp-syntax/css/wp-syntax.css?ver=1.1" type="text/css" media="all"> 
+  <link rel="stylesheet" id="twentythirteen-fonts-css" href="//fonts.googleapis.com/css?family=Source+Sans+Pro%3A300%2C400%2C700%2C300italic%2C400italic%2C700italic%7CBitter%3A400%2C700&amp;subset=latin%2Clatin-ext" type="text/css" media="all"> 
+  <link rel="stylesheet" id="genericons-css" href="http://www.stoimen.com/blog/wp-content/themes/twentythirteen/genericons/genericons.css?ver=3.03" type="text/css" media="all"> 
+  <link rel="stylesheet" id="twentythirteen-style-css" href="http://www.stoimen.com/blog/wp-content/themes/twentythirteen/style.css?ver=2013-07-18" type="text/css" media="all"> 
+  <!--[if lt IE 9]>
+<link rel='stylesheet' id='twentythirteen-ie-css'  href='http://www.stoimen.com/blog/wp-content/themes/twentythirteen/css/ie.css?ver=2013-07-18' type='text/css' media='all' />
+<![endif]--> 
+  <script type="text/javascript" src="http://www.stoimen.com/blog/wp-includes/js/jquery/jquery.js?ver=1.12.4"></script> 
+  <script type="text/javascript" src="http://www.stoimen.com/blog/wp-includes/js/jquery/jquery-migrate.js?ver=1.4.1"></script> 
+  <link rel="https://api.w.org/" href="http://www.stoimen.com/blog/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.stoimen.com/blog/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.stoimen.com/blog/wp-includes/wlwmanifest.xml"> 
+  <link rel="prev" title="Replace the Broken Images with a Default Image with JavaScript" href="http://www.stoimen.com/blog/2010/07/01/replace-the-broken-images-with-a-default-image-with-javascript/"> 
+  <link rel="next" title="PHP: preg_match Give Names to the Matches" href="http://www.stoimen.com/blog/2010/07/03/php-preg_match-give-names-to-the-matches/"> 
+  <meta name="generator" content="WordPress 4.8.1"> 
+  <link rel="shortlink" href="http://www.stoimen.com/blog/?p=1746"> 
+  <link rel="alternate" type="application/json+oembed" href="http://www.stoimen.com/blog/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.stoimen.com%2Fblog%2F2010%2F07%2F02%2Ffriday-algorithms-javascript-merge-sort%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="http://www.stoimen.com/blog/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.stoimen.com%2Fblog%2F2010%2F07%2F02%2Ffriday-algorithms-javascript-merge-sort%2F&amp;format=xml"> 
+  <style data-context="foundation-flickity-css">/*! Flickity v2.0.2
+http://flickity.metafizzy.co
+---------------------------------------------- */.flickity-enabled{position:relative}.flickity-enabled:focus{outline:0}.flickity-viewport{overflow:hidden;position:relative;height:100%}.flickity-slider{position:absolute;width:100%;height:100%}.flickity-enabled.is-draggable{-webkit-tap-highlight-color:transparent;tap-highlight-color:transparent;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.flickity-enabled.is-draggable .flickity-viewport{cursor:move;cursor:-webkit-grab;cursor:grab}.flickity-enabled.is-draggable .flickity-viewport.is-pointer-down{cursor:-webkit-grabbing;cursor:grabbing}.flickity-prev-next-button{position:absolute;top:50%;width:44px;height:44px;border:none;border-radius:50%;background:#fff;background:hsla(0,0%,100%,.75);cursor:pointer;-webkit-transform:translateY(-50%);transform:translateY(-50%)}.flickity-prev-next-button:hover{background:#fff}.flickity-prev-next-button:focus{outline:0;box-shadow:0 0 0 5px #09F}.flickity-prev-next-button:active{opacity:.6}.flickity-prev-next-button.previous{left:10px}.flickity-prev-next-button.next{right:10px}.flickity-rtl .flickity-prev-next-button.previous{left:auto;right:10px}.flickity-rtl .flickity-prev-next-button.next{right:auto;left:10px}.flickity-prev-next-button:disabled{opacity:.3;cursor:auto}.flickity-prev-next-button svg{position:absolute;left:20%;top:20%;width:60%;height:60%}.flickity-prev-next-button .arrow{fill:#333}.flickity-page-dots{position:absolute;width:100%;bottom:-25px;padding:0;margin:0;list-style:none;text-align:center;line-height:1}.flickity-rtl .flickity-page-dots{direction:rtl}.flickity-page-dots .dot{display:inline-block;width:10px;height:10px;margin:0 8px;background:#333;border-radius:50%;opacity:.25;cursor:pointer}.flickity-page-dots .dot.is-selected{opacity:1}</style>
+  <style data-context="foundation-slideout-css">.slideout-menu{position:fixed;left:0;top:0;bottom:0;right:auto;z-index:0;width:256px;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none}.slideout-menu.pushit-right{left:auto;right:0}.slideout-panel{position:relative;z-index:1;will-change:transform}.slideout-open,.slideout-open .slideout-panel,.slideout-open body{overflow:hidden}.slideout-open .slideout-menu{display:block}.pushit{display:none}</style> 
+  <style type="text/css" id="twentythirteen-header-css">
+			.site-header {
+			background: url(http://www.stoimen.com/blog/wp-content/themes/twentythirteen/images/headers/circle.png) no-repeat scroll top;
+			background-size: 1600px auto;
+		}
+		@media (max-width: 767px) {
+			.site-header {
+				background-size: 768px auto;
+			}
+		}
+		@media (max-width: 359px) {
+			.site-header {
+				background-size: 360px auto;
+			}
+		}
+		</style> 
+  <style>.ios7.web-app-mode.has-fixed header{ background-color: rgba(3,122,221,.88);}</style>
+ </head> 
+ <body class="post-template-default single single-post postid-1746 single-format-standard"> 
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-function _quickSort(t, s, e, sp, ep){   
-    if( s&gt;=e )  return;
-    while( sp&lt;ep &amp;&amp; t[sp]&lt;t[e] ) sp++;  
-    if( sp==e )
-        _quickSort(t,s,e-1,s,e-1);  
-    else{
-        while(t[ep]&gt;=t[e] &amp;&amp; sp&lt;ep ) ep--;      
-        if( sp==ep ){
-            var temp = t[sp];
-            t[sp] = t[e];
-            t[e] = temp;
-            if( s!=sp ){
-                _quickSort(t,s,sp-1,s,sp-1);
-            }
-            _quickSort(t,sp+1,e,sp+1,e);            
-        }else{
-            var temp = t[sp];
-            t[sp] = t[ep];
-            t[ep] = temp;
-            _quickSort(t,s,e,sp+1,ep);
-        }
-    }
-}
-</code></pre> 
-              <p>quickSort time (ms): 738 <br> javaScriptSort time (ms): 603</p> 
-              <pre><code>var m = randTxT(5000,500,-1000,1000);
-VS(m);
+  ga('create', 'UA-670359-6', 'auto');
+  ga('send', 'pageview');
 
-function VS(M){
-    var t;
-    t = Date.now();
-    for(var i=0;i&lt;M.length;i++){
-        quickSort(M[i].slice());
-    }console.log("quickSort time (ms): "+(Date.now()-t));
-
-    t = Date.now();
-    for(var i=0;i&lt;M.length;i++){
-        M[i].slice().sort(compare);
-    }console.log("javaScriptSort time (ms): "+(Date.now()-t));
-}
-
-function compare(a, b) {
-    if( a&lt;b )
-        return -1;
-    if( a==b )
-        return 0;
-    return 1;
-}
-
-function randT(n,min,max){
-    var res = [], i=0;
-    while( i&lt;n ){
-        res.push( Math.floor(Math.random()*(max-min+1)+min) );
-        i++;
-    }
-    return res; 
-}
-function randTxT(n,m,min,max){
-    var res = [], i=0;
-    while( i&lt;n ){
-        res.push( randT(m,min,max) );
-        i++;
-    }
-    return res; 
-}
-</code></pre> 
-             </div> 
-             <table class="fw"> 
-              <tbody>
-               <tr> 
-                <td class="vt"> 
-                 <div class="post-menu">
-                  <a href="/a/37189412" title="short permalink to this answer" class="short-link" id="link-post-37189412">share</a>
-                  <span class="lsep">|</span>
-                  <a href="/posts/37189412/edit" class="suggest-edit-post" title="">improve this answer</a>
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info "> 
-                  <div class="user-action-time">
-                    answered 
-                   <span title="2016-05-12 14:07:27Z" class="relativetime">May 12 '16 at 14:07</span> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/3870075/user3870075">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://www.gravatar.com/avatar/5386acb752b24d1343c59ec09c1bf277?s=32&amp;d=identicon&amp;r=PG&amp;f=1" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/3870075/user3870075">user3870075</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score " dir="ltr">36</span>
-                    <span title="7 bronze badges"><span class="badge3"></span><span class="badgecount">7</span></span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-               </tr> 
-              </tbody>
-             </table> </td> 
-           </tr> 
-           <tr> 
-            <td class="votecell"></td> 
-            <td> 
-             <div id="comments-37189412" class="comments  dno"> 
-              <table> 
-               <tbody data-remaining-comments-count="0" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true"> 
-                <tr>
-                 <td></td>
-                 <td></td>
-                </tr> 
-               </tbody> 
-              </table> 
-             </div> 
-             <div id="comments-link-37189412" data-rep="50" data-anon="true"> 
-              <a class="js-add-link comments-link disabled-link " title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add a comment</a>
-              <span class="js-link-separator dno">&nbsp;|&nbsp;</span> 
-              <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href="#" onclick=""></a> 
-             </div> </td> 
-           </tr> 
-          </tbody>
-         </table> 
-        </div> 
-        <a name="42809114"></a> 
-        <div id="answer-42809114" class="answer" data-answerid="42809114" itemscope itemtype="http://schema.org/Answer"> 
-         <table> 
-          <tbody>
-           <tr> 
-            <td class="votecell"> 
-             <div class="vote"> 
-              <input type="hidden" name="_id_" value="42809114"> 
-              <a class="vote-up-off" title="This answer is useful">up vote</a> 
-              <span itemprop="upvoteCount" class="vote-count-post ">0</span> 
-              <a class="vote-down-off" title="This answer is not useful">down vote</a> 
-             </div> </td> 
-            <td class="answercell"> 
-             <div class="post-text" itemprop="text"> 
-              <h2>A Functional equivalent</h2> 
-              <p>In celebration of Functional Javascript, which appears to be the <strong>in thing</strong></p> 
-              <p>at the moment, especially given ES6+ wonderful syntactic sugar additions. Arrow functions and destructuring I propose a very clean, short functional equivalent of the quicksort function. I have not tested it for performance or compared it to the built-in quicksort function but it might help those who are struggling to understand the practical use of a quicksort. Given its declarative nature it is very easy to see <strong>what</strong> is happening as oppose to <strong>how</strong> it works.</p> 
-              <p>Here is a JSBin version without comments <a href="https://jsbin.com/zenajud/edit?js,console" rel="nofollow noreferrer">https://jsbin.com/zenajud/edit?js,console</a></p> 
-              <pre class="lang-js prettyprint-override"><code>function quickSortF(arr) {
-    // Base case
-    if (!arr.length) return []
-
-    // This is a ES6 addition, it uses destructuring to pull out the 
-    // first value and the rest, similar to how other functional languages
-    // such as Haskell, Scala do it. You can then use the variables as 
-    // normal below
-    const [head, ...tail] = arr,
-          // here we are using the arrow functions, and taking full 
-          // advantage of the concise syntax, the verbose version of
-          // function(e) =&gt; { return e &lt; head } is the same thing
-          // so we end up with the partition part, two arrays,
-          // one smaller than the pivot and one bigger than the 
-          // pivot, in this case is the head variable
-          left = tail.filter( e =&gt; e &lt; head),
-          right = tail.filter( e =&gt; e &gt;= head)
-
-       // this is the conquer bit of divide-and-conquer
-       // recursively run through each left and right array
-       // until we hit the if condition which returns an empty
-       // array. These results are all connected using concat,
-       // and we get our sorted array.
-       return quickSortF(left).concat(head, quickSortF(right))           
-
-}
-
-const q7 = quickSortF([11,8,14,3,6,2,7]) 
-//[2, 3, 6, 7, 8, 11, 14]
-const q8 =  quickSortF([11,8,14,3,6,2,1, 7])
-//[1, 2, 3, 6, 7, 8, 11, 14]
-const q9 = quickSortF([16,11,9,7,6,5,3, 2])
-//[2, 3, 5, 6, 7, 9, 11, 16]
-
-console.log(q7,q8,q9)
-</code></pre> 
-              <p>The comments should provide enough if it is already not clear what is happening. The actual code is very short without comments, and you may have noticed I am <strong>not</strong> a fan of the semicolon. :)</p> 
-             </div> 
-             <table class="fw"> 
-              <tbody>
-               <tr> 
-                <td class="vt"> 
-                 <div class="post-menu">
-                  <a href="/a/42809114" title="short permalink to this answer" class="short-link" id="link-post-42809114">share</a>
-                  <span class="lsep">|</span>
-                  <a href="/posts/42809114/edit" class="suggest-edit-post" title="">improve this answer</a>
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info "> 
-                  <div class="user-action-time"> 
-                   <a href="/posts/42809114/revisions" title="show all edits to this post">edited <span title="2017-03-15 12:04:46Z" class="relativetime">Mar 15 at 12:04</span></a> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                  </div> 
-                  <div class="user-details"> 
-                   <div class="-flair"> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info "> 
-                  <div class="user-action-time">
-                    answered 
-                   <span title="2017-03-15 11:58:04Z" class="relativetime">Mar 15 at 11:58</span> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/4109124/faktor-10">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://www.gravatar.com/avatar/d76d7c8bccd9acfe6a1e413ec8dcad86?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/4109124/faktor-10">Faktor 10</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score " dir="ltr">510</span>
-                    <span title="1 gold badge"><span class="badge1"></span><span class="badgecount">1</span></span>
-                    <span title="7 silver badges"><span class="badge2"></span><span class="badgecount">7</span></span>
-                    <span title="16 bronze badges"><span class="badge3"></span><span class="badgecount">16</span></span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-               </tr> 
-              </tbody>
-             </table> </td> 
-           </tr> 
-           <tr> 
-            <td class="votecell"></td> 
-            <td> 
-             <div id="comments-42809114" class="comments  dno"> 
-              <table> 
-               <tbody data-remaining-comments-count="0" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true"> 
-                <tr>
-                 <td></td>
-                 <td></td>
-                </tr> 
-               </tbody> 
-              </table> 
-             </div> 
-             <div id="comments-link-42809114" data-rep="50" data-anon="true"> 
-              <a class="js-add-link comments-link disabled-link " title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add a comment</a>
-              <span class="js-link-separator dno">&nbsp;|&nbsp;</span> 
-              <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href="#" onclick=""></a> 
-             </div> </td> 
-           </tr> 
-          </tbody>
-         </table> 
-        </div> 
-        <a name="45581276"></a> 
-        <div id="answer-45581276" class="answer" data-answerid="45581276" itemscope itemtype="http://schema.org/Answer"> 
-         <table> 
-          <tbody>
-           <tr> 
-            <td class="votecell"> 
-             <div class="vote"> 
-              <input type="hidden" name="_id_" value="45581276"> 
-              <a class="vote-up-off" title="This answer is useful">up vote</a> 
-              <span itemprop="upvoteCount" class="vote-count-post ">0</span> 
-              <a class="vote-down-off" title="This answer is not useful">down vote</a> 
-             </div> </td> 
-            <td class="answercell"> 
-             <div class="post-text" itemprop="text"> 
-              <p>Yet another quick sort demonstration, which takes middle of the array as pivot for no specific reason.</p> 
-              <pre><code>const QuickSort = function (A, start, end) {
-    // 
-    if (start &gt;= end) {
-        return;
-    }
-    // return index of the pivot
-    var pIndex = Partition(A, start, end);
-    // partition left side
-    QuickSort(A, start, pIndex - 1);
-    // partition right side
-    QuickSort(A, pIndex + 1, end);
-}
-
-const Partition = function (A, start, end) {
-    if (A.length &gt; 1 == false) {
-        return 0;
-    }
-    let pivotIndex = Math.ceil((start + end) / 2);
-    let pivotValue = A[pivotIndex];
-    for (var i = 0; i &lt; A.length; i++) {
-        var leftValue = A[i];
-        // 
-        if (i &lt; pivotIndex) {
-            if (leftValue &gt; pivotValue) {
-                let temp = pivotValue;
-                A[pivotIndex] = leftValue;
-                A[i] = pivotValue;
-                pivotIndex = i;
-            }
-        }
-        else if (i &gt; pivotIndex) {
-            if (leftValue &lt; pivotValue) {
-                let temp = pivotValue;
-                A[pivotIndex] = leftValue;
-                A[i] = pivotValue;
-                pivotIndex = i;
-            }
-        }
-    }
-    return pivotIndex;
-
-}
-
-const QuickSortTest = function () {
-    const arrTest = [3, 5, 6, 22, 7, 1, 8, 9];
-    QuickSort(arrTest, 0, arrTest.length - 1);
-    console.log("arrTest", arrTest);
-}
-// 
-QuickSortTest();
-</code></pre> 
-             </div> 
-             <table class="fw"> 
-              <tbody>
-               <tr> 
-                <td class="vt"> 
-                 <div class="post-menu">
-                  <a href="/a/45581276" title="short permalink to this answer" class="short-link" id="link-post-45581276">share</a>
-                  <span class="lsep">|</span>
-                  <a href="/posts/45581276/edit" class="suggest-edit-post" title="">improve this answer</a>
-                 </div> </td> 
-                <td align="right" class="post-signature"> 
-                 <div class="user-info "> 
-                  <div class="user-action-time">
-                    answered 
-                   <span title="2017-08-09 03:34:50Z" class="relativetime">Aug 9 at 3:34</span> 
-                  </div> 
-                  <div class="user-gravatar32"> 
-                   <a href="/users/929902/teoman-shipahi">
-                    <div class="gravatar-wrapper-32">
-                     <img src="https://i.stack.imgur.com/7ORhC.jpg?s=32&amp;g=1" alt="" width="32" height="32">
-                    </div></a> 
-                  </div> 
-                  <div class="user-details"> 
-                   <a href="/users/929902/teoman-shipahi">Teoman shipahi</a> 
-                   <div class="-flair"> 
-                    <span class="reputation-score" title="reputation score 27,910" dir="ltr">27.9k</span>
-                    <span title="4 gold badges"><span class="badge1"></span><span class="badgecount">4</span></span>
-                    <span title="52 silver badges"><span class="badge2"></span><span class="badgecount">52</span></span>
-                    <span title="72 bronze badges"><span class="badge3"></span><span class="badgecount">72</span></span> 
-                   </div> 
-                  </div> 
-                 </div> </td> 
-               </tr> 
-              </tbody>
-             </table> </td> 
-           </tr> 
-           <tr> 
-            <td class="votecell"></td> 
-            <td> 
-             <div id="comments-45581276" class="comments  dno"> 
-              <table> 
-               <tbody data-remaining-comments-count="0" data-canpost="false" data-cansee="true" data-comments-unavailable="false" data-addlink-disabled="true"> 
-                <tr>
-                 <td></td>
-                 <td></td>
-                </tr> 
-               </tbody> 
-              </table> 
-             </div> 
-             <div id="comments-link-45581276" data-rep="50" data-anon="true"> 
-              <a class="js-add-link comments-link disabled-link " title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add a comment</a>
-              <span class="js-link-separator dno">&nbsp;|&nbsp;</span> 
-              <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href="#" onclick=""></a> 
-             </div> </td> 
-           </tr> 
-          </tbody>
-         </table> 
-        </div> 
-        <a name="new-answer"></a> 
-        <form id="post-form" action="/questions/5185864/answer/submit" method="post" class="post-form"> 
-         <input type="hidden" id="post-id" value="5185864"> 
-         <input type="hidden" id="qualityBanWarningShown" name="qualityBanWarningShown" value="false"> 
-         <input type="hidden" name="referrer" value=""> 
-         <h2 class="space">Your Answer</h2> 
-         <script>
-            StackExchange.ifUsing("editor", function () {
-                StackExchange.using("externalEditor", function () {
-                    StackExchange.using("snippets", function () {
-                        StackExchange.snippets.init();
-                    });
-                });
-            }, "code-snippets");
-        </script> 
-         <script>
-    StackExchange.ready(function() {
-        initTagRenderer("".split(" "), "".split(" "));
-       
-        StackExchange.using("externalEditor", function() {
-                // Have to fire editor after snippets, if snippets enabled
-                if (StackExchange.settings.snippets.snippetsEnabled) {
-                    StackExchange.using("snippets", function() {
-                        createEditor();
-                    });
-                }
-                else {
-                    createEditor();
-                }
-            });
-
-            function createEditor() {
-                StackExchange.prepareEditor({
-                    heartbeatType: 'answer',
-                convertImagesToLinks: true,
-                reputationToPostImages: 10,
-                bindNavPrevention: true,
-                postfix: "",
-                    onDemand: true,
-                    discardSelector: ".discard-answer"
-                    ,immediatelyShowMarkdownHelp:true
-                    });
-                
-
-        }
-    });
 </script> 
-         <div id="post-editor" class="post-editor js-post-editor"> 
-          <div style="position: relative;"> 
-           <div class="wmd-container"> 
-            <div id="wmd-button-bar" class="wmd-button-bar"></div> 
-            <textarea id="wmd-input" class="wmd-input" name="post-text" cols="92" rows="15" tabindex="101" data-min-length=""></textarea> 
-           </div> 
-          </div> 
-          <div class="fl" style="margin-top: 8px; height:24px;">
-           &nbsp;
-          </div> 
-          <div id="draft-saved" class="draft-saved community-option fl" style="margin-top: 8px; height:24px; display:none;">
-           draft saved
-          </div> 
-          <div id="draft-discarded" class="draft-discarded community-option fl" style="margin-top: 8px; height:24px; display:none;">
-           draft discarded
-          </div> 
-          <div id="wmd-preview" class="wmd-preview"></div> 
-          <div></div> 
-          <div class="edit-block"> 
-           <input id="fkey" name="fkey" type="hidden" value="5076de860a8440948661b4667474561c"> 
-           <input id="author" name="author" type="text"> 
-          </div> 
-         </div> 
-         <div style="position: relative;"> 
-          <div class="form-item dno new-post-login"> 
-           <div class="new-login-form"> 
-            <div class="new-login-left"> 
-             <h3>Sign up or <a id="login-link" href="/users/login?ssrc=question_page&amp;returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f5185864%2fjavascript-quicksort%23new-answer">log in</a></h3> 
-             <script>
-                            StackExchange.ready(function () {
-                                StackExchange.helpers.onClickDraftSave('#login-link');
-                            });
-                        </script> 
-             <div class="preferred-login google-login"> 
-              <p><span class="icon"></span><span>Sign up using Google</span></p> 
-             </div> 
-             <div class="preferred-login facebook-login"> 
-              <p><span class="icon"></span><span>Sign up using Facebook</span></p> 
-             </div> 
-             <div class="preferred-login stackexchange-login"> 
-              <p><span class="icon"></span><span>Sign up using Email and Password</span></p> 
-             </div> 
-            </div> 
-            <input type="hidden" name="manual-openid" class="manual-openid"> 
-            <input type="hidden" name="use-facebook" class="use-facebook" value="false"> 
-            <input type="hidden" name="use-google" class="use-google" value="false"> 
-            <input type="button" class="submit-openid" value="Submit" style="display:none"> 
-            <div class="new-login-right"> 
-             <h3>Post as a guest</h3> 
-             <div class="form-item"> 
-              <table> 
-               <tbody>
-                <tr> 
-                 <td class="vm"> 
-                  <div> 
-                   <label for="display-name">Name</label> 
-                   <input id="display-name" name="display-name" type="text" size="30" maxlength="30" value="" tabindex="105"> 
-                  </div> 
-                  <div> 
-                   <label for="m-address">Email</label> 
-                   <input id="m-address" name="m-address" type="email" size="30" maxlength="100" value="" tabindex="106" placeholder="required, but never shown"> 
-                  </div> </td> 
-                </tr> 
-               </tbody>
-              </table> 
-             </div> 
-            </div> 
-           </div> 
-          </div> 
-          <script>
-                StackExchange.ready(
-                    function () {
-                        StackExchange.openid.initPostLogin('.new-post-login', 'https%3a%2f%2fstackoverflow.com%2fquestions%2f5185864%2fjavascript-quicksort%23new-answer', 'question_page');
-                    }
-                );
-            </script> 
-          <noscript> 
-           <h3>Post as a guest</h3> 
-           <div class="form-item"> 
-            <table> 
-             <tbody>
-              <tr> 
-               <td class="vm"> 
-                <div> 
-                 <label for="display-name">Name</label> 
-                 <input id="display-name" name="display-name" type="text" size="30" maxlength="30" value="" tabindex="105"> 
-                </div> 
-                <div> 
-                 <label for="m-address">Email</label> 
-                 <input id="m-address" name="m-address" type="email" size="30" maxlength="100" value="" tabindex="106" placeholder="required, but never shown"> 
-                </div> </td> 
-              </tr> 
-             </tbody>
-            </table> 
-           </div> 
-          </noscript> 
-         </div> 
-         <div class="form-submit cbt"> 
-          <input id="submit-button" type="submit" value="Post Your Answer" tabindex="110"> 
-          <a href="#" class="btn-clear discard-answer dno">discard</a> 
-          <p class="privacy-policy-agreement"> By posting your answer, you agree to the <a href="https://stackexchange.com/legal/privacy-policy" name="privacy" target="_blank">privacy policy</a> and <a href="https://stackexchange.com/legal/terms-of-service" name="tos" target="_blank">terms of service</a>.</p> 
-          <input type="hidden" name="legalLinksShown" value="1"> 
-         </div> 
-        </form> 
-        <h2 class="bottom-notice" data-loc="1"> Not the answer you're looking for? Browse other questions tagged <a href="/questions/tagged/javascript" class="post-tag" title="show questions tagged 'javascript'" rel="tag">javascript</a> <a href="/questions/tagged/quicksort" class="post-tag" title="show questions tagged 'quicksort'" rel="tag">quicksort</a> or <a href="/questions/ask">ask your own question</a>. </h2> 
-       </div> 
+  <div id="page" class="hfeed site"> 
+   <header id="masthead" class="site-header" role="banner"> 
+    <a class="home-link" href="http://www.stoimen.com/blog/" title="stoimen's web log" rel="home"> <h1 class="site-title">stoimen's web log</h1> <h2 class="site-description">on web development</h2> </a> 
+    <div id="navbar" class="navbar"> 
+     <nav id="site-navigation" class="navigation main-navigation" role="navigation"> 
+      <button class="menu-toggle">Menu</button> 
+      <a class="screen-reader-text skip-link" href="#content" title="Skip to content">Skip to content</a> 
+      <div class="menu-menu-1-container">
+       <ul id="primary-menu" class="nav-menu">
+        <li id="menu-item-3594" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-3594"><a href="http://www.stoimen.com/blog/">Home</a></li> 
+        <li id="menu-item-3595" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3595"><a href="http://www.stoimen.com/blog/about/">About</a></li> 
+        <li id="menu-item-3597" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3597"><a href="https://github.com/stoimen/algorithms">Algorithms on GitHub</a></li> 
+        <li id="menu-item-3641" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-3641"><a href="https://github.com/stoimen/infographics">Infographics on GitHub</a></li> 
+       </ul>
       </div> 
-      <div id="sidebar" class="show-votes" role="complementary" aria-label="sidebar"> 
-       <div class="module question-stats"> 
-        <table id="qinfo"> 
-         <tbody>
-          <tr> 
-           <td> <p class="label-key">asked</p> </td> 
-           <td style="padding-left: 10px"> <p class="label-key" title="2011-03-03 19:59:55Z"><b>6 years, 6 months ago</b></p> </td> 
-          </tr> 
-          <tr> 
-           <td> <p class="label-key">viewed</p> </td> 
-           <td style="padding-left: 10px"> <p class="label-key"> <b>25,233 times</b> </p> </td> 
-          </tr> 
-          <tr> 
-           <td> <p class="label-key">active</p> </td> 
-           <td style="padding-left: 10px"> <p class="label-key"><b><a href="?lastactivity" class="lastactivity-link" title="2017-08-09 03:34:50Z">1 month ago</a></b></p> </td> 
-          </tr> 
-         </tbody>
-        </table> 
-       </div> 
-       <script>
-                    var ados = ados || {}; ados.run = ados.run || [];
-                    ados.run.push(function () { ados_add_placement(22,8277,"adzerk736537168",[5,17,2221,1129,43]).setZone(45); });
-                </script> 
-       <div class="everyonelovesstackoverflow" id="adzerk736537168"></div> 
-       <script>try{;window.clc=window.clc||{},window.clc.init=window.clc.init||function(a){var b=window,c=b.document;try{if('function'!=typeof[].indexOf||!window.addEventListener||!a.allowed)return;var d=new RegExp(a.allowed);if(!d.test(location.hostname))return;if(b.clc.options)for(var e in b.clc.options)a[e]=b.clc.options[e];b.clc.cmd='undefined'==typeof b.clc.cmd?[]:b.clc.cmd,b.clc.autoload=b.clc.autoload||function(){'function'==typeof b.clc.load?b.clc.load():b.clc.cmd.push(function(a){a.load()})};var f=a.wv;if(c.hidden&&f)return void c.addEventListener('visibilitychange',function b(){c.hidden||(window.clc.init(a),c.removeEventListener('visibilitychange',b))});b.clc.options=a,a.al&&b.clc.autoload();var g=c.createElement('script');g.async=!0,g.src=a.lib,c.body.appendChild(g)}catch(a){}},window.clc.loadDisplayAds=window.clc.loadDisplayAds||function(){var a=window,b={slots:{lb:[[728,90]],mlb:[[728,90]],sb:[[300,250],[300,600]],"tag-sponsorship":[[730,135],'fluid']},ids:{"dfp-tlb":'lb',"dfp-mlb":'mlb',"dfp-tsb":'sb',"dfp-tag":'tag-sponsorship',"clc-tlb":'lb',"clc-mlb":'mlb',"clc-tsb":'sb'}},c=/^\/tags\//.test(location.pathname)||/^\/questions\/tagged\//.test(location.pathname)?'tag-pages':'question-pages',d=/^dev\./.test(location.hostname)?'test/'+location.hostname:location.hostname;return function(e){var f=(e&&0<e.length?e:Object.keys(b.ids)).map(function(a){return document.getElementById(a)}).filter(function(a){return!!a&&/^\s*$/.test(a.innerHTML)}).map(function(a){return a.id});if(0!==f.length){a.googletag=a.googletag||{},a.googletag.cmd=a.googletag.cmd||[],a.googletag.cmd.push(function(){var e=a.googletag,g=e.pubads();g.enableSingleRequest();var h=a.dfp_targeting||{};h&&Object.keys(h).forEach(function(a){e.pubads().setTargeting(a,h[a])});for(var i=0,j=f;i<j.length;i++){var k=j[i],l=b.ids[k],m=b.slots[l];e.defineSlot('/'+'248424177'+'/'+d+'/'+l+'/'+c,m,k).addService(e.pubads()).setCollapseEmptyDiv('tag-sponsorship'===l,!0)}e.enableServices();for(var k,n=0,o=f;n<o.length;n++)k=o[n],e.display(k)});var g=document.createElement('script');g.async=!0,g.src='https://www.googletagservices.com/tag/js/gpt.js',document.body.appendChild(g)}}}(),window.clc.loadDfp=window.clc.loadDisplayAds,window.clc.init.call(null, {"lib":"https://cdn.sstatic.net/clc/clc.min.js?v=d76f676ad858","u":"https://clc.stackoverflow.com/markup.js","wa":true,"kt":2000,"tto":true,"h":"clc.stackoverflow.com","allowed":"^(((talent\\.)?stackoverflow)|(blog\\.codinghorror)|(serverfault|askubuntu)|([^\\.]+\\.stackexchange))\\.com$","wv":true,"al":false,"fb":null});}catch(e){typeof console!=='undefined'&&typeof console.error==='function'&&console.error(e);}</script> 
-       <script>
-                var dfp_targeting={Registered:['false'],'so-tag':['javascript','quicksort']};
-            </script> 
-       <div id="hireme"></div> 
-       <script>try{window.clc_request='Amb7wq34_dQIAAAAAEghTwACAAAAAgAAAAAWAAAAfGphdmFzY3JpcHR8cXVpY2tzb3J0fAAHFBo49c-Y3Vg6';typeof clc!=='undefined'&&typeof clc.autoload==='function'&&clc.autoload();}catch(e){typeof console!=='undefined'&&typeof console.error==='function'&&console.error(e);}</script> 
-       <div id="dfp-tsb" class="dfpad"></div> 
-       <style>.dfpad{position:absolute;height:1px;width:1px;opacity:0;top:0;left:0;pointer-events:none;}</style> 
-       <script>try{typeof clc!=='undefined'&&typeof clc.loadDisplayAds==='function'&&clc.loadDisplayAds();}catch(e){typeof console!=='undefined'&&typeof console.error==='function'&&console.error(e);}</script> 
-       <div class="module" id="chat-feature"> 
-        <h4><a href="http://chat.stackoverflow.com" id="h-chat-link">Visit Chat</a></h4> 
-        <div class="related" id="ad502-rooms"></div> 
-        <script>
-    // <!--
-        StackExchange.ready(
-        function () {
-            var options = {
-                chatUrl: 'http://chat.stackoverflow.com',
-                reloadUrl: '/api/recent-chat',
-                preloadData: {"activeUsers":46,"activeRooms":28,"rooms":[{"name":"JavaScript","id":17,"lastPost":1505649081,"posts":4225359,"users":[{"name":"Peter Cos","id":7145532,"emailhash":"a761e9bcd6cdd7eb6d11cba5e15957af","lastPost":1505649081},{"name":"nyconing","id":5858238,"emailhash":"!https://i.stack.imgur.com/E1Dug.jpg?s=128\u0026g=1","lastPost":1505648978},{"name":"Caprica Six","id":1839506,"emailhash":"!https://i.stack.imgur.com/Sej2t.jpg?s=128\u0026g=1","lastPost":1505648972},{"name":"towc","id":3161092,"emailhash":"!https://i.stack.imgur.com/oVs5E.png?s=128\u0026g=1","lastPost":1505643506},{"name":"Zirak","id":617762,"emailhash":"348d335cd13298e475eeaefa1841dee6","lastPost":1505625964},{"name":"little pootis","id":1947276,"emailhash":"!https://i.stack.imgur.com/F8tJi.jpg?s=128\u0026g=1","lastPost":1505625464},{"name":"Kendall Frey","id":785745,"emailhash":"f9fc3249a341a64ee2721637915cd301","lastPost":1505614617}],"messages":[{"date":1505649081,"user":"Peter Cos","userid":7145532}],"singleImage":false,"tags":["ecmascript","ecmascript-6","javascript","legal-advice","nodejs"]},{"name":"Lounge\u003cC++\u003e","id":10,"lastPost":1505651276,"posts":4953659,"users":[{"name":"iksemyonov","id":342384,"emailhash":"!https://i.stack.imgur.com/MRRvI.jpg?s=128\u0026g=1","lastPost":1505651276},{"name":"sehe","id":85371,"emailhash":"6d52c235ec6dd15f30bab444103e7af2","lastPost":1505650952},{"name":"nwp","id":3484570,"emailhash":"!https://i.stack.imgur.com/r5BRZ.png?s=128\u0026g=1","lastPost":1505646679},{"name":"Ven","id":1737909,"emailhash":"ff56e1492c7311f8c29742d6f493bb9e","lastPost":1505642468},{"name":"milleniumbug","id":1012936,"emailhash":"!https://i.stack.imgur.com/lVX7j.jpg?s=128\u0026g=1","lastPost":1505634272},{"name":"Mysticial","id":922184,"emailhash":"!https://i.stack.imgur.com/URZNf.jpg?s=128\u0026g=1","lastPost":1505625829},{"name":"Mikhail","id":314290,"emailhash":"5ffde821f0f9670e601b19f1731a6849","lastPost":1505610074}],"messages":[{"date":1505651276,"user":"iksemyonov","userid":342384}],"singleImage":false,"tags":["c++","c++11","c++14","c++17","c++-faq"]}]} 
-            };
-
-            StackExchange.chatAd.init(options);
-        });
-    // -->
-    </script> 
-       </div> 
-       <div class="module sidebar-linked"> 
-        <h4 id="h-linked">Linked</h4> 
-        <div class="linked" data-tracker="lq=1"> 
-         <div class="spacer"> 
-          <a href="/q/234683" title="Vote score (upvotes - downvotes)"> 
-           <div class="answer-votes answered-accepted large">
-            149
-           </div> </a> 
-          <a href="/questions/234683/javascript-array-sort-implementation?noredirect=1" class="question-hyperlink">Javascript Array.sort implementation?</a> 
-         </div> 
-         <div class="spacer"> 
-          <a href="/q/3026281" title="Vote score (upvotes - downvotes)"> 
-           <div class="answer-votes answered-accepted default">
-            55
-           </div> </a> 
-          <a href="/questions/3026281/array-sort-sorting-stability-in-different-browsers?noredirect=1" class="question-hyperlink">Array.sort Sorting Stability in Different Browsers</a> 
-         </div> 
-         <div class="spacer"> 
-          <a href="/q/40977455" title="Vote score (upvotes - downvotes)"> 
-           <div class="answer-votes  default">
-            1
-           </div> </a> 
-          <a href="/questions/40977455/javascript-quicksort-recursive?noredirect=1" class="question-hyperlink">JavaScript Quicksort recursive</a> 
-         </div> 
-        </div> 
-       </div> 
-       <div class="module sidebar-related"> 
-        <h4 id="h-related">Related</h4> 
-        <div class="related js-gps-related-questions" data-tracker="rq=1"> 
-         <div class="spacer">
-          <a href="/q/111102" title="Vote score (upvotes - downvotes)">
-           <div class="answer-votes answered-accepted extra-large">
-            7666
-           </div></a>
-          <a href="/questions/111102/how-do-javascript-closures-work" class="question-hyperlink">How do JavaScript closures work?</a>
-         </div>
-         <div class="spacer">
-          <a href="/q/359494" title="Vote score (upvotes - downvotes)">
-           <div class="answer-votes answered-accepted extra-large">
-            4941
-           </div></a>
-          <a href="/questions/359494/which-equals-operator-vs-should-be-used-in-javascript-comparisons" class="question-hyperlink">Which equals operator (== vs ===) should be used in JavaScript comparisons?</a>
-         </div>
-         <div class="spacer">
-          <a href="/q/1335851" title="Vote score (upvotes - downvotes)">
-           <div class="answer-votes answered-accepted extra-large">
-            5984
-           </div></a>
-          <a href="/questions/1335851/what-does-use-strict-do-in-javascript-and-what-is-the-reasoning-behind-it" class="question-hyperlink">What does “use strict” do in JavaScript, and what is the reasoning behind it?</a>
-         </div>
-         <div class="spacer">
-          <a href="/q/1789945" title="Vote score (upvotes - downvotes)">
-           <div class="answer-votes answered-accepted extra-large">
-            6656
-           </div></a>
-          <a href="/questions/1789945/how-to-check-whether-a-string-contains-a-substring-in-javascript" class="question-hyperlink">How to check whether a string contains a substring in JavaScript?</a>
-         </div>
-         <div class="spacer">
-          <a href="/q/5767325" title="Vote score (upvotes - downvotes)">
-           <div class="answer-votes answered-accepted extra-large">
-            4813
-           </div></a>
-          <a href="/questions/5767325/how-do-i-remove-a-particular-element-from-an-array-in-javascript" class="question-hyperlink">How do I remove a particular element from an array in JavaScript?</a>
-         </div>
-         <div class="spacer">
-          <a href="/q/11620489" title="Vote score (upvotes - downvotes)">
-           <div class="answer-votes answered-accepted default">
-            0
-           </div></a>
-          <a href="/questions/11620489/quicksort-in-javascript-error-too-much-recursion" class="question-hyperlink">QuickSort in Javascript - error too much recursion</a>
-         </div>
-         <div class="spacer">
-          <a href="/q/29964962" title="Vote score (upvotes - downvotes)">
-           <div class="answer-votes answered-accepted default">
-            0
-           </div></a>
-          <a href="/questions/29964962/is-it-possible-to-quicksort-objects-based-on-their-keys-in-an-array-using-javas" class="question-hyperlink">Is it possible to quicksort objects based on their keys in an array, using JavaScript?</a>
-         </div>
-         <div class="spacer">
-          <a href="/q/29967481" title="Vote score (upvotes - downvotes)">
-           <div class="answer-votes default">
-            0
-           </div></a>
-          <a href="/questions/29967481/is-it-possible-to-quicksort-objects-in-an-array-based-on-a-property-javascript" class="question-hyperlink">Is it possible to quicksort objects in an array based on a property? Javascript</a>
-         </div>
-         <div class="spacer">
-          <a href="/q/33905920" title="Vote score (upvotes - downvotes)">
-           <div class="answer-votes answered-accepted default">
-            0
-           </div></a>
-          <a href="/questions/33905920/how-to-make-a-quicksort-algorithm-display-results-on-the-screen-using-javascript" class="question-hyperlink">How to make a Quicksort algorithm display results on the screen using Javascript</a>
-         </div>
-         <div class="spacer">
-          <a href="/q/41063025" title="Vote score (upvotes - downvotes)">
-           <div class="answer-votes default">
-            0
-           </div></a>
-          <a href="/questions/41063025/implementing-quicksort-in-javascript" class="question-hyperlink">Implementing Quicksort in Javascript</a>
-         </div> 
-        </div> 
-       </div> 
-       <div id="hot-network-questions" class="module tex2jax_ignore"> 
-        <h4> <a href="https://stackexchange.com/questions?tab=hot" class="js-gps-track" data-gps-track="posts_hot_network.click({ item_type:1, location:11 })"> Hot Network Questions </a> </h4> 
+      <form role="search" method="get" class="search-form" action="http://www.stoimen.com/blog/"> 
+       <label> <span class="screen-reader-text">Search for:</span> <input type="search" class="search-field" placeholder="Search …" value="" name="s"> </label> 
+       <input type="submit" class="search-submit" value="Search"> 
+      </form> 
+     </nav>
+     <!-- #site-navigation --> 
+    </div>
+    <!-- #navbar --> 
+   </header>
+   <!-- #masthead --> 
+   <div id="main" class="site-main"> 
+    <div id="primary" class="content-area"> 
+     <div id="content" class="site-content" role="main"> 
+      <article id="post-1746" class="post-1746 post type-post status-publish format-standard hentry category-algorithms category-javascript-on-stoimen-com category-web-development tag-algorithm tag-computer-science tag-computing tag-firebug tag-javascript-on-stoimen-com tag-mathematics tag-merge-sort tag-sorting-algorithms tag-technologyinternet"> 
+       <header class="entry-header"> 
+        <h1 class="entry-title">Friday Algorithms: JavaScript Merge Sort</h1> 
+        <div class="entry-meta"> 
+         <span class="date"><a href="http://www.stoimen.com/blog/2010/07/02/friday-algorithms-javascript-merge-sort/" title="Permalink to Friday Algorithms: JavaScript Merge Sort" rel="bookmark"><time class="entry-date" datetime="2010-07-02T13:28:16+00:00">July 2, 2010</time></a></span>
+         <span class="categories-links"><a href="http://www.stoimen.com/blog/category/algorithms/" rel="category tag">algorithms</a>, <a href="http://www.stoimen.com/blog/category/javascript-on-stoimen-com/" rel="category tag">javascript</a>, <a href="http://www.stoimen.com/blog/category/web-development/" rel="category tag">web development</a></span>
+         <span class="tags-links"><a href="http://www.stoimen.com/blog/tag/algorithm/" rel="tag">Algorithm</a>, <a href="http://www.stoimen.com/blog/tag/computer-science/" rel="tag">Computer science</a>, <a href="http://www.stoimen.com/blog/tag/computing/" rel="tag">Computing</a>, <a href="http://www.stoimen.com/blog/tag/firebug/" rel="tag">firebug</a>, <a href="http://www.stoimen.com/blog/tag/javascript-on-stoimen-com/" rel="tag">javascript</a>, <a href="http://www.stoimen.com/blog/tag/mathematics/" rel="tag">Mathematics</a>, <a href="http://www.stoimen.com/blog/tag/merge-sort/" rel="tag">Merge sort</a>, <a href="http://www.stoimen.com/blog/tag/sorting-algorithms/" rel="tag">Sorting algorithms</a>, <a href="http://www.stoimen.com/blog/tag/technologyinternet/" rel="tag">Technology/Internet</a></span>
+         <span class="author vcard"><a class="url fn n" href="http://www.stoimen.com/blog/author/admin/" title="View all posts by Stoimen" rel="author">Stoimen</a></span> 
+        </div>
+        <!-- .entry-meta --> 
+       </header>
+       <!-- .entry-header --> 
+       <div class="entry-content"> 
+        <h2>Merge Sort</h2> 
+        <p>This week I’m going to cover one very popular sorting algorithm – the merge sort. It’s very intuitive and simple as it’s described in <a title="Merge Sort" href="http://en.wikipedia.org/wiki/Merge_sort" target="_blank">Wikipedia</a>:</p> 
         <ul> 
-         <li> 
-          <div class="favicon favicon-ell" title="English Language Learners Stack Exchange"></div><a href="https://ell.stackexchange.com/questions/142324/what-is-mom-pkin" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:481 }); posts_hot_network.click({ item_type:2, location:11 })"> What is mom-pkin? </a> </li> 
-         <li> 
-          <div class="favicon favicon-scifi" title="Science Fiction &amp; Fantasy Stack Exchange"></div><a href="https://scifi.stackexchange.com/questions/169515/is-anyone-else-not-buying-the-buggers-story" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:186 }); posts_hot_network.click({ item_type:2, location:11 })"> Is anyone else not buying the Buggers' story? </a> </li> 
-         <li> 
-          <div class="favicon favicon-askubuntu" title="Ask Ubuntu"></div><a href="https://askubuntu.com/questions/956744/if-i-want-8gb-ram-am-i-supposed-to-select-8000mb-or-8192mb-when-selecting-size" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:89 }); posts_hot_network.click({ item_type:2, location:11 })"> If I want 8GB RAM, am I supposed to select 8000MB or 8192MB when selecting size? </a> </li> 
-         <li> 
-          <div class="favicon favicon-arduino" title="Arduino Stack Exchange"></div><a href="https://arduino.stackexchange.com/questions/44823/use-esp-01-with-arduino-uno-nano-with-the-esp8266wifi-library" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:540 }); posts_hot_network.click({ item_type:2, location:11 })"> Use ESP-01 with Arduino Uno/Nano, with the ESP8266WiFi library </a> </li> 
-         <li> 
-          <div class="favicon favicon-mathoverflow" title="MathOverflow"></div><a href="https://mathoverflow.net/questions/281330/does-zfad-settle-the-original-suslin-hypothesis" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:504 }); posts_hot_network.click({ item_type:2, location:11 })"> Does ZF+AD settle the original Suslin hypothesis? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-politics" title="Politics Stack Exchange"></div><a href="https://politics.stackexchange.com/questions/24512/why-are-weapon-restriction-laws-considered-liberal" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:475 }); posts_hot_network.click({ item_type:2, location:11 })"> Why are Weapon Restriction Laws considered Liberal? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-webmasters" title="Webmasters Stack Exchange"></div><a href="https://webmasters.stackexchange.com/questions/109419/should-stop-words-such-as-and-and-in-be-omitted-from-urls-for-seo" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:45 }); posts_hot_network.click({ item_type:2, location:11 })"> Should stop words such as "and" and "in" be omitted from URLs for SEO? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-tex" title="TeX - LaTeX Stack Exchange"></div><a href="https://tex.stackexchange.com/questions/391831/latex-doesnt-like-my-equation-whats-up" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:85 }); posts_hot_network.click({ item_type:2, location:11 })"> LaTeX doesn't like my equation... what's up? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-retrocomputing" title="Retrocomputing Stack Exchange"></div><a href="https://retrocomputing.stackexchange.com/questions/4744/how-fast-is-memcpy-on-the-z80" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:648 }); posts_hot_network.click({ item_type:2, location:11 })"> How fast is memcpy on the Z80? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-raspberrypi" title="Raspberry Pi Stack Exchange"></div><a href="https://raspberrypi.stackexchange.com/questions/72595/is-using-a-usb-sound-card-still-better-than-the-onboard-jack" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:447 }); posts_hot_network.click({ item_type:2, location:11 })"> Is using a USB sound card still better than the onboard jack? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-crypto" title="Cryptography Stack Exchange"></div><a href="https://crypto.stackexchange.com/questions/51499/why-do-wireless-keyboards-only-use-128-bit-aes-why-not-256" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:281 }); posts_hot_network.click({ item_type:2, location:11 })"> Why do wireless keyboards only use 128-bit AES? Why not 256? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-workplace" title="The Workplace Stack Exchange"></div><a href="https://workplace.stackexchange.com/questions/98849/should-i-explain-to-other-team-members-why-i-fired-somebody" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:423 }); posts_hot_network.click({ item_type:2, location:11 })"> Should I explain to other team members why I fired somebody? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-english" title="English Language &amp; Usage Stack Exchange"></div><a href="https://english.stackexchange.com/questions/410371/does-the-archaic-prefix-wer-wep-have-modern-descendants" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:97 }); posts_hot_network.click({ item_type:2, location:11 })"> Does the archaic prefix wer/wep have modern descendants? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-travel" title="Travel Stack Exchange"></div><a href="https://travel.stackexchange.com/questions/102110/can-i-enter-the-usa-i-have-dual-citizenship-japan-and-usa-but-i-have-been-to" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:273 }); posts_hot_network.click({ item_type:2, location:11 })"> Can I enter the USA? I have dual citizenship (Japan and USA), but I have been to Iran with my Japanese passport </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-interpersonal" title="Interpersonal Skills Stack Exchange"></div><a href="https://interpersonal.stackexchange.com/questions/3952/afraid-of-losing-best-friends-how-can-i-tell-them" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:680 }); posts_hot_network.click({ item_type:2, location:11 })"> Afraid of losing best friends, how can I tell them? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-aviation" title="Aviation Stack Exchange"></div><a href="https://aviation.stackexchange.com/questions/43880/how-is-the-emergency-locator-transmitter-of-the-a320-fixed-activated-and-carrie" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:528 }); posts_hot_network.click({ item_type:2, location:11 })"> How is the emergency locator transmitter of the A320 fixed, activated and carried away? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-tex" title="TeX - LaTeX Stack Exchange"></div><a href="https://tex.stackexchange.com/questions/391787/how-to-produce-a-partial-double-frame-using-tcolorbox" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:85 }); posts_hot_network.click({ item_type:2, location:11 })"> How to produce a partial double frame using tcolorbox? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-worldbuilding" title="Worldbuilding Stack Exchange"></div><a href="https://worldbuilding.stackexchange.com/questions/92346/reasons-why-healthy-people-would-intentionally-want-to-get-infected" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:579 }); posts_hot_network.click({ item_type:2, location:11 })"> Reasons why healthy people would intentionally want to get infected? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-interpersonal" title="Interpersonal Skills Stack Exchange"></div><a href="https://interpersonal.stackexchange.com/questions/4069/how-to-deal-with-an-annoying-front-passenger" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:680 }); posts_hot_network.click({ item_type:2, location:11 })"> How to deal with an annoying front passenger? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-puzzling" title="Puzzling Stack Exchange"></div><a href="https://puzzling.stackexchange.com/questions/55165/what-are-the-odds-for-the-student-to-be-right" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:559 }); posts_hot_network.click({ item_type:2, location:11 })"> What are the odds for the student to be right? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-gamedev" title="Game Development Stack Exchange"></div><a href="https://gamedev.stackexchange.com/questions/148354/why-is-account-sharing-so-bad" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:53 }); posts_hot_network.click({ item_type:2, location:11 })"> Why is account sharing so bad? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-sqa" title="Software Quality Assurance &amp; Testing Stack Exchange"></div><a href="https://sqa.stackexchange.com/questions/29567/asking-a-developer-to-be-explicit-about-how-a-bug-was-fixed" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:244 }); posts_hot_network.click({ item_type:2, location:11 })"> Asking a developer to be explicit about how a bug was fixed </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-superuser" title="Super User"></div><a href="https://superuser.com/questions/1250944/how-can-this-website-reidentify-me-even-after-deleting-all-of-my-browsers-histo" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:3 }); posts_hot_network.click({ item_type:2, location:11 })"> How can this website reidentify me even after deleting all of my browser's history and using a VPN? </a> </li> 
-         <li class="dno js-hidden"> 
-          <div class="favicon favicon-superuser" title="Super User"></div><a href="https://superuser.com/questions/1249251/how-can-i-intentionally-break-corrupt-a-sector-on-an-sd-card" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:3 }); posts_hot_network.click({ item_type:2, location:11 })"> How can I intentionally break/corrupt a sector on an SD card? </a> </li> 
+         <li>If the list is of length 0 or 1, then it is already sorted. Otherwise:</li> 
+         <li>Divide the unsorted list into two sublists of about half the size.</li> 
+         <li>Sort each sublist recursively by re-applying merge sort.</li> 
+         <li>Merge the two sublists back into one sorted list.</li> 
         </ul> 
-        <a href="#" class="show-more js-show-more js-gps-track" data-gps-track="posts_hot_network.click({ item_type:3, location:11 })"> more hot questions </a> 
-       </div> 
-      </div> 
-      <div id="feed-link"> 
-       <div id="feed-link-text"> 
-        <a href="/feeds/question/5185864" title="feed of this question and its answers"> <span class="feed-icon"></span>question feed </a> 
-       </div> 
-      </div> 
-     </div> 
-     <script>
-StackExchange.ready(function(){$.get('/posts/5185864/ivc/e705');});
-</script> 
-     <noscript> 
-      <div>
-       <img src="/posts/5185864/ivc/e705" class="dno" alt="" width="0" height="0">
-      </div> 
-     </noscript>
-     <div style="display:none" id="prettify-lang">
-      default
+        <h2>Here’s the Source</h2> 
+        <p><em>(JavaScript)</em></p> 
+        <div class="wp_syntax" style="position:relative;">
+         <table>
+          <tbody>
+           <tr>
+            <td class="code"><pre class="javascript" style="font-family:monospace;"><span style="color: #000066; font-weight: bold;">var</span> a <span style="color: #339933;">=</span> <span style="color: #009900;">[</span><span style="color: #CC0000;">34</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">203</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">3</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">746</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">200</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">984</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">198</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">764</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">9</span><span style="color: #009900;">]</span><span style="color: #339933;">;</span>
+&nbsp;
+<span style="color: #000066; font-weight: bold;">function</span> mergeSort<span style="color: #009900;">(</span>arr<span style="color: #009900;">)</span>
+<span style="color: #009900;">{</span>
+    <span style="color: #000066; font-weight: bold;">if</span> <span style="color: #009900;">(</span>arr.<span style="color: #660066;">length</span> <span style="color: #339933;">&lt;</span> <span style="color: #CC0000;">2</span><span style="color: #009900;">)</span>
+        <span style="color: #000066; font-weight: bold;">return</span> arr<span style="color: #339933;">;</span>
+&nbsp;
+    <span style="color: #000066; font-weight: bold;">var</span> middle <span style="color: #339933;">=</span> parseInt<span style="color: #009900;">(</span>arr.<span style="color: #660066;">length</span> <span style="color: #339933;">/</span> <span style="color: #CC0000;">2</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+    <span style="color: #000066; font-weight: bold;">var</span> left   <span style="color: #339933;">=</span> arr.<span style="color: #660066;">slice</span><span style="color: #009900;">(</span><span style="color: #CC0000;">0</span><span style="color: #339933;">,</span> middle<span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+    <span style="color: #000066; font-weight: bold;">var</span> right  <span style="color: #339933;">=</span> arr.<span style="color: #660066;">slice</span><span style="color: #009900;">(</span>middle<span style="color: #339933;">,</span> arr.<span style="color: #660066;">length</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+    <span style="color: #000066; font-weight: bold;">return</span> merge<span style="color: #009900;">(</span>mergeSort<span style="color: #009900;">(</span>left<span style="color: #009900;">)</span><span style="color: #339933;">,</span> mergeSort<span style="color: #009900;">(</span>right<span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+<span style="color: #009900;">}</span>
+&nbsp;
+<span style="color: #000066; font-weight: bold;">function</span> merge<span style="color: #009900;">(</span>left<span style="color: #339933;">,</span> right<span style="color: #009900;">)</span>
+<span style="color: #009900;">{</span>
+    <span style="color: #000066; font-weight: bold;">var</span> result <span style="color: #339933;">=</span> <span style="color: #009900;">[</span><span style="color: #009900;">]</span><span style="color: #339933;">;</span>
+&nbsp;
+    while <span style="color: #009900;">(</span>left.<span style="color: #660066;">length</span> <span style="color: #339933;">&amp;&amp;</span> right.<span style="color: #660066;">length</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+        <span style="color: #000066; font-weight: bold;">if</span> <span style="color: #009900;">(</span>left<span style="color: #009900;">[</span><span style="color: #CC0000;">0</span><span style="color: #009900;">]</span> <span style="color: #339933;">&lt;=</span> right<span style="color: #009900;">[</span><span style="color: #CC0000;">0</span><span style="color: #009900;">]</span><span style="color: #009900;">)</span> <span style="color: #009900;">{</span>
+            result.<span style="color: #660066;">push</span><span style="color: #009900;">(</span>left.<span style="color: #660066;">shift</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+        <span style="color: #009900;">}</span> <span style="color: #000066; font-weight: bold;">else</span> <span style="color: #009900;">{</span>
+            result.<span style="color: #660066;">push</span><span style="color: #009900;">(</span>right.<span style="color: #660066;">shift</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+        <span style="color: #009900;">}</span>
+    <span style="color: #009900;">}</span>
+&nbsp;
+    while <span style="color: #009900;">(</span>left.<span style="color: #660066;">length</span><span style="color: #009900;">)</span>
+        result.<span style="color: #660066;">push</span><span style="color: #009900;">(</span>left.<span style="color: #660066;">shift</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+    while <span style="color: #009900;">(</span>right.<span style="color: #660066;">length</span><span style="color: #009900;">)</span>
+        result.<span style="color: #660066;">push</span><span style="color: #009900;">(</span>right.<span style="color: #660066;">shift</span><span style="color: #009900;">(</span><span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span>
+&nbsp;
+    <span style="color: #000066; font-weight: bold;">return</span> result<span style="color: #339933;">;</span>
+<span style="color: #009900;">}</span>
+&nbsp;
+console.<span style="color: #660066;">log</span><span style="color: #009900;">(</span>mergeSort<span style="color: #009900;">(</span>a<span style="color: #009900;">)</span><span style="color: #009900;">)</span><span style="color: #339933;">;</span></pre></td>
+           </tr>
+          </tbody>
+         </table>
+         <p class="theCode" style="display:none;">var a = [34, 203, 3, 746, 200, 984, 198, 764, 9]; function mergeSort(arr) { if (arr.length &lt; 2) return arr; var middle = parseInt(arr.length / 2); var left = arr.slice(0, middle); var right = arr.slice(middle, arr.length); return merge(mergeSort(left), mergeSort(right)); } function merge(left, right) { var result = []; while (left.length &amp;&amp; right.length) { if (left[0] &lt;= right[0]) { result.push(left.shift()); } else { result.push(right.shift()); } } while (left.length) result.push(left.shift()); while (right.length) result.push(right.shift()); return result; } console.log(mergeSort(a));</p>
+        </div> 
+        <p>It’s interesting to see what happens in the Firebug’s console:</p> 
+        <div class="wp_syntax" style="position:relative;">
+         <table>
+          <tbody>
+           <tr>
+            <td class="code"><pre class="javascript" style="font-family:monospace;"><span style="color: #009900;">[</span><span style="color: #CC0000;">34</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">203</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">3</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">746</span><span style="color: #009900;">]</span> <span style="color: #009900;">[</span><span style="color: #CC0000;">200</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">984</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">198</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">764</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">9</span><span style="color: #009900;">]</span>
+&nbsp;
+<span style="color: #009900;">[</span><span style="color: #CC0000;">34</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">203</span><span style="color: #009900;">]</span> <span style="color: #009900;">[</span><span style="color: #CC0000;">3</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">746</span><span style="color: #009900;">]</span>
+&nbsp;
+<span style="color: #009900;">[</span><span style="color: #CC0000;">34</span><span style="color: #009900;">]</span> <span style="color: #009900;">[</span><span style="color: #CC0000;">203</span><span style="color: #009900;">]</span>
+&nbsp;
+<span style="color: #009900;">[</span><span style="color: #CC0000;">3</span><span style="color: #009900;">]</span> <span style="color: #009900;">[</span><span style="color: #CC0000;">746</span><span style="color: #009900;">]</span>
+&nbsp;
+<span style="color: #009900;">[</span><span style="color: #CC0000;">200</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">984</span><span style="color: #009900;">]</span> <span style="color: #009900;">[</span><span style="color: #CC0000;">198</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">764</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">9</span><span style="color: #009900;">]</span>
+&nbsp;
+<span style="color: #009900;">[</span><span style="color: #CC0000;">200</span><span style="color: #009900;">]</span> <span style="color: #009900;">[</span><span style="color: #CC0000;">984</span><span style="color: #009900;">]</span>
+&nbsp;
+<span style="color: #009900;">[</span><span style="color: #CC0000;">198</span><span style="color: #009900;">]</span> <span style="color: #009900;">[</span><span style="color: #CC0000;">764</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">9</span><span style="color: #009900;">]</span>
+&nbsp;
+<span style="color: #009900;">[</span><span style="color: #CC0000;">764</span><span style="color: #009900;">]</span> <span style="color: #009900;">[</span><span style="color: #CC0000;">9</span><span style="color: #009900;">]</span>
+&nbsp;
+<span style="color: #009900;">[</span><span style="color: #CC0000;">3</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">9</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">34</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">198</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">200</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">203</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">746</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">764</span><span style="color: #339933;">,</span> <span style="color: #CC0000;">984</span><span style="color: #009900;">]</span></pre></td>
+           </tr>
+          </tbody>
+         </table>
+         <p class="theCode" style="display:none;">[34, 203, 3, 746] [200, 984, 198, 764, 9] [34, 203] [3, 746] [34] [203] [3] [746] [200, 984] [198, 764, 9] [200] [984] [198] [764, 9] [764] [9] [3, 9, 34, 198, 200, 203, 746, 764, 984]</p>
+        </div> 
+        <p>Actually the tricky part in this algorithm is the merge function – it does all the work. </p> 
+        <div class="yarpp-related"> 
+         <p><a href="http://www.codeproject.com/script/Articles/BlogFeedList.aspx?amid=3166682" rel="tag" style="display:none">CodeProject</a></p>
+         <p>Related posts:</p>
+         <ol> 
+          <li><a href="http://www.stoimen.com/blog/2010/07/09/friday-algorithms-javascript-bubble-sort/" rel="bookmark" title="Friday Algorithms: JavaScript Bubble Sort">Friday Algorithms: JavaScript Bubble Sort </a></li> 
+          <li><a href="http://www.stoimen.com/blog/2010/06/11/friday-algorithms-quicksort-difference-between-php-and-javascript/" rel="bookmark" title="Friday Algorithms: Quicksort – Difference Between PHP and JavaScript">Friday Algorithms: Quicksort – Difference Between PHP and JavaScript </a></li> 
+          <li><a href="http://www.stoimen.com/blog/2012/03/05/computer-algorithms-merge-sort/" rel="bookmark" title="Computer Algorithms: Merge Sort">Computer Algorithms: Merge Sort </a></li> 
+          <li><a href="http://www.stoimen.com/blog/2010/01/21/array-merge-in-javascript/" rel="bookmark" title="Array merge in JavaScript">Array merge in JavaScript </a></li> 
+          <li><a href="http://www.stoimen.com/blog/2012/02/13/computer-algorithms-insertion-sort/" rel="bookmark" title="Computer Algorithms: Insertion Sort">Computer Algorithms: Insertion Sort </a></li> 
+         </ol> 
+        </div> 
+       </div>
+       <!-- .entry-content --> 
+       <footer class="entry-meta"> 
+       </footer>
+       <!-- .entry-meta --> 
+      </article>
+      <!-- #post --> 
+      <nav class="navigation post-navigation" role="navigation"> 
+       <h1 class="screen-reader-text">Post navigation</h1> 
+       <div class="nav-links"> 
+        <a href="http://www.stoimen.com/blog/2010/07/01/replace-the-broken-images-with-a-default-image-with-javascript/" rel="prev"><span class="meta-nav">?</span> Replace the Broken Images with a Default Image with JavaScript</a> 
+        <a href="http://www.stoimen.com/blog/2010/07/03/php-preg_match-give-names-to-the-matches/" rel="next">PHP: preg_match Give Names to the Matches <span class="meta-nav">?</span></a> 
+       </div>
+       <!-- .nav-links --> 
+      </nav>
+      <!-- .navigation --> 
+      <div id="comments" class="comments-area"> 
+       <h2 class="comments-title"> 4 thoughts on “<span>Friday Algorithms: JavaScript Merge Sort</span>” </h2> 
+       <ol class="comment-list"> 
+        <li id="comment-396941" class="comment even thread-even depth-1"> 
+         <article id="div-comment-396941" class="comment-body"> 
+          <footer class="comment-meta"> 
+           <div class="comment-author vcard"> 
+            <img alt="" src="http://1.gravatar.com/avatar/ae1805d243fbf4dbd6a0a397d1a6f2f7?s=74&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/ae1805d243fbf4dbd6a0a397d1a6f2f7?s=148&amp;d=mm&amp;r=g 2x" class="avatar avatar-74 photo" height="74" width="74"> 
+            <b class="fn"><a href="http://www.evanbdesigns.com" rel="external nofollow" class="url">evan b</a></b> 
+            <span class="says">says:</span> 
+           </div>
+           <!-- .comment-author --> 
+           <div class="comment-metadata"> 
+            <a href="http://www.stoimen.com/blog/2010/07/02/friday-algorithms-javascript-merge-sort/#comment-396941"> <time datetime="2016-02-08T17:49:41+00:00"> February 8, 2016 at 5:49 pm </time> </a> 
+           </div>
+           <!-- .comment-metadata --> 
+          </footer>
+          <!-- .comment-meta --> 
+          <div class="comment-content"> 
+           <p>Quick question, the part where you push right.shift() into the array. What is this part doing?</p> 
+          </div>
+          <!-- .comment-content --> 
+         </article>
+         <!-- .comment-body --> </li>
+        <!-- #comment-## --> 
+        <li id="comment-420068" class="comment odd alt thread-odd thread-alt depth-1"> 
+         <article id="div-comment-420068" class="comment-body"> 
+          <footer class="comment-meta"> 
+           <div class="comment-author vcard"> 
+            <img alt="" src="http://0.gravatar.com/avatar/9738c97ca551aad7b8fa8d54b03c4b7e?s=74&amp;d=mm&amp;r=g" srcset="http://0.gravatar.com/avatar/9738c97ca551aad7b8fa8d54b03c4b7e?s=148&amp;d=mm&amp;r=g 2x" class="avatar avatar-74 photo" height="74" width="74"> 
+            <b class="fn">Paloma</b> 
+            <span class="says">says:</span> 
+           </div>
+           <!-- .comment-author --> 
+           <div class="comment-metadata"> 
+            <a href="http://www.stoimen.com/blog/2010/07/02/friday-algorithms-javascript-merge-sort/#comment-420068"> <time datetime="2016-09-13T16:29:39+00:00"> September 13, 2016 at 4:29 pm </time> </a> 
+           </div>
+           <!-- .comment-metadata --> 
+          </footer>
+          <!-- .comment-meta --> 
+          <div class="comment-content"> 
+           <p>Wouldn’t be better to do an array concat instead of iterate the rest of the positions? I mean for this part:</p> 
+           <p> while (left.length)<br> result.push(left.shift());</p> 
+          </div>
+          <!-- .comment-content --> 
+         </article>
+         <!-- .comment-body --> </li>
+        <!-- #comment-## --> 
+        <li id="comment-420300" class="comment even thread-even depth-1"> 
+         <article id="div-comment-420300" class="comment-body"> 
+          <footer class="comment-meta"> 
+           <div class="comment-author vcard"> 
+            <img alt="" src="http://2.gravatar.com/avatar/269f5d5dfe707f774428b24d53544e04?s=74&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/269f5d5dfe707f774428b24d53544e04?s=148&amp;d=mm&amp;r=g 2x" class="avatar avatar-74 photo" height="74" width="74"> 
+            <b class="fn">Anthony</b> 
+            <span class="says">says:</span> 
+           </div>
+           <!-- .comment-author --> 
+           <div class="comment-metadata"> 
+            <a href="http://www.stoimen.com/blog/2010/07/02/friday-algorithms-javascript-merge-sort/#comment-420300"> <time datetime="2016-09-15T23:24:56+00:00"> September 15, 2016 at 11:24 pm </time> </a> 
+           </div>
+           <!-- .comment-metadata --> 
+          </footer>
+          <!-- .comment-meta --> 
+          <div class="comment-content"> 
+           <p>evenb: It’s removing the zeroth element from the right array and putting it into the result array</p> 
+          </div>
+          <!-- .comment-content --> 
+         </article>
+         <!-- .comment-body --> </li>
+        <!-- #comment-## --> 
+        <li id="comment-441617" class="comment odd alt thread-odd thread-alt depth-1"> 
+         <article id="div-comment-441617" class="comment-body"> 
+          <footer class="comment-meta"> 
+           <div class="comment-author vcard"> 
+            <img alt="" src="http://1.gravatar.com/avatar/4dfdf6cd064499349c33a21c537e54f1?s=74&amp;d=mm&amp;r=g" srcset="http://1.gravatar.com/avatar/4dfdf6cd064499349c33a21c537e54f1?s=148&amp;d=mm&amp;r=g 2x" class="avatar avatar-74 photo" height="74" width="74"> 
+            <b class="fn">Chris Reeve</b> 
+            <span class="says">says:</span> 
+           </div>
+           <!-- .comment-author --> 
+           <div class="comment-metadata"> 
+            <a href="http://www.stoimen.com/blog/2010/07/02/friday-algorithms-javascript-merge-sort/#comment-441617"> <time datetime="2017-02-10T22:06:33+00:00"> February 10, 2017 at 10:06 pm </time> </a> 
+           </div>
+           <!-- .comment-metadata --> 
+          </footer>
+          <!-- .comment-meta --> 
+          <div class="comment-content"> 
+           <p>This code works fine for small and medium-sized inputs, but it may not complete for far larger arrays. Probably has to do with all of the shifts …</p> 
+          </div>
+          <!-- .comment-content --> 
+         </article>
+         <!-- .comment-body --> </li>
+        <!-- #comment-## --> 
+       </ol>
+       <!-- .comment-list --> 
+       <div id="respond" class="comment-respond"> 
+        <h3 id="reply-title" class="comment-reply-title">Leave a Reply <small><a rel="nofollow" id="cancel-comment-reply-link" href="/blog/2010/07/02/friday-algorithms-javascript-merge-sort/#respond" style="display:none;">Cancel reply</a></small></h3> 
+        <form action="http://www.stoimen.com/blog/wp-comments-post.php" method="post" id="commentform" class="comment-form" novalidate> 
+         <p class="comment-notes"><span id="email-notes">Your email address will not be published.</span> Required fields are marked <span class="required">*</span></p>
+         <p class="comment-form-comment"><label for="comment">Comment</label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" aria-required="true" required></textarea></p>
+         <p class="comment-form-author"><label for="author">Name <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" aria-required="true" required></p> 
+         <p class="comment-form-email"><label for="email">Email <span class="required">*</span></label> <input id="email" name="email" type="email" value="" size="30" maxlength="100" aria-describedby="email-notes" aria-required="true" required></p> 
+         <p class="comment-form-url"><label for="url">Website</label> <input id="url" name="url" type="url" value="" size="30" maxlength="200"></p> 
+         <p class="form-submit"><input name="submit" type="submit" id="submit" class="submit" value="Post Comment"> <input type="hidden" name="comment_post_ID" value="1746" id="comment_post_ID"> <input type="hidden" name="comment_parent" id="comment_parent" value="0"> </p>
+         <p style="display: none;"><input type="hidden" id="akismet_comment_nonce" name="akismet_comment_nonce" value="ffc7fcf21c"></p>
+         <p style="display: none;"><input type="hidden" id="ak_js" name="ak_js" value="0"></p> 
+        </form> 
+       </div>
+       <!-- #respond --> 
+      </div>
+      <!-- #comments --> 
      </div>
-    </div> 
-   </div> 
-  </div> 
-  <footer id="footer" class="s-footer js-footer" role="contentinfo"> 
-   <div class="-container"> 
-    <div class="g-row js-sp-between"> 
-     <div class="-logo"> 
-      <a href="https://stackoverflow.com">
-       <svg aria-hidden="true" class="svg-icon iconLogo" width="150" height="30" viewbox="0 0 150 30">
-        <g>
-         <path d="M33.9 18.6l-1.7-.2c-1.3-.1-1.9-.6-1.9-1.6 0-1.1.8-1.8 2.4-1.8 1.1 0 2.1.3 2.8.8l1-1c-1-.8-2.3-1.1-3.8-1.1-2.3 0-3.9 1.2-3.9 3.1 0 1.8 1.1 2.7 3.2 2.9l1.8.2c1.2.1 1.8.6 1.8 1.6 0 1.3-1.1 1.9-2.8 1.9-1.3 0-2.5-.3-3.3-1.2l-1 1c1.2 1.1 2.6 1.5 4.4 1.5 2.6 0 4.3-1.2 4.3-3.2-.2-2-1.5-2.7-3.3-2.9zm13.3-4.8c-1.7 0-2.8.3-3.7 1.5l1 1c.6-.9 1.3-1.2 2.7-1.2 1.9 0 2.7.8 2.7 2.3v1h-3.2c-2.4 0-3.7 1.2-3.7 3.1 0 .8.3 1.6.8 2.2.7.7 1.5 1 3 1 1.4 0 2.2-.3 3.1-1.1v1h1.6v-7.2c-.1-2.4-1.5-3.6-4.3-3.6zm2.7 7c0 .9-.2 1.5-.5 1.8-.7.6-1.5.7-2.4.7-1.7 0-2.4-.6-2.4-1.8 0-1.2.8-1.9 2.4-1.9h3l-.1 1.2zm7.6-5.6c1 0 1.6.3 2.4 1.2l1-1c-1.1-1.2-2-1.6-3.5-1.6-2.7 0-4.7 1.8-4.7 5.5 0 3.6 2 5.5 4.7 5.5 1.5 0 2.4-.4 3.5-1.6l-1.1-1c-.8.9-1.4 1.2-2.4 1.2s-1.9-.4-2.5-1.2c-.5-.7-.7-1.5-.7-2.9 0-1.3.2-2.2.7-2.9.7-.8 1.6-1.2 2.6-1.2zm13.4-1.3H69l-4.8 4.7V9.1h-1.6v15.4h1.6v-3.9l1.9-1.9 3.6 5.8h1.9l-4.4-6.9 3.7-3.7zm7.3-.33c-1.6 0-2.7.6-3.4 1.4-1 1-1.3 2.3-1.3 4.3s.3 3.3 1.3 4.3c.7.7 1.8 1.4 3.4 1.4 1.6 0 2.8-.6 3.4-1.4 1-1 1.3-2.3 1.3-4.3s-.3-3.3-1.3-4.3c-.6-.8-1.7-1.4-3.4-1.4zm1.3 8.3c-.3.3-.7.5-1.3.5-.6 0-1-.2-1.3-.5-.6-.6-.6-1.6-.6-2.7 0-1.2.1-2.1.6-2.7.3-.3.7-.5 1.3-.5.6 0 1 .2 1.3.5.6.6.6 1.5.6 2.7.1 1.2 0 2.2-.6 2.7zm10.8-8.2l-2.2 6.9-2.3-6.9h-2.9l4.1 11.1h2.2l4.1-11.1h-3zm7.6-.1c-2.9 0-4.8 2-4.8 5.7 0 4.5 2.5 5.7 5.1 5.7 2 0 3.1-.6 4.2-1.7l-1.7-1.6c-.7.7-1.3 1-2.5 1-1.6 0-2.4-1-2.4-2.5h6.9v-1.2c0-3.2-1.7-5.4-4.8-5.4zm-2.1 4.6c0-.5.1-.8.3-1.2.3-.7.9-1.2 1.9-1.2.9 0 1.6.5 1.9 1.2.2.4.2.7.3 1.2h-4.4zm11-3.4v-1.1h-2.7v11.1h2.8v-6.7c0-1.4.9-2 1.8-2 .7 0 1 .2 1.5.7l2.1-2.1c-.8-.8-1.5-1-2.6-1-1.3-.1-2.3.4-2.9 1.1zm6.3-2.3v12.3h2.8v-8.8h2v-2.1h-2v-1.2c0-.6.3-1 1-1h1.1v-2.3h-1.6c-2.3 0-3.3 1.6-3.3 3.1zm16.2 1.1c-1.6 0-2.7.6-3.4 1.4-1 1-1.3 2.3-1.3 4.3s.3 3.3 1.3 4.3c.7.7 1.8 1.4 3.4 1.4 1.6 0 2.8-.6 3.4-1.4 1-1 1.3-2.3 1.3-4.3s-.3-3.3-1.3-4.3c-.6-.8-1.8-1.4-3.4-1.4zm1.3 8.3c-.3.3-.7.5-1.3.5-.6 0-1-.2-1.3-.5-.6-.6-.6-1.6-.6-2.7 0-1.2.1-2.1.6-2.7.3-.3.7-.5 1.3-.5.6 0 1 .2 1.3.5.6.6.6 1.5.6 2.7 0 1.2 0 2.2-.6 2.7zm16.5-8.2l-1.8 6.9-2.3-6.9h-2l-2.3 6.9-1.8-6.9H134l3.4 11.1h2.3l2.3-7 2.3 7h2.3l3.4-11.1h-2.9zm-25.1 7.7V9.27h-2.8v12.3c0 1.6 1 3.2 3.2 3.2h1.6v-2.3h-1c-.7 0-1-.4-1-1.1zM41.3 15.6l1.4-1.4h-3v-3.5h-1.6v11.1c0 1.6.9 2.9 2.7 2.9h1.1v-1.3h-.8c-1 0-1.5-.6-1.5-1.6v-6.1h1.7v-.1z" fill="#222426" />
-         <path fill="#BCBBBB" d="M21 27v-8h3v11H0V19h3v8z" />
-         <path d="M5.4 19.1l13.56 1.96.17-2.38-13.26-2.55-.47 2.97zm1.8-6.8l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm3.4-5.9l10.2 8.5 1.7-2-10.2-8.5-1.7 2zM17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zM5 25h14v-3H5v3z" fill="#F48024" />
-        </g>
-       </svg></a> 
-     </div> 
-     <nav class="-nav js-category _visible" data-name="default"> 
-      <h5 class="-title"><a href="https://stackoverflow.com" class="js-gps-track" data-gps-track="footer.click({ location: 2, link: 15})">Stack Overflow</a></h5> 
-      <ul class="-list"> 
-       <li class="-item"><a href="/questions" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 16})">Questions</a></li> 
-       <li class="-item"><a href="https://stackoverflow.com/jobs" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 17})">Jobs</a></li> 
-       <li class="-item"><a href="https://stackoverflow.com/jobs/directory/developer-jobs" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 11})">Developer Jobs Directory</a></li> 
-       <li class="-item"><a href="/help" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 3 })">Help</a></li> 
-       <li class="-item"><a onclick="StackExchange.switchMobile(&quot;on&quot;)" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 12 })">Mobile</a></li> 
-      </ul> 
-     </nav> 
-     <nav class="-nav js-category _visible" data-name="default"> 
-      <h5 class="-title"><a href="https://www.stackoverflowbusiness.com/?utm_source=so-footer&amp;utm_medium=referral&amp;utm_campaign=brand-activation" class="js-gps-track" data-gps-track="footer.click({ location: 2, link: 19 })">Stack Overflow<br> Business</a></h5> 
-      <ul class="-list"> 
-       <li class="-item"><a href="https://www.stackoverflowbusiness.com/talent?utm_source=so-footer&amp;utm_medium=referral&amp;utm_campaign=brand-activation" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 20 })">Talent</a></li> 
-       <li class="-item"><a href="https://www.stackoverflowbusiness.com/advertise?utm_source=so-footer&amp;utm_medium=referral&amp;utm_campaign=brand-activation" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 21 })">Ads</a></li> 
-       <li class="-item"><a href="https://www.stackoverflowbusiness.com/enterprise?utm_source=so-footer&amp;utm_medium=referral&amp;utm_campaign=brand-activation" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 22 })">Enterprise</a></li> 
-       <li class="-item"><a href="https://www.stackoverflowbusiness.com/insights?utm_source=so-footer&amp;utm_medium=referral&amp;utm_campaign=brand-activation" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 23 })">Insights</a></li> 
-      </ul> 
-     </nav> 
-     <nav class="-nav js-category _visible" data-name="default"> 
-      <h5 class="-title"><a class="js-gps-track" data-gps-track="footer.click({ location: 2, link: 1 })" href="https://stackoverflow.com/company/about">Company</a></h5> 
-      <ul class="-list"> 
-       <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 1 })" href="https://stackoverflow.com/company/about">About</a></li> 
-       <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 27 })" href="https://stackoverflow.com/company/press">Press</a></li> 
-       <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 9 })" href="https://stackoverflow.com/company/work-here">Work Here</a></li> 
-       <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 7 })" href="https://stackexchange.com/legal">Legal</a></li> 
-       <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 8 })" href="https://stackexchange.com/legal/privacy-policy">Privacy Policy</a></li> 
-       <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 13 })" href="https://stackoverflow.com/company/contact">Contact Us</a></li> 
-      </ul> 
-     </nav> 
-     <div class="-network g-row"> 
-      <a href="#" class="-back-trigger js-back">
-       <svg aria-hidden="true" class="svg-icon iconArrowLeftAlt" width="18" height="18" viewbox="0 0 18 18">
-        <path d="M10.58 16L12 14.59 6.4 9 12 3.41 10.57 2l-7 7z" />
-       </svg></a> 
-      <div> 
-       <h5 class="-title"><a href="https://stackexchange.com">Stack Exchange<br> Network</a></h5> 
-       <ul class="-list"> 
-        <li class="-item"><a href="#" class="-link _expandable js-category-trigger js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })" data-target="Technology">Technology</a></li> 
-        <li class="-item"><a href="#" class="-link _expandable js-category-trigger js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })" data-target="Life / Arts">Life / Arts</a></li> 
-        <li class="-item"><a href="#" class="-link _expandable js-category-trigger js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })" data-target="Culture / Recreation">Culture / Recreation</a></li> 
-        <li class="-item"><a href="#" class="-link _expandable js-category-trigger js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })" data-target="Science">Science</a></li> 
-        <li class="-item"><a href="#" class="-link _expandable js-category-trigger js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })" data-target="Other">Other</a></li> 
-       </ul> 
-      </div> 
-     </div> 
-     <nav class="-nav js-category" data-name="Technology"> 
-      <ul class="-list"> 
-       <li class="-item"><a href="//stackoverflow.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="professional and enthusiast programmers">Stack Overflow</a></li> 
-       <li class="-item"><a href="//serverfault.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="system and network administrators">Server Fault</a></li> 
-       <li class="-item"><a href="//superuser.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="computer enthusiasts and power users">Super User</a></li> 
-       <li class="-item"><a href="//webapps.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="power users of web applications">Web Applications</a></li> 
-       <li class="-item"><a href="//askubuntu.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="Ubuntu users and developers">Ask Ubuntu</a></li> 
-       <li class="-item"><a href="//webmasters.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="pro webmasters">Webmasters</a></li> 
-       <li class="-item"><a href="//gamedev.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="professional and independent game developers">Game Development</a></li> 
-      </ul>
-     </nav>
-     <nav class="-nav js-category" data-name="Technology">
-      <ul class="-list"> 
-       <li class="-item"><a href="//tex.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="users of TeX, LaTeX, ConTeXt, and related typesetting systems">TeX - LaTeX</a></li> 
-       <li class="-item"><a href="//softwareengineering.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="professionals, academics, and students working within the systems development life cycle">Software Engineering</a></li> 
-       <li class="-item"><a href="//unix.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="users of Linux, FreeBSD and other Un*x-like operating systems">Unix &amp; Linux</a></li> 
-       <li class="-item"><a href="//apple.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="power users of Apple hardware and software">Ask Different (Apple)</a></li> 
-       <li class="-item"><a href="//wordpress.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="WordPress developers and administrators">WordPress Development</a></li> 
-       <li class="-item"><a href="//gis.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="cartographers, geographers and GIS professionals">Geographic Information Systems</a></li> 
-       <li class="-item"><a href="//electronics.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="electronics and electrical engineering professionals, students, and enthusiasts">Electrical Engineering</a></li> 
-      </ul>
-     </nav>
-     <nav class="-nav js-category" data-name="Technology">
-      <ul class="-list"> 
-       <li class="-item"><a href="//android.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="enthusiasts and power users of the Android operating system">Android Enthusiasts</a></li> 
-       <li class="-item"><a href="//security.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="information security professionals">Information Security</a></li> 
-       <li class="-item"><a href="//dba.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="database professionals who wish to improve their database skills and learn from others in the community">Database Administrators</a></li> 
-       <li class="-item"><a href="//drupal.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="Drupal developers and administrators">Drupal Answers</a></li> 
-       <li class="-item"><a href="//sharepoint.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="SharePoint enthusiasts">SharePoint</a></li> 
-       <li class="-item"><a href="//ux.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="user experience researchers and experts">User Experience</a></li> 
-       <li class="-item"><a href="//mathematica.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="users of Wolfram Mathematica">Mathematica</a></li> 
-      </ul>
-     </nav>
-     <nav class="-nav js-category" data-name="Technology">
-      <ul class="-list"> 
-       <li class="-item"><a href="//salesforce.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="Salesforce administrators, implementation experts, developers and anybody in-between">Salesforce</a></li> 
-       <li class="-item"><a href="//expressionengine.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="administrators, end users, developers and designers for ExpressionEngine® CMS">ExpressionEngine® Answers</a></li> 
-       <li class="-item"><a href="//blender.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="people who use Blender to create 3D graphics, animations, or games">Blender</a></li> 
-       <li class="-item"><a href="//networkengineering.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="network engineers">Network Engineering</a></li> 
-       <li class="-item"><a href="//crypto.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="software developers, mathematicians and others interested in cryptography">Cryptography</a></li> 
-       <li class="-item"><a href="//codereview.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="peer programmer code reviews">Code Review</a></li> 
-       <li class="-item"><a href="//magento.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="users of the Magento e-Commerce platform">Magento</a></li> 
-      </ul>
-     </nav>
-     <nav class="-nav js-category" data-name="Technology">
-      <ul class="-list"> 
-       <li class="-item"><a href="//softwarerecs.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="people seeking specific software recommendations">Software Recommendations</a></li> 
-       <li class="-item"><a href="//dsp.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="practitioners of the art and science of signal, image and video processing">Signal Processing</a></li> 
-       <li class="-item"><a href="//emacs.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="those using, extending or developing Emacs">Emacs</a></li> 
-       <li class="-item"><a href="//raspberrypi.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="users and developers of hardware and software for Raspberry Pi">Raspberry Pi</a></li> 
-       <li class="-item"><a href="//codegolf.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="programming puzzle enthusiasts and code golfers">Programming Puzzles &amp; Code Golf</a></li> 
-       <li class="-item"><a href="//ethereum.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="users of Ethereum, the decentralized application platform and smart contract enabled blockchain">Ethereum</a></li> 
-       <li class="-item"><a href="//datascience.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="Data science professionals, Machine Learning specialists, and those interested in learning more about the field">Data Science</a></li> 
-      </ul>
-     </nav>
-     <nav class="-nav js-category" data-name="Technology">
-      <ul class="-list"> 
-       <li class="-item"><a href="//arduino.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="developers of open-source hardware and software that is compatible with Arduino">Arduino</a></li> 
-       <li class="-item"> <a href="https://stackexchange.com/sites#technology" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 26 })"> <strong> more (27) </strong> </a> </li> 
-      </ul> 
-     </nav> 
-     <nav class="-nav js-category" data-name="Life / Arts"> 
-      <ul class="-list"> 
-       <li class="-item"><a href="//photo.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="professional, enthusiast and amateur photographers">Photography</a></li> 
-       <li class="-item"><a href="//scifi.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="science fiction and fantasy enthusiasts">Science Fiction &amp; Fantasy</a></li> 
-       <li class="-item"><a href="//graphicdesign.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="Graphic Design professionals, students, and enthusiasts">Graphic Design</a></li> 
-       <li class="-item"><a href="//movies.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="movie and tv enthusiasts">Movies &amp; TV</a></li> 
-       <li class="-item"><a href="//music.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="musicians, students, and enthusiasts">Music: Practice &amp; Theory</a></li> 
-       <li class="-item"><a href="//worldbuilding.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="writers/artists using science, geography and culture to construct imaginary worlds and settings">Worldbuilding</a></li> 
-       <li class="-item"><a href="//cooking.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="professional and amateur chefs">Seasoned Advice (cooking)</a></li> 
-      </ul>
-     </nav>
-     <nav class="-nav js-category" data-name="Life / Arts">
-      <ul class="-list"> 
-       <li class="-item"><a href="//diy.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="contractors and serious DIYers">Home Improvement</a></li> 
-       <li class="-item"><a href="//money.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="people who want to be financially literate">Personal Finance &amp; Money</a></li> 
-       <li class="-item"><a href="//academia.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="academics and those enrolled in higher education">Academia</a></li> 
-       <li class="-item"><a href="//law.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="legal professionals, students, and others with experience or interest in law">Law</a></li> 
-       <li class="-item"> <a href="https://stackexchange.com/sites#lifearts" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 26 })"> <strong> more (17) </strong> </a> </li> 
-      </ul> 
-     </nav> 
-     <nav class="-nav js-category" data-name="Culture / Recreation"> 
-      <ul class="-list"> 
-       <li class="-item"><a href="//english.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="linguists, etymologists, and serious English language enthusiasts">English Language &amp; Usage</a></li> 
-       <li class="-item"><a href="//skeptics.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="scientific skepticism">Skeptics</a></li> 
-       <li class="-item"><a href="//judaism.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="those who base their lives on Jewish law and tradition and anyone interested in learning more">Mi Yodeya (Judaism)</a></li> 
-       <li class="-item"><a href="//travel.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="road warriors and seasoned travelers">Travel</a></li> 
-       <li class="-item"><a href="//christianity.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="committed Christians, experts in Christianity and those interested in learning more">Christianity</a></li> 
-       <li class="-item"><a href="//ell.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="speakers of other languages learning English">English Language Learners</a></li> 
-       <li class="-item"><a href="//japanese.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="students, teachers, and linguists wanting to discuss the finer points of the Japanese language">Japanese Language</a></li> 
-      </ul>
-     </nav>
-     <nav class="-nav js-category" data-name="Culture / Recreation">
-      <ul class="-list"> 
-       <li class="-item"><a href="//gaming.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="passionate videogamers on all platforms">Arqade (gaming)</a></li> 
-       <li class="-item"><a href="//bicycles.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="people who build and repair bicycles, people who train cycling, or commute on bicycles">Bicycles</a></li> 
-       <li class="-item"><a href="//rpg.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="gamemasters and players of tabletop, paper-and-pencil role-playing games">Role-playing Games</a></li> 
-       <li class="-item"><a href="//anime.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="anime and manga fans">Anime &amp; Manga</a></li> 
-       <li class="-item"><a href="//puzzling.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="those who create, solve, and study puzzles">Puzzling</a></li> 
-       <li class="-item"><a href="//mechanics.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="mechanics and DIY enthusiast owners of cars, trucks, and motorcycles">Motor Vehicle Maintenance &amp; Repair</a></li> 
-       <li class="-item"> <a href="https://stackexchange.com/sites#culturerecreation" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 26 })"> <strong> more (32) </strong> </a> </li> 
-      </ul> 
-     </nav> 
-     <nav class="-nav js-category" data-name="Science"> 
-      <ul class="-list"> 
-       <li class="-item"><a href="//mathoverflow.net" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="professional mathematicians">MathOverflow</a></li> 
-       <li class="-item"><a href="//math.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="people studying math at any level and professionals in related fields">Mathematics</a></li> 
-       <li class="-item"><a href="//stats.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="people interested in statistics, machine learning, data analysis, data mining, and data visualization">Cross Validated (stats)</a></li> 
-       <li class="-item"><a href="//cstheory.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="theoretical computer scientists and researchers in related fields">Theoretical Computer Science</a></li> 
-       <li class="-item"><a href="//physics.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="active researchers, academics and students of physics">Physics</a></li> 
-       <li class="-item"><a href="//chemistry.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="scientists, academics, teachers and students">Chemistry</a></li> 
-       <li class="-item"><a href="//biology.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="biology researchers, academics, and students">Biology</a></li> 
-      </ul>
-     </nav>
-     <nav class="-nav js-category" data-name="Science">
-      <ul class="-list"> 
-       <li class="-item"><a href="//cs.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="students, researchers and practitioners of computer science">Computer Science</a></li> 
-       <li class="-item"><a href="//philosophy.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="those interested in the study of the fundamental nature of knowledge, reality, and existence">Philosophy</a></li> 
-       <li class="-item"> <a href="https://stackexchange.com/sites#science" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 26 })"> <strong> more (10) </strong> </a> </li> 
-      </ul> 
-     </nav> 
-     <nav class="-nav js-category" data-name="Other"> 
-      <ul class="-list"> 
-       <li class="-item"><a href="//meta.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="meta-discussion of the Stack Exchange family of Q&amp;A websites">Meta Stack Exchange</a></li> 
-       <li class="-item"><a href="//stackapps.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="apps, scripts, and development with the Stack Exchange API">Stack Apps</a></li> 
-       <li class="-item"><a href="https://api.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="programmatic interaction with Stack Exchange sites">API</a></li> 
-       <li class="-item"><a href="https://data.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="querying Stack Exchange data using SQL">Data</a></li> 
-       <li class="-item"><a href="//area51.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 1, link: 25 })" title="proposing new sites in the Stack Exchange network">Area 51</a></li> 
-      </ul> 
-     </nav> 
-     <div class="-copyright text-right"> 
-      <div class="g-column jc-sp-between"> 
-       <ul class="-list"> 
-        <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link:4 })" href="https://stackoverflow.blog?blb=1">Blog</a></li> 
-        <li class="-item"><a href="https://www.facebook.com/officialstackoverflow/" class="-link">Facebook</a></li> 
-        <li class="-item"><a href="https://twitter.com/stackoverflow" class="-link">Twitter</a></li> 
-        <li class="-item"><a href="https://linkedin.com/company/stack-overflow" class="-link">LinkedIn</a></li> 
-       </ul> 
-       <div> 
-        <p> site design / logo © 2017 Stack Exchange Inc; user contributions licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="license" class="-link">cc by-sa 3.0</a> with <a href="https://stackoverflow.blog/2009/06/25/attribution-required/" rel="license" class="-link">attribution required</a>. <span id="svnrev">rev 2017.9.15.27039</span> </p> 
+     <!-- #content --> 
+    </div>
+    <!-- #primary --> 
+   </div>
+   <!-- #main --> 
+   <footer id="colophon" class="site-footer" role="contentinfo"> 
+    <div id="secondary" class="sidebar-container" role="complementary"> 
+     <div class="widget-area"> 
+      <aside id="search-2" class="widget widget_search">
+       <form role="search" method="get" class="search-form" action="http://www.stoimen.com/blog/"> 
+        <label> <span class="screen-reader-text">Search for:</span> <input type="search" class="search-field" placeholder="Search …" value="" name="s"> </label> 
+        <input type="submit" class="search-submit" value="Search"> 
+       </form>
+      </aside>
+      <aside id="yarpp_widget-3" class="widget widget_yarpp_widget">
+       <h3 class="widget-title">Related Posts</h3>
+       <div class="yarpp-related-widget"> 
+        <ol>
+         <li><a href="http://www.stoimen.com/blog/2010/07/09/friday-algorithms-javascript-bubble-sort/" rel="bookmark">Friday Algorithms: JavaScript Bubble Sort</a></li>
+         <li><a href="http://www.stoimen.com/blog/2010/06/11/friday-algorithms-quicksort-difference-between-php-and-javascript/" rel="bookmark">Friday Algorithms: Quicksort – Difference Between PHP and JavaScript</a></li>
+         <li><a href="http://www.stoimen.com/blog/2012/03/05/computer-algorithms-merge-sort/" rel="bookmark">Computer Algorithms: Merge Sort</a></li>
+         <li><a href="http://www.stoimen.com/blog/2010/01/21/array-merge-in-javascript/" rel="bookmark">Array merge in JavaScript</a></li>
+         <li><a href="http://www.stoimen.com/blog/2012/02/13/computer-algorithms-insertion-sort/" rel="bookmark">Computer Algorithms: Insertion Sort</a></li>
+        </ol> 
        </div> 
-      </div> 
-     </div> 
-    </div> 
-   </div> 
-  </footer> 
-  <noscript> 
-   <div id="noscript-warning">
-    Stack Overflow works best with JavaScript enabled 
-    <img src="https://pixel.quantserve.com/pixel/p-c1rF4kxgLUzNc.gif" alt="" class="dno"> 
-   </div> 
-  </noscript> 
-  <script>var z=document.createElement("script");z.type="text/javascript",z.async=!0,z.src="https://static.adzerk.net/ados.js";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(z,s);</script> 
-  <script>
-var ados = ados || {};
-ados.run = ados.run || [];
-
-
-ados.run.push(function () {
-    setTimeout(function () { $("#adzerk-user-match").remove(); }, window.AUMIframeDone ? 0 : 2000);
-    ados_setKeywords('javascript,quicksort');; ados_load();
-});   
-
-</script> 
-  <script>
-            (function(i, s, o, g, r, a, m) {
-                i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function() { (i[r].q = i[r].q || []).push(arguments) }, i[r].l = 1 * new Date(); a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m);
-            })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-                ga('create', 'UA-5620270-1');
-                ga('create', 'UA-5620270-59', {name: 'pageData', sampleRate: 5 });
-                ga('set', 'dimension2', '|javascript|quicksort|');
-                ga('pageData.set', 'dimension2', '|javascript|quicksort|');
-                ga('send', 'pageview');
-                ga('pageData.send', 'pageview');
-        var _qevents = _qevents || [],
-            _comscore = _comscore || [];
-        (function () {
-            var ssl='https:'==document.location.protocol,
-                s=document.getElementsByTagName('script')[0],
-                qc=document.createElement('script');
-                qc.async = true;
-                qc.src = (ssl ? 'https://secure' : 'http://edge') + '.quantserve.com/quant.js';
-                s.parentNode.insertBefore(qc, s);
-                _qevents.push({ qacct: "p-c1rF4kxgLUzNc" });
-                            var sc=document.createElement('script');
-                sc.async=true;
-                sc.src=(ssl?'https://sb':'http://b') + '.scorecardresearch.com/beacon.js';
-                s.parentNode.insertBefore(sc, s);
-                _comscore.push({ c1: "2", c2: "17440561" });
-        })();
-
-    </script> 
-  <script type="text/javascript">
-                
-                (function(appendChild) {
-                    Node.prototype.appendChild = function() {
-                        var parent = this;
-                        var newNode = arguments[0];
-                        if (parent.nodeName === 'HEAD'
-                            && newNode
-                            && newNode.nodeName === 'SCRIPT'
-                            && newNode.src) {
-                            
-                            window.setTimeout(function() {
-                                var result = newNode.src.match(/^https:\/\/maps\.googleapis\.com\/maps\/api\/place\/js\/(\w+)Service\./i) || [];
-                                var service = result[1];
-                                if (service) {
-                                    if (service === 'Autocompletion') service =  2;
-                                    else if (service === 'Place') service = 1;
-                                    else service = 0;
-                                    StackExchange.using('gps', function() {
-                                        StackExchange.gps.track('google_maps_places_api.call', { service: service });
-                                    });
-                                }
-                            }, 0);
-                        }
-                        return appendChild.apply(this, arguments);
-                    };
-                })(Node.prototype.appendChild);
-            </script>   
+      </aside>
+      <aside id="categories-3" class="widget widget_categories">
+       <h3 class="widget-title">Categories</h3> 
+       <ul> 
+        <li class="cat-item cat-item-834"><a href="http://www.stoimen.com/blog/category/agile/" title="All about agile software development">agile</a> (3) </li> 
+        <li class="cat-item cat-item-886"><a href="http://www.stoimen.com/blog/category/algorithms/" title="A process or set of rules to be followed in calculations or other problem-solving operations, esp. by a computer.">algorithms</a> (65) </li> 
+        <li class="cat-item cat-item-1251"><a href="http://www.stoimen.com/blog/category/cheatsheets/">cheatsheets</a> (2) </li> 
+        <li class="cat-item cat-item-24"><a href="http://www.stoimen.com/blog/category/css/">css</a> (29) </li> 
+        <li class="cat-item cat-item-1336"><a href="http://www.stoimen.com/blog/category/data-structures-2/" title="A data structure is a particular way of storing and organizing data in a computer so that it can be used efficiently.">data structures</a> (25) </li> 
+        <li class="cat-item cat-item-108"><a href="http://www.stoimen.com/blog/category/download/" title="You can download different chunks of code and custom components here.">download</a> (3) </li> 
+        <li class="cat-item cat-item-1487"><a href="http://www.stoimen.com/blog/category/algorithms/dynamic-programming/">dynamic programming</a> (1) </li> 
+        <li class="cat-item cat-item-38"><a href="http://www.stoimen.com/blog/category/featured/">featured</a> (46) </li> 
+        <li class="cat-item cat-item-50"><a href="http://www.stoimen.com/blog/category/flex-3/">flex 3</a> (25) </li> 
+        <li class="cat-item cat-item-1420"><a href="http://www.stoimen.com/blog/category/graphs/">Graphs</a> (10) </li> 
+        <li class="cat-item cat-item-1527"><a href="http://www.stoimen.com/blog/category/infographic/">infographic</a> (3) </li> 
+        <li class="cat-item cat-item-123"><a href="http://www.stoimen.com/blog/category/javascript-on-stoimen-com/">javascript</a> (143) </li> 
+        <li class="cat-item cat-item-174"><a href="http://www.stoimen.com/blog/category/micro-tutorial/">micro tutorial</a> (204) </li> 
+        <li class="cat-item cat-item-40"><a href="http://www.stoimen.com/blog/category/php/">PHP</a> (114) </li> 
+        <li class="cat-item cat-item-37"><a href="http://www.stoimen.com/blog/category/what-i-make/">portfolio</a> (5) </li> 
+        <li class="cat-item cat-item-573"><a href="http://www.stoimen.com/blog/category/quiz/">quiz</a> (7) </li> 
+        <li class="cat-item cat-item-631"><a href="http://www.stoimen.com/blog/category/snippets/">snippets</a> (7) </li> 
+        <li class="cat-item cat-item-131"><a href="http://www.stoimen.com/blog/category/tech-related-videos/">video</a> (1) </li> 
+        <li class="cat-item cat-item-12"><a href="http://www.stoimen.com/blog/category/web-development/">web development</a> (169) </li> 
+        <li class="cat-item cat-item-39"><a href="http://www.stoimen.com/blog/category/zend-framework-on-stoimen-com/" title="Extending the art &amp; spirit of PHP, Zend Framework is based on simplicity, object-oriented best practices, corporate friendly licensing, and a rigorously tested agile codebase. Zend Framework is focused on building more secure, reliable, and modern Web 2.0 applications &amp; web services, and consuming widely available APIs from leading vendors like Google, Amazon, Yahoo!, Flickr, as well as API providers and cataloguers like StrikeIron and ProgrammableWeb.">zend framework</a> (82) </li> 
+       </ul> 
+      </aside> 
+     </div>
+     <!-- .widget-area --> 
+    </div>
+    <!-- #secondary --> 
+    <div class="site-info"> 
+     <a href="http://wordpress.org/" title="Semantic Personal Publishing Platform">Proudly powered by WordPress</a> 
+    </div>
+    <!-- .site-info --> 
+   </footer>
+   <!-- #colophon --> 
+  </div>
+  <!-- #page --> 
+  <!-- Powered by WPtouch: 4.3.19 -->
+  <link rel="stylesheet" id="yarppRelatedCss-css" href="http://www.stoimen.com/blog/wp-content/plugins/yet-another-related-posts-plugin/style/related.css?ver=4.8.1" type="text/css" media="all"> 
+  <script type="text/javascript" src="http://www.stoimen.com/blog/wp-content/plugins/wp-syntax/js/wp-syntax.js?ver=1.1"></script> 
+  <script type="text/javascript" src="http://www.stoimen.com/blog/wp-includes/js/imagesloaded.min.js?ver=3.2.0"></script> 
+  <script type="text/javascript" src="http://www.stoimen.com/blog/wp-includes/js/masonry.min.js?ver=3.3.2"></script> 
+  <script type="text/javascript" src="http://www.stoimen.com/blog/wp-includes/js/jquery/jquery.masonry.min.js?ver=3.1.2b"></script> 
+  <script type="text/javascript" src="http://www.stoimen.com/blog/wp-content/themes/twentythirteen/js/functions.js?ver=20150330"></script> 
+  <script type="text/javascript" src="http://www.stoimen.com/blog/wp-includes/js/wp-embed.js?ver=4.8.1"></script> 
+  <script type="text/javascript" src="http://www.stoimen.com/blog/wp-content/plugins/akismet/_inc/form.js?ver=3.3.4"></script>  
  </body>
 </html>

@@ -1,623 +1,1058 @@
 <!doctype html>
-<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en-US" prefix="og: http://ogp.me/ns#"> <![endif]-->
-<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en-US" prefix="og: http://ogp.me/ns#"> <![endif]-->
-<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en-US" prefix="og: http://ogp.me/ns#"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<!--[if lt IE 10]><html class="no-js ie-9" lang="en-US" prefix="og: http://ogp.me/ns#"><![endif]-->
-<html class="no-js" lang="en">
+<!--[if IE 8]><html lang="en" class="no-js ie ie8 lt-ie9"><![endif]-->
+<!--[if IE 9]><html lang="en" class="no-js ie ie9"><![endif]-->
+<!--[if gt IE 9]><!-->
+<html lang="en" class="no-js">
  <!--<![endif]-->
  <head> 
-  <meta charset="UTF-8"> 
-  <meta http-equiv="X-UA-Compatible" content="IE=edge"> 
-  <meta name="format-detection" content="telephone=no"> 
-  <meta name="IE_RM_OFF" content="true"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
-  <!-- This site is optimized with the Yoast SEO plugin v5.1 - https://yoast.com/wordpress/plugins/seo/ --> 
-  <title>Accepting and Sending Messages in JavaScript with SignalR | Learning Tree Blog</title> 
-  <link rel="canonical" href="http://blog.learningtree.com/accepting-and-sending-messages-in-javascript-with-signalr/"> 
-  <link rel="publisher" href="https://plus.google.com/u/0/b/103117096568938085473/+learningtree/about"> 
-  <meta property="og:locale" content="en_US"> 
-  <meta property="og:type" content="article"> 
-  <meta property="og:title" content="Accepting and Sending Messages in JavaScript with SignalR | Learning Tree Blog"> 
-  <meta property="og:description" content="In my last post, I showed how to use Microsoft’s new SignalR technology to create a server-side “hub” that would accept messages from clients and forward that message on to all connected clients. What’s special about SignalR is that, with a modern browser, those connected clients don’t have to send a request to the server …"> 
-  <meta property="og:url" content="http://blog.learningtree.com/accepting-and-sending-messages-in-javascript-with-signalr/"> 
-  <meta property="og:site_name" content="Learning Tree Blog"> 
-  <meta property="article:publisher" content="https://www.facebook.com/LearningTreeIntl"> 
-  <meta property="article:tag" content="bidrectional services"> 
-  <meta property="article:tag" content="SignalR"> 
-  <meta property="article:tag" content="web services"> 
-  <meta property="article:tag" content="WebSockets"> 
-  <meta property="article:section" content=".NET/Visual Studio"> 
-  <meta property="article:published_time" content="2013-02-25T07:09:41+00:00"> 
-  <meta name="twitter:card" content="summary_large_image"> 
-  <meta name="twitter:description" content="In my last post, I showed how to use Microsoft’s new SignalR technology to create a server-side “hub” that would accept messages from clients and forward that message on to all connected clients. What’s special about SignalR is that, with a modern browser, those connected clients don’t have to send a request to the server […]"> 
-  <meta name="twitter:title" content="Accepting and Sending Messages in JavaScript with SignalR | Learning Tree Blog"> 
-  <meta name="twitter:site" content="@LearningTree"> 
-  <meta name="twitter:creator" content="@LearningTree"> 
-  <!-- / Yoast SEO plugin. --> 
-  <link rel="dns-prefetch" href="//ajax.googleapis.com"> 
-  <link rel="dns-prefetch" href="//code.jquery.com"> 
-  <link rel="dns-prefetch" href="//fonts.googleapis.com"> 
-  <link rel="dns-prefetch" href="//maxcdn.bootstrapcdn.com"> 
-  <link rel="dns-prefetch" href="//www.learningtree.com"> 
-  <link rel="dns-prefetch" href="//s.w.org"> 
-  <link rel="alternate" type="application/rss+xml" title="Learning Tree Blog » Accepting and Sending Messages in JavaScript with SignalR Comments Feed" href="http://blog.learningtree.com/accepting-and-sending-messages-in-javascript-with-signalr/feed/"> 
-  <link rel="stylesheet" id="mailchimpSF_main_css-css" href="http://blog.learningtree.com/?mcsf_action=main_css&amp;ver=1.5.7" type="text/css" media="all"> 
-  <!--[if IE]>
-<link rel='stylesheet' id='mailchimpSF_ie_css-css'  href='http://blog.learningtree.com/wp-content/plugins/mailchimp/css/ie.css' type='text/css' media='all' />
-<![endif]--> 
-  <link rel="stylesheet" id="easy_author_image-css" href="http://blog.learningtree.com/wp-content/plugins/easy-author-image/css/easy-author-image.css" type="text/css" media="all"> 
-  <link rel="stylesheet" id="display-authors-widget-styles-css" href="http://blog.learningtree.com/wp-content/plugins/display-authors-widget/css/display-authors-widget.css" type="text/css" media="all"> 
-  <link rel="stylesheet" id="ltre-google-fonts-css" href="//fonts.googleapis.com/css?family=Montserrat" type="text/css" media="all"> 
-  <link rel="stylesheet" id="ltre-fontawesome-fonts-css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" type="text/css" media="all"> 
-  <link rel="stylesheet" id="ltre-base-styles-css" href="http://blog.learningtree.com/wp-content/themes/learningtree-blog-responsive/dist/css/base.min.css" type="text/css" media="all"> 
-  <link rel="stylesheet" id="ltre-main-styles-css" href="https://www.learningtree.com/css/main.min.css" type="text/css" media="all"> 
-  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script> 
-  <script type="text/javascript" src="http://blog.learningtree.com/wp-content/plugins/image-source-control-isc/public/assets/js/front-js.js"></script> 
-  <script type="text/javascript">
-            /* <![CDATA[ */
-                var isc_front_data =
-                {
-                    caption_position : 'top-left',
-                }
-            /* ]]> */
-            </script> 
-  <!-- Stream WordPress user activity plugin v3.2.0 --> 
-  <style type="text/css">
-.qtranxs_flag_en {background-image: url(http://blog.learningtree.com/wp-content/plugins/qtranslate-x/flags/gb.png); background-repeat: no-repeat;}
-.qtranxs_flag_se {background-image: url(http://blog.learningtree.com/wp-content/plugins/qtranslate-x/flags/se.png); background-repeat: no-repeat;}
-.qtranxs_flag_ca {background-image: url(http://blog.learningtree.com/wp-content/plugins/qtranslate-x/flags/ca.png); background-repeat: no-repeat;}
-.qtranxs_flag_uk {background-image: url(http://blog.learningtree.com/wp-content/plugins/qtranslate-x/flags/uk.png); background-repeat: no-repeat;}
-</style> 
-  <link hreflang="en" href="http://blog.learningtree.com/en/accepting-and-sending-messages-in-javascript-with-signalr/" rel="alternate"> 
-  <link hreflang="uk" href="http://blog.learningtree.com/uk/accepting-and-sending-messages-in-javascript-with-signalr/" rel="alternate"> 
-  <link hreflang="ca" href="http://blog.learningtree.com/ca/accepting-and-sending-messages-in-javascript-with-signalr/" rel="alternate"> 
-  <link hreflang="se" href="http://blog.learningtree.com/se/accepting-and-sending-messages-in-javascript-with-signalr/" rel="alternate"> 
-  <link hreflang="x-default" href="http://blog.learningtree.com/accepting-and-sending-messages-in-javascript-with-signalr/" rel="alternate"> 
-  <meta name="generator" content="qTranslate-X 3.4.6.8"> 
+  <meta charset="utf-8"> 
+  <title>Send a single SMS | Plivo SMS API</title> 
+  <meta name="google-site-verification" content="M9au9pQPwfab0Z4z4Gyp5UmLifA8PGij9w1r2jRbsBs"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> 
+  <meta name="description" content="Plivo's Voice API enables businesses to build Voice apps to reach customers globally in 200+ countries. Try Plivo's Voice API for free. Instant Sign Up."> 
+  <meta property="og:title" content="Send a single SMS | Plivo SMS API"> 
+  <meta property="og:description" content="Plivo's Voice API enables businesses to build Voice apps to reach customers globally in 200+ countries. Try Plivo's Voice API for free. Instant Sign Up."> 
+  <meta property="og:url" content="https://www.plivo.com/"> 
+  <meta property="og:image" content="/assets/dist/img/plivo-og-image.png"> 
+  <meta property="og:type" content="website"> 
+  <meta property="og:site_name" content="Send a single SMS | Plivo SMS API"> 
+  <link rel="publisher" href="https://plus.google.com/+Plivo/"> 
+  <link rel="icon" type="image/png" href="/assets/dist/img/favicon-white-png.png"> 
+  <link rel="stylesheet" href="/assets/dist/css/style.min.css"> 
+  <link rel="stylesheet" href="/assets/dist/css/pygments.min.css"> 
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"> 
+  <link rel="canonical" href="https://www.plivo.com/docs/getting-started/send-a-single-sms/"> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.6/handlebars.min.js"></script> 
+  <script src="//use.typekit.net/faz8tkt.js"></script> 
   <script>
-// GTM DataLayer Definition
-dataLayer = [{"content_groupings":{"language":"en"}}];
-</script> 
+        try{Typekit.load();}catch(e){}
+    </script> 
+  <link type="application/atom+xml" rel="alternate" href="https://www.plivo.com/atom.xml" title="Plivo"> 
  </head> 
- <body class="ltre-blog en"> 
-  <!--[if lt IE 9]>
-<div class="browserupgrade">
-	You are using an <strong>outdated</strong> browser! Please <a href="http://browsehappy.com/" title="Upgrade Your Browser" target="_blank">upgrade your browser</a> to improve your experience.
-</div>
-<![endif]--> 
-  <header class="page-header"> 
-   <span class="mobile-nav-toggle">Menu</span> 
-   <div class="header-top"> 
-    <div class="container"> 
-     <div class="row"> 
-      <div class="col-md-3 col-sm-5"> 
-       <a href="https://www.learningtree.com" class="logo"></a> 
-      </div> 
-      <div class="col-md-9 col-sm-7 clearfix"> 
-       <div class="contacts"> 
-        <div class="phone">
-         <a href="https://www.learningtree.com/contact-us">Contact Us</a>
-        </div>
-        <div class="calendar">
-         <a href="https://www2.learningtree.com/coursecalendar"><span class="bold">Scheduling tool</span></a>
-        </div>
-        <div class="login-create" onclick="window.location.href='https://www2.learningtree.com/mylearningtree/overview.aspx'">
-         <a href="https://www2.learningtree.com/mylearningtree/overview.aspx"><span>My Learning Tree</span> <span class="text-uppercase bold">Login / Create</span></a>
-        </div> 
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-   </div> 
-   <div class="header-bottom"> 
-    <a href="https://www.learningtree.com" class="logo"></a> 
-    <div class="container"> 
-     <nav> 
-      <span class="close-tablet-mobile-nav"></span> 
-      <ul id="menu-main-navigation" class="clearfix">
-       <li id="menu-item-12021" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12021"><a title="Training" href="https://www.learningtree.com/training/">Training</a></li> 
-       <li id="menu-item-12022" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12022"><a title="Certifications" href="https://www.learningtree.com/certification/">Certifications</a></li> 
-       <li id="menu-item-12023" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12023"><a title="Resources" href="https://resources.learningtree.com/resources.aspx">Resources</a></li> 
-       <li id="menu-item-12024" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-12024"><a title="Locations" href="https://www5.learningtree.com/locations/">Locations</a></li> 
-      </ul> 
-     </nav> 
-    </div> 
-    <ul class="action-links"> 
-     <li><a class="tel" href="https://www.learningtree.com/contact-us" "></a></li>
-     <li><a class="schedule-tool" href="https://www2.learningtree.com/coursecalendar" "></a></li>
-     <li><a class="login-create" href="https://www2.learningtree.com/mylearningtree/overview.aspx" onclick="window.location = this.href;" "></a></li> 
-    </ul> 
-   </div> 
-  </header> 
-  <div class="container"> 
-   <div class="row"> 
-    <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-0"> 
-     <div class="col-lg-11 col-lg-offset-1 post post--list-item"> 
-      <h1 class="post__title ">Accepting and Sending Messages in JavaScript with SignalR</h1> 
-      <div class="post__date"> 
-       <i class="fa fa-fw fa-calendar-o hidden-lg"></i> 
-       <span class="month-day">Feb 25</span>
-       <span class="hidden-lg">, </span> 2013 
-      </div> 
-      <div class="post__author"> 
-       <i class="fa fa-fw fa-user"></i> 
-       <a href="http://blog.learningtree.com/author/pvogelltre/" title="Posts by Peter Vogel" rel="author">Peter Vogel</a> 
-      </div> 
-      <ul class="share-buttons"> 
-       <li class="label">Share <span class="hidden-xs">this article</span>:</li> 
-       <li> <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fblog.learningtree.com%2Faccepting-and-sending-messages-in-javascript-with-signalr%2F" class="facebook-btn" data-win-width="900" data-win-height="550" title="Share on Facebook" target="_blank"> <i class="fa fa-facebook-square" aria-hidden="true"></i> <span class="share-text hidden-xs">Share</span> </a> </li> 
-       <li> <a href="https://twitter.com/intent/tweet?text=&amp;url=http%3A%2F%2Fblog.learningtree.com%2Faccepting-and-sending-messages-in-javascript-with-signalr%2F" class="twitter-btn" data-win-width="550" data-win-height="420" title="Share on Twitter" target="_blank"> <i class="fa fa-twitter" aria-hidden="true"></i> <span class="share-text hidden-xs">Tweet</span> </a> </li> 
-       <li> <a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fblog.learningtree.com%2Faccepting-and-sending-messages-in-javascript-with-signalr%2F" class="linkedin-btn" data-win-width="550" data-win-height="420" title="Share on LinkedIn" target="_blank"> <i class="fa fa-linkedin" aria-hidden="true"></i> <span class="share-text hidden-xs">Share</span> </a> </li> 
-       <li> <a href="https://plus.google.com/share?url=http%3A%2F%2Fblog.learningtree.com%2Faccepting-and-sending-messages-in-javascript-with-signalr%2F" class="google-btn" data-win-width="390" data-win-height="580" title="Share on Google+" target="_blank"> <i class="fa fa-google-plus" aria-hidden="true"></i> <span class="share-text hidden-xs">Share</span> </a> </li> 
-      </ul> 
-      <div class="post__content">
-       <p>In my <a title="Having the Server Call the Client with SignalR" href="http://dotnet.learningtree.com/2013/02/23/having-the-server-call-the-client-with-signalr/" target="_blank">last post</a>, I showed how to use Microsoft’s new SignalR technology to create a server-side “hub” that would accept messages from clients and forward that message on to all connected clients. What’s special about SignalR is that, with a modern browser, those connected clients don’t have to send a request to the server to get their messages–the browsers will, receive their messages as soon as the hub sends the message (and the message will still get through with less up-to-date browsers though they will automatically fall back to older polling based methods).</p> 
-       <p>In that last post I set up a hub (I called it MessageHub) with a method (called ReceiveMessage) that clients could call to pass a text string to the server–if you’ve forgotten what that hub looked like, I’ve repeated it at the end of this column with one tweak. My ReceiveMessage method called a function on the clients (named acceptMessage) to send that text string out to all connected clients. In this post, I’m going to show how to set up a JavaScript client to receive that message. I’ll also show how to send a message from your server-side hub back to all of the clients <em>except</em> the client that sent the message (it doesn’t make much sense to me to send the message to its originator).</p> 
-       <h3>Accepting Messages in JavaScript</h3> 
-       <p>The first step in creating a Web page that will accept messages from a server-side hub is to add the script libraries that the page will need. The order of these libraries matters so add them as shown below (I’ve put my libraries in a Scripts folder in my application but you can keep them anywhere you want in your project). While you must add a script tag for the last library (signalr/hubs) you won’t have that library in your project–it’s a proxy library that’s generated for your application by SignalR:</p> 
-       <pre>&lt;script type="text/javascript" src="Scripts/jquery-1.6.4.min.js"&gt;&lt;/script&gt;
-&lt;script type="text/javascript" src="Scripts/json2.min.js"&gt;&lt;/script&gt;
-&lt;script type="text/javascript" src="Scripts/jquery.signalR-1.0.0-rc2.min.js"&gt;&lt;/script&gt;
-&lt;script type="text/javascript" src="/signalr/hubs"&gt;&lt;/script&gt;</pre> 
-       <p>Now you’re ready to use some JavaScript to open a connection to your hub. Presumably, you’ll want to do this when the page first starts so, in the following code, I use the jQuery ready function (“$(function() {…”) to hold the code to make the connection. SignalR is implemented as a jQuery add-in so you use the jQuery identifier ($) to call the SignalR function called connection. You must also specify which of your application’s server-side hubs you’ll be connecting with by tacking on the name of your hub class to the connection function (the first letter of your hub class must be lowercased). So, to open a connection to my MessageHub class, I would use code like this:</p> 
-       <pre>&lt;script type="text/javascript"&gt;
-var conn;
-$(function ()
-  {
-   conn = $.connection.messageHub;</pre> 
-       <p>The next step is to provide a function for the hub to call when the hub has a message to send to your client. When you created the hub, you specified the name of that function (I used AcceptMessage) and the number of parameters that would be passed (I used one parameter).&nbsp; In the browser page, you add a property with the function name to the connection’s client property. Once that property is added, just set the property to the function you want to execute when the hub sends out a message using that function name.</p> 
-       <p>This code defines a function with a single parameter (to match what my server-side code calls) and inserts the function into a property called AcceptMessage (to match the name I used in my server-side code–casing doesn’t seem to matter here). The function finds an element on the page with its id attribute set to messages and appends the text in the parameter&nbsp;passed from the server to that element:</p> 
-       <pre> conn.client.AcceptMessage = function (message)
-  {
-    $('#messages').append('message');
-  };</pre> 
-       <p>However, before the hub can send messages to your page (or you can send messages to the hub) you must start the connection by calling the start function on the hub property of the SignalR connection. This is an asynchronous process so you can’t be sure when it will complete–I’ll come back to that issue.</p> 
-       <h3>Sending Messages in JavaScript</h3> 
-       <p>You can also send messages to the server from JavaScript. In an ASP.NET application, I’d probably wire up a JavaScript function for sending messages to a Button object, using the Button’s OnClientClick property:</p> 
-       <pre>&lt;asp:Button ID="sendMessageBtn" runat="server" Text="Connect" OnClientClick="return SendMessage();"/&gt;</pre> 
-       <p>Again, to keep everything as simple as possible, all I’m going to do in my SendMessage function is call the method I created in my server-side hub (which I called ReceiveMessage). That method accepted a single parameter, a text string. To call your server-side method, you use the server property on the connection object, followed by the name of the method in your hub (again, with the first letter of the method name in lowercase). Calling my server-side RecieveMessage method and passing a single string parameter looks like this:</p> 
-       <pre>function SendMessage()
-{
-  conn.server.receiveMessage("Hello, World!");
-  return false;
-}</pre> 
-       <p>Before you can either accept or send messages, however, you must start the connection by calling it’s start function–which is an asynchronous operation. If&nbsp; you’d prefer to wait until the start function successfully connects to the server-side hub before wiring up your Button’s click event you can use the done function on the start method to wait for the start method to complete.</p> 
-       <p>This code not only starts the connection but also wires up my SendMessage function to the Button with its id attribute method set to sendMessageBtn when the start method completes:</p> 
-       <pre>$.connection.hub.start().done($('#sendMessageBtn').click(SendMessage));</pre> 
-       <p>With this change, I don’t need to use the OnClientClick property on my Button:</p> 
-       <pre>&lt;asp:Button ID="sendMessageBtn" runat="server" Text="Connect"/&gt;</pre> 
-       <h3>Ignoring the Sender</h3> 
-       <p>To finish up this example: When returning the message, it doesn’t make much sense for the hub to send the message back to the client that originated it. In my server-side hub, I originally used this code to call a function called AcceptMessage on all the connected clients:</p> 
-       <pre>Me.Clients.All.AcceptMessage(Message)</pre> 
-       <p>However, I can use the AllExcept method to send messages to all clients except for those I specify in an array. I can specify a particular client by using that client’s ConnectionId. Fortunately, I can retrieve the ConnectionId of the client I’m currently processing from my hub’s Context property. So, to send a message back to all of my clients except the one who sent the message, I would rewrite my hub to look like this:</p> 
-       <pre>Imports System
-Imports System.Web
-Imports Microsoft.AspNet.SignalR
-
-Public Class MessageHub
-           Inherits Hub
-
-  Public Sub ReceiveMessageOther(Message As String)
-    Me.Clients.AllExcept(Me.Context.ConnectionId).AcceptMessage(Message)
-  End Sub
-
-End Class</pre> 
-       <p>However, SignalR provides a shortcut for doing this–just use the Others property on Clients to send a message to all the connected clients other than the calling client:</p> 
-       <pre>Me.Clients.Others.AcceptMessage(Message)</pre> 
-       <p>Of course, what I’ve created so far is just barely an application where the server calls the client when the server “knows” something that the client would like to know. Right now, only other JavaScript clients can add to the server’s store of information. In my next post, I’ll set up some&nbsp; non-JavaScript clients (from both inside and outside the application) to provide information to the server that it can pass on to its JavaScript clients (and also have those non-JavaScript clients accept messages from the hub).</p> 
-       <p><a title="Author's Name: Peter Vogel" href="http://dotnet.learningtree.com/authors/peter-vogel/" target="_blank">Peter Vogel</a></p> 
-      </div> 
-      <ul class="share-buttons"> 
-       <li class="label">Share <span class="hidden-xs">this article</span>:</li> 
-       <li> <a href="https://www.facebook.com/sharer/sharer.php?u=http%3A%2F%2Fblog.learningtree.com%2Faccepting-and-sending-messages-in-javascript-with-signalr%2F" class="facebook-btn" data-win-width="900" data-win-height="550" title="Share on Facebook" target="_blank"> <i class="fa fa-facebook-square" aria-hidden="true"></i> <span class="share-text hidden-xs">Share</span> </a> </li> 
-       <li> <a href="https://twitter.com/intent/tweet?text=&amp;url=http%3A%2F%2Fblog.learningtree.com%2Faccepting-and-sending-messages-in-javascript-with-signalr%2F" class="twitter-btn" data-win-width="550" data-win-height="420" title="Share on Twitter" target="_blank"> <i class="fa fa-twitter" aria-hidden="true"></i> <span class="share-text hidden-xs">Tweet</span> </a> </li> 
-       <li> <a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=http%3A%2F%2Fblog.learningtree.com%2Faccepting-and-sending-messages-in-javascript-with-signalr%2F" class="linkedin-btn" data-win-width="550" data-win-height="420" title="Share on LinkedIn" target="_blank"> <i class="fa fa-linkedin" aria-hidden="true"></i> <span class="share-text hidden-xs">Share</span> </a> </li> 
-       <li> <a href="https://plus.google.com/share?url=http%3A%2F%2Fblog.learningtree.com%2Faccepting-and-sending-messages-in-javascript-with-signalr%2F" class="google-btn" data-win-width="390" data-win-height="580" title="Share on Google+" target="_blank"> <i class="fa fa-google-plus" aria-hidden="true"></i> <span class="share-text hidden-xs">Share</span> </a> </li> 
-      </ul> 
-      <div class="post__meta"> 
-       <div class="post__categories"> 
-        <i class="fa fa-fw fa-folder"></i> 
-        <a href="http://blog.learningtree.com/category/net/" rel="category tag">.NET/Visual Studio</a> 
-       </div> 
-       <div class="post__tags"> 
-        <i class="fa fa-fw fa-tag"></i> 
-        <a href="http://blog.learningtree.com/tag/bidrectional-services/" rel="tag">bidrectional services</a>, 
-        <a href="http://blog.learningtree.com/tag/signalr/" rel="tag">SignalR</a>, 
-        <a href="http://blog.learningtree.com/tag/web-services/" rel="tag">web services</a>, 
-        <a href="http://blog.learningtree.com/tag/websockets/" rel="tag">WebSockets</a> 
-       </div> 
-      </div> 
-     </div> 
-     <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-lg-11"> 
-      <div class="pagination"></div> 
-     </div> 
-    </div> 
-    <div class="col-xs-12 col-sm-10 col-sm-offset-1 col-md-4 col-md-offset-0" id="sidebar"> 
-     <div id="top-widgets"> 
-      <div id="search-3" class="widget widget_search">
-       <div class="widget__header">
-        Blog Search
-       </div>
-       <form role="search" method="get" class="search-form" action="http://blog.learningtree.com/"> 
-        <label> <span class="screen-reader-text">Search for:</span> <input type="search" class="search-field" placeholder="Search …" value="" name="s"> </label> 
-        <button type="submit" class="search-submit"><i class="fa fa-search"></i><span class="sr-only">Search</span></button> 
-       </form>
-      </div>
-      <div id="categories-3" class="widget widget_categories">
-       <div class="widget__header">
-        Categories
-       </div> 
-       <ul> 
-        <li class="cat-item cat-item-46"><a href="http://blog.learningtree.com/category/net/">.NET/Visual Studio</a> </li> 
-        <li class="cat-item cat-item-1965"><a href="http://blog.learningtree.com/category/agile-with-scrum/">Agile with Scrum</a> </li> 
-        <li class="cat-item cat-item-279"><a href="http://blog.learningtree.com/category/big-data/">Big Data</a> </li> 
-        <li class="cat-item cat-item-3151"><a href="http://blog.learningtree.com/category/blended-training/">Blended Training</a> </li> 
-        <li class="cat-item cat-item-1309"><a href="http://blog.learningtree.com/category/business-analysis-2/">Business Analysis</a> </li> 
-        <li class="cat-item cat-item-330"><a href="http://blog.learningtree.com/category/business-intelligence/">Business Intelligence</a> </li> 
-        <li class="cat-item cat-item-2"><a href="http://blog.learningtree.com/category/cloud-computing/">Cloud Computing</a> </li> 
-        <li class="cat-item cat-item-1980"><a href="http://blog.learningtree.com/category/communication-2/">Communication</a> </li> 
-        <li class="cat-item cat-item-346"><a href="http://blog.learningtree.com/category/cybersecurity/">Cyber Security</a> </li> 
-        <li class="cat-item cat-item-890"><a href="http://blog.learningtree.com/category/itil-cobit/">ITIL®, COBIT® &amp; TOGAF®</a> </li> 
-        <li class="cat-item cat-item-1291"><a href="http://blog.learningtree.com/category/leadership/">Leadership</a> </li> 
-        <li class="cat-item cat-item-1983"><a href="http://blog.learningtree.com/category/linux-and-unix/">Linux and UNIX</a> </li> 
-        <li class="cat-item cat-item-2031"><a href="http://blog.learningtree.com/category/microsoft-office/">Microsoft Office</a> </li> 
-        <li class="cat-item cat-item-976"><a href="http://blog.learningtree.com/category/mobile-app-development-2/">Mobile App Development</a> </li> 
-        <li class="cat-item cat-item-2667"><a href="http://blog.learningtree.com/category/networking-virtualization/">Networking &amp; Virtualization</a> </li> 
-        <li class="cat-item cat-item-3185"><a href="http://blog.learningtree.com/category/oracle/">Oracle</a> </li> 
-        <li class="cat-item cat-item-1140"><a href="http://blog.learningtree.com/category/project-management/" title="Read up on the latest project management insights and tips from Learning Tree's expert instructors in topics related to project management, project leadership, program management, stakeholder management, PMI certifications, effective communication, and more.
-
-Related Training: Project Management Courses ›">Project Management</a> </li> 
-        <li class="cat-item cat-item-2623"><a href="http://blog.learningtree.com/category/r-programming/">R Programming</a> </li> 
-        <li class="cat-item cat-item-1125"><a href="http://blog.learningtree.com/category/sharepoint-2/">SharePoint</a> </li> 
-        <li class="cat-item cat-item-309"><a href="http://blog.learningtree.com/category/sql-server/">SQL Server</a> </li> 
-        <li class="cat-item cat-item-1385"><a href="http://blog.learningtree.com/category/training-and-development/">Training and Development</a> </li> 
-        <li class="cat-item cat-item-2739"><a href="http://blog.learningtree.com/category/uiux/">UI/UX</a> </li> 
-        <li class="cat-item cat-item-1894"><a href="http://blog.learningtree.com/category/web-development-2/">Web Development</a> </li> 
-        <li class="cat-item cat-item-2274"><a href="http://blog.learningtree.com/category/workforce-optimization-solutions/">Workforce Optimization Solutions</a> </li> 
-       </ul> 
-      </div>
-      <div id="archives-3" class="widget widget_archive">
-       <div class="widget__header">
-        Archives
-       </div> 
-       <label class="screen-reader-text" for="archives-dropdown-3">Archives</label> 
-       <select id="archives-dropdown-3" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;"> <option value="">Select Month</option> <option value="http://blog.learningtree.com/2017/09/"> September 2017 </option> <option value="http://blog.learningtree.com/2017/08/"> August 2017 </option> <option value="http://blog.learningtree.com/2017/07/"> July 2017 </option> <option value="http://blog.learningtree.com/2017/06/"> June 2017 </option> <option value="http://blog.learningtree.com/2017/05/"> May 2017 </option> <option value="http://blog.learningtree.com/2017/04/"> April 2017 </option> <option value="http://blog.learningtree.com/2017/03/"> March 2017 </option> <option value="http://blog.learningtree.com/2017/02/"> February 2017 </option> <option value="http://blog.learningtree.com/2017/01/"> January 2017 </option> <option value="http://blog.learningtree.com/2016/12/"> December 2016 </option> <option value="http://blog.learningtree.com/2016/11/"> November 2016 </option> <option value="http://blog.learningtree.com/2016/10/"> October 2016 </option> <option value="http://blog.learningtree.com/2016/09/"> September 2016 </option> <option value="http://blog.learningtree.com/2016/08/"> August 2016 </option> <option value="http://blog.learningtree.com/2016/07/"> July 2016 </option> <option value="http://blog.learningtree.com/2016/06/"> June 2016 </option> <option value="http://blog.learningtree.com/2016/05/"> May 2016 </option> <option value="http://blog.learningtree.com/2016/04/"> April 2016 </option> <option value="http://blog.learningtree.com/2016/03/"> March 2016 </option> <option value="http://blog.learningtree.com/2016/02/"> February 2016 </option> <option value="http://blog.learningtree.com/2016/01/"> January 2016 </option> <option value="http://blog.learningtree.com/2015/12/"> December 2015 </option> <option value="http://blog.learningtree.com/2015/11/"> November 2015 </option> <option value="http://blog.learningtree.com/2015/10/"> October 2015 </option> <option value="http://blog.learningtree.com/2015/09/"> September 2015 </option> <option value="http://blog.learningtree.com/2015/08/"> August 2015 </option> <option value="http://blog.learningtree.com/2015/07/"> July 2015 </option> <option value="http://blog.learningtree.com/2015/06/"> June 2015 </option> <option value="http://blog.learningtree.com/2015/05/"> May 2015 </option> <option value="http://blog.learningtree.com/2015/04/"> April 2015 </option> <option value="http://blog.learningtree.com/2015/03/"> March 2015 </option> <option value="http://blog.learningtree.com/2015/02/"> February 2015 </option> <option value="http://blog.learningtree.com/2015/01/"> January 2015 </option> <option value="http://blog.learningtree.com/2014/12/"> December 2014 </option> <option value="http://blog.learningtree.com/2014/11/"> November 2014 </option> <option value="http://blog.learningtree.com/2014/10/"> October 2014 </option> <option value="http://blog.learningtree.com/2014/09/"> September 2014 </option> <option value="http://blog.learningtree.com/2014/08/"> August 2014 </option> <option value="http://blog.learningtree.com/2014/07/"> July 2014 </option> <option value="http://blog.learningtree.com/2014/06/"> June 2014 </option> <option value="http://blog.learningtree.com/2014/05/"> May 2014 </option> <option value="http://blog.learningtree.com/2014/04/"> April 2014 </option> <option value="http://blog.learningtree.com/2014/03/"> March 2014 </option> <option value="http://blog.learningtree.com/2014/02/"> February 2014 </option> <option value="http://blog.learningtree.com/2014/01/"> January 2014 </option> <option value="http://blog.learningtree.com/2013/12/"> December 2013 </option> <option value="http://blog.learningtree.com/2013/11/"> November 2013 </option> <option value="http://blog.learningtree.com/2013/10/"> October 2013 </option> <option value="http://blog.learningtree.com/2013/09/"> September 2013 </option> <option value="http://blog.learningtree.com/2013/08/"> August 2013 </option> <option value="http://blog.learningtree.com/2013/07/"> July 2013 </option> <option value="http://blog.learningtree.com/2013/06/"> June 2013 </option> <option value="http://blog.learningtree.com/2013/05/"> May 2013 </option> <option value="http://blog.learningtree.com/2013/04/"> April 2013 </option> <option value="http://blog.learningtree.com/2013/03/"> March 2013 </option> <option value="http://blog.learningtree.com/2013/02/"> February 2013 </option> <option value="http://blog.learningtree.com/2013/01/"> January 2013 </option> <option value="http://blog.learningtree.com/2012/12/"> December 2012 </option> <option value="http://blog.learningtree.com/2012/11/"> November 2012 </option> <option value="http://blog.learningtree.com/2012/10/"> October 2012 </option> <option value="http://blog.learningtree.com/2012/09/"> September 2012 </option> <option value="http://blog.learningtree.com/2012/08/"> August 2012 </option> <option value="http://blog.learningtree.com/2012/07/"> July 2012 </option> <option value="http://blog.learningtree.com/2012/06/"> June 2012 </option> <option value="http://blog.learningtree.com/2012/05/"> May 2012 </option> <option value="http://blog.learningtree.com/2012/04/"> April 2012 </option> <option value="http://blog.learningtree.com/2012/03/"> March 2012 </option> <option value="http://blog.learningtree.com/2012/02/"> February 2012 </option> <option value="http://blog.learningtree.com/2012/01/"> January 2012 </option> <option value="http://blog.learningtree.com/2011/12/"> December 2011 </option> <option value="http://blog.learningtree.com/2011/11/"> November 2011 </option> <option value="http://blog.learningtree.com/2011/10/"> October 2011 </option> <option value="http://blog.learningtree.com/2011/09/"> September 2011 </option> <option value="http://blog.learningtree.com/2011/08/"> August 2011 </option> <option value="http://blog.learningtree.com/2011/07/"> July 2011 </option> <option value="http://blog.learningtree.com/2011/06/"> June 2011 </option> <option value="http://blog.learningtree.com/2011/05/"> May 2011 </option> <option value="http://blog.learningtree.com/2011/04/"> April 2011 </option> <option value="http://blog.learningtree.com/2011/03/"> March 2011 </option> <option value="http://blog.learningtree.com/2011/02/"> February 2011 </option> <option value="http://blog.learningtree.com/2011/01/"> January 2011 </option> <option value="http://blog.learningtree.com/2010/12/"> December 2010 </option> <option value="http://blog.learningtree.com/2010/11/"> November 2010 </option> <option value="http://blog.learningtree.com/2010/10/"> October 2010 </option> <option value="http://blog.learningtree.com/2010/09/"> September 2010 </option> <option value="http://blog.learningtree.com/2010/08/"> August 2010 </option> <option value="http://blog.learningtree.com/2010/07/"> July 2010 </option> <option value="http://blog.learningtree.com/2010/06/"> June 2010 </option> <option value="http://blog.learningtree.com/2010/05/"> May 2010 </option> <option value="http://blog.learningtree.com/2010/04/"> April 2010 </option> <option value="http://blog.learningtree.com/2010/03/"> March 2010 </option> <option value="http://blog.learningtree.com/2010/02/"> February 2010 </option> <option value="http://blog.learningtree.com/2010/01/"> January 2010 </option> <option value="http://blog.learningtree.com/2009/12/"> December 2009 </option> <option value="http://blog.learningtree.com/2009/11/"> November 2009 </option> <option value="http://blog.learningtree.com/2009/10/"> October 2009 </option> </select> 
-      </div> 
-     </div> 
-     <div id="bottom-widgets"> 
-      <div id="text-4" class="widget widget_text"> 
-       <div class="textwidget"> 
-        <div class="cta cta--sidebar overlay overlay--red"> 
-         <div class="cta__content"> 
-          <div class="cta__header">
-           How to Choose the ITIL® Training That's Right for You
-          </div> 
-          <i class="cta__icon fa fa-video-camera"></i> 
-          <a class="cta__btn btn" href="">Watch Video</a> 
-         </div> 
-        </div>
-       </div> 
-      </div>
-      <div id="text-5" class="widget widget_text">
-       <div class="widget__header">
-        Our Top YouTube Suggestions
-       </div> 
-       <div class="textwidget">
-        <ul> 
-         <li><a href="https://www.youtube.com/watch?v=FHVuRxJpiwI">What is Big Data and Hadoop?</a></li> 
-         <li><a href="https://www.youtube.com/watch?v=zu4spjJkH88">How to Achieve a Successful AgileImplementation</a></li> 
-         <li><a href="https://www.youtube.com/watch?v=7c8MDut6yvY">ITIL Best Practices</a></li> 
-         <li><a href="https://www.youtube.com/watch?v=NezsX6oyq7Y">Introduction to ITIL</a></li> 
-        </ul>
-       </div> 
-      </div> 
-     </div> 
-    </div> 
-   </div> 
-  </div> 
-  <!-- Google Tag Manager --> 
+ <body class="_doc"> 
   <noscript>
-   <iframe src="//www.googletagmanager.com/ns.html?id=GTM-K87D5N" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+   <iframe src="//www.googletagmanager.com/ns.html?id=GTM-MXJNN5" height="0" width="0" style="display:none;visibility:hidden"></iframe>
   </noscript> 
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-K87D5N');</script> 
-  <!-- End Google Tag Manager --> 
-  <div class="scroll-top"></div>  
-  <footer class="footer"> 
-   <div class="footer-top"> 
-    <div class="container"> 
-     <div class="umb-grid layout-Full"> 
-      <div class="grid-section"> 
-       <div class="grid-row"> 
-        <div class="container"> 
-         <div class="row Four-Columns"> 
-          <div id="text-7" class="col-md-3 column widget widget_text">
-           <div class="widget_related-links">
-            <h3>Tuition &amp; Savings</h3> 
-            <div class="textwidget">
-             <ul> 
-              <li><a href="https://www.learningtree.com/tuition/">Standard and GSA Tuition</a></li> 
-              <li><a href="https://www.learningtree.com/government/">Government Tuition Savings</a></li> 
-              <li><a href="https://www.learningtree.com/tuition/">Returning Attendee Tuition Savings</a></li> 
-              <li><a href="https://www.learningtree.com/tuition/">1-DAY BOOT CAMP Tuition</a></li> 
-              <li><a href="https://www.learningtree.com/tuition/">Multi-Course Tuition Savings Plans</a></li> 
-              <li><a href="https://www.learningtree.com/tuition/">Hassle-Free Enrollment</a></li> 
-             </ul>
-            </div> 
-           </div>
-          </div>
-          <div id="text-8" class="col-md-3 column widget widget_text">
-           <div class="widget_related-links">
-            <h3>Help &amp; Information</h3> 
-            <div class="textwidget">
-             <ul> 
-              <li><a href="https://www.learningtree.com/about-us/" target="_self">About Us</a></li> 
-              <li><a href="https://www2.learningtree.com/contactus/askaquestion.aspx" target="_self">Customer Service</a></li> 
-              <li><a href="https://www.learningtree.com/instructors/become-an-instructor.htm" target="_self">Become an Instructor</a></li> 
-              <li><a href="https://www.learningtree.com/careers/" target="_self">Careers</a></li> 
-              <li><a href="https://www.learningtree.com/contact-us/" target="_self">Contact Us</a></li> 
-              <li><a href="https://www.learningtree.com/contact-us/privacy.htm" target="_self">Privacy Policy</a></li> 
-              <li><a href="https://www.learningtree.com/tuition/terms-and-conditions.htm" target="_self">Terms and Conditions</a></li> 
-              <li><a href="https://www.learningtree.com/press-releases/" target="_self">Press Releases</a></li> 
-              <li><a href="https://www.learningtree.com/winners/" target="_blank">Contest Winners</a></li> 
-             </ul>
-            </div> 
-           </div>
-          </div>
-          <div id="text-9" class="col-md-3 column widget widget_text">
-           <div class="widget_related-links">
-            <h3>Useful Links</h3> 
-            <div class="textwidget">
-             <ul> 
-              <li><a href="https://www2.learningtree.com/SkillsTree/" target="_self">Skills Assessments</a></li> 
-              <li><a href="https://www.learningtree.com/team-training/" target="_self">Team Training Solutions</a></li> 
-              <li><a href="https://www2.learningtree.com/CourseCalendar/default.aspx" target="_self">Course Scheduling Tool</a></li> 
-              <li><a href="https://www.learningtree.com/topic-keyword-index/" target="_self">Course Index</a></li> 
-              <li><a href="https://resources.learningtree.com/resources.aspx" target="_self">FREE Resources</a></li> 
-              <li><a href="https://www.learningtree.com/benefits/" target="_self">Attendee Benefits</a></li> 
-              <li><a href="https://www.learningtree.com/investor/" target="_self">Investor Relations</a></li> 
-             </ul>
-            </div> 
-           </div>
-          </div>
-          <div id="text-10" class="col-md-3 column widget widget_text">
-           <div class="widget_related-links">
-            <h3>Stay Connected</h3> 
-            <div class="textwidget">
-             <div class="social-icons"> 
-              <a href="http://www.facebook.com/pages/Learning-Tree-International/337705119197?ref=ts" target="_blank" class="fb"></a> 
-              <a href="http://www.linkedin.com/company/164699" target="_blank" class="li"></a> 
-              <a href="http://blog.learningtree.com" target="_blank" class="wp"></a> 
-              <a href="https://twitter.com/learningtree" target="_blank" class="tw"></a> 
-              <a href="http://www.youtube.com/learningtree#p/u" target="_blank" class="yt"></a> 
-              <a href="http://www.google.com/+learningtree" target="_blank" class="gp"></a> 
-             </div>
-            </div> 
-           </div>
-          </div> 
-         </div> 
-        </div> 
-       </div> 
-      </div> 
+})(window,document,'script','dataLayer','GTM-MXJNN5');</script> 
+  <header id="header" class="header"> 
+   <div class="container"> 
+    <div class="row"> 
+     <div class="span10 offset1"> 
+      <a href="/" class="logo">Plivo</a> 
+      <button id="nav-btn" class="btn-nav">Nav</button> 
+      <nav id="nav"> 
+       <nav class="nav-main"> 
+        <a href="/voice-api/">Voice</a> 
+        <a href="/sms-api/">SMS</a> 
+        <a href="/sms-short-code/">Short Code</a> 
+        <a href="/pricing/">Pricing</a> 
+       </nav> 
+       <nav class="nav-user"> 
+        <a href="https://manage.plivo.com/accounts/login/" class="btn-link">Login</a> 
+        <a href="https://manage.plivo.com/accounts/register/" id="nav-cta-btn" class="btn-primary-">SIGN UP</a> 
+       </nav> 
+       <!-- nav class="nav-util">
+                            <a href="https://www.plivo.com/contact/sales/" class="sales-line-active" style="color: #989b9e;font-size:13px;"><img src="/assets/dist/img/icons/flags/United-States.png" width="80" height="50" style="height: auto;width: 20px;"> &nbsp;+1 855 4675 486</a>
+                            <a href="https://www.plivo.com/contact/sales/"  class="sales-line-active" style="color: #989b9e;font-size:13px;"><img src="/assets/dist/img/icons/flags/United-Kingdom.png" style="height: auto;width: 20px;"> +44 125 4375 486</a>
+                        </nav --> 
+       <nav class="nav-util"> 
+        <a href="/contact/sales/" style="color: #989b9e; padding-top:12px; font-size:17px;" class="active sales-line-inactive">Contact Sales</a> 
+       </nav> 
+       <nav class="nav-secondary"> 
+        <a href="/docs/">Docs</a> 
+        <a href="/support/">Support</a> 
+       </nav> 
+      </nav> 
      </div> 
     </div> 
    </div> 
-   <div class="footer-bottom"> 
-    <div class="container"> 
-     <div class="row"> 
-      <div class="col-md-2"> 
-       <a href="https://www.learningtree.com" title="Learning Tree International" class="logo"></a> 
-      </div> 
-      <div class="col-md-7 addr"> 
-       <div id="text-11" class="widget widget_text"> 
-        <div class="textwidget">
-         Learning Tree International
-         <br> 13650 Dulles Technology Drive, Suite 400 | Herndon, VA 20171-6156
-         <br> 1-888-843-8733
-         <br> 
-         <span class="copy"> © Learning Tree International, Inc. All trademarks are owned by their respective owners. <a class="whiteHyperlink" href="https://www.learningtree.com/info/trademark-recognition.htm">Click here</a> for details. </span> 
+  </header> 
+  <div id="content"> 
+   <div class="nav-sub-nav-wrap"> 
+    <nav class="nav-sub-nav"> 
+     <div class="container-main"> 
+      <a href="/docs/"> <span>Overview</span> </a> 
+      <a href="/docs/getting-started/" class="active"> <span>Getting Started</span> </a> 
+      <a href="/docs/integrations/"> <span>Integrations</span> </a> 
+      <a href="/docs/helpers/"> <span>Helper Libraries</span> </a> 
+      <a href="/docs/sdk/"> <span>SDK</span> </a> 
+      <a href="/docs/api/"> <span>API</span> </a> 
+      <a href="/docs/xml/"> <span>XML</span> </a> 
+      <a href="/docs/sip-trunking/"> <span>Zentrunk</span> </a> 
+     </div> 
+    </nav> 
+   </div> 
+   <div class="container"> 
+    <div class="row"> 
+     <div class="span7 offset1 doc-content"> 
+      <h1 id="send-a-single-sms">Send a Single SMS</h1> 
+      <p>This tutorial will show you how to send an outbound Short Message Service (SMS) (i.e., text message) using Plivo’s REST API. This can be used in any web or mobile application that requires communication with end users via SMS text messages including delivery notifications, system alerts, two-factor authentication and even rideshare alerts.</p> 
+      <p>Plivo’s Message API supports Unicode UTF-8 encoded texts, which means that you can send messages in any language. The Message API also automatically splits long messages at 160 characters and concatenates them into a single SMS on the receiver’s end. Delivery reports are also automatically supported in networks where they are provided by the operator.</p> 
+      <p>To send an SMS, we’ll need to make an <code>HTTP POST</code> request to the <a href="/docs/api/message/">Message API</a>.</p> 
+      <pre><code>POST https://api.plivo.com/v1/Account/{auth_id}/Message/
+</code></pre> 
+      <h2 id="prerequisites">Prerequisites</h2> 
+      <ol class="numbered"> 
+       <li>Sign up for a <a href="https://manage.plivo.com/accounts/register/?utm_source=send%20single%20sms&amp;utm_medium=sms-docs&amp;utm_campaign=internal">Plivo trial account</a>.</li> 
+       <li>Check out our <a href="/docs/helpers/">Helper Libraries</a> page and install the right helper based on the programming language you want to use.</li> 
+       <li><a href="https://manage.plivo.com/number/search/">Buy a Plivo phone number</a> (optional). 
+        <div class="doc-note">
+          Note: A phone number is required only for sending SMS to US and Canadian phone numbers. However, country-specific carrier conditions may still apply. You can buy a US or Canadian phone number through the 
+         <a href="https://manage.plivo.com/number/search/">Buy Numbers</a> tab on your Plivo account UI. 
+        </div> </li> 
+       <li>Use a web hosting service to host your web application. There are many inexpensive cloud hosting providers that you can use for just a few dollars a month. Follow the instructions of your hosting provider to host your web application. 
+        <div class="doc-note">
+          Note: If you are using a Plivo Trial account for this example, you can only send sms to phone numbers that have been verified with Plivo. Phone numbers can be verified at the 
+         <a href="https://manage.plivo.com/sandbox-numbers/">Sandbox Numbers</a> page. 
+        </div> </li> 
+      </ol> 
+      <h2 id="implementation">Implementation</h2> 
+      <ol class="numbered"> 
+       <li>Copy the relevant code below into a text file and save it.</li> 
+       <li>Replace <code>Your AUTH_ID</code> and <code>Your AUTH_TOKEN</code> with the AUTH ID and AUTH TOKEN found on your <a href="https://manage.plivo.com/dashboard/">Plivo dashboard</a>.</li> 
+       <li>Add your <code>'src'</code> (source) phone number. This will show up as your Sender ID. Be sure that all phone numbers include country code, area code, and phone number without spaces or dashes (e.g., 14153336666). 
+        <div class="doc-note">
+          Note: You can send SMS text messages to any country using the Message API and set any ‘src’ number except for US and Canadian numbers. In order to send text messages to phones in the US or Canada, you will need to purchase a US or Canadian phone number from Plivo and use it as the ‘src’ number. You can buy a Plivo number from the 
+         <a href="https://manage.plivo.com/number/search/">Buy Numbers</a> tab on your Plivo account dashboard. 
+        </div> </li> 
+       <li>Add your <code>'dst'</code> (destination) phone numbers. These are the phone numbers you will be sending SMS text messages to. To send multiple messages in the same API request, separate your destination phone numbers with the “&lt;” character (e.g., 14156667777&lt;14157778888&lt;14158889999). Be sure that all phone numbers include country code, area code, and phone number without spaces or dashes (e.g., 14153336666). 
+        <div class="doc-note">
+          Note: If you are using a trial account, your destination number needs to be verified with Plivo. Phone numbers can be verified at the 
+         <a href="https://manage.plivo.com/sandbox-numbers/">Sandbox Numbers</a> page. 
+        </div> </li> 
+       <li>Edit the <code>'text'</code> field with your SMS text message. 
+        <div class="doc-note">
+          Note: text messages that are longer than 160 characters are concatenated and billed separately as individual text messages. 
+        </div> </li> 
+       <li>Make the <code>'HTTP POST'</code> request to Plivo. If successful, Plivo will queue your SMS deliver it to your recipients at a base rate of 1 message per second. 
+        <div class="doc-hack">
+         Advanced hack: Check out our full 
+         <a href="https://www.plivo.com/docs/api/message/">Message API</a> docs to see all the parameters and functionalities you can use. 
+        </div> </li> 
+      </ol> 
+      <h2 id="code">Code</h2> 
+      <div class="tabs"> 
+       <ul class="tab-btns"> 
+        <li class="active"><a href="#code-01-python" data-toggle="tab">Python</a></li> 
+        <li><a href="#code-01-ruby" data-toggle="tab">Ruby</a></li> 
+        <li><a href="#code-01-node" data-toggle="tab">Node.js</a></li> 
+        <li><a href="#code-01-php" data-toggle="tab">PHP</a></li> 
+        <li><a href="#code-01-java" data-toggle="tab">Java</a></li> 
+        <li><a href="#code-01-net" data-toggle="tab">.NET</a></li> 
+        <li><a href="#code-01-curl" data-toggle="tab">Curl</a></li> 
+       </ul> 
+       <div class="tab-content"> 
+        <div id="code-01-python" class="tab-pane active"> 
+         <table class="highlighttable">
+          <tbody>
+           <tr>
+            <td class="linenos">
+             <div class="linenodiv">
+              <pre><code class="language-python" data-lang="python"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59</code></pre>
+             </div></td>
+            <td class="code">
+             <div class="highlight">
+              <pre><span class="c"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">plivo</span>
+
+<span class="n">auth_id</span> <span class="o">=</span> <span class="s">"Your AUTH_ID"</span>
+<span class="n">auth_token</span> <span class="o">=</span> <span class="s">"Your Auth_TOKEN"</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">plivo</span><span class="o">.</span><span class="n">RestAPI</span><span class="p">(</span><span class="n">auth_id</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">)</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'src'</span><span class="p">:</span> <span class="s">'1111111111'</span><span class="p">,</span> <span class="c"># Sender's phone number with country code</span>
+    <span class="s">'dst'</span> <span class="p">:</span> <span class="s">'2222222222'</span><span class="p">,</span> <span class="c"># Receiver's phone Number with country code</span>
+    <span class="s">'text'</span> <span class="p">:</span> <span class="s">u"Hello, how are you?"</span><span class="p">,</span> <span class="c"># Your SMS Text Message - English</span>
+<span class="c">#   'text' : u"????????????" # Your SMS Text Message - Japanese</span>
+<span class="c">#   'text' : u"Ce est texte généré aléatoirement" # Your SMS Text Message - French</span>
+    <span class="s">'url'</span> <span class="p">:</span> <span class="s">"http://example.com/report/"</span><span class="p">,</span> <span class="c"># The URL to which with the status of the message is sent</span>
+    <span class="s">'method'</span> <span class="p">:</span> <span class="s">'POST'</span> <span class="c"># The method used to call the url</span>
+<span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+<span class="c"># Prints the complete response</span>
+<span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+<span class="c"># Sample successful output</span>
+<span class="c"># (202,</span>
+<span class="c">#       {</span>
+<span class="c">#               u'message': u'message(s) queued',</span>
+<span class="c">#               u'message_uuid': [u'b795906a-8a79-11e4-9bd8-22000afa12b9'],</span>
+<span class="c">#               u'api_id': u'b77af520-8a79-11e4-b153-22000abcaa64'</span>
+<span class="c">#       }</span>
+<span class="c"># )</span>
+
+<span class="c"># Prints only the status code</span>
+<span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c"># Sample successful output</span>
+<span class="c"># 202</span>
+
+<span class="c"># Prints the message details</span>
+<span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c"># Sample successful output</span>
+<span class="c"># {</span>
+<span class="c">#       u'message': u'message(s) queued',</span>
+<span class="c">#       u'message_uuid': [u'b795906a-8a79-11e4-9bd8-22000afa12b9'],</span>
+<span class="c">#       u'api_id': u'b77af520-8a79-11e4-b153-22000abcaa64'</span>
+<span class="c"># }</span>
+
+<span class="c"># Print the message_uuid</span>
+<span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">'message_uuid'</span><span class="p">])</span>
+
+<span class="c"># Sample successful output</span>
+<span class="c"># [u'b795906a-8a79-11e4-9bd8-22000afa12b9']</span>
+
+<span class="c"># Print the api_id</span>
+<span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s">'api_id'</span><span class="p">])</span>
+
+<span class="c"># Sample successful output</span>
+<span class="c"># b77af520-8a79-11e4-b153-22000abcaa64</span>
+</pre>
+             </div> </td>
+           </tr>
+          </tbody>
+         </table> 
+        </div> 
+        <div id="code-01-ruby" class="tab-pane"> 
+         <table class="highlighttable">
+          <tbody>
+           <tr>
+            <td class="linenos">
+             <div class="linenodiv">
+              <pre><code class="language-ruby" data-lang="ruby"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</code></pre>
+             </div></td>
+            <td class="code">
+             <div class="highlight">
+              <pre><span class="c1"># encoding: utf-8</span>
+<span class="nb">require</span> <span class="s1">'rubygems'</span>
+<span class="nb">require</span> <span class="s1">'plivo'</span>
+<span class="kp">include</span> <span class="no">Plivo</span>
+
+<span class="no">AUTH_ID</span> <span class="o">=</span> <span class="s2">"Your AUTH_ID"</span>
+<span class="no">AUTH_TOKEN</span> <span class="o">=</span> <span class="s2">"Your AUTH_TOKEN"</span>
+
+<span class="nb">p</span> <span class="o">=</span> <span class="no">RestAPI</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="no">AUTH_ID</span><span class="p">,</span> <span class="no">AUTH_TOKEN</span><span class="p">)</span>
+
+<span class="c1"># Send SMS</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'src'</span> <span class="o">=&gt;</span> <span class="s1">'1111111111'</span><span class="p">,</span> <span class="c1"># Sender's phone number with country code</span>
+    <span class="s1">'dst'</span> <span class="o">=&gt;</span> <span class="s1">'2222222222'</span><span class="p">,</span> <span class="c1"># Receiver's phone Number with country code</span>
+    <span class="s1">'text'</span> <span class="o">=&gt;</span> <span class="s1">'Hi, from Plivo'</span><span class="p">,</span> <span class="c1"># Your SMS Text Message - English</span>
+<span class="c1">#   'text' =&gt; '????????????', # Your SMS Text Message - Japanese</span>
+<span class="c1">#   'text' =&gt; 'Ce est texte généré aléatoirement', # Your SMS Text Message - French</span>
+    <span class="s1">'url'</span> <span class="o">=&gt;</span> <span class="s1">'http://example.com/report/'</span><span class="p">,</span> <span class="c1"># The URL to which with the status of the message is sent</span>
+    <span class="s1">'method'</span> <span class="o">=&gt;</span> <span class="s1">'POST'</span> <span class="c1"># The method used to call the url</span>
+<span class="p">}</span>
+<span class="n">response</span> <span class="o">=</span> <span class="nb">p</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+<span class="nb">puts</span> <span class="n">response</span>
+
+<span class="c1"># Sample Output</span>
+<span class="c1"># [202,</span>
+<span class="c1">#   {</span>
+<span class="c1">#       "api_id"=&gt;"492f5288-9f27-11e4-b153-22000abcaa64",</span>
+<span class="c1">#       "message"=&gt;"message(s) queued",</span>
+<span class="c1">#       "message_uuid"=&gt;["494b5c4e-9f27-11e4-b1a4-22000ac693b1"]</span>
+<span class="c1">#   }</span>
+<span class="c1"># ]</span>
+
+<span class="c1"># Print the message message_uuid</span>
+<span class="nb">puts</span> <span class="n">response</span><span class="o">[</span><span class="mi">1</span><span class="o">][</span><span class="s1">'message_uuid'</span><span class="o">]</span>
+
+<span class="c1"># Sample successful output</span>
+<span class="c1"># ["f58113a2-9fca-11e4-b1a4-22000ac693b1"]</span>
+
+<span class="c1"># Print the api_id</span>
+<span class="nb">puts</span> <span class="n">response</span><span class="o">[</span><span class="mi">1</span><span class="o">][</span><span class="s1">'api_id'</span><span class="o">]</span>
+
+<span class="c1"># Sample successful output</span>
+<span class="c1"># f566addc-9fca-11e4-ac1f-22000ac51de6</span>
+</pre>
+             </div> </td>
+           </tr>
+          </tbody>
+         </table> 
+        </div> 
+        <div id="code-01-node" class="tab-pane"> 
+         <table class="highlighttable">
+          <tbody>
+           <tr>
+            <td class="linenos">
+             <div class="linenodiv">
+              <pre><code class="language-javascript" data-lang="javascript"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</code></pre>
+             </div></td>
+            <td class="code">
+             <div class="highlight">
+              <pre><span class="kd">var</span> <span class="nx">plivo</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'plivo'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">p</span> <span class="o">=</span> <span class="nx">plivo</span><span class="p">.</span><span class="nx">RestAPI</span><span class="p">({</span>
+  <span class="nx">authId</span><span class="o">:</span> <span class="s1">'Your AUTH_ID'</span><span class="p">,</span>
+  <span class="nx">authToken</span><span class="o">:</span> <span class="s1">'Your AUTH_TOKEN'</span>
+<span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'src'</span><span class="o">:</span> <span class="s1">'1111111111'</span><span class="p">,</span> <span class="c1">// Sender's phone number with country code</span>
+    <span class="s1">'dst'</span> <span class="o">:</span> <span class="s1">'2222222222'</span><span class="p">,</span> <span class="c1">// Receiver's phone Number with country code</span>
+    <span class="s1">'text'</span> <span class="o">:</span> <span class="s2">"Hi, text from Plivo"</span><span class="p">,</span> <span class="c1">// Your SMS Text Message - English</span>
+    <span class="c1">//'text' : "????????????", // Your SMS Text Message - Japanese</span>
+    <span class="c1">//'text' : "Ce est texte généré aléatoirement", // Your SMS Text Message - French</span>
+    <span class="s1">'url'</span> <span class="o">:</span> <span class="s2">"http://example.com/report/"</span><span class="p">,</span> <span class="c1">// The URL to which with the status of the message is sent</span>
+    <span class="s1">'method'</span> <span class="o">:</span> <span class="s2">"GET"</span> <span class="c1">// The method used to call the url</span>
+<span class="p">};</span>
+
+<span class="c1">// Prints the complete response</span>
+<span class="nx">p</span><span class="p">.</span><span class="nx">send_message</span><span class="p">(</span><span class="nx">params</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">status</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Status: '</span><span class="p">,</span> <span class="nx">status</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'API Response:\n'</span><span class="p">,</span> <span class="nx">response</span><span class="p">);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Message UUID:\n'</span><span class="p">,</span> <span class="nx">response</span><span class="p">[</span><span class="s1">'message_uuid'</span><span class="p">]);</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Api ID:\n'</span><span class="p">,</span> <span class="nx">response</span><span class="p">[</span><span class="s1">'api_id'</span><span class="p">]);</span>
+<span class="p">});</span>
+
+<span class="cm">/*</span>
+<span class="cm">Sample Output</span>
+
+<span class="cm">Status:  202</span>
+<span class="cm">API Response:</span>
+<span class="cm"> { api_id: 'b91b8736-134b-11e5-b0d7-22000ac520cd',</span>
+<span class="cm">  message: 'message(s) queued',</span>
+<span class="cm">  message_uuid: [ '138ee55f-9efb-4fc3-8ad7-4d71219bf56c' ] }</span>
+
+<span class="cm">Message UUID:</span>
+<span class="cm"> [ '138ee55f-9efb-4fc3-8ad7-4d71219bf56c' ]</span>
+<span class="cm">Api ID:</span>
+<span class="cm"> b91b8736-134b-11e5-b0d7-22000ac520cd</span>
+<span class="cm">*/</span>
+</pre>
+             </div> </td>
+           </tr>
+          </tbody>
+         </table> 
+        </div> 
+        <div id="code-01-php" class="tab-pane"> 
+         <table class="highlighttable">
+          <tbody>
+           <tr>
+            <td class="linenos">
+             <div class="linenodiv">
+              <pre><code class="language-php" data-lang="php"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</code></pre>
+             </div></td>
+            <td class="code">
+             <div class="highlight">
+              <pre><span class="cp">&lt;?php</span>
+    <span class="k">require</span> <span class="s1">'vendor/autoload.php'</span><span class="p">;</span>
+    <span class="k">use</span> <span class="nx">Plivo\RestAPI</span><span class="p">;</span>
+    <span class="nv">$auth_id</span> <span class="o">=</span> <span class="s2">"Your AUTH_ID"</span><span class="p">;</span>
+    <span class="nv">$auth_token</span> <span class="o">=</span> <span class="s2">"Your AUTH_TOKEN"</span><span class="p">;</span>
+
+    <span class="nv">$p</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RestAPI</span><span class="p">(</span><span class="nv">$auth_id</span><span class="p">,</span> <span class="nv">$auth_token</span><span class="p">);</span>
+
+    <span class="c1">// Set message parameters</span>
+    <span class="nv">$params</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">'src'</span> <span class="o">=&gt;</span> <span class="s1">'1111111111'</span><span class="p">,</span> <span class="c1">// Sender's phone number with country code</span>
+        <span class="s1">'dst'</span> <span class="o">=&gt;</span> <span class="s1">'2222222222'</span><span class="p">,</span> <span class="c1">// Receiver's phone number with country code</span>
+        <span class="s1">'text'</span> <span class="o">=&gt;</span> <span class="s1">'Hi, Message from Plivo'</span><span class="p">,</span> <span class="c1">// Your SMS text message</span>
+        <span class="c1">// To send Unicode text</span>
+        <span class="c1">//'text' =&gt; '????????????' # Your SMS Text Message - Japanese</span>
+        <span class="c1">//'text' =&gt; 'Ce est texte généré aléatoirement' # Your SMS Text Message - French</span>
+        <span class="s1">'url'</span> <span class="o">=&gt;</span> <span class="s1">'http://example.com/report/'</span><span class="p">,</span> <span class="c1">// The URL to which with the status of the message is sent</span>
+        <span class="s1">'method'</span> <span class="o">=&gt;</span> <span class="s1">'POST'</span> <span class="c1">// The method used to call the url</span>
+    <span class="p">);</span>
+    <span class="c1">// Send message</span>
+    <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">send_message</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
+
+    <span class="c1">// Print the response</span>
+    <span class="k">echo</span> <span class="s2">"Response : "</span><span class="p">;</span>
+    <span class="nb">print_r</span> <span class="p">(</span><span class="nv">$response</span><span class="p">[</span><span class="s1">'response'</span><span class="p">]);</span>
+
+    <span class="c1">// Print the Api ID</span>
+    <span class="k">echo</span> <span class="s2">"&lt;br&gt; Api ID : </span><span class="si">{</span><span class="nv">$response</span><span class="p">[</span><span class="s1">'response'</span><span class="p">][</span><span class="s1">'api_id'</span><span class="p">]</span><span class="si">}</span><span class="s2"> &lt;br&gt;"</span><span class="p">;</span>
+
+    <span class="c1">// Print the Message UUID</span>
+    <span class="k">echo</span> <span class="s2">"Message UUID : </span><span class="si">{</span><span class="nv">$response</span><span class="p">[</span><span class="s1">'response'</span><span class="p">][</span><span class="s1">'message_uuid'</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> &lt;br&gt;"</span><span class="p">;</span>
+
+<span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">&lt;!--</span>
+<span class="x">Sample output</span>
+<span class="x">Response : Array</span>
+<span class="x">(</span>
+<span class="x">    [api_id] =&gt; 6debfaec-a25e-11e4-96e3-22000abcb9af</span>
+<span class="x">    [message] =&gt; message(s) queued</span>
+<span class="x">    [message_uuid] =&gt; Array ( [0] =&gt; 6dffe3ea-a25e-11e4-a6e4-22000afa12b0 )</span>
+<span class="x">)</span>
+<span class="x">Api ID : 6debfaec-a25e-11e4-96e3-22000abcb9af</span>
+<span class="x">Message UUID : 6dffe3ea-a25e-11e4-a6e4-22000afa12b0</span>
+<span class="x">--&gt;</span>
+</pre>
+             </div> </td>
+           </tr>
+          </tbody>
+         </table> 
+        </div> 
+        <div id="code-01-java" class="tab-pane"> 
+         <table class="highlighttable">
+          <tbody>
+           <tr>
+            <td class="linenos">
+             <div class="linenodiv">
+              <pre><code class="language-java" data-lang="java"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</code></pre>
+             </div></td>
+            <td class="code">
+             <div class="highlight">
+              <pre><span class="kn">package</span> <span class="n">com</span><span class="o">.</span><span class="na">plivo</span><span class="o">.</span><span class="na">test</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.LinkedHashMap</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.plivo.helper.api.client.*</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.plivo.helper.api.response.message.MessageResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.plivo.helper.exception.PlivoException</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">SendMessage</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">String</span> <span class="n">authId</span> <span class="o">=</span> <span class="s">"Your AUTH_ID"</span><span class="o">;</span>
+        <span class="n">String</span> <span class="n">authToken</span> <span class="o">=</span> <span class="s">"Your AUTH_TOKEN"</span><span class="o">;</span>
+        <span class="n">RestAPI</span> <span class="n">api</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">RestAPI</span><span class="o">(</span><span class="n">authId</span><span class="o">,</span> <span class="n">authToken</span><span class="o">,</span> <span class="s">"v1"</span><span class="o">);</span>
+
+        <span class="n">LinkedHashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;</span> <span class="n">parameters</span> <span class="o">=</span> <span class="k">new</span> <span class="n">LinkedHashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">String</span><span class="o">&gt;();</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"src"</span><span class="o">,</span> <span class="s">"1111111111"</span><span class="o">);</span> <span class="c1">// Sender's phone number with country code</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"dst"</span><span class="o">,</span> <span class="s">"2222222222"</span><span class="o">);</span> <span class="c1">// Receiver's phone number with country code</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"text"</span><span class="o">,</span> <span class="s">"Hi, text from Plivo"</span><span class="o">);</span> <span class="c1">// Your SMS text message</span>
+        <span class="c1">// Send Unicode text</span>
+        <span class="c1">//parameters.put("text", "????????????"); // Your SMS text message - Japanese</span>
+        <span class="c1">//parameters.put("text", "Ce est texte généré aléatoirement"); // Your SMS text message - French</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"url"</span><span class="o">,</span> <span class="s">"http://example.com/report/"</span><span class="o">);</span> <span class="c1">// The URL to which with the status of the message is sent</span>
+        <span class="n">parameters</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"method"</span><span class="o">,</span> <span class="s">"GET"</span><span class="o">);</span> <span class="c1">// The method used to call the url</span>
+
+        <span class="k">try</span> <span class="o">{</span>
+            <span class="c1">// Send the message</span>
+            <span class="n">MessageResponse</span> <span class="n">msgResponse</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="na">sendMessage</span><span class="o">(</span><span class="n">parameters</span><span class="o">);</span>
+
+            <span class="c1">// Print the response</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">msgResponse</span><span class="o">);</span>
+            <span class="c1">// Print the Api ID</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Api ID : "</span> <span class="o">+</span> <span class="n">msgResponse</span><span class="o">.</span><span class="na">apiId</span><span class="o">);</span>
+            <span class="c1">// Print the Response Message</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Message : "</span> <span class="o">+</span> <span class="n">msgResponse</span><span class="o">.</span><span class="na">message</span><span class="o">);</span>
+
+            <span class="k">if</span> <span class="o">(</span><span class="n">msgResponse</span><span class="o">.</span><span class="na">serverCode</span> <span class="o">==</span> <span class="mi">202</span><span class="o">)</span> <span class="o">{</span>
+                <span class="c1">// Print the Message UUID</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"Message UUID : "</span> <span class="o">+</span> <span class="n">msgResponse</span><span class="o">.</span><span class="na">messageUuids</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="na">toString</span><span class="o">());</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">msgResponse</span><span class="o">.</span><span class="na">error</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">PlivoException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getLocalizedMessage</span><span class="o">());</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre>
+             </div> </td>
+           </tr>
+          </tbody>
+         </table> 
+        </div> 
+        <div id="code-01-net" class="tab-pane"> 
+         <table class="highlighttable">
+          <tbody>
+           <tr>
+            <td class="linenos">
+             <div class="linenodiv">
+              <pre><code class="language-c#" data-lang="c#"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52</code></pre>
+             </div></td>
+            <td class="code">
+             <div class="highlight">
+              <pre><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Collections.Generic</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">System.Reflection</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">RestSharp</span><span class="p">;</span>
+<span class="k">using</span> <span class="nn">Plivo.API</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">Send_Sms</span>
+<span class="p">{</span>
+    <span class="k">class</span> <span class="nc">Program</span>
+    <span class="p">{</span>
+        <span class="k">static</span> <span class="k">void</span> <span class="nf">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">RestAPI</span> <span class="n">plivo</span> <span class="p">=</span> <span class="k">new</span> <span class="n">RestAPI</span><span class="p">(</span><span class="s">"Your AUTH_ID"</span><span class="p">,</span> <span class="s">"Your AUTH_TOKEN"</span><span class="p">);</span>
+
+            <span class="n">IRestResponse</span><span class="p">&lt;</span><span class="n">MessageResponse</span><span class="p">&gt;</span> <span class="n">resp</span> <span class="p">=</span> <span class="n">plivo</span><span class="p">.</span><span class="n">send_message</span><span class="p">(</span><span class="k">new</span> <span class="n">Dictionary</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">,</span> <span class="kt">string</span><span class="p">&gt;()</span>
+            <span class="p">{</span>
+                <span class="p">{</span> <span class="s">"src"</span><span class="p">,</span> <span class="s">"1111111111"</span> <span class="p">},</span> <span class="c1">// Sender's phone number with country code</span>
+                <span class="p">{</span> <span class="s">"dst"</span><span class="p">,</span> <span class="s">"2222222222"</span> <span class="p">},</span> <span class="c1">// Receiver's phone number wiht country code</span>
+                <span class="p">{</span> <span class="s">"text"</span><span class="p">,</span> <span class="s">"Hi, text from Plivo."</span> <span class="p">},</span> <span class="c1">// Your SMS text message</span>
+                <span class="c1">// To send Unicode text</span>
+                <span class="c1">// {"text", "????????????"} // Your SMS text message - Japanese</span>
+                <span class="c1">// {"text", "Ce est texte généré aléatoirement"} // Your SMS text message - French</span>
+                <span class="p">{</span> <span class="s">"url"</span><span class="p">,</span> <span class="s">"http://example.com/report/"</span><span class="p">},</span> <span class="c1">// The URL to which with the status of the message is sent</span>
+                <span class="p">{</span> <span class="s">"method"</span><span class="p">,</span> <span class="s">"POST"</span><span class="p">}</span> <span class="c1">// Method to invoke the url</span>
+            <span class="p">});</span>
+
+            <span class="c1">// Prints the message details</span>
+            <span class="n">Console</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">resp</span><span class="p">.</span><span class="n">Content</span><span class="p">);</span>
+
+            <span class="c1">// Print the message_uuid</span>
+            <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">resp</span><span class="p">.</span><span class="n">Data</span><span class="p">.</span><span class="n">message_uuid</span><span class="p">[</span><span class="m">0</span><span class="p">]);</span>
+
+            <span class="c1">// Print the api_id</span>
+            <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="n">resp</span><span class="p">.</span><span class="n">Data</span><span class="p">.</span><span class="n">api_id</span><span class="p">);</span>
+
+            <span class="n">Console</span><span class="p">.</span><span class="n">ReadLine</span><span class="p">();</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Sample Output</span>
+<span class="cm">/*</span>
+<span class="cm">{</span>
+<span class="cm">  "api_id": "e8f04d94-a0ae-11e4-b423-22000ac8a2f8",</span>
+<span class="cm">  "message": "message(s) queued",</span>
+<span class="cm">  "message_uuid": [</span>
+<span class="cm">    "e908608c-a0ae-11e4-89de-22000ae885b8"</span>
+<span class="cm">  ]</span>
+<span class="cm">}</span>
+<span class="cm">Message UUID : e908608c-a0ae-11e4-89de-22000ae885b8</span>
+<span class="cm">Api ID : e8f04d94-a0ae-11e4-b423-22000ac8a2f8</span>
+<span class="cm">*/</span>
+</pre>
+             </div> </td>
+           </tr>
+          </tbody>
+         </table> 
+        </div> 
+        <div id="code-01-curl" class="tab-pane"> 
+         <table class="highlighttable">
+          <tbody>
+           <tr>
+            <td class="linenos">
+             <div class="linenodiv">
+              <pre><code class="language-bash" data-lang="bash">1
+2
+3
+4</code></pre>
+             </div></td>
+            <td class="code">
+             <div class="highlight">
+              <pre>curl -i --user AUTH_ID:AUTH_TOKEN <span class="se">\</span>
+    -H <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+    -d <span class="s1">'{"src": "1111111111","dst": "2222222222", "text": "Hi, text from Plivo"}'</span> <span class="se">\</span>
+    https://api.plivo.com/v1/Account/<span class="o">{</span>auth_id<span class="o">}</span>/Message/
+</pre>
+             </div> </td>
+           </tr>
+          </tbody>
+         </table> 
         </div> 
        </div> 
       </div> 
-      <div class="col-md-3 flags"> 
-       <span class="title">Choose Your Country:</span> 
-       <div class="flags-dropup dropup"> 
-        <span class="icon-flag us dropdown-toggle" data-toggle="dropdown"></span> 
-        <ul class="dropdown-menu"> 
-         <ul class="language-chooser language-chooser-image qtranxs_language_chooser" id="qtranslate-chooser"> 
-          <li class="lang-en active"><a href="http://blog.learningtree.com/en/accepting-and-sending-messages-in-javascript-with-signalr/" hreflang="en" title="English (en)" class="qtranxs_image qtranxs_image_en"><img src="http://blog.learningtree.com/wp-content/themes/learningtree-blog-responsive/dist/images/flags/us.png" alt="English (en)"><span style="display:none">English</span></a></li> 
-          <li class="lang-uk"><a href="http://blog.learningtree.com/uk/accepting-and-sending-messages-in-javascript-with-signalr/" hreflang="uk" title="United Kingdom (uk)" class="qtranxs_image qtranxs_image_uk"><img src="http://blog.learningtree.com/wp-content/themes/learningtree-blog-responsive/dist/images/flags/uk.png" alt="United Kingdom (uk)"><span style="display:none">United Kingdom</span></a></li> 
-          <li class="lang-ca"><a href="http://blog.learningtree.com/ca/accepting-and-sending-messages-in-javascript-with-signalr/" hreflang="ca" title="Canadian (ca)" class="qtranxs_image qtranxs_image_ca"><img src="http://blog.learningtree.com/wp-content/themes/learningtree-blog-responsive/dist/images/flags/ca.png" alt="Canadian (ca)"><span style="display:none">Canadian</span></a></li> 
-          <li class="lang-se"><a href="http://blog.learningtree.com/se/accepting-and-sending-messages-in-javascript-with-signalr/" hreflang="se" title="Svenska (se)" class="qtranxs_image qtranxs_image_se"><img src="http://blog.learningtree.com/wp-content/themes/learningtree-blog-responsive/dist/images/flags/se.png" alt="Svenska (se)"><span style="display:none">Svenska</span></a></li> 
-         </ul>
-         <div class="qtranxs_widget_end"></div> 
-        </ul> 
+      <h2 id="sample-response">Sample Response</h2> 
+      <div class="highlight">
+       <pre><code class="language-bash" data-lang="bash"><span class="o">(</span>202,
+    <span class="o">{</span>
+        u<span class="s1">'message'</span>: u<span class="s1">'message(s) queued'</span>,
+        u<span class="s1">'message_uuid'</span>: <span class="o">[</span>u<span class="s1">'b795906a-8a79-11e4-9bd8-22000afa12b9'</span><span class="o">]</span>,
+        u<span class="s1">'api_id'</span>: u<span class="s1">'b77af520-8a79-11e4-b153-22000abcaa64'</span>
+    <span class="o">}</span>
+<span class="o">)</span></code></pre>
+      </div> 
+      <h2 id="next-step">Next Step</h2> 
+      <p>Learn what happens when you <a href="/docs/getting-started/send-a-long-sms/">send a Long SMS</a> that’s over the character limit.</p> 
+      <h2 id="related-links">Related Links</h2> 
+      <ol class="numbered"> 
+       <li><a href="/docs/getting-started/send-a-long-sms/">Send a Long SMS</a></li> 
+       <li><a href="/docs/getting-started/send-bulk-sms/">Send Multiple (Bulk) SMS</a></li> 
+       <li><a href="/docs/getting-started/send-an-sms-with-alphanumeric-sender-id/">Send an SMS with Alphanumeric Sender ID</a></li> 
+       <li><a href="/docs/getting-started/receive-an-sms/">Receive an SMS</a></li> 
+       <li><a href="/docs/getting-started/reply-to-an-incoming-sms/">Reply to an Incoming SMS</a></li> 
+       <li><a href="/docs/getting-started/forward-an-incoming-sms/">Forward an Incoming SMS</a></li> 
+       <li><a href="/docs/getting-started/sms-details-all-messages/">Get Details of all Messages</a></li> 
+       <li><a href="/docs/getting-started/sms-details-single-message/">Get Details of a Single Message</a></li> 
+       <li><a href="/docs/getting-started/sms-delivery-reports/">Handling SMS Delivery Reports</a></li> 
+       <li><a href="/docs/getting-started/forward-sms-to-email/">Forward SMS to Email</a></li> 
+      </ol> 
+     </div> 
+     <div class="span3"> 
+      <nav class="nav-sidebar"> 
+       <h5 class="has-sub">Getting Started</h5> 
+       <ul> 
+        <li> <a href="/docs/getting-started/">Overview</a> </li> 
+        <li> <a href="/docs/getting-started/quick-start-guide/">Quick-Start Guide</a> </li> 
+       </ul> 
+       <div class="mg-tp-10 mg-bt-10">
+        <hr class="hr" style="margin:0">
        </div> 
+       <h5 class="has-sub">SMS TUTORIALS</h5> 
+       <ul> 
+        <li class="active"> <a href="/docs/getting-started/send-a-single-sms/">Send a Single SMS</a> </li> 
+        <li> <a href="/docs/getting-started/send-a-long-sms/">Send a Long SMS</a> </li> 
+        <li> <a href="/docs/getting-started/send-bulk-sms/">Send Multiple (Bulk) SMS</a> </li> 
+        <li> <a href="/docs/getting-started/send-an-sms-with-alphanumeric-sender-id/">Alphanumeric Sender ID</a> </li> 
+        <li> <a href="/docs/getting-started/receive-an-sms/">Receive an SMS</a> </li> 
+        <li> <a href="/docs/getting-started/reply-to-an-incoming-sms/">Reply to an Incoming SMS</a> </li> 
+        <li> <a href="/docs/getting-started/forward-an-incoming-sms/">Forward an Incoming SMS</a> </li> 
+        <li> <a href="/docs/getting-started/sms-details-all-messages/">Get Details of all Messages</a> </li> 
+        <li> <a href="/docs/getting-started/sms-details-single-message/">Get Details of a Single Message</a> </li> 
+        <li> <a href="/docs/getting-started/sms-delivery-reports/">Handling SMS Delivery Reports</a> </li> 
+        <li> <a href="/docs/getting-started/forward-sms-to-email/">Forward SMS to Email</a> </li> 
+       </ul> 
+       <h5 class="has-sub">Voice TUTORIALS</h5> 
+       <ul> 
+        <li> <a href="/docs/getting-started/making-outbound-calls/">Make an Outbound Call</a> </li> 
+        <li> <a href="/docs/getting-started/make-bulk-calls/">Make Bulk Calls</a> </li> 
+        <li> <a href="/docs/getting-started/pass-custom-sip-headers/">Pass Custom SIP Headers</a> </li> 
+        <li> <a href="/docs/getting-started/text-to-speech-on-a-call/">Play a Text-to-speech Message</a> </li> 
+        <li> <a href="/docs/getting-started/connect-call-to-second-person/">Connect Call to a Second Person</a> </li> 
+        <li> <a href="/docs/getting-started/greet-caller-by-name/">Greet Caller by Name</a> </li> 
+        <li> <a href="/docs/getting-started/play-mp3-audio-to-caller/">Play MP3/WAV Audio to Caller</a> </li> 
+        <li> <a href="/docs/getting-started/hang-up-calls/">Hangup Using API</a> </li> 
+        <li> <a href="/docs/getting-started/receive-incoming-call/">Receive Incoming Call</a> </li> 
+        <li> <a href="/docs/getting-started/forward-an-incoming-call/">Forward Incoming Call</a> </li> 
+        <li> <a href="/docs/getting-started/reject-incoming-call/">Reject Incoming Call</a> </li> 
+        <li> <a href="/docs/getting-started/record-api/">Record Using API</a> </li> 
+        <li> <a href="/docs/getting-started/screen-incoming-call/">Screen Incoming Call</a> </li> 
+        <li> <a href="/docs/getting-started/get-details-of-all-calls/">Get Details of all Calls</a> </li> 
+        <li> <a href="/docs/getting-started/get-details-of-a-single-call/">Get Details of a Single Call</a> </li> 
+        <li> <a href="/docs/getting-started/get-details-of-live-calls/">Get Details of Live Calls</a> </li> 
+        <li> <a href="/docs/getting-started/conference-call/">Make a Conference Call</a> </li> 
+        <li> <a href="/docs/getting-started/dial-status-reporting/">Dial Status Reporting</a> </li> 
+        <li> <a href="/docs/getting-started/play-custom-music-to-caller/">Play Custom music to Caller</a> </li> 
+        <li> <a href="/docs/getting-started/phone-ivr/">Build a IVR Phone Menu</a> </li> 
+        <li> <a href="/docs/getting-started/dtmf-xml/">DTMF XML</a> </li> 
+        <li> <a href="/docs/getting-started/dynamic-caller-id/">Dynamic Caller ID</a> </li> 
+        <li> <a href="/docs/getting-started/machine-detection/">Machine Detection</a> </li> 
+        <li> <a href="/docs/getting-started/wait-xml/">Wait XML</a> </li> 
+        <li> <a href="/docs/getting-started/speak-api/">Speak API</a> </li> 
+        <li> <a href="/docs/getting-started/transfer-api/">Transfer API</a> </li> 
+        <li> <a href="/docs/getting-started/call-forward/">Call Forwarding</a> </li> 
+        <li> <a href="/docs/getting-started/sip-endpoint/">SIP Endpoints</a> </li> 
+        <li> <a href="/docs/getting-started/inbound-trunk/">Inbound Trunk</a> </li> 
+        <li> <a href="/docs/getting-started/outbound-trunk/">Outbound Trunk</a> </li> 
+       </ul> 
+       <h5 class="has-sub">MOBILE SDK TUTORIALS</h5> 
+       <ul> 
+        <h5 class="has-sub">Android</h5> 
+        <ul> 
+         <li> <a href="/docs/getting-started/android/">Getting Started</a> </li> 
+         <li> <a href="/docs/getting-started/android/plivo-phone/">Phone Registration</a> </li> 
+         <li> <a href="/docs/getting-started/android/plivo-outbound/">Outbound Call</a> </li> 
+         <li> <a href="/docs/getting-started/android/plivo-inbound/">Inbound Call</a> </li> 
+         <!--
+                        <li >
+                            <a href="/docs/getting-started/android/dynamic-endpoint/">Dynamic Endpoints</a>
+                        </li>
+                        <li >
+                            <a href="/docs/getting-started/android/make-outgoing-calls/">Make Outgoing Calls</a>
+                        </li>
+                        <li >
+                            <a href="/docs/getting-started/android/login/">Manual Login</a>
+                        </li>
+                        <li >
+                            <a href="/docs/getting-started/android/quick-start/">Quick Start</a>
+                        </li>
+                        <li >
+                            <a href="/docs/getting-started/android/receive-incoming-calls/">Receive Incoming Calls</a>
+                        </li>
+                        --> 
+        </ul> 
+        <h5 class="has-sub">iOS</h5> 
+        <ul> 
+         <li> <a href="/docs/getting-started/ios/">Getting Started</a> </li> 
+         <li> <a href="/docs/getting-started/ios/sip-phone-registration/">Phone Registration</a> </li> 
+         <li> <a href="/docs/getting-started/ios/outbound-call/">Outbound Call</a> </li> 
+         <li> <a href="/docs/getting-started/ios/inbound-call/">Inbound Call</a> </li> 
+        </ul> 
+       </ul> 
+       <h5 class="has-sub">WEB SDK TUTORIALS</h5> 
+       <ul> 
+        <li> <a href="/docs/getting-started/web-sdk/quick-start/">Web SDK Quick-Start</a> </li> 
+        <li> <a href="/docs/getting-started/web-sdk/make-outgoing-calls/">Make Outgoing Calls</a> </li> 
+        <li> <a href="/docs/getting-started/web-sdk/login/">Modify the Login Interface</a> </li> 
+        <li> <a href="/docs/getting-started/web-sdk/receive-incoming-calls/">Receive Incoming Calls</a> </li> 
+        <li> <a href="/docs/getting-started/web-sdk/dynamic-endpoint/">Create Dynamic SIP Endpoints</a> </li> 
+       </ul> 
+       <h5 class="has-sub">API TUTORIALS</h5> 
+       <ul> 
+        <li> <a href="/docs/getting-started/account-api/">Account API</a> </li> 
+        <li> <a href="/docs/getting-started/application-api/">Application API</a> </li> 
+        <li> <a href="/docs/getting-started/endpoint-api/"> Endpoint API</a> </li> 
+        <li> <a href="/docs/getting-started/number-api/">Number API</a> </li> 
+        <li> <a href="/docs/getting-started/phone-number-api/">Phone Number API</a> </li> 
+        <li> <a href="/docs/getting-started/pricing-api/">Pricing API</a> </li> 
+        <li> <a href="/docs/getting-started/pagination/">API Pagination</a> </li> 
+       </ul> 
+       <div class="mg-tp-10 mg-bt-10">
+        <hr class="hr" style="margin:0">
+       </div> 
+       <h5 class="has-sub">References</h5> 
+       <ul> 
+        <li> <a href="/docs/getting-started/reference/xml/">XML Reference</a> </li> 
+        <li> <a href="/docs/getting-started/search-and-buy-phone-number/">Search &amp; Buy Phone Numbers</a> </li> 
+       </ul> 
+       <section class="nav-sidebar-section"> 
+        <h5>Have a question?</h5> 
+        <a href="/faq/" class="btn-primary-">Check out our FAQ</a> 
+       </section> 
+      </nav> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <footer id="footer" class="footer"> 
+   <div class="container"> 
+    <div class="row"> 
+     <div class="span10 offset1"> 
+      <div class="row"> 
+       <nav class="nav-footer span2"> 
+        <h6>Contact Us</h6> 
+        <ul> 
+         <li><a href="/contact/sales">Contact Sales</a> </li> 
+         <li> <a href="https://support.plivo.com/support/home"> Contact Support </a> </li> 
+         <li> 
+          <ul class="social-nav"> 
+           <li><a href="http://plus.google.com/+Plivo/" rel="nofollow"><i class="i-gplus"></i></a> </li> 
+           <li><a href="http://twitter.com/plivo" rel="nofollow"><i class="i-twitter"></i></a> </li> 
+           <li><a href="http://fb.com/plivo" rel="nofollow"><i class="i-fb"></i></a> </li> 
+           <li><a href="http://www.linkedin.com/company/plivo-inc" rel="nofollow"><i class="i-linkedin"></i></a> </li> 
+           <li><a href="http://github.com/plivo" rel="nofollow"><i class="i-github"></i></a> </li> 
+          </ul> </li> 
+        </ul> 
+        <span class="copyright">© 2017 Plivo Inc.</span> 
+       </nav> 
+       <nav class="nav-footer span2"> 
+        <h6>Customers</h6> 
+        <ul> 
+         <li><a href="/pricing/">Pricing</a> </li> 
+         <li><a href="/voice-api/coverage/">Voice API Coverage</a> </li> 
+         <li><a href="/sms-api/coverage/">SMS API Coverage</a> </li> 
+         <li><a href="/support/">Support</a> </li> 
+         <li><a href="https://status.plivo.com/" target="_blank">Service Status</a> </li> 
+         <li><a href="/customers/">Customer Success</a> </li> 
+        </ul> 
+       </nav> 
+       <nav class="nav-footer span2"> 
+        <h6>Resources</h6> 
+        <ul> 
+         <li><a href="/docs/getting-started/">Getting Started</a> </li> 
+         <li><a href="/faq/">FAQ</a> </li> 
+         <li><a href="/docs/">Docs</a> </li> 
+         <li><a href="/docs/sdk/">SDKs</a> </li> 
+         <li><a href="/docs/helpers/">Helper Libraries</a> </li> 
+         <li><a href="/network/">Network</a> </li> 
+         <li><a href="/carriers/">Carriers</a> </li> 
+         <li><a href="/security/">Security</a> </li> 
+        </ul> 
+       </nav> 
+       <nav class="nav-footer span2"> 
+        <h6>Products</h6> 
+        <ul> 
+         <li><a href="/voice-api/">Voice API</a> </li> 
+         <li><a href="/sms-api/">SMS API</a> </li> 
+         <li><a href="/sms-short-code/">SMS Short Code</a> </li> 
+         <li><a href="/web-sdk/">WebRTC SDK</a> </li> 
+         <li><a href="/mobile-sdk/">Mobile SDK</a> </li> 
+         <li><a href="/salesforce/">Salesforce Integration</a></li> 
+         <li><a href="/open-source/">Open Source</a> </li> 
+        </ul> 
+       </nav> 
+       <nav class="nav-footer span2"> 
+        <h6>Company</h6> 
+        <ul> 
+         <li><a href="/about/">About</a> </li> 
+         <li><a href="/jobs/">Jobs</a> </li> 
+         <li><a href="/blog/">Blog</a> </li> 
+         <li><a href="/terms/">Terms</a> </li> 
+         <li><a href="/privacy/">Privacy</a> </li> 
+         <li><a href="/responsible-disclosure-policy/">Disclosure</a> </li> 
+        </ul> 
+       </nav> 
       </div> 
      </div> 
     </div> 
    </div> 
   </footer> 
-  <div class="modal fade modal-login" tabindex="-1" role="dialog"> 
-   <div class="modal-dialog"> 
-    <div class="modal-content"> 
-     <div class="modal-header"> 
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-test=""></button> 
-      <h4 class="modal-title">Login to My Learning Tree</h4> 
-     </div> 
-     <div class="modal-body"> 
-      <form id="login-form"> 
-       <div class="form-validation-message error">
-        Incorrect username or password
-       </div> 
-       <div class="form-group"> 
-        <input type="text" name="username" placeholder="Username"> 
-       </div> 
-       <div class="form-group"> 
-        <input type="password" name="password" placeholder="Password"> 
-       </div> 
-       <div class="checkbox"> 
-        <label><input type="checkbox" name="remember_me">Remember Me</label> 
-       </div> 
-       <div class="form-group"> 
-        <input type="submit" value="Log In" data-test="loginSubmit"> 
-        <div class="help-text">
-         <a href="https://www2.learningtree.com/mylearningtree/forgotuserid.aspx">Forgot Username</a> or 
-         <a href="https://www2.learningtree.com/mylearningtree/resetpass.aspx">Password</a>
-        </div> 
-       </div> 
-       <div class="create-account" data-test="loginCreate"> 
-        <a href="https://www2.learningtree.com/mylearningtree/overview.aspx">Create Account</a> 
-       </div> 
-      </form> 
-     </div> 
-    </div> 
-   </div> 
-  </div> 
-  <div class="search-overlay-block ng-scope" ng-controller="searchController2"> 
-   <span class="close"></span> 
-   <form id="search-layer-form" name="search-layer-form" method="GET" action="http://blog.learningtree.com" class="ng-pristine ng-valid" novalidate> 
-    <div class="search-typeahead"> 
-     <input type="search" placeholder="Site Search" name="s" autocomplete="off" size="" tabindex="1" autofocus ng-model="searchQuery" ng-keypress="" class="ng-pristine ng-untouched ng-valid"> 
-     <button ng-click="search2(1)" type="submit" class="s-btn"></button> 
-    </div> 
-    <p class="search-label">Type to search blog.learningtree.com</p> 
-   </form> 
-   <div class="ng-hide" ng-show="response.correctedQuery"> 
-    <p> <strong> Do you mean "<a href="#" ng-click="correct(response.correctedQuery)" onclick="return false" class="ng-binding"></a>" ? </strong> </p> 
-   </div> 
-   <div class="ng-hide search-results" ng-show="response.items"> 
-    <span class="close"></span> 
-    <ul> 
-     <!-- ngRepeat: x in response.items --> 
-    </ul> 
-   </div> 
-   <div class="ng-hide" ng-show=" response"> 
-    <div ng-hide="response.items" class="search-results"> 
-     <div class="closeit"></div> 
-     <p><b>Sorry, no results were found for your query.</b></p> 
-     <p>Please check your spelling and try your search again.</p> 
-    </div> 
-   </div> 
-  </div> 
-  <div class="loading-backdrop"> 
-   <div class="loadingimg"></div> 
-  </div> 
-  <div class="ltmodalbg"></div> 
-  <div class="dkmodalbg"></div> 
-  <script type="text/javascript" src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script> 
-  <script type="text/javascript" src="http://blog.learningtree.com/wp-content/themes/learningtree-blog-responsive/dist/js/plugins.min.js"></script> 
-  <script type="text/javascript" src="http://blog.learningtree.com/wp-content/themes/learningtree-blog-responsive/dist/js/bootstrap.min.js"></script> 
-  <script type="text/javascript">
-/* <![CDATA[ */
-var app_localized = {"themepath":"http:\/\/blog.learningtree.com\/wp-content\/themes\/learningtree-blog-responsive","ajaxurl":"http:\/\/blog.learningtree.com\/wp-admin\/admin-ajax.php","check":"8fed062957","namespace":"ltre"};
-/* ]]> */
-</script> 
-  <script type="text/javascript" src="http://blog.learningtree.com/wp-content/themes/learningtree-blog-responsive/dist/js/app.min.js"></script> 
-  <script>
-jQuery( document ).ready( function( $ ) {
-
-	$( '.widget_categories' ).append( '<a href="#" id="more-cats"></a>' );
-
-	// Adding Load More link to Categories
-	var hideCats = function() {
-		$( '.widget_categories .cat-item' ).each( function() {
-			var $this = $( this );
-			var lindex = $this.index();
-			if ( lindex > 7 ) $this.addClass( 'hide' );
-			$( '#more-cats' ).text( 'Load More...' );
-		});
-	};
-
-	hideCats();
-
-	$( '#more-cats' ).click( function( e ) {
-
-		e.preventDefault();
-
-		if ( $( '.widget_categories .cat-item.hide' ).length ) {
-			$( '.widget_categories .cat-item.hide' ).removeClass( 'hide' );
-			$( this ).text( 'Show Less...' );
-		} else {
-			hideCats();
-		}
-
-		return false;
-
-	});
-
-	
-});
-</script> 
-  <script>
-jQuery( document ).ready( function( $ ) {
-
-	var $sharePopupLinks = $( '.share-buttons a' );
-
-	var openWindowCentered = function( url, title, w, h ) {
-
-		// Fixes dual-screen position                         Most browsers      Firefox
-	    var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
-	    var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
-
-	    var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-	    var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
-
-	    var left = ( ( width / 2 ) - ( w / 2 ) ) + dualScreenLeft;
-	    var top = ( ( height / 2 ) - ( h / 2 ) ) + dualScreenTop;
-	    var newWindow = window.open( url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left );
-
-	    // Puts focus on the newWindow
-	    if ( window.focus ) {
-	        newWindow.focus();
-	    }
-
-	};
-
-	$sharePopupLinks.on( 'click', function( e ) {
-		e.preventDefault();
-		var $this = $( this );
-		openWindowCentered( $this.attr( 'href' ), $this.attr( 'title' ), $this.data( 'win-width' ), $this.data( 'win-height' ) );
-	});
-
-});
-</script> 
-  <script>
-jQuery( document ).ready( function( $ ) {
-
-	var $sharePopupLinks = $( '.share-buttons a' );
-
-	var openWindowCentered = function( url, title, w, h ) {
-
-		// Fixes dual-screen position                         Most browsers      Firefox
-	    var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
-	    var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
-
-	    var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
-	    var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
-
-	    var left = ( ( width / 2 ) - ( w / 2 ) ) + dualScreenLeft;
-	    var top = ( ( height / 2 ) - ( h / 2 ) ) + dualScreenTop;
-	    var newWindow = window.open( url, title, 'scrollbars=yes, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left );
-
-	    // Puts focus on the newWindow
-	    if ( window.focus ) {
-	        newWindow.focus();
-	    }
-
-	};
-
-	$sharePopupLinks.on( 'click', function( e ) {
-		e.preventDefault();
-		var $this = $( this );
-		openWindowCentered( $this.attr( 'href' ), $this.attr( 'title' ), $this.data( 'win-width' ), $this.data( 'win-height' ) );
-	});
-
-});
-</script>   
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> 
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script> 
+  <script src="/assets/dist/js/script.js"></script> 
+  <script src="/assets/dist/js/parsley.min.js"></script>   
  </body>
 </html>

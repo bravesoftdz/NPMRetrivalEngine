@@ -33,7 +33,7 @@ public class HitManager {
 	}
 
 	protected void loadQueriesXhits() {
-		String fichero = "examples/queriesXhits";
+		String fichero = ConfigManager.getInstance().getProperty("queries_dir")+"/queriesXhits";
 		FileReader fr = null;
 		BufferedReader br = null;
 		try {
@@ -71,7 +71,7 @@ public class HitManager {
 	}
 
 	public void saveQueriesXhits() {
-		String fichero = "examples/queriesXhits";
+		String fichero = ConfigManager.getInstance().getProperty("queries_dir")+"/queriesXhits";
 		FileWriter fw = null;
 		PrintWriter pw = null;
 		try {

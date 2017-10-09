@@ -1,764 +1,1060 @@
 <!doctype html>
-<html>
+<html class="no-js" lang="en">
  <head> 
-  <meta http-equiv="Content-Type" content="text/html" charset="UTF-8"> 
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
-  <title>Using Node.js to Interact with Facebook's Graph API</title> 
-  <link rel="shortcut icon" href="/assets/favicon.png?v=475c5e3b61"> 
-  <meta name="description" content="This post outlines strategies for interacting with Facebook's Graph API using Node.js. Code examples for common operations are provided."> 
-  <link href="https://fonts.googleapis.com/css?family=Arvo|Raleway" rel="stylesheet"> 
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet"> 
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet"> 
-  <link rel="stylesheet" type="text/css" href="/assets/css/styles.css?v=475c5e3b61"> 
-  <link rel="stylesheet" type="text/css" href="/assets/css/loren.css?v=475c5e3b61"> 
-  <link rel="stylesheet" type="text/css" href="/assets/css/jPushMenu.css?v=475c5e3b61"> 
-  <link rel="stylesheet" type="text/css" href="/assets/css/prism.css?v=475c5e3b61"> 
-  <script type="text/javascript" src="/assets/js/jquery-1.9.1.min.js?v=475c5e3b61"></script> 
-  <script type="text/javascript" src="/assets/js/prism.js?v=475c5e3b61"></script> 
-  <script>
-  (function($) {
-    var ost = 0;
-    $(window).scroll(function() {
-      var cOst = $(this).scrollTop();
-
-      if(cOst > 100 && cOst > ost) {
-         $('#header').addClass('fixed').removeClass('default');
-         $('#mc_embed_signup').addClass('fixed');
-      }
-      else {
-         $('#header').addClass('default').removeClass('fixed');
-         $('#mc_embed_signup').removeClass('fixed');
-      }
-
-      ost = cOst;
-    });
-  })(jQuery);
-</script> 
-  <script type="text/javascript" src="/assets/js/jPushMenu.js?v=475c5e3b61"></script> 
-  <script>
-jQuery(document).ready(function($) {
-	$('.toggle-menu').jPushMenu();
-});
-</script> 
-  <script>
-  (function(d) {
-    var config = {
-      kitId: 'ffz5sus',
-      scriptTimeout: 3000,
-      async: true
-    },
-    h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
-  })(document);
-</script> 
-  <meta name="HandheldFriendly" content="True"> 
-  <meta name="MobileOptimized" content="320"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> 
-  <link rel="canonical" href="http://lorenstewart.me/2017/03/12/using-node-js-to-interact-with-facebooks-graph-api/"> 
-  <meta name="referrer" content="no-referrer-when-downgrade"> 
-  <meta property="og:site_name" content="Loren Stewart"> 
-  <meta property="og:type" content="article"> 
-  <meta property="og:title" content="Using Node.js to Interact with Facebook's Graph API"> 
-  <meta property="og:description" content="This post outlines strategies for interacting with Facebook's Graph API using Node.js. Code examples for common operations are provided."> 
-  <meta property="og:url" content="http://lorenstewart.me/2017/03/12/using-node-js-to-interact-with-facebooks-graph-api/"> 
-  <meta property="article:published_time" content="2017-03-12T23:50:08.000Z"> 
-  <meta property="article:modified_time" content="2017-04-03T11:58:35.000Z"> 
-  <meta property="article:tag" content="node.js"> 
-  <meta property="article:tag" content="api"> 
-  <meta property="article:tag" content="express.js"> 
-  <meta property="article:tag" content="JavaScript"> 
-  <meta name="twitter:card" content="summary"> 
-  <meta name="twitter:title" content="Using Node.js to Interact with Facebook's Graph API"> 
-  <meta name="twitter:description" content="This post outlines strategies for interacting with Facebook's Graph API using Node.js. Code examples for common operations are provided."> 
-  <meta name="twitter:url" content="http://lorenstewart.me/2017/03/12/using-node-js-to-interact-with-facebooks-graph-api/"> 
-  <meta name="twitter:label1" content="Written by"> 
-  <meta name="twitter:data1" content="Loren Stewart"> 
-  <meta name="twitter:label2" content="Filed under"> 
-  <meta name="twitter:data2" content="node.js, api, express.js, JavaScript"> 
-  <meta name="twitter:site" content="@lorenstewart111"> 
-  <meta name="twitter:creator" content="@lorenstewart111"> 
-  <script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "publisher": {
-        "@type": "Organization",
-        "name": "Loren Stewart",
-        "logo": "http://lorenstewart.me/ghost/img/ghosticon.jpg"
-    },
-    "author": {
-        "@type": "Person",
-        "name": "Loren Stewart",
-        "image": {
-            "@type": "ImageObject",
-            "url": "http://lorenstewart.me/content/images/2017/06/speakr_headshot_cropped.png",
-            "width": 2664,
-            "height": 2580
-        },
-        "url": "http://lorenstewart.me/author/lorenseanstewart/",
-        "sameAs": [
-            "http://codemore.io",
-            "https://twitter.com/lorenstewart111"
-        ],
-        "description": "Writing code with the wonderful devs at Speaker, a data-driven influencer marketing company. Also an educator for Codemore."
-    },
-    "headline": "Using Node.js to Interact with Facebook&#x27;s Graph API",
-    "url": "http://lorenstewart.me/2017/03/12/using-node-js-to-interact-with-facebooks-graph-api/",
-    "datePublished": "2017-03-12T23:50:08.000Z",
-    "dateModified": "2017-04-03T11:58:35.000Z",
-    "keywords": "node.js, api, express.js, JavaScript",
-    "description": "This post outlines strategies for interacting with Facebook&#x27;s Graph API using Node.js. Code examples for common operations are provided.",
-    "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "http://lorenstewart.me"
-    }
-}
+  <meta charset="utf-8"> 
+  <meta http-equiv="x-ua-compatible" content="ie=edge"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <script src="/assets/js/webcomponents-lite.min.js"></script> 
+  <link rel="import" href="/assets/elements.build.html"> 
+  <link rel="stylesheet" href="/assets/css/70a46b18d7a545048acd7d4ea242a384/docs.css"> 
+  <!-- No GA Experiment ID --> 
+  <script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-81135-3', 'auto');
+    ga('send', 'pageview');
     </script> 
-  <script type="text/javascript" src="/shared/ghost-url.min.js?v=475c5e3b61"></script> 
+  <title>JavaScript Client | Nuxeo Documentation</title> 
+  <meta name="description" content=""> 
+  <meta name="lang" content="en"> 
+  <meta name="language" content="en"> 
+  <link rel="canonical" href="https://doc.nuxeo.com/nxdoc/javascript-client/"> 
+  <meta name="twitter:card" content="summary_large_image"> 
+  <meta name="twitter:site" content="@nuxeo"> 
+  <meta name="twitter:title" content="JavaScript Client"> 
+  <meta name="twitter:description" content=""> 
+  <meta name="twitter:creator" content="@nuxeo"> 
+  <meta name="twitter:image" content="http://doc.nuxeo.com/assets/imgs/logo340x60.png"> 
+  <meta property="og:title" content="JavaScript Client"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:url" content="http://doc.nuxeo.com/nxdoc/javascript-client/"> 
+  <meta property="og:image" content="http://doc.nuxeo.com/assets/imgs/logo340x60.png"> 
+  <meta property="og:description" content=""> 
+  <meta property="og:site_name" content="Nuxeo Documentation"> 
+  <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-touch-icon-57x57.png"> 
+  <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-touch-icon-60x60.png"> 
+  <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-touch-icon-72x72.png"> 
+  <link rel="apple-touch-icon" sizes="76x76" href="/assets/icons/apple-touch-icon-76x76.png"> 
+  <link rel="apple-touch-icon" sizes="114x114" href="/assets/icons/apple-touch-icon-114x114.png"> 
+  <link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/apple-touch-icon-120x120.png"> 
+  <link rel="apple-touch-icon" sizes="144x144" href="/assets/icons/apple-touch-icon-144x144.png"> 
+  <link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/apple-touch-icon-152x152.png"> 
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon-180x180.png"> 
+  <link rel="icon" type="image/png" href="/assets/icons/favicon-32x32.png" sizes="32x32"> 
+  <link rel="icon" type="image/png" href="/assets/icons/favicon-194x194.png" sizes="194x194"> 
+  <link rel="icon" type="image/png" href="/assets/icons/favicon-96x96.png" sizes="96x96"> 
+  <link rel="icon" type="image/png" href="/assets/icons/android-chrome-192x192.png" sizes="192x192"> 
+  <link rel="icon" type="image/png" href="/assets/icons/favicon-16x16.png" sizes="16x16"> 
+  <link rel="manifest" href="/assets/icons/manifest.json"> 
+  <link rel="mask-icon" href="/assets/icons/safari-pinned-tab.svg" color="#5bbad5"> 
+  <link rel="shortcut icon" href="/assets/icons/favicon.ico"> 
+  <meta name="msapplication-TileColor" content="#da532c"> 
+  <meta name="msapplication-TileImage" content="/assets/icons/mstile-144x144.png"> 
+  <meta name="msapplication-config" content="/assets/icons/browserconfig.xml"> 
+  <meta name="theme-color" content="#2199e8"> 
+  <link rel="search" type="application/opensearchdescription+xml" title="Nuxeo Documentation" href="/opensearch.xml"> 
   <script type="text/javascript">
-ghost.init({
-	clientId: "ghost-frontend",
-	clientSecret: "798a70529932"
-});
-</script> 
-  <meta name="generator" content="Ghost 0.11"> 
-  <link rel="alternate" type="application/rss+xml" title="Loren Stewart" href="http://lorenstewart.me/rss/"> 
-  <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-83573568-1', 'auto');
-  ga('send', 'pageview');
-
-</script> 
-  <style>
-    .promo-banner { display: none; }
-    .about-author_purus h5 a {
-        color: #5ba4e5;
-    }
-    .about-author_purus h5 a:hover {
-        color: #5ba4e5;
-    }
-</style> 
-  <!-- Begin MailChimp Signup Form --> 
-  <link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css"> 
-  <style type="text/css">
-	#mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width:100%;}
-	/* Add your own MailChimp form style overrides in your site stylesheet or in this style block.
-	   We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
-</style> 
- </head>
- <body class="post-template tag-node-js tag-api tag-express-js tag-javascript">
-  <div id="mc_embed_signup"> 
-   <form action="//lorenstewart.us14.list-manage.com/subscribe/post?u=ced969084ede5300260257b00&amp;id=ebd8679806" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate> 
-    <div id="mc_embed_signup_scroll"> 
-     <label for="mce-EMAIL">Get notified about new content</label> 
-     <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required> 
-     <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups--> 
-     <div style="position: absolute; left: -5000px;" aria-hidden="true">
-      <input type="text" name="b_ced969084ede5300260257b00_ebd8679806" tabindex="-1" value="">
-     </div> 
-     <div class="clear">
-      <input type="submit" value="?" name="subscribe" id="mc-embedded-subscribe" class="button">
+      !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="4.0.0";
+      analytics.load("4qquvje3fv");
+      analytics.page();
+      }}();
+    </script> 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.css"> 
+  <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js" />
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js" />
+    <![endif]--> 
+ </head> 
+ <body> 
+  <nuxeo-header> 
+  </nuxeo-header> 
+  <div id="nuxeo-satellite-header"> 
+   <div class="nuxeo-satellite-menu expanded"> 
+    <div class="nuxeo-satellite-left-menu"> 
+     <div class="rainbow-menu" role="menuitem"> 
+      <a href="/"><img class="nuxeo-satellite-icon" src="/assets/icons/favicon-16x16.png" width="16" height="16" alt="Nuxeo Documentation"> Documentation <i class="fa fa-caret-down" aria-hidden="true"></i> </a> 
      </div> 
     </div> 
-   </form> 
-  </div> 
-  <!--End mc_embed_signup-->   
-  <header id="header" class="default "> 
-   <button class="toggle-menu menu-left push-body"> <i class="fa fa-bars"></i> </button> 
-   <!--<div class="header-author_purus">
-                <div class="authorimage_purus" style="background-image: url(/content/images/2017/06/speakr_headshot_cropped.png)"></div>
-            <h4 class="authorname_purus"><a href="http://lorenstewart.me/author/lorenseanstewart">Loren Stewart</a></h4>
-        </div>--> 
-   <div class="post-reading-time"></div> 
-  </header> 
-  <div class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-left"> 
-   <section class="menu_purus"> 
-    <h6>Menu</h6> 
-    <ul> 
-     <li class="nav-blog" role="presentation"><a href="http://lorenstewart.me/">Blog</a></li> 
-     <li class="nav-search" role="presentation"><a href="http://lorenstewart.me/search/">Search</a></li> 
-     <li class="nav-contact" role="presentation"><a href="http://lorenstewart.me/contact/">Contact</a></li> 
-     <li class="nav-reading-list" role="presentation"><a href="http://lorenstewart.me/reading-list/">Reading List</a></li> 
-     <li class="nav-codemore" role="presentation"><a href="http://codemore.io/">Codemore</a></li> 
-    </ul> 
-   </section> 
-   <section class="subscribe_purus"> 
-    <a href="https://twitter.com/lorenstewart111" target="_blank"><i class="fa fa-twitter"></i><span class="hidden_purus">Twitter</span></a> 
-    <a href="https://github.com/lorenseanstewart" target="_blank"><i class="fa fa-github"></i><span class="hidden_purus">Github</span></a> 
-    <a href="https://www.linkedin.com/in/lsstewart111
-" target="_blank"><i class="fa fa-linkedin"></i><span class="hidden_purus">LinkedIn</span></a> 
-    <a href="http://feeds.feedburner.com/LorenStewart" target="_blank"><i class="fa fa-rss"></i><span class="hidden_purus">Subscribe</span></a> 
-   </section> 
-  </div> 
-  <main role="main"> 
-   <article class="post tag-node-js tag-api tag-express-js tag-javascript article_purus"> 
-    <header class="postheader_purus no-cover"> 
-     <div class="vertical_purus"> 
-      <div class="inner_purus"> 
-       <h1 class="posttitle_purus">Using Node.js to Interact with Facebook's Graph API</h1> 
-       <ul> 
-        <li><time class="date_purus"> Mar 12 2017</time></li> 
-       </ul> 
-      </div> 
-     </div> 
-    </header> 
-    <div class="wrapper_purus"> 
-     <div class="postcontent_purus"> 
-      <p>Here's some context about pairing Node.js with Facebook's Graph API. </p> 
-      <h5 id="thebad">The Bad:</h5> 
-      <ul> 
-       <li>Facebook has a JavaScript SDK for interacting with their Graph API, but it's for client-side JavaScript – there is <strong>no Node.js SDK</strong>. </li> 
-       <li>Although there are several NPM packages for working with Facebook's Graph API, <strong>no NPM package seems to be as mature as packages for other social media platforms</strong> like <a href="https://github.com/ttezel/twit" target="_blank">Twit</a> for the Twitter API. The best of the few seems to be <a href="https://github.com/node-facebook/facebook-node-sdk" target="_blank">facebook-node-sdk</a>, but I hesitate to rely on it for a business critical app. </li> 
-       <li>The Graph API docs have <strong>no examples using vanilla JavaScript</strong> (although there are a few examples using their client-side SDK).</li> 
-       <li>At the time of this writing (March 12th, 2017), there are <strong>very few blog posts or tutorial on the topic</strong>.</li> 
-      </ul> 
-      <h5 id="thegood">The good:</h5> 
-      <ul> 
-       <li>If you have some examples, using <strong>Facebook's Graph API with Node.js is fun</strong>. </li> 
-       <li>This blog post is filled with <strong>useful examples using Node/Express</strong>!</li> 
-      </ul> 
-      <h4 id="contents">Contents:</h4> 
-      <ol> 
-       <li>Authorization &amp; Access Tokens </li> 
-       <li>Querying the Search Route </li> 
-       <li>Querying a Single Graph Object </li> 
-       <li>Querying for the Pages a User Manages </li> 
-       <li>Posting Content</li> 
-      </ol> 
-      <p>What's outlined here is based on my app's needs. For example, most people probably don't need to get a list of pages a user manages. Despite this, the actions outlined below can be used as a model for nearly any other request. </p> 
-      <p>A common need this post doesn't address is working with response <strong>pagination</strong>. However, working with pagination seems straightforward. The docs for pagination are <a href="https://developers.facebook.com/docs/graph-api/using-graph-api" target="_blank">here</a>.</p> 
-      <p>As always, if you have questions or feedback, you can reach me on <a href="https://twitter.com/lorenstewart111" target="_blank">Twitter</a> or via the <a href="http://lorenstewart.me/contact/" target="_blank">Contact form</a>.</p> 
-      <h5 id="ajaxlibrary">AJAX library</h5> 
-      <p>All the examples below use <a href="https://github.com/request/request-promise" target="_blank">request-promise</a>, so be sure to <code>npm install --save request request-promise</code> and </p> 
-      <pre><code class="language-javascript">const request = require('request-promise');  
-</code></pre> 
-      <p>in your code. </p> 
-      <h5 id="nodeframework">Node framework</h5> 
-      <p>The examples below you may notice a route or two. As I mentioned above, <a href="http://expressjs.com/" target="_blank">Express.js</a> is my framework of choice, and it's used in several of the examples below.</p> 
-      <h3 id="1authorizationampaccesstokens">1. Authorization &amp; Access Tokens</h3> 
-      <blockquote> 
-       <p>To get started, you need an access token obtained through Facebook authentication. <strong>If you have an access token at your disposal, you can skip the rest of this section.</strong> If you need to get one, read on.</p> 
-      </blockquote> 
-      <p>Generally, an app acquires a user access token through an authentication procedure. <a href="http://passportjs.org/" target="_blank">Passport.js</a> is a great authentication package for Node.js apps. </p> 
-      <p>The Passport.js Facebook authentication strategy comes with a very useful <a href="https://github.com/passport/express-4.x-facebook-example" target="_blank">demo app</a> that uses Express.js. If you need to acquaint yourself with Passport, this repo is a great place to start.</p> 
-      <h5 id="gettingatoken">Getting a token</h5> 
-      <p>Unfortunately, it isn't as easy as merely firing up the example linked to above and authenticating. <strong>You must to have an app registered with Facebook.</strong> Instructions for doing so can be found <a href="https://developers.facebook.com/docs/apps/register" target="_blank">here</a>. </p> 
-      <p>Once you have a registered app, you'll need to use the <code>app_id</code> and <code>app_secret</code> in the config file of your authentication app. Adjust the code in the <a href="https://github.com/passport/express-4.x-facebook-example" target="_blank">demo app</a> so you <code>console.log()</code> the returned access token, as you'll need the token for the requests outlined below.</p> 
-      <h5 id="gettingpostpermissions">Getting POST permissions</h5> 
-      <p>No all access tokens are created equal. If you intend to post to a user's feed or to a page managed by a user, you need to specifically ask for <code>'publish_actions'</code> and <code>'manage_pages'</code> permissions through a scope object in your authentication. </p> 
-      <p>When you ask for these permissions, a user logging in will see a prompt stating your app is requesting these permissions. If the user clicks the okay button, an access token with the specified permissions is generated.</p> 
-      <p>To request publish permissions include an object with a scope property in the <code>'/login/facebook'</code> route, as demonstrated below:</p> 
-      <pre><code class="language-javascript">app.get('/login/facebook',  
-  passport.authenticate('facebook', {
-    scope: ['publish_actions', 'manage_pages']
-  }
-));
-</code></pre> 
-      <p>If you don't include an object with the <code>scope</code> property, the tokens returned will have <code>'public_profile'</code> permissions only.</p> 
-      <p>You may want other permissions, like <code>'user_about_me'</code>, <code>'user_photos'</code>, or <code>'user_feed'</code>, but the two in the code above are the only ones you need for publishing. Take a look at <a href="https://developers.facebook.com/docs/facebook-login/permissions" target="_blank">this page</a> for an outline of different permissions you can request during authorization. </p> 
-      <h5 id="facebooksappreviewprocess">Facebook's App Review Process</h5> 
-      <p>Without submitting your app to an official FB review process, the above code will only give you <code>'public_profile'</code> access. To request additional permissions you have to prove that you're a well-intentioned developer with a well-intentioned app.</p> 
-      <p>For the right to obtain access tokens with additional permissions, you'll have to fill out the 'App Review' section of your app's settings page in the Facebook Developers website. </p> 
-      <p><strong>The review process is quite an endeavor</strong>, and requires you to describe your app and submit a video walk-through of how your app is used. </p> 
-      <p>Remember, the procedure for getting an access token is not related to interacting with the Graph API. The only reason I mention it is so you can obtain an access token (or an access token with permissions to post), as code examples below require one.</p> 
-      <h3 id="2graphapisearch">2. Graph API Search</h3> 
-      <p>If have an access token, you're ready to get started.</p> 
-      <p>In this section, we'll look at querying users and pages through Facebook's <code>https://graph.facebook.com/v2.8/search</code> url. Other objects should be similar to these, so you can use the examples here as a guide. Here's a list of the object you can search:</p> 
-      <ul> 
-       <li><code>user</code></li> 
-       <li><code>page</code></li> 
-       <li><code>event</code></li> 
-       <li><code>group</code></li> 
-       <li><code>place</code></li> 
-       <li><code>placetopic</code></li> 
-      </ul> 
-      <p>The search route below is a POST endpoint that requires a payload like the one below. The payload object has two properties: a search term (<code>queryTerm</code>) property, and a search type (<code>searchType</code>) property. </p> 
-      <p>Although the Node/Express route is a POST route, the request we are sending to the Graph API is a GET.</p> 
-      <p>For the app we are building, the value assigned to <code>searchType</code> could be <code>'page'</code> or <code>'user'</code>, and each type will return different properties. In reality, the <code>searchType</code> could be any of the objects listed above. </p> 
-      <p>Check out the docs for the <a href="https://developers.facebook.com/docs/graph-api/reference/user/" target="_blank">User</a> object, and <a href="https://developers.facebook.com/docs/graph-api/reference/page/" target="_blank">Page</a> object to see the properties that belong to each object, and can be requested.</p> 
-      <pre><code class="language-javascript">const payload = {  
-  queryTerm: 'Fiat',
-  searchType: 'page'
-}
-</code></pre> 
-      <p>Below is the route:</p> 
-      <pre><code class="language-javascript line-numbers">const request = require('request-promise');
-
-module.exports = (app) =&gt; {
-
-  // you'll need to have requested 'user_about_me' permissions
-  // in order to get 'quotes' and 'about' fields from search
-  const userFieldSet = 'name, link, is_verified, picture';
-  const pageFieldSet = 'name, category, link, picture, is_verified';
-
-
-  app.post('/facebook-search', (req, res) =&gt; {
-    const  { queryTerm, searchType } = req.body;
-
-    const options = {
-      method: 'GET',
-      uri: 'https://graph.facebook.com/search',
-      qs: {
-        access_token: config.user_access_token,
-        q: queryTerm,
-        type: searchType,
-        fields: searchType === 'page' ? pageFieldSet : userFieldSet
-      }
-    };
-
-    request(options)
-      .then(fbRes =&gt; {
-// Search results are in the data property of the response.
-// There is another property that allows for pagination of results.
-// Pagination will not be covered in this post,
-// so we only need the data property of the parsed response.
-        const parsedRes = JSON.parse(fbRes).data; 
-        res.json(parsedRes);
-      })
-  });
-}
-</code></pre> 
-      <p>Notice the the <code>fields</code> property and the <code>userFieldSet</code> and <code>pageFieldSet</code> constants. When searching <strong>pages</strong>, the code above requests the <code>'name, category, link, picture, is_verified'</code> fields to be returned. These are all part of the page public profile and do not require special permissions.</p> 
-      <p>The <code>fields</code> requested when searching <strong>users</strong> are part of the user public profile. Although these fields are all publicly available, this data will not be returned unless specified in the <code>fields</code> property of the request. </p> 
-      <p>The Graph API's search end point only returns publicly available information (<em>I think</em>), and there's a good chance that you'll want more than this; you'll probably want the additional information your user access token permits you.</p> 
-      <p>In my case, my employer has clients that manage quite a few Facebook pages. One of these clients will want to search pages, chose one that they manage, and get more info. This requires a second API call – a request for a specific object (in this scenario, a <code>page</code> object) from the Graph API.</p> 
-      <h3 id="3queryingasinglegraphobject">3. Querying a Single Graph Object</h3> 
-      <p>This section covers what you'll need to do to get information about a single object. The section starts with querying a single user, and ends with querying a single photo.</p> 
-      <p>When querying the search route (see above), an id is returned regardless of the object type and fields specified. You need this id to make a single object request(e.g. <code>'page'</code>, <code>'user'</code>, <code>'event'</code>, <code>'photo'</code>, <code>'post'</code>, etc.). </p> 
-      <p>Below is an example of querying a single user by id.</p> 
-      <p><strong>Permissions:</strong> If you have a Graph object's id, you can request detailed data as long as the access token you're using has permissions for the fields you are requesting.</p> 
-      <p>The access token used in the request below has the following permissions:</p> 
-      <ul> 
-       <li><code>'user_relationships'</code></li> 
-       <li><code>'user_about_me'</code></li> 
-       <li><code>'user_location'</code></li> 
-       <li><code>'user_website'</code></li> 
-       <li><code>'user_photos'</code></li> 
-       <li><code>'user_posts</code></li> 
-       <li><code>'email'</code></li> 
-      </ul> 
-      <p>Given all the above permissions, the code below will return detailed user information.</p> 
-      <p><strong>Other Graph objects can be requested the same way</strong>. The only difference would be the fields specified. </p> 
-      <p>If you don't have a <em>user</em> access token from authorization, you can use your <em>app's</em> access token. In the latter case, you'll only be able to request publicly available profile data.</p> 
-      <pre><code class="language-javascript line-numbers">app.get('/facebook-search/:id', (req, res) =&gt; {
-
-  // you need permission for most of these fields
-  const userFieldSet = 'id, name, about, email, accounts, link, is_verified, significant_other, relationship_status, website, picture, photos, feed';
-
-  const options = {
-    method: 'GET',
-    uri: `https://graph.facebook.com/v2.8/${req.params.id}`,
-    qs: {
-      access_token: user_access_token,
-      fields: userFieldSet
-    }
-  };
-  request(options)
-    .then(fbRes =&gt; {
-      res.json(fbRes);
-    })
-})
-</code></pre> 
-      <p>Below is the JSON response received when I request my own user data (using an access token all the permissions listed above). I replaced sensitive information with <code>'youwish!'</code>.</p> 
-      <pre><code class="language-javascript line-numbers">{
-  "id": "1458722400807259",
-  "name": "Loren Stewart",
-  "email": "youwish!",
-  "location": {
-    "id": "109434625742337",
-    "name": "West Hollywood, California"
-  },
-  "accounts": {
-    "data": [
-      {
-        "access_token": "youwish!",
-        "category": "Internet Company",
-        "name": "Codemore",
-        "id": "1775471846051866",
-        "perms": [
-          "ADMINISTER",
-          "EDIT_PROFILE",
-          "CREATE_CONTENT",
-          "MODERATE_CONTENT",
-          "CREATE_ADS",
-          "BASIC_ADMIN"
-        ]
-      }
-    ],
-    "paging": {
-      "cursors": {
-        "before": "MTc3NTQ3MTg0NjA1MTg2NgZDZD",
-        "after": "MTc3NTQ3MTg0NjA1MTg2NgZDZD"
-      }
-    }
-  },
-  "link": "https://www.facebook.com/app_scoped_user_id/1458722400807259/",
-  "is_verified": false,
-  "significant_other": {
-    "name": "Alex Galeczka",
-    "id": "10210777928898847"
-  },
-  "relationship_status": "In a relationship",
-  "website": "http://lorenstewart.me/",
-  "picture": {
-    "data": {
-      "is_silhouette": false,
-      "url": "https://scontent.xx.fbcdn.net/v/t1.0-1/p50x50/14463080_1313697801976387_8357030504322451215_n.jpg?oh=c958013d684d5d409e3523b6a31470cf&amp;oe=5969F623"
-    }
-  },
-  "photos": {
-    "data": [
-      {
-        "created_time": "2015-05-11T12:23:08+0000",
-        "id": "994251753920995"
-      },
-      {
-        "created_time": "2014-06-07T01:55:50+0000",
-        "name": "Worker bee",
-        "id": "810452288967610"
-      },   
-// the list goes on
-    ],
-    "paging": {
-      "cursors": {
-        "before": "T1RrME1qVXhOelV6T1RJd09UazFPakUwTXpFek5Ea3dORGs2TXprME1EZAzVOalF3TmpRM09ETTIZD",
-        "after": "TXpReE1USXlOREkxT1RBNE5UZAzVPakV6TWpjNU1EQTFOakE2TXprME1EZAzVOalF3TmpRM09ETTIZD"
-      }
-    }
-  },
-  "feed": {
-    "data": [
-      {
-        "message": "Hey all. Don't just delete Uber's app. Delete your account.",
-        "created_time": "2017-01-30T02:20:41+0000",
-        "id": "1458722400807259_1445514005461432"
-      },
-      {
-        "message": "I'm teaching a React workshop at the end of February ?   \nPlease share with your developer friends. Rachael, lemme know if you want to come and we'll work something out.",
-        "story": "Loren Stewart shared an event.",
-        "created_time": "2017-01-29T21:00:17+0000",
-        "id": "1458722400807259_1445248875487945"
-      },
-      {
-        "story": "Loren Stewart updated his cover photo.",
-        "created_time": "2017-01-04T02:56:35+0000",
-        "id": "1458722400807259_1418730148139818"
-      },
-      {
-        "story": "Loren Stewart at Artists Palette, Death Valley.",
-        "created_time": "2016-12-31T04:19:52+0000",
-        "id": "1458722400807259_1415002355179264"
-      }
-// the list goes on
-    ],
-    "paging": {
-      "previous": "https://graph.facebook.com/v2.8/1458722400807259/feed?since=1485742841&amp;access_token=youwish!&amp;__previous=1",
-      "next": "https://graph.facebook.com/v2.8/1458722400807259/feed?access_token=youwish!!"
-    }
-  }
-}
-</code></pre> 
-      <p>Although a lot of information is returned, much important information is left out. For example, no urls are provided for the photos in my photo library. To get a photo's url, you have to ask for the <code>link</code> field of the photo. <code>photos</code> is a field of a <code>User</code> node; <code>link</code> is field of <code>photo</code>. To get the link of each photo in our response, we need to request a field (<code>link</code>) of a field (<code>photo</code>).</p> 
-      <p>The syntax for requesting the field of a field is <code>field{nestedField}</code>. To request more than one nested field, separate them by commas like so: <code>field{nestedField1, nestedField2, nestedField3}</code>. While we're on the topic of cool syntax to work with the Graph API, there's also a way to limit the number of items returned.</p> 
-      <p>If I only want two photos returned with my user data, I can specify <code>photos.limit(2)</code>. And if I want to include the link to the photo, the people tagged in the photo, as well as three comments, the syntax would be <code>photos.limit(2){link, tags, comments.limit(3)}</code>.</p> 
-      <p>A request for a user's last two photos, along with the link and the last two comments, looks like this:</p> 
-      <pre><code class="language-javascript">const getMediaOptions = {  
-  method: 'GET',
-  uri: `https://graph.facebook.com/v2.8/${user.facebook_id}`,
-  qs: {
-    access_token: user.access_token,
-    type: 'user',
-    fields: 'photos.limit(2).order(reverse_chronological){link, comments.limit(2).order(reverse_chronological)}'
-  }
-};
-</code></pre> 
-      <p>Notice that I specify the order in which I want the photos back. By specifying <code>.order(reverse_chronological)</code> I get the latest two photos.</p> 
-      <pre><code class="language-javascript line-numbers">{
-  "photos":{
-    "data":[
-      {
-        "link":"https://www.facebook.com/photo.php?fbid=994251753920995&amp;set=a.393129324033244.98295.100000085382615&amp;type=3",
-        "comments":{
-          "data":[
-            {
-              "created_time":"2015-05-11T19:29:01+0000",
-              "from":{
-                "name":"Danny Human",
-                "id":"1245359685745239"
-              },
-              "message":".......   https://youtu.be/sGiZoE5eqZc",
-              "id":"994251753920995_994327993913389"
-            },
-            {
-              "created_time":"2015-05-11T15:24:23+0000",
-              "from":{
-                "name":"Jose Sapien",
-                "id":"1245359685745235"
-              },
-              "message":"Wish I were there!",
-              "id":"994251753920995_994404017239188"
-            }
-          ]
-          "id":"994251753920995"
-      },
-      {
-        "link":"https://www.facebook.com/photo.php?fbid=810452288967610&amp;set=a.260137377332440.73629.100000085382615&amp;type=3",
-        "comments":{
-          "data":[
-            {
-              "created_time":"2015-04-19T04:17:01+0000",
-              "from":{
-                "name":"Danny Human",
-                "id":"1245359685745239"
-              },
-              "message":"OMG!",
-              "id":"994251753920995_994327993913389"
-            },
-            {
-              "created_time":"2015-04-19T01:56:13+0000",
-              "from":{
-                "name":"Jose Sapien",
-                "id":"1245359685745235"
-              },
-              "message":"Is that real!",
-              "id":"994251753920995_994404017239188"
-            }
-          ],
-
-          "id":"810452288967610"
-        }
-      ]
-}
-</code></pre> 
-      <p>Many thanks to <a href="" target="_blank">Ian Williams</a> for helping me out with the Graph API's unusual query syntax.</p> 
-      <h3 id="4queryingforthepagesausermanages">4. Querying for the Pages a User Manages</h3> 
-      <p>This request is probably not one you need to use very frequently, but if your app needs to manage the pages for which the user has admin permissions, this example will be useful.</p> 
-      <p>In the example below, notice <strong>the <code>fields</code> property is not included</strong> because the data you're requesting is implicit in the url.</p> 
-      <p>The user query in section #3 above also returned this information because the user access token that is used has permissions for this information, and <code>'accounts'</code> is specified in the <code>fields</code> property of the request. </p> 
-      <p>If you have <code>accounts</code> permissions, and only want a list of accounts the user manages (rather than all user data), then this is the query you want to perform. </p> 
-      <pre><code class="language-javascript line-numbers">const options = {  
-// let's assume id below is 1458722400807259,
-// which is my user id
-  method: 'GET',
-  uri: `https://graph.facebook.com/v2.8/${req.params.id}/accounts`,
-  qs: {
-      access_token: user_access_token
-  }
-};
-request(options)  
-  .then(fbRes =&gt; {
-    res.json(fbRes);
-  })
-</code></pre> 
-      <p>Here's the response:</p> 
-      <pre><code class="language-javascript line-numbers">{
-  "data": [
-      {
-          "access_token": "youwish!",
-          "category": "Internet Company",
-          "name": "Codemore",
-          "id": "1775471846051866",
-          "perms": [
-              "ADMINISTER",
-              "EDIT_PROFILE",
-              "CREATE_CONTENT",
-              "MODERATE_CONTENT",
-              "CREATE_ADS",
-              "BASIC_ADMIN"
-          ]
-      }
-  ],
-  "paging": {
-      "cursors": {
-          "before": "MTc3NTQ3MTg0NjA1MTg2NgZDZD",
-          "after": "MTc3NTQ3MTg0NjA1MTg2NgZDZD"
-      }
-  }
-}
-</code></pre> 
-      <p>The request above returns the Facebook pages I manage, and since I only manage one page, the list is short!</p> 
-      <p>Similar to other responses, there's no url to the Facebook page; that has to be requested separately (see section #5 below).</p> 
-      <p>The user permission types with regard to each page/account are also listed in the response, and may be useful to your project.</p> 
-      <h5 id="somanyaccesstokens">So many access tokens</h5> 
-      <p>When you query for user accounts (i.e. pages they manage), each account returns an access token. If you want to perform an action on that page, this is the token to use.</p> 
-      <p>For example, if I wanted to post content to my <a href="https://www.facebook.com/codemore/" target="_blank">Codemore Facebook page</a>, I would need to use the page access token above (not my user access token) in the post request. Since I used my user token to get the page token, the page token has my permissions with regard to that page. For some pages I may be able to post content, other pages I may only be able to read analytics, etc. </p> 
-      <h3 id="5postingcontent">5. Posting Content</h3> 
-      <p>Below are examples for posting text, images, and videos (the latter have to be under 1GB in size) to a page or a user's feed. We'll start with posting text to a feed.</p> 
-      <h5 id="postingtext">Posting text</h5> 
-      <pre><code class="language-javascript line-numbers">const id = 'page or user id goes here';  
-const access_token = 'for page if posting to a page, for user if posting to a user\'s feed';
-
-const postTextOptions = {  
-  method: 'POST',
-  uri: `https://graph.facebook.com/v2.8/${id}/feed`,
-  qs: {
-    access_token: access_token,
-    message: 'Hello world!'
-  }
-};
-request(postTextOptions);  
-</code></pre> 
-      <h5 id="postinganimage">Posting an image</h5> 
-      <pre><code class="language-javascript line-numbers">const id = 'page or user id goes here';  
-const access_token = 'for page if posting to a page, for user if posting to a user\'s feed';
-
-const postImageOptions = {  
-  method: 'POST',
-  uri: `https://graph.facebook.com/v2.8/${id}/photos`,
-  qs: {
-    access_token: access_token,
-    caption: 'Caption goes here',
-    url: 'Image url goes here'
-  }
-};
-request(postImageOptions)  
-</code></pre> 
-      <h5 id="postingavideo">Posting a video</h5> 
-      <p>Videos over 1GB in size need to be chunk uploaded, and I won't go over that here (because I don't have a good solution yet!). Fortunately, uploading a video (under 1GB) is no more difficult than an image or text.</p> 
-      <pre><code class="language-javascript line-numbers">const id = 'page or user id goes here';  
-const access_token = 'for page if posting to a page, for user if posting to a user\'s feed';
-
-const postVideoOptions = {  
-  method: 'POST',
-  uri: `https://graph.facebook.com/v2.8/${id}/videos`,
-  qs: {
-    access_token: access_token,
-    description: 'Caption goes here',
-    file_url: 'Video url goes here'
-  }
-};
-request(postVideoOptions);  
-</code></pre> 
-      <h5 id="uploadingmediawithoutinclusioninfeed">Uploading media without inclusion in feed</h5> 
-      <p>It's possible to add an image or video to the library of the user/page without having it show up in their feed. To do this, in the <code>qs</code> property of the request, add the property <code>no_story</code> and set it to <code>true</code>. If <code>no_story</code> isn't specified, Facebook defaults to <code>no_story: false</code> and the upload is visible in the user's/page's feed.</p> 
-      <h5 id="gettingtheurlofyourpost">Getting the url of your post</h5> 
-      <p>After the POST you can use the returned <code>id</code> or <code>post_id</code> to make another request for the post's url. Uploading an image returns an object with <code>id</code> and <code>post_id</code> properties, while uploading a video or posting text returns only an <code>id</code> property.</p> 
-      <p>Here are some example responses:</p> 
-      <pre><code class="language-javascript line-numbers">// example video/text post response
-{
-  id: '323262661405199'
-}
-
-// example image post response
-{
-  id: '323262661405199',
-  post_id: '309953479402795_323262661405172'
-}
-</code></pre> 
-      <p>To obtain a url, the field you need to request is <code>'permalink_url'</code>.</p> 
-      <pre><code class="language-javascript line-numbers">const fb_id = 'the returned post_id or id goes here';  
-const type = '`video` or `post`, see comment below'
-
-const getUrlOptions = {  
-  method: 'GET',
-  uri: `https://graph.facebook.com/v2.8/${fb_id}`,
-    qs: {
-      access_token: user_access_token,
-      // type should be 'post' for image or text, 
-      // and should be 'video' for a video url
-      type: type,
-      fields: 'permalink_url'
-    }
-};
-return request(getUrlOptions)  
-  .then(fbUrlRes =&gt; {
-    const permalink = JSON.parse(fbUrlRes).permalink_url;
-      if(video) {
-        permalink = `https://www.facebook.com${permalink}`;
-      }
-      return {postUrl: permalink};
-  })
-</code></pre> 
-      <p>Image and text posts return a full url. However, the video response returns only the end of the url so you'll need to construct the full url yourself (see line 19 above). In order to construct a video url, you have to prepend <code>'https://www.facebook.com'</code> to the returned value.</p> 
-      <h3 id="nbsp">&nbsp;</h3> 
-      <p><em>If you'd like to be notified when I publish new content, sign up for my mailing list in the navbar.</em></p> 
-     </div> 
-     <footer class="article-footer_purus"> 
-      <section class="written-by_purus"> 
-       <h6>Written by</h6> 
-       <div class="footerflex_purus"> 
-        <div class="authorimage_purus" style="background-image: url(/content/images/2017/06/speakr_headshot_cropped.png)"></div> 
-        <div class="about-author_purus"> 
-         <h4 class="authorname_purus"><a href="http://lorenstewart.me/author/lorenseanstewart">Loren Stewart</a></h4> 
-         <p class="authorbio_purus">Writing code with the wonderful devs at Speaker, a data-driven influencer marketing company. Also an educator for Codemore.</p> 
-         <h5>Los Angeles, CA</h5> 
-         <h5><a href="http://codemore.io" itemprop="url">http://codemore.io</a></h5> 
-         <br> 
-         <a class="social-icon_purus" href="https://twitter.com/lorenstewart111"><i class="fa fa-twitter"><span class="hidden_purus">@lorenstewart111</span></i></a> 
-        </div> 
-       </div> 
-      </section> 
-      <section class="tags-post_purus"> 
-       <h6>Tags</h6> 
-       <span><a href="/tag/node-js/">node.js</a><a href="/tag/api/">api</a><a href="/tag/express-js/">express.js</a><a href="/tag/javascript/">JavaScript</a></span> 
-      </section> 
-     </footer> 
-    </div> 
-   </article> 
-   <!-- <div class="wrapper_purus">
-        <div class="disqusbox_purus">
-            <div id="disqus_thread"><form onsubmit="my.loadDisqus();return false;" class=formBlock><input class="cmd_purus" type=submit value="Load Comments"></form>
-            </div>
-
-                    <script type="text/javascript">
-                    var disqus_shortname = 'example'; // required: replace example with your Disqus shortname
-                    /* * * DON'T EDIT BELOW THIS LINE * * */
-                    var disqus_url = "http://lorenstewart.me/2017/03/12/using-node-js-to-interact-with-facebooks-graph-api/";
-                    var disqus_identifier = '';
-                    var my = my || {};
-                    my.loadDisqus = function() {
-                        var dsq = document.createElement('script');
-                        dsq.type = 'text/javascript';
-                        dsq.async = true;
-                        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                    };
-                    </script>
-
-                    <noscript>Please enable javascript to <a rel="nofollow" href="http://disqus.com/?ref_noscript">discus this page, powered by Disqus.</a></noscript>
-                    <style scoped=scoped>
-                    @media print{
-                     .disqusbox{display:none}
-                    }
-                    </style>
-        </div>
-    </div> --> 
-  </main> 
-  <aside class="read-next_purus"> 
-   <a class="frame-article_purus next-story_purus" href="/2017/06/04/data-validation-a-functional-approach/"> 
-    <section> 
-     <h2>A Functional Approach to Data Validation</h2> 
-     <p>Validating data usually starts out simple, but as requirements change and your app grows, validation logic can quickly become…</p> 
-     <time>04 Jun 2017</time> 
-    </section> </a> 
-   <a class="frame-article_purus prev-story_purus" href="/2017/02/03/twitter-api-uploading-videos-using-node-js/"> 
-    <section> 
-     <h2>Twitter API: Uploading Videos using Node.js</h2> 
-     <p>I work for an influencer marketing and data company, Speakr, and we work with social media APIs all the…</p> 
-     <time>03 Feb 2017</time> 
-    </section> </a> 
-  </aside> 
-  <footer class="main-footer_purus" style="background-image: url()"> 
-   <div class="wrapper-footer_purus"> 
-    <div class="center-footer_purus"> 
-     <a target="_blank" href="https://twitter.com/share?text=Using Node.js to Interact with Facebook's Graph API&amp;url=http://lorenstewart.me/2017/03/12/using-node-js-to-interact-with-facebooks-graph-api/"><i class="fa fa-twitter"></i><span class="hidden_purus">Twitter</span></a> 
-     <a target="_blank" href="https://www.facebook.com/sharer.php?u=http://lorenstewart.me/2017/03/12/using-node-js-to-interact-with-facebooks-graph-api/"><i class="fa fa-facebook"></i><span class="hidden_purus">Facebook</span></a> 
-     <a target="_blank" href="https://plus.google.com/share?url=http://lorenstewart.me/2017/03/12/using-node-js-to-interact-with-facebooks-graph-api/"><i class="fa fa-google-plus"></i> <span class="hidden_purus">Google+</span></a> 
+    <div class="nuxeo-satellite-right-menu"> 
+     <ul> 
+      <li> <button id="search-button"><i class="fa fa-search"></i></button> </li> 
+      <li> 
+       <form id="search-box" class="closed"> 
+        <input id="search-input" type="text" value="" placeholder="SEARCH DOCS…"> 
+       </form> </li> 
+     </ul> 
     </div> 
    </div> 
-   <div class="copyright_purus"> 
-    <p>All content copyright <a href="/">Loren Stewart</a> © 2017 • All rights reserved.<br> Proudly published with <a class="icon-ghost" href="http://ghost.org" target="_blank">Ghost</a></p> 
-   </div>
-  </footer> 
-  <!--
-<div class="promo-banner">
-  <p>Come to my <a href="http://bit.ly/2kjworkshopbanner" target="_blank">React Workshop</a> in LA!</p>
-</div>
---> 
-  <script type="text/javascript" src="/assets/js/jquery.fitvids.js?v=475c5e3b61"></script> 
-  <script type="text/javascript" src="/assets/js/index1.js?v=475c5e3b61"></script>   
+   <div id="doc-main-menu"> 
+    <ul> 
+     <li class="section-tutorials" role="menuitem"> <a href="/nxdoc/tutorials" role="menuitem">Tutorials</a> 
+      <ul class="child"> 
+       <li> <a href="/nxdoc/discover-nuxeo-platform-apis" role="menuitem" title="Discover Nuxeo Platform APIs">Discover Nuxeo Platform APIs</a> </li> 
+       <li> <a href="/nxdoc/configure-nuxeo-platform" role="menuitem" title="Configure Nuxeo Platform">Configure Nuxeo Platform</a> </li> 
+       <li> <a href="/nxdoc/develop-with-nuxeo-platform" role="menuitem" title="Develop with Nuxeo Platform">Develop with Nuxeo Platform</a> </li> 
+       <li> <a href="/nxdoc/quick-overview" role="menuitem" title="Quick Overview">Quick Overview</a> </li> 
+       <li> <a href="/nxdoc/educational" role="menuitem" title="Educational">Educational</a> </li> 
+       <li> <a href="/nxdoc/transversal-how-tos" role="menuitem" title="Transversal How-Tos">Transversal How-Tos</a> </li> 
+       <li> <a href="/nxdoc/how-to-index" role="menuitem" title="How-To Index">How-To Index</a> </li> 
+      </ul> </li> 
+     <li class="section-server" role="menuitem"> <a href="/nxdoc/nuxeo-server" role="menuitem">Nuxeo Server</a> 
+      <ul class="child"> 
+       <li> <a href="/nxdoc/installation" role="menuitem" title="Installation">Installation</a> </li> 
+       <li> <a href="/nxdoc/administration" role="menuitem" title="Administration">Administration</a> </li> 
+       <li> <a href="/nxdoc/rest-api" role="menuitem" title="REST API">REST API</a> </li> 
+       <li> <a href="/nxdoc/automation" role="menuitem" title="Automation">Automation</a> </li> 
+       <li> <a href="/nxdoc/upgrading-the-nuxeo-platform" role="menuitem" title="Upgrading the Nuxeo Platform">Upgrading the Nuxeo Platform</a> </li> 
+       <li> <a href="/nxdoc/monitoring-and-maintenance" role="menuitem" title="Monitoring and Maintenance">Monitoring and Maintenance</a> </li> 
+       <li> <a href="/nxdoc/runtime-and-component-model" role="menuitem" title="Runtime and Component Model">Runtime and Component Model</a> </li> 
+       <li> <a href="/nxdoc/content-repository" role="menuitem" title="Content Repository">Content Repository</a> </li> 
+       <li> <a href="/nxdoc/workflow" role="menuitem" title="Workflow">Workflow</a> </li> 
+       <li> <a href="/nxdoc/security" role="menuitem" title="Security">Security</a> </li> 
+       <li> <a href="/nxdoc/nuxeo-server-roadmap" role="menuitem" title="Nuxeo Server Roadmap">Nuxeo Server Roadmap</a> </li> 
+      </ul> </li> 
+     <li class="section-web-ui" role="menuitem"> <a href="/nxdoc/web-ui" role="menuitem">Web UI</a> 
+      <ul class="child"> 
+       <li> <a href="/nxdoc/web-ui-overview" role="menuitem" title="Web UI Overview">Web UI Overview</a> </li> 
+       <li> <a href="/nxdoc/polymer-guide" role="menuitem" title="Polymer Guide">Polymer Guide</a> </li> 
+       <li> <a href="/nxdoc/nuxeo-elements" role="menuitem" title="Nuxeo Elements">Nuxeo Elements</a> </li> 
+       <li> <a href="/nxdoc/web-ui-tutorials" role="menuitem" title="Web UI Tutorials">Web UI Tutorials</a> </li> 
+       <li> <a href="/nxdoc/web-ui-roadmap" role="menuitem" title="Web UI Roadmap">Web UI Roadmap</a> </li> 
+      </ul> </li> 
+     <li class="section-desktop-mob" role="menuitem"> <a href="/nxdoc/desktop-and-mobile" role="menuitem">Desktop and Mobile</a> 
+      <ul class="child"> 
+       <li> <a href="/nxdoc/nuxeo-drive" role="menuitem" title="Nuxeo Drive">Nuxeo Drive</a> </li> 
+       <li> <a href="/nxdoc/nuxeo-mobile" role="menuitem" title="Nuxeo Mobile">Nuxeo Mobile</a> </li> 
+      </ul> </li> 
+     <li class="section-addons" role="menuitem"> <a href="/nxdoc/nuxeo-add-ons" role="menuitem">Nuxeo Add-Ons</a> 
+      <ul class="child"> 
+       <li> <a href="/nxdoc/installing-a-new-package-on-your-instance" role="menuitem" title="Installing a New Package on Your Instance">Installing a New Package on Your Instance</a> </li> 
+       <li> <a href="/nxdoc/creating-nuxeo-packages" role="menuitem" title="Creating Nuxeo Packages">Creating Nuxeo Packages</a> </li> 
+       <li> <a href="/nxdoc/nuxeo-add-ons" role="menuitem" title="Nuxeo Add-Ons">Nuxeo Add-Ons</a> </li> 
+      </ul> </li> 
+     <li class="section-sdks" role="menuitem"> <a href="/nxdoc/client-sdks" role="menuitem">Client SDKs</a> 
+      <ul class="child"> 
+       <li> <a href="/nxdoc/java-client" role="menuitem" title="Java Client">Java Client</a> </li> 
+       <li> <a href="/nxdoc/javascript-client" role="menuitem" title="JavaScript Client">JavaScript Client</a> </li> 
+       <li> <a href="/nxdoc/python-client" role="menuitem" title="Python Client">Python Client</a> </li> 
+       <li> <a href="/nxdoc/net-client" role="menuitem" title=".NET Client">.NET Client</a> </li> 
+       <li> <a href="/nxdoc/ios-client" role="menuitem" title="iOS Client">iOS Client</a> </li> 
+       <li> <a href="/nxdoc/android-client" role="menuitem" title="Android Client">Android Client</a> </li> 
+       <li> <a href="/nxdoc/php-automation-client" role="menuitem" title="PHP Automation Client">PHP Automation Client</a> </li> 
+       <li> <a href="/nxdoc/client-api-test-suite-tck" role="menuitem" title="Client API Test suite (TCK)">Client API Test suite (TCK)</a> </li> 
+       <li> <a href="/nxdoc/using-curl" role="menuitem" title="Using cURL">Using cURL</a> </li> 
+      </ul> </li> 
+     <li class="section-services" role="menuitem"> <a href="/studio" role="menuitem">Nuxeo Online Services</a> 
+      <ul class="child"> 
+       <li> <a href="/studio/nuxeo-online-services-portal" role="menuitem" title="Nuxeo Online Services Portal">Nuxeo Online Services Portal</a> </li> 
+       <li> <a href="/studio/nuxeo-studio" role="menuitem" title="Nuxeo Studio">Nuxeo Studio</a> </li> 
+       <li> <a href="/studio/nuxeo-studio-roadmap" role="menuitem" title="Nuxeo Studio Roadmap">Nuxeo Studio Roadmap</a> </li> 
+       <li> <a href="/studio/support-jira" role="menuitem" title="Support / JIRA">Support / JIRA</a> </li> 
+      </ul> </li> 
+     <li class="section-tools" role="menuitem"> <a href="/nxdoc/nuxeo-tools" role="menuitem">Tools for the Nuxeo Platform</a> 
+      <ul class="child"> 
+       <li> <a href="/nxdoc/nuxeo-dev-tools-extension" role="menuitem" title="Nuxeo Dev Tools Extension">Nuxeo Dev Tools Extension</a> </li> 
+       <li> <a href="/studio/nuxeo-studio" role="menuitem" title="Nuxeo Studio">Nuxeo Studio</a> </li> 
+       <li> <a href="/nxdoc/nuxeo-cli" role="menuitem" title="Nuxeo CLI">Nuxeo CLI</a> </li> 
+       <li> <a href="/corg" role="menuitem" title="Nuxeo Core Developer Guide">Nuxeo Core Developer Guide</a> </li> 
+      </ul> </li> 
+    </ul> 
+   </div> 
+  </div> 
+  <div id="page_container" class="row expanded doc-section doc-section-sdks"> 
+   <div id="content_container" class="column medium-8 large-9 medium-push-4 large-push-3"> 
+    <div> 
+     <div class="row"> 
+      <div class="column"> 
+       <div class="breadcrumb "> 
+        <a href="/">Home</a> &gt; 
+        <a href="/nxdoc/">Developer Documentation Center</a> &gt; 
+        <a href="/nxdoc/client-sdks/">Client SDKs</a> &gt; JavaScript Client 
+       </div> 
+       <div class="heading-group"> 
+        <div id="section_name" class="hide">
+         Client SDKs
+        </div> 
+        <h1 id="page-title">JavaScript Client</h1> 
+        <div class="style-bar"></div> 
+        <div> 
+         <div id="page-versions"> 
+          <ul class="dropdown menu" data-dropdown-menu> 
+           <li> <a href="#"> Version: <span class="version-label">FT</span> <i class="fa fa-caret-down"></i> </a> 
+            <ul class="menu"> 
+             <li><a href="/nxdoc/javascript-client/" class="active">FT</a></li> 
+             <li><a href="/810/nxdoc/javascript-client/">LTS 2016</a></li> 
+             <li><a href="/710/nxdoc/javascript-client/">LTS 2015</a></li> 
+             <li><a href="/60/nxdoc/javascript-client/">6.0</a></li> 
+            </ul> </li> 
+          </ul> 
+         </div> Updated: December 6, 2016 
+         <a data-open="page-information" title="Page Information" aria-controls="page-information" aria-haspopup="true" tabindex="0"> <img src="/assets/imgs/icons/info-icon.svg" alt="Page Information" width="18px" height="18px"> </a> 
+         <a class="edit-page" title="Edit on GitHub" href="https://github.com/nuxeo/doc.nuxeo.com-platform-spaces/tree/master/src/nxdoc/client-sdks/javascript-client.md"> <img src="/assets/imgs/icons/edit-in-github-icon.svg" alt="Edit on GitHub" width="15px" height="15px"> </a> 
+        </div> 
+       </div> 
+      </div> 
+      <div id="content" class="column toc end"> 
+       <p></p>
+       <h2 id="client-library-for-nuxeo-api">Client Library for Nuxeo API</h2>
+       <p><a href="https://qa.nuxeo.org/jenkins/job/Client/job/nuxeo-js-client-master-vs-maste/"><img alt="Jenkins" src="https://img.shields.io/jenkins/s/https/qa.nuxeo.org/jenkins/job/Client/job/nuxeo-js-client-master-vs-master.svg?style=flat-square"></a> <a href="https://www.npmjs.com/package/nuxeo"><img alt="npm version" src="https://img.shields.io/npm/v/nuxeo.svg?style=flat-square"></a> <a href="https://www.npmjs.com/package/nuxeo"><img alt="npm downloads" src="https://img.shields.io/npm/dm/nuxeo.svg?style=flat-square"></a> <a href="https://david-dm.org/nuxeo/nuxeo-js-client"><img alt="Dependency Status" src="https://img.shields.io/david/nuxeo/nuxeo-js-client.svg?style=flat-square"></a> <a href="https://david-dm.org/nuxeo/nuxeo-js-client#info=devDependencies"><img alt="devDependency Status" src="https://img.shields.io/david/dev/nuxeo/nuxeo-js-client.svg?style=flat-square"></a></p> 
+       <p>The Nuxeo JavaScript Client is a JavaScript client library for the Nuxeo Automation and REST API. The library can work in a browser, or in Node.js, using the same API.</p> 
+       <p>This is an on-going project, supported by Nuxeo.</p> 
+       <h2 id="nuxeo-platform-dependency">Nuxeo Platform Dependency</h2>
+       <p>The JS Client is compliant with all Nuxeo versions as of LTS 2015.</p> 
+       <h2 id="getting-started">Getting Started</h2>
+       <h3 id="installation">Installation</h3>
+       <h4 id="nodejs-applications">Node.js Applications</h4>
+       <p>After <a href="https://nodejs.org/#download">installing</a> <a href="https://nodejs.org">Node.js</a>, use <code>npm</code> to install the <code>nuxeo</code> package:</p> 
+       <pre><code>$ npm install nuxeo
+</code></pre>
+       <h5 id="nodejs-v6-lts-boron">Node.js v6 LTS (Boron)</h5>
+       <pre><code class="javascript">var Nuxeo = require('nuxeo');
+var nuxeo = new Nuxeo({ ... });
+</code></pre> 
+       <h5 id="nodejs-v4-lts-argon">Node.js v4 LTS (Argon)</h5>
+       <pre><code class="javascript">var Nuxeo = require('nuxeo/es5');
+var nuxeo = new Nuxeo({ ... });
+</code></pre> 
+       <h4 id="bower-powered-applications">Bower Powered Applications</h4>
+       <p>The <code>nuxeo</code> client can be also installed through bower:</p> 
+       <pre><code>$ bower install nuxeo --save
+</code></pre>
+       <p>When added to your page, <code>Nuxeo</code> is available as a global variable.</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({ ... });
+</code></pre> 
+       <h4 id="angular-applications">Angular Applications</h4>
+       <p>After adding <code>nuxeo</code> through Bower, you can easily create a service that will return a client:</p> 
+       <pre><code class="javascript">...
+.service('nuxeo', function() {
+  return new Nuxeo({
+    baseURL: 'http://localhost:8080/nuxeo/',
+    auth: {
+      method: 'basic',
+      username: 'Administrator',
+      password: 'Administrator'
+    }
+  });
+})
+...
+</code></pre> 
+       <p>To notify Angular to update the UI when a Nuxeo promise has resolved, you can either wrap Nuxeo promises in <code>$q.when()</code> or, the preferred way, configure the Promise library class to be <code>$q</code>.</p> 
+       <pre><code class="javascript">// wrap promises
+...
+$q.when(nuxeo.request('/path/').get()).then(function(res) {
+  $scope.res = res;
+});
+// use $q as the Promise library class
+...
+.service('nuxeo', function($q) {
+  Nuxeo.promiseLibrary($q);
+  return new Nuxeo({
+    baseURL: 'http://localhost:8080/nuxeo/',
+    auth: {
+      method: 'basic',
+      username: 'Administrator',
+      password: 'Administrator'
+    }
+  });
+})
+...
+</code></pre> 
+       <h4 id="react-applications">React Applications</h4>
+       <p>After adding <code>nuxeo</code> through <code>npm</code> to your application, to make it sure that it will work on most browsers you must require <code>nuxeo</code> differently according to your build system.</p> 
+       <p>If your build transpiles external libraries from ES6 to ES5:</p> 
+       <pre><code class="javascript">var Nuxeo = require('nuxeo');
+</code></pre> 
+       <p>If your build does not (such as <a href="https://github.com/facebookincubator/create-react-app">create-react-app</a>):</p> 
+       <pre><code class="javascript">var Nuxeo = require('nuxeo/es5');
+</code></pre> 
+       <h2 id="documentation">Documentation</h2>
+       <p>Check out the <a href="https://nuxeo.github.io/nuxeo-js-client/latest/">API documentation</a>.</p> 
+       <h2 id="examples">Examples</h2>
+       <p>Some working examples using the Nuxeo JavaScript Client can be found <a href="https://github.com/nuxeo/nuxeo-js-client/tree/master/examples">here</a>.</p> 
+       <h2 id="quick-start">Quick Start</h2>
+       <p>This quick start guide will show how to do basics operations using the client.</p> 
+       <h3 id="authentication">Authentication</h3>
+       <p>The authentication method to be used is defined when creating a client:</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({
+  auth: {
+    method: ...,
+    ...
+  }
+});
+</code></pre> 
+       <p>The client supports different authentication methods matching the ones available on the Nuxeo Platform.</p> 
+       <h4 id="basic-authentication">Basic Authentication</h4>
+       <p>The simplest one allowing to authenticate with a <code>username</code> and <code>password</code>.</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({
+  auth: {
+    method: 'basic',
+    username: 'Administrator',
+    password: 'Administrator'
+  }
+});
+</code></pre> 
+       <h4 id="portal-authenticaton">Portal Authenticaton</h4>
+       <p>If the <a href="https://doc.nuxeo.com/nxdoc/using-sso-portals/">Portal Authentication</a> is configured on the Nuxeo Platform, you can authenticate with the <code>portal</code> method.</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({
+  auth: {
+    method: 'portal',
+    username: 'joe',
+    secret: 'shared-secret-from-server'
+  }
+});
+</code></pre> 
+       <h4 id="token-authentication">Token Authentication</h4>
+       <p>To authenticate through a token from the Nuxeo Server:</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({
+  auth: {
+    method: 'token',
+    token: 'a-token'
+  }
+});
+</code></pre> 
+       <p>There is a utility method <code>Nuxeo#requestAuthenticationToken</code> to retrieve a <code>token</code> from a Nuxeo Server using the configured authentication method. For instance, a typical flow would be:</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({
+  auth: {
+    method: 'basic',
+    username: 'Administrator',
+    password: 'Administrator'
+  }
+});
+
+nuxeo.requestAuthenticationToken('My App', deviceUID, deviceName, 'rw')
+  .then(function(token) {
+    nuxeo = new Nuxeo({
+      auth: {
+        method: 'token',
+        token: token
+      }
+    });
+
+    // do something with the new `nuxeo` client using token authentication
+    // store the token, and next time you need to create a client, use it
+  })
+  .catch(function(err) {
+    throw err;
+  });
+</code></pre> 
+       <h4 id="oauth2-authorization-and-bearer-token-authentication">OAuth2 Authorization and Bearer Token Authentication</h4>
+       <p>Since Nuxeo Platform 9.2, you can use OAuth2 authorization through the JS client.</p> 
+       <p>For more information on OAuth2 server side, see <a href="https://doc.nuxeo.com/nxdoc/using-oauth2/">Using OAuth2</a>.</p> 
+       <p>Assuming you already have an access token, you can configure the client:</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({
+  auth: {
+    method: 'bearerToken',
+    token: access_token,
+    clientId: 'my-app' // optional OAuth2 client ID to refresh the access token
+  }
+});
+</code></pre> 
+       <p>The <code>bearertoken</code> method supports the <code>token</code> being a simple string (an access token) or a full token object such as:</p> 
+       <pre><code class="javascript">{
+  "access_token":"H8dXDdEW9U2jJnFDh6lJJ74AHRzCyG4D",
+  "token_type":"bearer",
+  "expires_in":3600,
+  "refresh_token":"Amz8JlyglhGWDmYHMYS5EnTTFUFAwZLiHG4aqQDfkwUNunSMpTTSFUmvprX3WdSF"
+}
+</code></pre> 
+       <p>If the <code>token</code> is a full token object (ie. with a <code>refresh_token</code> key) and a <code>clientId</code> is configured on the <code>auth</code> object, the client will try automatically to refresh the access token if it's expired.</p> 
+       <h5 id="oauth2-flow">OAuth2 Flow</h5>
+       <p>A typical OAuth2 flow with the Nuxeo Platform would be:</p> 
+       <p><strong>Retrieving Authorization Code</strong></p> 
+       <p>Generate a "log in" link to be used in a browser, such as:</p> 
+       <p><code>http://localhost:8080/nuxeo/oauth2/authorize?client_id=CLIENT_ID&amp;response_type=code&amp;redirect_uri=REDIRECT_URI</code></p> 
+       <p>The user sees the login page then, after being logged in, the authorization prompt for the application.</p> 
+       <p>If the user grants access, the Nuxeo Platform redirects the user back to the application:</p> 
+       <p><code>http://localhost:8000/authorize?code=AUTH_CODE</code></p> 
+       <p><strong>Retrieving Access Token</strong></p> 
+       <p>The client exchanges the authorization code for an access token:</p> 
+       <pre><code>POST http://localhost:8080/nuxeo/oauth2/token
+  grant_type=authorization_code
+  code=AUTH_CODE
+  redirect_uri=REDIRECT_URI
+  client_id=CLIENT_ID
+</code></pre>
+       <p>The Nuxeo Platform replies with an access token:</p> 
+       <pre><code class="javascript">{
+  "access_token":"H8dXDdEW9U2jJnFDh6lJJ74AHRzCyG4D",
+  "token_type":"bearer",
+  "expires_in":3600,
+  "refresh_token":"Amz8JlyglhGWDmYHMYS5EnTTFUFAwZLiHG4aqQDfkwUNunSMpTTSFUmvprX3WdSF"
+}
+</code></pre> 
+       <p>There are some utility methods on the client to help you with this flow:</p> 
+       <p><strong>Nuxeo.oauth2.getAuthorizationURL(baseURL, clientId[, params])</strong></p> 
+       <p>Returns the OAuth2 authorization URL for the given <code>baseURL</code> and <code>clientId</code>.</p> 
+       <pre><code class="javascript">var authorizationURL = Nuxeo.oauth2.getAuthorizationURL('http://localhost:8080/nuxeo', 'my-app', {
+  state: 'xyz',
+  redirect_uri: 'http://localhost:8000/authorize',
+});
+console.log(authorizationURL); // http://localhost:8080/nuxeo/oauth2/authorize?client_id=my-app&amp;response_type=code&amp;state=xyz&amp;redirect_uri=http://localhost:8000/authorize
+</code></pre> 
+       <p><strong>Nuxeo.oauth2.fetchAccessToken(baseURL, clientId, code[, params])</strong></p> 
+       <p>Fetches an OAuth2 access token for the given <code>baseURL</code>, <code>clientId</code> and <code>code</code>.</p> 
+       <pre><code class="javascript">var code = ...
+Nuxeo.oauth2.fetchAccessToken('http://localhost:8080/nuxeo', 'my-app', code, {
+  redirect_uri: 'http://localhost:8000/authorize',
+}).then(function(token) {
+  // do something with the access token
+  var nuxeo = new Nuxeo({
+    auth: {
+      method: 'bearerToken',
+      token: token
+    }
+  });
+});
+</code></pre> 
+       <p><strong>Nuxeo.oauth2.refreshAccessToken(baseURL, clientId, refreshToken[, params])</strong></p> 
+       <p>Manually refresh an access token for the given <code>baseURL</code>, <code>clientId</code> and <code>refreshToken</code>.</p> 
+       <pre><code class="javascript">var refreshToken = ...
+Nuxeo.oauth2.refreshAccessToken('http://localhost:8080/nuxeo', 'my-app', refreshToken)
+  .then(function(token) {
+    console.log(token); // refreshed access token
+});
+</code></pre> 
+       <h3 id="creating-a-client">Creating a Client</h3>
+       <pre><code class="javascript">var nuxeo = new Nuxeo({
+  auth: {
+    method: 'basic',
+    username: 'Administrator',
+    password: 'Administrator'
+  }
+});
+</code></pre> 
+       <p>To connect to a different Nuxeo Platform Instance, you can use the following:</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({
+  baseURL: 'http://demo.nuxeo.com/nuxeo/',
+  auth: {
+    method: 'basic',
+    username: 'Administrator',
+    password: 'Administrator'
+  }
+});
+</code></pre> 
+       <h3 id="promise-based-calls">Promise Based Calls</h3>
+       <p>All API calls made on the server return a Promise object.</p> 
+       <pre><code class="javascript">nuxeo.operation('Document.GetChildren')
+  .input('/')
+  .execute()
+  .then(function(docs) {
+    // work with docs
+  })
+  .catch(function(error) {
+    // something went wrong
+    throw error;
+  });
+</code></pre> 
+       <p>When something went wrong, the <code>error</code> is an <code>Error</code> object with a <code>response</code> field containing the whole response.</p> 
+       <h3 id="connecting-to-a-nuxeo-server">Connecting to a Nuxeo Server</h3>
+       <p>After creating a Client, you can connect to a Nuxeo Server by using the <code>connect</code> method. This method returns a <code>Promise</code> which is resolved with the connected client.</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({ ... });
+nuxeo.connect()
+  .then(function(client){
+    // client.connected === true
+    // client === nuxeo
+    console.log('Connected OK!');
+  })
+  .catch(function(error) {
+    // wrong credentials / auth method / ...
+    throw error;
+  });
+</code></pre> 
+       <h4 id="current-user">Current User</h4>
+       <p>The <code>connect</code> method fills the <code>user</code> property of the client. <code>user</code> is a full <code>User</code> object.</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({ ... });
+nuxeo.connect()
+  .then(function(client){
+    // client.user.id === 'Administrator'
+    console.log(client.user);
+  })
+  .catch(function(error) {
+    // wrong credentials / auth method / ...
+    throw error;
+  });
+</code></pre> 
+       <h4 id="nuxeo-server-version">Nuxeo Server version</h4>
+       <p>The <code>connect</code> method fills the <code>nuxeoVersion</code> property of the client.</p> 
+       <pre><code class="javascript">var nuxeo = new Nuxeo({ ... });
+nuxeo.connect()
+  .then(function(client){
+    // client.nuxeoVersion === '8.10'
+    console.log(client.nuxeoVersion);
+  })
+  .catch(function(error) {
+    // wrong credentials / auth method / ...
+    throw error;
+  });
+</code></pre> 
+       <p>Some constants are available in the <code>Nuxeo</code> object for supported LTS versions:</p> 
+       <pre><code class="javascript">Nuxeo.VERSIONS.LTS_2015 === '7.10';
+Nuxeo.VERSIONS.LTS_2016 === '8.10';
+</code></pre> 
+       <p>You can use them to easily make different calls according to the target version:</p> 
+       <pre><code class="javascript">...
+if (nuxeo.nuxeoVersion &lt; Nuxeo.VERSIONS.LTS_2016) {
+  // do something on versions before LTS 2016
+} else {
+  // do something else
+}
+...
+</code></pre> 
+       <h3 id="operation">Operation</h3>
+       <p><code>Operation</code> object allows you to execute an operation (or operation chain).</p> 
+       <p>See the <a href="https://nuxeo.github.io/nuxeo-js-client/latest/Operation.html">Operation</a> documentation.</p> 
+       <h4 id="samples">Samples</h4>
+       <p><strong>Call an operation to create a new folder in the Root document</strong></p> 
+       <pre><code class="javascript">nuxeo.operation('Document.Create')
+  .params({
+    type: 'Folder',
+    name: 'My Folder',
+    properties: 'dc:title=My Folder \ndc:description=A Simple Folder'
+  })
+  .input('/')
+  .execute()
+  .then(function(doc) {
+    console.log('Created ' + doc.title + ' folder');
+  })
+  .catch(function(error) {
+    throw error;
+  });
+</code></pre> 
+       <h3 id="request">Request</h3>
+       <p>The <code>Request</code> object allows you to call the Nuxeo REST API.</p> 
+       <p>See the <a href="https://nuxeo.github.io/nuxeo-js-client/latest/Request.html">Request</a> documentation.</p> 
+       <h4 id="samples">Samples</h4>
+       <p><strong>Fetch the Administrator user</strong></p> 
+       <pre><code class="javascript">nuxeo.request('user/Administrator')
+  .get()
+  .then(function(user) {
+    console.log(user);
+  })
+  .catch(function(error) {
+    throw error;
+  });
+</code></pre> 
+       <p><strong>Fetch the whole list of Natures</strong></p> 
+       <pre><code class="javascript">nuxeo.request('directory/nature')
+  .get()
+  .then(function(data) {
+    console.log(JSON.stringify(data.entries, null, 2))
+  })
+  .catch(function(error) {
+    throw error
+  });
+</code></pre> 
+       <h3 id="repository">Repository</h3>
+       <p>The <code>Repository</code> object allows you to work with document.</p> 
+       <p>See the <a href="https://nuxeo.github.io/nuxeo-js-client/latest/Repository.html">Repository</a> documentation.</p> 
+       <h4 id="samples">Samples</h4>
+       <p><strong>Create a <code>Repository</code> object</strong></p> 
+       <pre><code class="javascript">var defaultRepository = nuxeo.repository(); // 'default' repository
+...
+var testRepository = nuxeo.repository('test'); // 'test' repository
+...
+</code></pre> 
+       <p><strong>Fetch the Root document</strong></p> 
+       <pre><code class="javascript">nuxeo.repository().fetch('/')
+  .then(function(doc) {
+    console.log(doc);
+  })
+  .catch(function(error) {
+    throw error;
+  });
+</code></pre> 
+       <p><strong>Create a new folder</strong></p> 
+       <pre><code class="javascript">var newFolder = {
+  'entity-type': 'document',
+  name: 'a-folder',
+  type: 'Folder',
+  properties: {
+    'dc:title': 'foo'
+  }
+};
+nuxeo.repository()
+  .create('/', newFolder)
+  .then(function(doc) {
+    console.log(doc);
+  })
+  .catch(function(error) {
+    throw error;
+  });
+</code></pre> 
+       <p><strong>Delete a document</strong></p> 
+       <pre><code class="javascript">nuxeo.repository()
+  .delete('/a-folder')
+  .then(function(res) {
+    // res.status === 204
+  });
+</code></pre> 
+       <h3 id="document">Document</h3>
+       <p><code>Repository</code> object returns and works with <code>Document</code> objects. <code>Document</code> objects exposes a simpler API to work with a document.</p> 
+       <p>See the <a href="https://nuxeo.github.io/nuxeo-js-client/latest/Document.html">Document</a> documentation.</p> 
+       <h4 id="samples">Samples</h4>
+       <p><strong>Retrieve a <code>Document</code> object</strong></p> 
+       <pre><code class="javascript">nuxeo.repository()
+  .fetch('/')
+  .then(function(doc) {
+    // doc instanceof Nuxeo.Document === true
+  })
+  .catch(function(error) {
+    throw error;
+  });
+</code></pre> 
+       <p><strong>Set a document property</strong></p> 
+       <pre><code class="javascript">doc.set({ 'dc:title': 'foo' });
+</code></pre> 
+       <p><strong>Get a document property</strong></p> 
+       <pre><code class="javascript">doc.get('dc:title');
+</code></pre> 
+       <p><strong>Save an updated document</strong></p> 
+       <pre><code class="javascript">nuxeo.repository()
+  .fetch('/')
+  .then(function(doc) {
+    // doc.title !== 'foo'
+    doc.set({ 'dc:title': 'foo' });
+    return doc.save();
+  })
+  .then(function(doc) {
+    // doc.title === 'foo'
+  })
+  .catch(function(error) {
+    throw error;
+  });
+</code></pre> 
+       <p><strong>Fetch the main Blob of a document</strong></p> 
+       <pre><code class="javascript">doc.fetchBlob()
+  .then(function(res) {
+    // in the browser, use res.blob() to work with the converted PDF
+    // in Node.js, use res.body
+  });
+</code></pre> 
+       <p><strong>Convert a document main Blob to PDF</strong></p> 
+       <pre><code class="javascript">doc.convert({ format: 'pdf' })
+  .then(function(res) {
+    // in the browser, use res.blob() to work with the converted PDF
+    // in Node.js, use res.body
+  });
+</code></pre> 
+       <p><strong>Fetch the 'thumbnail' rendition</strong></p> 
+       <pre><code class="javascript">doc.fetchRendition('thumbnail')
+  .then(function(res) {
+    // in the browser, use res.blob() to work with the rendition
+    // in Node.js, use res.body
+  });
+</code></pre> 
+       <p><strong>Start a workflow</strong></p> 
+       <pre><code class="javascript">doc.startWorkflow('SerialDocumentReview')
+  .then(function(workflow) {
+    // workflow instance of Nuxeo.Workflow
+  });
+</code></pre> 
+       <p><strong>Complete a workflow task</strong></p> 
+       <pre><code class="javascript">workflow.fetchTasks()
+  .then(function(tasks) {
+    return tasks[0];
+  })
+  .then(function(tasks) {
+    task.variable('participants', ['user:Administrator'])
+      .variable('assignees', ['user:Administrator'])
+      .variable('end_date', '2011-10-23T12:00:00.00Z');
+    return task.complete('start_review', { comment: 'a comment' });
+  })
+  .then(function(task) {
+    // task.state === 'ended'
+  })
+</code></pre> 
+       <h3 id="batchupload">BatchUpload</h3>
+       <p>The <code>BatchUpload</code> object allows you to upload blobs to a Nuxeo Platform instance, and use them as operation input or as document property value.</p> 
+       <p>See the <a href="https://nuxeo.github.io/nuxeo-js-client/latest/BatchUpload.html">BatchUpload</a> documentation.</p> 
+       <h4 id="samples">Samples</h4>
+       <p><strong>Create a Nuxeo.Blob to be uploaded</strong></p> 
+       <pre><code class="javascript">// on the browser, assuming you have a File object 'file'
+var blob = new Nuxeo.Blob({ content: file });
+// the name, mimeType and size will be extracted from the file object itself, you can still override them.
+...
+// on Node.js, assuming you have a Stream 'file'
+var blob = new Nuxeo.Blob({ content: file, name: 'foo.txt', mimeType: 'plain/text', size: 10 })
+</code></pre> 
+       <p><strong>Upload a blob</strong></p> 
+       <pre><code class="javascript">nuxeo.batchUpload()
+  .upload(blob)
+  .then(function(res) {
+    // res.blob instanceof Nuxeo.BatchBlob
+    console.log(res.blob);
+  })
+  .catch(function(error) {
+    throw error;
+  });
+</code></pre> 
+       <p><strong>Attach an uploaded blob to a document</strong></p> 
+       <pre><code class="javascript">nuxeo.batchUpload()
+  .upload(blob)
+  .then(function(res) {
+    return nuxeo.operation('Blob.AttachOnDocument')
+      .param('document', '/a-file')
+      .input(res.blob)
+      .execute();
+  })
+  .then(function() {
+    return nuxeo.repository().fetch('/a-file', { schemas: ['dublincore', 'file']});
+  })
+  .then(function(doc) {
+    console.log(doc.get('file:content'));
+  })
+  .catch(function(error) {
+    throw error;
+  });
+</code></pre> 
+       <h3 id="users">Users</h3>
+       <p>The <code>Users</code> object allows you to work with users.</p> 
+       <p>See the <a href="https://nuxeo.github.io/nuxeo-js-client/latest/Users.html">Users</a> and <a href="https://nuxeo.github.io/nuxeo-js-client/latest/User.html">User</a> documentation.</p> 
+       <h4 id="samples">Samples</h4>
+       <p><strong>Fetch an user</strong></p> 
+       <pre><code class="javascript">nuxeo.users()
+  .fetch('Administrator')
+  .then(function(user) {
+    // user.id === 'Administrator'
+  });
+</code></pre> 
+       <p><strong>Create a new user</strong></p> 
+       <pre><code class="javascript">var newUser = {
+  properties: {
+    username: 'leela',
+    firstName: 'Leela',
+    company: 'Futurama',
+    email: '<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fa969f9f969bba9c8f8e8f889b979bd4999597">[email&nbsp;protected]</a>'
+  },
+};
+nuxeo.users()
+  .create(newUser)
+  .then(function(user) {
+    // user.id === 'leela'
+  });
+</code></pre> 
+       <p><strong>Delete an user</strong></p> 
+       <pre><code class="javascript">nuxeo.users()
+  .delete('leela').then(function(res) {
+    // res.status === 204
+  });
+</code></pre> 
+       <h3 id="groups">Groups</h3>
+       <p>The <code>Groups</code> object allows you to work with groups.</p> 
+       <p>See the <a href="https://nuxeo.github.io/nuxeo-js-client/latest/Groups.html">Groups</a> and <a href="https://nuxeo.github.io/nuxeo-js-client/latest/Group.html">Group</a> documentation.</p> 
+       <h4 id="samples">Samples</h4>
+       <p><strong>Fetch a group</strong></p> 
+       <pre><code class="javascript">nuxeo.groups().fetch('administrators')
+  .then(function(group) {
+    // group.groupname === 'administrators'
+  });
+</code></pre> 
+       <p><strong>Create a new group</strong></p> 
+       <pre><code class="javascript">var newGroup = {
+  groupname: 'foo',
+  grouplabel: 'Foo'
+};
+nuxeo.groups()
+  .create(newGroup)
+  .then(function(group) {
+    // group.groupname === 'foo';
+  });
+</code></pre> 
+       <p><strong>Delete a group</strong></p> 
+       <pre><code class="javascript">nuxeo.groups()
+  .delete('foo').then(function(res) {
+    // res.status === 204
+  });
+</code></pre> 
+       <h3 id="directory">Directory</h3>
+       <p>The <code>Directory</code> object allows you to work with directories.</p> 
+       <p>See the <a href="https://nuxeo.github.io/nuxeo-js-client/latest/Directory.html">Directory</a> and <a href="https://nuxeo.github.io/nuxeo-js-client/latest/DirectoryEntry.html">DirectoryEntry</a> documentation.</p> 
+       <h4 id="samples">Samples</h4>
+       <p><strong>Fetch all entries of a directory</strong></p> 
+       <pre><code class="javascript">nuxeo.directory('nature')
+  .fetchAll()
+  .then(function(entries) {
+    // entries instance of Array
+  });
+</code></pre> 
+       <p><strong>Fetch a given directory entry</strong></p> 
+       <pre><code class="javascript">nuxeo.directory('nature')
+  .fetch('article')
+  .then(function(entry) {
+    // entry.directoryName === 'nature'
+    // entry.properties.id === 'article'
+  });
+</code></pre> 
+       <p><strong>Create a new directory entry</strong></p> 
+       <pre><code class="javascript">var newEntry = {
+  properties: {
+    id: 'foo',
+    label: 'Foo'
+  },
+};
+nuxeo.directory('nature')
+  .create(newEntry)
+  .then(function(entry) {
+    // entry.directoryName === 'nature'
+    // entry.properties.id === 'foo'
+  });
+</code></pre> 
+       <p><strong>Delete a directory entry</strong></p> 
+       <pre><code class="javascript">nuxeo.directory('nature')
+ .delete('foo')
+ .then(function(res) {
+   // res.status === 204
+ });
+</code></pre> 
+       <h2 id="contributing">Contributing</h2>
+       <p>See our <a href="https://doc.nuxeo.com/x/VIZH">contribution documentation</a>.</p> 
+       <h3 id="requirements">Requirements</h3>
+       <ul start="null"> 
+        <li><a href="https://nodejs.org/#download">Node.js</a></li> 
+        <li><a href="http://gulpjs.com/">gulp</a></li> 
+        <li><a href="https://bower.io/">Bower</a></li> 
+        <li><a href="https://www.npmjs.com/">npm</a></li> 
+       </ul> 
+       <h3 id="setup">Setup</h3>
+       <p>Install <a href="https://nodejs.org/#download">Node.js</a> and then use <code>npm</code> to install all the required libraries:</p> 
+       <pre><code>$ git clone https://github.com/nuxeo/nuxeo-js-client
+$ cd nuxeo-js-client
+$ npm install
+</code></pre>
+       <h3 id="test">Test</h3>
+       <p>A Nuxeo Platform instance needs to be running on <code>http://localhost:8080/nuxeo</code> for the tests to be run.</p> 
+       <p>Tests can be launched on Node.js with:</p> 
+       <pre><code>$ gulp test:node
+</code></pre>
+       <p>For testing the browser client (tests are run on Firefox and Chrome by default):</p> 
+       <pre><code>$ gulp test:browser
+</code></pre>
+       <p>To run both Node.js and browser tests:</p> 
+       <pre><code>$ gulp test
+</code></pre>
+       <h3 id="reporting-issues">Reporting Issues</h3>
+       <p>You can follow the developments in the Nuxeo JS Client project of our JIRA bug tracker: <a href="https://jira.nuxeo.com/browse/NXJS">https://jira.nuxeo.com/browse/NXJS</a>.</p> 
+       <p>You can report issues on <a href="http://answers.nuxeo.com">answers.nuxeo.com</a>.</p> 
+       <h2 id="license">License</h2>
+       <p><a href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License 2.0</a> Copyright (c) Nuxeo SA</p> 
+       <h2 id="about-nuxeo">About Nuxeo</h2>
+       <p>Nuxeo dramatically improves how content-based applications are built, managed and deployed, making customers more agile, innovative and successful. Nuxeo provides a next generation, enterprise ready platform for building traditional and cutting-edge content oriented applications. Combining a powerful application development environment with SaaS-based tools and a modular architecture, the Nuxeo Platform and Products provide clear business value to some of the most recognizable brands including Verizon, Electronic Arts, Sharp, FICO, the U.S. Navy, and Boeing. Nuxeo is headquartered in New York and Paris. More information is available at <a href="http://www.nuxeo.com/">www.nuxeo.com</a>.</p> 
+       <p></p> 
+       <p>&nbsp;</p> 
+       <hr> 
+       <div class="row" data-equalizer data-equalize-on="medium">
+        <div class="column medium-6">
+         <div class="callout ">
+          <div class="title">
+           Related pages in current documentation
+          </div>
+          <ul start="null"> 
+           <li><a href="/nxdoc/jsf-and-javascript/">JSF and JavaScript</a></li> 
+           <li><a href="/nxdoc/how-to-declare-the-css-and-javascript-resources-used-in-your-templates/">How to Declare the CSS and JavaScript Resources Used in Your Templates</a></li> 
+           <li><a href="">Developing with AngularJS</a></li> 
+          </ul> 
+         </div> 
+        </div>
+        <div class="column medium-6">
+         <div class="callout ">
+          <div class="title">
+           Related Blog Posts
+          </div>
+          <ul start="null"> 
+           <li><a href="http://www.nuxeo.com/blog/developping-content-application-mustachejs-bootstrap-nuxeojs/">A Content App in JavaScript Using Mustache, Bootstrap and nuxeo.js&nbsp;</a></li> 
+           <li><a href="http://www.nuxeo.com/blog/import-documents-nuxeo-platform-using-node-js/">Import Documents in the Nuxeo Platform Using Node.js</a></li> 
+           <li><a href="http://www.nuxeo.com/blog/nodejs-nuxeo-client/">Using the node.js Nuxeo Client</a></li> 
+          </ul> 
+         </div> 
+        </div>
+       </div> 
+      </div> 
+      <div class="small reveal" id="page-information" data-reveal data-animation-in="slide-in-right" data-animation-out="slide-out-right"> 
+       <button class="close-button" data-close aria-label="Close modal" type="button"> <span aria-hidden="true">×</span> </button> 
+       <div class="content"> 
+        <div id="page-information-tags" class="column "> 
+         <a href="/nxdoc/label/lts2016-ok">lts2016-ok</a>, 
+         <a href="/nxdoc/label/javascript">javascript</a>, 
+         <a href="/nxdoc/label/client">client</a>, 
+         <a href="/nxdoc/label/sdk">sdk</a>, 
+         <a href="/nxdoc/label/nuxeo-js">nuxeo-js</a>, 
+         <a href="/nxdoc/label/javascript-client-component">javascript-client-component</a>, 
+         <a href="/nxdoc/label/link-update">link-update</a> 
+        </div> 
+        <table class="hover stack"> 
+         <tbody>
+          <tr> 
+           <td title="6 Dec 2016 17:08">9 months ago</td> 
+           <td>Thomas Roger</td> 
+           <td>Review JavaScript client doc</td> 
+          </tr> 
+          <tr> 
+           <td title="2 Dec 2016 11:07">9 months ago</td> 
+           <td>Andrew Goodricke</td> 
+           <td>Add content-review-lts2016 to labels</td> 
+          </tr> 
+          <tr> 
+           <td title="10 Nov 2016 13:47">10 months ago</td> 
+           <td>Kevin Leturc</td> 
+           <td>NXP-19481: Update MarkLogic page to detail how to configure range element indexes</td> 
+          </tr> 
+          <tr> 
+           <td title="16 Sep 2015 11:27">2 years ago</td> 
+           <td>Manon Lumeau</td> 
+           <td>14</td> 
+          </tr> 
+          <tr> 
+           <td title="31 Aug 2015 13:18">2 years ago</td> 
+           <td>Solen Guitter</td> 
+           <td>13</td> 
+          </tr> 
+          <tr> 
+           <td title="3 Aug 2015 12:19">2 years ago</td> 
+           <td>Anahide Tchertchian</td> 
+           <td>12</td> 
+          </tr> 
+          <tr> 
+           <td title="23 Jun 2015 10:55">2 years ago</td> 
+           <td>Bertrand Chauvin</td> 
+           <td>11 | Added link to AngularJS doc</td> 
+          </tr> 
+          <tr> 
+           <td title="26 Dec 2014 13:00">3 years ago</td> 
+           <td>Solen Guitter</td> 
+           <td>10 | Add link to latest blog post about JavaScript client</td> 
+          </tr> 
+          <tr> 
+           <td title="17 Dec 2014 13:31">3 years ago</td> 
+           <td>Solen Guitter</td> 
+           <td>9 | Display readme from GitHub</td> 
+          </tr> 
+          <tr> 
+           <td title="16 Dec 2014 16:42">3 years ago</td> 
+           <td>Solen Guitter</td> 
+           <td>8 | Update related pages</td> 
+          </tr> 
+          <tr> 
+           <td title="1 Jul 2014 00:54">3 years ago</td> 
+           <td>Alain Escaffre</td> 
+           <td>7</td> 
+          </tr> 
+          <tr> 
+           <td title="7 Apr 2014 10:56">3 years ago</td> 
+           <td>Solen Guitter</td> 
+           <td>6</td> 
+          </tr> 
+          <tr> 
+           <td title="1 Apr 2014 18:53">3 years ago</td> 
+           <td>Alain Escaffre</td> 
+           <td>5</td> 
+          </tr> 
+          <tr> 
+           <td title="27 Mar 2014 11:17">3 years ago</td> 
+           <td>Solen Guitter</td> 
+           <td>4</td> 
+          </tr> 
+          <tr> 
+           <td title="20 Mar 2014 02:14">3 years ago</td> 
+           <td>Alain Escaffre</td> 
+           <td>3</td> 
+          </tr> 
+          <tr> 
+           <td title="20 Mar 2014 02:13">3 years ago</td> 
+           <td>Alain Escaffre</td> 
+           <td>1</td> 
+          </tr> 
+          <tr> 
+           <td title="20 Mar 2014 02:13">3 years ago</td> 
+           <td>Alain Escaffre</td> 
+           <td>2</td> 
+          </tr> 
+         </tbody>
+        </table> 
+        <div class="summary">
+         History: Created by 
+         <strong>Alain Escaffre</strong>
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+   </div> 
+   <div id="side_menu_container" class="column show-for-medium medium-4 large-3 medium-pull-8 large-pull-9"> 
+    <div id="side_menu" data-space="nxdoc"> 
+     <div> 
+      <div class="input-container"> 
+       <div class="input-group"> 
+        <input type="text" placeholder="FILTER MENU…" class="input-group-field menu-filter"> 
+       </div> 
+      </div> 
+      <ul> 
+       <li id="menu_item_0" data-menu-id="client-sdks" data-menu-level="1" data-menu-parent="" data-init-open="" data-init-show="show" class="l1"> <a href="/nxdoc/client-sdks/">Client SDKs</a> </li> 
+       <li id="menu_item_1" data-menu-id="javascript-client" data-menu-level="2" data-menu-parent="client-sdks" data-init-open="open" data-init-show="show" class="pclient-sdks active l2 open"> <a href="/nxdoc/javascript-client/">JavaScript Client</a> </li> 
+       <li id="menu_item_2" data-menu-id="java-client" data-menu-level="2" data-menu-parent="client-sdks" data-init-open="" data-init-show="show" class="pclient-sdks l2"> <a href="/nxdoc/java-client/">Java Client</a> </li> 
+       <li id="menu_item_3" data-menu-id="python-client" data-menu-level="2" data-menu-parent="client-sdks" data-init-open="" data-init-show="show" class="pclient-sdks l2"> <a href="/nxdoc/python-client/">Python Client</a> </li> 
+       <li id="menu_item_4" data-menu-id="net-client" data-menu-level="2" data-menu-parent="client-sdks" data-init-open="" data-init-show="show" class="pclient-sdks l2"> <a href="/nxdoc/net-client/">.NET Client</a> </li> 
+       <li id="menu_item_5" data-menu-id="ios-client" data-menu-level="2" data-menu-parent="client-sdks" data-init-open="" data-init-show="show" class="pclient-sdks l2"> <a href="/nxdoc/ios-client/">iOS Client</a> </li> 
+       <li id="menu_item_6" data-menu-id="android-client" data-menu-level="2" data-menu-parent="client-sdks" data-init-open="" data-init-show="show" class="pclient-sdks l2"> <a href="/nxdoc/android-client/">Android Client</a> </li> 
+       <li id="menu_item_7" data-menu-id="php-automation-client" data-menu-level="2" data-menu-parent="client-sdks" data-init-open="" data-init-show="show" class="pclient-sdks l2"> <a href="/nxdoc/php-automation-client/">PHP Automation Client</a> </li> 
+       <li id="menu_item_8" data-menu-id="client-api-test-suite-tck" data-menu-level="2" data-menu-parent="client-sdks" data-init-open="" data-init-show="show" class="pclient-sdks l2"> <a href="/nxdoc/client-api-test-suite-tck/">Client API Test suite (TCK)</a> </li> 
+       <li id="menu_item_9" data-menu-id="using-curl" data-menu-level="2" data-menu-parent="client-sdks" data-init-open="" data-init-show="show" class="pclient-sdks l2"> <a href="/nxdoc/using-curl/">Using cURL</a> </li> 
+       <li id="menu_item_10" data-menu-id="deprecated" data-menu-level="2" data-menu-parent="client-sdks" data-init-open="" data-init-show="show" class="pclient-sdks has-control l2"> <i class="fa fa-fw fa-caret-right" aria-hidden="true"></i> <a href="/nxdoc/deprecated/">Deprecated</a> </li> 
+       <li id="menu_item_11" data-menu-id="java-automation-client" data-menu-level="3" data-menu-parent="deprecated" data-init-open="" data-init-show="" class="pclient-sdks pdeprecated l3" style="display: none;"> <a href="/nxdoc/java-automation-client/">Java Automation Client</a> </li> 
+      </ul> 
+     </div> 
+    </div> 
+   </div> 
+  </div> 
+  <div id="docs_footer" class="row expanded"> 
+   <button id="goto_top" type="button"> <img src="/assets/imgs/icons/goto-top-icon.svg"> <span>To Top</span> </button> 
+   <div id="versions_inline" class="row expanded"> 
+    <ul class="menu"> 
+     <li class="label">Documentation versions <span class="vertical-bar"></span></li> 
+     <li><a href="/nxdoc/javascript-client/" class="active">FT</a></li> 
+     <li><a href="/810/nxdoc/javascript-client/" class="">LTS 2016</a></li> 
+     <li><a href="/710/nxdoc/javascript-client/" class="">LTS 2015</a></li> 
+     <li><a href="/60/nxdoc/javascript-client/" class="">6.0</a></li> 
+    </ul> 
+   </div> 
+   <nuxeo-footer year="2017" show-license> 
+    <nuxeo-footer-column column-items="[[
+        {&quot;title&quot;: &quot;Why Nuxeo?&quot;, &quot;url&quot;: &quot;https://nuxeo.com/why-nuxeo/&quot;}], [
+        {&quot;title&quot;: &quot;Contact&quot;, &quot;url&quot;: &quot;https://nuxeo.com/about/contact/&quot;},
+        {&quot;title&quot;: &quot;Request a Demo&quot;, &quot;url&quot;: &quot;https://nuxeo.com/about/request-demo/&quot;}]]"></nuxeo-footer-column> 
+    <nuxeo-footer-column column-items="[[
+        {&quot;title&quot;: &quot;Nuxeo Platform&quot;, &quot;url&quot;: &quot;https://nuxeo.com/products/content-management-platform/&quot;},
+        {&quot;title&quot;: &quot;Nuxeo Studio&quot;, &quot;url&quot;: &quot;https://nuxeo.com/products/studio/&quot;},
+        {&quot;title&quot;: &quot;Integrations&quot;, &quot;url&quot;: &quot;https://nuxeo.com/integration/&quot;},
+        {&quot;title&quot;: &quot;REST API&quot;, &quot;url&quot;: &quot;https://nuxeo.com/rest-api/&quot;},
+        {&quot;title&quot;: &quot;Performance &amp; Scalability&quot;, &quot;url&quot;: &quot;https://nuxeo.com/products/performance/&quot;}], [
+        {&quot;title&quot;: &quot;Download or Online Trial&quot;, &quot;url&quot;: &quot;https://nuxeo.com/downloads/&quot;}]]"></nuxeo-footer-column> 
+    <nuxeo-footer-column column-items="[[
+        {&quot;title&quot;: &quot;Use Cases&quot;, &quot;url&quot;: &quot;https://nuxeo.com/solutions/digital-asset-management/&quot;},
+        {&quot;title&quot;: &quot;Document Management&quot;, &quot;url&quot;: &quot;https://nuxeo.com/solutions/document-management/&quot;},
+        {&quot;title&quot;: &quot;Digital Asset Management&quot;, &quot;url&quot;: &quot;https://nuxeo.com/solutions/digital-asset-management/&quot;},
+        {&quot;title&quot;: &quot;More Use Cases…&quot;, &quot;url&quot;: &quot;https://nuxeo.com/solutions/&quot;}], [
+        {&quot;title&quot;: &quot;Customers&quot;, &quot;url&quot;: &quot;https://nuxeo.com/customers/&quot;}]]"></nuxeo-footer-column> 
+    <nuxeo-footer-column column-items="[[
+        {&quot;title&quot;: &quot;Learning&quot;, &quot;url&quot;: &quot;https://nuxeo.com/resources/&quot;},
+        {&quot;title&quot;: &quot;Reports&quot;, &quot;url&quot;: &quot;https://nuxeo.com/reports/&quot;},
+        {&quot;title&quot;: &quot;Blog&quot;, &quot;url&quot;: &quot;https://nuxeo.com/blog/&quot;},
+        {&quot;title&quot;: &quot;University&quot;, &quot;url&quot;: &quot;https://university.nuxeo.io/&quot;}], [
+        {&quot;title&quot;: &quot;Services&quot;, &quot;url&quot;: &quot;https://nuxeo.com/services/&quot;}]]"></nuxeo-footer-column> 
+   </nuxeo-footer> 
+  </div> 
+  <script>!function(e,t,r,n,c,h,o){function a(e,t,r,n){for(r='',n='0x'+e.substr(t,2)|0,t+=2;t<e.length;t+=2)r+=String.fromCharCode('0x'+e.substr(t,2)^n);return r}try{for(c=e.getElementsByTagName('a'),o='/cdn-cgi/l/email-protection#',n=0;n<c.length;n++)try{(t=(h=c[n]).href.indexOf(o))>-1&&(h.href='mailto:'+a(h.href,t+o.length))}catch(e){}for(c=e.querySelectorAll('.__cf_email__'),n=0;n<c.length;n++)try{(h=c[n]).parentNode.replaceChild(e.createTextNode(a(h.getAttribute('data-cfemail'),0)),h)}catch(e){}}catch(e){}}(document);</script>
+  <script type="text/javascript" src="/assets/js/5d9f82c7de0fa890e5e5/vendor.bundle.js"></script> 
+  <script type="text/javascript" src="/assets/js/5d9f82c7de0fa890e5e5/docs.5d9f82c7de0fa890e5e5.bundle.js"></script> 
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/docsearch.js/2/docsearch.min.js"></script> 
+  <script type="text/javascript"> docsearch({
+apiKey: '482c0a65c92c01569f0d04bac01b5979',
+indexName: 'nuxeo',
+inputSelector: '#search-input',
+algoliaOptions: {
+    filters: 'tags:ft OR tags:static',
+    hitsPerPage: 10
+},
+debug: false // Set debug to true if you want to inspect the dropdown ""
+});
+</script>   
  </body>
 </html>

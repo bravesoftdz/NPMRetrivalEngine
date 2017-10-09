@@ -27,6 +27,8 @@ import metasearch.MetaSearcherImp;
 import metasearch.Searcher;
 import metasearch.cache.CacheRankingManager;
 import ner.HiperlinkMatching;
+import ner.Stanford_CRF;
+import ner.StringMatching;
 import ranking.RankedItem;
 import ranking.Ranking;
 import util.ConfigManager;
@@ -71,7 +73,11 @@ public class AggregateData {
 
 		NPMWrapper npm = new NPMWrapper(max_results, NPMWrapper.OPTIMAL);
 		GoogleWrapper google = new GoogleWrapper(max_results,new HiperlinkMatching());
-		//BingWrapper bing = new BingWrapper(max_results,new HiperlinkMatching());
+		GoogleWrapper google2 = new GoogleWrapper(max_results,new StringMatching());
+		GoogleWrapper google3 = new GoogleWrapper(max_results,new Stanford_CRF());
+		BingWrapper bing = new BingWrapper(max_results,new HiperlinkMatching());
+		BingWrapper bing2 = new BingWrapper(max_results,new StringMatching());
+		BingWrapper bing3 = new BingWrapper(max_results,new Stanford_CRF());
 		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);
 		
 		/**
@@ -116,11 +122,16 @@ public class AggregateData {
 		filters.add(npm);	
 		List<Searcher> externalRank = new ArrayList<Searcher>();
 		externalRank.add(google);
+		externalRank.add(google2);
+		externalRank.add(google3);
+		externalRank.add(bing);
+		externalRank.add(bing2);
+		externalRank.add(bing3);
 		
 		FilterExternalRankAgregator filterGoogleRankAgregator = new FilterExternalRankAgregator();
 		filterGoogleRankAgregator.setName(filterGoogleRankAgregator.getPrefix()+externalRank.get(0).getId());
 
-		/*for (int i = 0 ; i < max_queries ; i++) {
+		for (int i = 0 ; i < max_queries ; i++) {
 
 			String query = QueryManager.getInstance().getQueries().get(i);
 
@@ -147,8 +158,7 @@ public class AggregateData {
 			
 			System.out.println();
 
-		}
-		*/
+		}		
 		
 		
 		/**
@@ -159,14 +169,14 @@ public class AggregateData {
 		//searchers.add(lucene);
 		//searchers.add(google);
 		searchers.add(npm);
-		searchers.add(npmsearch);
+		//searchers.add(npmsearch);
 		searchers.add(new MetaSearcherImp(externalRank, filterGoogleRankAgregator, max_results));
 		
 		List<Aggregator> aggregators = new ArrayList<Aggregator>();
 
 		
 
-		/*Aggregator m1 = new M1();
+		Aggregator m1 = new M1();
 		aggregators.add(m1);
 		
 		Aggregator m2 = new M2();
@@ -176,20 +186,20 @@ public class AggregateData {
 		aggregators.add(m3);
 		
 		Aggregator m4 = new M4();
-		aggregators.add(m4);*/
+		aggregators.add(m4);
 		
 		Double[] weights_borda = {0.50, 0.00, 0.50};
 		Aggregator w_borda = new WeightedBordaFuse(Arrays.asList(weights_borda));
 		aggregators.add(w_borda);
 		
-		/*Aggregator borda = new BordaFuse();
+		Aggregator borda = new BordaFuse();
 		aggregators.add(borda);
 		
 		Aggregator boosted_borda = new BoostedBordaFuse();
 		aggregators.add(boosted_borda);
 		
 		Aggregator cordorcet = new CordorcetAggregator();
-		aggregators.add(cordorcet);*/
+		aggregators.add(cordorcet);
 		
 		for (Aggregator aggregator : aggregators) {
 			for (int i = 0 ; i < max_queries ; i++) {

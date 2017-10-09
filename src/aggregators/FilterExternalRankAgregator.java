@@ -24,17 +24,18 @@ public class FilterExternalRankAgregator implements Aggregator {
 		
 		List<RankedItem> result = new ArrayList<RankedItem>();
 		
-		if (rankings != null && rankings.size() == 1){ 
-			Ranking ranking = rankings.get(0);
-			for(RankedItem item:ranking.getRankingList()){
-				for(Ranking filter:filters){
-					if(!result.contains(item) && filter.contains(item)){
-						Double weightedScore = item.getScore()/**weights.get(i)*/;
-						result.add(new RankedItem(item.getName(), weightedScore));
+		if (rankings != null && rankings.size() > 0){ 
+			for(Ranking ranking:rankings){
+				for(RankedItem item:ranking.getRankingList()){
+					for(Ranking filter:filters){
+						if(!result.contains(item) && filter.contains(item)){
+							Double weightedScore = item.getScore()/**weights.get(i)*/;
+							result.add(new RankedItem(item.getName(), weightedScore));
+						}
 					}
 				}
 			}
-		}else System.out.println("Warning: Ranking list (r) need to be: 0 < r < 2 ");
+		}else System.out.println("Warning: Ranking list (r) need to be: > 0 ");
 		
 		return new Ranking(result);
 	}

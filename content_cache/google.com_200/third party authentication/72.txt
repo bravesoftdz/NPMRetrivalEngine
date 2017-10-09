@@ -1,394 +1,476 @@
 <!doctype html>
-<html>
+<html lang="en-US" prefix="og: http://ogp.me/ns#">
  <head> 
-  <title>HTTP API - Wrappers - SoundCloud Developers</title> 
-  <script src="/assets/application-d9a60bae78d5a7f9f459a2f3852c8107.js" type="text/javascript"></script> 
-  <link href="https://style.sndcdn.com/css/interstate-0ab59479718c8235122cad6b16a66953d725c43a.css" media="screen" rel="stylesheet" type="text/css"> 
-  <link href="https://style.sndcdn.com/css/sc-2a570b50658785a42b5e465d6f88aee4b1423a58.css" media="screen" rel="stylesheet" type="text/css"> 
-  <link href="/assets/application-93c7b42aea16b74c4b10ce33e93f99f1.css" media="screen" rel="stylesheet" type="text/css"> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"> 
+  <link rel="profile" href="http://gmpg.org/xfn/11"> 
+  <link rel="pingback" href="http://heidloff.net/xmlrpc.php"> 
+  <!--[if lt IE 9]>
+	<script src="http://heidloff.net/wp-content/themes/accesspress-lite/js/html5.min.js"></script>
+<![endif]--> 
+  <title>Authentication in Node.js Applications on Bluemix</title> 
+  <!-- This site is optimized with the Yoast SEO plugin v2.3.5 - https://yoast.com/wordpress/plugins/seo/ --> 
+  <meta name="description" content="Authentication in Node.js Applications on Bluemix"> 
+  <link rel="canonical" href="http://heidloff.net/article/authentication-node-js-bluemix"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="Authentication in Node.js Applications on Bluemix"> 
+  <meta property="og:description" content="Authentication in Node.js Applications on Bluemix"> 
+  <meta property="og:url" content="http://heidloff.net/article/authentication-node-js-bluemix"> 
+  <meta property="og:site_name" content="Niklas Heidloff"> 
+  <meta property="article:section" content="Articles"> 
+  <meta property="article:published_time" content="2016-02-09T08:03:02+00:00"> 
+  <meta property="article:modified_time" content="2016-02-17T07:40:57+00:00"> 
+  <meta property="og:updated_time" content="2016-02-17T07:40:57+00:00"> 
+  <meta property="og:image" content="http://heidloff.net/wp-content/uploads/2016/02/sso-setup-3.png"> 
+  <meta property="og:image" content="http://heidloff.net/wp-content/uploads/2016/02/login-1.png"> 
+  <meta name="twitter:card" content="summary_large_image"> 
+  <meta name="twitter:description" content="Authentication in Node.js Applications on Bluemix"> 
+  <meta name="twitter:title" content="Authentication in Node.js Applications on Bluemix"> 
+  <meta name="twitter:site" content="@nheidloff"> 
+  <meta name="twitter:domain" content="Niklas Heidloff"> 
+  <meta name="twitter:image" content="http://heidloff.net/wp-content/uploads/2016/02/sso-setup-3.png"> 
+  <meta name="twitter:creator" content="@nheidloff"> 
+  <!-- / Yoast SEO plugin. --> 
+  <link rel="alternate" type="application/rss+xml" title="Niklas Heidloff » Feed" href="http://heidloff.net/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Niklas Heidloff » Comments Feed" href="http://heidloff.net/comments/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="Niklas Heidloff » Authentication in Node.js Applications on Bluemix Comments Feed" href="http://heidloff.net/article/authentication-node-js-bluemix/feed/"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"http:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/heidloff.net\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.3.12"}};
+			!function(a,b,c){function d(a){var c=b.createElement("canvas"),d=c.getContext&&c.getContext("2d");return d&&d.fillText?(d.textBaseline="top",d.font="600 32px Arial","flag"===a?(d.fillText(String.fromCharCode(55356,56812,55356,56807),0,0),c.toDataURL().length>3e3):(d.fillText(String.fromCharCode(55357,56835),0,0),0!==d.getImageData(16,16,1,1).data[0])):!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g;c.supports={simple:d("simple"),flag:d("flag")},c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.simple&&c.supports.flag||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <link rel="stylesheet" id="accesspresslite-google-fonts-css" href="//fonts.googleapis.com/css?family=Open+Sans%3A400%2C400italic%2C300italic%2C300%2C600%2C600italic%7CLato%3A400%2C100%2C300%2C700&amp;ver=4.3.12" type="text/css" media="all"> 
+  <link rel="stylesheet" id="accesspresslite-font-awesome-css" href="http://heidloff.net/wp-content/themes/accesspress-lite/css/font-awesome.min.css?ver=4.3.12" type="text/css" media="all"> 
+  <link rel="stylesheet" id="accesspresslite-fancybox-css-css" href="http://heidloff.net/wp-content/themes/accesspress-lite/css/nivo-lightbox.css?ver=4.3.12" type="text/css" media="all"> 
+  <link rel="stylesheet" id="accesspresslite-bx-slider-style-css" href="http://heidloff.net/wp-content/themes/accesspress-lite/css/jquery.bxslider.css?ver=4.3.12" type="text/css" media="all"> 
+  <link rel="stylesheet" id="accesspresslite-woo-commerce-style-css" href="http://heidloff.net/wp-content/themes/accesspress-lite/css/woocommerce.css?ver=4.3.12" type="text/css" media="all"> 
+  <link rel="stylesheet" id="accesspresslite-font-style-css" href="http://heidloff.net/wp-content/themes/accesspress-lite/css/fonts.css?ver=4.3.12" type="text/css" media="all"> 
+  <link rel="stylesheet" id="accesspresslite-style-css" href="http://heidloff.net/wp-content/themes/accesspress-lite/style.css?ver=4.3.12" type="text/css" media="all"> 
+  <link rel="stylesheet" id="accesspresslite-responsive-css" href="http://heidloff.net/wp-content/themes/accesspress-lite/css/responsive.css?ver=4.3.12" type="text/css" media="all"> 
+  <link rel="stylesheet" id="wptt_front-css" href="http://heidloff.net/wp-content/plugins/wp-twitter-feeds/css/admin_style.min.css?ver=4.3.12" type="text/css" media="all"> 
+  <link rel="stylesheet" id="genericons-css" href="http://heidloff.net/wp-content/plugins/jetpack/_inc/genericons/genericons/genericons.css?ver=3.1" type="text/css" media="all"> 
+  <link rel="stylesheet" id="jetpack_css-css" href="http://heidloff.net/wp-content/plugins/jetpack/css/jetpack.css?ver=3.8.0" type="text/css" media="all"> 
+  <script type="text/javascript" src="http://heidloff.net/wp-includes/js/jquery/jquery.js?ver=1.11.3"></script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1"></script> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://heidloff.net/xmlrpc.php?rsd"> 
+  <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://heidloff.net/wp-includes/wlwmanifest.xml"> 
+  <meta name="generator" content="WordPress 4.3.12"> 
+  <link rel="shortlink" href="http://wp.me/p6Xe9Q-tM"> 
+  <style type="text/css">img#wpstats{display:none}</style>
+  <link rel="shortcut icon" type="image/png" href="http://heidloff.net/wp-content/uploads/2015/11/android-icon-144x144.png">
+  <style type="text/css">.site-info { 
+    visibility:hidden;
+}
+
+.sidebar {
+    max-width: 300px;
+}
+
+.syntaxhighlighter .gutter .line {
+    border-right: 3px solid #01AEFD !important;
+}</style>
+  <link rel="dns-prefetch" href="//platform.twitter.com"> 
+  <style type="text/css" id="syntaxhighlighteranchor"></style> 
+  <!-- BEGIN GADWP v4.8.3 Universal Tracking - https://deconf.com/google-analytics-dashboard-wordpress/ --> 
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-21626700-1', 'auto');
+  ga('send', 'pageview');
+</script> 
+  <!-- END GADWP Universal Tracking --> 
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Authentication in Node.js Applications on Bluemix">
+  <meta name="twitter:site" content="@nheidloff">
+  <meta name="twitter:description" content="There are different ways how to do authentication in Node.js applications running on Bluemix, either via Bluemix services, third party offerings, open source libraries or self written code. Below is a sample that leverages the Single Sign On service and a Mongo database to store user sessions for cloud native applications. Get the code from…">
+  <meta name="twitter:image" content="http://heidloff.net/wp-content/uploads/2016/02/login-1.png">
+  <meta name="twitter:image:width" content="800">
+  <meta name="twitter:image:height" content="464">
+  <meta name="twitter:creator" content="@nheidloff"> 
+  <meta name="twitter:widgets:link-color" content="#000000">
+  <meta name="twitter:widgets:border-color" content="#000000">
+  <meta name="twitter:partner" content="tfwp">
  </head> 
- <body class="docs"> 
-  <div class="sc-header"> 
-   <nav> 
-    <a href="http://soundcloud.com/" class="sc-logo" title="Go to SoundCloud.com">SoundCloud</a> 
-    <ul> 
-     <li><a href="/" class="current">Developers</a></li> 
-     <li><a href="http://blog.soundcloud.com">Blog</a></li> 
-     <li><a href="http://soundcloud.tumblr.com/">Tumblr</a></li> 
-     <li><a href="https://soundcloud.com/jobs">Jobs</a></li> 
-    </ul> 
-   </nav> 
-   <hgroup> 
-    <h1>SoundCloud for Developers</h1> 
-    <h2>Discover, connect and build</h2> 
-   </hgroup> 
-  </div> 
-  <div class="sc-header-wipeout"> 
-   <div class="two-columns"> 
-    <aside class="menu">
-     <div class="main-menu"> 
-      <ul> 
-       <li class="head"> <a href="/">Developers</a> </li> 
-       <li class="head"> <a href="http://soundcloud.com/you/apps" target="_blank">Your Apps</a> </li> 
-       <li class="head"> <a href="http://soundcloud.com/you/apps/new" target="_blank"><span style="text-decoration: line-through"> Register a new app </span> <span> (Currently unavailable) </span> </a></li> 
-       <li class="head"> <a href="/docs/api/guide">HTTP API Guide</a> </li> 
-       <li class="head"> <a href="/docs/api/reference">HTTP API Reference</a> </li> 
-       <li class="active head"> <a href="/docs/api/sdks">HTTP API Wrappers</a> </li>
-       <li class="sub"> <a href="#javascript">JavaScript SDK</a> </li> 
-       <li class="sub"> <a href="https://github.com/soundcloud/soundcloud-ruby" target="_blank">Ruby</a> </li> 
-       <li class="sub"> <a href="https://github.com/soundcloud/soundcloud-python" target="_blank">Python</a> </li>  
-       <li class="head"> <a href="/docs/api/html5-widget">Widget API</a> </li> 
-       <li class="head"> <a href="/docs/api/rate-limits">Rate Limits</a> </li> 
-       <li class="head"> <a href="/support">Support</a> </li> 
-       <li class="head"> <a href="/blog">Backstage Blog</a> </li> 
-       <li class="head"> <a href="/docs/api/buttons-logos">Buttons &amp; Logos</a> </li> 
-       <li class="head"> <a href="/docs/api/terms-of-use">Terms of Use</a> </li> 
-      </ul> 
+ <body class="single single-post postid-1846 single-format-standard right-sidebar"> 
+  <div id="page" class="site"> 
+   <header id="masthead" class="site-header"> 
+    <div id="top-header"> 
+     <div class="ak-container"> 
+      <div class="site-branding"> 
+       <a href="http://heidloff.net/"> <h1 class="site-title">Niklas Heidloff</h1> 
+        <div class="tagline site-description"></div> </a> 
+      </div>
+      <!-- .site-branding --> 
+      <div class="right-header clearfix"> 
+       <div class="clearfix"></div> 
+       <div class="socials"> 
+        <a href="https://www.facebook.com/niklas.heidloff" class="facebook" title="Facebook" target="_blank"><span class="font-icon-social-facebook"></span></a> 
+        <a href="http://twitter.com/nheidloff" class="twitter" title="Twitter" target="_blank"><span class="font-icon-social-twitter"></span></a> 
+        <a href="https://www.youtube.com/user/nheidloff" class="youtube" title="Youtube" target="_blank"><span class="font-icon-social-youtube"></span></a> 
+        <a href="https://www.linkedin.com/in/niklasheidloff/" class="linkedin" title="Linkedin" target="_blank"><span class="font-icon-social-linkedin"></span></a> 
+        <a href="http://heidloff.net/feed/" class="rss" title="RSS" target="_blank"><span class="font-icon-rss"></span></a> 
+       </div> 
+       <div class="ak-search"> 
+        <form method="get" class="searchform" action="http://heidloff.net/" role="search"> 
+         <input type="text" name="s" value="" class="s" placeholder="Search..."> 
+         <button type="submit" name="submit" class="searchsubmit"><i class="fa fa-search"></i></button> 
+        </form> 
+       </div> 
+      </div>
+      <!-- .right-header --> 
+     </div>
+     <!-- .ak-container --> 
+    </div>
+    <!-- #top-header --> 
+    <nav id="site-navigation" class="main-navigation menu-left"> 
+     <div class="ak-container"> 
+      <h1 class="menu-toggle">Menu</h1> 
+      <div class="menu-articles-container">
+       <ul id="menu-articles" class="menu">
+        <li id="menu-item-77" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-77"><a href="http://heidloff.net">Home</a></li> 
+        <li id="menu-item-82" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-82"><a href="http://heidloff.net/page/archives">Archives</a></li> 
+        <li id="menu-item-78" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-78"><a href="http://twitter.com/nheidloff">Tweets</a></li> 
+        <li id="menu-item-76" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-76"><a href="http://www.slideshare.net/niklasheidloff">Slides</a></li> 
+        <li id="menu-item-79" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-79"><a href="https://www.youtube.com/nheidloff">Videos</a></li> 
+        <li id="menu-item-81" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-81"><a href="https://github.com/nheidloff?tab=repositories">Source Code</a></li> 
+       </ul>
+      </div> 
      </div> 
-    </aside> 
-    <section id="content"> 
-     <h1>HTTP API Wrappers</h1> 
-     <p> The SDKs will make it easier to access the SoundCloud API on your framework of choice. We officially provide and support Ruby, Python and JavaScript. All other SDKs are supported by third-party developers. </p> 
-     <p> We welcome contributions to the open source projects so imagine how happy we'd be if you submit an SDK of your own for any additional language. </p> 
-     <h2 id="javascript">JavaScript SDK</h2> 
-     <section> 
-      <p>The JavaScript SDK lets you easily integrate SoundCloud into your website or webapp.</p> 
-      <div class="note"> 
-       <p> <strong> In this section: </strong> </p>
+    </nav>
+    <!-- #site-navigation --> 
+   </header>
+   <!-- #masthead --> 
+   <section id="slider-banner"> 
+   </section>
+   <!-- #slider-banner --> 
+   <div id="content" class="site-content"> 
+    <div class="ak-container"> 
+     <div id="primary" class="content-area"> 
+      <main id="main" class="site-main" role="main"> 
+       <article id="post-1846" class="post-1846 post type-post status-publish format-standard hentry category-articles"> 
+        <header class="entry-header"> 
+         <h1 class="entry-title">Authentication in Node.js Applications on Bluemix</h1> 
+         <div class="entry-meta"> 
+          <span class="posted-on">Posted on <a href="http://heidloff.net/article/authentication-node-js-bluemix" rel="bookmark"><time class="entry-date published" datetime="2016-02-09T08:03:02+00:00">February 9, 2016</time><time class="updated" datetime="2016-02-17T07:40:57+00:00">February 17, 2016</time></a></span>
+          <span class="byline"> by <span class="author vcard"><a class="url fn n" href="http://heidloff.net/author/niklasheidloff/">Niklas Heidloff</a></span></span> 
+         </div>
+         <!-- .entry-meta --> 
+        </header>
+        <!-- .entry-header --> 
+        <div class="entry-content"> 
+         <p>There are different ways how to do authentication in Node.js applications running on <a href="https://bluemix.net" target="_blank">Bluemix</a>, either via Bluemix services, third party offerings, open source libraries or self written code. Below is a sample that leverages the <a href="https://www.ng.bluemix.net/docs/#services/SingleSignOn/index.html" target="_blank">Single Sign On</a> service and a Mongo database to store user sessions for cloud native applications.<span id="more-1846"></span></p> 
+         <p><a href="https://github.com/IBM-Bluemix/collaboration/tree/initialversion" target="_blank">Get the code from GitHub.</a></p> 
+         <p>The Single Sign On service supports different identity providers. For example enterprise customers typically use SAML. If customers don’t have an SAML identity provider, they can install an <a href="https://www.ng.bluemix.net/docs/services/SingleSignOn/idbr_info.html#idbr_overview" target="_blank">Identity Bridge</a> on premises which externalizes the SAML protocol to an LDAP version 3 compliant directory. In the sample below I use a cloud directory with only one test user, but the application code would be identical when using SAML.</p> 
+         <p><a href="http://heidloff.net/wp-content/uploads/2016/02/sso-setup-3.png"><img src="http://heidloff.net/wp-content/uploads/2016/02/sso-setup-3.png" alt="sso-setup-3" width="2288" height="666" class="alignnone size-full wp-image-1845"></a></p> 
+         <p>In the Node.js application <a href="http://passportjs.org/" target="_blank">passport</a> and <a href="https://www.npmjs.com/package/passport-idaas-openidconnect" target="_blank">passport-idaas-openidconnect</a> are used. passport-idaas-openidconnect is a passport authentication strategy for the IBM Bluemix Single Sign On service. Check out <a href="https://github.com/IBM-Bluemix/collaboration/blob/initialversion/server/authentication.js" target="_blank">authentication.js</a> for details.</p> 
+         <p>The sample code relies on cookies which are sent with the client requests and validated on the server. For cloud native applications the validation needs to work when multiple instances of applications are run. My colleague Tim Robinson documented in the article <a href="https://www.ibm.com/developerworks/library/wa-scale-sso-for-node-apps-trs-bluemix/" target="_blank">Scale single sign-on for your Node.js cloud apps</a> how to do this by leveraging Redis. My sample is very similar but uses Mongo instead of Redis.</p> 
+         <p>Follow the instructions in the <a href="https://github.com/IBM-Bluemix/collaboration/blob/initialversion/README.md" target="_blank">README</a> how to set up the sample application. Since as a developer I prefer to develop locally I documented how to configure the local development environment. After everything is set up correctly, you’ll be able to log on and access the user information in the server side code.</p> 
+         <p><a href="http://heidloff.net/wp-content/uploads/2016/02/login-1.png"><img src="http://heidloff.net/wp-content/uploads/2016/02/login-1.png" alt="login-1" width="800" height="464" class="alignnone size-full wp-image-1844"></a></p> 
+         <div class="sharedaddy sd-sharing-enabled">
+          <div class="robots-nocontent sd-block sd-social sd-social-official sd-sharing">
+           <h3 class="sd-title">Share this:</h3>
+           <div class="sd-content">
+            <ul>
+             <li class="share-twitter">
+              <div class="twitter_button">
+               <iframe allowtransparency="true" frameborder="0" scrolling="no" src="http://platform.twitter.com/widgets/tweet_button.html?url=http%3A%2F%2Fheidloff.net%2Farticle%2Fauthentication-node-js-bluemix&amp;counturl=http%3A%2F%2Fheidloff.net%2Farticle%2Fauthentication-node-js-bluemix&amp;count=horizontal&amp;text=Authentication%20in%20Node.js%20Applications%20on%20Bluemix%3A&amp;via=nheidloff" style="width:101px; height:20px;"></iframe>
+              </div></li>
+             <li class="share-linkedin">
+              <div class="linkedin_button">
+               <script type="in/share" data-url="http://heidloff.net/article/authentication-node-js-bluemix" data-counter="right"></script>
+              </div></li>
+             <li class="share-facebook">
+              <div class="fb-share-button" data-href="http://heidloff.net/article/authentication-node-js-bluemix" data-layout="button_count"></div></li>
+             <li class="share-google-plus-1">
+              <div class="googleplus1_button">
+               <div class="g-plus" data-action="share" data-annotation="bubble" data-href="http://heidloff.net/article/authentication-node-js-bluemix"></div>
+              </div></li>
+             <li class="share-email"><a rel="nofollow" data-shared="" class="share-email sd-button" href="http://heidloff.net/article/authentication-node-js-bluemix?share=email" target="_blank" title="Click to email this to a friend"><span>Email</span></a></li>
+             <li class="share-end"></li>
+            </ul>
+           </div>
+          </div>
+         </div> 
+        </div>
+        <!-- .entry-content --> 
+        <footer class="entry-footer"> 
+        </footer>
+        <!-- .entry-footer --> 
+       </article>
+       <!-- #post-## --> 
+       <div id="disqus_thread"> 
+       </div> 
+      </main>
+      <!-- #main --> 
+     </div>
+     <!-- #primary --> 
+     <div id="secondary-right" class="widget-area right-sidebar sidebar"> 
+      <aside id="text-4" class="widget widget_text">
+       <h3 class="widget-title">Niklas Heidloff</h3> 
+       <div class="textwidget">
+        <img src="/wp-content/uploads/2015/11/4Y7B9422-4.jpg" alt=""> Hi, my name is Niklas Heidloff. I work for IBM as a Developer Advocate. I like learning, conversational user experiences and serverless technologies. I'm a proud father of five and love BBQ.
+       </div> 
+      </aside>
+      <aside id="blog_subscription-2" class="widget jetpack_subscription_widget">
+       <h3 class="widget-title">Subscribe</h3> 
+       <form action="#" method="post" accept-charset="utf-8" id="subscribe-blog-blog_subscription-2"> 
+        <div id="subscribe-text"></div> 
+        <p id="subscribe-email"> <label id="jetpack-subscribe-label" for="subscribe-field-blog_subscription-2; ?>"> Email Address </label> <input type="email" name="email" required class="required" value="" id="subscribe-field-blog_subscription-2" placeholder="Email Address"> </p> 
+        <p id="subscribe-submit"> <input type="hidden" name="action" value="subscribe"> <input type="hidden" name="source" value="http://heidloff.net/article/authentication-node-js-bluemix"> <input type="hidden" name="sub-type" value="widget"> <input type="hidden" name="redirect_fragment" value="blog_subscription-2"> <input type="submit" value="Subscribe" name="jetpack_subscriptions_widget"> </p> 
+       </form> 
+       <script>
+			/*
+			Custom functionality for safari and IE
+			 */
+			(function( d ) {
+				// Creates placeholders for IE
+				if ( ( 'placeholder' in d.createElement( 'input' ) ) ) {
+					var label = d.getElementById( 'jetpack-subscribe-label' );
+						label.style.clip 	 = 'rect(1px, 1px, 1px, 1px)';
+						label.style.position = 'absolute';
+						label.style.height   = '1px';
+						label.style.width    = '1px';
+						label.style.overflow = 'hidden';
+				}
+
+				// Make sure the email value is filled in before allowing submit
+				var form = d.getElementById('subscribe-blog-blog_subscription-2'),
+					input = d.getElementById('subscribe-field-blog_subscription-2'),
+					handler = function( event ) {
+						if ( '' === input.value ) {
+							input.focus();
+
+							if ( event.preventDefault ){
+								event.preventDefault();
+							}
+
+							return false;
+						}
+					};
+
+				if ( window.addEventListener ) {
+					form.addEventListener( 'submit', handler, false );
+				} else {
+					form.attachEvent( 'onsubmit', handler );
+				}
+			})( document );
+			</script> 
+      </aside>
+      <aside id="text-6" class="widget widget_text">
+       <h3 class="widget-title">Latest Tweets</h3> 
+       <div class="textwidget"> 
+        <a data-chrome="nofooter noborders noheader transparent noscrollbar" class="twitter-timeline" href="https://twitter.com/nheidloff" data-widget-id="413338456887025664"> Tweets by @nheidloff </a> 
+        <script>
+						!function(d,s,id){var
+						js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");
+					</script>
+       </div> 
+      </aside> 
+      <aside id="recent-posts-3" class="widget widget_recent_entries"> 
+       <h3 class="widget-title">Recent Posts</h3> 
        <ul> 
-        <li> <a href="#basic">Basic Usage</a> </li> 
-        <li> <a href="#authentication">Authentication</a> </li> 
-        <li> <a href="#http">HTTP API</a> </li> 
-        <li> <a href="#streaming">Streaming</a> </li> 
-        <li> <a href="#recording">Recording</a> </li> 
-        <li> <a href="#uploading">Uploading</a> </li> 
-        <li> <a href="#embedding">Embedding</a> </li> 
-        <li> <a href="#examples">Examples</a> </li> 
-        <li> <a href="#promises">Promises</a> </li> 
-        <li> <a href="#documentation">API Documentation</a> </li> 
-        <li> <a href="#player">Player (methods &amp; events)</a> </li> 
+        <li> <a href="http://heidloff.net/article/kubernetes-helm-ibm-cloud">Deploying Apps to Kubernetes on the IBM Cloud with Helm</a> </li> 
+        <li> <a href="http://heidloff.net/article/microprofile-bluemix-kubernetes">Deploying MicroProfile based Java Applications to Bluemix</a> </li> 
+        <li> <a href="http://heidloff.net/article/microprofile-ibm-cloud-private-kubernetes">Deploying MicroProfile based Apps to IBM Cloud private</a> </li> 
+        <li> <a href="http://heidloff.net/article/watson-machine-learning-sample">Watson Machine Learning Sample for Developers</a> </li> 
+        <li> <a href="http://heidloff.net/article/pictures-hack.iaa-ibm">Some Pictures from Hack.IAA</a> </li> 
        </ul> 
-       <p></p> 
+      </aside>
+      <aside id="text-9" class="widget widget_text">
+       <h3 class="widget-title">DZone</h3> 
+       <div class="textwidget">
+        <a href="https://dzone.com/users/1394519/nheidloff.html?sort=articles"><img src="/wp-content/uploads/2015/12/22430-dzone_mvb_button1-1.jpg" alt=""></a>
+       </div> 
+      </aside>
+      <aside id="text-2" class="widget widget_text">
+       <h3 class="widget-title">Disclaimer</h3> 
+       <div class="textwidget">
+        The postings on this site are my own and don't necessarily represent my employer IBM's positions, strategies or opinions.
+       </div> 
+      </aside> 
+     </div>
+     <!-- #secondary --> 
+    </div> 
+   </div>
+   <!-- #content --> 
+   <footer id="colophon" class="site-footer" role="contentinfo"> 
+    <div id="bottom-footer"> 
+     <div class="ak-container"> 
+      <h1 class="site-info"> <a href="http://wordpress.org/">Free WordPress Theme</a> <span class="sep"> | </span> <a href="https://accesspressthemes.com/" title="AccessPress Themes" target="_blank">AccessPress Lite</a> </h1>
+      <!-- .site-info --> 
+      <div class="copyright">
+        Copyright © 2017 
+       <a href="http://heidloff.net"> Niklas Heidloff </a> 
       </div> 
-      <h3 id="basic">Basic Use</h3> 
-      <p>To start using the SDK just add this script to your HTML and initialize the client with your own <code>client_id</code> and optionally your <code>redirect_uri</code> in case you want to use authentication:</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">&lt;script src="https://connect.soundcloud.com/sdk/sdk-3.2.2.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-  SC.initialize({
-    client_id: 'YOUR_CLIENT_ID',
-    redirect_uri: 'http://example.com/callback'
-  });
-&lt;/script&gt;</code></pre> 
-      </div> 
-      <p>You can also install the SDK via <a href="https://www.npmjs.com/package/soundcloud" target="_blank">NPM</a> now: <code>npm install soundcloud</code>.</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">var SC = require('soundcloud');
-
-SC.initialize({
-  client_id: 'YOUR_CLIENT_ID',
-  redirect_uri: 'http://example.com/callback'
-});</code></pre> 
-      </div> 
-      <p>Once that's done you are all set and ready to use the SoundCloud API. For example getting a user's latest track:</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">SC.get('/user/183/tracks').then(function(tracks){
-  alert('Latest track: ' + tracks[0].title);
-});</code></pre> 
-      </div> 
-      <p>The JavaScript SDK is open source and can be found <a href="https://github.com/soundcloud/soundcloud-javascript">on Github</a>. If you are looking for example applications, have a look at <a href="#examples">the examples on this page</a>.</p> 
-      <h3 id="authentication">Authentication</h3> 
-      <p>To use the authentication you have to host a <code>callback.html</code> file on your server and set it as the <code>redirect_uri</code> in your <a href="http://soundcloud.com/you/apps">app settings</a> and when initializing the SDK. This <code>callback.html</code> file needs to contain just a few lines:</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">&lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
-  &lt;head&gt;
-    &lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
-    &lt;title&gt;Connect with SoundCloud&lt;/title&gt;
-  &lt;/head&gt;
-  &lt;body onload="window.setTimeout(window.opener.SC.connectCallback, 1)"&gt;
-    &lt;b style="text-align: center;"&gt;This popup should automatically close in a few seconds&lt;/b&gt;
-  &lt;/body&gt;
-&lt;/html&gt;</code></pre> 
-      </div> 
-      <p>You initiate the connect flow by calling <code>SC.connect()</code>. Once your users are authenticated and authorized, your app is allowed to use the HTTP methods <a href="#post">SC.post</a>, <a href="#put">SC.put</a> and <a href="#delete">SC.delete</a> to create comments, liking a track or updating user profiles. The following example shows how to follow a user, after connecting the current user:</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">SC.initialize({
-  client_id: 'YOUR_CLIENT_ID',
-  redirect_uri: 'http://example.com/callback'
-});
-
-SC.connect().then(function(){
-  return SC.put('/me/followings/183');
-}).then(function(user){
-  alert('You are now following ' + user.username);
-}).catch(function(error){
-  alert('Error: ' + error.message);
-});</code></pre> 
-      </div> 
-      <p>Relevant methods: <a href="#connect">SC.connect</a>, <a href="#post">SC.post</a>, <a href="#put">SC.put</a>, <a href="#delete">SC.delete</a></p> 
-      <h3 id="http">HTTP API</h3> 
-      <p>The SDK provides easy access to all HTTP endpoints through the <a href="#get">SC.get</a>, <a href="#post">SC.post</a>, <a href="#put">SC.put</a> and <a href="#delete">SC.delete</a> methods.</p> 
-      <p>For a list of available endpoints, check the <a href="/docs/api/reference">HTTP API Reference</a>.</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">SC.put('/me', {
-  user: { description: 'I am using the SoundCloud API!' }
-}).then(function(){
-  return SC.get('/me');
-}).then(function(me){
-  console.log(me.description);
-}).catch(function(error){
-  alert('Error: ' + error.message);
-});</code></pre> 
-      </div> 
-      <h3 id="streaming">Streaming</h3> 
-      <p>Streaming sounds from the SDK is powered by the same player that is also used on <a href="https://soundcloud.com">soundcloud.com</a> to ensure the best playback experience.</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">SC.stream('/tracks/293').then(function(player){
-  player.play();
-});</code></pre> 
-      </div> 
-      <p>The player has all basic methods to control the playback flow like <code>play()</code>, <code>seek()</code>, <code>pause()</code>, <code>setVolume()</code>, etc.</p> 
-      <p>Relevant methods: <a href="#stream">SC.stream</a></p> 
-      <h3 id="recording">Recording</h3> 
-      <p>The SDK uses <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getUserMedia">getUserMedia</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/Worker">Web Workers</a> and the <a href="http://webaudio.github.io/web-audio-api/">Web Audio API</a> to record from a user's computer, so make sure to check if the user's browser supports all of it (<a href="http://caniuse.com/#feat=stream">1</a>, <a href="http://caniuse.com/#feat=webworkers">2</a>, <a href="http://caniuse.com/#feat=audio-api">3</a>) before you start recording. This example will record 5 seconds and play it back right away:</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">var recorder = new SC.Recorder();
-recorder.start();
-
-setTimeout(function(){
-  recorder.stop();
-  recorder.play();
-}, 5000);</code></pre> 
-      </div> 
-      <p>In addition to recording from the user's computer, the SDK also supports recording from an arbitrary AudioNode by passing it to the Recorder's constructor. Check out the <a href="#record">documentation</a> and the <a href="#examples">examples</a> for more information.</p> 
-      <p>Relevant methods: <a href="#record">SC.Recorder</a></p> 
-      <h3 id="uploading">Uploading</h3> 
-      <p>You can upload recordings and files using the SDK's <code>SC.upload</code> method. This method requires the user's browser to support <a href="https://developer.mozilla.org/en/docs/Web/API/FormData">FormData</a> (supported in all modern browsers and IE10+, <a href="http://caniuse.com/#feat=xhr2">1</a>).</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">SC.upload({
-  file: theBlob, // a Blob of your WAV, MP3...
-  title: 'This is my sound'
-});</code></pre> 
-      </div> 
-      <p>Uploads can take a while and it makes sense to inform the user about the progress. For this reason, <code>SC.upload</code> returns the original request as well so that you can calculate the progress yourself.</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">var upload = SC.upload({
-  file: aBigBlob, // a Blob of your WAV, MP3...
-  title: 'This upload took quite some while'
-});
-
-upload.request.addEventListener('progress', function(e){
-  console.log('progress: ', (e.loaded / e.total) * 100, '%');
-});
-
-upload.then(function(track){
-  alert('Upload is done! Check your sound at ' + track.permalink_url);
-});</code></pre> 
-      </div> 
-      <p>Relevant methods: <a href="#upload">SC.upload</a></p> 
-      <h3 id="embedding">Embedding</h3> 
-      <p>The <code>SC.oEmbed</code> function is a wrapper for the SoundCloud <a href="/docs/oembed">oEmbed endpoint</a>.</p> 
-      <p>It takes the URL you want to embed as an argument, and an optional options object that can contain an element that should be replaced by the embed code. All of the <code>options</code> object's properties will be passed as parameters to the oEmbed endpoint. For example <code>maxwidth</code>, <code>maxheight</code>, or <code>auto_play</code>. The options are described in detail in the <a href="/docs/api/reference#oembed">oEmbed documentation</a>.</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">SC.oEmbed('http://soundcloud.com/forss/flickermood', {
-  auto_play: true
-}).then(function(embed){
-  console.log('oEmbed response: ', embed);
-});</code></pre> 
-      </div> 
-      <p>Or:</p> 
-      <div class="code-example"> 
-       <pre><code class="standalone" data-language="javascript">&lt;div id="putTheWidgetHere"&gt;&lt;/div&gt;
-&lt;script type="text/javascript"&gt;
-  SC.oEmbed('http://soundcloud.com/forss/sets/soulhack', {
-    element: document.getElementById('putTheWidgetHere')
-  });
-&lt;/script&gt;</code></pre> 
-      </div> 
-      <p>Relevant methods: <a href="#oEmbed">SC.oEmbed</a></p> 
-      <h3 id="examples">Examples</h3> 
-      <p>If you want to check out more SDK usage examples, head over to the <a href="/docs/api/guide">HTTP API Guide</a>. It shows how to use API methods in all available SDKs.</p> 
-      <p>An example of an application that is using a combination of several SDK methods can be found <a href="https://github.com/soundcloud/soundcloud-javascript/blob/master/examples/recording.html">on Github</a>. It records a user's microphone and uploads it together with an artwork that is generated from the user's webcam. (no Flash required!)</p> 
-      <h3 id="promises">Promises</h3> 
-      <p>The SDK uses <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promises</a> for most of its methods. They provide a way to easily compose API calls and offer a sane way to handle the various errors that can occur.</p> 
-      <p>Promises can be chained by using their <code>then()</code> method and errors can be handled in a <code>catch()</code> handler. If you are new to Promises, check out this introductory blog artice on HTML5 rocks: <a href="http://www.html5rocks.com/en/tutorials/es6/promises/">html5rocks.com/en/tutorials/es6/promises</a>.</p> 
-      <p>In order to conform with the ES6 standard, the SDK uses <a href="https://github.com/jakearchibald/es6-promise">es6-promise</a> which shims the <code>Promise</code> object on systems where it is not available. We also expose the library via <a href="#scpromise">SC.Promise</a>, so that you can use methods like <code>Promise.all</code> or <code>Promise.race</code> even if your user's browser is not supporting Promises yet.</p> 
-      <p>Relevant methods: <a href="#scpromise">SC.Promise</a></p> 
-      <h2 id="documentation">API Documentation</h2> 
-      <h3 id="initialize">SC.initialize(options)</h3> 
-      <p>Initializes the SDK.</p> 
-      <p> <strong>Parameters:</strong> </p> 
-      <ul> 
-       <li> <code>options (Object)</code>: 
-        <ul> 
-         <li><code>client_id</code>: You application's client id</li> 
-         <li><code>redirect_uri</code> (optional): Only needed if you want to authenticate users</li> 
-         <li><code>oauth_token</code> (optional): If you want to reuse an access token</li> 
-        </ul> </li> 
-      </ul> 
-      <h3 id="connect">SC.connect(options)</h3> 
-      <p>Initiate the OAuth2 connect flow.</p> 
-      <p> <strong>Parameters:</strong> </p> 
-      <ul> 
-       <li> <code>options (Object, optional)</code>: 
-        <ul> 
-         <li><code>client_id</code>: override the before set client id.</li> 
-         <li><code>redirect_uri</code>: the redirect URI as defined in your app settings.</li> 
-         <li><code>scope</code>: additional OAuth2 scopes (default: "*")</li> 
-        </ul> </li> 
-      </ul> 
-      <p> <strong>Returns:</strong> A promise that will resolve with a session data object </p> 
-      <h3 id="get">SC.get(path, [params])</h3> 
-      <p>Execute a GET request.</p> 
-      <p> <strong>Parameters:</strong> </p> 
-      <ul> 
-       <li><code>path (String)</code>: the path to the requested resource e.g. '/users/183'</li> 
-       <li><code>params (Object, optional)</code>: an object of additional parameters to pass in the request.</li> 
-      </ul> 
-      <p> <strong>Returns:</strong> A promise that will resolve with the requested resource </p> 
-      <h3 id="post">SC.post(path, [params])</h3> 
-      <p>Execute a POST request.</p> 
-      <p> <strong>Parameters:</strong> </p> 
-      <ul> 
-       <li><code>path (String)</code>: the path to the requested resource e.g. '/me/followings'</li> 
-       <li><code>params (Object / FormData, optional)</code>: an object of additional parameters to pass in the request body.</li> 
-      </ul> 
-      <p> <strong>Returns:</strong> A promise that will resolve with the requested resource </p> 
-      <h3 id="put">SC.put(path, [params])</h3> 
-      <p>Execute a PUT request.</p> 
-      <p> <strong>Parameters:</strong> </p> 
-      <ul> 
-       <li><code>path (String)</code>: the path to the requested resource e.g. '/me'</li> 
-       <li><code>params (Object / FormData, optional)</code>: an object of additional parameters to pass in the request body.</li> 
-      </ul> 
-      <p> <strong>Returns:</strong> A promise that will resolve with the requested resource </p> 
-      <h3 id="delete">SC.delete(path)</h3> 
-      <p>Execute a DELETE request.</p> 
-      <p> <strong>Parameters:</strong> </p> 
-      <ul> 
-       <li><code>path (String)</code>: the path to the requested resource</li> 
-      </ul> 
-      <p> <strong>Returns:</strong> A promise that will resolve when the resource has been deleted </p> 
-      <h3 id="upload">SC.upload(options)</h3> 
-      <p>Uploads a file or a recording to SoundCloud</p> 
-      <p> <strong>Parameters:</strong> </p> 
-      <ul> 
-       <li> <code>options (Object)</code>: 
-        <ul> 
-         <li><code>file (Blob)</code>: a <a href="https://developer.mozilla.org/en/docs/Web/API/Blob">Blob</a> of the file or the recording (see <a href="#recordgetwav">recorder.getWAV()</a>).</li> 
-         <li><code>title (String)</code>: a title for the recording.</li> 
-         <li><code>progress (Function)</code>: a progress callback.</li> 
-         <li>It also accepts all other params for upload requests, such as <code>artwork_data</code> or <code>sharing</code> (see <a href="/docs/api/reference">HTTP API Reference</a> for a full list).</li> 
-        </ul> </li> 
-      </ul> 
-      <p> <strong>Returns:</strong> A promise that will resolve when the resource has been uploaded. It also contains a reference to the original request (see <a href="#uploading">Uploading</a>) </p> 
-      <h3 id="resolve">SC.resolve(url)</h3> 
-      <p>Resolves a SoundCloud URL to a JSON representation of the requested resource</p> 
-      <p> <strong>Parameters:</strong> </p>
-      <ul> 
-       <li><code>url (String)</code>: a URL to a track, playlist or user on SoundCloud.</li> 
-      </ul> 
-      <p></p> 
-      <p> <strong>Returns:</strong> A promise that will resolve with a JSON object </p> 
-      <h3 id="oEmbed">SC.oEmbed(url, [params])</h3> 
-      <p>Will lookup the embed code for the passed URL (track, set or user) using <a href="/docs/api/reference#oembed">oEmbed</a></p> 
-      <p> <strong>Parameters:</strong> </p>
-      <ul> 
-       <li><code>url (String)</code>: a URL to a track, set or user on SoundCloud.</li> 
-       <li><code>params (Object, optional)</code>: additional parameters for oEmbed. See <a href="/docs/api/reference#oembed">oEmbed docs</a>. In addition to that, it accepts an <code>element</code> property that will replace the HTML element with the widget.</li> 
-      </ul> 
-      <p></p> 
-      <p> <strong>Returns:</strong> A promise that will resolve with the oEmbed info for the resource </p> 
-      <h3 id="stream">SC.stream(trackPath, [secretToken])</h3> 
-      <p>Creates a player for this stream</p> 
-      <p> <strong>Parameters:</strong> </p> 
-      <ul> 
-       <li><code>trackPath (String)</code>: the path of the track to be streamed e.g. /tracks/293</li> 
-       <li><code>secretToken (String, optional)</code>: a secret token for the track</li> 
-      </ul> 
-      <p> <strong>Returns: A promise that will resolve with a player for the track</strong> </p> 
-      <h3 id="record">SC.Recorder(options)</h3> 
-      <p>The constructor function which returns an instance of the Web Audio Recorder (has to be called with <code>new</code>)</p> 
-      <p> <strong>Parameters:</strong> </p> 
-      <ul> 
-       <li> <code>options (Object, optional)</code>: 
-        <ul> 
-         <li><code>context</code>: You can pass an AudioContext if you want to reuse it</li> 
-         <li><code>source</code>: Pass a source if you want to record from an AudioNode</li> 
-        </ul> </li> 
-      </ul> 
-      <h3 id="recordstart">recorder.start()</h3> 
-      <p>Starts recording from the user's computer or the <code>source</code> that was passed into the constructor</p> 
-      <p>Requires the <a href="http://caniuse.com/#feat=audio-api">Web Audio API</a>, <a href="http://caniuse.com/#feat=webworkers">Web Workers</a> and <a href="http://caniuse.com/#feat=stream">getUserMedia</a> to be available in the user's browser</p> 
-      <h3 id="recordstop">recorder.stop()</h3> 
-      <p>Stops the current recording</p> 
-      <h3 id="recordplay">recorder.play()</h3> 
-      <p>Plays back what was just recorded</p> 
-      <p> <strong>Returns:</strong> The <a href="https://developer.mozilla.org/en-US/docs/Web/API/AudioNode">AudioNode</a> that is used to play the sound </p> 
-      <h3 id="recordgetwav">recorder.getWAV()</h3> 
-      <p> <strong>Returns:</strong> A promise that resolves with a WAV Blob of the current recording </p> 
-      <h3 id="recordgetbuffer">recorder.getBuffer()</h3> 
-      <p> <strong>Returns:</strong> A promise that resolves with an <a href="https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer">AudioBuffer</a> of the current recording </p> 
-      <h3 id="recordsaveas">recorder.saveAs(filename)</h3> 
-      <p>Downloads the recorded WAV to the user's computer</p> 
-      <p> <strong>Parameters:</strong> </p> 
-      <ul> 
-       <li><code>filename (String)</code>: The desired name of the file</li> 
-      </ul> 
-      <h3 id="recorddelete">recorder.delete()</h3> 
-      <p>Stops and deletes the recording</p> 
-      <h2 id="scpromise">SC.Promise</h2> 
-      <p>The promise prototype that is used in the SDK internally (<a href="https://github.com/jakearchibald/es6-promise">es6-promise</a>). Use it to create your own promises or to use methods like <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all">Promise.all</a> or <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/race">Promise.race</a>.</p> 
-      <h2 id="player">Player (methods &amp; events)</h2> 
-      <h3 id="playermethods">Methods</h3> 
-      <p>You can use the methods below to control the player that is returned from <a href="#stream">SC.stream</a></p> 
-      <ul> 
-       <li><code>play()</code>: Starts to play the sound</li> 
-       <li><code>pause()</code>: Pauses the player</li> 
-       <li><code>seek(time)</code>: Seeks to the position in the song (in milliseconds)</li> 
-       <li><code>currentTime()</code>: Returns the current position (in milliseconds)</li> 
-       <li><code>setVolume(volume)</code>: Sets the volume (from 0 to 1)</li> 
-       <li><code>getVolume()</code>: Returns the current volume</li> 
-       <li><code>on(event, handler)</code>: Subscribes the handler to the given event</li> 
-      </ul> 
-      <h3 id="playerevents">Events</h3> 
-      <p>You can subscribe to the events below by using the player's <code>on(event, handler)</code> method.</p> 
-      <ul> 
-       <li><code>state-change</code>: when audio controller changes state (e.g. from pause to play)</li> 
-       <li><code>play</code>: when <code>play</code> method is called</li> 
-       <li><code>play-start</code>: before playback is actually triggered</li> 
-       <li><code>play-resume</code>: when playback transits from any idle/loading/seeking state into playing state</li> 
-       <li><code>pause</code>: when playback is paused</li> 
-       <li><code>finish</code>: when sound is finished</li> 
-       <li><code>seek</code>: when <code>seek</code> method is called</li> 
-       <li><code>seeked</code>: when playback position is updated after calling <code>seek</code> method</li> 
-       <li><code>geo_blocked</code>: when there's no available streams for a sound, as it is not allowed to be played in the user's territory.</li> 
-       <li><code>buffering_start</code>: when buffering starts</li> 
-       <li><code>buffering_end</code>: when buffering stops</li> 
-       <li><code>audio_error</code>: when an error occurs</li> 
-       <li><code>time</code>: when playback position is updated</li> 
-       <li><code>no_streams</code>: when we failed fetching stream information</li> 
-       <li><code>no_protocol</code>: when no supported protocol could be found</li> 
-       <li><code>no_connection</code>: when we failed to connect to an endpoint due to missing transport or request timeout</li> 
-      </ul> 
-     </section> 
-     <footer> 
-      <ul> 
-       <li><a href="http://status.soundcloud.com" data-tracking-action="Status" data-tracking-category="Footer" target="_blank">Status</a></li> 
-       <li><a href="/docs/api/privacy" data-tracking-category="Footer">Privacy</a></li> 
-       <li><a href="/docs/api/cookies" data-tracking-category="Footer">Cookies</a></li> 
-       <li><a href="https://soundcloud.com/imprint" data-tracking-category="Footer" target="_blank">Imprint</a></li> 
-      </ul> 
-      <ul> 
-       <li><a href="http://twitter.com/soundclouddev" class="twitter" data-tracking-action="@SoundCloudDev" data-tracking-category="Footer" target="_blank">@SoundCloudDev</a></li> 
-      </ul> 
-     </footer> 
-    </section> 
-   </div> 
+     </div> 
+    </div> 
+   </footer>
+   <!-- #colophon --> 
+  </div>
+  <!-- #page --> 
+  <div style="display:none"> 
   </div> 
-  <noscript> 
-   <img src="http://b.scorecardresearch.com/p?c1=2&amp;c2=16601931&amp;cv=2.0&amp;cj=1"> 
-  </noscript>   
+  <script type="text/javascript">
+		window.WPCOM_sharing_counts = {"http:\/\/heidloff.net\/article\/authentication-node-js-bluemix":1846};
+	</script> 
+  <script type="text/javascript">
+			var windowOpen;
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-twitter' ).on( 'click', function() {
+				if ( 'undefined' !== typeof windowOpen ){ // If there's another sharing window open, close it.
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery(this).attr( 'href' ), 'wpcomtwitter', 'menubar=1,resizable=1,width=600,height=350' );
+				return false;
+			});
+		});
+		</script> 
+  <script type="text/javascript">
+			jQuery( document ).ready( function() {
+			    jQuery.getScript( '//platform.linkedin.com/in.js?async=true', function success() {
+			        IN.init();
+			    });
+			});
+			jQuery( document.body ).on( 'post-load', function() {
+				if ( typeof IN != 'undefined' )
+					IN.parse();
+			});
+			</script> 
+  <script type="text/javascript">
+			var windowOpen;
+		jQuery(document).on( 'ready post-load', function(){
+			jQuery( 'a.share-facebook' ).on( 'click', function() {
+				if ( 'undefined' !== typeof windowOpen ){ // If there's another sharing window open, close it.
+					windowOpen.close();
+				}
+				windowOpen = window.open( jQuery(this).attr( 'href' ), 'wpcomfacebook', 'menubar=1,resizable=1,width=600,height=400' );
+				return false;
+			});
+		});
+		</script> 
+  <div id="fb-root"></div> 
+  <script>(function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = '//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=249643311490&version=v2.3'; fjs.parentNode.insertBefore(js, fjs); }(document, 'script', 'facebook-jssdk'));</script> 
+  <script>
+			jQuery( document.body ).on( 'post-load', function() {
+				if ( 'undefined' !== typeof FB ) {
+					FB.XFBML.parse();
+				}
+			} );
+			</script> 
+  <script>
+			function renderGooglePlus1() {
+				if ( 'undefined' === typeof gapi ) {
+					return;
+				}
+
+				jQuery( '.g-plus' ).each(function() {
+					var $button = jQuery( this );
+
+					if ( ! $button.data( 'gplus-rendered' ) ) {
+						gapi.plusone.render( this, {
+							href: $button.attr( 'data-href' ),
+							size: $button.attr( 'data-size' ),
+							annotation: $button.attr( 'data-annotation' )
+						});
+
+						$button.data( 'gplus-rendered', true );
+					}
+				});
+			}
+
+			(function() {
+				var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+				po.src = 'https://apis.google.com/js/plusone.js';
+				po.innerHTML = '{"parsetags": "explicit"}';
+				po.onload = renderGooglePlus1;
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+			})();
+
+			jQuery( document.body ).on( 'post-load', renderGooglePlus1 );
+			</script> 
+  <div id="sharing_email" style="display: none;"> 
+   <form action="/article/authentication-node-js-bluemix" method="post"> 
+    <label for="target_email">Send to Email Address</label> 
+    <input type="email" name="target_email" id="target_email" value=""> 
+    <label for="source_name">Your Name</label> 
+    <input type="text" name="source_name" id="source_name" value=""> 
+    <label for="source_email">Your Email Address</label> 
+    <input type="email" name="source_email" id="source_email" value=""> 
+    <input type="text" id="jetpack-source_f_name" name="source_f_name" class="input" value="" size="25" autocomplete="off"> 
+    <script> document.getElementById('jetpack-source_f_name').value = ''; </script> 
+    <img style="float: right; display: none" class="loading" src="http://heidloff.net/wp-content/plugins/jetpack/modules/sharedaddy/images/loading.gif" alt="loading" width="16" height="16"> 
+    <input type="submit" value="Send Email" class="sharing_send"> 
+    <a rel="nofollow" href="#cancel" class="sharing_cancel">Cancel</a> 
+    <div class="errors errors-1" style="display: none;">
+      Post was not sent - check your email addresses! 
+    </div> 
+    <div class="errors errors-2" style="display: none;">
+      Email check failed, please try again 
+    </div> 
+    <div class="errors errors-3" style="display: none;">
+      Sorry, your blog cannot share posts by email. 
+    </div> 
+   </form> 
+  </div> 
+  <script type="text/javascript" src="http://s0.wp.com/wp-content/js/devicepx-jetpack.js?ver=201740"></script> 
+  <script type="text/javascript" src="http://s.gravatar.com/js/gprofiles.js?ver=2017Octaa"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var WPGroHo = {"my_hash":""};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-content/plugins/jetpack/modules/wpgroho.js?ver=4.3.12"></script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-content/themes/accesspress-lite/js/jquery.bxslider.min.js?ver=4.1"></script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-content/themes/accesspress-lite/js/nivo-lightbox.min.js?ver=2.1"></script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-content/themes/accesspress-lite/js/jquery.actual.min.js?ver=1.0.16"></script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-content/themes/accesspress-lite/js/skip-link-focus-fix.js?ver=20130115"></script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-content/themes/accesspress-lite/js/custom.js?ver=1.1"></script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-includes/js/comment-reply.min.js?ver=4.3.12"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+window.twttr=(function(w){t=w.twttr||{};t._e=[];t.ready=function(f){t._e.push(f);};return t;}(window));
+/* ]]> */
+</script> 
+  <script type="text/javascript" id="twitter-wjs" async defer src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var embedVars = {"disqusConfig":{"platform":"wordpress@4.3.12","language":""},"disqusIdentifier":"1846 http:\/\/heidloff.net\/?p=1846","disqusShortname":"heidloff","disqusTitle":"Authentication in Node.js Applications on Bluemix","disqusUrl":"http:\/\/heidloff.net\/article\/authentication-node-js-bluemix","options":{"manualSync":false},"postId":"1846"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-content/plugins/disqus-comment-system/media/js/disqus.js?ver=4.3.12"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var countVars = {"disqusShortname":"heidloff"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-content/plugins/disqus-comment-system/media/js/count.js?ver=4.3.12"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var sharing_js_options = {"lang":"en","counts":"1"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="http://heidloff.net/wp-content/plugins/jetpack/modules/sharedaddy/sharing.js?ver=3.8.0"></script> 
+  <script type="text/javascript" src="http://stats.wp.com/e-201740.js" async defer></script> 
+  <script type="text/javascript">
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:3.8.0',blog:'102773794',post:'1846',tz:'0',srv:'heidloff.net'} ]);
+	_stq.push([ 'clickTrackerInit', '102773794', '1846' ]);
+</script>  
  </body>
 </html>

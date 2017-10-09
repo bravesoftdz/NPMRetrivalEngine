@@ -1,1416 +1,780 @@
 <!doctype html>
-<!--[if lt IE 7 ]><html class="ie6 oldie" lang="en"><![endif]-->
-<!--[if IE 7 ]><html class="ie7 oldie" lang="en"><![endif]-->
-<!--[if IE 8 ]><html class="ie8 oldie" lang="en"><![endif]-->
-<!--[if IE 9 ]><html class="ie9" lang="en"><![endif]-->
-<!--[if IE 10 ]><html class="ie10" lang="en"><![endif]-->
-<!--[if !IE ]><!-->
-<html class="non-ie" lang="en">
- <!--<![endif]-->
+<html class="no-js" lang="en">
  <head> 
-  <meta charset="UTF-8"> 
-  <script>
-  function C(k){return(document.cookie.match('(^|; )'+k+'=([^;]*)')||0)[2]}
-  var timeoutTime = 3000;
-  var startTime = new Date();
-  var ga_c = C('_ga');
-  var cidSet = C('cidSet');
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-  if(cidSet != "True" || typeof ga_c === 'undefined'){
-    // If cookie was not set yet.  Wait for timeoutTime ms, if the iframe sends
-    // the clientId => update client id if not => execute dataLayer and use
-    // existing cookie GA tracking code
-    document.head.insertAdjacentHTML("beforeend", '<iframe src="//s.rodale.com/ga/cd-analytics.html"  height="0" width="0"style="display:none;visibility:hidden"></iframe>');
-
-    // Create IE + others compatible event handler
-    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-    var eventer = window[eventMethod];
-    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
-
-    var hasTimedOut = false;
-    var clientIdReceived = false;
-    // Listen to message from child window
-    eventer(messageEvent, function(e) {
-      var message = e.data.split(':');
-      var clientId = null;
-      if(message.indexOf('clientId') > -1 && !hasTimedOut){
-        clientIdReceived = true;
-        clearTimeout(idNotReceivedTimeout);
-        clientId = message[1];
-        ga('create', 'UA-55298526-5', {
-          'clientId': clientId
-        });
-        ga('require', 'GTM-N2X58C3');
-        document.cookie="cidSet=True;path=/;domain=shop.menshealth.com; ?>;";
-        // later record end time
-        var endTime = new Date();
-        var timeDiff = endTime - startTime;
-        dataLayer.push({"event":"pageview", 'qt':timeDiff, 'cookieSet':'throughiframe', 'cid': clientId});
-      }
-    },false); // eventer
-
-    var idNotReceivedTimeout = setTimeout(function(){
-      if(!clientIdReceived){
-        hasTimedOut = true;
-        document.cookie="cidSet=True;path=/;domain=shop.menshealth.com; ?>;";
-        ga('create', 'UA-55298526-5');
-        ga('require', 'GTM-N2X58C3');
-        ga(function(tracker) {
-          var clientId = tracker.get('clientId');
-          var endTime = new Date();
-          var timeDiff = endTime - startTime;
-          dataLayer.push({"event":"pageview", 'qt':timeDiff, 'cookieSet':'timeout', 'cid': clientId});
-        });
-      }
-    }, timeoutTime);
-  }
-  else{
-    //if the cookie was already set for this session, use it
-    ga('create', 'UA-55298526-5');
-    ga('require', 'GTM-N2X58C3');
-    ga(function(tracker) {
-      var clientId = tracker.get('clientId');
-      dataLayer.push({"event":"pageview", "qt":0, 'cookieSet':'already existed', 'cid': clientId});
-    });
-
-  }
-</script> 
-  <script src="//cdn.optimizely.com/js/3221870289.js"></script> 
-  <script src="//assets.adobedtm.com/6f743006a41bd9090cd6c6b7dfa16b2cbed9c289/satelliteLib-386ccb51b230ecd4b731c4e2bb0326130ad7fa78.js"></script> 
-  <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script> 
-  <title>Rodale's Shipping &amp; Delivery Information: Tracking Wonderful</title> 
-  <meta name="description" content=""> 
-  <meta name="keywords" content=""> 
-  <script>
-	var brandSiteInfo = {
-		brand : "HLH",
-		isBranded : "true",
-		store : "rodales",
-		device : "desktop"
-	};
-</script> 
-  <script>
-	//Create the empty data layer
-	//var dataLayer=[];
-</script> 
-  <link href="/on/demandware.static/Sites-rodales-Site/-/default/dwbb790bdb/images/brands/menshealth/favicon-menshealth.ico" rel="shortcut icon" type="image/x-icon"> 
-  <link rel="stylesheet" href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/fonts/brands/menshealth/acronym_extrabold_macroman/stylesheet.css" type="text/css" charset="utf-8"> 
-  <link rel="stylesheet" href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/css/normalize.css"> 
-  <link rel="stylesheet" media="print" href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/css/print.css"> 
-  <link href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/css/janrain.css" type="text/css" rel="stylesheet"> 
+  <meta charset="utf-8">
+  <script type="text/javascript">window.NREUM||(NREUM={}),__nr_require=function(e,n,t){function r(t){if(!n[t]){var o=n[t]={exports:{}};e[t][0].call(o.exports,function(n){var o=e[t][1][n];return r(o||n)},o,o.exports)}return n[t].exports}if("function"==typeof __nr_require)return __nr_require;for(var o=0;o<t.length;o++)r(t[o]);return r}({1:[function(e,n,t){function r(){}function o(e,n,t){return function(){return i(e,[c.now()].concat(u(arguments)),n?null:this,t),n?void 0:this}}var i=e("handle"),a=e(2),u=e(3),f=e("ee").get("tracer"),c=e("loader"),s=NREUM;"undefined"==typeof window.newrelic&&(newrelic=s);var p=["setPageViewName","setCustomAttribute","setErrorHandler","finished","addToTrace","inlineHit","addRelease"],d="api-",l=d+"ixn-";a(p,function(e,n){s[n]=o(d+n,!0,"api")}),s.addPageAction=o(d+"addPageAction",!0),s.setCurrentRouteName=o(d+"routeName",!0),n.exports=newrelic,s.interaction=function(){return(new r).get()};var m=r.prototype={createTracer:function(e,n){var t={},r=this,o="function"==typeof n;return i(l+"tracer",[c.now(),e,t],r),function(){if(f.emit((o?"":"no-")+"fn-start",[c.now(),r,o],t),o)try{return n.apply(this,arguments)}finally{f.emit("fn-end",[c.now()],t)}}}};a("setName,setAttribute,save,ignore,onEnd,getContext,end,get".split(","),function(e,n){m[n]=o(l+n)}),newrelic.noticeError=function(e){"string"==typeof e&&(e=new Error(e)),i("err",[e,c.now()])}},{}],2:[function(e,n,t){function r(e,n){var t=[],r="",i=0;for(r in e)o.call(e,r)&&(t[i]=n(r,e[r]),i+=1);return t}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],3:[function(e,n,t){function r(e,n,t){n||(n=0),"undefined"==typeof t&&(t=e?e.length:0);for(var r=-1,o=t-n||0,i=Array(o<0?0:o);++r<o;)i[r]=e[n+r];return i}n.exports=r},{}],4:[function(e,n,t){n.exports={exists:"undefined"!=typeof window.performance&&window.performance.timing&&"undefined"!=typeof window.performance.timing.navigationStart}},{}],ee:[function(e,n,t){function r(){}function o(e){function n(e){return e&&e instanceof r?e:e?f(e,u,i):i()}function t(t,r,o,i){if(!d.aborted||i){e&&e(t,r,o);for(var a=n(o),u=m(t),f=u.length,c=0;c<f;c++)u[c].apply(a,r);var p=s[y[t]];return p&&p.push([b,t,r,a]),a}}function l(e,n){v[e]=m(e).concat(n)}function m(e){return v[e]||[]}function w(e){return p[e]=p[e]||o(t)}function g(e,n){c(e,function(e,t){n=n||"feature",y[t]=n,n in s||(s[n]=[])})}var v={},y={},b={on:l,emit:t,get:w,listeners:m,context:n,buffer:g,abort:a,aborted:!1};return b}function i(){return new r}function a(){(s.api||s.feature)&&(d.aborted=!0,s=d.backlog={})}var u="nr@context",f=e("gos"),c=e(2),s={},p={},d=n.exports=o();d.backlog=s},{}],gos:[function(e,n,t){function r(e,n,t){if(o.call(e,n))return e[n];var r=t();if(Object.defineProperty&&Object.keys)try{return Object.defineProperty(e,n,{value:r,writable:!0,enumerable:!1}),r}catch(i){}return e[n]=r,r}var o=Object.prototype.hasOwnProperty;n.exports=r},{}],handle:[function(e,n,t){function r(e,n,t,r){o.buffer([e],r),o.emit(e,n,t)}var o=e("ee").get("handle");n.exports=r,r.ee=o},{}],id:[function(e,n,t){function r(e){var n=typeof e;return!e||"object"!==n&&"function"!==n?-1:e===window?0:a(e,i,function(){return o++})}var o=1,i="nr@id",a=e("gos");n.exports=r},{}],loader:[function(e,n,t){function r(){if(!x++){var e=h.info=NREUM.info,n=d.getElementsByTagName("script")[0];if(setTimeout(s.abort,3e4),!(e&&e.licenseKey&&e.applicationID&&n))return s.abort();c(y,function(n,t){e[n]||(e[n]=t)}),f("mark",["onload",a()+h.offset],null,"api");var t=d.createElement("script");t.src="https://"+e.agent,n.parentNode.insertBefore(t,n)}}function o(){"complete"===d.readyState&&i()}function i(){f("mark",["domContent",a()+h.offset],null,"api")}function a(){return E.exists&&performance.now?Math.round(performance.now()):(u=Math.max((new Date).getTime(),u))-h.offset}var u=(new Date).getTime(),f=e("handle"),c=e(2),s=e("ee"),p=window,d=p.document,l="addEventListener",m="attachEvent",w=p.XMLHttpRequest,g=w&&w.prototype;NREUM.o={ST:setTimeout,SI:p.setImmediate,CT:clearTimeout,XHR:w,REQ:p.Request,EV:p.Event,PR:p.Promise,MO:p.MutationObserver};var v=""+location,y={beacon:"bam.nr-data.net",errorBeacon:"bam.nr-data.net",agent:"js-agent.newrelic.com/nr-1044.min.js"},b=w&&g&&g[l]&&!/CriOS/.test(navigator.userAgent),h=n.exports={offset:u,now:a,origin:v,features:{},xhrWrappable:b};e(1),d[l]?(d[l]("DOMContentLoaded",i,!1),p[l]("load",r,!1)):(d[m]("onreadystatechange",o),p[m]("onload",r)),f("mark",["firstbyte",u],null,"api");var x=0,E=e(4)},{}]},{},["loader"]);</script> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <script src="//cdn.optimizely.com/js/2765661494.js"></script> 
+  <!-- This site is optimized with the Yoast SEO plugin v3.9 - https://yoast.com/wordpress/plugins/seo/ --> 
+  <title>Is MeteorJS the Right Node.js Framework For You?</title> 
+  <meta name="description" content="MeteorJS is one of the most talked-about Node.js frameworks on the scene. So where does it fall in the Node.js framework landscape, and is it the right choice for your MEAN-powered application?"> 
+  <meta name="robots" content="noodp"> 
+  <link rel="canonical" href="https://www.upwork.com/hiring/development/meteorjs-node-js-framework/"> 
+  <meta property="og:locale" content="en_US"> 
+  <meta property="og:type" content="article"> 
+  <meta property="og:title" content="Is MeteorJS the Right Node.js Framework For You?"> 
+  <meta property="og:description" content="MeteorJS is one of the most talked-about Node.js frameworks on the scene. So where does it fall in the Node.js framework landscape, and is it the right choice for your MEAN-powered application?"> 
+  <meta property="og:url" content="https://www.upwork.com/hiring/development/meteorjs-node-js-framework/"> 
+  <meta property="og:site_name" content="Hiring | Upwork"> 
+  <meta property="article:tag" content="AngularJS"> 
+  <meta property="article:tag" content="application development"> 
+  <meta property="article:tag" content="back-end programming"> 
+  <meta property="article:tag" content="ExpressJS"> 
+  <meta property="article:tag" content="frameworks"> 
+  <meta property="article:tag" content="JavaScript"> 
+  <meta property="article:tag" content="MeteorJS"> 
+  <meta property="article:tag" content="Node.JS"> 
+  <meta property="article:section" content="Web Development"> 
+  <meta property="article:published_time" content="2016-04-11T11:32:07-07:00"> 
+  <meta property="article:modified_time" content="2017-08-31T23:38:30-07:00"> 
+  <meta property="og:updated_time" content="2017-08-31T23:38:30-07:00"> 
+  <meta property="og:image" content="https://content-static.upwork.com/blog/uploads/sites/3/2016/04/11072508/DEV_MeteorJS-framework-app-development_T.png"> 
+  <meta property="og:image:width" content="940"> 
+  <meta property="og:image:height" content="400"> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:description" content="MeteorJS is one of the most talked-about Node.js frameworks on the scene. So where does it fall in the Node.js framework landscape, and is it the right choice for your MEAN-powered application?"> 
+  <meta name="twitter:title" content="Is MeteorJS the Right Node.js Framework For You?"> 
+  <meta name="twitter:image" content="https://content-static.upwork.com/blog/uploads/sites/3/2016/04/11072508/DEV_MeteorJS-framework-app-development_T.png"> 
+  <!-- / Yoast SEO plugin. --> 
+  <link rel="dns-prefetch" href="//www.upwork.com"> 
+  <link rel="dns-prefetch" href="//d2oh4tlt9mrke9.cloudfront.net"> 
+  <link rel="dns-prefetch" href="//s0.wp.com"> 
+  <link rel="dns-prefetch" href="//components.elance-odesk.com"> 
+  <link rel="dns-prefetch" href="//cdnjs.cloudflare.com"> 
+  <link rel="dns-prefetch" href="//app-sj09.marketo.com"> 
+  <link rel="dns-prefetch" href="//fonts.googleapis.com"> 
+  <link rel="dns-prefetch" href="//s.w.org"> 
+  <link rel="alternate" type="application/rss+xml" title="Hiring | Upwork » Is MeteorJS the Right Node.js Framework for Your App? Comments Feed" href="https://www.upwork.com/hiring/development/meteorjs-node-js-framework/feed/"> 
   <script type="text/javascript">
-(function() {
-    if (typeof window.janrain !== 'object') window.janrain = {};
-    if (typeof window.janrain.settings !== 'object') window.janrain.settings = {};
-
-	var protocol = 'https';
-	var connect = '://';
-	var host = 'shop.menshealth.com';
-	var path = '/on/demandware.store/Sites-rodales-Site/en_US/Page-Show';
-	var n=path.indexOf("Account-Show");
-	var m=path.indexOf("Account-StartRegister");
-	if ( n > 0 ) {
-		path = path.substr(0,n) + "Account-Show";
-	} else if ( m > 0 ) {
-		path = path.substr(0,m) + "Account-Show";
-	}
-	var q = "?";
-	var qs = 'cid=shipping';
-
-	// This condition should only be met after clicking the Checkout button from the Cart page
-	if (qs == "fromcheckout=yes")
-	{
-		var redirectUrl = 'https://shop.menshealth.com/checkout-shipping/';
-	}
-	else
-	{
-		var redirectUrl = protocol + connect + host + path;
-		if (qs != 'null') redirectUrl += q + qs;
-	}
-    
-    /* _______________ can edit below this line _______________ */
-
-    janrain.settings.tokenUrl = 'https://shop.menshealth.com/on/demandware.store/Sites-rodales-Site/en_US/Janrain-Process'+"?redirect="+redirectUrl;
-    janrain.settings.type = 'embed';
-    janrain.settings.appId = 'nnogcbalbebngeahjfip';
-    janrain.settings.appUrl = 'https://login.rodales.com';
-    janrain.settings.providers = ["facebook","googleplus"];
-    janrain.settings.providersPerPage = '3';
-    janrain.settings.format = 'one column';
-    janrain.settings.actionText = ' ';
-    janrain.settings.showAttribution = false;
-    janrain.settings.fontColor = '#333333';
-    janrain.settings.fontFamily = 'arial';
-    janrain.settings.backgroundColor = '#FFFFFF';
-    janrain.settings.width = '150';
-    janrain.settings.borderColor = '#FFFFFF';
-    janrain.settings.borderRadius = '5';    
-    janrain.settings.buttonBorderColor = '#CCCCCC';
-    janrain.settings.buttonBorderRadius = '5';
-    janrain.settings.buttonBackgroundStyle = 'gradient';
-    janrain.settings.language = '';
-    janrain.settings.linkClass = 'janrainEngage';
-
-    /* _______________ can edit above this line _______________ */
-
-    function isReady() { janrain.ready = true; };
-    if (document.addEventListener) {
-      document.addEventListener("DOMContentLoaded", isReady, false);
-    } else {
-      window.attachEvent('onload', isReady);
-    }
-
-    var e = document.createElement('script');
-    e.type = 'text/javascript';
-    e.id = 'janrainAuthWidget';
-
-    if (document.location.protocol === 'https:') {
-      e.src = 'https://rpxnow.com/js/lib/dev-login.rodales.com/engage.js';
-    } else {
-      e.src = 'http://widget-cdn.rpxnow.com/js/lib/dev-login.rodales.com/engage.js';
-    }
-
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(e, s);
-})();
-</script> 
-  <link href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/ui/jquery.ui.all.css" rel="stylesheet"> 
-  <!-- jQuery --> 
-  <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/jquery-1.8.3.js"></script> 
-  <script>var app={};</script> 
-  <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/modernizr.custom.js"></script> 
-  <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/picturefill.min.js"></script> 
-  <script type="text/javascript">//<!--
-/* <![CDATA[ (head-active_data.js) */
-var dw = (window.dw || {});
-dw.ac = {
-    _analytics: null,
-    _events: [],
-    _category: "",
-    _capture: function(configs) {
-        if (Object.prototype.toString.call(configs) === "[object Array]") {
-            configs.forEach(captureObject);
-            return;
-        }
-        dw.ac._events.push(configs);
-    },
-    capture: function() { dw.ac._capture(arguments); },
-    EV_PRD_SEARCHHIT: "searchhit",
-    EV_PRD_DETAIL: "detail",
-    EV_PRD_RECOMMENDATION: "recommendation",
-    EV_PRD_SETPRODUCT: "setproduct",
-    applyContext: function(context) {
-        if (typeof context === "object" && context.hasOwnProperty("category")) {
-        	dw.ac._category = context.category;
-        }
-    },
-    setDWAnalytics: function(analytics) {
-        dw.ac._analytics = analytics;
-    }
-};
-/* ]]> */
-// -->
-</script>
-  <script type="text/javascript">//<!--
-/* <![CDATA[ (head-cquotient.js) */
-var CQuotient = window.CQuotient = {};
-CQuotient.clientId = 'aale-rodales';
-CQuotient.activities = [];
-CQuotient.cqcid='';
-CQuotient.cquid='';
-CQuotient.initFromCookies = function () {
-	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++) {
-	  var c = ca[i];
-	  while (c.charAt(0)==' ') c = c.substring(1,c.length);
-	  if (c.indexOf('cqcid=') == 0) {
-		  CQuotient.cqcid=c.substring('cqcid='.length,c.length);
-	  } else if (c.indexOf('cquid=') == 0) {
-		  CQuotient.cquid=c.substring('cquid='.length,c.length);
-		  break;
-	  }
-	}
-}
-CQuotient.getCQCookieId = function () {
-	if(window.CQuotient.cqcid == '')
-		window.CQuotient.initFromCookies();
-	return window.CQuotient.cqcid;
-};
-CQuotient.getCQUserId = function () {
-	if(window.CQuotient.cquid == '')
-		window.CQuotient.initFromCookies();
-	return window.CQuotient.cquid;
-};
-/* ]]> */
-// -->
-</script> 
-  <!--  UI --> 
-  <link rel="stylesheet" href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/css/style.css"> 
-  <link rel="stylesheet" href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/css/rodalesetail.css"> 
-  <link rel="stylesheet" href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/css/brands/all-brands/all-brands.css"> 
-  <link rel="stylesheet" href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/css/brands/menshealth/menshealth.css"> 
-  <link rel="stylesheet" href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/css/responsive.css"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0"> 
-  <meta name="google-site-verification" content="NUG0wnlvZW7w_TmujcPTEvNcKhUVEsgafi5_ZDjBaYw"> 
-  <meta name="msvalidate.01" content="50D234E9D646A72D34180164D841E5BC"> 
-  <script>(function() {
-	  var _fbq = window._fbq || (window._fbq = []);
-	  if (!_fbq.loaded) {
-	    var fbds = document.createElement('script');
-	    fbds.async = true;
-	    fbds.src = '//connect.facebook.net/en_US/fbds.js';
-	    var s = document.getElementsByTagName('script')[0];
-	    s.parentNode.insertBefore(fbds, s);
-	    _fbq.loaded = true;
-	  }
-	  _fbq.push(['addPixelId', '400341070132750']);
-	})();
-	window._fbq = window._fbq || [];
-	window._fbq.push(['track', 'PixelInitialized', {}]);
-	</script> 
-  <noscript>
-   &lt;img height="1" width="1" alt="" style="display:none" src="https://www.facebook.com/tr?id=400341070132750&amp;amp;ev=PixelInitialized"&gt;
-  </noscript> 
-  <link rel="stylesheet" href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/fonts/icomoon/stylesheet.css" type="text/css" charset="utf-8"> 
-  <script type="text/javascript">jQuery('html').addClass('js').removeClass('no-js')</script> 
-  <script type="text/javascript">
-	jQuery(document).ready(function() {
-	app.util.clearDynamicCss();
-	
-	});
-</script> 
-  <link rel="stylesheet" href="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/css/customerservice.css"> 
-  <meta name="rqid" content="zwf4TVnTi-2gAgAK">
- </head> 
- <body class="hlh-store"> 
-  <script language="javascript" type="text/javascript">
-  s_account='rdl.shopbke';
- </script> 
-  <script language="javascript" src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/js/s_code.js" type="text/javascript"></script> 
-  <script language="javascript" type="text/javascript">
-	/* You may give each page an identifying name, server, and channel on
-	the next lines. */
-	s.currencyCode='USD';
-	s.pageName="";
-	s.events="";
-	s.products="";
-	s.prop1="";
-	s.eVar1=s.getVisitNum();
-	s.eVar25='Tue, 10/03/2017 09:09, EDT';
-	s.prop10=s.eVar25;
-</script> 
-  <script language="javascript" type="text/javascript">
-		s.eVar14 = 'Guest';
-		s.prop3 = 'Guest';	
-	</script> 
-  <script language="javascript" type="text/javascript">
-	s.channel="Shipping Customer Service";
-	//s.prop2="Shipping Customer Service";
-</script> 
-  <script language="javascript" type="text/javascript">
-	
-		s.pageName= "[menshealth] shipping customer service";
-		
-			s.hier1= "menshealth";
-		
-	
-</script> 
-  <script language="javascript" type="text/javascript">
-		if(!s.eVar13)
-			s.eVar13="Non-browse";
-	</script> 
-  <!-- Google Tag Manager --> 
-  <noscript>
-   <iframe src="//www.googletagmanager.com/ns.html?id=GTM-WDRH89" height="0" width="0" style="display:none;visibility:hidden"></iframe>
-  </noscript> 
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-	new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-	j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-	'//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-	})(window,document,'script','dataLayer','GTM-WDRH89');</script> 
-  <!-- End Google Tag Manager --> 
-  <script>dataLayer.push({"brand": "HLH"});</script> 
-  <!-- Bing Code for Remarketing tag --> 
-  <div style="display:none"> 
-   <img src="https://ads.bluelithium.com/pixel?id=2421641&amp;t=2" width="1" height="1"> 
-  </div> 
-  <!-- End Bing Code for Remarketing tag --> 
-  <div id="wrapper" class="pt_customer-service"> 
-   <div class="top-nav"> 
-    <div class="page-header" role="banner"> 
-     <div class="container"> 
-      <div class="header-left"> 
-       <div class="brand-logo" data-dropdown="brand-nav"> 
-        <a href="/"> <img src="/on/demandware.static/Sites-rodales-Site/-/default/dwdeae31a8/images/unified/hlh-logo-white.png" srcset="/on/demandware.static/Sites-rodales-Site/-/default/dw7f459280/images/unified/hlh-logo-white.svg" height="50" alt="Men's Health"> </a> 
-       </div> 
-      </div>
-      <!-- /.header-left --> 
-      <div class="header-right"> 
-       <ul class="header-util-items"> 
-        <li> <a href="https://shop.menshealth.com/account/" data-dropdown="header-user" data-dropdown-toggle="true" class="user-link"><span class="icon icon-user" aria-hidden="true"></span> <span class="sr-text">Account</span></a> 
-         <div class="header-user header-dropdown"> 
-          <!--  utility user menu --> 
-          <nav> 
-           <h5>My Account</h5> 
-           <ul class="menu-utility-user"> 
-            <li> <a title="Login | Register" href="https://shop.menshealth.com/account/" class="user-login"> Login | Register </a> </li> 
-            <li> <a title="Order Status" href="https://shop.menshealth.com/order-history/" class="user-login"> Order Status </a> </li> 
-           </ul> 
-          </nav> 
-         </div> </li> 
-        <li> 
-         <div class="mini-cart" id="minicart"> 
-          <!-- Report any requested source code --> 
-          <!-- Report the active source code --> 
-          <div class="mini-cart-total"> 
-           <a href="https://shop.menshealth.com/cart/" title="View Basket" class="mini-cart-link mini-cart-empty"> <span class="icon icon-cart" aria-hidden="true"></span> <span class="mini-cart-label sr-text">Cart</span> <span class="mini-cart-quantity" style="display:none;">0</span> </a> 
-          </div>
-          <!-- /.mini-cart-total --> 
-          <div class="mini-cart-content"> 
-           <div class="mini-cart-content-inner"> 
-            <p class="empty-mini-cart-text">There are no items in your cart.</p> 
-           </div> 
-          </div> 
-          <!-- Used when adding a single product to a cart. Note that we cannot always use addproducts with an array of 1 because
-that relies on a custom object. We cannot use a custom script wrapper object before an interaction continue node, see DW-2210
- --> 
-         </div> </li> 
-        <li> <a href="#simplesearch" class="search-link" title="search"><span class="icon icon-search" aria-hidden="true"></span> <span class="sr-text">Search</span></a> 
-         <div class="header-search" id="header-search"> 
-          <form class="search-form" role="search" action="https://shop.menshealth.com/menshealth/" method="get" id="simple-search" name="simpleSearch" novalidate> 
-           <label class="visually-hidden" for="q">Search</label> 
-           <input type="text" id="q" name="q" value="" class="input-text valid" autocomplete="off" placeholder="Search"> 
-           <button class="search-submit"><span class="icon icon-search"></span><span class="sr-text">Go</span></button> 
-          </form> 
-         </div>
-         <!-- /.header-search --> </li> 
-       </ul> 
-      </div>
-      <!-- /.header-right --> 
-      <div class="global-message-bar"> 
-      </div>
-      <!-- /.global-message-bar --> 
-      <!-- BRAND: HLH --> 
-      <div class="brand-nav header-dropdown"> 
-       <nav> 
-        <h5>Shop by Brand</h5> 
-        <ul class="brand-nav-items"> 
-         <li class="brand-nav-item "><a href="https://shop.menshealth.com/s/Sites-rodales-Site/dw/shared_session_redirect?url=https%3A%2F%2Fshop.bicycling.com">Bicycling</a></li> 
-         <li class="brand-nav-item current-nav-item"><a href="https://shop.menshealth.com">Men's Health</a></li> 
-         <li class="brand-nav-item "><a href="https://shop.menshealth.com/s/Sites-rodales-Site/dw/shared_session_redirect?url=https%3A%2F%2Fshop.prevention.com">Prevention</a></li> 
-         <li class="brand-nav-item "><a href="https://shop.menshealth.com/s/Sites-rodales-Site/dw/shared_session_redirect?url=https%3A%2F%2Fshop.runnersworld.com">Runner's World</a></li> 
-         <li class="brand-nav-item "><a href="https://shop.menshealth.com/s/Sites-rodales-Site/dw/shared_session_redirect?url=https%3A%2F%2Fshop.womenshealthmag.com">Women's Health</a></li> 
-        </ul> 
-       </nav> 
-      </div>
-      <!-- /.brand-nav --> 
-     </div>
-     <!-- /.container --> 
-    </div>
-    <!-- /.page-header --> 
-    <div class="brand-promo">  
-    </div>
-    <!--  /.brand-promo --> 
-   </div>
-   <!-- /.top-nav --> 
-   <div role="navigation" class="category-nav"> 
-    <nav class="container"> 
-     <h5 class="navigation-header">Shop by Category</h5> 
-     <!--  category navigation --> 
-     <div class="nav-wrap"> 
-      <ul class="l1-items"> 
-       <li id="categorymenu-item-1" class="l1nav l1-fitness "> <a href="/mens-health-fitness/?link=categorymenu" class="maincatlink catnav" id="HLH-fitness_HLH-fitness_HLH-fitness_Fitness"> <span class="cat-name">Fitness</span> </a> 
-        <div class="flyout-wrap categorydropdown"> 
-         <div class="submenu clearfix"> 
-          <div class="submenu-left"> 
-           <div class="submenu-column"> 
-            <a href="/mens-health-fitness/?link=categorymenu" class="menu-section-title">Shop All Fitness</a> 
-            <ul class="submenu-items"> 
-             <li class="submenu-item-hlh-fitness-programs"> <a href="/fitness/training/?link=categorymenu"> Training Programs </a> </li> 
-             <li class="submenu-item-hlh-fitness-accessories"> <a href="/fitness/accessories/?link=categorymenu"> Fitness Accessories </a> </li> 
-             <li class="submenu-item-hlh-fitness-tee"> <a href="/fitness/wear/?link=categorymenu"> Exclusive Fitness Wear </a> </li> 
-            </ul> 
-           </div>
-           <!-- /.submenu-column --> 
-          </div>
-          <!-- /.submenu-left --> 
-          <div class="submenu-right"> 
-           <div class="flyout-banner-product"> 
-            <div class="flyout-banner-header">
-             Featured
-            </div> 
-            <div class="cat-menu-product"> 
-             <div class="topnav-product" id="b230a47c01063b9134b6f0f0e1" data-itemid="E005991">
-              <!-- dwMarker="product" dwContentID="b230a47c01063b9134b6f0f0e1" --> 
-              <div class="product-image"> 
-               <a class="catmenu-product-image" href="https://shop.menshealth.com/product/mens-health-camo-tee/E005991.html?dwvar_E005991_color=A01&amp;categoryid=Featured&amp;link=newInCategory" title="Men's Health Camo Tee"> <img src="https://sits-pod46.demandware.net/dw/image/v2/AALE_PRD/on/demandware.static/-/Sites-rodales-products/default/dw53f09336/images/hi-res/E005991_A01_A_1.jpg?sw=210&amp;sfrm=jpg" alt="Men_s Health Camo Tee" title="Men_s Health Camo Tee" height="210" width="150"> </a> 
-              </div> 
-              <div class="topnav_nameprice_contain"> 
-               <div class="topnav_nameprice_contain_inside"> 
-                <div class="product-name"> 
-                 <a class="name-link" href="https://shop.menshealth.com/product/mens-health-camo-tee/E005991.html?dwvar_E005991_color=A01&amp;categoryid=Featured&amp;link=newInCategory" title="Men's Health Camo Tee"> Men's Health Camo Tee </a> 
-                </div> 
-               </div> 
-              </div> 
-             </div>
-             <!--  END: .product-tile --> 
-            </div> 
-           </div>
-           <!-- /.flyout-banner-product --> 
-           <div class="flyout-banner-banner"> 
-            <div class="flyout-banner-header"></div> 
-            <a href="https://shop.menshealth.com/mens-health-21-day-metashred-deluxe-set/E004882.html"><img src="https://shop.menshealth.com/on/demandware.static/-/Sites-rodales-Library/default/dw027a0f39/images/Flyouts/mh_fitness_480x250.jpg" alt="Men's Health Fitness" title="Men's Health Fitness"></a> 
-           </div> 
-          </div>
-          <!-- /.submenu-right --> 
-         </div>
-         <!-- /.submenu --> 
-        </div>
-        <!-- /.flyout-wrap --> </li> 
-       <li id="categorymenu-item-2" class="l1nav l1-fuel "> <a href="/mens-health-fuel/?link=categorymenu" class="maincatlink catnav" id="HLH-fuel_HLH-fuel_HLH-fuel_Fuel"> <span class="cat-name">Fuel</span> </a> 
-        <div class="flyout-wrap categorydropdown"> 
-         <div class="submenu clearfix"> 
-          <div class="submenu-left"> 
-           <div class="submenu-column"> 
-            <a href="/mens-health-fuel/?link=categorymenu" class="menu-section-title">Shop All Fuel</a> 
-            <ul class="submenu-items"> 
-             <li class="submenu-item-hlh-fuel-superfoods"> <a href="/fuel/superfoods/?link=categorymenu"> Superfoods &amp; Nutrients </a> </li> 
-            </ul> 
-           </div>
-           <!-- /.submenu-column --> 
-          </div>
-          <!-- /.submenu-left --> 
-          <div class="submenu-right"> 
-           <div class="flyout-banner-product"> 
-            <div class="flyout-banner-header">
-             Featured
-            </div> 
-            <div class="cat-menu-product"> 
-             <div class="topnav-product" id="eaf08ef41616c0bbe282ea184b" data-itemid="E005233">
-              <!-- dwMarker="product" dwContentID="eaf08ef41616c0bbe282ea184b" --> 
-              <div class="product-image"> 
-               <a class="catmenu-product-image" href="https://shop.menshealth.com/product/organic-vanilla-whey-protein-powder/E005233.html?dwvar_E005233_color=F12&amp;categoryid=Featured&amp;link=newInCategory" title="Organic Vanilla Whey Protein Powder"> <img src="https://sits-pod46.demandware.net/dw/image/v2/AALE_PRD/on/demandware.static/-/Sites-rodales-products/default/dw7cb2d30b/images/hi-res/E005233_F12_A_1.jpg?sw=210&amp;sfrm=jpg" alt="Organic Vanilla Whey Protein Powder" title="Organic Vanilla Whey Protein Powder" height="210" width="150"> </a> 
-              </div> 
-              <div class="topnav_nameprice_contain"> 
-               <div class="topnav_nameprice_contain_inside"> 
-                <div class="product-name"> 
-                 <a class="name-link" href="https://shop.menshealth.com/product/organic-vanilla-whey-protein-powder/E005233.html?dwvar_E005233_color=F12&amp;categoryid=Featured&amp;link=newInCategory" title="Organic Vanilla Whey Protein Powder"> Organic Vanilla Whey Protein Powder </a> 
-                </div> 
-               </div> 
-              </div> 
-             </div>
-             <!--  END: .product-tile --> 
-            </div> 
-           </div>
-           <!-- /.flyout-banner-product --> 
-           <div class="flyout-banner-banner"> 
-            <div class="flyout-banner-header"></div> 
-            <a href="https://shop.menshealth.com/product/organic-whey-protein/E001700.html"><img src="https://shop.menshealth.com/on/demandware.static/-/Sites-rodales-Library/default/dw4e8e9c20/images/Flyouts/mh_fuel_480x250.jpg" alt="Men's Health Fuel" title="Men's Health Fuel"></a> 
-           </div> 
-          </div>
-          <!-- /.submenu-right --> 
-         </div>
-         <!-- /.submenu --> 
-        </div>
-        <!-- /.flyout-wrap --> </li> 
-       <li id="categorymenu-item-3" class="l1nav l1-sex "> <a href="/mens-health-sexual-health/?link=categorymenu" class="maincatlink catnav" id="HLH-sex_HLH-sex_HLH-sex_Sex"> <span class="cat-name">Sex</span> </a> 
-        <div class="flyout-wrap categorydropdown"> 
-         <div class="submenu clearfix"> 
-          <div class="submenu-left"> 
-           <div class="submenu-column"> 
-            <a href="/mens-health-sexual-health/?link=categorymenu" class="menu-section-title">Shop All Sex</a> 
-            <ul class="submenu-items"> 
-             <li class="submenu-item-hlh-lubricants"> <a href="/mens-health-sexual-health/lubricants-and-condoms/?link=categorymenu"> Lubricants &amp; Condoms </a> </li> 
-             <li class="submenu-item-hlh-sex-toys"> <a href="/mens-health-sexual-health/sex-toys-and-adult-novelties/?link=categorymenu"> Sex Toys </a> </li> 
-             <li class="submenu-item-hlh-hygiene"> <a href="/mens-health-sexual-health/sexual-hygiene/?link=categorymenu"> Hygiene </a> </li> 
-             <li class="submenu-item-hlh-massage"> <a href="/mens-health-sexual-health/massage/?link=categorymenu"> Massage </a> </li> 
-             <li class="submenu-item-hlh-sex-accessories"> <a href="/mens-health-sexual-health/sex-accessories/?link=categorymenu"> Accessories </a> </li> 
-            </ul> 
-           </div>
-           <!-- /.submenu-column --> 
-          </div>
-          <!-- /.submenu-left --> 
-          <div class="submenu-right"> 
-           <div class="flyout-banner-product"> 
-            <div class="flyout-banner-header">
-             Featured
-            </div> 
-            <div class="cat-menu-product"> 
-             <div class="topnav-product" id="bcPcYiaageaBAaaadkBT7DHn9J" data-itemid="E003682">
-              <!-- dwMarker="product" dwContentID="bcPcYiaageaBAaaadkBT7DHn9J" --> 
-              <div class="product-image"> 
-               <a class="catmenu-product-image" href="https://shop.menshealth.com/product/almost-naked-organic-personal-lubricant/E003682.html?dwvar_E003682_color=S11&amp;categoryid=Featured&amp;link=newInCategory" title="Almost Naked Organic Personal Lubricant"> <img src="https://sits-pod46.demandware.net/dw/image/v2/AALE_PRD/on/demandware.static/-/Sites-rodales-products/default/dw93d2abd8/images/hi-res/E003682_S11_A_1.jpg?sw=210&amp;sfrm=jpg" alt="Almost Naked Organic Personal Lubricant" title="Almost Naked Organic Personal Lubricant" height="210" width="150"> </a> 
-              </div> 
-              <div class="topnav_nameprice_contain"> 
-               <div class="topnav_nameprice_contain_inside"> 
-                <div class="product-name"> 
-                 <a class="name-link" href="https://shop.menshealth.com/product/almost-naked-organic-personal-lubricant/E003682.html?dwvar_E003682_color=S11&amp;categoryid=Featured&amp;link=newInCategory" title="Almost Naked Organic Personal Lubricant"> Almost Naked Organic Personal Lubricant </a> 
-                </div> 
-               </div> 
-              </div> 
-             </div>
-             <!--  END: .product-tile --> 
-            </div> 
-           </div>
-           <!-- /.flyout-banner-product --> 
-           <div class="flyout-banner-banner"> 
-            <div class="flyout-banner-header"></div> 
-            <a href="https://shop.menshealth.com/mens-health-sexual-health/massage/"><img src="https://shop.menshealth.com/on/demandware.static/-/Sites-rodales-Library/default/dw13b944ac/images/Flyouts/mh_sex_480x250.jpg" alt="Men's Health Sex" title="Men's Health Sex"></a> 
-           </div> 
-          </div>
-          <!-- /.submenu-right --> 
-         </div>
-         <!-- /.submenu --> 
-        </div>
-        <!-- /.flyout-wrap --> </li> 
-       <li id="categorymenu-item-4" class="l1nav l1-cooking "> <a href="/cooking/?link=categorymenu" class="maincatlink catnav" id="HLH-cooking_HLH-cooking_HLH-cooking_Cooking"> <span class="cat-name">Cooking</span> </a> 
-        <div class="flyout-wrap categorydropdown"> 
-         <div class="submenu clearfix"> 
-          <div class="submenu-left"> 
-           <div class="submenu-column"> 
-            <a href="/cooking/?link=categorymenu" class="menu-section-title">Shop All Cooking</a> 
-            <ul class="submenu-items"> 
-             <li class="submenu-item-hlh-cookware"> <a href="/cook/mens-health-cookware/?link=categorymenu"> Cooking Essentials </a> </li> 
-             <li class="submenu-item-hlh-cooking-cookbooks"> <a href="/cook/mens-health-cookbooks/?link=categorymenu"> Cookbooks </a> </li> 
-            </ul> 
-           </div>
-           <div class="submenu-column submenu-column-featured"> 
-            <strong class="menu-section-title">Featured</strong> 
-            <ul class="submenu-items"> 
-             <li class="submenu-item-hlh-featured-food-storage"> <a href="/cook/food-storage/?link=categorymenu"> Non-Toxic Food Storage </a> </li> 
-            </ul> 
-           </div>
-           <!-- /.submenu-column --> 
-          </div>
-          <!-- /.submenu-left --> 
-          <div class="submenu-right"> 
-           <div class="flyout-banner-product"> 
-            <div class="flyout-banner-header">
-             Featured Product
-            </div> 
-            <div class="cat-menu-product"> 
-             <div class="topnav-product" id="bcm2ciaagevSUaaaddVKhHZbUn" data-itemid="E002152">
-              <!-- dwMarker="product" dwContentID="bcm2ciaagevSUaaaddVKhHZbUn" --> 
-              <div class="product-image"> 
-               <a class="catmenu-product-image" href="https://shop.menshealth.com/product/glass-terrine-jars/E002152.html?dwvar_E002152_color=A03&amp;categoryid=Featured&amp;link=newInCategory" title="Glass Terrine Jars"> <img src="https://sits-pod46.demandware.net/dw/image/v2/AALE_PRD/on/demandware.static/-/Sites-rodales-products/default/dwfaa9e792/images/hi-res/E002152_A03_A_1.jpg?sw=210&amp;sfrm=jpg" alt="Glass Terrine Jars" title="Glass Terrine Jars" height="210" width="150"> </a> 
-              </div> 
-              <div class="topnav_nameprice_contain"> 
-               <div class="topnav_nameprice_contain_inside"> 
-                <div class="product-name"> 
-                 <a class="name-link" href="https://shop.menshealth.com/product/glass-terrine-jars/E002152.html?dwvar_E002152_color=A03&amp;categoryid=Featured&amp;link=newInCategory" title="Glass Terrine Jars"> Glass Terrine Jars </a> 
-                </div> 
-               </div> 
-              </div> 
-             </div>
-             <!--  END: .product-tile --> 
-            </div> 
-           </div>
-           <!-- /.flyout-banner-product --> 
-           <div class="flyout-banner-banner"> 
-            <div class="flyout-banner-header"></div> 
-            <a href="https://shop.menshealth.com/cook/mens-health-cookbooks/"><img src="https://shop.menshealth.com/on/demandware.static/-/Sites-rodales-Library/default/dw19ac1096/images/Flyouts/mh_cooking_480x250.jpg" alt="Men's Health Cooking" title="Men's Health Cooking"></a> 
-           </div> 
-          </div>
-          <!-- /.submenu-right --> 
-         </div>
-         <!-- /.submenu --> 
-        </div>
-        <!-- /.flyout-wrap --> </li> 
-       <li id="categorymenu-item-5" class="l1nav l1-books-dvds "> <a href="/books-and-dvds-by-mens-health/?link=categorymenu" class="maincatlink catnav" id="HLH-books_HLH-books_HLH-books_Books &amp; DVDs"> <span class="cat-name">Books &amp; DVDs</span> </a> 
-        <div class="flyout-wrap categorydropdown"> 
-         <div class="submenu clearfix"> 
-          <div class="submenu-left"> 
-           <div class="submenu-column"> 
-            <a href="/books-and-dvds-by-mens-health/?link=categorymenu" class="menu-section-title">Shop All Books &amp; DVDs</a> 
-            <ul class="submenu-items"> 
-             <li class="submenu-item-hlh-books-books"> <a href="/books/mens-health-books/?link=categorymenu"> Books </a> </li> 
-             <li class="submenu-item-hlh-books-dvds"> <a href="/books/mens-health-dvds/?link=categorymenu"> DVDs </a> </li> 
-            </ul> 
-           </div>
-           <!-- /.submenu-column --> 
-          </div>
-          <!-- /.submenu-left --> 
-          <div class="submenu-right"> 
-           <div class="flyout-banner-product"> 
-            <div class="flyout-banner-header">
-             Featured
-            </div> 
-            <div class="cat-menu-product"> 
-             <div class="topnav-product" id="bcHkkiaagm5haaaadohr7bQcgQ" data-itemid="E004542">
-              <!-- dwMarker="product" dwContentID="bcHkkiaagm5haaaadohr7bQcgQ" --> 
-              <div class="product-image"> 
-               <a class="catmenu-product-image" href="https://shop.menshealth.com/mens-health-spartacus-workout/E004542.html?dwvar_E004542_color=N01&amp;categoryid=Featured&amp;link=newInCategory" title="Men's Health Spartacus Workout"> <img src="https://sits-pod46.demandware.net/dw/image/v2/AALE_PRD/on/demandware.static/-/Sites-rodales-products/default/dw3c620fe1/images/hi-res/E004542_N01_A_1.jpg?sw=210&amp;sfrm=jpg" alt="Men_s Health Spartacus Workout" title="Men_s Health Spartacus Workout" height="210" width="150"> </a> 
-              </div> 
-              <div class="topnav_nameprice_contain"> 
-               <div class="topnav_nameprice_contain_inside"> 
-                <div class="product-name"> 
-                 <a class="name-link" href="https://shop.menshealth.com/mens-health-spartacus-workout/E004542.html?dwvar_E004542_color=N01&amp;categoryid=Featured&amp;link=newInCategory" title="Men's Health Spartacus Workout"> Men's Health Spartacus Workout </a> 
-                </div> 
-               </div> 
-              </div> 
-             </div>
-             <!--  END: .product-tile --> 
-            </div> 
-           </div>
-           <!-- /.flyout-banner-product --> 
-           <div class="flyout-banner-banner"> 
-            <div class="flyout-banner-header"></div> 
-            <a href="https://shop.menshealth.com/books-and-dvds-by-mens-health/"><img src="https://shop.menshealth.com/on/demandware.static/-/Sites-rodales-Library/default/dw0ab618f3/images/Flyouts/mh_books_480x250.jpg" alt="Men's Health Books &amp; DVDs" title="Men's Health Books &amp; DVDs"></a> 
-           </div> 
-          </div>
-          <!-- /.submenu-right --> 
-         </div>
-         <!-- /.submenu --> 
-        </div>
-        <!-- /.flyout-wrap --> </li> 
-       <li id="categorymenu-item-6" class="l1nav l1-gifts "> <a href="/gifts-by-mens-health/?link=categorymenu" class="maincatlink catnav" id="HLH-gifts_HLH-gifts_HLH-gifts_Gifts"> <span class="cat-name">Gifts</span> </a> 
-        <div class="flyout-wrap categorydropdown"> 
-         <div class="submenu clearfix"> 
-          <div class="submenu-left"> 
-           <div class="submenu-column"> 
-            <a href="/gifts-by-mens-health/?link=categorymenu" class="menu-section-title">Shop All Gifts</a> 
-            <ul class="submenu-items"> 
-             <li class="submenu-item-hlh-gifts-editorspicks"> <a href="/gifts/mens-health-editors-picks/?link=categorymenu"> Editor's Top Picks </a> </li> 
-             <li class="submenu-item-hlh-gifts-men"> <a href="/gifts/men/?link=categorymenu"> Gifts for the Fit Guy </a> </li> 
-             <li class="submenu-item-hlh-gifts-sexy-gifts-her"> <a href="/gifts/sexy-gift-her/?link=categorymenu"> Sexy Gifts for Her </a> </li> 
-             <li class="submenu-item-hlh-gifts-fitness"> <a href="/gifts/mens-health-fitness/?link=categorymenu"> Fitness Gifts </a> </li> 
-             <li class="submenu-item-hlh-gifts-under-50"> <a href="/mens-health-gifts/mens-health-gifts-under-50/?link=categorymenu"> Gifts Under $50 </a> </li> 
-             <li class="submenu-item-hlh-gifts-stocking-stuffers"> <a href="/mens-health-gifts/mens-health-gifts-under-25/?link=categorymenu"> Gifts Under $25 </a> </li> 
-            </ul> 
-           </div>
-           <!-- /.submenu-column --> 
-          </div>
-          <!-- /.submenu-left --> 
-          <div class="submenu-right"> 
-           <div class="flyout-banner-product"> 
-            <div class="flyout-banner-header">
-             Featured
-            </div> 
-            <div class="cat-menu-product"> 
-             <div class="topnav-product" id="90046eb6351dbd2bd2f257e9c2" data-itemid="E005519">
-              <!-- dwMarker="product" dwContentID="90046eb6351dbd2bd2f257e9c2" --> 
-              <div class="product-image"> 
-               <a class="catmenu-product-image" href="https://shop.menshealth.com/product/intimate-earth-massage-oil/E005519.html?dwvar_E005519_color=S01&amp;categoryid=Featured&amp;link=newInCategory" title="Intimate Earth Massage Oil"> <img src="https://sits-pod46.demandware.net/dw/image/v2/AALE_PRD/on/demandware.static/-/Sites-rodales-products/default/dwdf6d59f8/images/hi-res/E005519_S01_A_1.jpg?sw=210&amp;sfrm=jpg" alt="Intimate Earth Massage Oil" title="Intimate Earth Massage Oil" height="210" width="150"> </a> 
-              </div> 
-              <div class="topnav_nameprice_contain"> 
-               <div class="topnav_nameprice_contain_inside"> 
-                <div class="product-name"> 
-                 <a class="name-link" href="https://shop.menshealth.com/product/intimate-earth-massage-oil/E005519.html?dwvar_E005519_color=S01&amp;categoryid=Featured&amp;link=newInCategory" title="Intimate Earth Massage Oil"> Intimate Earth Massage Oil </a> 
-                </div> 
-               </div> 
-              </div> 
-             </div>
-             <!--  END: .product-tile --> 
-            </div> 
-           </div>
-           <!-- /.flyout-banner-product --> 
-           <div class="flyout-banner-banner"> 
-            <div class="flyout-banner-header"></div> 
-            <a href="https://shop.menshealth.com/gifts/sexy-gift-her/"><img src="https://shop.menshealth.com/on/demandware.static/-/Sites-rodales-Library/default/dw865b4048/images/Flyouts/mh_gifts_480x250.jpg" alt="Men's Health Gifts" title="Men's Health Gifts"></a> 
-           </div> 
-          </div>
-          <!-- /.submenu-right --> 
-         </div>
-         <!-- /.submenu --> 
-        </div>
-        <!-- /.flyout-wrap --> </li> 
-       <li id="categorymenu-item-7" class="l1nav l1-subscribe "> <a href="/mens-health-is-among-the-most-popular-magazines-for-men.-get-your-mens-health-subscription-today-and-save-/?link=categorymenu" class="maincatlink catnav" id="HLH-subscribe_HLH-subscribe_HLH-subscribe_Subscribe"> <span class="cat-name">Subscribe</span> </a> </li> 
-      </ul> 
-     </div>
-     <!-- /.nav-wrap --> 
-    </nav> 
-   </div>
-   <!-- /.navigation --> 
-   <div id="main" role="main" class="page-content clearfix"> 
-    <div id="primary" class="primary-content"> 
-     <section> 
-      <div id="browser-check"> 
-       <noscript> 
-        <div class="browser-compatibility-alert"> 
-         <p class="browser-error">Your browser's Javascript functionality is turned off. Please turn it on so that you can experience the full capabilities of this site.</p> 
-        </div> 
-       </noscript> 
-      </div> 
-      <div class="content-asset">
-       <!-- dwMarker="content" dwContentID="bdpZsiaagei1gaaac6Lbk4lzLI" --> 
-       <input type="hidden" id="menu_option" value="customer-service-menu"> 
-       <input type="hidden" id="content-page" value="shipping"> 
-       <div id="content"> 
-        <div class="cs-columns"> 
-         <!-- START MAIN CONTENT AREA ------------------------------------------> 
-         <div class="mainservice"> 
-          <h1 class="pagetitle">Shipping &amp; Delivery Information</h1> 
-          <hr class="content-slot"> 
-          <div class="anchortag">
-           <a name="shippingmethods">&nbsp;</a>
-          </div> 
-          <h2 class="rdle-ship">Shipping Methods &amp; Costs</h2> 
-          <p>Rodale may use a variety of carriers to deliver your order as quickly as possible. Please use the chart below to estimate the shipping charge for your order:</p> 
-          <table id="rdle-ship"> 
-           <tbody>
-            <tr> 
-             <th class="col1">ORDER SUBTOTAL</th> 
-             <th class="col2">STANDARD</th> 
-             <th class="col3">EXPEDITED</th> 
-             <th class="col4">PRIORITY</th> 
-            </tr> 
-            <tr> 
-             <td>$0-$4.99</td> 
-             <td>$3.95</td> 
-             <td>$14.95</td> 
-             <td>$20.95</td> 
-            </tr> 
-            <tr> 
-             <td>$5.00-$49.99</td> 
-             <td>$6.95</td> 
-             <td>$17.95</td> 
-             <td>$23.95</td> 
-            </tr> 
-            <tr> 
-             <td>$50.00-$74.99</td> 
-             <td>$8.95</td> 
-             <td>$19.95</td> 
-             <td>$25.95</td> 
-            </tr> 
-            <tr> 
-             <td>$75.00-$99.99</td> 
-             <td>$9.95</td> 
-             <td>$20.95</td> 
-             <td>$26.95</td> 
-            </tr> 
-            <tr> 
-             <td>$100.00-$124.99</td> 
-             <td>$10.95</td> 
-             <td>$21.95</td> 
-             <td>$27.95</td> 
-            </tr> 
-            <tr> 
-             <td>$125.00-$149.99</td> 
-             <td>$11.95</td> 
-             <td>$21.95</td> 
-             <td>$28.95</td> 
-            </tr> 
-            <tr> 
-             <td>$150.00+</td> 
-             <td>$11.95</td> 
-             <td>$21.95</td> 
-             <td>$29.95</td> 
-            </tr> 
-           </tbody>
-          </table> 
-          <p><strong>Standard Shipping:</strong> Orders will arrive in 3-7 business days.<br> <strong>Expedited Shipping:</strong> Orders will arrive in 2-3 business days.<br> <strong>Priority Shipping:</strong> Orders received by 1pm EST (M-F) will arrive in 1-2 business days.</p> 
-          <!-- <h4><i>SHIPPING DEADLINES for Guaranteed Delivery by 11/23</i></h4>
-	<p><strong>Standard Shipping:</strong> Order by 3pm EST on Sunday 11/15<br />	
-	<strong>Expedited Shipping:</strong> Order by 3pm EST on Monday 11/20<br />	
-	<strong>Priority Shipping:</strong> Order by 3pm EST on Tuesday 11/21</p>
-
-	<h4><i>SHIPPING DEADLINES for Guaranteed Delivery by 12/23</i></h4>
-	<p><strong>Standard Shipping:</strong> Order by 3pm EST on Sunday 12/11<br />	
-	<strong>Expedited Shipping:</strong> Order by 3pm EST on Monday 12/20<br />	
-	<strong>Priority Shipping:</strong> Order by 3pm EST on Tuesday 12/21</p>
-
-	<h4><i>SHIPPING DEADLINES for Guaranteed Delivery by 12/30</i></h4>
-	<p><strong>Standard Shipping:</strong> Order by 3pm EST on Sunday 12/22<br />	
-	<strong>Expedited Shipping:</strong> Order by 3pm EST on Monday 12/27<br />	
-	<strong>Priority Shipping:</strong> Order by 3pm EST on Tuesday 12/28</p> --> 
-          <p>Expedited and Priority shipping options are not available for addresses with PO Boxes, APO/FPO, or in U.S. Territories.</p> 
-          <p>Items that are especially heavy, large, or require special handling may incur a delivery surcharge, which will be stated during checkout and is in addition to regular shipping charges.</p> 
-          <p> Rodale will not be shipping on the following holidays in 2017: January 16, February 20, May 29, July 3 &amp; 4, September 4, October 9, November 23 &amp; 24, December 25, and January 1, 2018.</p> 
-          <hr class="content-slot"> 
-          <div class="anchortag">
-           <a name="internationalshipping">&nbsp;</a>
-          </div> 
-          <h2>International Shipping</h2> 
-          <p>Currently, Rodale is able to ship only to addresses in the United States and its Territories.</p> 
-          <hr class="content-slot"> 
-          <div class="anchortag">
-           <a name="packagetracking">&nbsp;</a>
-          </div> 
-          <h2>Package Tracking</h2> 
-          <p>You can track your package by logging in to <a href="https://shop.menshealth.com/account/">your account</a>, or by calling Customer Service at 888-891-8900, 8AM to midnight EST, 7 days a week. There may be a delay between the time you place your order and the time tracking information is available, usually no more than 1 business day.</p> 
-          <hr class="content-slot"> 
-          <div class="anchortag">
-           <a name="salestax">&nbsp;</a>
-          </div> 
-          <h2>Sales Tax</h2> 
-          <p>We charge sales tax when applicable. Please <a href="http://www.rodale.com/customer-care/sales-tax/" target="_blank">click here</a> for our sales tax policy.</p> 
-          <!-- <p>Rodale Inc. is required to collect sales tax in states where we have a physical presence. Sales tax is added to orders delivered in New York and Pennsylvania, based on the appropriate rate of sales tax in each state. If applicable taxes are required, they are calculated and charged to your credit card at time of shipment.</p>
- 
-<p>Some items purchased from Rodale may be exempt from sales tax, even for those states where Rodale has a physical presence.</p>
- 
-<p>Should your order include sales tax, and it is being delivered to a state where Rodale does not have a physical presence, tax is being charged because your state has required Rodale to collect their sales tax.</p>
- 
-<p>Please note, you may be required to pay sales tax and file a sales tax return for certain purchases made from Rodale, even if your order does not include sales tax charges. Please consult your city, county, and state sales tax authorities to determine whether you are required to pay sales tax on any purchases made from Rodale.</p>
- 
-<p>Specifically, if you are a resident of Colorado, Kentucky, Oklahoma, Tennessee, South Dakota, or Vermont, Rodale is required to notify you of the following: (1) Rodale is not required to and does not collect sales tax on orders shipped to your state, (2) Purchases shipped to your state are subject to sales tax unless there is a specific exemption, (3) Purchases are not exempt from sales tax merely because the purchase takes place over the Internet or other remote means, (4) Purchasers in your state are required to report all purchases that were not taxed and pay tax on those purchases. Please consult <a href="http://www.colorado.gov/revenue" target="_blank">www.colorado.gov/revenue</a>, <a href="http://www.revenue.ky.gov" target="_blank">www.revenue.ky.gov</a>, <a href="http://www.tax.ok.gov" target="_blank">www.tax.ok.gov</a>, <a href="https://apps.tn.gov/usetax/" target="_blank">https://apps.tn.gov/usetax/</a>, <a href="http://dor.sd.gov/" target="_blank">dor.sd.gov/</a>, or <a href="http://tax.vermont.gov/" target="_blank">tax.vermont.gov</a>, as appropriate, for more information, including applicable forms and filing rules.</p> --> 
-         </div> 
-         <!-- END MAIN CONTENT AREA ------------------------------------------> 
-        </div> 
-       </div> 
-      </div> 
-      <!-- End content-asset --> 
-     </section> 
-    </div> 
-    <div id="secondary" class="nav"> 
-     <nav> 
-      <h1 class="visually-hidden">tertiary navigation</h1> 
-      <div class="account-nav-asset"> 
-       <div class="content-asset">
-        <!-- dwMarker="content" dwContentID="cdFaMiaage446aaadmuNboy2HS" --> 
-        <div class="customer-service-menu"> 
-         <h3 class="visually-hidden">Customer Service</h3> 
-         <span class="secondary-header">Customer Service</span> 
-         <ul> 
-          <li><a class="customer-service" href="http://shop.menshealth.com/customer-care/contact-us/">Contact Us</a> 
-           <ul class="submenu contactus"> 
-            <li><a href="#byemail">By Email</a></li> 
-            <li><a href="#byphone">By Phone</a></li> 
-            <li><a href="#bymail">By Mail</a></li> 
-            <!-- <li><a href="#joinconversation">Join the Conversation</a></li> --> 
-            <li><a href="#press">Press</a></li> 
-           </ul> </li> 
-          <li><a class="customer-service" href="https://shop.menshealth.com/returns-brand/returns-brand.html">Returns</a> 
-           <ul class="submenu returns"> 
-            <li><a href="#returnsbymail">How to Return an Item</a></li> 
-            <li><a href="#creditforyourreturn">Receiving Credit for Your Return</a></li> 
-            <li><a href="#exchanges">Exchanges</a></li> 
-           </ul> </li> 
-          <li><a class="customer-service" href="https://shop.menshealth.com/shipping-customer-service/shipping.html">Shipping Info</a> 
-           <ul class="submenu shipping"> 
-            <li><a href="#shippingmethods">Shipping Methods &amp; Costs</a></li> 
-            <li><a href="#internationalshipping">International Shipping</a></li> 
-            <li><a href="#packagetracking">Package Tracking</a></li> 
-            <li><a href="#salestax">Sales Tax</a></li> 
-           </ul> </li> 
-          <li><a class="customer-service" href="https://shop.menshealth.com/faqs-brand/faqs-brand.html">FAQs</a> 
-           <ul class="submenu faqs"> 
-            <li><a href="#returns">Returns</a></li> 
-            <li><a href="#shipping">Shipping Information</a></li> 
-            <li><a href="#payment">Payment Information</a></li> 
-            <li><a href="#general">General Questions</a></li> 
-            <li><a href="#aboutus">About Us</a></li> 
-           </ul> </li> 
-          <!-- <li><a class="privacy" class="customer-service" href="https://shop.menshealth.com/privacy-policy/privacy-policy.html">Your Privacy Rights</a>
-                        <ul class="submenu privacy">
-                                <li><a href="#1">Children Under 13</a></li>
-                                <li><a href="#2">Information Collection</a></li>
-                                <li><a href="#3">How We Use Your Information</a></li>
-                                <li><a href="#3a">Consent</a></li>
-                                <li><a href="#4">Your California Privacy Rights</a></li>
-                                <li><a href="#5">Updating Your Information</a></li>
-                                <li><a href="#6">Opting-out of Email</a></li>
-                                <li><a href="#7">Transfers for Legal Purposes</a></li>
-                                <li><a href="#8">Mobile Devices</a></li>
-                                <li><a href="#9">Cookies and Web Beacons</a></li>
-                                <li><a href="#10">Do Not Track/Third Party Advertising</a></li>
-                                <li><a href="#11">Links</a></li>
-                                <li><a href="#12">Policy Changes</a></li>
-                                <li><a href="#13">Data Security</a></li>
-                                <li><a href="#14">Contact Us</a></li>
-                        </ul>
-                </li> --> 
-          <li><a class="customer-service" href="http://www.rodale.com/customer-care/terms-of-use/" target="_blank">Terms of Use</a> 
-           <!--  <ul class="submenu terms">
-                                <li><a href="#1">Your Privacy Rights</a></li>
-                                <li><a href="#2">User Comments</a></li>
-                                <li><a href="#3">Claims of Copyright Infringement</a></li>
-                                <li><a href="#4">Rights to Change Site</a></li>
-                                <li><a href="#5">Inaccuraccies</a></li>
-                                <li><a href="#6">Other Web Sites</a></li>
-                                <li><a href="#7">Site Transactions</a></li>
-                                <li><a href="#8">Disclaimer</a></li>
-                                <li><a href="#9">Indemnification</a></li>
-                                <li><a href="#10">Geographic Limitations</a></li>
-                                <li><a href="#11">Dispute/Arbitration/Venue</a></li>
-                                <li><a href="#12">General Provisions</a></li>
-                                <li><a href="#13">Notices</a></li>
-                                <li><a href="#14">Termination</a></li>
-                        </ul> --> </li> 
-          <!-- <li><a class="giftwrappage" href="https://shop.menshealth.com/gift-wrap-page/gift-wrap-page.html">Rodale's Gift Wrap</a></li> --> 
-          <li><a class="sitemap" href="http://shop.menshealth.com/sitemap/">Sitemap</a></li> 
-         </ul> 
-        </div> 
-        <div class="about-rodales-menu"> 
-         <h3 class="visually-hidden">Why Rodale's</h3> 
-         <span class="secondary-header">Why Rodale's</span> 
-         <ul> 
-          <!-- <li><a class="whyshoprodales" class="about-rodales" href="https://shop.menshealth.com/on/demandware.store/Sites-rodales-Site/en_US/Page-Show?cid=whyshoprodales">Why Shop Rodale's</a></li> --> 
-          <!-- <li><a class="story" class="about-rodales" href="https://shop.menshealth.com/on/demandware.store/Sites-rodales-Site/en_US/Page-Show?cid=story">Our Story</a></li> --> 
-          <!-- <li><a class="commitment" class="about-rodales"  href="https://shop.menshealth.com/our-commitment-to-sustainability/commitment.html">Our Commitment to Sustainability</a></li> --> 
-          <!-- <li><a class="whyitmatters" class="about-rodales"  href="https://shop.menshealth.com/why-it-matters/why-it-matters.html">Why It Matters</a></li> --> 
-          <!-- <li><a class="insidervideos" class="about-rodales"  href="http://discover.rodales.com/topics/insider-videos" target="_blank">Insider Videos</a></li> --> 
-          <!-- <li><a class="glossary" class="about-rodales"  href="https://shop.menshealth.com/glossary-of-terms/glossary.html">Glossary</a></li> --> 
-          <li><a class="about-rodales" href="http://www.rodale.com/brands/iconic-brands/" target="_blank">Press</a></li> 
-          <li><a class="about-rodales" href="https://shop.menshealth.com/affiliate/affiliate.html">Affiliate</a></li> 
-          <li><a class="about-rodales" href="http://www.rodale.com/about-us/news-press/" target="_blank">Press</a></li> 
-         </ul> 
-        </div> 
-       </div> 
-       <!-- End content-asset --> 
-      </div> 
-     </nav> 
-    </div> 
-   </div>
-   <!-- /main --> 
-   <script type="text/javascript">
-	var optinURL = "/on/demandware.store/Sites-rodales-Site/en_US/Email-GlobalJSONEmailSignup?emailTypeName=FOOTER";
-	var optinBrandsURL = "/on/demandware.store/Sites-rodales-Site/en_US/Email-GlobalJSONEmailSignup?emailTypeName=BrandedAcquisition";
-	var optinPromosURL = "/on/demandware.store/Sites-rodales-Site/en_US/Email-GlobalJSONEmailSignup?emailTypeName=PromoPageAcquisition";
-	var optinModalAbandonURL = "/on/demandware.store/Sites-rodales-Site/en_US/Email-GlobalJSONEmailSignup?emailTypeName=ModalAbandonAcquisition";
-</script> 
-   <script>document.cookie="UA=; path=/";var authenticated=false;</script> 
-   <div class="content-asset">
-    <!-- dwMarker="content" dwContentID="42dbc2d02565cd29a4b8df1b2d" --> 
-    <div id="footer" role="contentinfo"> 
-     <div class="container"> 
-      <ul class="menu-footer"> 
-       <li class="customerservice-column"> 
-        <div class="footer-column-contain"> 
-         <div class="footer-social-wrap"> 
-          <h6>Follow Men's Health</h6> 
-          <ul class="social-menu"> 
-           <li><a class="icon-facebook" title="Facebook" target="_blank" href="https://www.facebook.com/MensHealth/"><span class="visually-hidden">Facebook</span></a></li> 
-           <li><a class="icon-twitter" title="Twitter" target="_blank" href="https://twitter.com/menshealthmag"><span class="visually-hidden">Twitter</span></a></li> 
-           <li><a class="icon-instagram" title="Instagram" target="_blank" href="https://www.instagram.com/menshealthmag/"><span class="visually-hidden">Instagram</span></a></li> 
-           <li><a class="icon-youtube" title="YouTube" target="_blank" href="https://www.youtube.com/user/MensHealthMag"><span class="visually-hidden">YouTube</span></a></li> 
-           <li><a class="icon-pinterest" title="Pinterest" target="_blank" href="https://www.pinterest.com/menshealthmag/"><span class="visually-hidden">Pinterest</span></a></li> 
-           <!-- <li><a class="icon-google-plus" title="Google+" target="_blank" href="#"><span class="visually-hidden">Google+</span></a></li>
-                            <li><a class="icon-spotify" title="Spotify" target="_blank" href="#"><span class="visually-hidden">Spotify</span></a></li> --> 
-          </ul> 
-         </div>
-         <!--  /.footer-social-wrap --> 
-         <h6>SHOP OUR BRANDS</h6> 
-         <ul class="brand-nav-items"> 
-          <li class="brand-nav-item "><a href="https://shop.menshealth.com/s/Sites-rodales-Site/dw/shared_session_redirect?url=https%3A%2F%2Fshop.bicycling.com">Bicycling</a></li> 
-          <li class="brand-nav-item current-nav-item"><a href="https://shop.menshealth.com">Men's Health</a></li> 
-          <li class="brand-nav-item "><a href="https://shop.menshealth.com/s/Sites-rodales-Site/dw/shared_session_redirect?url=https%3A%2F%2Fshop.prevention.com">Prevention</a></li> 
-          <li class="brand-nav-item "><a href="https://shop.menshealth.com/s/Sites-rodales-Site/dw/shared_session_redirect?url=https%3A%2F%2Fshop.runnersworld.com">Runner's World</a></li> 
-          <li class="brand-nav-item "><a href="https://shop.menshealth.com/s/Sites-rodales-Site/dw/shared_session_redirect?url=https%3A%2F%2Fshop.womenshealthmag.com">Women's Health</a></li> 
-         </ul> 
-        </div> </li> 
-       <li class="customerservice-column"> 
-        <div class="footer-column-contain"> 
-         <h6>CUSTOMER CARE</h6> 
-         <ul> 
-          <li><a href="http://shop.menshealth.com/customer-care/contact-us/">Contact Us</a></li> 
-          <li><a href="https://shop.menshealth.com/shipping-customer-service/shipping.html">Shipping</a></li> 
-          <li><a href="https://shop.menshealth.com/returns-brand/returns-brand.html">Returns</a></li> 
-          <li><a href="https://shop.menshealth.com/faqs-brand/faqs-brand.html">FAQs</a></li> 
-          <li><a href="http://e-rodalepartner.com/preference/welcome.jsp" target="_blank">Email Preferences</a></li> 
-         </ul> 
-        </div> </li> 
-       <li class="account-column"> 
-        <div class="footer-column-contain"> 
-         <h6>MY ACCOUNT</h6> 
-         <nav> 
-          <h5>My Account</h5> 
-          <ul class="menu-utility-user"> 
-           <li> <a title="Login | Register" href="https://shop.menshealth.com/account/" class="user-login"> Login | Register </a> </li> 
-           <li> <a title="Order Status" href="https://shop.menshealth.com/order-history/" class="user-login"> Order Status </a> </li> 
-          </ul> 
-         </nav> 
-        </div> </li> 
-       <li class="miscellaneous-column"> 
-        <div class="footer-column-contain"> 
-         <h6>RODALE INC.</h6> 
-         <ul> 
-          <li><a href="https://shop.menshealth.com/about-us/about-us.html">About Us</a></li> 
-          <li><a href="http://www.rodale.com/brands/iconic-brands/" target="_blank">Rodale Inc. Brands</a></li> 
-          <li><a href="http://www.menshealth.com/" target="_blank">Men's Health Magazine</a></li> 
-          <li><a href="https://shop.menshealth.com/affiliate/affiliate.html">Affiliates</a></li> 
-          <li><a href="http://www.rodale.com/about-us/news-press/" target="_blank">News/Press</a></li> 
-         </ul> 
-        </div> </li> 
-      </ul> 
-      <footer> 
-       <img class="footer-logo" src="https://shop.menshealth.com/on/demandware.static/-/Sites-rodales-Library/default/dw243bafe0/images/footer/logo/footer-logo-mh.png" height="30" alt="Men's Health"> 
-       <div class="footer-meta footer-meta-columns"> 
-        <div class="footer-meta-left"> 
-         <p><a href="http://www.rodale.com/privacy-policy" target="_blank">Privacy Policy</a> <a href="http://www.rodale.com/customer-care/terms-of-use/" target="_blank">Terms of Use</a> <a href="/sitemap">Site Map</a></p> 
-         <small class="copyright">© <script>var dt=new Date();document.write(dt.getFullYear());</script> Rodale Inc. All Rights Reserved.</small> 
-        </div>
-        <!--  /.footer-meta-left --> 
-        <div class="footer-meta-right"> 
-         <a href="https://www.bbb.org/washington-dc-eastern-pa/business-reviews/publishers-periodical/rodale-inc-in-emmaus-pa-50007196/#sealclick" target="_blank" rel="nofollow"><img src="https://seal-dc-easternpa.bbb.org/seals/darkgray-seal-250-52-whitetxt-bbb-50007196.png" style="border: 0;" alt="Rodale, Inc BBB Business Review"></a> 
-        </div>
-        <!--  /.footer-meta-right --> 
-       </div> 
-      </footer> 
-     </div>
-     <!--  /.container --> 
-    </div>
-    <!-- /#footer --> 
-   </div> 
-   <!-- End content-asset --> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/ui/jquery-ui-1.9.2.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/ui/jquery.ui.touch-punch.min.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/jquery.cookie.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/jcarousel/jquery.jcarousel.min.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/tooltip/jquery.tooltip.min.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/hashchange/jquery.ba-hashchange.min.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/validate/jquery.validate.min-1.9.0.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/zoom/jquery.jqzoom.dw.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/print/printThis.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/lib/jquery/jquery.truncator.js"></script> 
-   <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-53ee156750e24441&amp;domready=1"></script> 
-   <script src="/on/demandware.store/Sites-rodales-Site/en_US/Resources-Load?t=appresources"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/js/app.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/js/branded-app.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/js/slick.min.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/js/app-unified.min.js"></script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/js/roundabout.js"></script> 
-   <script>app.page.setContext({"title":"Customer Service","type":"customerservice","ns":"account"});</script> 
-   <script>
-var meta = "";
-var keywords = "";
-</script> 
-   <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/js/ddsmoothmenu.js"></script> 
-   <script>
-        if( jQuery('#categorymenu').length ) {
-    		ddsmoothmenu.init({
-    			mainmenuid: 'categorymenu',
-    			orientation: 'h',
-    			classname: 'ddsmoothmenu',
-    			contentsource: 'markup'
-    		});
-        }
-	</script> 
-   <!-- remove add this css from head --> 
-   <script>
-jQuery(document).ready(function(e){
-	//Remove the loaded css from first position in header in case of IE
-	$("LINK[href='//ct5.addthis.com/static/r07/widget109.css']").remove();
-});
-</script> 
-   <script type="text/javascript">
-	var biJsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
-	document.write(unescape("%3Cscript src='" + biJsHost + "cdn.listrakbi.com/scripts/script.js?m=7xxbwC1lUH8v&v=1' type='text/javascript'%3E%3C/script%3E"));
-	</script> 
-   <script type="text/javascript">
-
-	jQuery.ajax({
-		  url: '/on/demandware.store/Sites-rodales-Site/en_US/ltkClickTracking-Start' + '?' + document.location.search,
-		  context: document,
-		  success: function(trkt){
-			  var start = trkt.indexOf('[');
-			  var end = trkt.indexOf(']');
-			  var token = trkt.substring(start+1, end); 
-			  setCookie("_trkt", token, 365, null, '/'); 
-			  }
-		});
-	
-	function setCookie(c_name,value,exdays, domain, path, secure)
-	{
-		if (value != '' && value != undefined)
-		{
-			var exd = new Date();
-			exd.setDate(exd.getDate() + exdays);
-			document.cookie =
-				c_name + "=" + encodeURIComponent(value) +
-		        ((exdays == null) ? "" : "; expires=" + exd.toGMTString()) +
-		        ((domain == null && domain != "") ? "" : "; domain=" + domain) +
-		        ((path == null) ? "" : "; path=" + path) +
-		        ((secure) ? "; secure" : "");			
-		}
-	}	
-</script> 
-   <script type="text/javascript">
-	
-	var _ltkwmt = '';
-	
-		_ltkwmt = '';
-	
-	
-	
-	function isWatermark(wmt) {
-	    if(!_ltkwmt || _ltkwmt.length == 0) {
-	        return false;
-	    }
-	    if(_ltkwmt.indexOf(wmt) >= 0) { 
-	        return true; 
-	    }
-	    else { return false; }
-	}
-		
-	function ltkCaptureEmail(id) {
-	    try {
-	        var _stsi1 = setInterval(function () {
-	            if (!window.jQuery) { return; }
-	            clearInterval(_stsi1);
-	            if (typeof id == "undefined" || id == "") { return; }
-	            var _sl = jQuery("[id='" + id + "']");
-	            if (_sl.length == 0) { _sl = jQuery("input[name='" + id + "']"); }
-	            if (_sl.length) {
-	                _sl.change(function () { 
-			                if (jQuery(_sl).val().length > 0 && !isWatermark(jQuery(_sl).val()))
-			                {
-			                	jQuery.ajax({
-			              		  url: '/on/demandware.store/Sites-rodales-Site/en_US/ltkEmailCapture-Start' + '?email=' + jQuery(this).val(),
-			              		  context: document,
-			              		  success: function(success){ return; }
-			              		});
-			                }
-						}
-	                );
-	                if (jQuery(_sl).val().length > 0 && !isWatermark(jQuery(_sl).val())) { _ltk.SCA.Update("email", jQuery(_sl).val()); }
-	            }
-	        }, 100);
-	    }
-	    catch (ex) {
-	        _ltk.Exception.Submit(ex, 'CaptureEmail');
-	    }
-	}
-	
-	
-		
-			ltkCaptureEmail("emailjoininput");
-		
-			ltkCaptureEmail("dwfrm_profile_customer_email");
-		
-			ltkCaptureEmail("dwfrm_contactus_email");
-		
-			ltkCaptureEmail("dwfrm_catalogrequest_email");
-		
-			ltkCaptureEmail("dwfrm_singleshipping_shippingAddress_email_emailAddress");
-		
-			ltkCaptureEmail("emailjoininputpromopage");
-		
-			ltkCaptureEmail("modal-email-sign-up");
-		
-	
-	
-	jQuery(document).bind("ltkmodal.show", function() {
-		ltkCaptureEmail("ltkmodal-email");
-	});
-	
-	</script> 
-   <script type="text/javascript">
-	var path = '/on/demandware.store/Sites-rodales-Site/en_US/ltkActivityTracker-StartActivity';
-	jQuery.ajax({
-		  url: path.concat('?path=' + document.location.href),
-		  context: document,
-		  success: function(){}
-		});
-</script> 
-   <script type="text/javascript">
-    var _sf_async_config={};
-    /** CONFIGURATION START **/
-    _sf_async_config.uid = 15891;
-    _sf_async_config.domain = 'rodales.com';
-    _sf_async_config.useCanonical = true;
-    _sf_async_config.sections = 'Storefront'; 
-  
-    /** CONFIGURATION END **/
-    (function(){
-      function loadChartbeat() {
-        window._sf_endpt=(new Date()).getTime();
-        var e = document.createElement('script');
-        e.setAttribute('language', 'javascript');
-        e.setAttribute('type', 'text/javascript');
-        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
-        document.body.appendChild(e);
-      }
-      var oldonload = window.onload;
-      window.onload = (typeof window.onload != 'function') ?
-         loadChartbeat : function() { oldonload(); loadChartbeat(); };
-    })();
-</script> 
-   <script type="text/javascript">_satellite.pageBottom();</script> 
-   <script>
-	jQuery(document).ready(function() {
-		// highlight active secondary nav link
-		if(jQuery.cookie('clickedAnchor') != null) {
-			jQuery('#secondary li a').each(function() {
-				if( jQuery(this).attr('id') == jQuery.cookie('clickedAnchor') ) {
-					jQuery(this).addClass('active');
-				}
-			});
-	    }
-		jQuery('#secondary li a').click(function() {
-			jQuery.cookie( 'clickedAnchor', jQuery(this).attr('id') );
-	    });
-		//Show the correct menu
-		var menuOption = jQuery(this).find('#menu_option').val();
-		if(menuOption != null && menuOption == 'customer-service-menu'){
-			jQuery(this).find('.customer-service-menu').show();
-		}
-		else if(menuOption != null && menuOption == 'about-rodales-menu'){
-			jQuery(this).find('.about-rodales-menu').show();
-		}
-		//Show the correct links
-		var contentPage = jQuery(this).find('#content-page').val();
-		if(contentPage !=  null){
-			if(contentPage == 'contactus'){
-				jQuery(this).find('.contactus').show();
-				jQuery(this).find('.contactus').addClass('active');
-			}
-			if(contentPage == 'contactussent'){
-				jQuery(this).find('.contactus').show();
-				jQuery(this).find('.contactus').addClass('active');
-				jQuery(this).find('.submenu').hide();
-			}			
-			else if(contentPage == 'returns'){
-				jQuery(this).find('.returns').show();
-				jQuery(this).find('.returns').addClass('active');
-			}
-			else if(contentPage == 'preferences'){
-				jQuery(this).find('.preferences').show();
-				jQuery(this).find('.preferences').addClass('active');
-			} 
-			else if(contentPage == 'catalogrequest'){
-				jQuery(this).find('.catalogrequest').show();
-				jQuery(this).find('.catalogrequest').addClass('active');
-			}
-			else if(contentPage == 'shipping'){
-				jQuery(this).find('.shipping').show();
-				jQuery(this).find('.shipping').addClass('active');
-			}
-			else if(contentPage == 'faqs'){
-				jQuery(this).find('.faqs').show();
-				jQuery(this).find('.faqs').addClass('active');
-			}
-			else if(contentPage == 'privacy'){
-				jQuery(this).find('.privacy').show();
-				jQuery(this).find('.privacy').addClass('active');
-			}
-			else if(contentPage == 'terms'){
-				jQuery(this).find('.terms').show();
-				jQuery(this).find('.terms').addClass('active');
-			}
-			else if(contentPage == 'size'){
-				jQuery(this).find('.size').show();
-				jQuery(this).find('.size').addClass('active');
-			}
-			else if(contentPage == 'sitemap'){
-				jQuery(this).find('.sitemap').show();
-				jQuery(this).find('.sitemap').addClass('active');
-			}
-			else if(contentPage == 'story'){
-				jQuery(this).find('.story').show();
-				jQuery(this).find('.story').addClass('active');
-			}
-			else if(contentPage == 'history'){
-				jQuery(this).find('.history').show();
-				jQuery(this).find('.history').addClass('active');
-			}
-			else if(contentPage == 'commitment'){
-				jQuery(this).find('.commitment').show();
-				jQuery(this).find('.commitment').addClass('active');
-			}
-			else if(contentPage == 'brand'){
-				jQuery(this).find('.brand').show();
-				jQuery(this).find('.brand').addClass('active');
-			}
-			else if(contentPage == 'guidingprinciples'){
-				jQuery(this).find('.guidingprinciples').show();
-				jQuery(this).find('.guidingprinciples').addClass('active');
-			}
-			else if(contentPage == 'glossary'){
-				jQuery(this).find('.glossary').show();
-				jQuery(this).find('.glossary').addClass('active');
-			}
-			else if(contentPage == 'matters'){
-				jQuery(this).find('.matters').show();
-				jQuery(this).find('.matters').addClass('active');
-			}
-			else if(contentPage == 'why'){
-				jQuery(this).find('.why').show();
-				jQuery(this).find('.why').addClass('active');
-			}
-			else if(contentPage == 'whyshoprodales'){
-				jQuery(this).find('.whyshoprodales').show();
-				jQuery(this).find('.whyshoprodales').addClass('active');
-			}
-			else if(contentPage == 'whyitmatters'){
-				jQuery(this).find('.whyitmatters').show();
-				jQuery(this).find('.whyitmatters').addClass('active');
-			}
-			else if(contentPage == 'insidervideos'){
-				jQuery(this).find('.insidervideos').show();
-				jQuery(this).find('.insidervideos').addClass('active');
-			}
-			else if(contentPage == 'rodalebrands'){
-				jQuery(this).find('.rodalebrands').show();
-				jQuery(this).find('.rodalebrands').addClass('active');
-			}
-			else if(contentPage == 'giftwrappage'){
-				jQuery(this).find('.giftwrappage').show();
-				jQuery(this).find('.giftwrappage').addClass('active');
-			}			
-			jQuery("a").on("click", function(e){
-				   jQuery(this).parent().parent().find('a').removeClass("active");
-				   jQuery(this).addClass("active"); 
-			});
-		}
-			
-		
-	});
-</script> 
-  </div>
-  <!--  /wrapper --> 
-  <!-- Google Code for Remarketing tag --> 
-  <!-- Remarketing tags may not be associated with personally identifiable information or placed on pages related to sensitive categories. For instructions on adding this tag and more information on the above requirements, read the setup guide: google.com/ads/remarketingsetup --> 
-  <script type="text/javascript">
-			var google_tag_params = {
-			ecomm_prodid: '',
-			ecomm_pagetype: 'other',
-			ecomm_totalvalue: ''
-			};
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.3\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/www.upwork.com\/hiring\/wp-includes\/js\/wp-emoji-release.min.js"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,56826,8203,55356,56819),0,0),c=j.toDataURL(),b===c&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55358,56794,8205,9794,65039),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55358,56794,8203,9794,65039),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
 		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <link rel="stylesheet" id="et-gf-open-sans-css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" type="text/css" media="all"> 
+  <link rel="stylesheet" id="et_monarch-css-css" href="https://www.upwork.com/hiring/wp-content/plugins/monarch/css/style.css" type="text/css" media="all"> 
+  <link rel="stylesheet" id="wp-pagenavi-css" href="https://www.upwork.com/hiring/wp-content/plugins/wp-pagenavi/pagenavi-css.css" type="text/css" media="all"> 
+  <link rel="stylesheet" id="marketing-ui-components-css" href="//components.elance-odesk.com/marketing-ui/1.3.0/css/components.css" type="text/css" media="all"> 
+  <link rel="stylesheet" id="outdated-css" href="https://www.upwork.com/hiring/wp-content/themes/upwork-theme/lib/outdated/outdated.css" type="text/css" media="all"> 
+  <link rel="stylesheet" id="app-css" href="https://www.upwork.com/hiring/wp-content/themes/resource-center-theme/css/app.css?amp;9226fc" type="text/css" media="all"> 
+  <link rel="stylesheet" id="hipo-reg-css-css" href="https://www.upwork.com/hiring/wp-content/plugins/wp-upwork-widget/widgets/reg-popup-cta/styles/hipo-reg.min.css" type="text/css" media="all"> 
+  <link rel="stylesheet" id="upwork_widget_css-css" href="https://www.upwork.com/hiring/wp-content/plugins/wp-upwork-widget/assets/css/upwork-widgets.css" type="text/css" media="all"> 
+  <link rel="stylesheet" id="jetpack_css-css" href="https://www.upwork.com/hiring/wp-content/plugins/jetpack/css/jetpack.css" type="text/css" media="all"> 
+  <link rel="https://api.w.org/" href="https://www.upwork.com/hiring/wp-json/"> 
+  <link rel="shortlink" href="https://wp.me/p6omIA-2RJ"> 
+  <link rel="alternate" type="application/json+oembed" href="https://www.upwork.com/hiring/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="https://www.upwork.com/hiring/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;format=xml"> 
+  <script type="text/javascript">
+(function(url){
+	if(/(?:Chrome\/26\.0\.1410\.63 Safari\/537\.31|WordfenceTestMonBot)/.test(navigator.userAgent)){ return; }
+	var addEvent = function(evt, handler) {
+		if (window.addEventListener) {
+			document.addEventListener(evt, handler, false);
+		} else if (window.attachEvent) {
+			document.attachEvent('on' + evt, handler);
+		}
+	};
+	var removeEvent = function(evt, handler) {
+		if (window.removeEventListener) {
+			document.removeEventListener(evt, handler, false);
+		} else if (window.detachEvent) {
+			document.detachEvent('on' + evt, handler);
+		}
+	};
+	var evts = 'contextmenu dblclick drag dragend dragenter dragleave dragover dragstart drop keydown keypress keyup mousedown mousemove mouseout mouseover mouseup mousewheel scroll'.split(' ');
+	var logHuman = function() {
+		var wfscr = document.createElement('script');
+		wfscr.type = 'text/javascript';
+		wfscr.async = true;
+		wfscr.src = url + '&r=' + Math.random();
+		(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(wfscr);
+		for (var i = 0; i < evts.length; i++) {
+			removeEvent(evts[i], logHuman);
+		}
+	};
+	for (var i = 0; i < evts.length; i++) {
+		addEvent(evts[i], logHuman);
+	}
+})('//www.upwork.com/hiring/?wordfence_logHuman=1&hid=EDDD8E052BC20DA035A365A2F2C8788F');
+</script>
+  <style type="text/css" id="et-social-custom-css">
+				.et_monarch .et_social_sidebar_networks li, .et_monarch .et_social_mobile li { background: #f2f2f2; } .et_monarch .et_social_sidebar_networks .et_social_icons_container li:hover, .et_monarch .et_social_mobile .et_social_icons_container li:hover { background: #37a000 !important; } .et_social_sidebar_border li { border-color: #37a000 !important; } .et_monarch .et_social_sidebar_networks .et_social_icons_container li i, .et_monarch .et_social_sidebar_networks .et_social_icons_container li .et_social_count, .et_monarch .et_social_mobile .et_social_icons_container li i, .et_monarch .et_social_mobile .et_social_icons_container li .et_social_count { color: #b2b2b2; } .et_monarch .et_social_icon, .et_monarch .et_social_icon:before, .et_monarch .et_social_icon:after { font-size: 14px; } .et_monarch .et_social_icon_googleplus:before, .et_monarch .et_social_icon_googleplus:after { font-size: 10px; } .et_social_networkname { color: #b2b2b2; } .et_social_icons_container li:hover .et_social_networkname { color: #fff; } .et_social_hide_sidebar { display:none!important; } @media only screen and (max-width: 1024px) { .et_social_mobile { height: 40px!important } .et_social_heading { display: none!important; overflow: hidden; } .et_monarch .et_social_mobile .et_social_networks { display: block!important; padding: 0!important; background-color: #f2f2f2!important; height: 40px!important; overflow: hidden; } .et_social_network_label { display: none!important; } .et_monarch .et_social_mobile .et_social_networks li a { width: auto!important; display: inline-block; } .et_monarch .et_social_networks li, .et_monarch .et_social_mobile .et_social_networks li { clear: none !important; float: left; margin-top: 0px!important; margin-left: 0px!important; margin-right: 0px!important; margin-bottom: 0px!important; width: 16.66666%!important; text-align: center; border-radius: 0; } .et_monarch .et_social_networks li:nth-child(2n+1), .et_monarch .et_social_mobile .et_social_networks li:nth-child(2n+1) { clear: none !important; } .et_monarch .et_social_networks li:nth-child(n+2), .et_monarch .et_social_mobile .et_social_networks li:nth-child(n+2) { margin-top: 0px!important; margin-left: 0px!important; margin-right: 0px!important; margin-bottom: 0px!important; } }
+			</style>
+  <style type="text/css">img#wpstats{display:none}</style>
+  <link rel="amphtml" href="https://www.upwork.com/hiring/development/meteorjs-node-js-framework/amp/">
+  <style type="text/css" id="syntaxhighlighteranchor"></style> 
+  <style id="custom-css-css">.single table{margin-bottom:5px}.single td{border:1px solid #000;padding:10px}</style> 
+ </head> 
+ <body class="post-template-default single single-post postid-11019 single-format-standard et_monarch" data-ng-app="uiApplet"> 
+  <!-- Google Tag Manager --> 
+  <script>dataLayer = [{"site":{"application":"Wordpress","version":"06d60b8","environment":"production"},"user":{"visitor_id":"","recognized":false}}];</script> 
+  <noscript>
+   <iframe src="//www.googletagmanager.com/ns.html?id=GTM-K7572X" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript> 
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-K7572X');</script> 
+  <!-- End Google Tag Manager --> 
+  <script type="text/javascript">
+    let Applet = new function() {
+        let phpVars = {"csrfTokenCookieName":"XSRF-TOKEN","csrfTokenHeaderName":"X-Odesk-Csrf-Token","visitorID":"152.170.26.191.1507036166440662","visitorApiKey":"3c5f79fc8cebf6958c0df00159d0c207"};
+
+        this.getVar = getVar;
+        this.getVisitorId = getVisitorId;
+        this.getVisitorApiKey = getVisitorApiKey;
+
+        function getVar(key) {
+            return phpVars[key];
+        };
+
+        function getVisitorId() {
+            return getVar('visitorID');
+        };
+
+        function getVisitorApiKey() {
+            return getVar('visitorApiKey');
+        };
+    };
+
+    function getReferrer() {
+        if (navigator.userAgent.match(/Android/i)) {
+            return 'mobile_web_android';
+        } else if (navigator.userAgent.match(/BlackBerry/i)) {
+            return 'mobile_web_blackberry';
+        } else if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+            return 'mobile_web_ios';
+        } else if (navigator.userAgent.match(/Opera Mini/i)) {
+            return 'mobile_web_opera';
+        } else if (navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i)) {
+            return 'mobile_web_windows';
+        } else {
+            return 'desktop_site';
+        }
+    };
+</script> 
+  <olog-trigger olog-name="impression" olog-location="/development/meteorjs-node-js-framework/"></olog-trigger> 
+  <div class="off-canvas-wrap" ui-off-canvas> 
+   <header role="banner" class="header-navbar header-client" ui-sticky-nav> 
+    <div class="container"> 
+     <a href="/" class="logo"> <img src="//components.elance-odesk.com/marketing-ui/master/img/upwork-logo.svg" alt="Upwork" width="106"> </a> 
+     <div class=" desktop-navbar"> 
+      <nav class="nav font-gotham-medium"> 
+       <ul class="user-links list-inline pull-right"> 
+        <li> <a href="/signup/create-account/client_direct" class="btn btn-primary header-cta-feh"> Get Started </a> </li> 
+       </ul> 
+      </nav> 
+     </div> 
+    </div> 
+   </header> 
+   <div class="header-navbar header-dummy"></div> 
+   <main id="main"> 
+    <!-- Main content Part Start --> 
+    <main role="main"> 
+     <!-- Banner start --> 
+     <section id="hhq-headline" class="text-center" role="navigation"> 
+      <div class="container"> 
+       <div class="header-navbar inner-wrapper"> 
+        <a href="https://www.upwork.com/hiring" class="logo"> Hiring Headquarters </a> 
+        <ul class="list-inline"> 
+         <li class="nav"> 
+          <ul class="site-links list-inline navbar-right"> 
+           <li class="active visible-xs-inline-block"> <a href="https://www.upwork.com/hiring"> Hiring HQ </a> </li> 
+           <li id="menu-item-1218" class=" menu-item-1218"> <a href="https://www.upwork.com/blog/"> Blog </a> </li> 
+           <li id="menu-item-14787" class=" menu-item-14787"> <a href="https://www.upwork.com/i/hiring-guides/"> Resources </a> </li> 
+           <li id="menu-item-9040" class=" menu-item-9040"> <a href="https://www.upwork.com/hiring/promote-blog-posts-hiring-hq/"> Publish Content </a> </li> 
+          </ul> </li> 
+         <li class="search-form-li"> <span id="search"> 
+           <div class="form-wrapper"> 
+            <form role="search" action="https://www.upwork.com/hiring" method="get" class="ng-pristine ng-valid"> 
+             <div class="input-group"> 
+              <div class="button white-icon visible-xs-inline-block"></div> 
+              <button type="submit" class="button hidden-xs"></button> 
+              <input autocomplete="on" type="text" class="hidden-xs search-input" name="s" value="" placeholder="Search Articles" maxlength="100" required> 
+              <ul class="autocomplete-dropdown"></ul> 
+             </div> 
+            </form> 
+           </div> </span> </li> 
+        </ul> 
+       </div> 
+      </div> 
+     </section> 
+     <!-- End of Banner --> 
+     <div class="container-fluid bg-light-grey"> 
+      <div class="row"> 
+       <div class="accordion nav-categories visible-xs visible-sm col-xs-12"> 
+        <h4 class="title font-gotham-bold text-uppercase categories-main-title"> <a data-toggle="collapse" data-target="#navigation" class="collapsed">Articles</a> </h4> 
+        <div id="navigation" class="collapse"> 
+         <ul id="menu_accordion_mobile" class="categories parent-category list-unstyled text-uppercase"> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5627"> <a title="Admin Support" class="collapsed" href="https://www.upwork.com/hiring/category/admin-support/">Admin Support</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5628"> <a title="Community" class="collapsed" href="https://www.upwork.com/hiring/category/community/">Community</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-8617"> <a title="Customer Stories" class="collapsed" href="https://www.upwork.com/hiring/category/customer-stories/">Customer Stories</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5630"> <a title="Customer Support" class="collapsed" href="https://www.upwork.com/hiring/category/customer-support/">Customer Support</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5634"> <a title="Data" class="collapsed" href="https://www.upwork.com/hiring/category/data/">Data</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5636"> <a title="Design" class="collapsed" href="https://www.upwork.com/hiring/category/design/">Design</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-9315"> <a title="Education" class="collapsed" href="https://www.upwork.com/hiring/category/education/">Education</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5644"> <a title="Enterprise Solutions" class="collapsed" href="https://www.upwork.com/hiring/category/enterprise/">Enterprise Solutions</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5646"> <a title="For Clients" class="collapsed" href="https://www.upwork.com/hiring/category/for-clients/">For Clients</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5647"> <a title="For Freelancers" class="collapsed" href="https://www.upwork.com/hiring/category/for-freelancers/">For Freelancers</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5649"> <a title="Legal" class="collapsed" href="https://www.upwork.com/hiring/category/legal/">Legal</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5651"> <a title="Marketing" class="collapsed" href="https://www.upwork.com/hiring/category/marketing/">Marketing</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5656"> <a title="Mobile Development" class="collapsed" href="https://www.upwork.com/hiring/category/mobile/">Mobile Development</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-10966"> <a title="Trends" class="collapsed" href="https://www.upwork.com/hiring/category/trends/">Trends</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category menu-item-5660"> <a title="Starting Up" class="collapsed" href="https://www.upwork.com/hiring/category/startup/">Starting Up</a> </li> 
+          <li class="title list-item menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-5661"> <a title="Web Development" class="collapsed" href="https://www.upwork.com/hiring/category/development/">Web Development</a> </li> 
+          <li class="title"> <span id="search_mobile"> 
+            <div class="search  visible-xs "> 
+             <form role="search" action="https://www.upwork.com/hiring" method="get"> 
+              <div class="input-group"> 
+               <button type="submit" class="button"></button> 
+               <input type="text" name="s" value="" placeholder="Search Articles" maxlength="100" autocomplete="on" required> 
+              </div> 
+             </form> 
+            </div> </span> </li> 
+         </ul> 
+        </div> 
+       </div> 
+      </div> 
+     </div> 
+     <!-- Content Part --> 
+     <section id="article-container"> 
+      <div class="container" itemscope itemtype="http://schema.org/Article"> 
+       <!-- Start of Popular Articles --> 
+       <div class="row"> 
+        <div class="col-sm-10 col-sm-offset-1 article-headings"> 
+         <h1 class="font-gotham-bold" itemprop="headline">Is MeteorJS the Right Node.js Framework for Your App?</h1> 
+        </div> 
+        <section class="col-sm-10 col-sm-offset-1 hidden-xs"> 
+         <div class="custom-breadcrumb"> 
+          <ul itemscope itemtype="http://schema.org/BreadcrumbList">
+           <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem" class="font-gotham-bold front_page"><a itemprop="item" href="https://www.upwork.com/hiring"><span itemprop="name">Hiring Headquarters Home</span></a>
+            <meta itemprop="position" content="1"></li>
+           <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem" class="font-gotham-bold"><a itemprop="item" href="https://www.upwork.com/hiring/category/development/"><span itemprop="name">Web Development</span></a>
+            <meta itemprop="position" content="2"></li>
+           <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem" class="font-gotham-bold breadcrumb-active"><a itemprop="item" href="https://www.upwork.com/hiring/development/meteorjs-node-js-framework/"><span itemprop="name">Is MeteorJS the Right Node.js Framework for Your App?</span></a>
+            <meta itemprop="position" content="3"></li>
+          </ul> 
+         </div> 
+        </section> 
+        <!-- Popular Article Single Part --> 
+        <div class="content-body"> 
+         <section class="col-sm-10 col-sm-offset-1"> 
+          <article class="col-sm-12 article-details no-gutters"> 
+           <div class="article-featured-image"> 
+            <img itemprop="image" src="https://content-static.upwork.com/blog/uploads/sites/3/2016/04/11072508/DEV_MeteorJS-framework-app-development_T-940x400.png" class="img-responsive col-xs-12 wp-image-11022" srcset="https://content-static.upwork.com/blog/uploads/sites/3/2016/04/11072508/DEV_MeteorJS-framework-app-development_T.png 940w, https://content-static.upwork.com/blog/uploads/sites/3/2016/04/11072508/DEV_MeteorJS-framework-app-development_T-300x128.png 300w, https://content-static.upwork.com/blog/uploads/sites/3/2016/04/11072508/DEV_MeteorJS-framework-app-development_T-768x327.png 768w, https://content-static.upwork.com/blog/uploads/sites/3/2016/04/11072508/DEV_MeteorJS-framework-app-development_T-645x274.png 645w" sizes="(max-width: 940px) 100vw, 940px" alt="Image for Is MeteorJS the Right Node.js Framework for Your App?"> 
+           </div> 
+           <div class="body-content" itemprop="articleBody"> 
+            <p><em>MeteorJS is one of the most talked-about <a href="https://www.upwork.com/hiring/development/15-node-js-frameworks-to-know/">Node.js frameworks</a> on the scene. So where does it fall in the Node.js framework landscape, and is it the right choice for your MEAN-powered application?</em></p> 
+            <h4>First, why would you choose one framework and not another?</h4> 
+            <p>In the world of frameworks, choosing the one that’s right for your application can be daunting. There are pros and cons, full-stack vs. minimalist, API-driven or data-driven. Frequently, when a developer chooses one framework (and programming language) over another, it’s to meet a specific engineering requirement for the app. And most often, they’re striking a balance between <em>speed of development</em> and <em>flexibility</em>.</p> 
+            <p>There’s no one-size-fits-all with frameworks, so it’s important to choose the one that meets the most hard-and-fast requirements for your app.</p> 
+            <p>Let’s take a closer look at why so many developers are looking to this full-stack, MVC-style framework for fast development of responsive, real-time applications.</p> 
+            <figure>
+             <a href="https://www.upwork.com/signup/?dest=home&amp;forceHipo=1" target="_blank" rel="noopener"><img class="alignnone wp-image-29391" src="https://content-static.upwork.com/blog/uploads/sites/3/2017/08/11150212/Join-Upwork-CTA-2.jpg" alt="Join Upwork" width="210" height="41"></a>
+            </figure> 
+            <h3>MeteorJS Basics</h3> 
+            <p>The key to Meteor is hinted at right in its name: <strong>speed</strong>. If you’re looking to rapidly develop smaller, <strong>reactive applications</strong> on <a href="https://www.upwork.com/hiring/development/what-is-node-js/">the Node.js platform</a>, Meteor is definitely an excellent choice.</p> 
+            <p>Meteor is a full-stack, highly opinionated MVC framework for Node.js that’s a little less flexible than a more lightweight framework like <strong><a href="https://www.upwork.com/hiring/development/express-js-a-server-side-javascript-framework/">ExpressJS</a></strong>. If you’re working with a MEAN stack (or any variation of it that includes the Node platform), bringing Meteor into your software stack is going to help you accelerate the development of iOS, Android, and web applications.</p> 
+            <p>It uses a mix of front-end JavaScript that runs in the browser, back-end JavaScript that runs on a Meteor server within a Node.js container, and any other HTML, CSS, and static assets to create highly reactive <a href="https://www.upwork.com/hiring/design/ux-ui-ia-digital-design-terms-explained/">user interfaces (UIs)</a>—the kind that update information within the UI without having to hit refresh. This is the kind of UI users have come to expect, and for many companies, it’s the number one technical requirement they have for their apps. Also, it integrates with Apache Cordova, <a href="https://www.upwork.com/hiring/development/angularjs-basics/">AngularJS</a>, <a href="https://www.upwork.com/hiring/mobile/react-native-hybrid-app-development/">React</a>, and <a href="https://www.upwork.com/hiring/data/should-you-use-mongodb-a-look-at-the-leading-nosql-database/">MongoDB</a>.</p> 
+            <p>So why do developers love it? Here are a few of its biggest pros.</p> 
+            <h4>It’s full-stack.</h4> 
+            <p>This is one way of saying Meteor comes with a ton of integration, support, and features right out of the box. The advantage here is that Meteor has already assembled the compatible parts of the stack for you, from the database integrations to the front-end framework. It has a default technology for every layer of its stack, but these are interchangeable if you’re looking for alternatives. You’re not locked in if you prefer swapping one technology for another. For example, Meteor’s default <strong>front-end framework Blaze</strong> can be swapped for React or AngularJS.</p> 
+            <p>Meteor is a highly opinionated framework, which is developer-speak for being a little less flexible—a trade-off when you’re working with so much scaffolding and features right out of the gates. Again, the benefit here is speed. What it lacks in minimalism it makes up for in fast development turnarounds, and having a fully integrated stack up front lets you get going on your project a lot faster.</p> 
+            <h4>It’s fast.</h4> 
+            <p>Meteor’s speed comes from its ample scaffolding, libraries, and excellent community-authored packages that make up for most shortcomings or holes in requirements. Also, it takes care of a lot of the tedious, small tasks developers have to carry out, which enables them to focus more on the business logic and functionality of the end result. Like most frameworks, Meteor keeps you from having to reinvent the wheel every time you’re crafting a back end.</p> 
+            <p>Also, you can easily deploy your Meteor applications to the cloud with its subscription-based cloud deployment service, <strong>Galaxy</strong>.</p> 
+            <h4>It’s reactive, and creates the real-time updated UIs that modern app users expect.</h4> 
+            <p>Real-time capabilities are huge for apps like social networking sites or collaborative apps where users want updates shared right as they’re happening. Many traditional web apps required a refresh button, which can be tedious. If you can picture the users of your app having to click refresh often, Meteor is probably going to be your best bet. That, and, real-time is what people are used to when it comes to mobile apps.</p> 
+            <p>From a technical standpoint, Meteor is reactive because of its methods for refreshing data. To refresh the data in the UI, it replicates a subset of the MongoDB database in the browser as a local “miniMongo” subset. Any updates to data will happen live in your app, on your user’s screen. This is partly possible thanks to Meteor’s MVC model. Meteor is able to render refreshed data (the model) right in the browser (the view) without making a trip back to the server. By processing the HTML in the browser, the user sees an updated UI while Meteor loops back to the server to make modifications in the actual database.</p> 
+            <p>Where Node on its own can lack in serving up dynamic web content, Meteor steps in and makes it faster and more fluid. The key is that it overrides Node’s module-based system and uses its own packaging system.</p> 
+            <p>Meteor is reactive on the programming side, too, so developers can get more done with less lines of code.</p> 
+            <h4>Its built-in integration with Apache Cordova offers immense business value.</h4> 
+            <p>With Apache Cordova built into the latest release of Meteor, you can easily build your app to be cross-platform for Android, iOS, or the web with only one codebase. Going cross-platform over native is a great option for businesses that want the feel and functionality of native apps, but don’t want to spend the time or budget to create two separate codebases for separate operating systems or devices. <a href="https://www.upwork.com/hiring/mobile/cross-platform-mobile-app-technology/">Learn more about the benefits of cross-platform apps in this article.</a></p> 
+            <h4>It’s well-supported—both by the MDG team and a growing community of developers.</h4> 
+            <p>From a production standpoint, the Meteor Development Group (MDG) is a great team who stands behind Meteor and is dedicated to keeping it updated and working well. There’s no risk of a developer who created the framework moving on from the project or neglecting to keep it updated—MDG is on top of the health of the Meteor ecosystem.</p> 
+            <p>But the developers who use Meteor have contributed to its growth and longevity, as well. The community behind it is constantly creating packages that extend Meteor’s functionality. MDG has invested a lot not only in the technology itself, but in cultivating this community behind it. There are packages for everything from API functions like login, authentication, and oauth authorization to router packages like the widely used iron:router.</p> 
+            <p>This big community of developers is able to help one another troubleshoot problems of every kind. With a crowd that big behind it, it’s rare to run into a problem during development that someone else hasn’t already seen, fixed, and shared a solution for.</p> 
+            <h4>It’s got plenty of libraries and packages to extend its functionality.</h4> 
+            <p>A lot of Meteor’s code is built on <a href="https://www.upwork.com/hiring/development/jquery-javascript-library/">the jQuery JavaScript library</a> and the Underscore.js framework as the foundation for more common tasks. MeteorJS’s front-end development is handled by proprietary libraries like Blaze and Tracker. It’s similar to Express with many of the same “internals,” and recent releases embed&nbsp;a package manager so you don’t have to install the third-party package system, Meteorite.</p> 
+            <p>Now, Meteor makes it easy to install third-party packages. Check out Atmosphere.js for the best Meteor packages—it’s a total catalog for libraries that are reliable, up-to-date and popular among other Meteor developers.</p> 
+            <h4>A few considerations before you dive in.</h4> 
+            <p>The Meteor community is always working to make up for shortcomings in the framework, but remember: a framework is often designed to do one or more things very well. You have to decide where you want to compromise, and what you need from it. That said, there are a few things to consider with Meteor before giving it a go.</p> 
+            <p>It only integrates with the MongoDB database. That means no support for SQL databases. Also, historically there have been issues using Meteor with a pre-existing MongoDB installation.<br> If your app is going to get big, you may need a more scalable stack than Meteor. There are some developers who say Meteor’s biggest strength is for messaging apps. But if you anticipate a lot of growth in users, traffic, and data or need a more robust app, you may want to look into a more robust solution.</p> 
+            <p>Want to try Meteor on your MEAN-stack application? Search for freelance&nbsp;<a href="https://www.upwork.com/hire/javascript-developers/">JavaScript programmers</a>, <a href="https://www.upwork.com/hire/nodejs-developers/">Node.js engineers</a>, and <a href="https://www.upwork.com/hire/meteor-freelancers/">Meteor experts</a> on Upwork today.</p> 
+            <figure>
+             <a href="https://www.upwork.com/signup/?dest=job-posting&amp;forceHipo=1" target="_blank" rel="noopener"><img class="alignnone wp-image-15743" src="https://content-static.upwork.com/blog/uploads/sites/3/2016/11/17140510/post-a-job-its-free-green-bar.png" alt="Post a job on Upwork. It's free!" width="255" height="40"></a>
+            </figure> 
+            <span class="et_social_bottom_trigger"></span> 
+           </div> 
+           <div class="author-details no-gutters col-xs-12"> 
+            <div class="author-image"> 
+             <img src="https://content-static.upwork.com/blog/uploads/sites/3/2015/05/05115358/Carey_Wodehouse-150x150.jpg" width="96" height="96" alt="Carey Wodehouse" class="avatar avatar-96 wp-user-avatar wp-user-avatar-96 alignnone photo"> 
+            </div> 
+            <div class="author-description"> 
+             <p class="text-uppercase"> by <span class="author-name"><a href="https://www.upwork.com/hiring/author/careywodehouse/" itemprop="author">Carey Wodehouse</a></span> - Freelance Content Marketer and Writer </p> 
+             <div class="hashtags"> 
+              <ul> 
+              </ul> 
+             </div> 
+             <div class="author-bio no-gutters col-md-10"> 
+              <p>Carey Wodehouse is a freelance content marketer and writer based in Richmond, VA who’s worked for clients ranging from online retailers and global market research… <a href="https://www.upwork.com/hiring/author/careywodehouse/">more</a></p> 
+             </div> 
+            </div> 
+           </div> 
+           <div class="related-skills"> 
+            <h4 class="font-gotham-medium text-uppercase">Related Skills</h4> 
+            <ul class="list-unstyled"> 
+             <li><a class="text-capitalize" href="/hire/angularjs-freelancers/">AngularJS</a></li> 
+             <li><a class="text-capitalize" href="https://www.upwork.com/hiring/tag/application-development/">application development</a></li> 
+             <li><a class="text-capitalize" href="https://www.upwork.com/hiring/tag/back-end-programming/">back-end programming</a></li> 
+             <li><a class="text-capitalize" href="https://www.upwork.com/hiring/tag/expressjs/">ExpressJS</a></li> 
+             <li><a class="text-capitalize" href="https://www.upwork.com/hiring/tag/frameworks/">frameworks</a></li> 
+             <li><a class="text-capitalize" href="/hire/javascript-freelancers/">JavaScript</a></li> 
+             <li><a class="text-capitalize" href="https://www.upwork.com/hiring/tag/meteorjs/">MeteorJS</a></li> 
+             <li><a class="text-capitalize" href="/hire/node-js-freelancers/">Node.JS</a></li> 
+            </ul> 
+           </div> 
+           <div class="prev-next col-xs-12 no-gutters"> 
+            <div class="previous"> 
+             <a href="https://www.upwork.com/hiring/startup/corporate-identity-look-like-a-million-bucks-or-more/">Previous article</a> 
+            </div> 
+            <div class="next"> 
+             <a href="https://www.upwork.com/hiring/community/guide-to-using-angularjs-directives/">Next article</a> 
+            </div> 
+           </div> 
+           <meta itemprop="datePublished" content="2016-04-11"> 
+          </article> 
+         </section> 
+         <!-- / End of Popular Article Single Part --> 
+        </div> 
+        <div class="row related-articles"> 
+         <h3 class="font-gotham-medium text-uppercase col-xs-12">Related articles</h3> 
+         <article class="related-article-item col-sm-3"> 
+          <h4 class="font-gotham-medium text-uppercase"> <a href="https://www.upwork.com/hiring/development/angularjs-basics/">AngularJS: A Powerful JavaScript Framework</a></h4> 
+          <div class="postmeta"> 
+           <span class="article-date">September 22, 2016</span> 
+          </div> 
+          <div class="article-content"> 
+           <p class="hidden-mobile">Front-end web developers rely most heavily on JavaScript (JS) to create the interactive aspects of a website that users see in their browsers—and, where there’s JS, there are frameworks and libraries being employed to streamline and simplify its complex code. AngularJS is a comprehensive JavaScript framework—and it gives developers everything they need to set up the front-end of a web application. Read on to learn more about this popular framework and see what's new with its newest release, Angular 2.0. <a href="https://www.upwork.com/hiring/development/angularjs-basics/" class="read-more">Read More</a></p> 
+          </div> 
+         </article> 
+         <article class="related-article-item col-sm-3"> 
+          <h4 class="font-gotham-medium text-uppercase"> <a href="https://www.upwork.com/hiring/community/use-meteor-react-frameworks-next-project/">Why You Should Use the Meteor and React Frameworks for Your Next Project</a></h4> 
+          <div class="postmeta"> 
+           <span class="article-date">June 3, 2016</span> 
+          </div> 
+          <div class="article-content"> 
+           <p class="hidden-mobile">In the world of server-side programming, PHP is getting dethroned. Developers are challenging the status quo by migrating to different technologies that can perform virtually all of the same tasks while providing a better user experience. Here's a look at two frameworks to try: MeteorJS and React. <a href="https://www.upwork.com/hiring/community/use-meteor-react-frameworks-next-project/" class="read-more">Read More</a></p> 
+          </div> 
+         </article> 
+         <article class="related-article-item col-sm-3"> 
+          <h4 class="font-gotham-medium text-uppercase"> <a href="https://www.upwork.com/hiring/development/5-common-javascript-programming-mistakes-and-tips-to-avoid-them/">5 Common JavaScript Programming Mistakes and Tips to Avoid Them</a></h4> 
+          <div class="postmeta"> 
+           <span class="article-date">November 21, 2016</span> 
+          </div> 
+          <div class="article-content"> 
+           <p class="hidden-mobile">JavaScript is a client-side scripting language that accomplishes what server-side scripting can't, like in-browser interactivity. Although it's similar to other scripting languages, it's easy to fall into JavaScript programming traps and create inefficient code that's buggy and disorganized. Here are a few pitfalls to avoid with this language. <a href="https://www.upwork.com/hiring/development/5-common-javascript-programming-mistakes-and-tips-to-avoid-them/" class="read-more">Read More</a></p> 
+          </div> 
+         </article> 
+         <article class="related-article-item col-sm-3"> 
+          <h4 class="font-gotham-medium text-uppercase"> <a href="https://www.upwork.com/hiring/development/java-vs-javascript/">Java vs. JavaScript: What’s the Difference?</a></h4> 
+          <div class="postmeta"> 
+           <span class="article-date">December 28, 2016</span> 
+          </div> 
+          <div class="article-content"> 
+           <p class="hidden-mobile">Java vs JavaScript—what’s the difference? Both languages are prominent in the world of web development, but were developed to serve entirely different purposes. Today, the two languages have evolved to fill very different roles in web development and programming as a whole. Let’s take a closer look at the similarities and differences between Java and JavaScript. <a href="https://www.upwork.com/hiring/development/java-vs-javascript/" class="read-more">Read More</a></p> 
+          </div> 
+         </article> 
+        </div> 
+        <div class="col-xs-12 bottom-widget-wrapper"> 
+        </div> 
+       </div> 
+       <!-- / End of Popular Articles --> 
+      </div> 
+     </section> 
+     <!-- / End of Content Part --> 
+    </main> 
+   </main> 
+   <section class="footer-primary bg-dark-grey visible-lg"> 
+    <div class="container"> 
+     <div class="row col-lg-12 footer-links"> 
+      <section class="row inline-categories"> 
+       <div class="col-lg-2"> 
+        <h4 class="text-uppercase">Sections</h4> 
+       </div> 
+       <div class="col-lg-10"> 
+        <ul class="list-inline list-unstyled"> 
+         <li><a href="https://www.upwork.com/hiring/category/admin-support/">Admin Support</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/community/">Community</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/customer-stories/">Customer Stories</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/customer-support/">Customer Support</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/data/">Data</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/design/">Design</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/education/">Education</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/enterprise/">Enterprise Solutions</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/finance/">Finance</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/for-clients/">For Clients</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/for-freelancers/">For Freelancers</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/legal/">Legal</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/marketing/">Marketing</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/mobile/">Mobile Development</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/startup/">Starting Up</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/trends/">Trends</a></li> 
+         <li><a href="https://www.upwork.com/hiring/category/development/">Web Development</a></li> 
+        </ul> 
+        <ul class="list-inline sub-categories list-unstyled"> 
+        </ul> 
+       </div> 
+      </section> 
+      <section class="row inline-categories"> 
+       <div class="col-lg-2"> 
+        <h4 class="text-uppercase">Additional</h4> 
+       </div> 
+       <div class="col-lg-10"> 
+        <ul class="list-inline list-unstyled"> 
+         <li> <a title="Authors" href="https://www.upwork.com/hiring/authors/">Authors</a> </li> 
+         <li> <a title="Contact" href="https://www.upwork.com/hiring/contact-us/">Contact</a> </li> 
+         <li> <a title="Syndicate Your Blog" href="https://www.upwork.com/hiring/promote-blog-posts-hiring-hq/?utm_campaign=HHQ%20mobile&amp;utm_source=HHQ&amp;utm_medium=content">Syndicate Your Blog</a> </li> 
+         <li> <a title="Sign Up For Email" href="https://www.upwork.com/hiring/subscribe-to-email/">Sign Up For Email</a> </li> 
+         <li> <a title="Register" href="https://www.upwork.com/signup/?utm_campaign=HHQ%20mobile&amp;utm_source=HHQ&amp;utm_medium=content">Register</a> </li> 
+         <li> <a title="Post a Job" href="https://www.upwork.com/signup/create-account/client_post_job?utm_campaign=HHQ%20mobile&amp;utm_source=HHQ&amp;utm_medium=content">Post a Job</a> </li> 
+        </ul> 
+       </div> 
+      </section> 
+     </div> 
+    </div>
+   </section> 
+   <footer class="footer-navbar bg-dark-grey" role="contentinfo"> 
+    <div class="container"> 
+     <div class="row footer-links visible-lg"> 
+      <div class="col-lg-4"> 
+       <div class="links-column pull-left"> 
+        <h4 class="text-uppercase">Company Info</h4> 
+        <ul class="list-unstyled"> 
+         <li><a href="/about/">About Us</a></li> 
+         <li><a href="/press/">Press</a></li> 
+         <li><a href="/about/careers/">Careers</a></li> 
+         <li><a href="/blog/">Upwork Blog</a></li> 
+         <li><a href="/legal/terms/">Terms of Service</a></li> 
+         <li><a href="/legal/privacy/">Privacy Policy</a></li> 
+         <li><a href="/hiring/" target="_blank">Hiring Headquarters</a></li> 
+         <li><a target="_blank" href="/press/quarterly-skills-index/">Quarterly Skills Index</a></li> 
+         <li><a href="/i/trust-safety-mission/">Trust &amp; Safety</a></li> 
+        </ul> 
+       </div> 
+      </div> 
+      <div class="col-lg-4 text-center"> 
+       <div class="links-column text-left"> 
+        <h4 class="text-uppercase">Additional Services</h4> 
+        <ul class="list-unstyled"> 
+         <li><a href="http://ptc.elance.com" target="_blank">Enterprise Solutions</a></li> 
+         <li><a href="/pro/?utm_campaign=HHQ-content&amp;utm_source=main%20footer&amp;utm_medium=content" target="_blank">Upwork Pro</a></li> 
+         <li><a href="/i/business-resources/" target="_self">Local Business Resources</a></li> 
+        </ul> 
+        <h4 class="text-uppercase">Connect with us</h4> 
+        <ul class="list-unstyled"> 
+         <li><a href="https://support.upwork.com">Contact &amp; Support</a></li> 
+         <li><a href="https://developers.upwork.com/">API Center</a></li> 
+        </ul> 
+       </div> 
+      </div> 
+      <div class="col-lg-4"> 
+       <div class="links-column pull-right"> 
+        <h4 class="text-uppercase">Browse</h4> 
+        <ul class="list-unstyled"> 
+         <li><a href="/i/freelancer-categories/">Freelancers by Skill</a></li> 
+         <li><a href="/local/united-states/">Freelancers in USA</a></li> 
+         <li><a href="/local/united-kingdom/">Freelancers in UK</a></li> 
+         <li><a href="/local/canada/">Freelancers in Canada</a></li> 
+         <li><a href="/local/australia/">Freelancers in Australia</a></li> 
+         <li><a href="/o/job-categories/">Find Jobs</a></li> 
+        </ul> 
+       </div> 
+      </div> 
+     </div> 
+    </div> 
+    <div class="container-fluid"> 
+     <div class="row footer-social text-center visible-lg"> 
+      <h4 class="font-gotham-book-italic">Follow us</h4> 
+      <ul class="social-links list-inline">
+       <li class="gplus"><a href="https://plus.google.com/+Upwork" target="_blank" title="Add Upwork to Google+ circles"></a></li>
+       <li class="twitter"><a href="https://twitter.com/Upwork" target="_blank" title="Follow @upwork on Twitter"></a></li>
+       <li class="linkedin"><a href="https://www.linkedin.com/company/upwork" target="_blank" title="Read Upwork company news on LinkedIn"></a></li>
+       <li class="facebook"><a href="https://www.facebook.com/upwork" target="_blank" title="Visit Upwork on Facebook"></a></li>
+       <li class="youtube"><a href="http://www.youtube.com/c/upwork" target="_blank" title="Watch Upwork videos on YouTube"></a></li>
+      </ul> 
+     </div> 
+     <div class="row footer-mobile hidden-lg"> 
+      <nav class="footer-mobile-links text-center"> 
+       <ul class="list-inline">
+        <li><a href="/login">Log In</a></li>
+        <li><a href="/signup/create-account">Sign Up</a></li>
+        <li><a href="/legal/">Terms &amp; Conditions</a></li>
+       </ul> 
+      </nav> 
+     </div> 
+     <div class="row footer-colophon text-center"> 
+      <p>© 2015 - 2017 Upwork Global Inc.</p> 
+     </div> 
+    </div> 
+   </footer> 
+  </div> 
+  <div class="et_social_pin_images_outer"> 
+   <div class="et_social_pinterest_window"> 
+    <div class="et_social_modal_header">
+     <h3>Pin It on Pinterest</h3>
+     <span class="et_social_close"></span>
+    </div> 
+    <div class="et_social_pin_images" data-permalink="https://www.upwork.com/hiring/development/meteorjs-node-js-framework/" data-title="Is MeteorJS the Right Node.js Framework for Your App?" data-post_id="11019"></div> 
+   </div> 
+  </div>
+  <div class="et_social_sidebar_networks et_social_visible_sidebar et_social_slideright et_social_animated et_social_rectangle et_social_sidebar_simple et_social_sidebar_withcounts et_social_mobile_on"> 
+   <ul class="et_social_icons_container">
+    <li class="et_social_facebook"> <a href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;t=Is%20MeteorJS%20the%20Right%20Node.js%20Framework%20for%20Your%20App%3F" class="et_social_share et_social_display_count" rel="nofollow" data-social_name="facebook" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_facebook"></i> <span class="et_social_overlay"></span> </a> </li>
+    <li class="et_social_googleplus"> <a href="https://plus.google.com/share?url=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;t=Is%20MeteorJS%20the%20Right%20Node.js%20Framework%20for%20Your%20App%3F" class="et_social_share et_social_display_count" rel="nofollow" data-social_name="googleplus" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_googleplus"></i> <span class="et_social_overlay"></span> </a> </li>
+    <li class="et_social_linkedin"> <a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;title=Is%20MeteorJS%20the%20Right%20Node.js%20Framework%20for%20Your%20App%3F" class="et_social_share et_social_display_count" rel="nofollow" data-social_name="linkedin" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_linkedin"></i> <span class="et_social_overlay"></span> </a> </li>
+    <li class="et_social_twitter"> <a href="http://twitter.com/share?text=Is%20MeteorJS%20the%20Right%20Node.js%20Framework%20for%20Your%20App%3F&amp;url=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;via=" class="et_social_share et_social_display_count" rel="nofollow" data-social_name="twitter" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_twitter"></i> <span class="et_social_overlay"></span> </a> </li>
+    <li class="et_social_pinterest"> <a href="#" class="et_social_share_pinterest et_social_display_count" rel="nofollow" data-social_name="pinterest" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_pinterest"></i> <span class="et_social_overlay"></span> </a> </li>
+    <li class="et_social_gmail"> <a href="https://mail.google.com/mail/u/0/?view=cm&amp;fs=1&amp;su=Is%20MeteorJS%20the%20Right%20Node.js%20Framework%20for%20Your%20App%3F&amp;body=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;ui=2&amp;tf=1" class="et_social_share et_social_display_count" rel="nofollow" data-social_name="gmail" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_gmail"></i> <span class="et_social_overlay"></span> </a> </li>
+   </ul> 
+   <span class="et_social_hide_sidebar et_social_icon"></span> 
+  </div>
+  <div class="et_social_mobile_button"></div> 
+  <div class="et_social_mobile et_social_fadein"> 
+   <div class="et_social_heading">
+    Share This
+   </div> 
+   <span class="et_social_close"></span> 
+   <div class="et_social_networks et_social_simple et_social_rounded et_social_left et_social_withcounts"> 
+    <ul class="et_social_icons_container">
+     <li class="et_social_facebook"> <a href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;t=Is%20MeteorJS%20the%20Right%20Node.js%20Framework%20for%20Your%20App%3F" class="et_social_share et_social_display_count" rel="nofollow" data-social_name="facebook" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_facebook"></i> 
+       <div class="et_social_network_label">
+        <div class="et_social_networkname">
+         Facebook
+        </div>
+       </div> <span class="et_social_overlay"></span> </a> </li>
+     <li class="et_social_googleplus"> <a href="https://plus.google.com/share?url=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;t=Is%20MeteorJS%20the%20Right%20Node.js%20Framework%20for%20Your%20App%3F" class="et_social_share et_social_display_count" rel="nofollow" data-social_name="googleplus" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_googleplus"></i> 
+       <div class="et_social_network_label">
+        <div class="et_social_networkname">
+         Google+
+        </div>
+       </div> <span class="et_social_overlay"></span> </a> </li>
+     <li class="et_social_linkedin"> <a href="http://www.linkedin.com/shareArticle?mini=true&amp;url=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;title=Is%20MeteorJS%20the%20Right%20Node.js%20Framework%20for%20Your%20App%3F" class="et_social_share et_social_display_count" rel="nofollow" data-social_name="linkedin" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_linkedin"></i> 
+       <div class="et_social_network_label">
+        <div class="et_social_networkname">
+         LinkedIn
+        </div>
+       </div> <span class="et_social_overlay"></span> </a> </li>
+     <li class="et_social_twitter"> <a href="http://twitter.com/share?text=Is%20MeteorJS%20the%20Right%20Node.js%20Framework%20for%20Your%20App%3F&amp;url=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;via=" class="et_social_share et_social_display_count" rel="nofollow" data-social_name="twitter" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_twitter"></i> 
+       <div class="et_social_network_label">
+        <div class="et_social_networkname">
+         Twitter
+        </div>
+       </div> <span class="et_social_overlay"></span> </a> </li>
+     <li class="et_social_pinterest"> <a href="#" class="et_social_share_pinterest et_social_display_count" rel="nofollow" data-social_name="pinterest" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_pinterest"></i> 
+       <div class="et_social_network_label">
+        <div class="et_social_networkname">
+         Pinterest
+        </div>
+       </div> <span class="et_social_overlay"></span> </a> </li>
+     <li class="et_social_gmail"> <a href="https://mail.google.com/mail/u/0/?view=cm&amp;fs=1&amp;su=Is%20MeteorJS%20the%20Right%20Node.js%20Framework%20for%20Your%20App%3F&amp;body=https%3A%2F%2Fwww.upwork.com%2Fhiring%2Fdevelopment%2Fmeteorjs-node-js-framework%2F&amp;ui=2&amp;tf=1" class="et_social_share et_social_display_count" rel="nofollow" data-social_name="gmail" data-post_id="11019" data-social_type="share" data-location="sidebar" data-min_count="0"> <i class="et_social_icon et_social_icon_gmail"></i> 
+       <div class="et_social_network_label">
+        <div class="et_social_networkname">
+         Gmail
+        </div>
+       </div> <span class="et_social_overlay"></span> </a> </li>
+    </ul> 
+   </div> 
+  </div> 
+  <div class="et_social_mobile_overlay"></div> 
+  <div style="display:none"> 
+   <div class="grofile-hash-map-374e00ecd64c295aa7d1e6be88dd8deb"> 
+   </div> 
+  </div> 
+  <script type="text/javascript">
+            var ajaxurl = 'https://www.upwork.com/hiring/ajax-api/';
+        </script> 
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/plugins/monarch/js/idle-timer.min.js"></script> 
   <script type="text/javascript">
 /* <![CDATA[ */
-var google_conversion_id = 992772755;
-var google_conversion_label = "bnX3CM3doAgQk4Wy2QM";
-var google_custom_params = window.google_tag_params;
-var google_conversion_format = "3";
-var google_remarketing_only = true;
+var monarchSettings = {"ajaxurl":"https:\/\/www.upwork.com\/hiring\/ajax-api\/","pageurl":"https:\/\/www.upwork.com\/hiring\/development\/meteorjs-node-js-framework\/","stats_nonce":"a125077991","share_counts":"08edae304a","follow_counts":"d58056fa93","total_counts":"037192106d","media_single":"746823d5af","media_total":"31883ecfa2","generate_all_window_nonce":"9ecb998db7","no_img_message":"No images available for sharing on this page"};
 /* ]]> */
 </script> 
-  <div style="display:none"> 
-   <script type="text/javascript" src="//www.googleadservices.com/pagead/conversion.js">
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/plugins/monarch/js/custom.js"></script> 
+  <script type="text/javascript" src="https://d2oh4tlt9mrke9.cloudfront.net/Record/js/sessioncam.js"></script> 
+  <script type="text/javascript" src="https://s0.wp.com/wp-content/js/devicepx-jetpack.js"></script> 
+  <script type="text/javascript" src="//components.elance-odesk.com/0.5.8/core.0.5.8.min.js"></script> 
+  <script type="text/javascript">
+angular.module('uiApplet', ['components.core.log', 'marketing.global']);
 </script> 
-  </div> 
-  <noscript> 
-   <div style="display:inline;"> 
-    <img height="1" width="1" style="border-style:none;" alt="" src="//googleads.g.doubleclick.net/pagead/viewthroughconversion/992772755/?value=0&amp;label=bnX3CM3doAgQk4Wy2QM&amp;guid=ON&amp;script=0"> 
-   </div> 
-  </noscript> 
-  <!-- End Google Code for Remarketing tag --> 
-  <script language="javascript" type="text/javascript">
-/************* DO NOT ALTER ANYTHING BELOW THIS LINE ! **************/
-var s_code=s.t();if(s_code)document.write(s_code)//--></script> 
-  <script language="JavaScript" type="text/javascript"><!--
-if(navigator.appVersion.indexOf('MSIE')>=0)document.write(unescape('%3C')+'\!-'+'-')
-//--></script>
-  <noscript>
-   <img src="http://rodale.d1.sc.omtrdc.net/b/ss/rodalesetaildev/1/H.25.4--NS/0" height="1" width="1" border="0" alt="">
-  </noscript>
-  <!--/DO NOT REMOVE/--> 
-  <!-- End SiteCatalyst code version: H.25.4. --> 
-  <!-- Demandware Analytics code 1.0 (body_end-analytics-tracking-asynch.js) --> 
-  <script type="text/javascript">//<!--
+  <script type="text/javascript" src="//components.elance-odesk.com/marketing-ui/1.9.3/js/global.js?v1"></script> 
+  <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/themes/upwork-theme/lib/outdated/bower_components/bowser/bowser.min.js"></script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/themes/upwork-theme/lib/outdated/outdated.min.js"></script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/themes/resource-center-theme/bower_components/salvattore/dist/salvattore.min.js"></script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/themes/resource-center-theme/bower_components/QuickShare/dist/quickshare.min.js"></script> 
+  <script type="text/javascript" src="//app-sj09.marketo.com/js/forms2/js/forms2.min.js"></script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/themes/resource-center-theme/js/app.min.js?v=1.02"></script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/plugins/wp-upwork-widget/widgets/reg-popup-cta/scripts/form-helpers.js"></script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/plugins/wp-upwork-widget/widgets/reg-popup-cta/scripts/hipo-reg.js"></script> 
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-touch/1.3.15/angular-touch.min.js"></script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/plugins/wp-upwork-widget/assets/js/upwork-widgets.js"></script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-includes/js/wp-embed.min.js"></script> 
+  <script type="text/javascript">
 /* <![CDATA[ */
-function trackPage() {
-    try{
-        var trackingUrl = "https://shop.menshealth.com/on/demandware.store/Sites-rodales-Site/en_US/__Analytics-Tracking";
-        var dwAnalytics = dw.__dwAnalytics.getTracker(trackingUrl);
-        if (typeof dw.ac == "undefined") {
-            dwAnalytics.trackPageView();
-        } else {
-            dw.ac.setDWAnalytics(dwAnalytics);
-        }
-    }catch(err) {};
-}
+var countVars = {"disqusShortname":"hhq"};
 /* ]]> */
-// -->
 </script> 
-  <script type="text/javascript" src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/internal/jscript/dwanalytics-16.9.js" async onload="trackPage()"></script> 
-  <!-- Demandware Active Data (body_end-active_data.js) --> 
-  <script src="/on/demandware.static/Sites-rodales-Site/-/en_US/v1507033937262/internal/jscript/dwac-16.9.js" type="text/javascript" async></script>
-  <!-- CQuotient Activity Tracking (body_end-cquotient.js) --> 
-  <script src="https://cdn.cquotient.com/js/v2/gretel.min.js" type="text/javascript" async></script>  
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/plugins/disqus-comment-system/media/js/count.js"></script> 
+  <script type="text/javascript" src="https://ssl-munchkin.marketo.net/js/munchkin.js"></script> 
+  <script type="text/javascript">
+/* <![CDATA[ */
+var marketo_vars = {"munchkin_id":"518-RKL-392"};
+/* ]]> */
+</script> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/plugins/marketo/includes/marketo.js"></script> 
+  <script type="text/javascript">
+        jQuery(function($){
+            if($('.et_social_display_count').length){
+                let element = $('.et_social_facebook a');
+                let shareUrl = location.href;
+                $.getJSON('//graph.facebook.com/?id=' + shareUrl)
+                    .success(function(data){
+                        element.append('<div class="et_social_count"><span>' + data.share.share_count + '</span></div>');
+                        $.post(
+                            ajaxurl, 
+                            {
+                                'action': 'monarch_add_fb_count',
+                                'data': data.share.share_count,
+                                'post_id': $('.et_social_facebook [data-post_id]').data('post_id')
+                            });
+                    });
+            }
+        });
+    </script> 
+  <!--QUIZ_EMBEDER START--> 
+  <!--QUIZ_EMBEDER START--> 
+  <link rel="stylesheet" href="https://www.upwork.com/hiring/wp-content/plugins/insert-or-embed-articulate-content-into-wordpress/colorbox/themes/default/colorbox.css"> 
+  <script type="text/javascript" src="https://www.upwork.com/hiring/wp-content/plugins/insert-or-embed-articulate-content-into-wordpress/colorbox/jquery.colorbox-min.js"></script> 
+  <script type="text/javascript">
+            jQuery(document).ready(function ($) {
+                                //Examples of how to assign the ColorBox event to elements
+
+                var box_default_width = parseInt('80%');
+                var box_default_height = parseInt('80%');
+
+                $('.colorbox_iframe').on('click', function (event) {
+                    //check for small devices
+
+                    if ($(window).width() <= 769) {
+                        if (!$(this).data('allowmobile')) {
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            var modal = $('#module_modal');
+                            $('body').addClass('modal-open');
+                            modal.fadeIn(200);
+
+                            modal.find('.btn').click(function () {
+                                $('body').removeClass('modal-open');
+                                modal.fadeOut(200);
+                            });
+
+                            return false;
+                        }
+                    }
+                }).each(function () {
+                    var _this = $(this);
+
+                    if (_this.data('allowmobile')) {
+                        _this.colorbox({
+                            iframe: true,
+                            width: box_default_width,
+                            height: box_default_height,
+                            transition: 'elastic',
+                            scrolling: 1,
+                            className: 'allowmobile',
+                            onComplete: function (element) {
+                                $.colorbox.resize({
+                                    width: getBoxWidth(_this, $(window).width(), box_default_width),
+                                    height: getBoxHeight(_this, $(window).height(), box_default_height)
+                                });
+                            }
+                        });
+                    } else {
+                        _this.colorbox({
+                            iframe: true,
+                            width: _this.data('width') == void 0 || _this.data('width') == ''
+                                ? box_default_width
+                                : parseInt(_this.data('width')),
+                            height: _this.data('height') == void 0 || _this.data('width') == ''
+                                ? box_default_height
+                                : parseInt(_this.data('height')),
+                            transition: 'elastic',
+                            scrolling: 1                        });
+                    }
+                });
+
+                $(window).resize(function () {
+                    var _this = $(this);
+                    var _colorbox = $('#colorbox');
+
+                    if (_colorbox.is(':visible') && _colorbox.hasClass('allowmobile')) {
+                        $.colorbox.resize({
+                            width: getBoxWidth($.colorbox.element(), _this.width(), box_default_width),
+                            height: getBoxHeight($.colorbox.element(), _this.height(), box_default_height)
+                        });
+                    }
+                });
+
+                function getBoxWidth(elem, scr_width, def_width) {
+                    var given_width = elem.data('width') == void 0 || elem.data('width') == ''
+                        ? 0
+                        : parseInt(elem.data('width'));
+
+                    return given_width
+                        ? (scr_width <= given_width ? scr_width : given_width)
+                        : (scr_width <= def_width ? scr_width : def_width);
+                }
+
+                function getBoxHeight(elem, scr_height, def_height) {
+                    var given_height = elem.data('height') == void 0 || elem.data('height') == ''
+                        ? 0
+                        : parseInt(elem.data('height'));
+
+                    return given_height
+                        ? (scr_height <= given_height ? scr_height : given_height)
+                        : (scr_height <= def_height ? scr_height : def_height);
+                }
+                
+            });
+        </script> 
+  <!--QUIZ_EMBEDER END--> 
+  <script type="text/javascript" src="https://stats.wp.com/e-201740.js" async defer></script> 
+  <script type="text/javascript">
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:3.9.7',blog:'94465220',post:'11019',tz:'-7',srv:'www.upwork.com'} ]);
+	_stq.push([ 'clickTrackerInit', '94465220', '11019' ]);
+</script> 
+  <div class="outdated-browser-popup hidden-xs hidden-sm" id="outdated-browser-popup"> 
+   <div class="container"> 
+    <a href="#" class="btn-close-update-browser" title="Close">×</a> 
+    <i class="icon-warning"></i> 
+    <h1 class="font-gotham-bold">Your browser is not supported</h1> 
+    <p class="text-overview font-gotham-medium">To access essential Upwork features, you'll need to update your browser.</p> 
+    <a class="btn btn-default btn-update-browser" href="http://outdatedbrowser.com/">Update my browser</a> 
+   </div> 
+  </div> 
+  <script type="text/javascript">window.NREUM||(NREUM={});NREUM.info={"beacon":"bam.nr-data.net","licenseKey":"8e23a381b9","applicationID":"69924466","transactionName":"NVxRMRBYVhBXUhBQDAwWcgYWUFcNGUINVwQOXA==","queueTime":0,"applicationTime":663,"atts":"GRtSR1hCRR4=","errorBeacon":"bam.nr-data.net","agent":""}</script> 
  </body>
 </html>

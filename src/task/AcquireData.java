@@ -45,10 +45,10 @@ public class AcquireData {
 
 	public static void main(String[] args) {
 
-		Proxy proxy = new Proxy(
+		Proxy proxy = null/*new Proxy(
 				Proxy.Type.HTTP, 
 				InetSocketAddress.createUnresolved("192.168.2.12", 3128)
-		);
+		)*/;
 		
 		int max_queries = Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
 		int max_results = Integer.valueOf(ConfigManager.getInstance().getProperty("max_results"));
@@ -64,7 +64,7 @@ public class AcquireData {
 		NPMSearchWrapper npmsearch = new NPMSearchWrapper(max_results);
 		
 		List<Searcher> searchers = new ArrayList<Searcher>();
-		searchers.add(google);
+		//searchers.add(google);
 		searchers.add(npm);
 		searchers.add(bing);
 		searchers.add(npmsearch);
@@ -83,10 +83,8 @@ public class AcquireData {
 		        List<String> data = CacheContentManager.getInstance().loadContentFromCache(searcher,query);
 		        if(data==null){
 		        	data = searcher.acquireData(query,proxy);
+		        	CacheContentManager.getInstance().saveContentInCache(data,searcher,query);
 		        }
-				
-				CacheContentManager.getInstance().saveContentInCache(data,searcher,query);
-
 				System.out.println();
 			}
 		}

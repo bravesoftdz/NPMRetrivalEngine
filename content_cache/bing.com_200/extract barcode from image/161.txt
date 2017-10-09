@@ -1,727 +1,852 @@
 <!doctype html>
 <html>
  <head> 
-  <meta charset="utf-8"> 
-  <meta http-equiv="X-UA-Compatible" content="chrome=1"> 
-  <title>QuaggaJS, an advanced barcode-reader written in JavaScript</title> 
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
-  <meta name="copyright" content="This project is maintained by Christoph Oberhofer"> 
-  <meta name="description" content="QuaggaJS is an advanced barcode-reader written in JavaScript"> 
-  <meta name="keywords" content="barcode, javascript, canvas, computer vision, image processing, ean, code128"> 
-  <meta name="robots" content="index,follow"> 
-  <link rel="canonical" href="https://serratus.github.io/"> 
-  <link rel="stylesheet" href="https://serratus.github.io/quaggaJS/stylesheets/styles.css"> 
-  <link rel="stylesheet" href="https://serratus.github.io/quaggaJS/stylesheets/example.css"> 
-  <link rel="stylesheet" href="https://serratus.github.io/quaggaJS/stylesheets/pygment_trac.css"> 
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"> 
-  <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]--> 
-  <script>
-        var host = "serratus.github.io";
-        if ((host == window.location.host) && (window.location.protocol != "https:")) {
-            window.location.protocol = "https";
-        }
-    </script> 
-  <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-56318310-1', 'auto');
-      ga('send', 'pageview');
-
-    </script> 
+  <title>Image extractor « Python recipes « ActiveState Code</title> 
+  <meta http-equiv="X-UA-Compatible" content="IE=8"> 
+  <link rel="stylesheet" href="/static/css/activestyle.css" type="text/css"> 
+  <!--[if IE]>
+    <link rel="stylesheet" href="/static/css/ie.css" type="text/css" />
+  <![endif]--> 
+  <!--[if IE 7]>
+    <link rel="stylesheet" href="/static/css/ie7.css" type="text/css" />
+  <![endif]--> 
+  <!--[if IE 6]>
+    <link rel="stylesheet" href="/static/css/ie6.css" type="text/css" />
+  <![endif]--> 
+  <link href="/static/prettify/prettify.css" type="text/css" rel="stylesheet"> 
+  <link href="http://fonts.googleapis.com/css?family=PT+Sans+Narrow:bold&amp;subset=latin" rel="stylesheet" type="text/css"> 
+  <link href="http://fonts.googleapis.com/css?family=PT+Sans:bold" rel="stylesheet" type="text/css"> 
+  <link rel="alternate" href="/feeds/news/" type="application/atom+xml" title="ActiveState Code News"> 
+  <link type="image/x-icon" href="/static/activestyle/img/favicon.ico" rel="shortcut icon"> 
+  <script src="/static/js/jquery-1.3.2.min.js" type="text/javascript"></script> 
+  <script src="/static/js/jquery-ui-1.7.2.custom.min.js" type="text/javascript"></script> 
+  <script src="/static/js/jquery-form-2.36.js" type="text/javascript"></script> 
+  <link rel="canonical" href="/recipes/189862-image-extractor/"> 
+  <!--[if IE]><style type="text/css"> div.codeblock, pre.prettyprint { overflow: visible; overflow-x: auto; overflow-y: hidden; padding-bottom:15px; } </style><![endif]--> 
+  <!-- Start Google Analytics tracking code --> 
+  <script type="text/javascript">
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-20072-24', 'auto', {'allowLinker': true});
+    ga('require', 'linker');
+    ga('linker:autoLink', ['activestate.com', 'stackato.com', 'komodoide.com']);
+    ga('require', 'linkid', 'linkid.js');
+    ga('send', 'pageview');
+  </script> 
+  <!-- End Google Analytics tracking code --> 
  </head> 
  <body> 
-  <div class="wrapper"> 
-   <header> 
-    <h1><a href="/quaggaJS/"><img src="/quaggaJS/assets/code128.png" alt="QuaggaJS"></a></h1> 
-    <p>An advanced barcode-reader written in JavaScript</p> 
-    <nav class="side-nav"> 
-     <ul class="pages"> 
-      <li><a href="/quaggaJS/">Project Home</a></li> 
-      <li><a href="/quaggaJS/examples">Examples</a></li> 
-      <li><a href="/quaggaJS/v1.0.0-beta.1/examples">Examples (v1.0.0-beta)</a></li> 
-     </ul> 
-    </nav> 
-    <p class="view"><a href="https://github.com/serratus/quaggaJS">View the Project on GitHub <small>serratus/quaggaJS</small></a></p> 
-    <ul class="github"> 
-     <li><a href="https://github.com/serratus/quaggaJS/zipball/master">Download <strong>ZIP File</strong></a></li> 
-     <li><a href="https://github.com/serratus/quaggaJS/tarball/master">Download <strong>TAR Ball</strong></a></li> 
-     <li><a href="https://github.com/serratus/quaggaJS">Fork On <strong>GitHub</strong></a></li> 
-    </ul> 
-   </header> 
-   <section> 
-    <h1 id="quaggajs">quaggaJS</h1> 
-    <ul> 
-     <li><a href="#changelog">Changelog</a> (2017-06-07)</li> 
-     <li><a href="#browser-support">Browser Support</a></li> 
-     <li><a href="#installing">Installing</a></li> 
-     <li><a href="#gettingstarted">Getting Started</a></li> 
-     <li><a href="#api">API</a></li> 
-     <li><a href="#configobject">Configuration</a></li> 
-     <li><a href="#tipsandtricks">Tips &amp; Tricks</a></li> 
-     <li><a href="#sponsors">Sponsors</a></li> 
-    </ul> 
-    <h2 id="what-is-quaggajs">What is QuaggaJS?</h2> 
-    <p>QuaggaJS is a barcode-scanner entirely written in JavaScript supporting real- time localization and decoding of various types of barcodes such as <strong>EAN</strong>, <strong>CODE 128</strong>, <strong>CODE 39</strong>, <strong>EAN 8</strong>, <strong>UPC-A</strong>, <strong>UPC-C</strong>, <strong>I2of5</strong>, <strong>2of5</strong>, <strong>CODE 93</strong> and <strong>CODABAR</strong>. The library is also capable of using <code class="highlighter-rouge">getUserMedia</code> to get direct access to the user’s camera stream. Although the code relies on heavy image-processing even recent smartphones are capable of locating and decoding barcodes in real-time.</p> 
-    <p>Try some <a href="https://serratus.github.io/quaggaJS/examples">examples</a> and check out the blog post (<a href="http://www.oberhofer.co/how-barcode-localization-works-in-quaggajs/">How barcode-localization works in QuaggaJS</a>) if you want to dive deeper into this topic.</p> 
-    <p><img src="https://raw.githubusercontent.com/serratus/quaggaJS/master/doc/img/mobile-located.png" alt="teaser"><img src="https://raw.githubusercontent.com/serratus/quaggaJS/master/doc/img/mobile-detected.png" alt="teaser"></p> 
-    <h2 id="yet-another-barcode-library">Yet another barcode library?</h2> 
-    <p>This is not yet another port of the great <a href="https://github.com/zxing/zxing">zxing</a> library, but more of an extension to it. This implementation features a barcode locator which is capable of finding a barcode-like pattern in an image resulting in an estimated bounding box including the rotation. Simply speaking, this reader is invariant to scale and rotation, whereas other libraries require the barcode to be aligned with the viewport.</p> 
-    <h2 id="browser-support"><a name="browser-support">Browser Support</a></h2> 
-    <p>Quagga makes use of many modern Web-APIs which are not implemented by all browsers yet. There are two modes in which Quagga operates: 1. analyzing static images and 2. using a camera to decode the images from a live-stream. The latter requires the presence of the MediaDevices API. You can track the compatibility of the used Web-APIs for each mode:</p> 
-    <ul> 
-     <li><a href="http://caniuse.com/#feat=webworkers,canvas,typedarrays,bloburls,blobbuilder">Static Images</a></li> 
-     <li><a href="http://caniuse.com/#feat=webworkers,canvas,typedarrays,bloburls,blobbuilder,stream">Live Stream</a></li> 
-    </ul> 
-    <h3 id="static-images">Static Images</h3> 
-    <p>The following APIs need to be implemented in your browser:</p> 
-    <ul> 
-     <li><a href="http://caniuse.com/#feat=webworkers">webworkers</a></li> 
-     <li><a href="http://caniuse.com/#feat=canvas">canvas</a></li> 
-     <li><a href="http://caniuse.com/#feat=typedarrays">typedarrays</a></li> 
-     <li><a href="http://caniuse.com/#feat=bloburls">bloburls</a></li> 
-     <li><a href="http://caniuse.com/#feat=blobbuilder">blobbuilder</a></li> 
-    </ul> 
-    <h3 id="live-stream">Live Stream</h3> 
-    <p>In addition to the APIs mentioned above:</p> 
-    <ul> 
-     <li><a href="http://caniuse.com/#feat=stream">MediaDevices</a></li> 
-    </ul> 
-    <h2 id="installing"><a name="installing">Installing</a></h2> 
-    <p>QuaggaJS can be installed using <strong>npm</strong>, <strong>bower</strong>, or by including it with the <strong>script</strong> tag.</p> 
-    <h3 id="npm">NPM</h3> 
-    <div class="language-console highlighter-rouge">
-     <pre class="highlight"><code>&gt; npm install quagga
-</code></pre> 
-    </div> 
-    <p>And then import it as dependency in your project:</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="kr">import</span> <span class="nx">Quagga</span> <span class="nx">from</span> <span class="s1">'quagga'</span><span class="p">;</span> <span class="c1">// ES6</span>
-<span class="kr">const</span> <span class="nx">Quagga</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'quagga'</span><span class="p">).</span><span class="k">default</span><span class="p">;</span> <span class="c1">// Common JS (important: default)</span>
-</code></pre> 
-    </div> 
-    <p>Currently, the full functionality is only available through the browser. When using QuaggaJS within <strong>node</strong>, only file-based decoding is available. See the example for <a href="#node-example">node_examples</a>.</p> 
-    <h3 id="bower">Bower</h3> 
-    <p>You can also install QuaggaJS through <strong>bower</strong>:</p> 
-    <div class="language-console highlighter-rouge">
-     <pre class="highlight"><code>&gt; bower install quagga
-</code></pre> 
-    </div> 
-    <h3 id="script-tag-anno-1998">Script-Tag Anno 1998</h3> 
-    <p>You can simply include <code class="highlighter-rouge">dist/quagga.min.js</code> in your project and you are ready to go. The script exposes the library on the global namespace under <code class="highlighter-rouge">Quagga</code>.</p> 
-    <h2 id="getting-started"><a name="gettingstarted">Getting Started</a></h2> 
-    <p>For starters, have a look at the <a href="https://serratus.github.io/quaggaJS/examples">examples</a> to get an idea where to go from here.</p> 
-    <h2 id="building"><a name="Building">Building</a></h2> 
-    <p>You can build the library yourself by simply cloning the repo and typing:</p> 
-    <div class="language-console highlighter-rouge">
-     <pre class="highlight"><code>&gt; npm install
-&gt; npm run build
-</code></pre> 
-    </div> 
-    <p>This npm script builds a non optimized version <code class="highlighter-rouge">quagga.js</code> and a minified version <code class="highlighter-rouge">quagga.min.js</code> and places both files in the <code class="highlighter-rouge">dist</code> folder. Additionally, a <code class="highlighter-rouge">quagga.map</code> source-map is placed alongside these files. This file is only valid for the non-uglified version <code class="highlighter-rouge">quagga.js</code> because the minified version is altered after compression and does not align with the map file any more.</p> 
-    <h3 id="node">Node</h3> 
-    <p>The code in the <code class="highlighter-rouge">dist</code> folder is only targeted to the browser and won’t work in node due to the dependency on the DOM. For the use in node, the <code class="highlighter-rouge">build</code> command also creates a <code class="highlighter-rouge">quagga.js</code> file in the <code class="highlighter-rouge">lib</code> folder.</p> 
-    <h2 id="api"><a name="api">API</a></h2> 
-    <p>You can check out the <a href="https://serratus.github.io/quaggaJS/examples">examples</a> to get an idea of how to use QuaggaJS. Basically the library exposes the following API:</p> 
-    <h3 id="quaggainitconfig-callback"><a name="quaggainit">Quagga.init(config, callback)</a></h3> 
-    <p>This method initializes the library for a given configuration <code class="highlighter-rouge">config</code> (see below) and invokes the <code class="highlighter-rouge">callback(err)</code> when Quagga has finished its bootstrapping phase. The initialization process also requests for camera access if real-time detection is configured. In case of an error, the <code class="highlighter-rouge">err</code> parameter is set and contains information about the cause. A potential cause may be the <code class="highlighter-rouge">inputStream.type</code> is set to <code class="highlighter-rouge">LiveStream</code>, but the browser does not support this API, or simply if the user denies the permission to use the camera.</p> 
-    <p>If you do not specify a target, QuaggaJS would look for an element that matches the CSS selector <code class="highlighter-rouge">#interactive.viewport</code> (for backwards compatibility). <code class="highlighter-rouge">target</code> can be a string (CSS selector matching one of your DOM node) or a DOM node.</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="nx">Quagga</span><span class="p">.</span><span class="nx">init</span><span class="p">({</span>
-    <span class="na">inputStream</span> <span class="p">:</span> <span class="p">{</span>
-      <span class="na">name</span> <span class="p">:</span> <span class="s2">"Live"</span><span class="p">,</span>
-      <span class="na">type</span> <span class="p">:</span> <span class="s2">"LiveStream"</span><span class="p">,</span>
-      <span class="na">target</span><span class="p">:</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">'#yourElement'</span><span class="p">)</span>    <span class="c1">// Or '#yourElement' (optional)</span>
-    <span class="p">},</span>
-    <span class="na">decoder</span> <span class="p">:</span> <span class="p">{</span>
-      <span class="na">readers</span> <span class="p">:</span> <span class="p">[</span><span class="s2">"code_128_reader"</span><span class="p">]</span>
-    <span class="p">}</span>
-  <span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
-          <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">);</span>
-          <span class="k">return</span>
-      <span class="p">}</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Initialization finished. Ready to start"</span><span class="p">);</span>
-      <span class="nx">Quagga</span><span class="p">.</span><span class="nx">start</span><span class="p">();</span>
-  <span class="p">});</span>
-</code></pre> 
-    </div> 
-    <h3 id="quaggastart">Quagga.start()</h3> 
-    <p>When the library is initialized, the <code class="highlighter-rouge">start()</code> method starts the video-stream and begins locating and decoding the images.</p> 
-    <h3 id="quaggastop">Quagga.stop()</h3> 
-    <p>If the decoder is currently running, after calling <code class="highlighter-rouge">stop()</code> the decoder does not process any more images. Additionally, if a camera-stream was requested upon initialization, this operation also disconnects the camera.</p> 
-    <h3 id="quaggaonprocessedcallback">Quagga.onProcessed(callback)</h3> 
-    <p>This method registers a <code class="highlighter-rouge">callback(data)</code> function that is called for each frame after the processing is done. The <code class="highlighter-rouge">data</code> object contains detailed information about the success/failure of the operation. The output varies, depending whether the detection and/or decoding were successful or not.</p> 
-    <h3 id="quaggaondetectedcallback">Quagga.onDetected(callback)</h3> 
-    <p>Registers a <code class="highlighter-rouge">callback(data)</code> function which is triggered whenever a barcode- pattern has been located and decoded successfully. The passed <code class="highlighter-rouge">data</code> object contains information about the decoding process including the detected code which can be obtained by calling <code class="highlighter-rouge">data.codeResult.code</code>.</p> 
-    <h3 id="quaggadecodesingleconfig-callback">Quagga.decodeSingle(config, callback)</h3> 
-    <p>In contrast to the calls described above, this method does not rely on <code class="highlighter-rouge">getUserMedia</code> and operates on a single image instead. The provided callback is the same as in <code class="highlighter-rouge">onDetected</code> and contains the result <code class="highlighter-rouge">data</code> object.</p> 
-    <h3 id="quaggaoffprocessedhandler">Quagga.offProcessed(handler)</h3> 
-    <p>In case the <code class="highlighter-rouge">onProcessed</code> event is no longer relevant, <code class="highlighter-rouge">offProcessed</code> removes the given <code class="highlighter-rouge">handler</code> from the event-queue.</p> 
-    <h3 id="quaggaoffdetectedhandler">Quagga.offDetected(handler)</h3> 
-    <p>In case the <code class="highlighter-rouge">onDetected</code> event is no longer relevant, <code class="highlighter-rouge">offDetected</code> removes the given <code class="highlighter-rouge">handler</code> from the event-queue.</p> 
-    <h2 id="the-result-object"><a name="resultobject">The result object</a></h2> 
-    <p>The callbacks passed into <code class="highlighter-rouge">onProcessed</code>, <code class="highlighter-rouge">onDetected</code> and <code class="highlighter-rouge">decodeSingle</code> receive a <code class="highlighter-rouge">data</code> object upon execution. The <code class="highlighter-rouge">data</code> object contains the following information. Depending on the success, some fields may be <code class="highlighter-rouge">undefined</code> or just empty.</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="p">{</span>
-  <span class="s2">"codeResult"</span><span class="err">:</span> <span class="p">{</span>
-    <span class="s2">"code"</span><span class="err">:</span> <span class="s2">"FANAVF1461710"</span><span class="p">,</span>  <span class="c1">// the decoded code as a string</span>
-    <span class="s2">"format"</span><span class="err">:</span> <span class="s2">"code_128"</span><span class="p">,</span> <span class="c1">// or code_39, codabar, ean_13, ean_8, upc_a, upc_e</span>
-    <span class="s2">"start"</span><span class="err">:</span> <span class="mi">355</span><span class="p">,</span>
-    <span class="s2">"end"</span><span class="err">:</span> <span class="mi">26</span><span class="p">,</span>
-    <span class="s2">"codeset"</span><span class="err">:</span> <span class="mi">100</span><span class="p">,</span>
-    <span class="s2">"startInfo"</span><span class="err">:</span> <span class="p">{</span>
-      <span class="s2">"error"</span><span class="err">:</span> <span class="mf">1.0000000000000002</span><span class="p">,</span>
-      <span class="s2">"code"</span><span class="err">:</span> <span class="mi">104</span><span class="p">,</span>
-      <span class="s2">"start"</span><span class="err">:</span> <span class="mi">21</span><span class="p">,</span>
-      <span class="s2">"end"</span><span class="err">:</span> <span class="mi">41</span>
-    <span class="p">},</span>
-    <span class="s2">"decodedCodes"</span><span class="err">:</span> <span class="p">[{</span>
-      <span class="s2">"code"</span><span class="p">:</span> <span class="mi">104</span><span class="p">,</span>
-      <span class="s2">"start"</span><span class="p">:</span> <span class="mi">21</span><span class="p">,</span>
-      <span class="s2">"end"</span><span class="p">:</span> <span class="mi">41</span>
-    <span class="p">},</span>
-    <span class="c1">// stripped for brevity</span>
-    <span class="p">{</span>
-      <span class="s2">"error"</span><span class="p">:</span> <span class="mf">0.8888888888888893</span><span class="p">,</span>
-      <span class="s2">"code"</span><span class="p">:</span> <span class="mi">106</span><span class="p">,</span>
-      <span class="s2">"start"</span><span class="p">:</span> <span class="mi">328</span><span class="p">,</span>
-      <span class="s2">"end"</span><span class="p">:</span> <span class="mi">350</span>
-    <span class="p">}],</span>
-    <span class="s2">"endInfo"</span><span class="err">:</span> <span class="p">{</span>
-      <span class="s2">"error"</span><span class="err">:</span> <span class="mf">0.8888888888888893</span><span class="p">,</span>
-      <span class="s2">"code"</span><span class="err">:</span> <span class="mi">106</span><span class="p">,</span>
-      <span class="s2">"start"</span><span class="err">:</span> <span class="mi">328</span><span class="p">,</span>
-      <span class="s2">"end"</span><span class="err">:</span> <span class="mi">350</span>
-    <span class="p">},</span>
-    <span class="s2">"direction"</span><span class="err">:</span> <span class="o">-</span><span class="mi">1</span>
-  <span class="p">},</span>
-  <span class="s2">"line"</span><span class="err">:</span> <span class="p">[{</span>
-    <span class="s2">"x"</span><span class="p">:</span> <span class="mf">25.97278706156836</span><span class="p">,</span>
-    <span class="s2">"y"</span><span class="p">:</span> <span class="mf">360.5616435369468</span>
-  <span class="p">},</span> <span class="p">{</span>
-    <span class="s2">"x"</span><span class="p">:</span> <span class="mf">401.9220519377024</span><span class="p">,</span>
-    <span class="s2">"y"</span><span class="p">:</span> <span class="mf">70.87524989906444</span>
-  <span class="p">}],</span>
-  <span class="s2">"angle"</span><span class="err">:</span> <span class="o">-</span><span class="mf">0.6565217179979483</span><span class="p">,</span>
-  <span class="s2">"pattern"</span><span class="err">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="cm">/* ... */</span> <span class="mi">1</span><span class="p">],</span>
-  <span class="s2">"box"</span><span class="err">:</span> <span class="p">[</span>
-    <span class="p">[</span><span class="mf">77.4074243622672</span><span class="p">,</span> <span class="mf">410.9288668804402</span><span class="p">],</span>
-    <span class="p">[</span><span class="mf">0.050203235235130705</span><span class="p">,</span> <span class="mf">310.53619724086366</span><span class="p">],</span>
-    <span class="p">[</span><span class="mf">360.15706727788256</span><span class="p">,</span> <span class="mf">33.05711026051813</span><span class="p">],</span>
-    <span class="p">[</span><span class="mf">437.5142884049146</span><span class="p">,</span> <span class="mf">133.44977990009465</span><span class="p">]</span>
-  <span class="p">],</span>
-  <span class="s2">"boxes"</span><span class="err">:</span> <span class="p">[</span>
-    <span class="p">[</span>
-      <span class="p">[</span><span class="mf">77.4074243622672</span><span class="p">,</span> <span class="mf">410.9288668804402</span><span class="p">],</span>
-      <span class="p">[</span><span class="mf">0.050203235235130705</span><span class="p">,</span> <span class="mf">310.53619724086366</span><span class="p">],</span>
-      <span class="p">[</span><span class="mf">360.15706727788256</span><span class="p">,</span> <span class="mf">33.05711026051813</span><span class="p">],</span>
-      <span class="p">[</span><span class="mf">437.5142884049146</span><span class="p">,</span> <span class="mf">133.44977990009465</span><span class="p">]</span>
-    <span class="p">],</span>
-    <span class="p">[</span>
-      <span class="p">[</span><span class="mf">248.90769330706507</span><span class="p">,</span> <span class="mf">415.2041489551161</span><span class="p">],</span>
-      <span class="p">[</span><span class="mf">198.9532321622869</span><span class="p">,</span> <span class="mf">352.62160512937635</span><span class="p">],</span>
-      <span class="p">[</span><span class="mf">339.546160777576</span><span class="p">,</span> <span class="mf">240.3979259789976</span><span class="p">],</span>
-      <span class="p">[</span><span class="mf">389.5006219223542</span><span class="p">,</span> <span class="mf">302.98046980473737</span><span class="p">]</span>
-    <span class="p">]</span>
-  <span class="p">]</span>
-<span class="p">}</span>
-</code></pre> 
-    </div> 
-    <h2 id="configuration"><a name="configobject">Configuration</a></h2> 
-    <p>The configuration that ships with QuaggaJS covers the default use-cases and can be fine-tuned for specific requirements.</p> 
-    <p>The configuration is managed by the <code class="highlighter-rouge">config</code> object defining the following high-level properties:</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="p">{</span>
-  <span class="nl">numOfWorkers</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
-  <span class="nx">locate</span><span class="err">:</span> <span class="kc">true</span><span class="p">,</span>
-  <span class="nx">inputStream</span><span class="err">:</span> <span class="p">{...},</span>
-  <span class="nx">frequency</span><span class="err">:</span> <span class="mi">10</span><span class="p">,</span>
-  <span class="nx">decoder</span><span class="err">:</span><span class="p">{...},</span>
-  <span class="nx">locator</span><span class="err">:</span> <span class="p">{...},</span>
-  <span class="nx">debug</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
-<span class="p">}</span>
-</code></pre> 
-    </div> 
-    <h3 id="numofworkers">numOfWorkers</h3> 
-    <p>QuaggaJS supports web-workers out of the box and runs with <code class="highlighter-rouge">4</code> workers in its default configuration. The number should align with the number of cores available in your targeted devices.</p> 
-    <p>In case you don’t know the number upfront, or if the variety of devices is too big, you can either use <code class="highlighter-rouge">navigator.hardwareConcurrency</code> (see <a href="https://wiki.whatwg.org/wiki/Navigator_HW_Concurrency">here</a>) where available or make use of <a href="https://github.com/oftn/core-estimator">core-estimator</a>.</p> 
-    <h3 id="locate">locate</h3> 
-    <p>One of the main features of QuaggaJS is its ability to locate a barcode in a given image. The <code class="highlighter-rouge">locate</code> property controls whether this feature is turned on (default) or off.</p> 
-    <p>Why would someone turn this feature off? Localizing a barcode is a computationally expensive operation and might not work properly on some devices. Another reason would be the lack of auto-focus producing blurry images which makes the localization feature very unstable.</p> 
-    <p>However, even if none of the above apply, there is one more case where it might be useful to disable <code class="highlighter-rouge">locate</code>: If the orientation, and/or the approximate position of the barcode is known, or if you want to guide the user through a rectangular outline. This can increase performance and robustness at the same time.</p> 
-    <h3 id="inputstream">inputStream</h3> 
-    <p>The <code class="highlighter-rouge">inputStream</code> property defines the sources of images/videos within QuaggaJS.</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="p">{</span>
-  <span class="nl">name</span><span class="p">:</span> <span class="s2">"Live"</span><span class="p">,</span>
-  <span class="nx">type</span><span class="err">:</span> <span class="s2">"LiveStream"</span><span class="p">,</span>
-  <span class="nx">constraints</span><span class="err">:</span> <span class="p">{</span>
-    <span class="nl">width</span><span class="p">:</span> <span class="mi">640</span><span class="p">,</span>
-    <span class="nx">height</span><span class="err">:</span> <span class="mi">480</span><span class="p">,</span>
-    <span class="nx">facingMode</span><span class="err">:</span> <span class="s2">"environment"</span><span class="p">,</span>
-    <span class="nx">deviceId</span><span class="err">:</span> <span class="s2">"7832475934759384534"</span>
-  <span class="p">},</span>
-  <span class="nx">area</span><span class="err">:</span> <span class="p">{</span> <span class="c1">// defines rectangle of the detection/localization area</span>
-    <span class="nl">top</span><span class="p">:</span> <span class="s2">"0%"</span><span class="p">,</span>    <span class="c1">// top offset</span>
-    <span class="nx">right</span><span class="err">:</span> <span class="s2">"0%"</span><span class="p">,</span>  <span class="c1">// right offset</span>
-    <span class="nx">left</span><span class="err">:</span> <span class="s2">"0%"</span><span class="p">,</span>   <span class="c1">// left offset</span>
-    <span class="nx">bottom</span><span class="err">:</span> <span class="s2">"0%"</span>  <span class="c1">// bottom offset</span>
-  <span class="p">},</span>
-  <span class="nx">singleChannel</span><span class="err">:</span> <span class="kc">false</span> <span class="c1">// true: only the red color-channel is read</span>
-<span class="p">}</span>
-</code></pre> 
-    </div> 
-    <p>First, the <code class="highlighter-rouge">type</code> property can be set to three different values: <code class="highlighter-rouge">ImageStream</code>, <code class="highlighter-rouge">VideoStream</code>, or <code class="highlighter-rouge">LiveStream</code> (default) and should be selected depending on the use-case. Most probably, the default value is sufficient.</p> 
-    <p>Second, the <code class="highlighter-rouge">constraint</code> key defines the physical dimensions of the input image and additional properties, such as <code class="highlighter-rouge">facingMode</code> which sets the source of the user’s camera in case of multiple attached devices. Additionally, if required, the <code class="highlighter-rouge">deviceId</code> can be set if the selection of the camera is given to the user. This can be easily achieved via <a href="https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/enumerateDevices">MediaDevices.enumerateDevices()</a></p> 
-    <p>Thirdly, the <code class="highlighter-rouge">area</code> prop restricts the decoding area of the image. The values are given in percentage, similar to the CSS style property when using <code class="highlighter-rouge">position: absolute</code>. This <code class="highlighter-rouge">area</code> is also useful in cases the <code class="highlighter-rouge">locate</code> property is set to <code class="highlighter-rouge">false</code>, defining the rectangle for the user.</p> 
-    <p>The last key <code class="highlighter-rouge">singleChannel</code> is only relevant in cases someone wants to debug erroneous behavior of the decoder. If set to <code class="highlighter-rouge">true</code> the input image’s red color-channel is read instead of calculating the gray-scale values of the source’s RGB. This is useful in combination with the <code class="highlighter-rouge">ResultCollector</code> where the gray-scale representations of the wrongly identified images are saved.</p> 
-    <h3 id="frequency">frequency</h3> 
-    <p>This top-level property controls the scan-frequency of the video-stream. It’s optional and defines the maximum number of scans per second. This renders useful for cases where the scan-session is long-running and resources such as CPU power are of concern.</p> 
-    <h3 id="decoder">decoder</h3> 
-    <p>QuaggaJS usually runs in a two-stage manner (<code class="highlighter-rouge">locate</code> is set to <code class="highlighter-rouge">true</code>) where, after the barcode is located, the decoding process starts. Decoding is the process of converting the bars into its true meaning. Most of the configuration options within the <code class="highlighter-rouge">decoder</code> are for debugging/visualization purposes only.</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="p">{</span>
-  <span class="nl">readers</span><span class="p">:</span> <span class="p">[</span>
-    <span class="s1">'code_128_reader'</span>
-  <span class="p">],</span>
-  <span class="nx">debug</span><span class="err">:</span> <span class="p">{</span>
-      <span class="nl">drawBoundingBox</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-      <span class="nx">showFrequency</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
-      <span class="nx">drawScanline</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
-      <span class="nx">showPattern</span><span class="err">:</span> <span class="kc">false</span>
-  <span class="p">}</span>
-  <span class="nl">multiple</span><span class="p">:</span> <span class="kc">false</span>
-<span class="p">}</span>
-</code></pre> 
-    </div> 
-    <p>The most important property is <code class="highlighter-rouge">readers</code> which takes an array of types of barcodes which should be decoded during the session. Possible values are:</p> 
-    <ul> 
-     <li>code_128_reader (default)</li> 
-     <li>ean_reader</li> 
-     <li>ean_8_reader</li> 
-     <li>code_39_reader</li> 
-     <li>code_39_vin_reader</li> 
-     <li>codabar_reader</li> 
-     <li>upc_reader</li> 
-     <li>upc_e_reader</li> 
-     <li>i2of5_reader</li> 
-     <li>2of5_reader</li> 
-     <li>code_93_reader</li> 
-    </ul> 
-    <p>Why are not all types activated by default? Simply because one should explicitly define the set of barcodes for their use-case. More decoders means more possible clashes, or false-positives. One should take care of the order the readers are given, since some might return a value even though it is not the correct type (EAN-13 vs. UPC-A).</p> 
-    <p>The <code class="highlighter-rouge">multiple</code> property tells the decoder if it should continue decoding after finding a valid barcode. If multiple is set to <code class="highlighter-rouge">true</code>, the results will be returned as an array of result objects. Each object in the array will have a <code class="highlighter-rouge">box</code>, and may have a <code class="highlighter-rouge">codeResult</code> depending on the success of decoding the individual box.</p> 
-    <p>The remaining properties <code class="highlighter-rouge">drawBoundingBox</code>, <code class="highlighter-rouge">showFrequency</code>, <code class="highlighter-rouge">drawScanline</code> and <code class="highlighter-rouge">showPattern</code> are mostly of interest during debugging and visualization.</p> 
-    <h4 id="enabling-extended-ean"><a name="ean_extended">Enabling extended EAN</a></h4> 
-    <p>The default setting for <code class="highlighter-rouge">ean_reader</code> is not capable of reading extensions such as <a href="https://en.wikipedia.org/wiki/EAN_2">EAN-2</a> or <a href="https://en.wikipedia.org/wiki/EAN_5">EAN-5</a>. In order to activate those supplements you have to provide them in the configuration as followed:</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="nx">decoder</span><span class="err">:</span> <span class="p">{</span>
-    <span class="nl">readers</span><span class="p">:</span> <span class="p">[{</span>
-        <span class="na">format</span><span class="p">:</span> <span class="s2">"ean_reader"</span><span class="p">,</span>
-        <span class="na">config</span><span class="p">:</span> <span class="p">{</span>
-            <span class="na">supplements</span><span class="p">:</span> <span class="p">[</span>
-                <span class="s1">'ean_5_reader'</span><span class="p">,</span> <span class="s1">'ean_2_reader'</span>
-            <span class="p">]</span>
-        <span class="p">}</span>
-    <span class="p">}]</span>
-<span class="p">}</span>
-</code></pre> 
-    </div> 
-    <p>Beware that the order of the <code class="highlighter-rouge">supplements</code> matters in such that the reader stops decoding when the first supplement was found. So if you are interested in EAN-2 and EAN-5 extensions, use the order depicted above.</p> 
-    <p>It’s important to mention that, if supplements are supplied, regular EAN-13 codes cannot be read any more with the same reader. If you want to read EAN-13 with and without extensions you have to add another <code class="highlighter-rouge">ean_reader</code> reader to the configuration.</p> 
-    <h3 id="locator">locator</h3> 
-    <p>The <code class="highlighter-rouge">locator</code> config is only relevant if the <code class="highlighter-rouge">locate</code> flag is set to <code class="highlighter-rouge">true</code>. It controls the behavior of the localization-process and needs to be adjusted for each specific use-case. The default settings are simply a combination of values which worked best during development.</p> 
-    <p>Only two properties are relevant for the use in Quagga (<code class="highlighter-rouge">halfSample</code> and <code class="highlighter-rouge">patchSize</code>) whereas the rest is only needed for development and debugging.</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="p">{</span>
-  <span class="nl">halfSample</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
-  <span class="nx">patchSize</span><span class="err">:</span> <span class="s2">"medium"</span><span class="p">,</span> <span class="c1">// x-small, small, medium, large, x-large</span>
-  <span class="nx">debug</span><span class="err">:</span> <span class="p">{</span>
-    <span class="nl">showCanvas</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="nx">showPatches</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="nx">showFoundPatches</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="nx">showSkeleton</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="nx">showLabels</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="nx">showPatchLabels</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="nx">showRemainingPatchLabels</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
-    <span class="nx">boxFromPatches</span><span class="err">:</span> <span class="p">{</span>
-      <span class="nl">showTransformed</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-      <span class="nx">showTransformedBox</span><span class="err">:</span> <span class="kc">false</span><span class="p">,</span>
-      <span class="nx">showBB</span><span class="err">:</span> <span class="kc">false</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre> 
-    </div> 
-    <p>The <code class="highlighter-rouge">halfSample</code> flag tells the locator-process whether it should operate on an image scaled down (half width/height, quarter pixel-count ) or not. Turning <code class="highlighter-rouge">halfSample</code> on reduces the processing-time significantly and also helps finding a barcode pattern due to implicit smoothing. It should be turned off in cases where the barcode is really small and the full resolution is needed to find the position. It’s recommended to keep it turned on and use a higher resolution video-image if needed.</p> 
-    <p>The second property <code class="highlighter-rouge">patchSize</code> defines the density of the search-grid. The property accepts strings of the value <code class="highlighter-rouge">x-small</code>, <code class="highlighter-rouge">small</code>, <code class="highlighter-rouge">medium</code>, <code class="highlighter-rouge">large</code> and <code class="highlighter-rouge">x-large</code>. The <code class="highlighter-rouge">patchSize</code> is proportional to the size of the scanned barcodes. If you have really large barcodes which can be read close-up, then the use of <code class="highlighter-rouge">large</code> or <code class="highlighter-rouge">x-large</code> is recommended. In cases where the barcode is further away from the camera lens (lack of auto-focus, or small barcodes) then it’s advised to set the size to <code class="highlighter-rouge">small</code> or even <code class="highlighter-rouge">x-small</code>. For the latter it’s also recommended to crank up the resolution in order to find a barcode.</p> 
-    <h2 id="examples">Examples</h2> 
-    <p>The following example takes an image <code class="highlighter-rouge">src</code> as input and prints the result on the console. The decoder is configured to detect <em>Code128</em> barcodes and enables the locating-mechanism for more robust results.</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="nx">Quagga</span><span class="p">.</span><span class="nx">decodeSingle</span><span class="p">({</span>
-    <span class="na">decoder</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">readers</span><span class="p">:</span> <span class="p">[</span><span class="s2">"code_128_reader"</span><span class="p">]</span> <span class="c1">// List of active readers</span>
-    <span class="p">},</span>
-    <span class="na">locate</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// try to locate the barcode in the image</span>
-    <span class="na">src</span><span class="p">:</span> <span class="s1">'/test/fixtures/code_128/image-001.jpg'</span> <span class="c1">// or 'data:image/jpg;base64,' + data</span>
-<span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">){</span>
-    <span class="k">if</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">codeResult</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"result"</span><span class="p">,</span> <span class="nx">result</span><span class="p">.</span><span class="nx">codeResult</span><span class="p">.</span><span class="nx">code</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"not detected"</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">});</span>
-</code></pre> 
-    </div> 
-    <h3 id="using-node"><a name="node-example">Using node</a></h3> 
-    <p>The following example illustrates the use of QuaggaJS within a node environment. It’s almost identical to the browser version with the difference that node does not support web-workers out of the box. Therefore the config property <code class="highlighter-rouge">numOfWorkers</code> must be explicitly set to <code class="highlighter-rouge">0</code>.</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="kd">var</span> <span class="nx">Quagga</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'quagga'</span><span class="p">);</span>
-
-<span class="nx">Quagga</span><span class="p">.</span><span class="nx">decodeSingle</span><span class="p">({</span>
-    <span class="na">src</span><span class="p">:</span> <span class="s2">"image-abc-123.jpg"</span><span class="p">,</span>
-    <span class="na">numOfWorkers</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>  <span class="c1">// Needs to be 0 when used within node</span>
-    <span class="na">inputStream</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">size</span><span class="p">:</span> <span class="mi">800</span>  <span class="c1">// restrict input-size to be 800px in width (long-side)</span>
-    <span class="p">},</span>
-    <span class="na">decoder</span><span class="p">:</span> <span class="p">{</span>
-        <span class="na">readers</span><span class="p">:</span> <span class="p">[</span><span class="s2">"code_128_reader"</span><span class="p">]</span> <span class="c1">// List of active readers</span>
-    <span class="p">},</span>
-<span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span><span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">codeResult</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"result"</span><span class="p">,</span> <span class="nx">result</span><span class="p">.</span><span class="nx">codeResult</span><span class="p">.</span><span class="nx">code</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"not detected"</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">});</span>
-</code></pre> 
-    </div> 
-    <h2 id="tips--tricks"><a name="tipsandtricks">Tips &amp; Tricks</a></h2> 
-    <p>A growing collection of tips &amp; tricks to improve the various aspects of Quagga.</p> 
-    <h3 id="barcodes-too-small">Barcodes too small?</h3> 
-    <p>Barcodes too far away from the camera, or a lens too close to the object result in poor recognition rates and Quagga might respond with a lot of false-positives.</p> 
-    <p>Starting in Chrome 59 you can now make use of <code class="highlighter-rouge">capabilities</code> and directly control the zoom of the camera. Head over to the <a href="https://serratus.github.io/quaggaJS/examples/live_w_locator.html">web-cam demo</a> and check out the <strong>Zoom</strong> feature.</p> 
-    <p>You can read more about those <code class="highlighter-rouge">capabilities</code> in <a href="https://www.oberhofer.co/mediastreamtrack-and-its-capabilities">Let’s light a torch and explore MediaStreamTrack’s capabilities</a></p> 
-    <h3 id="video-too-dark">Video too dark?</h3> 
-    <p>Dark environments usually result in noisy images and therefore mess with the recognition logic.</p> 
-    <p>Since Chrome 59 you can turn on/off the <strong>Torch</strong> of our device and vastly improve the quality of the images. Head over to the <a href="https://serratus.github.io/quaggaJS/examples/live_w_locator.html">web-cam demo</a> and check out the <strong>Torch</strong> feature.</p> 
-    <p>To find out more about this feature <a href="https://www.oberhofer.co/mediastreamtrack-and-its-capabilities">read on</a>.</p> 
-    <h2 id="tests">Tests</h2> 
-    <p>Unit Tests can be run with <a href="http://karma-runner.github.io/">Karma</a> and written using <a href="https://github.com/mochajs/mocha">Mocha</a>, <a href="http://chaijs.com/">Chai</a> and <a href="http://sinonjs.org/">SinonJS</a>. Coverage reports are automatically generated in the coverage/ folder.</p> 
-    <div class="language-console highlighter-rouge">
-     <pre class="highlight"><code>&gt; npm install
-&gt; npm run test
-</code></pre> 
-    </div> 
-    <h2 id="image-debugging">Image Debugging</h2> 
-    <p>In case you want to take a deeper dive into the inner workings of Quagga, get to know the <em>debugging</em> capabilities of the current implementation. The various flags exposed through the <code class="highlighter-rouge">config</code> object give you the abilily to visualize almost every step in the processing. Because of the introduction of the web-workers, and their restriction not to have access to the DOM, the configuration must be explicitly set to <code class="highlighter-rouge">config.numOfWorkers = 0</code> in order to work.</p> 
-    <h2 id="resultcollector"><a name="resultcollector">ResultCollector</a></h2> 
-    <p>Quagga is not perfect by any means and may produce false positives from time to time. In order to find out which images produced those false positives, the built-in <code class="highlighter-rouge">ResultCollector</code> will support you and me helping squashing bugs in the implementation.</p> 
-    <h3 id="creating-a-resultcollector">Creating a <code class="highlighter-rouge">ResultCollector</code></h3> 
-    <p>You can easily create a new <code class="highlighter-rouge">ResultCollector</code> by calling its <code class="highlighter-rouge">create</code> method with a configuration.</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="kd">var</span> <span class="nx">resultCollector</span> <span class="o">=</span> <span class="nx">Quagga</span><span class="p">.</span><span class="nx">ResultCollector</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
-    <span class="na">capture</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// keep track of the image producing this result</span>
-    <span class="na">capacity</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>  <span class="c1">// maximum number of results to store</span>
-    <span class="na">blacklist</span><span class="p">:</span> <span class="p">[</span>   <span class="c1">// list containing codes which should not be recorded</span>
-        <span class="p">{</span><span class="na">code</span><span class="p">:</span> <span class="s2">"3574660239843"</span><span class="p">,</span> <span class="na">format</span><span class="p">:</span> <span class="s2">"ean_13"</span><span class="p">}],</span>
-    <span class="na">filter</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">codeResult</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// only store results which match this constraint</span>
-        <span class="c1">// returns true/false</span>
-        <span class="c1">// e.g.: return codeResult.format === "ean_13";</span>
-        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">});</span>
-</code></pre> 
-    </div> 
-    <h3 id="using-a-resultcollector">Using a <code class="highlighter-rouge">ResultCollector</code></h3> 
-    <p>After creating a <code class="highlighter-rouge">ResultCollector</code> you have to attach it to Quagga by calling <code class="highlighter-rouge">Quagga.registerResultCollector(resultCollector)</code>.</p> 
-    <h3 id="reading-results">Reading results</h3> 
-    <p>After a test/recording session, you can now print the collected results which do not fit into a certain schema. Calling <code class="highlighter-rouge">getResults</code> on the <code class="highlighter-rouge">resultCollector</code> returns an <code class="highlighter-rouge">Array</code> containing objects with:</p> 
-    <div class="language-javascript highlighter-rouge">
-     <pre class="highlight"><code><span class="p">{</span>
-    <span class="nl">codeResult</span><span class="p">:</span> <span class="p">{},</span> <span class="c1">// same as in onDetected event</span>
-    <span class="nx">frame</span><span class="err">:</span> <span class="s2">"data:image/png;base64,iVBOR..."</span> <span class="c1">// dataURL of the gray-scaled image</span>
-<span class="p">}</span>
-</code></pre> 
-    </div> 
-    <p>The <code class="highlighter-rouge">frame</code> property is an internal representation of the image and therefore only available in gray-scale. The dataURL representation allows easy saving/rendering of the image.</p> 
-    <h3 id="comparing-results">Comparing results</h3> 
-    <p>Now, having the frames available on disk, you can load each single image by calling <code class="highlighter-rouge">decodeSingle</code> with the same configuration as used during recording . In order to reproduce the exact same result, you have to make sure to turn on the <code class="highlighter-rouge">singleChannel</code> flag in the configuration when using <code class="highlighter-rouge">decodeSingle</code>.</p> 
-    <h2 id="sponsors"><a name="sponsors">Sponsors</a></h2> 
-    <ul> 
-     <li><a href="http://maintenanceconnection.ca/">Maintenance Connection Canada (Asset Pro Solutions Inc.</a></li> 
-    </ul> 
-    <h2 id="changelog"><a name="changelog">Changelog</a></h2> 
-    <h3 id="2017-06-07">2017-06-07</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>added <code class="highlighter-rouge">muted</code> and <code class="highlighter-rouge">playsinline</code> to <code class="highlighter-rouge">&lt;video/&gt;</code> to make it work for Safari 11 Beta (even iOS)</li> 
-      </ul> </li> 
-     <li>Fixes 
-      <ul> 
-       <li>Fixed <a href="https://github.com/serratus/quaggaJS/blob/master/example/live_w_locator.js">example/live_w_locator.js</a></li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2017-06-06">2017-06-06</h3> 
-    <ul> 
-     <li>Features 
-      <ul> 
-       <li>Support for Standard 2of5 barcodes (See <a href="https://github.com/serratus/quaggaJS/issues/194">#194</a>)</li> 
-       <li>Support for Code 93 barcodes (See <a href="https://github.com/serratus/quaggaJS/issues/195">#194</a>)</li> 
-       <li>Exposing <code class="highlighter-rouge">Quagga.CameraAccess.getActiveTrack()</code> to get access to the currently used <code class="highlighter-rouge">MediaStreamTrack</code> 
-        <ul> 
-         <li>Example can be viewed here: <a href="https://github.com/serratus/quaggaJS/blob/master/example/live_w_locator.js">example/live_w_locator.js</a> and a <a href="https://serratus.github.io/quaggaJS/examples/live_w_locator.html">demo</a></li> 
+  <div id="as_wrapper"> 
+   <ul class="as_skip"> 
+    <li><a href="#q">Skip to Search</a></li> 
+    <li><a href="#site_nav">Skip to Navigation</a></li> 
+    <li><a href="#as_content">Skip to Content</a></li> 
+   </ul> 
+   <div id="as_header_wrapper" class="nosearchhi"> 
+    <div id="as_header"> 
+     <div id="as_navbar" class="as_navbar_short"> 
+      <ul id="as_sitesnav"> 
+       <li class="as_logo"><a href="//www.activestate.com/"><img height="18" width="90" src="/static/activestyle/img/activestate.png" title="ActiveState | The Dynamic Language Experts"></a></li> 
+       <span class="as_navsep"></span> 
+       <li><a href="//community.activestate.com/">Community</a></li> 
+       <span class="as_navsep">|</span> 
+       <li><b><a href="/">Code</a></b></li> 
+       <span class="as_navsep">|</span> 
+       <li><a href="http://docs.activestate.com/">Docs</a></li> 
+       <span class="as_navsep">|</span> 
+       <li class="as_sitesnav_more"><a onclick="$('#as_sitesnav_downloads').slideToggle(100); return false;" href="//www.activestate.com/downloads"><u>Downloads</u> <small>?</small></a> 
+        <ul style="display: none;" id="as_sitesnav_downloads"> 
+         <li><a href="//www.activestate.com/activeperl/downloads" title="Download Perl">ActivePerl</a></li> 
+         <li><a href="//www.activestate.com/activepython/downloads" title="Download Python">ActivePython</a></li> 
+         <li><a href="//www.activestate.com/activetcl/downloads" title="Download Tcl">ActiveTcl</a></li> 
+         <li><a href="//www.activestate.com/activego/downloads" title="Download Go">ActiveGo</a></li> 
+         <li><a href="//www.activestate.com/komodo-ide/downloads" title="Download Komodo IDE">Komodo IDE</a></li> 
         </ul> </li> 
-      </ul> </li> 
-    </ul> 
-    <p>Take a look at the release-notes ( <a href="https://github.com/serratus/quaggaJS/releases/tag/v0.12.0">0.12.0</a>)</p> 
-    <h3 id="2017-01-08">2017-01-08</h3> 
-    <ul> 
-     <li>Improvements 
+       <span class="as_navsep">|</span> 
+       <li class="as_sitesnav_more"><a href="//www.activestate.com/community" onclick="$('#as_sitesnav_more').slideToggle(100); return false;"><u>more</u> <small>?</small></a> 
+        <ul id="as_sitesnav_more" style="display: none;"> 
+         <li><a href="//lists.activestate.com/">Lists</a></li> 
+         <li><a href="//bugs.activestate.com/">Bugs</a></li> 
+         <li><a href="//code.activestate.com/ppm">PPM Index</a></li> 
+         <li><a href="//code.activestate.com/pypm">PyPM Index</a></li> 
+        </ul> </li> 
+      </ul> 
+      <script type="text/javascript">
+      $('body').click(function() { $('#as_sitesnav_more').hide(); $('#as_sitesnav_downloads').hide(); });
+    </script> 
+      <div id="as_accountnav">
+        Welcome, guest 
+       <span class="as_navsep">|</span> 
+       <a href="https://account.activestate.com/signin/?next=https%3A//code.activestate.com/recipes/189862-image-extractor/">Sign In</a> 
+       <span class="as_navsep">|</span> 
+       <a href="https://account.activestate.com/">My Account</a> 
+       <span class="as_navsep">|</span> 
+       <a href="https://store.activestate.com/">Store</a> 
+       <span class="as_navsep">|</span> 
+       <a href="https://store.activestate.com/cart" class="icon-cart">Cart</a> 
+      </div> 
+     </div> 
+     <div id="as_bannerbar"> 
+      <div id="site_logo" class="as_banner_text"> 
+       <a class="as_banner_text" href="/">ActiveState Code</a> » 
+       <a href="/recipes/" class="as_banner_text">Recipes</a> 
+      </div> 
+      <div id="site_nav"> 
+       <form id="search_form" action="/search/recipes/"> 
+        <input size="24" id="q" name="q" accesskey="s"> 
+        <input type="submit" value="Search"> 
+       </form> 
+      </div> 
+      <div style="clear:both"></div> 
+     </div> 
+    </div> 
+    <!-- end of as_header --> 
+    <div id="as_sub_banner"> 
+     <div id="as_sub_site_nav"> 
+      <div id="as_sub_site_links"> 
+       <a href="/recipes/langs/">Languages</a> 
+       <a href="/recipes/tags/">Tags</a> 
+       <a href="/recipes/users/">Authors</a> 
+       <a href="/recipes/sets/">Sets</a> 
+      </div> 
+     </div> 
+    </div> 
+    <!-- end of as_sub_banner --> 
+   </div> 
+   <!-- end of as_header_wrapper --> 
+   <div id="as_middle"> 
+    <div id="as_content_wrapper"> 
+     <div id="as_content"> 
+      <div style="padding: 1em; margin-top: 20px; margin-bottom: 20px; border: 1px solid #666; -webkit-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5); -moz-box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5); box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5);">
+        NOTE: Recipes have moved! Please visit 
+       <a href="https://github.com/ActiveState/code">GitHub.com/activestate/code</a> for the current versions. 
+      </div> 
+      <div id="page_header"> 
+       <h1> Image extractor (Python recipe) <span class="print_only secondary">by Anand</span> 
+        <div class="print_only secondary" style="margin-top: 10px;">
+          ActiveState Code (http://code.activestate.com/recipes/189862/) 
+        </div> </h1> 
+      </div> 
+      <div id="content"> 
+       <div id="description"> 
+        <p>Extract images (jpeg/gif) from screensaver files, webshots collection files ,powerpoints, microsoft word documents etc.</p> 
+       </div> 
+       <div id="blocks"> 
+        <div id="block-0" class="block"> 
+         <div class="block-toolbar as_secondary"> 
+          <span style="float: right;">Python, 144 lines</span> 
+          <div class="block-toolbar-button">
+           <a href="/recipes/189862-image-extractor/download/1/"><img src="/static/img/bullet_disk.png">Download</a>
+          </div> 
+          <div id="clipboard_container" class="block-toolbar-button" style="position: relative; display: none;">
+           <div id="clipboard_button">
+            <img src="/static/img/bullet_go16.png">Copy to clipboard
+           </div>
+          </div> 
+         </div> 
+         <div class="codeblock"> 
+          <table class="highlighttable">
+           <tbody>
+            <tr>
+             <td class="linenos"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144</pre></td>
+             <td class="code">
+              <div class="highlight">
+               <pre><span class="k">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">string</span>
+
+<span class="c">#write now write only GIF/JPEG</span>
+
+<span class="c">#image types </span>
+<span class="n">imgtypes</span><span class="o">=</span><span class="p">[</span><span class="s">'JPG'</span><span class="p">,</span> <span class="s">'GIF'</span><span class="p">,</span><span class="s">'GIF'</span><span class="p">]</span>
+
+<span class="c">#signature at beginning of file</span>
+<span class="n">imgsigs</span><span class="o">=</span><span class="p">[</span><span class="s">'JFIF'</span><span class="p">,</span> <span class="s">'GIF87a'</span><span class="p">,</span> <span class="s">'GIF89a'</span><span class="p">]</span>
+
+<span class="c">#offset of signatures from</span>
+<span class="c">#file beginning</span>
+<span class="n">imgsigoffs</span><span class="o">=</span><span class="p">[</span><span class="mf">6</span><span class="p">,</span> <span class="mf">0</span><span class="p">,</span> <span class="mf">0</span><span class="p">]</span>
+
+<span class="c">#our marker array</span>
+<span class="n">imgmarker</span><span class="o">=</span><span class="p">[]</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+
+	<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">2</span><span class="p">:</span>
+		<span class="k">print</span> <span class="s">'Usage: picdumper &lt;file&gt;</span><span class="se">\n</span><span class="s">'</span>
+		<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+
+	<span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mf">1</span><span class="p">])</span>
+
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+		<span class="k">print</span> <span class="s">'Error: No such file '</span><span class="p">,</span> <span class="n">filename</span>
+		<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mf">2</span><span class="p">)</span>
+
+	<span class="c">#open file in binary mode</span>
+	<span class="k">try</span><span class="p">:</span>
+		<span class="n">infile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">'rb'</span><span class="p">)</span>
+	<span class="c">#dont bother about specific exceptions</span>
+	<span class="k">except</span><span class="p">:</span>
+		<span class="k">print</span> <span class="s">'Could not open file to read !'</span><span class="p">,</span> <span class="n">filename</span>
+		<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+		
+	<span class="k">if</span> <span class="n">infile</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+		<span class="k">print</span> <span class="s">'Error opening file '</span><span class="p">,</span> <span class="n">filename</span>
+		<span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mf">3</span><span class="p">)</span>
+
+	<span class="n">c</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+
+	<span class="n">lastmatch</span><span class="o">=</span><span class="s">""</span>
+	<span class="k">while</span> <span class="n">c</span> <span class="o">!=</span> <span class="s">''</span><span class="p">:</span>
+
+		<span class="c">#look for image sig</span>
+		<span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mf">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">imgsigs</span><span class="p">)):</span>
+
+			<span class="c">#find if c is first character of imgsig</span>
+			<span class="n">sig</span><span class="o">=</span><span class="n">imgsigs</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+			
+			<span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="n">sig</span><span class="p">[</span><span class="mf">0</span><span class="p">]:</span>
+				<span class="c">#find if the rest of imgsig match</span>
+				<span class="n">lentoread</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1</span>
+				<span class="n">chunk</span><span class="o">=</span><span class="n">c</span> <span class="o">+</span> <span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">lentoread</span><span class="p">)</span>
+				<span class="c">#print chunk</span>
+				<span class="c">#matches</span>
+				<span class="k">if</span> <span class="n">chunk</span><span class="o">==</span><span class="n">sig</span><span class="p">:</span>
+					<span class="n">fpos</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">infile</span><span class="o">.</span><span class="n">tell</span><span class="p">())</span>
+					
+					<span class="c">#now we are at end of sig, for getting image</span>
+					<span class="c">#pos we need to subtract length of sig and offset</span>
+					<span class="n">sigpos</span><span class="o">=</span><span class="n">fpos</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+					<span class="n">imgpos</span><span class="o">=</span><span class="n">sigpos</span> <span class="o">-</span> <span class="n">imgsigoffs</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+
+					<span class="c">#write position and image type to marker</span>
+					<span class="n">imgmarker</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">imgpos</span><span class="p">,</span> <span class="n">imgtypes</span><span class="p">[</span><span class="n">x</span><span class="p">]))</span>
+					<span class="n">lastmatch</span><span class="o">=</span><span class="n">imgtypes</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="c">#bug, we need to reset file position</span>
+					<span class="c">#to match other sigs correctly if this</span>
+					<span class="c">#one does not.</span>
+					<span class="n">currpos</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">infile</span><span class="o">.</span><span class="n">tell</span><span class="p">())</span>
+					<span class="n">prevpos</span><span class="o">=</span><span class="n">currpos</span><span class="o">-</span><span class="n">lentoread</span>
+					<span class="c">#seek to previous position</span>
+					<span class="n">infile</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">prevpos</span><span class="p">)</span>
+					
+
+		<span class="c">#read next char</span>
+		<span class="n">c</span><span class="o">=</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span>
+
+	<span class="n">posn</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">infile</span><span class="o">.</span><span class="n">tell</span><span class="p">())</span>
+	<span class="n">imgmarker</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">posn</span><span class="p">,</span> <span class="n">lastmatch</span><span class="p">))</span>
+
+	<span class="k">print</span> <span class="n">imgmarker</span>
+	<span class="c">#write images</span>
+
+	<span class="c">#rewind file</span>
+	<span class="n">infile</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mf">0</span><span class="p">)</span>
+
+	<span class="n">imgcount</span><span class="o">=</span><span class="mf">0</span>
+
+	<span class="c">#most collections store image in reverse</span>
+	<span class="c">#order that was appended</span>
+	<span class="n">x</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">imgmarker</span><span class="p">)</span><span class="o">-</span><span class="mf">1</span>
+
+	<span class="k">while</span> <span class="n">x</span><span class="o">&gt;=</span><span class="mf">1</span><span class="p">:</span>
+
+		<span class="n">imgcount</span> <span class="o">+=</span> <span class="mf">1</span>
+		<span class="n">imginfo</span><span class="o">=</span><span class="n">imgmarker</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+
+		<span class="n">imgposn</span><span class="o">=</span><span class="n">imginfo</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+		<span class="n">imgtype</span><span class="o">=</span><span class="n">imginfo</span><span class="p">[</span><span class="mf">1</span><span class="p">]</span>
+
+		<span class="c">#this is the tricky part, to get the correct image</span>
+		<span class="c">#we need the file posn before previous one!, that</span>
+		<span class="c">#is we need to jump a position. Otherwise all images</span>
+		<span class="c">#will be junk or of small resolution.</span>
+		<span class="n">imginfoprev</span><span class="o">=</span><span class="n">imgmarker</span><span class="p">[</span><span class="n">x</span><span class="o">-</span><span class="mf">2</span><span class="p">]</span>
+		<span class="n">imgposnprev</span><span class="o">=</span><span class="n">imginfoprev</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+
+		<span class="c">#get length in chars</span>
+		<span class="n">imglen</span><span class="o">=</span> <span class="n">imgposn</span> <span class="o">-</span> <span class="n">imgposnprev</span>
+		
+		<span class="c">#seek to file position</span>
+		<span class="n">infile</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">imgposnprev</span><span class="p">)</span>
+		<span class="c">#read so many chars</span>
+		<span class="n">data</span><span class="o">=</span><span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">imglen</span><span class="p">)</span>
+
+		<span class="c">#create file name</span>
+		<span class="n">imgname</span><span class="o">=</span><span class="s">"image"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">imgcount</span><span class="p">)</span> <span class="o">+</span> <span class="s">'.'</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">(</span><span class="n">imgtype</span><span class="p">)</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="n">ofile</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">imgname</span><span class="p">,</span> <span class="s">'wb'</span><span class="p">)</span>
+		<span class="k">except</span><span class="p">:</span>
+			<span class="k">print</span> <span class="s">'Could not open file '</span><span class="p">,</span> <span class="n">imgname</span><span class="p">,</span> <span class="s">' for writing...</span><span class="se">\n</span><span class="s">'</span>
+			<span class="k">continue</span>
+		
+		<span class="k">if</span> <span class="n">ofile</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="k">print</span> <span class="s">'Error while trying to create file '</span><span class="p">,</span> <span class="n">imgname</span><span class="p">,</span> <span class="s">'!</span><span class="se">\n</span><span class="s">'</span>
+			<span class="k">continue</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">print</span> <span class="s">'Dumping image file '</span><span class="p">,</span> <span class="n">imgname</span><span class="p">,</span> <span class="s">'...</span><span class="se">\n</span><span class="s">'</span>
+			<span class="n">ofile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+			<span class="n">ofile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+		<span class="c">#previous marker</span>
+		<span class="n">x</span><span class="o">-=</span><span class="mf">1</span>
+
+		
+	<span class="k">print</span> <span class="s">'Dumped '</span><span class="p">,</span> <span class="n">imgcount</span><span class="p">,</span> <span class="s">' images</span><span class="se">\n</span><span class="s">'</span>
+	
+<span class="k">if</span> <span class="n">__name__</span><span class="o">==</span><span class="s">"__main__"</span><span class="p">:</span>
+	<span class="n">main</span><span class="p">()</span>
+</pre>
+              </div> </td>
+            </tr>
+           </tbody>
+          </table> 
+         </div> 
+        </div> 
+        <div id="block-1" class="block"> 
+         <div class="proseblock"> 
+          <p>A piece of python script to dump out GIF/JPEG images from different files like powerpoints/webshots collections/screensavers etc. Sometimes I feel the need to do this, especially from powerpoints to have a better look at some of the embedded images. I dont know why anyone else would like to do it, but I felt that this was probably useful. :-)</p> 
+         </div> 
+        </div> 
+       </div> 
+       <div id="recipe_tools"> 
+        <!-- AddThis Button BEGIN --> 
+        <script type="text/javascript">var addthis_config = {services_compact: 'delicious,digg,reddit,twitter,email,favorites,more', username: 'xa-4b4f86a749591ece', data_use_flash: false};</script> 
+        <a class="addthis_button"></a> 
+        <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js"></script> 
+        <!-- AddThis Button END --> 
+       </div> 
+       <div class="print_only">
+         Tags: 
+        <a href="/recipes/tags/graphics/">graphics</a> 
+       </div> 
+       <h4 class="section_header">2 comments</h4> 
+       <div id="comments"> 
+        <div class="section comment" id="c1"> 
+         <div class="comment_gutter"> 
+          <div class="gravatar30"> 
+           <img src="http://www.gravatar.com/avatar.php?gravatar_id=27d030e74950db38ad21aa4b5b82bcf2&amp;d=identicon&amp;s=30" height="30" width="30"> 
+          </div> 
+         </div> 
+         <div class="comment_content"> 
+          <div class="comment_header"> 
+           <a class="comment_author " href="/recipes/users/4173150/">anaxagramma</a> 
+           <span class="comment_time">6 years, 5 months ago</span> 
+           <span class="comment_actions"> <a title="permalink" href="#c1">&nbsp;#</a> | <a title="flag comment as requiring moderator attention" href="/help/feedback/?type=flag&amp;subject=Flag comment 1 of recipe 189862&amp;text=Please indicate **why** you want to flag that comment.">flag</a> </span> 
+          </div> 
+          <div class="comment_body"> 
+           <p>I've created a faster enchanted version with PNG and multiple JPG support, I try to post it as a comment in 2 parts. Part 1:</p> 
+           <pre class="prettyprint"><code>import sys, os, time
+## v0.2.1
+#now write only GIF/JPEG
+#v0.2.1 (by naxa):
+#PNG and several other JPEG formats supported as well
+
+## extra
+BUFFER_LENGTH = 1024
+# File signatures with their associated mime type
+Types = {
+    "\x47\x49\x46\x38\x37\x61": "GIF87a", #GIF87a type gif
+    "\x47\x49\x46\x38\x39\x61": "GIF89a", #GIF89a type gif
+    "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A": "PNG",
+    "\xFF\xD8\xFF\xE0": "JPG", #JFIF jpeg
+    "\xFF\xD8\xFF\xE1": "JPG", #EXIF jpeg
+    "\xFF\xD8\xFF\xE8": "JPG" #SPIFF jpeg
+    }
+imgsigs = Types.keys()
+imgtypes = [Types[f] for f in imgsigs]
+imgsigoffs = [0]*len(imgtypes)
+## end of extra
+imgmarker=[]
+
+def main():
+    if len(sys.argv) &lt; 2:
+        print 'Usage: picdumper &lt;file&gt;\n'
+        sys.exit(1)
+    #
+    if os.name == 'nt':
+        # some hacks for windows CLI unicode problems
+        filename = unicode(sys.argv[1], "mbcs") # better on recent windows'
+        dirname = unicode( os.path.split( os.path.abspath(filename) )[0] )
+        if not os.path.isdir(dirname): #couldn't find an easy solution yet for misencoded directory names
+            print "Can't read directory, please try to navigate there manually\nand start me from the inside. Directory not found:\n%s"%dirname
+            exit(3)
+        file_list = os.listdir(unicode(dirname))
+        file_map = dict( [ (f.encode("mbcs"), f) for f in file_list ] )
+        # if two files are the same in 'mbcs' encoding, cannot help it yet
+        if filename in file_map:
+            filename = file_map[filename]
+        print "Found", repr(filename)
+        filename = os.path.abspath(filename)
+    else: filename = os.path.abspath(sys.argv[1])
+
+    img_filename_start = os.path.splitext( os.path.split(filename)[-1] )[0]
+    if " " in img_filename_start: img_filename_start += " - image "
+    else: img_filename_start += "__image"
+
+    if not os.path.isfile(filename):
+        print 'Error: No such file ', filename
+        sys.exit(2)
+    #
+    #open file in binary mode
+    try:
+        infile = open(filename, 'rb')
+    #dont bother about specific exceptions
+    except Exception, e:
+        print 'Could not open file to read !', filename
+        print e
+        sys.exit(3)
+    #
+    if infile is None:
+        print 'Error opening file ', filename
+        sys.exit(3)
+    #
+    # c = infile.read(1)
+    c = infile.read(BUFFER_LENGTH)
+    current_offset = 0
+    lastmatch=""
+    print "parsing file"
+</code></pre> 
+          </div> 
+         </div> 
+        </div> 
+        <div class="section comment" id="c2"> 
+         <div class="comment_gutter" id="clast"> 
+          <div class="gravatar30"> 
+           <img src="http://www.gravatar.com/avatar.php?gravatar_id=27d030e74950db38ad21aa4b5b82bcf2&amp;d=identicon&amp;s=30" height="30" width="30"> 
+          </div> 
+         </div> 
+         <div class="comment_content"> 
+          <div class="comment_header"> 
+           <a class="comment_author " href="/recipes/users/4173150/">anaxagramma</a> 
+           <span class="comment_time">6 years, 5 months ago</span> 
+           <span class="comment_actions"> <a title="permalink" href="#c2">&nbsp;#</a> | <a title="flag comment as requiring moderator attention" href="/help/feedback/?type=flag&amp;subject=Flag comment 2 of recipe 189862&amp;text=Please indicate **why** you want to flag that comment.">flag</a> </span> 
+          </div> 
+          <div class="comment_body"> 
+           <p>Part 2:</p> 
+           <pre class="prettyprint"><code>    while c != '':
+        #look for image sig
+        for x,sig in enumerate(imgsigs):
+            #find if c is first character of imgsig
+            sig_inner_pos = 0
+            while c[sig_inner_pos:].count(sig):
+                pos = c.find(sig)
+                sigpos=current_offset + pos #fpos=int(infile.tell())
+                sig_inner_pos += pos + len(sig)
+                imgpos=sigpos - imgsigoffs[x]
+
+                #write position and image type to marker
+                imgmarker.append((imgpos, imgtypes[x]))
+                print "found %s.,"%len(imgmarker), imgtypes[x], repr(sig), "at", imgpos
+                lastmatch=imgtypes[x]
+            #
+        #
+        #read next char
+        c=infile.read(BUFFER_LENGTH)
+        current_offset += len(c)
+    #
+    posn=int(infile.tell())
+    imgmarker.append((posn, lastmatch))
+
+    print imgmarker
+    #write images
+    #rewind file
+    infile.seek(0)
+    imgcount=0
+    #most collections store image in reverse
+    #order that was appended
+    x=len(imgmarker)-1
+    decimal_digits = len(str(x))
+    # while x&gt;=1:
+    while x&gt;=2: #last one is dummy
+        imgcount += 1
+        imginfo=imgmarker[x]
+
+        imgposn=imginfo[0]
+        imgtype=imginfo[1]
+        #this is the tricky part, to get the correct image
+        #we need the file posn before previous one!, that
+        #is we need to jump a position. Otherwise all images
+        #will be junk or of small resolution.
+        imginfoprev=imgmarker[x-2]
+        imgposnprev=imginfoprev[0]
+        #get length in chars
+        imglen= imgposn - imgposnprev
+        #seek to file position
+        infile.seek(imgposnprev)
+        #read so many chars
+        data=infile.read(imglen)
+        #create file name
+        imgname=img_filename_start + "%0*d"%(decimal_digits, imgcount) + '.' + str.lower(imgtype)
+        try:
+            ofile=open(imgname, 'wb')
+        except:
+            print 'Could not open file ', imgname, ' for writing...\n'
+            continue
+        #
+        if ofile is None:
+            print 'Error while trying to create file ', imgname, '!\n'
+            continue
+        else:
+            print 'Dumping image file', repr(imgname), '...'
+            ofile.write(data)
+            ofile.close()
+        #previous marker
+        x-=1
+    #
+    print 'Dumped', imgcount, 'images'
+#
+
+if __name__=="__main__":
+    x = time.clock()
+    main()
+    print "Completed in %.5f sec"%(time.clock()-x) 
+#
+</code></pre> 
+          </div> 
+         </div> 
+        </div> 
+       </div> 
+      </div> 
+      <!-- end of content --> 
+     </div> 
+     <!-- end of as_content --> 
+    </div> 
+    <!-- end of as_content_wrapper --> 
+    <div id="as_sidebar_wrapper"> 
+     <div id="as_sidebar"> 
+      <div id="as_sidebar_dynamic"> 
+       <table class="gravatar"> 
+        <tbody>
+         <tr>
+          <td style="width: 40px;"> <img src="http://www.gravatar.com/avatar.php?gravatar_id=9299885cc445f874c9be85cb2d1924b3&amp;d=identicon&amp;s=30" height="30" width="30"> </td>
+          <td> Created by <a href="/recipes/users/760763/">Anand</a> on <span class="nowrap">Mon, 17 Mar 2003</span> (<a href="/recipes/tags/meta:license=psf/" title="Licensed under the PSF License">PSF</a>) </td>
+         </tr> 
+        </tbody>
+       </table> 
+       <table class="prevnext"> 
+        <tbody>
+         <tr class="prevnext-lang-python"> 
+          <td><a class="prevnext_arrow" href="/recipes/189858-python-text-to-pdf-converter/?in=lang-python" title="Previous element in Python recipes">?</a></td> 
+          <td class="prevnext_label"><a href="/recipes/langs/python">Python recipes (4591)</a></td> 
+          <td><a class="prevnext_arrow" href="/recipes/189971-basic-linear-algebra-matrix/?in=lang-python" title="Next element in Python recipes">?</a></td> 
+         </tr> 
+         <tr class="prevnext-user-760763"> 
+          <td><a class="prevnext_arrow" href="/recipes/189858-python-text-to-pdf-converter/?in=user-760763" title="Previous element in Anand's recipes">?</a></td> 
+          <td class="prevnext_label"><a href="/recipes/users/760763">Anand's recipes (38)</a></td> 
+          <td><a class="prevnext_arrow" href="/recipes/191017-backup-your-files/?in=user-760763" title="Next element in Anand's recipes">?</a></td> 
+         </tr> 
+        </tbody>
+       </table> 
+       <div id="tags"> 
+        <h3>Tags</h3> 
+        <ul class="nomachinetags flat">
+         <li class="tag" id="tag-li-29"><a href="/recipes/tags/graphics/" class="tag">graphics</a></li>
+        </ul>
+        <a class="machine_tag_toggle"><span>? Show</span> machine tags (7)</a> 
+        <a class="machine_tag_help" href="/help/tags/" title="help about tags and machine tags"><img src="/static/img/help.png"></a>
+        <ul class="machinetags flat">
+         <li class="tag" id="tag-li-2085"><a href="/recipes/tags/meta:language=python/" class="tag">meta:language=python</a></li>
+         <li class="tag" id="tag-li-2116"><a href="/recipes/tags/meta:license=psf/" class="tag">meta:license=psf</a></li>
+         <li class="tag" id="tag-li-2276"><a href="/recipes/tags/meta:loc=144/" class="tag">meta:loc=144</a></li>
+         <li class="tag" id="tag-li-1399"><a href="/recipes/tags/meta:requires=string/" class="tag">meta:requires=string</a></li>
+         <li class="tag" id="tag-li-1407"><a href="/recipes/tags/meta:requires=os/" class="tag">meta:requires=os</a></li>
+         <li class="tag" id="tag-li-1405"><a href="/recipes/tags/meta:requires=sys/" class="tag">meta:requires=sys</a></li>
+         <li class="tag" id="tag-li-1378"><a href="/recipes/tags/meta:score=1/" class="tag">meta:score=1</a></li>
+        </ul> 
+       </div> 
+       <div id="requires"> 
+        <h3>Required Modules</h3> 
+        <ul class="flat"> 
+         <li><a href="/recipes/langs/python/tags/meta:requires=sys/">sys</a> </li> 
+         <li><a href="/recipes/langs/python/tags/meta:requires=os/">os</a> </li> 
+         <li><a href="/recipes/langs/python/tags/meta:requires=string/">string</a> </li> 
+        </ul> 
+       </div> 
+       <div id="otherinfo"> 
+        <h3>Other Information and Tasks</h3> 
+        <ul class="action_list"> 
+         <li>Licensed under the <a href="/recipes/tags/meta:license=psf/">PSF License</a></li> 
+         <li>Viewed 11161 times</li> 
+         <li><a href="history/1/" title="Recipe history">Revision 1</a> </li> 
+        </ul> 
+       </div> 
+      </div> 
+      <div style="margin: 30px 15px;"> 
+       <script type="text/javascript"><!--//<![CDATA[
+  var m3_u = (location.protocol=='https:'?'https://ads.activestate.com/www/delivery/ajs.php':'http://ads.activestate.com/www/delivery/ajs.php');
+  var m3_r = Math.floor(Math.random()*99999999999);
+  if (!document.MAX_used) document.MAX_used = ',';
+  document.write ("<scr"+"ipt type='text/javascript' src='"+m3_u);
+  document.write ("?zoneid=1");
+  document.write ('&amp;cb=' + m3_r);
+  if (document.MAX_used != ',') document.write ("&amp;exclude=" + document.MAX_used);
+  document.write (document.charset ? '&amp;charset='+document.charset : (document.characterSet ? '&amp;charset='+document.characterSet : ''));
+  document.write ("&amp;loc=" + escape(window.location));
+  if (document.referrer) document.write ("&amp;referer=" + escape(document.referrer));
+  if (document.context) document.write ("&context=" + escape(document.context));
+  if (document.mmm_fo) document.write ("&amp;mmm_fo=1");
+  document.write ("'><\/scr"+"ipt>");
+//]]>--></script>
+       <noscript>
+        <a href="http://ads.activestate.com/www/delivery/ck.php?n=aa9dea02&amp;cb=INSERT_RANDOM_NUMBER_HERE" target="_blank"><img src="http://ads.activestate.com/www/delivery/avw.php?zoneid=1&amp;cb=INSERT_RANDOM_NUMBER_HERE&amp;n=aa9dea02" border="0" alt=""></a>
+       </noscript> 
+      </div> 
+     </div> 
+     <!-- end of sidebar --> 
+    </div> 
+    <!-- end of as_sidebar_wrapper --> 
+    <div class="as_clear">
+     &nbsp;
+    </div> 
+   </div> 
+   <!-- end of as_middle --> 
+   <div id="as_footer_wrapper" class="as_footer2 nosearchhi"> 
+    <div id="as_footer"> 
+     <div class="as_footer2_section"> 
+      <h4 class="as_footer2_header">Accounts</h4> 
       <ul> 
-       <li>Exposing <code class="highlighter-rouge">CameraAccess</code> module to get access to methods like <code class="highlighter-rouge">enumerateVideoDevices</code> and <code class="highlighter-rouge">getActiveStreamLabel</code> (see <code class="highlighter-rouge">example/live_w_locator</code>)</li> 
-       <li>Update to webpack 2.2 (API is still unstable)</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2016-10-03">2016-10-03</h3> 
-    <ul> 
-     <li>Fixes 
+       <li><a href="https://account.activestate.com/signup/?activationnext=https%3A//code.activestate.com/recipes/189862-image-extractor/">Create Account (Free!)</a></li> 
+       <li><a href="https://account.activestate.com/signin/?next=https%3A//code.activestate.com/recipes/189862-image-extractor/">Sign In</a></li> 
+      </ul> 
+     </div> 
+     <div class="as_footer2_section"> 
+      <h4 class="as_footer2_header">Code Recipes</h4> 
       <ul> 
-       <li>Fixed <code class="highlighter-rouge">facingMode</code> issue with Chrome &gt;= 53 (see <a href="https://github.com/serratus/quaggaJS/issues/128">#128</a>)</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2016-08-15">2016-08-15</h3> 
-    <ul> 
-     <li>Features 
+       <li><a href="/recipes/">Recipes</a></li> 
+       <li><a href="/recipes/langs/">Languages</a></li> 
+       <li><a href="/recipes/tags/">Tags</a></li> 
+       <li><a href="/recipes/users/">Authors</a></li> 
+       <li><a href="/recipes/sets/">Sets</a></li> 
+      </ul> 
+     </div> 
+     <div class="as_footer2_section"> 
+      <h4 class="as_footer2_header">Feedback &amp; Information</h4> 
       <ul> 
-       <li>Proper handling of EXIF orientation when using <code class="highlighter-rouge">Quagga.decodeSingle</code> (see <a href="https://github.com/serratus/quaggaJS/issues/121">#121</a>)</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2016-04-24">2016-04-24</h3> 
-    <ul> 
-     <li>Features 
+       <li><a href="/about/">About</a></li> 
+       <li><a href="/help/faq/">FAQ</a></li> 
+       <li><a href="/help/terms/">Terms of Service</a></li> 
+      </ul> 
+     </div> 
+     <div class="as_footer2_section"> 
+      <h4 class="as_footer2_header">ActiveState</h4> 
       <ul> 
-       <li>EAN-13 extended codes can now be decoded (See <a href="https://github.com/serratus/quaggaJS/issues/71">#71</a>)</li> 
-      </ul> </li> 
-    </ul> 
-    <p>Take a look at the release-notes ( <a href="https://github.com/serratus/quaggaJS/releases/tag/v0.11.0">0.11.0</a>)</p> 
-    <h3 id="2016-04-19">2016-04-19</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Reducing false-positives for Code 128 barcodes ( addresses <a href="https://github.com/serratus/quaggaJS/issues/104">#104</a>)</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2016-03-31">2016-03-31</h3> 
-    <p>Take a look at the release-notes ( <a href="https://github.com/serratus/quaggaJS/releases/tag/v0.10.0">0.10.0</a>)</p> 
-    <h3 id="2016-02-18">2016-02-18</h3> 
-    <ul> 
-     <li>Internal Changes 
-      <ul> 
-       <li>Restructuring into meaningful folders</li> 
-       <li>Removing debug-code in production build</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2016-02-15">2016-02-15</h3> 
-    <p>Take a look at the release-notes ( <a href="https://github.com/serratus/quaggaJS/releases/tag/v0.9.0">0.9.0</a>)</p> 
-    <h3 id="2015-11-22">2015-11-22</h3> 
-    <ul> 
-     <li>Fixes 
-      <ul> 
-       <li>Fixed inconsistencies for Code 128 decoding (See <a href="https://github.com/serratus/quaggaJS/issues/76">#76</a>)</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-11-15">2015-11-15</h3> 
-    <ul> 
-     <li>Fixes 
-      <ul> 
-       <li>Fixed inconsistency in Code 39 decoding</li> 
-       <li>added inline-source-map to quagga.js file</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-10-13">2015-10-13</h3> 
-    <p>Take a look at the release-notes ([0.8.0] (https://github.com/serratus/quaggaJS/releases/tag/v0.8.0))</p> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Replaced RequireJS with webpack</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-09-15">2015-09-15</h3> 
-    <p>Take a look at the release-notes ([0.7.0] (https://github.com/serratus/quaggaJS/releases/tag/v0.7.0))</p> 
-    <ul> 
-     <li>Features 
-      <ul> 
-       <li>Added basic support for running QuaggaJS inside <strong>node</strong> (see [example] (#node-example))</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-08-29">2015-08-29</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Added support for Internet Explorer (only Edge+ supports <code class="highlighter-rouge">getUserMedia</code>)</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-08-13">2015-08-13</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Added <code class="highlighter-rouge">offProcessed</code> and <code class="highlighter-rouge">offDetected</code> methods for detaching event- listeners from the event-queue.</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-07-29">2015-07-29</h3> 
-    <ul> 
-     <li>Features 
-      <ul> 
-       <li>Added basic support for <a href="https://en.wikipedia.org/wiki/Interleaved_2_of_5">ITF</a> barcodes (<code class="highlighter-rouge">i2of5_reader</code>)</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-07-08">2015-07-08</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Parameter tweaking to reduce false-positives significantly (for the entire EAN and UPC family)</li> 
-       <li>Fixing bug in parity check for UPC-E codes</li> 
-       <li>Fixing bug in alignment for EAN-8 codes</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-07-06">2015-07-06</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Added <code class="highlighter-rouge">err</code> parameter to <a href="#quaggainit">Quagga.init()</a> callback function</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-06-21">2015-06-21</h3> 
-    <ul> 
-     <li>Features 
-      <ul> 
-       <li>Added <code class="highlighter-rouge">singleChannel</code> configuration to <code class="highlighter-rouge">inputStream</code> (in [config] (#configobject))</li> 
-       <li>Added <code class="highlighter-rouge">ResultCollector</code> functionality (see [ResultCollector] (#resultcollector))</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-06-13">2015-06-13</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Added <code class="highlighter-rouge">format</code> property to <code class="highlighter-rouge">codeResult</code> (in <a href="#resultobject">result</a>)</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-06-13-1">2015-06-13</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Added fixes for <code class="highlighter-rouge">Code39Reader</code> (trailing whitespace was missing)</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-06-09">2015-06-09</h3> 
-    <ul> 
-     <li>Features 
-      <ul> 
-       <li>Introduced the <code class="highlighter-rouge">area</code> property</li> 
-       <li>Ability to define a rectangle where localization/decoding should be applied</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-05-20">2015-05-20</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Making EAN and UPC readers even more restrictive</li> 
-       <li>Added example using requirejs</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-05-18">2015-05-18</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Making EAN and UPC readers more restrictive</li> 
-       <li>Added integration-tests for all barcode-readers</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-05-09">2015-05-09</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Odd image dimensions no longer cause problems</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-04-30">2015-04-30</h3> 
-    <ul> 
-     <li>Features 
-      <ul> 
-       <li>Added support for <a href="http://en.wikipedia.org/wiki/Universal_Product_Code">UPC-A and UPC-E</a> barcodes</li> 
-       <li>Added support for <a href="http://en.wikipedia.org/wiki/EAN-8">EAN-8</a> barcodes</li> 
-      </ul> </li> 
-     <li>Improvements 
-      <ul> 
-       <li>Added extended configuration to the live-video example</li> 
-       <li>Releasing resources when calling <code class="highlighter-rouge">Quagga.stop()</code></li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-04-25">2015-04-25</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>Added extended configuration to the file-input example</li> 
-       <li>Configurable <code class="highlighter-rouge">patchSize</code> for better adjustment to small/medium/large barcodes</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-04-16">2015-04-16</h3> 
-    <ul> 
-     <li>Features 
-      <ul> 
-       <li>Added support for <a href="http://en.wikipedia.org/wiki/Codabar">Codabar</a> barcodes</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-03-16">2015-03-16</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>now includes minified version (23.3KB gzipped)</li> 
-       <li>No need for configuration of script-name any more</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-03-12">2015-03-12</h3> 
-    <ul> 
-     <li>Improvements 
-      <ul> 
-       <li>removed dependency on async.js</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-03-04">2015-03-04</h3> 
-    <ul> 
-     <li>Features 
-      <ul> 
-       <li>Added support for <a href="http://en.wikipedia.org/wiki/Code_39">Code 39</a> barcodes</li> 
-      </ul> </li> 
-    </ul> 
-    <h3 id="2015-01-21">2015-01-21</h3> 
-    <ul> 
-     <li>Features 
-      <ul> 
-       <li>Added support for web-worker (using 4 workers as default, can be changed through <code class="highlighter-rouge">config.numOfWorkers</code>)</li> 
-       <li>Due to the way how web-workers are created, the name of the script file (<code class="highlighter-rouge">config.scriptName</code>) should be kept in sync with your actual filename</li> 
-       <li>Removed canvas-overlay for decoding (boxes &amp; scanline) which can now be easily implemented using the existing API (see example)</li> 
-      </ul> </li> 
-     <li>API Changes In the course of implementing web-workers some breaking changes were introduced to the API. 
-      <ul> 
-       <li>The <code class="highlighter-rouge">Quagga.init</code> function no longer receives the callback as part of the config but rather as a second argument: <code class="highlighter-rouge">Quagga.init(config, cb)</code></li> 
-       <li>The callback to <code class="highlighter-rouge">Quagga.onDetected</code> now receives an object containing much more information in addition to the decoded code.(see <a href="#resultobject">data</a>)</li> 
-       <li>Added <code class="highlighter-rouge">Quagga.onProcessed(callback)</code> which provides a way to get information for each image processed. The callback receives the same <code class="highlighter-rouge">data</code> object as <code class="highlighter-rouge">Quagga.onDetected</code> does. Depending on the success of the process the <code class="highlighter-rouge">data</code> object might not contain any <code class="highlighter-rouge">resultCode</code> and/or <code class="highlighter-rouge">box</code> properties.</li> 
-      </ul> </li> 
-    </ul> 
-   </section> 
-   <footer> 
-    <p>This project is maintained by <a href="http://github.com/serratus">Christoph Oberhofer</a></p> 
-    <p><small>Hosted on GitHub Pages — Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p> 
-   </footer> 
+       <li class="as_footer2_feed"><a href="//www.activestate.com/blog">ActiveState Blog</a></li> 
+       <li><a title="Perl Solutions" href="//www.activestate.com/perl">Perl Solutions</a></li> 
+       <li><a title="Python Solutions" href="//www.activestate.com/python">Python Solutions</a></li> 
+       <li><a title="Tcl Solutions" href="//www.activestate.com/tcl">Tcl Solutions</a></li> 
+       <li><a title="Download Perl" href="//www.activestate.com/activeperl/downloads">Download ActivePerl</a></li> 
+       <li><a title="Download Python" href="//www.activestate.com/activepython/downloads">Download ActivePython</a></li> 
+       <li><a title="Download Tcl" href="//www.activestate.com/activetcl/downloads">Download ActiveTcl</a></li> 
+       <li style="margin-top: 10px"><a href="//www.activestate.com/company">About ActiveState</a></li> 
+       <li><a href="//www.activestate.com/company/careers">Careers</a></li> 
+      </ul> 
+     </div> 
+     <div class="as_footer2_copyright"> 
+      <p> <a href="//www.activestate.com/privacy-policy">Privacy Policy</a> | <a href="//www.activestate.com/company/contact-us">Contact Us</a> | <a href="//www.activestate.com/support">Support</a> </p> 
+      <p>© 2017 ActiveState Software Inc. All rights reserved. ActiveState®, Komodo®, ActiveState Perl Dev Kit®, ActiveState Tcl Dev Kit®, ActivePerl®, ActivePython®, and ActiveTcl® are registered trademarks of ActiveState. All other marks are property of their respective owners.</p> 
+     </div> 
+    </div> 
+    <!-- end of as_footer --> 
+   </div> 
+   <!-- end of as_footer_wrapper --> 
+   <div id="as_messagebar" style="display: none;"> 
+    <span style="float: right;"> <b onclick="$('#as_messagebar').slideUp(150);" style="cursor: pointer;">&nbsp;x&nbsp;</b> </span> 
+    <span class="message">&nbsp;</span> 
+    <span class="message-undo" style="display: none;"> 
+     <form method="POST" action="">
+      <button type="submit">
+       <div style="display:none">
+        <input type="hidden" name="csrfmiddlewaretoken" value="487e6b5d7e76f37d1478dd968111afe6">
+       </div><u>Undo</u></button>
+     </form> </span> 
+   </div> 
   </div> 
-  <script src="https://serratus.github.io/quaggaJS/javascripts/scale.fix.js"></script>   
+  <!-- end of as_wrapper --> 
+  <script src="/static/prettify/prettify.js"></script> 
+  <script type="text/javascript"> 
+ $(function() {
+    prettyPrint();
+ });
+</script> 
+  <script src="/static/js/flash_detect_min.js" type="text/javascript"></script> 
+  <script src="/static/zeroclipboard/ZeroClipboard.js" type="text/javascript"></script> 
+  <script src="/static/js/recipes.js" type="text/javascript"></script> 
+  <script type="text/javascript">
+$(function() {
+    Recipes.hijax_sidebar();
+    // hide machine tags by default
+    Recipes.toggle_machine_tags(false);
+    Recipes.highlight_last_comment();
+    // setup copy button
+    Recipes.setup_copy_button("", "");
+    // Pre-load wait animation used for voting buttons.
+    $('<img src="/static/img/ajax-loader.gif"/>');
+});
+var in_param = "";
+</script> 
+  <!-- python tracking --> 
+  <script type="text/javascript">
+    /* <![CDATA[ */
+    var google_conversion_id = 1071420929;
+    var google_conversion_language = "en";
+    var google_conversion_format = "3";
+    var google_conversion_color = "666666";
+    var google_conversion_label = "qWX3CIvQhAIQgazy_gM";
+    var google_conversion_value = 0;
+    /* ]]> */
+    </script> 
+  <script type="text/javascript" src="https://www.googleadservices.com/pagead/conversion.js">
+    </script> 
+  <noscript> 
+   <div style="display:inline;"> 
+    <img height="1" width="1" style="border-style:none;" alt="" src="https://www.googleadservices.com/pagead/conversion/1071420929/?label=qWX3CIvQhAIQgazy_gM&amp;guid=ON&amp;script=0"> 
+   </div> 
+  </noscript>   
  </body>
 </html>
