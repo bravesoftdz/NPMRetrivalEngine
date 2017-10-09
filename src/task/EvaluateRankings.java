@@ -20,7 +20,7 @@ public class EvaluateRankings {
 	public static String[] folders = { "npmjs.com_optimal", "npmsearch.com", 
 			"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedBordaFuse","Filter_google.com_hyp_match"};
 
-	public static int max_queries = 14;//Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
+	public static int max_queries = Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
 	public static int max_position = Integer.valueOf(ConfigManager.getInstance().getProperty("top_results"));
 	
 	public static void main(String[] args) {
