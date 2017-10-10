@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+ <head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"> 
+  <link rel="icon" href="//www.ibm.com/favicon.ico"> 
+  <link rel="canonical" href="http://www.ibm.com/developerworks/library/wa-build-deploy-web-app-sailsjs-1-bluemix/index.html"> 
+  <meta name="geo.country" content="ZZ"> 
+  <meta name="dcterms.rights" content="© Copyright&nbsp;IBM Corporation&nbsp;2015,&nbsp;2016"> 
+  <meta name="dcterms.date" content="2016-07-12"> 
+  <meta name="description" content="Like so many server-side JavaScript frameworks, Sails.js makes it easier to build traditional web applications. Sails also embraces some of the ideas that made Rails revolutionary, bringing a new level of productivity to web and mobile development on top of Node.js. This first installment in a series features an overview of what makes Sails different, including its new-school approach to MVC architectures. You'll also set up your development environment and deploy a basic Sails application to IBM Bluemix."> 
+  <meta name="keywords" content="Sails.js, Node.js, Bluemix, HTTP API, Web API, REST, RESTful, MVC, JavaScript, Ted Neward, tttwaca, tttosca, tttmobca"> 
+  <meta name="robots" content="index,follow"> 
+  <title>The busy JavaScript developer's guide to Sails.js, Part 1: Build and deploy a basic web app with Sails</title> 
+  <script> 
+    digitalData = {
+        "page":{
+            "category":{
+                "primaryCategory":"SOFDCDEVZZ"
+            },
+            "pageInfo":{
+                "effectiveDate":"2015-11-03",
+                "language":"en",
+                "publishDate":"2016-07-12",
+                "publisher":"IBM Corporation",
+                "version":"v18",
+                "ibm":{ 
+                    "contentDelivery":"IBM developerWorks template",
+                    "contentProducer":"IBM developerWorks",
+                    "country":"ZZ",
+                    "owner":"developerWorks Content/Raleigh/IBM",
+                    "subject":"TTA00",
+                    "type":"CT316",
+                    "topic":"Cloud computing,RESTful APIs,node.js,Bluemix,JavaScript,Application and information integration",
+                    "topicId":"953,999,1021,1237,107,603",
+                    "contentArea":"web,opensource,mobile,cloud",
+                    "contentAreaId":"5,7,52,47",
+                    "contentType":"article",
+                    "contentId":"1018803",
+                },
+                "keywords":"Sails.js, Node.js, Bluemix, HTTP API, Web API, REST, RESTful, MVC, JavaScript, Ted Neward, tttwaca, tttosca, tttmobca",
+                "description":"Like so many server-side JavaScript frameworks, Sails.js makes it easier to build traditional web applications. Sails also embraces some of the ideas that made Rails revolutionary, bringing a new level of productivity to web and mobile development on top of Node.js. This first installment in a series features an overview of what makes Sails different, including its new-school approach to MVC architectures. You'll also set up your development environment and deploy a basic Sails application to IBM Bluemix."
+            }
+        }
+    };
+    window._analytics = {
+        "segment_key":'HU3dbkAG5wE0F1IkRf9S1RexlAqo3jby'
+    };
+</script> 
+  <meta name="twitter:card" content="summary"> 
+  <meta name="twitter:site" content="@developerworks"> 
+  <meta property="og:title" content="Build and deploy a basic web app with Sails"> 
+  <meta property="og:description" content="Sails.js: Redefining expectations of web application development. Get started with this new series."> 
+  <meta property="og:image" content="http://www.ibm.com/developerworks/i/twitterdw-26855-sailsjs.png"> 
+  <!-- Segment meta tag --> 
+  <meta name="segment" property="(developerWorks)" productTitle="developerWorks" value="Web Development English (developerWorks)"> 
+  <!-- SITE MON : START (DO NOT DELETE) --> 
+  <!-- developerWorks monitoring token --> 
+  <!-- SITE MON : END (DO NOT DELETE) --> 
+  <!-- HEADER_SCRIPTS_AND_CSS_INCLUDE --> 
+  <!-- <script src="//cdn.optimizely.com/js/5399420604.js"></script> --> 
+  <!-- BEGIN: Use this section to set page specific variables for the Page Tag --> 
+  <script language="JavaScript">var NTPT_PGEXTRA="ibmSkillLevel=3&ibmCmaId=1018803&ibmContentAreas=web,opensource,mobile,cloud";</script> 
+  <!--END --> 
+  <script src="//1.www.s81c.com/common/stats/ida_stats.js"></script> 
+  <link href="//1.www.s81c.com/common/v18/css/www.css" rel="stylesheet"> 
+  <link href="//1.www.s81c.com/common/v18/css/syntaxhighlighter.css" rel="stylesheet"> 
+  <script src="//1.www.s81c.com/common/v18/js/www.js"></script> 
+  <script src="//1.www.s81c.com/common/v18/js/syntaxhighlighter.js"></script> 
+  <link href="//1.www.s81c.com/common/v18/css/tables.css" rel="stylesheet"> 
+  <script src="//1.www.s81c.com/common/v18/js/tables.js"></script> 
+  <!--  Masthead/footer  --> 
+  <link href="//dw1.s81c.com/developerworks/css/dw-mf/v18/dw-mf-v18.css?v=092117" rel="stylesheet"> 
+  <!-- <link href="//dw1.s81c.com/developerworks/css/dw-mf/v18/alt-signedin-ux.css" rel="stylesheet" /> --> 
+  <!--[if lt IE 9]>
+    <link href="//dw1.s81c.com/developerworks/css/dw-mf/v18/dw-mf-ie8fix.css?v=022216" rel="stylesheet" />
+<![endif]--> 
+  <link href="//dw1.s81c.com/developerworks/css/v18/dw-article.css?v=073117" rel="stylesheet"> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-auth-properties.js?v=041017"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-auth.js?v=062717"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/dw-mf/v18/dw-mf.js?v=110316"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-include.js"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-article.js?v=051817"></script> 
+  <script src="//dw1.s81c.com/developerworks/js/v18/dw-auto-links.js?v=091217"></script> 
+  <script src="//www.ibm.com/software/info/js/tactic.js"></script> 
+  <script src="//www.ibm.com/software/info/js/tacticbindlinks.js"></script> 
+  <!-- Segment --> 
+  <script src="//console.bluemix.net/analytics/build/bluemix-analytics.min.js"></script> 
+  <!-- 
+<PageMap>
+    <DataObject type="document">
+        <Attribute name="topic">Cloud computing,RESTful APIs,node.js,Bluemix,JavaScript,Application and information integration</Attribute>
+        <Attribute name="topicId">953,999,1021,1237,107,603</Attribute>
+        <Attribute name="contentArea">web,opensource,mobile,cloud</Attribute>
+        <Attribute name="contentAreaId">5,7,52,47</Attribute>
+        <Attribute name="abstract">Like so many server-side JavaScript frameworks, Sails.js makes it easier
+            to build traditional web applications. Sails also embraces some of the ideas
+            that made Rails revolutionary, bringing a new level of productivity to web and
+            mobile development on top of Node.js. This first installment in a series
+            features an overview of what makes Sails different, including its new-school
+            approach to MVC architectures. You'll also set up your development environment
+            and deploy a basic Sails application to IBM Bluemix.</Attribute>
+        <Attribute name="pub.date">2016-07-12</Attribute>
+        <Attribute name="contentType">article</Attribute>
+    </DataObject>
+</PageMap>
+--> 
+ </head> 
+ <body id="ibm-com" class="ibm-type dw-js-disabled"> 
+  <div id="ibm-top" class="ibm-landing-page"> 
+   <!-- MASTHEAD_BEGIN --> 
+   <div id="ibm-masthead" role="banner" aria-label="IBM"> 
+    <div id="ibm-mast-options"> 
+     <ul role="toolbar" aria-labelledby="ibm-masthead"> 
+      <li id="ibm-geo" role="presentation"><a href="http://www.ibm.com/planetwide/select/selector.html" role="button" aria-label="United States selected - Choose a country">United States</a></li> 
+     </ul> 
+    </div> 
+    <div id="ibm-universal-nav"> 
+     <nav role="navigation" aria-label="IBM"> 
+      <div id="ibm-home">
+       <a href="http://www.ibm.com/us/en/">IBM®</a>
+      </div> 
+      <ul id="ibm-menu-links" role="toolbar" aria-label="Site map"> 
+       <li><a href="http://www.ibm.com/sitemap/us/en/">Site map</a></li> 
+      </ul> 
+     </nav> 
+     <div id="ibm-search-module" role="search" aria-labelledby="ibm-masthead"> 
+      <form id="ibm-search-form" action="https://www.ibm.com/Search/" method="get"> 
+       <p> <label for="q">IBM</label> <input type="text" maxlength="100" value="" placeholder="Search" name="q" id="q" aria-label="Search developerWorks"> <input type="hidden" value="18" name="v"> <input type="hidden" value="utf" name="en"> <input type="hidden" value="en" name="lang"> <input type="hidden" value="us" name="cc"> <input type="hidden" name="sn" value="dw"> <input type="hidden" name="dws" value="dw"> <input type="hidden" name="hpp" value="20"> <input type="submit" id="ibm-search" class="ibm-btn-search" value="Submit"> </p> 
+      </form> 
+     </div> 
+    </div> 
+   </div>
+   <!-- MASTHEAD_END --> 
+   <!-- LAYOUT --> 
+   <div id="ibm-content-wrapper"> 
+    <!-- LEADSPACE_BEGIN --> 
+    <header role="banner" aria-labelledby="ibm-pagetitle-h1"> 
+     <!-- MASTHEAD_SITENAV_BEGIN --> 
+     <div class="ibm-sitenav-menu-container"> 
+      <div class="ibm-sitenav-menu-name"> 
+       <a href="//www.ibm.com/developerworks/"> <img width="186" height="24" alt="developerWorks®" src="//dw1.s81c.com/developerworks/i/mf/dw-mf-wordmark.svg"> </a> 
+      </div> 
+      <div class="ibm-sitenav-menu-list"> 
+       <ul role="menubar"> 
+        <li class="dw-navpage-learn ibm-haschildlist" role="presentation"> <span role="menuitem"><a href="//www.ibm.com/developerworks/learn/">Learn</a></span> 
+         <ul role="menu" aria-label="Learn" id="dw-mega-learn"> 
+          <li role="presentation"> 
+           <div class="ibm-columns"> 
+            <div class="ibm-col-5-3 dw-mega-main"> 
+             <h2>Learn with our tutorials and training</h2> 
+             <p class="dw-mega-main-p">developerWorks provides tutorials, articles and other technical resources to help you grow your development skills on a wide variety of topics and products. Learn about a specific product or take a course and get certified. So, what do you want to learn about?</p> 
+             <p class="ibm-button-link"> <a href="//www.ibm.com/developerworks/learn/" class="ibm-btn-pri">Choose a topic</a> </p> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured topics</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-mobile.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/mobile">Mobile development</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-bigdata.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/analytics">Big data</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-cognitive.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/cognitive">Cognitive computing</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-cloud.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/learn/cloud">Cloud</a> 
+              </div> 
+             </div> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured destinations</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-swift.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/swift/?lnk=hm">Swift @ IBM</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-open.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/open/?lnk=hm">developerWorks Open</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-arch.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/architecture/?lnk=hm">Architecture center</a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> </li> 
+         </ul> </li> 
+        <li role="presentation" class="dw-navpage-develop ibm-haschildlist"> <span role="menuitem"><a href="//www.ibm.com/developerworks/develop/">Develop</a></span> 
+         <ul role="menu" aria-label="Develop" id="dw-mega-develop"> 
+          <li role="presentation"> 
+           <div class="ibm-columns"> 
+            <div class="ibm-col-5-3 dw-mega-main"> 
+             <h2>Develop with our trials &amp; downloads</h2> 
+             <p class="dw-mega-main-p">Start developing with product trials, free downloads, and IBM Bluemix™ services. Sort by topic or product name and find everything we have to offer.</p> 
+             <p class="ibm-button-link"> <a href="//www.ibm.com/developerworks/develop/" class="ibm-btn-pri">View all downloads &amp; trials</a> </p> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured products</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-bluemix.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/sso/bmregistration">Bluemix</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-websphere.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/downloads/ws/was/">WebSphere Application Server</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-db2express.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//www.ibm.com/developerworks/downloads/im/db2express/">DB2 Express C</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-mobile.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//mobilefirstplatform.ibmcloud.com/">MobileFirst Platform Foundation</a> 
+              </div> 
+             </div> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured destinations</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-swift.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/swift/?lnk=hm">Swift @ IBM</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-open.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/open/?lnk=hm">developerWorks Open</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-arch.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/architecture/?lnk=hm">Architecture center</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-api-dest.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/api/">API Explorer</a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> </li> 
+         </ul> </li> 
+        <li role="presentation" class="dw-navpage-connect ibm-haschildlist"> <span role="menuitem"><a href="//www.ibm.com/developerworks/connect/">Connect</a></span> 
+         <ul role="menu" aria-label="Connect" id="dw-mega-connect"> 
+          <li role="presentation"> 
+           <div class="ibm-columns"> 
+            <div class="ibm-col-5-3 dw-mega-main"> 
+             <h2>Find a community and connect</h2> 
+             <p class="dw-mega-main-p">Learn from the experts and share with other developers in one of our dev centers. Ask questions and get answers with dW answers. Search for local events in your area. All in developerWorks communities.</p> 
+             <p class="ibm-button-link"> <a href="//www.ibm.com/developerworks/connect/" class="ibm-btn-pri">View communities</a> </p> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured Developer Centers</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-jazz-dev.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//jazz.net/">Jazz.net</a> 
+              </div> 
+             </div> 
+             <!--<div class="dw-mega-nav-item">
+                                        <div class="dw-mega-nav-img">
+                                            <img width="30" height="30" alt=""
+                                                src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-cloud-dev.png">
+                                        </div>
+                                        <div class="dw-mega-nav-link">
+                                            <a href="//developer.ibm.com/cloud-analytics/">IBM Cloud Analytics DEV</a>
+                                        </div>
+                                    </div>--> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-bluemix-dev.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/bluemix/">Bluemix</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-api-dev.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/api/">API Explorer</a> 
+              </div> 
+             </div> 
+            </div> 
+            <div class="ibm-col-5-1 dw-mega-nav"> 
+             <h3>Featured destinations</h3> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-swift.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/swift/?lnk=hm">Swift @ IBM</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-open.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/open/?lnk=hm">developerWorks Open</a> 
+              </div> 
+             </div> 
+             <div class="dw-mega-nav-item"> 
+              <div class="dw-mega-nav-img"> 
+               <img width="30" height="30" alt="" src="//dw1.s81c.com/developerworks/i/v18/mega/dw-mplist-arch.png"> 
+              </div> 
+              <div class="dw-mega-nav-link"> 
+               <a href="//developer.ibm.com/architecture/?lnk=hm">Architecture center</a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> </li> 
+         </ul> </li> 
+        <!-- dW featured --> 
+        <!-- <li role="presentation" class="dw-navpage-devcenter"><strong>Subheading</strong></li> --> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/cognitive/">Cognitive</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/cloud/">Cloud</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/analytics/">Data</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/iot/">Internet of Things</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/java/">Java</a></li> 
+        <li role="presentation" class="dw-navpage-devcenter"><a role="menuitem" href="//www.ibm.com/developerworks/learn/">All topics</a></li> 
+       </ul> 
+      </div> 
+     </div> 
+     <!-- MASTHEAD_SITENAV_END --> 
+     <!-- NAVIGATION_TRAIL_BEGIN --> 
+     <div id="ibm-leadspace-head" class="ibm-alternate"> 
+      <div id="ibm-leadspace-body"> 
+       <nav aria-label="Breadcrumb" role="navigation"> 
+        <ul id="dw-navigation-trail" itemscope itemtype="http://schema.org/BreadcrumbList">
+         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="http://www.ibm.com/developerworks/learn/"><span itemprop="name">Learn</span></a>
+          <meta itemprop="position" content="1"></li>
+         <li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem"><a itemprop="item" href="http://www.ibm.com/developerworks/web/"><span itemprop="name">Web development</span></a>
+          <meta itemprop="position" content="2"></li>
+        </ul> 
+       </nav> 
+      </div> 
+     </div> 
+     <!-- NAVIGATION_TRAIL_END --> 
+    </header> 
+    <!-- LEADSPACE_END --> 
+    <!-- MAIN_CONTENT_BEGIN --> 
+    <main role="main" aria-labelledby="ibm-pagetitle-h1"> 
+     <div id="ibm-pcon"> 
+      <!-- BEGIN_IBM-CONTENT --> 
+      <div id="ibm-content"> 
+       <!-- BEGIN_IBM-CONTENT-BODY --> 
+       <div id="ibm-content-body"> 
+        <!-- BEGIN_IBM-CONTENT-MAIN --> 
+        <div id="ibm-content-main" class="dw-article"> 
+         <!-- BEGIN_INTERIOR-COLUMNS --> 
+         <div class="ibm-columns dw-article-toc"> 
+          <!-- LEFT_6_2_CONTENT_COLUMN_BEGIN --> 
+          <div id="dw-article-toc-container" class="ibm-col-6-2"> 
+           <div id="dw-article-toc-body"> 
+            <h2>Contents</h2>
+            <div class="ibm-alternate-rule">
+             <hr>
+            </div>
+            <ul role="directory" aria-label="Table of contents" class="ibm-plain-list">
+             <li><a href="#ibm-pagetitle-h1">Introduction</a></li>
+             <li><a href="#sails">Choosing Sails.js</a></li>
+             <li><a href="#prereqs">What you'll need</a></li>
+             <li><a href="#N10117">Sails.js says "Hello, world!"</a></li>
+             <li><a href="#bluemix">Deploy Sails.js to the cloud</a></li>
+             <li><a href="#summary">Conclusion</a></li>
+             <li><a href="#artdownload">Downloadable resources</a></li>
+             <li><a href="#artrelatedtopics">Related topics</a></li>
+             <li><a href="#icomments">Comments</a></li>
+            </ul> 
+           </div> 
+          </div> 
+          <!-- LEFT_6_2_CONTENT_COLUMN_END --> 
+          <!-- CENTER_6_4_CONTENT_COLUMN_BEGIN --> 
+          <div class="ibm-col-6-4"> 
+           <p class="dw-article-series-head">The busy JavaScript developer's guide to Sails.js, Part 1</p> 
+           <h1 id="ibm-pagetitle-h1" class="ibm-h1">Build and deploy a basic web app with Sails</h1>
+           <p class="dw-article-subhead">Get started with Sails in your local development environment, then deploy it to Bluemix</p> 
+           <!-- Article Top Bar --> 
+           <div class="ibm-columns dw-article-topbar"> 
+            <!-- Author and article info. --> 
+            <div class="ibm-col-6-2 ibm-col-medium-6-4 dw-article-metadata"> 
+             <div class="dw-article-avatar">
+              <img width="42" height="42" src="/developerworks/i/p-tneward60.jpg" alt="Ted Neward">
+             </div>
+             <div class="dw-article-authordate">
+              <span class="dw-article-author"><a href="https://twitter.com/tedneward">Ted Neward</a></span>
+              <br>
+              <span class="dw-article-pubdate">Published on November 03, 2015</span>
+              <span class="dw-article-divider">/</span>
+              <span class="dw-article-updated">Updated: July 12, 2016</span>
+             </div> 
+            </div> 
+            <!-- Social --> 
+            <div class="ibm-col-6-2 ibm-col-medium-6-4 ibm-col-small-6-2 dw-article-social"> 
+             <!-- Sharing links --> 
+             <div id="dw-article-share-inline"> 
+              <div class="dw-article-sharelink-inline"> 
+               <div class="ibm-sharethispage"></div> 
+              </div> 
+             </div> 
+             <!-- Number of comments and link to comments --> 
+             <div id="dw-article-cmts"> 
+              <div class="dw-article-cmtslink"> 
+               <a onclick="tocLink('#icomments')" href="#icomments" role="link" tabindex="0" aria-label="Comments"> <img src="//dw1.s81c.com/developerworks/i/v18/article/dw-article-cmt-icon.png" width="29" height="29" alt="Comments"> </a> 
+              </div> 
+              <div class="dw-article-cmtslink"> 
+               <a onclick="tocLink('#icomments')" href="#icomments" role="link" tabindex="0"> 
+                <div id="nCmts"></div> </a> 
+              </div> 
+             </div> 
+            </div> 
+           </div> 
+           <div id="dw-series-container">
+            <h3 class="ibm-h3" id="dw-series-heading">Content series:</h3>
+            <div data-widget="showhide" data-type="panel" class="ibm-show-hide">
+             <h2 id="dw-series-show-hide">This content is part <span id="dw-series-part">#</span> of <span id="dw-series-total">4</span> in the series: <span id="dw-series-title">The busy JavaScript developer's guide to Sails.js, Part 1</span></h2>
+             <div class="ibm-container-body" id="dw-series-links">
+              http://www.ibm.com/developerworks/library/?search_by=busy+javascript+developer's+guide+sails
+             </div>
+             <div id="dw-not-all-published">
+              Stay tuned for additional content in this series.
+             </div>
+            </div>
+            <div id="dw-series-alt">
+             <h2>This content is part of the series: <span id="dw-series-title-alt">The busy JavaScript developer's guide to Sails.js, Part 1</span></h2>
+             <p>Stay tuned for additional content in this series.</p>
+            </div>
+           </div> 
+           <!-- Article Body --> 
+           <p>Ever find yourself wandering in the cheese aisle of a gourmet shop, overwhelmed by the impressive display of cheeses from all over the world? It's a nice problem to have, but the trouble is in deciding which of them to bring home.</p>
+           <div class="dw-article-sidebar ibm-background-cool-white-20">
+            <p><strong>About this series</strong><br> Sails.js, like its cousin Ruby on Rails, is a framework designed to help developers build web applications. Unlike Rails, which defaults to building applications that generate HTML on the server and ship it all back to the browser, Sails has great support for building HTTP APIs out of the box. This design encourages a better separation of concerns between client and server, in addition to promoting more interoperability across clients and servers. In this series, web developer and mentor Ted Neward introduces you to Sails.js. The HTTP API example app could be the back end for AngularJS, React, or virtually any other client application.</p>
+           </div>
+           <p>A cheese selection so abundant that it's overwhelming is a perfect example of the <em>paradox of choice,</em> the principle that says that while having no choice is bad, having too many choices is equally as bad, and can sometimes lead consumers to give up choosing altogether.</p>
+           <p>Developers looking for a Node.js framework or library are faced with this very issue, a virtual embarrassment of riches. It can be difficult to know which of the many options to choose from, much less how to get started with a Node.js framework, or which factors will help you decide whether it's the right fit.</p>
+           <h2 id="sails" class="ibm-h2">Choosing Sails.js</h2>
+           <p>Given the plethora of options, I had to wade through a few alternatives before settling on Sails.js. I like Sails because it embraces some of the ideas that have made the Rails framework so successful, while maintaining a distinct Node.js flair. In particular, Sails uses layered development and convention over configuration, two development techniques popularized by Rails and similar frameworks. Sails also integrates several other Node.js packages for key components, which means you don't necessarily have to learn the framework from scratch. Another plus is the fact that the documentation for Sails.js is continually improving, a key indicator that I look for from any open source project.</p>
+           <p>In this first installment, I'll focus on how Sails approaches layered development. Future installments will introduce convention over configuration and other conveniences of coding with Sails.</p>
+           <h3 id="mvc" class="ibm-h3">The new MVC</h3>
+           <p>The Sails approach to layered development is different from what many traditional web developers might expect. In fact, Sails is one of an emerging breed of frameworks that redefines expectations of web application development by turning MVC on its ear. Instead of the MVC components residing on the server, as in a traditional MVC architecture, Sails puts the models and controllers on the server, while the views live on the client tier. Sails also sees the "view" as a more generic concept; it could be HTML, but it could also be a mobile application written in native iOS or Android.</p>
+           <div class="ibm-pull-quote ibm-h3">
+            <blockquote>
+             <p><em class="dw-pullquote"><span class="dw-pullquote-open">“</span>This reconfiguring of the traditional MVC architecture achieves the very thing that architects and developers have long sought from application servers: a single place for business logic and validation, and a common interface for multiple clients.<span class="dw-pullquote-close">”</span></em></p>
+            </blockquote>
+           </div>
+           <p>Instead of the server shipping HTML back to the client, Sails just ships data, typically in the form of JSON or XML. The client (either a mobile app or a single-page web app written with a client-side JavaScript framework like AngularJS) then consumes that data and presents it in the manner most suited to the client's look and feel. For most clients, the data representation format will be JSON because many single-page web and mobile clients are written using JavaScript, and can easily consume JSON. It's also not hard to employ a different data representation format like XML if necessary.</p>
+           <div class="dw-article-sidebar ibm-background-cool-white-20">
+            <p><strong>What about Mean.js</strong><br> Scott Davis recently <a href="http://www.ibm.com/developerworks/library/wa-mean1/index.html"> introduced the MEAN stack</a> and the Mean.js framework to developerWorks readers. I've done some work with Mean.js and maintain a project I built using it, but I've found that I don't care for some of its underlying design decisions. In particular, Mean.js views the client and server as a sort of monolithic whole, whereas I embrace a more layered approach. I'll explain more about that later in this tutorial.</p>
+           </div>
+           <p>This reconfiguring of the traditional MVC architecture achieves the very thing architects and developers have long sought from application servers: a single place for business logic and validation, and a common interface for multiple clients. The server needs only to project data elements in a representation recognizable to the client, and this approach provides an easy way to do traditional business logic and data validation through HTTP endpoints.</p>
+           <h3 id="httpapi" class="ibm-h3">The HTTP API example app</h3>
+           <p>This new architecture, what I call an HTTP API, is similar to the RESTful style, but it's not actually REST — not, at least, according to Roy Fielding's <a href="http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm">definition of REST</a>. REST relies on the exchange of hypermedia as the principal vehicle of application state (this is the Hypertext As The Engine Of Application State, or HATEOAS, principle — quite possibly the worst acronym ever invented). But an HTTP API system surrenders some of the flexibility and "generic client" capability that REST offers in exchange for a simpler model.</p>
+           <p>Unlike a REST system, HTTP API clients do require some deductive knowledge of the system they're communicating with. They need to know the expected results and available endpoints ahead of time. It's contrary to a REST architecture, but I find that the trade-off for simplicity is worthwhile.</p>
+           <div class="dw-article-sidebar ibm-background-cool-white-20">
+            <p><strong>Evolving REST</strong><br> HTTP APIs are used by most major API-based online systems. CouchDB, EventBrite, Yelp, and GitHub all are using an HTTP API design that is just a few steps shy of a truly RESTful system. <a href="https://prismic.io">Prismic</a>, an HTTP API CMS system, was my inspiration for the example I'll develop in this series.</p>
+           </div>
+           <p>In an HTTP API, all communication between client and server takes place over HTTP. For the example app, I'll use JSON as the data format exchanged and standard HTTP verbs to indicate actions (GET as read, POST as insert, PUT as update, and DELETE as delete). I'll also use HTTP headers as the mechanism for conveying out-of-band information like authentication data and so on. I will, however, still store some state data on the server side (contrary to a traditional REST design), and the data exchanged will all be JSON and assumed to be specific to this system.</p>
+           <p>Consumers of the HTTP API example — mobile apps, single-page JavaScript apps, or even the other servers that want access to the data contained therein — will know about the JSON types I'll be shipping back to them. This is as opposed to the more REST-ish hypertext/HATEOAS focus, which suggests that any app should be able to "discover" the information being sent back. More importantly, consumers will know the subsequent HTTP endpoints to which their data can be sent, retrieved, or modified.</p>
+           <p>While evaluating Sails.js, I spent some time experimenting with it. So without further ado, let's start learning the ropes of Sails.</p>
+           <h2 id="prereqs" class="ibm-h2">What you'll need: Prerequisites and setup</h2>
+           <p>I'm going to expect that you are somewhat familiar with the principles and terminology of REST and RESTful architectures; you don't have to be a zealot, but you should be comfortable using HTTP "in the raw" to submit GET requests, POST requests, and so on. The idea of looking at an in-flight HTTP request shouldn't scare you.</p>
+           <p>I also assume that you are comfortable with JavaScript, Node.js, and npm, the package manager for JavaScript code and libraries. You should have Node.js installed on your development machine of choice, know how to run Node.js apps locally, and be able to "npm-install" your way out of a paper bag. While it will be helpful if you've read up on so-called <em>modern JavaScript</em> (specifically, the JavaScript described by Douglas Crockford in <em><a href="http://shop.oreilly.com/product/9780596517748.do">JavaScript: The Good Parts</a>,</em> or one of the many books or tutorials it's spawned), in truth, you'll need only a working knowledge of JavaScript to get started with Sails.</p>
+           <p>For your development environment, make sure Node.js is up to date on your machine (as of this writing, mine reports version 0.12.7), and that you have the latest version of npm installed (mine is version 2.12.1). While the Node.js community obviously tries to keep versions backward-compatible, there's no guarantee that the code I write here will work with significantly earlier versions of the technology. Caveat emptor.</p>
+           <h3 id="installation" class="ibm-h3">Install Sails.js and MongoDB</h3>
+           <p>The only installation required to use Sails.js is to install it globally to the npm cache, like so: <code>npm install -g Sails.js</code>.</p>
+           <p>Once you've done that you'll have a new utility command, <code>sails</code>, available for your use. Like npm, <code>sails</code> is a command-line utility written in JavaScript for Node.js. It acts as a kind of single-source utility for doing several things with the Sails.js framework — like creating a new application, running the application, running the application in a debug loop, generating new components for the app, and so on. When installing Sails.js via npm, make sure to use the <code>-g</code> option. Otherwise, it will only be installed to the current project directory, and this is one of those rare cases where the utility really needs to be global.</p>
+           <p>While you're waiting for the Sails.js framework to download and install, take a minute to be sure that you have MongoDB set up in your development environment. If you don't, now is a good time to <a href="http://www.mongodb.org/downloads">download an installation</a> appropriate for your target platform.</p>
+           <p>Note that Sails.js uses more than just a MongoDB back end; in fact, right out of the box, Sails.js uses a lightweight disk-based format. It's not a recommended setup for production use, but works delightfully well for examples like this one. It will take a minute to get to the part of this series where MongoDB comes in, but you'll be glad to have it when I do.</p>
+           <p>That's the basic setup for now. You'll need to add a <a href="https://docs.cloudfoundry.org/devguide/installcf/install-go-cli.html">Cloud Foundry install</a> and a <a href="https://console.ng.bluemix.net/"> Bluemix login</a> to the mix later in this tutorial, when I deploy the local app to the Bluemix cloud.</p>
+           <h3 id="verify" class="ibm-h3">Check the installation</h3>
+           <p>Is Sails.js done installing? Verify it with the command <code>sails version</code>.</p>
+           <p>As of this writing, the latest version of Sails.js is 0.11.0. As long as the above command yields anything other than an error, Sails is installed and ready to go.</p>
+           <h2 id="N10117" class="ibm-h2">Sails.js says "Hello, world!"</h2>
+           <p>Tradition holds that the very first thing a programmer does when learning a new language or environment is to write the simplest possible program in that language: a Hello World application. Fortunately, Sails generates a Hello World as the basic application scaffolding when you create a new app. I can use this to verify that the Sails infrastructure is working. In a nod to agile development strategies, I'll also deploy the scaffolding to the cloud (Bluemix, in this case) as part of a "release early, release often" strategy.</p>
+           <h3 id="N1011F" class="ibm-h3">Create a basic Sails.js app</h3>
+           <p>Getting a new Sails.js app is pretty simple. Note that by default, the scaffolding will generate a more traditional web application, where the server-generated HTML is sent back to the client. While that's useful in its own right, if the goal is to build an HTTP API app that is client-agnostic, I want to ensure that there's no accidental "leakage" tying the client to the server. The best way to do that is to build the server with zero client components anywhere in the project. In Sails.js, that's as simple as setting your default configuration to <code>--no-frontend</code>.</p>
+           <p>The downside of using the <code>--no-frontend</code> option is that I won't have a visual way to verify that the scaffolding works. I'll want that verification when I deploy the app to Bluemix. So for this first installment, I'll create an app that has the pretty HTML front-end scaffolding, but in future installments, I'll run with the assumption that the app was built without any front-end pieces. (The difference is just what's populated in the generated views directory, so it's not as big a deal as it may seem.)</p>
+           <p>Enough talk. Let's get sailing!</p>
+           <p>From the directory where you want the code to live on your development machine, issue a <code>new</code> command via the <code>sails</code> command line, then name your app: <code>sails new hello-sails</code>.</p>
+           <p>After you do this, Sails will think for a second, then should respond with a message like: "Created a new Sails app 'hello-sails'!" (If anything else comes back, something is probably wrong with your Sails.js installation.) In the target directory, which is inferred from the application name, you'll see that Sails.js laid down a number of directories and files. I'll explore most of these in greater detail throughout the series. For now, I'll just familiarize you with the basics of a Sails application.</p>
+           <p>Generally, it's safe to assume that the scaffolding won't have any problems (so long as nobody touches it), but it's helpful to know how to run the app locally. So let's kick off our journey with a "sails lift."</p>
+           <h5 id="fig1" class="ibm-h5">Figure 1. Running Sails.js locally</h5>
+           <img src="sailsjs-figure-1.jpg" class="ibm-downsize" alt="Screenshot shows Sails.js     output confirming that the default web  app is running on the local machine" height="698" width="830">
+           <p class="ibm-ind-link"><a class="ibm-popup-link" onclick="IBMCore.common.widget.overlay.show('N10145');return false;" href="#N10145">View image at full size</a></p>
+           <div class="ibm-common-overlay ibm-overlay-alt-three" data-widget="overlay" id="N10145">
+            <img alt="Screenshot shows Sails.js output confirming that the default web app is running on the local machine" src="sailsjs-figure-1.jpg" width="830">
+           </div>
+           <p>Pretty, no? Personally, I like the use of color, and additionally, it's quite the impressive display of ASCII art. More important is that this little ASCII painting confirms that Node.js is successfully running our scaffolded application on the local machine, on port 1337. Hit it with a browser and the default Sails.js web page will appear, complete with links back to the main Sails homepage and documentation.</p>
+           <div class="dw-article-sidebar ibm-background-cool-white-20">
+            <p><strong>About the production UI</strong><br> Selecting a <code>--no-frontend</code> Sails app will generate the same homepage as a more traditional web app; the UI will just be thin, with loads of client-side assets missing. As you get to know Sails, it's worthwhile to experiment by generating both a traditional web app scaffold and one without the front end. You'll learn for yourself what's there and what's missing from the HTTP API setup.</p>
+           </div>
+           <h2 id="bluemix" class="ibm-h2">Deploy Sails.js to the cloud</h2>
+           <p>Running on a local machine is not the same as deploying your code to a production (or production-like) server, and this is where the cloud comes into play. For this series, I'll use Bluemix as the cloud host. It seems apropos, and Bluemix is an easy platform to use for hosting Node.js-based applications.</p>
+           <p>Bluemix also happens to be based on Cloud Foundry, so if you haven't already, now is the time to <a href="https://docs.cloudfoundry.org/devguide/installcf/install-go-cli.html">install the Cloud Foundry client</a> (<code>cf</code>). You'll want it running on the same machine where your Sails.js code is hosted.</p>
+           <p>After you've installed the client, verify the installation by running <code>cf--version</code>; at the time of this writing, the version echoed back was 6.12.2.</p>
+           <p>As mentioned, you'll also need a <a href="https://console.ng.bluemix.net/">Bluemix login</a> to deploy the app to Bluemix. Once you've got your credentials, log in to Bluemix and push the code from your local hello-sails directory into the Bluemix cloud.</p>
+           <h5 id="listing1" class="ibm-h5">Listing 1. cf into Bluemix</h5>
+           <pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">Teds-MBP15:hello-sails ted$ cf login
+API endpoint: https://api.ng.bluemix.net
+
+Email&gt; ted@tedneward.com
+
+Password&gt; 
+Authenticating...
+OK
+
+Select an org (or press enter to skip):
+1. developerWorks
+2. ted@tedneward.com
+
+Org&gt; 1
+Targeted org developerWorks
+
+Targeted space Ted Neward
+
+
+                   
+API endpoint:   https://api.ng.bluemix.net (API version: 2.27.0)   
+User:           ted@tedneward.com   
+Org:            developerWorks   
+Space:          Ted Neward</pre>
+           <p>The <code>cf</code> tool will also need to know the API endpoint to use for deployment. If <code>cf</code> can't figure that out, you can manually set the endpoint (<code>api.ng.bluemix.net</code>) via the command <code>cf api api.ng.bluemix.net</code>.</p>
+           <h3 id="N10185" class="ibm-h3">Two useful files</h3>
+           <p>Once you've logged in and set the API endpoint, you'll use <code>cf push</code> to deploy the scaffolded Sails.js app to the cloud. Cloud Foundry will just need a few parameters in order to deploy the application correctly. Rather than typing those repeatedly (which grows tiresome), create a manifest file (manifest.yml). This will contain information like the application name to use on the Bluemix cloud, the hostname to use for a subdomain (if it's different from the application name), how much RAM to reserve for executing, and so on.</p>
+           <p>The simple manifest file for the example:</p>
+           <pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">---
+applications:
+- name: tedneward-sailsIntro
+  host: tedneward-sailsIntro
+  memory: 256M
+  command: node app.js</pre>
+           <div class="dw-article-sidebar ibm-background-cool-white-20">
+            <p><strong>More about YAML</strong><br> Note that the manifest's format is Yet Another Markup Language (YAML), which has been popularized by Ruby. Learning YAML isn't necessary to follow the example for this series. Interested readers can find a full reference to the manifest's settings on <a href="http://github.com/cloudfoundry/cli">Cloud Foundry's GitHub repository</a>.</p>
+           </div>
+           <p>Another useful file that Cloud Foundry recognizes is .cfignore. This contains the list of files or directories that shouldn't be pushed up from the local app to the cloud. For now, just file that information away for future reference.</p>
+           <p>With all that in place, all that's left is to do a <code>cf push</code> and let the push do its thing. (The output from this can be sometimes quite impressive in length, as the code must be packaged up, uploaded, unpacked, then installed on the cloud instance, which in turn means running an <code>npm install</code> on the cloud instance, which generates a ton of results. As a result, only about the first 20 and the last half-dozen lines are displayed here.)</p>
+           <h5 id="listing2" class="ibm-h5">Listing 2. cf push to Bluemix</h5>
+           <pre data-widget="syntaxhighlighter" class="brush: js; html-script: true; gutter: true;">Using manifest file /Users/ted/Projects/sails-intro/code/hello-sails/manifest.yml
+
+Updating app tedneward-sailsIntro in org developerWorks / space Ted Neward as ted@tedneward.com...
+OK
+
+Using route tedneward-sailsIntro.mybluemix.net
+Uploading tedneward-sailsIntro...
+Uploading app files from: /Users/ted/Projects/sails-intro/code/hello-sails
+Uploading 31M, 11773 files
+Done uploading               
+OK
+
+Stopping app tedneward-sailsIntro in org developerWorks / space Ted Neward as ted@tedneward.com...
+OK
+
+Starting app tedneward-sailsIntro in org developerWorks / space Ted Neward as ted@tedneward.com...
+-----&gt; Downloaded app package (24M)
+-----&gt; Downloaded app buildpack cache (18M)
+
+-----&gt; IBM SDK for Node.js Buildpack v2.5-20150902-1526
+       Based on Cloud Foundry Node.js Buildpack v1.5.0
+-----&gt; Creating runtime environment
+       NPM_CONFIG_LOGLEVEL=error
+       NPM_CONFIG_PRODUCTION=true
+       NODE_MODULES_CACHE=true
+-----&gt; Installing binaries
+       engines.node (package.json):  unspecified
+       engines.npm (package.json):   unspecified (use default)
+       
+. . .
+
+App tedneward-sailsIntro was started using this command `node app.js`
+
+Showing health and status for app tedneward-sailsIntro in org developerWorks / space Ted Neward as ted@tedneward.com...
+OK
+
+requested state: started
+instances: 1/1
+usage: 256M x 1 instances
+urls: tedneward-sailsIntro.mybluemix.net
+last uploaded: Mon Oct 5 01:36:54 UTC 2015
+stack: lucid64
+buildpack: SDK for Node.js(TM) (ibm-node.js-0.12.7)</pre>
+           <p>Assuming you've uploaded and installed all the components correctly, you should see a new subdomain on the Bluemix cloud (in my case, it's http://tedneward-sailsIntro.mybluemix.net). The new subdomain will respond to an HTTP <code>GET /</code> request by producing the Sails.js sample hello page.</p>
+           <h2 id="summary" class="ibm-h2">Conclusion</h2>
+           <p>With the scaffolding in place, I'm set up to begin extending and improving the example app. Thanks to the work done so far, I'll be able to deploy the new code to the Bluemix cloud each time I finish a new segment. Remember the principle, "always be shipping" — or put another way, "release early, release often." Each time I push code to the server for others to use, I'm creating opportunities for people to find bugs, verify that I'm headed in the right direction with the code, and so on. Using a well-established cloud foundation makes it trivial to ship, since I've done most of the work up front. With a simple <code>cf push</code>, the latest version of the Sails app will be aloft and waiting for HTTP clients to find and use it.</p>
+           <p>The next installment will feature the Sails.js models. Getting to know the models will also introduce you to a hefty amount of Sails convention, called blueprints or the Sails Blueprint API. Like its inspiration, Rails, Sails favors convention over configuration, which means I'll be able to build models, and get some useful functionality out of the box, without having to write a ton of configuration files or code.</p>
+           <p>I have just a scaffold now, but the example app that will take shape over the next several tutorials will be a blog engine — with a twist. Rather than build the engine as a traditional server-side web app, I'll develop it as an HTTP API. The API packs all the technology I'll need into the back end, leaving the client-side code to be determined by whatever front-end tool somebody wants to write.</p>
+           <p>For now, it's time to pause. Given the name of the framework, let us not say "so long" but the more appropriate "bon voyage."</p>
+           <!--CMA ID: 1018803-->
+           <!--Site ID: 1-->
+           <!--XSLT stylesheet used to transform this file: dw-document-html-8.0.xsl--> 
+           <!-- Article Resources --> 
+           <div class="ibm-alternate-rule">
+            <hr>
+           </div>
+           <h4 id="artdownload" class="ibm-h4">Downloadable resources</h4>
+           <ul class="ibm-link-list">
+            <li><a class="ibm-pdf-link" href="wa-build-deploy-web-app-sailsjs-1-bluemix-pdf.pdf">PDF</a></li>
+            <li><a class="ibm-download-link" href="http://www.ibm.com/developerworks/apps/download/index.jsp?contentid=1018803&amp;filename=sailsjs1-code.zip&amp;method=http&amp;locale=">Source code for example app</a> (sailsjs1-code.zip | 168KB)</li>
+           </ul>
+           <div class="ibm-alternate-rule">
+            <hr>
+           </div>
+           <h4 id="artrelatedtopics" class="ibm-h4">Related topics</h4>
+           <ul class="ibm-plain-list">
+            <li><a href="http://www.Sailsjs.org">Sails.js home page</a></li>
+            <li><a href="http://sailsjs.org/documentation/concepts/extending-sails/adapters/available-adapters">sails-disk adapter persistent object store (pre-production use only)</a></li>
+            <li><a href="http://github.com/cloudfoundry/cli">Cloud Foundry cf documentation page</a></li>
+            <li><a href="https://prismic.io">Prismic</a></li>
+            <li><a href="http://www.ibm.com/developerworks/web">developerWorks Web hub</a></li>
+           </ul> 
+           <!-- Commenting --> 
+           <!-- INLINE_COMMENTS_BEGIN: --> 
+           <div class="ibm-alternate-rule">
+            <hr>
+           </div> 
+           <div id="dw-article-cmts-top" class="ibm-columns"> 
+            <div class="ibm-col-6-2"> 
+             <h4 id="icomments" class="ibm-h4">Comments</h4> 
+             <div id="dw-article-cmts-login"> 
+              <p><a onclick="window.location=userLinks[0].url;" tabindex="0" role="link">Sign in</a> or <a onclick="window.location=userLinks[1].url;" tabindex="0" role="link">register</a> to add and subscribe to comments.</p> 
+             </div> 
+            </div> 
+            <div class="ibm-col-6-2" id="dw-notify"> 
+             <input type="checkbox" value="1" name="comment_notification" id="comment_notification" disabled> 
+             <label for="comment_notification">Subscribe me to comment notifications</label> 
+            </div> 
+           </div> 
+           <div class="dw-article-cmts-container"> 
+            <div class="ibm-no-print" id="dw-icomments-container"> 
+            </div> 
+           </div> 
+           <!-- INLINE_COMMENTS_END --> 
+           <!-- CENTER_6_4_CONTENT_COLUMN_END --> 
+          </div> 
+         </div> 
+         <!--Rating_Meta_BEGIN-->
+         <div class="metavalue">
+          static.content.url=http://www.ibm.com/developerworks/js/artrating/
+         </div>
+         <div class="metavalue">
+          SITE_ID=1
+         </div>
+         <div class="metavalue">
+          Zone=Web development, Open source, Mobile development, Cloud computing
+         </div>
+         <div class="metavalue">
+          ArticleID=1018803
+         </div>
+         <div class="metavalue">
+          ArticleTitle=The busy JavaScript developer's guide to Sails.js, Part 1: Build and deploy a basic web app with Sails
+         </div>
+         <div class="metavalue">
+          publish-date=07122016
+         </div>
+         <script language="javascript" type="text/javascript">document.write('<div class="metavalue">url='+location.href.replace(/</g,  '%3C')+'</div>');</script>
+         <!--Rating_Meta_END--> 
+        </div> 
+        <!-- END_IBM-CONTENT-MAIN --> 
+       </div> 
+       <!-- END_IBM-CONTENT-BODY --> 
+      </div> 
+      <!-- END_IBM-CONTENT --> 
+     </div> 
+     <!-- END_IBM-PCON --> 
+    </main> 
+    <!-- MAIN_CONTENT_END --> 
+    <!-- END_CONTENT-WRAPPER --> 
+   </div> 
+   <!-- FOOTER_BEGIN --> 
+   <footer role="contentinfo" aria-label="IBM developerWorks"> 
+    <div id="dw-footer-module" class="dw-footer-home"> 
+     <section aria-label="Resources" role="contentinfo"> 
+      <div class="ibm-columns"> 
+       <div class="ibm-col-6-1 dw-footer-col-1"> 
+        <ul> 
+         <li class="dw-footer-heading" aria-label="developerWorks">developerWorks</li> 
+         <li><a href="//www.ibm.com/developerworks/aboutdw/">About</a></li> 
+         <li><a href="//www.ibm.com/developerworks/feedback">Help</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/ideas">Submit content</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/secure/report/">Report abuse</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/community/terms/thirdparty/">Third-party notice</a></li> 
+        </ul> 
+        <ul> 
+         <li class="dw-footer-heading" aria-label="Community">Community</li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/rfe/">Product feedback</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/connect/">Developer Centers</a></li> 
+        </ul> 
+        <ul> 
+         <li class="dw-footer-heading dw-follow-us" aria-label="Follow us">Follow us</li> 
+        </ul> 
+        <p class="dw-footer-social"> <a href="//twitter.com/developerWorks"> <img width="28" height="27" alt="Twitter" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-twitter.png"> </a> </p> 
+        <p class="dw-footer-social-right"> <a href="//www.facebook.com/developerworks"> <img width="28" height="27" alt="Facebook" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-facebook.png"> </a> </p> 
+        <br> 
+        <p class="dw-footer-social"> <a href="//www.linkedin.com/groups/IBM-developerWorks-8137234"> <img width="28" height="27" alt="LinkedIn" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-linkedin.png"> </a> </p> 
+        <p class="dw-footer-social-right"> <a href="//www.youtube.com/user/developerworks"> <img width="28" height="27" alt="YouTube" src="//dw1.s81c.com/developerworks/i/mf/dw-footer-icon-youtube.png"> </a> </p> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-2"> 
+        <ul> 
+         <li class="dw-footer-heading" aria-label="Join">Join</li> 
+         <li><a href="//developer.ibm.com/academic/">Faculty</a></li> 
+         <li><a href="//developer.ibm.com/students/">Students</a></li> 
+         <li><a href="//developer.ibm.com/startups/">Startups</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/isv/">Business Partners</a></li> 
+        </ul> 
+        <ul class="dw-footer-lang" aria-label="Select a language"> 
+         <li class="dw-footer-heading">Select a language</li> 
+         <li><a href="//www.ibm.com/developerworks/">English</a></li> 
+         <li><a href="//www.ibm.com/developerworks/cn/" lang="zh">??</a></li> 
+         <li><a href="//www.ibm.com/developerworks/jp/" lang="ja">???</a></li> 
+         <li><a href="//www.ibm.com/developerworks/ru/" lang="ru">???????</a></li> 
+         <li class="dw-footer-newline"><a href="//www.ibm.com/developerworks/br/" lang="pt">Português (Brasil)</a></li> 
+         <li><a href="//www.ibm.com/developerworks/ssa/" lang="es">Español</a></li> 
+         <li><a href="//developer.ibm.com/kr/" lang="kr">??</a></li> 
+        </ul> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-3"> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-4"> 
+        <ul class="dw-footer-categories"> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/learn/">Tutorials &amp; training</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/accelerate/">Demos &amp; sample code</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/answers">Q&amp;A forums</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/dwblog/">dW Blog</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/events/">Events</a> </li> 
+        </ul> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-5"> 
+        <ul class="dw-footer-categories"> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/courses/">Courses</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/open/">Open source projects</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/tv/">Videos</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/recipes/">Recipes</a> </li> 
+        </ul> 
+       </div> 
+       <div class="ibm-col-6-1 dw-footer-col-6"> 
+        <ul class="dw-footer-categories"> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/develop/">Downloads</a> </li> 
+         <li class="dw-footer-category"> <a href="//developer.ibm.com/api/">APIs</a> </li> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/newsletter/">Newsletters</a> </li> 
+         <li class="dw-footer-category"> <a href="//www.ibm.com/developerworks/feeds/">Feeds</a> </li> 
+        </ul> 
+       </div> 
+      </div> 
+     </section> 
+    </div> 
+    <div id="dw-footer" class="ibm-padding-normal ibm-alternate"> 
+     <div class="ibm-columns"> 
+      <div class="ibm-col-1-1"> 
+       <div class="dw-footer-corporate-links"> 
+        <ul> 
+         <li><a href="//www.ibm.com/developerworks/aboutdw/contacts.html">Contact</a></li> 
+         <li><a href="//www.ibm.com/privacy/us/en/">Privacy</a></li> 
+         <li><a href="//www.ibm.com/developerworks/community/terms/use/">Terms of use</a></li> 
+         <li><a href="//www.ibm.com/accessibility/us/en/">Accessibility</a></li> 
+         <li class="ibm-feedbacklink"><a href="#">Feedback</a></li> 
+         <li id="ibm-truste-cp"><a onclick="truste.eu.clickListener();return false;" href="#">Cookie Preferences</a></li> 
+        </ul> 
+       </div> 
+       <div id="ibm-footer-locale-selector"></div> 
+      </div> 
+     </div> 
+    </div> 
+   </footer> 
+   <!-- FOOTER_END --> 
+   <!-- END_IBM-TOP --> 
+  </div> 
+  <!-- SCRIPTS_INCLUDE_BEGIN --> 
+  <!-- Styles --> 
+  <link rel="stylesheet" type="text/css" href="/developerworks/maverick/css/plugin/comments/jquery-comments.css"> 
+  <link rel="stylesheet" href="/developerworks/maverick/fonts/awesome-4.5.0/css/font-awesome.min.css"> 
+  <!-- Libraries --> 
+  <script type="text/javascript" src="/developerworks/maverick/js/plugin/comments/jquery-comments.min.js"></script> 
+  <script type="text/javascript" src="/developerworks/maverick/js/plugin/formatter/moment-with-locales.js"></script> 
+  <script type="text/javascript" src="/developerworks/maverick/js/ContentComments.js"></script> 
+  <script type="text/javascript" src="/developerworks/js/v18/ContentCommentsFormatter.js"></script> 
+  <script type="text/javascript" language="JavaScript">
+
+	IBMCore.common.module.masthead.subscribe("ready", "customjs", setupCommentsPlugin).runAsap(setupCommentsPlugin);
+
+	function setupCommentsPlugin(){
+		//debugger;
+			//alert(userLinks);
+			var commentsInitInfo = {
+				contentId : $("div[class=metavalue]:contains('ArticleID=')").text().split("=")[1],
+				siteId :  $("div[class=metavalue]:contains('SITE_ID=')").text().split("=")[1],
+				pluginDivId : '#dw-icomments-container',
+				notifyElementId : "#comment_notification",
+				loginMessageDivId : "#dw-article-cmts-login",
+				totalCommentsDivId : "#nCmts"
+			};				
+								
+			ContentComments.Setup(commentsInitInfo);
+	}
+</script> 
+  <script type="text/javascript">(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');ga('create','UA-41146412-3','auto');ga('require','linkid','linkid.js');var dcdate="2016-07-12";var cmaid="1018803";ga('set','dimension1',dcdate);ga('set','dimension2',cmaid);var dw_canonical="http://www.ibm.com/developerworks/library/wa-build-deploy-web-app-sailsjs-1-bluemix/index.html";dw_canonical=dw_canonical.substring(dw_canonical.indexOf(".ibm.com")+8);ga('send','pageview',{'page':dw_canonical,'dimension1':dcdate,'dimension2':cmaid});var trkOBL=function(url,id){id=id.split("-");var cat="v18 article";var act="Bluemix";if(id[2]=="dwpremium")act="Premium";if(id[2]=="dwopen")act="dWOpen";if(id[2]=="devops")act="Devops";act=act+' '+id[3];if(id[4]){var label=id[4];if(label=="btn")label="button";if(label=="txt")label="text link";if(label=="bnr")label="banner";if(label=="tl")label="tile";if(label=="regbar")label="registration bar";if(label=="vp")label="video promotion"}var ab=0;if(id[5]){if(id[5]=="ABa")ab=1;if(id[5]=="ABb")ab=2;if(id[5]=="ABc")ab=3;if(id[5]=="ABd")ab=4;if(id[5]=="ABe")ab=5;if(id[5]=="ABf")ab=6;if(id[5]=="ABg")ab=7;if(id[5]=="ABh")ab=8}ga('send','event',cat,act,label,ab,{'page':dw_canonical,'hitCallback':function(){document.location=url}})}</script>
+  <!-- Hotjar Tracking Code for ibm.com --> 
+  <script>
+    (function(h,o,t,j,a,r){
+    h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+    h._hjSettings={hjid:42920,hjsv:5};
+    a=o.getElementsByTagName('head')[0];
+    r=o.createElement('script');r.async=1;
+    r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+    a.appendChild(r);
+    })(window,document,'//static.hotjar.com/c/hotjar-','.js?sv=');
+</script> 
+  <!-- SCRIPTS_INCLUDE_END -->   
+ </body>
+</html>

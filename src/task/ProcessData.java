@@ -76,7 +76,7 @@ public class ProcessData {
 		searchers.add(bing3);
 		searchers.add(npmsearch);
 
-		for (Searcher searcher : searchers) {
+		/*for (Searcher searcher : searchers) {
 			
 			System.out.println("Analizando "+ searcher.getId());
 			
@@ -96,7 +96,7 @@ public class ProcessData {
 				System.out.println();
 				
 			//}
-		}
+		}*/
 		
 		
 		

@@ -1,0 +1,644 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US" xmlns:fb="http://ogp.me/ns/fb#" xmlns:addthis="http://www.addthis.com/help/api-spec">
+ <head profile="http://gmpg.org/xfn/11"> 
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+  <title>Developing Custom Components with Oracle Mobile Application Framework</title>
+  <meta name="description" content=" MAF's full support for JavaScript and CSS to create application behavior and styling, means developers can carry over the same skills of web development into the world of mobile apps.  In this article we will take a brief look at how you can build and use a custom component. We will examine how the custom tag is created, registered, and the various artifacts that are required to support your custom component."> 
+  <meta name="keywords" content="Mobile Application Framework, MAF, ADF Mobile, Mobile development, Mobile PLatform, App development, Javascript, , CSS, ,Custom Component, MAF Skins, Extending MAF Skins"> 
+  <meta name="robots" content="noodp,noydir"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="alternate" type="application/rss+xml" title="ATeam Chronicles » Feed" href="http://www.ateam-oracle.com/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="ATeam Chronicles » Comments Feed" href="http://www.ateam-oracle.com/comments/feed/"> 
+  <link rel="alternate" type="application/rss+xml" title="ATeam Chronicles » Developing Custom Components with Oracle Mobile Application Framework Comments Feed" href="http://www.ateam-oracle.com/custom-components-with-maf/feed/"> 
+  <link rel="canonical" href="http://www.ateam-oracle.com/custom-components-with-maf/"> 
+  <script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/72x72\/","ext":".png","source":{"concatemoji":"http:\/\/www.ateam-oracle.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.5.1"}};
+			!function(a,b,c){function d(a){var c,d,e,f=b.createElement("canvas"),g=f.getContext&&f.getContext("2d"),h=String.fromCharCode;if(!g||!g.fillText)return!1;switch(g.textBaseline="top",g.font="600 32px Arial",a){case"flag":return g.fillText(h(55356,56806,55356,56826),0,0),f.toDataURL().length>3e3;case"diversity":return g.fillText(h(55356,57221),0,0),c=g.getImageData(16,16,1,1).data,d=c[0]+","+c[1]+","+c[2]+","+c[3],g.fillText(h(55356,57221,55356,57343),0,0),c=g.getImageData(16,16,1,1).data,e=c[0]+","+c[1]+","+c[2]+","+c[3],d!==e;case"simple":return g.fillText(h(55357,56835),0,0),0!==g.getImageData(16,16,1,1).data[0];case"unicode8":return g.fillText(h(55356,57135),0,0),0!==g.getImageData(16,16,1,1).data[0]}return!1}function e(a){var c=b.createElement("script");c.src=a,c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i;for(i=Array("simple","flag","unicode8","diversity"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script> 
+  <style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style> 
+  <link rel="stylesheet" id="eleven40-theme-css" href="http://www.ateam-oracle.com/wp-content/themes/eleven40/style.css?ver=2.1.2" type="text/css" media="all"> 
+  <link rel="stylesheet" id="genesis-widgetized-footer-css" href="http://www.ateam-oracle.com/wp-content/plugins/genesis-widgetized-footer/css/gwfoot-styles.min.css?ver=1507211592" type="text/css" media="all"> 
+  <link rel="stylesheet" id="core3.0-css" href="http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/styles/shCore.css?ver=3.0" type="text/css" media="all"> 
+  <link rel="stylesheet" id="core-Default3.0-css" href="http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/styles/shCoreDefault.css?ver=3.0" type="text/css" media="all"> 
+  <link rel="stylesheet" id="theme-Default3.0-css" href="http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/styles/shThemeDefault.css?ver=3.0" type="text/css" media="all"> 
+  <link rel="stylesheet" id="column-styles-css" href="http://www.ateam-oracle.com/wp-content/plugins/wp_edit_pro/css/column-style.css?ver=4.5.1" type="text/css" media="all"> 
+  <script type="text/javascript" src="http://www.ateam-oracle.com/wp-includes/js/jquery/jquery.js?ver=1.12.3"></script> 
+  <script type="text/javascript" src="http://www.ateam-oracle.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.0"></script> 
+  <link rel="https://api.w.org/" href="http://www.ateam-oracle.com/wp-json/"> 
+  <link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.ateam-oracle.com/xmlrpc.php?rsd"> 
+  <link rel="alternate" type="application/json+oembed" href="http://www.ateam-oracle.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.ateam-oracle.com%2Fcustom-components-with-maf%2F"> 
+  <link rel="alternate" type="text/xml+oembed" href="http://www.ateam-oracle.com/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.ateam-oracle.com%2Fcustom-components-with-maf%2F&amp;format=xml"> 
+  <link type="text/css" rel="stylesheet" href="http://www.ateam-oracle.com/wp-content/plugins/Oracle-category-specific-rss-feed-menu/wp_cat_rss_style.css"> 
+  <!-- HITSTEPS TRACKING CODE v5.30 - DO NOT CHANGE --> 
+  <script type="text/javascript">
+	function hitsteps_gc( name ) { if (document.cookie){ var hs_cookie_split = document.cookie.split(';'); if (hs_cookie_split){ for( var i in hs_cookie_split ) { if (typeof hs_cookie_split[i] == "undefined"){}else{ if( hs_cookie_split[i].indexOf( name+'=' ) != -1 ) return decodeURIComponent( hs_cookie_split[i].split('=')[1] ); }}}} return '';}
+
+		_hs_uniqueid='';
+		ipname='';
+
+		ipnames=hitsteps_gc( 'comment_author_92a90176cf51900b4a9115d529d81dcc' );
+		ipemails=hitsteps_gc( 'comment_author_email_92a90176cf51900b4a9115d529d81dcc' );
+		if (ipnames!=''&&ipname=='') ipname=ipnames;
+		if (ipemails!=''&&_hs_uniqueid=='') _hs_uniqueid=ipemails;
+
+  	</script> 
+  <script>
+(function(){
+var hstc=document.createElement('script');
+var hstcs='www.';
+hstc.src='https://log.hitsteps.com/track.php?code=2295eb6bee4d4a15132b865dad767f54';
+hstc.async=true;
+var htssc = document.getElementsByTagName('script')[0];
+htssc.parentNode.insertBefore(hstc, htssc);
+})();
+
+var nochat=0;
+</script> 
+  <!-- HITSTEPS TRACKING CODE - Header Code - DO NOT CHANGE --> 
+  <style type="text/css">
+				#wpadminbar .quicklinks li#wp-admin-bar-hitstepsbtn {
+					height: 28px
+				}
+
+				#wpadminbar .quicklinks li#wp-admin-bar-hitstepsbtn a {
+					height: 28px;
+					padding: 0;
+				}
+
+				#wpadminbar .quicklinks li#wp-admin-bar-hitstepsbtn a img {
+					padding: 4px 5px;
+					height: 20px;
+	
+				}
+				
+
+
+				#wpadminbar .quicklinks li#wp-admin-bar-hitstepsgraph a {
+					padding: 0;
+				}
+
+				#wpadminbar .quicklinks li#wp-admin-bar-hitstepsgraph a img {
+					padding: 4px 5px;
+					padding-top:0px !important;
+					background-position:5px 0px !important;
+					
+	
+				}
+			</style> 
+  <script type="text/javascript" src="http://www.ateam-oracle.com/wp-content/plugins/wp-spamshield/js/jscripts.php"></script> 
+  <link rel="Shortcut Icon" href="http://www.ateam-oracle.com/wp-content/themes/eleven40/images/favicon.ico" type="image/x-icon"> 
+  <link rel="author" href="http://jeevan.g@gmail.com"> 
+  <link rel="shortcut icon" href="http://www.ateam-oracle.com/wp-content/themes/eleven40/favicon.ico">
+ </head>  
+ <body class="single single-post postid-25658 single-format-standard content-sidebar"> 
+  <div id="wrap"> 
+   <div id="header">
+    <div class="wrap">
+     <div id="title-area">
+      <p id="title"><a href="http://www.ateam-oracle.com/">ATeam Chronicles</a></p>
+      <p id="description">The Oracle A-Team Information Hub</p>
+     </div>
+     <div class="widget-area header-widget-area">
+      <div id="nav_menu-2" class="widget widget_nav_menu">
+       <div class="widget-wrap">
+        <div class="menu-main-menu-container">
+         <ul id="menu-main-menu" class="menu genesis-nav-menu js-superfish">
+          <li id="menu-item-34010" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-34010"><a href="http://www.ateam-oracle.com/oracle-cloud-offerings/">Cloud</a> 
+           <ul class="sub-menu"> 
+            <li id="menu-item-34004" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-34004"><a href="http://www.ateam-oracle.com/paas/">Platform as a Service</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-34028" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34028"><a href="http://www.ateam-oracle.com/paas-dbss/">Database Schema Service</a></li> 
+              <li id="menu-item-34212" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34212"><a href="http://www.ateam-oracle.com/paas-database-as-a-service/">Database as a Service</a></li> 
+              <li id="menu-item-34031" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34031"><a href="http://www.ateam-oracle.com/paas-dcs/">Developer Cloud Service</a></li> 
+              <li id="menu-item-34009" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34009"><a href="http://www.ateam-oracle.com/paas-docs/">Documents Cloud Service</a></li> 
+              <li id="menu-item-34021" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34021"><a href="http://www.ateam-oracle.com/paas-jcs/">Java Cloud Service</a></li> 
+              <li id="menu-item-34022" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34022"><a href="http://www.ateam-oracle.com/paas-jcsx/">Java Cloud Service – SaaS Extension</a></li> 
+              <li id="menu-item-34007" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34007"><a href="http://www.ateam-oracle.com/paas-mobile-cloud-service/">Mobile Cloud Service</a></li> 
+              <li id="menu-item-34008" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34008"><a href="http://www.ateam-oracle.com/paas-integration-cloud-service/">Integration Cloud Service</a></li> 
+              <li id="menu-item-34016" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34016"><a href="http://www.ateam-oracle.com/paas-nodejs/">Node.js</a></li> 
+              <li id="menu-item-34006" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34006"><a href="http://www.ateam-oracle.com/paas-bics/">BI Cloud Service</a></li> 
+              <li id="menu-item-35512" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35512"><a href="http://www.ateam-oracle.com/paas-security/">Security</a></li> 
+             </ul> </li> 
+            <li id="menu-item-34011" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-34011"><a href="http://www.ateam-oracle.com/saas/">Software as a Service</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-34037" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-34037"><a href="http://www.ateam-oracle.com/saas-human-capital-management/">Human Capital Management</a> 
+               <ul class="sub-menu"> 
+                <li id="menu-item-34042" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34042"><a href="http://www.ateam-oracle.com/saas-human-capital-management-global-human-resources/">Global Human Resources</a></li> 
+                <li id="menu-item-34043" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34043"><a href="http://www.ateam-oracle.com/saas-human-capital-management-talent-management/">Talent Management</a></li> 
+               </ul> </li> 
+              <li id="menu-item-34053" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-34053"><a href="http://www.ateam-oracle.com/saas-supply-chain-management/">Supply Chain Management</a> 
+               <ul class="sub-menu"> 
+                <li id="menu-item-34032" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34032"><a href="http://www.ateam-oracle.com/saas-supply-chain-management-inventory-and-costing/">Inventory and Costing</a></li> 
+                <li id="menu-item-34050" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34050"><a href="http://www.ateam-oracle.com/saas-supply-chain-management-product-value-chain/">Product Value Chain</a></li> 
+                <li id="menu-item-34049" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34049"><a href="http://www.ateam-oracle.com/saas-supply-chain-management-transportation-and-global-trade-management/">Transportation and Global Trade Management</a></li> 
+               </ul> </li> 
+              <li id="menu-item-34061" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-34061"><a href="http://www.ateam-oracle.com/saas-enterprise-resource-planning/">Enterprise Resource Planning</a> 
+               <ul class="sub-menu"> 
+                <li id="menu-item-34071" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34071"><a href="http://www.ateam-oracle.com/saas-enterprise-resource-planning-accounting-hub-reporting/">Accounting Hub Reporting</a></li> 
+                <li id="menu-item-34073" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34073"><a href="http://www.ateam-oracle.com/saas-enterprise-resource-planning-financials/">Financials</a></li> 
+                <li id="menu-item-34062" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34062"><a href="http://www.ateam-oracle.com/saas-enterprise-resource-planning-procurement/">Procurement</a></li> 
+                <li id="menu-item-34060" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34060"><a href="http://www.ateam-oracle.com/saas-enterprise-resource-planning-project-financial-management/">Project Financial Management</a></li> 
+                <li id="menu-item-34075" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34075"><a href="http://www.ateam-oracle.com/saas-enterprise-resource-planning-project-management/">Project Management</a></li> 
+                <li id="menu-item-34072" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34072"><a href="http://www.ateam-oracle.com/saas-enterprise-resource-plannings-revenue-management/">Revenue Management</a></li> 
+               </ul> </li> 
+              <li id="menu-item-34034" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-34034"><a href="http://www.ateam-oracle.com/oracle-cloud-offerings-saas-custexp/">Customer Experience</a> 
+               <ul class="sub-menu"> 
+                <li id="menu-item-34088" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34088"><a href="http://www.ateam-oracle.com/saas-customer-experience-marketing/">Marketing</a></li> 
+                <li id="menu-item-34087" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34087"><a href="http://www.ateam-oracle.com/saas-customer-experience-sales/">Sales</a></li> 
+                <li id="menu-item-34089" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-34089"><a href="http://www.ateam-oracle.com/saas-customer-experience-service/">Service</a></li> 
+               </ul> </li> 
+             </ul> </li> 
+           </ul> </li> 
+          <li id="menu-item-271" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-271"><a href="http://www.ateam-oracle.com/fmw/">Fusion Middleware</a> 
+           <ul class="sub-menu"> 
+            <li id="menu-item-4729" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-4729"><a href="http://www.ateam-oracle.com/cloud-foundation/">Cloud Application Foundation</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-13770" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13770"><a href="http://www.ateam-oracle.com/cloud-foundation/cloud-foundation-complete-listing/">Cloud Application Foundation – All articles</a></li> 
+              <li id="menu-item-13768" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13768"><a href="http://www.ateam-oracle.com/cloud-foundation/cloud-coherence/">Coherence</a></li> 
+              <li id="menu-item-17309" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17309"><a href="http://www.ateam-oracle.com/cloud-foundation/cloud-tuxedo/">Tuxedo</a></li> 
+              <li id="menu-item-13769" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13769"><a href="http://www.ateam-oracle.com/cloud-foundation/cloud-wls/">WebLogic Server</a></li> 
+             </ul> </li> 
+            <li id="menu-item-22211" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-22211"><a href="http://www.ateam-oracle.com/commerce-home/">Commerce Suite</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-22212" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-22212"><a href="http://www.ateam-oracle.com/commerce-suite-complete-listing/">Commerce Suite – All articles</a></li> 
+             </ul> </li> 
+            <li id="menu-item-1119" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-1119"><a href="http://www.ateam-oracle.com/data-integration/">Data Integration</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-1859" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1859"><a href="http://www.ateam-oracle.com/data-integration/di-complete-listing/">Data Integration – All articles</a></li> 
+              <li id="menu-item-13772" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13772"><a href="http://www.ateam-oracle.com/data-integration/di-odi/">Oracle Data Integrator</a></li> 
+              <li id="menu-item-13771" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13771"><a href="http://www.ateam-oracle.com/di-ogg/">GoldenGate</a></li> 
+             </ul> </li> 
+            <li id="menu-item-957" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-957"><a href="http://www.ateam-oracle.com/engsys-exalogic/">Engineered Systems</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-2003" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2003"><a href="http://www.ateam-oracle.com/engsys-exalogic/exalogic-complete/">Exalogic – All articles</a></li> 
+              <li id="menu-item-13774" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13774"><a href="http://www.ateam-oracle.com/engsys-exalogic/exalogic-arch/">Exalogic Architecture</a></li> 
+              <li id="menu-item-13775" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13775"><a href="http://www.ateam-oracle.com/engsys-exalogic/exalogic-hw/">Exalogic Hardware</a></li> 
+              <li id="menu-item-13776" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13776"><a href="http://www.ateam-oracle.com/engsys-exalogic/exalogic-os/">Exalogic O/S</a></li> 
+              <li id="menu-item-13777" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13777"><a href="http://www.ateam-oracle.com/engsys-exalogic/exalogic-sw/">Exalogic Software</a></li> 
+              <li id="menu-item-13778" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13778"><a href="http://www.ateam-oracle.com/engsys-exalogic/exalogic-tips/">Exalogic Tips and Tricks</a></li> 
+             </ul> </li> 
+            <li id="menu-item-5113" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-5113"><a href="http://www.ateam-oracle.com/oem-home/">Enterprise Manager</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-15355" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15355"><a href="http://www.ateam-oracle.com/oem-home/oem-complete/">Enterprise Manager – All articles</a></li> 
+             </ul> </li> 
+            <li id="menu-item-1048" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-1048"><a href="http://www.ateam-oracle.com/idm/">Identity Management</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-1883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1883"><a href="http://www.ateam-oracle.com/idm/idm-complete/">Identity Management – All articles</a></li> 
+              <li id="menu-item-1781" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1781"><a href="http://www.ateam-oracle.com/idm/idm-access/">Access Management</a></li> 
+              <li id="menu-item-1780" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1780"><a href="http://www.ateam-oracle.com/idm/idm-dir/">Directory Service</a></li> 
+              <li id="menu-item-17741" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-17741"><a href="http://www.ateam-oracle.com/idm/index-of-general-articles/">IDM General articles</a></li> 
+              <li id="menu-item-1779" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1779"><a href="http://www.ateam-oracle.com/idm/idm-governance/">Identity Governance</a></li> 
+              <li id="menu-item-1778" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1778"><a href="http://www.ateam-oracle.com/idm/idm-psec/">Platform Security</a></li> 
+             </ul> </li> 
+            <li id="menu-item-1055" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-1055"><a href="http://www.ateam-oracle.com/integration/">Integration</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-8893" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-8893"><a href="http://www.ateam-oracle.com/integration/integration-complete/">Integration – All articles</a></li> 
+              <li id="menu-item-13780" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-13780"><a href="http://www.ateam-oracle.com/integration/integration-aia/">AIA</a></li> 
+              <li id="menu-item-14756" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-14756"><a href="http://www.ateam-oracle.com/integration/index-of-bpm-suite-articles/">BPM Suite</a></li> 
+              <li id="menu-item-20855" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20855"><a href="http://www.ateam-oracle.com/index-of-oracle-event-processor-articles/">Oracle Event Processor</a></li> 
+              <li id="menu-item-1204" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1204"><a href="http://www.ateam-oracle.com/integration/integration-osb/">Oracle Service Bus</a></li> 
+              <li id="menu-item-1200" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1200"><a href="http://www.ateam-oracle.com/integration/integration-soa-suite/">SOA Suite</a></li> 
+             </ul> </li> 
+            <li id="menu-item-1063" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-1063"><a href="http://www.ateam-oracle.com/tools-home/">Tools</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-1877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1877"><a href="http://www.ateam-oracle.com/tools-home/tools-complete/">Tools – All articles</a></li> 
+              <li id="menu-item-15453" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15453"><a href="http://www.ateam-oracle.com/tools-home/tools-adf/">ADF</a></li> 
+              <li id="menu-item-16927" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-16927"><a href="http://www.ateam-oracle.com/tools-home/tools-adfmobile/">ADF Mobile</a></li> 
+              <li id="menu-item-15452" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15452"><a href="http://www.ateam-oracle.com/tools-home/tools-buildautomation/">Build Automation</a></li> 
+              <li id="menu-item-1879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1879"><a href="http://www.ateam-oracle.com/tools-home/tools-diagnostics/">Diagnostics</a></li> 
+              <li id="menu-item-35158" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35158"><a href="http://www.ateam-oracle.com/ojet/">Oracle JET</a></li> 
+              <li id="menu-item-15454" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15454"><a href="http://www.ateam-oracle.com/tools-home/tools-jdeveloper/">JDeveloper</a></li> 
+              <li id="menu-item-15455" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15455"><a href="http://www.ateam-oracle.com/tools-home/tools-other/">Index of Other tools</a></li> 
+             </ul> </li> 
+            <li id="menu-item-35857" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-35857"><a href="http://www.ateam-oracle.com/webcenter-home/">Webcenter</a> 
+             <ul class="sub-menu"> 
+              <li id="menu-item-35858" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35858"><a href="http://www.ateam-oracle.com/webcenter-home/webcenter-complete/">WebCenter – All articles</a></li> 
+              <li id="menu-item-35861" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35861"><a href="http://www.ateam-oracle.com/webcenter-home/webcenter-content/">WebCenter Content</a></li> 
+              <li id="menu-item-35859" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35859"><a href="http://www.ateam-oracle.com/webcenter-home/webcenter-portal/">WebCenter Portal</a></li> 
+              <li id="menu-item-35860" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35860"><a href="http://www.ateam-oracle.com/webcenter-home/webcenter-sites/">WebCenter Sites</a></li> 
+             </ul> </li> 
+           </ul> </li> 
+          <li id="menu-item-35862" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-35862"><a href="http://www.ateam-oracle.com/fusion-apps/">Fusion Applications</a> 
+           <ul class="sub-menu"> 
+            <li id="menu-item-35863" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35863"><a href="http://www.ateam-oracle.com/fusion-apps/fa-complete/">Fusion Applications – All Articles</a></li> 
+            <li id="menu-item-35869" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35869"><a href="http://www.ateam-oracle.com/fusion-apps/fa-architecture/">Fusion Applications Architecture</a></li> 
+            <li id="menu-item-35865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35865"><a href="http://www.ateam-oracle.com/fusion-apps/fa-bi/">Fusion Applications BI and Reporting</a></li> 
+            <li id="menu-item-35870" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35870"><a href="http://www.ateam-oracle.com/fusion-apps/fa-diagnose-and-troubleshoot/">Fusion Applications Diagnosis and Troubleshooting</a></li> 
+            <li id="menu-item-35868" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35868"><a href="http://www.ateam-oracle.com/fusion-apps/fa-extend/">Fusion Applications Extensibility and Customization</a></li> 
+            <li id="menu-item-35871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35871"><a href="http://www.ateam-oracle.com/fusion-apps/fa-install/">Fusion Applications Installation and Provisioning</a></li> 
+            <li id="menu-item-35864" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35864"><a href="http://www.ateam-oracle.com/fusion-apps/fa-integrate/">Fusion Applications Integration and Co-existence articles</a></li> 
+            <li id="menu-item-35872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35872"><a href="http://www.ateam-oracle.com/fusion-apps/fa-lifecycle/">Fusion Applications Lifecycle Management</a></li> 
+            <li id="menu-item-35873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35873"><a href="http://www.ateam-oracle.com/fusion-apps/fa-performance/">Fusion Applications Performance</a></li> 
+            <li id="menu-item-35874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-35874"><a href="http://www.ateam-oracle.com/fusion-apps/fa-security/">Fusion Applications Security</a></li> 
+           </ul> </li> 
+          <li id="menu-item-35877" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-35877"><a href="http://www.ateam-oracle.com/this-site/">About</a></li> 
+          <li><a href="http://www.ateam-oracle.com/wp-login.php?redirect_to=%2Fcustom-components-with-maf%2F">Log in</a></li>
+         </ul>
+        </div>
+       </div>
+      </div> 
+     </div>
+    </div>
+   </div>
+   <div id="inner">
+    <div class="wrap">
+     <div id="content-sidebar-wrap">
+      <div id="content" class="hfeed">
+       <div class="post-25658 post type-post status-publish format-standard hentry category-maf category-mobile-platform tag-adf-mobile tag-app-development tag-css tag-custom-component tag-extending-maf-skins tag-javascript tag-maf tag-maf-skins tag-mobile-application-framework tag-mobile-development tag-mobile-platform entry">
+        <h1 class="entry-title">Developing Custom Components with Oracle Mobile Application Framework</h1> 
+        <div class="post-info">
+         <span class="date published time" title="2014-07-07T09:16:07+00:00">July 7, 2014</span> by 
+         <span class="author vcard"><span class="fn"><a href="http://www.ateam-oracle.com/author/jeevan/" rel="author">Jeevan Joseph</a></span></span> 
+         <span class="post-comments"><a href="http://www.ateam-oracle.com/custom-components-with-maf/#comments">1 Comment</a></span> 
+        </div>
+        <div class="entry-content">
+         <p id="Introduction">Introduction</p> 
+         <p>Oracle’s Mobile Application Framework (MAF) is a great tool for web developers to enter the mobile application development space in an easy and seamless manner. MAF’s full support for JavaScript and CSS to create application behavior and styling, means developers can carry over the same skills of web development into the world of mobile apps. While MAF’s AMX component set is fully featured and is a great springboard to get your application jump-started, MAF developers are not limited by the component set that AMX offers. MAF supports custom components to be created in pure JavaScript and CSS. These custom components become custom tag libraries that can be reused. Custom components can even be used to wrap standard AMX components, making them ideal to customize or enhance the component set.</p> 
+         <p id="Main_Article">Main Article</p> 
+         <p>In this article we will take a brief look at how you can build and use a custom component. We will examine how the custom tag is created, registered, and the various artifacts that are required to support your custom component. To demonstrate the concepts, we will build a very simple custom component that is rendered like a notification badge inside the application. The component will have support for custom attributes that are used by the component implementation. In this article we also use Font Awesome, which is a font and CSS toolkit, which gives you glyphs and icons that are font characters instead of images. The finished notification badge looks like this <a href="http://www.ateam-oracle.com/wp-content/uploads/2014/07/finished1.png"><img src="http://www.ateam-oracle.com/wp-content/uploads/2014/07/finished1.png" alt="finished" width="365" height="80" class="aligncenter wp-image-25662 size-full" srcset="http://www.ateam-oracle.com/wp-content/uploads/2014/07/finished1.png 365w, http://www.ateam-oracle.com/wp-content/uploads/2014/07/finished1-300x65.png 300w" sizes="(max-width: 365px) 100vw, 365px"></a> The AMX code that accomplished this is simple a single line</p> 
+         <pre class="brush: xml; gutter: true">&lt;notification:badge id="badge" class="fa fa-bell fa-2x appIcon" unread="#{applicationScope.unreadCount}"/&gt; 
+</pre> 
+         <p>This is obviously not an AMX component tag, and it has some non standard attributes like “unread”. This is how a custom component will appear inside an AMX page, and we are going to take a look at how this tag was created, and what happens at runtime to render the icon with a notification badge. The finished project can be downloaded <a href="http://www.ateam-oracle.com/wp-content/uploads/2014/07/MAFCustomComponentExample.zip">here</a>.</p> 
+         <h3>The parts of a custom component</h3> 
+         <p>A custom component is really just a JavaScript function, that is usually accompanied by some CSS styling. The CSS Styling is of course optional. The job of the JavaScript function is to render the component by generating HTML for it. Any AMX page is ultimately rendered as HTML by the MAF runtime on the device on to the device’s WebView. The DOM structure that a custom component’s JavaScript function generates is inserted at the location where the custom component tag is encountered in the AMX markup as the MAF runtime renders it. You can also pass parameters to your JavaScript function using custom attributes on the tag you have defined for your custom component. In the example below, the <code>unread</code> attribute is used by the JavaScript <code>render()</code> function to decide what&nbsp;HTML to generate and what CSS classes to add to the DOM nodes when rendering the component. In the AMX markup, the custom attribute values can be EL expressions like in our example. The EL expression is evaluated and the JavaScript function sees the evaluated value. For our simple example, we are nor triggering this from real push notifications, but instead just driven off of an &nbsp;input slider component’s value. For more complex custom components, you can obviously organize the code with additional helper functions, but the very minimum for the JavaScript code is to define what HTML to generate when our custom tag is encountered. The JavaScript for our custom component is below :</p> 
+         <pre class="brush: javascript; gutter: true">(function () {
+    // ---------------------------------------------------------------------------------------------
+    // This is the Javascript for the notification:badge custom component
+    // ---------------------------------------------------------------------------------------------
+    var badge = adf.mf.api.amx.TypeHandler.register("http://xmlns.ateam.com/notification", "badge");
+    badge.prototype.render = function (amxNode, id) {
+        var rootElement = document.createElement("div");
+        try {
+            var link = document.createElement("a");
+            //tag's custom attribute values being accessed in the JavaScript function
+            var userClass = amx.getTextValue(amxNode.getAttribute("class"));
+            var unreadCount = parseInt(amx.getTextValue(amxNode.getAttribute("unread")));
+
+            link.setAttribute("href", "#");
+            link.setAttribute("class", userClass);
+            rootElement.appendChild(link);
+
+            var badgeOverlay = document.createElement("span");
+            badgeOverlay.className = "notification-badge";
+
+            // Display a badge only if there are more than 0 unread notifications
+            if (unreadCount &gt; 0) {
+                badgeOverlay.appendChild(document.createTextNode(unreadCount));
+            }
+            else {
+                badgeOverlay.className = "notification-badge-hidden";
+            }
+            link.appendChild(badgeOverlay);
+
+        }
+        catch (problem) {
+            alert(problem);
+            adf.mf.log.Framework.logp(adf.mf.log.level.SEVERE, "notification", "render", 
+                                       "Problem with custom component creation: " + problem);
+        }
+        return rootElement;
+    };
+
+})();
+</pre> 
+         <h3>A closer look at the JavaScript and the APIs used</h3> 
+         <p>How did MAF know to invoke the function you just wrote, when it encountered the <code>&lt;notification:badge&gt;</code>&nbsp;tag in the AMX page ? This is because we registered a <code>TypeHandler</code> for the tag within the tag name-space in the first line of code above. This is how custom tags are registered with the runtime and how the framework knows what function to call to generate the HTML for a custom component when that custom component’s tag is encountered. <a href="http://docs.oracle.com/middleware/mobile200/mobile/develop/maf-ui-custom-components.htm#BABHJAIB"><code>TypeHandler</code> is the primary API </a>for creating and managing custom UI components. The <a href="http://docs.oracle.com/middleware/mobile200/mobile/develop/maf-ui-custom-components.htm#BABJIBCB"><code>adf.mf.api.amx.TypeHandler.register</code></a> is a static API that lets you provide a name-space and a tag name to register that tag under that name space, and the API returns the <code>TypeHandler</code> subclass. This subclass can be used to prototype functions for this <code>TypeHandler</code> which is now registered for that (namespaced) tag. The function that should be prototyped mandatorily is on the returned <code>TypeHandler</code> is, unsurprisingly, <code>render()</code> which you see in the very next line of code. The <code>render()</code> function returns an <code>HTMLElement</code> subclass by creating&nbsp;the DOM hierarchy for this custom component, as shown in the code snippet above. This function can be arbitrarily complex and reply upon helper functions as well. The important thing is that it should prototype the <code>render()</code> function and return a single <code>HTMLElement</code> that is the root element for the custom component’s HTML.</p> 
+         <h3>Putting it together</h3> 
+         <p>Once you have the custom component’s JavaScript&nbsp;function and the optional CSS styling used by the component in a CSS file, you can start using it in your MAF application. Custom components are added as JavaScript and CSS additions at a feature level. To add the files to your feature, open the maf-feature.xml in your <em>ViewController&gt;ApplicationSources&gt;Meta-INF</em> directory. Select the feature you want to add your custom component to, and add the JavaScript&nbsp;and CSS&nbsp;files to the “includes”&nbsp;section.</p> 
+         <p><a href="http://www.ateam-oracle.com/wp-content/uploads/2014/07/addition1.png"><img src="http://www.ateam-oracle.com/wp-content/uploads/2014/07/addition1.png" alt="addition" width="662" height="306" class="aligncenter wp-image-25665 size-full" srcset="http://www.ateam-oracle.com/wp-content/uploads/2014/07/addition1.png 662w, http://www.ateam-oracle.com/wp-content/uploads/2014/07/addition1-300x138.png 300w" sizes="(max-width: 662px) 100vw, 662px"></a></p> 
+         <p>Once the assets are added to the feature, you can add the custom component to your AMX page. In our example we have the <em>notificationBadge.js</em> that does the registration and provides the <code>TypeHander</code> render prototyping, the <em>notification.css</em> that contains the CSS classes that we used to style the notification badge.&nbsp;&nbsp;The complete AMX code is short and concise :</p> 
+         <pre class="brush: xml; gutter: true">&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+&lt;amx:view xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          xmlns:amx="http://xmlns.oracle.com/adf/mf/amx"
+          xmlns:dvtm="http://xmlns.oracle.com/adf/mf/amx/dvt" 
+          xmlns:notification="http://xmlns.ateam.com/notification"&gt;
+ &lt;amx:panelPage id="pp1"&gt;
+   &lt;amx:facet name="header"&gt;
+     &lt;amx:outputText value="Custom Component Sample" id="ot1"/&gt;
+   &lt;/amx:facet&gt;
+   &lt;amx:facet name="primary"&gt;
+     &lt;notification:badge id="badge" 
+                      class="fa fa-bell fa-2x notification-icon"
+                      unread="#{applicationScope.unreadCount}"/&gt;
+   &lt;/amx:facet&gt;
+   &lt;amx:inputNumberSlider label="# of Notifications" 
+     id="ins1" minimum="0" maximum="15" 
+     stepSize="1"
+     value="#{applicationScope.unreadCount}"/&gt;
+ &lt;/amx:panelPage&gt;
+&lt;/amx:view&gt;
+</pre> 
+         <p class="note">Do not forget to add the xml namespace for your custom tag to the <code>&lt;amx:view&gt;</code> &nbsp;tag.<br> <code>&lt;amx:view xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"</code><br> <code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; xmlns:amx="http://xmlns.oracle.com/adf/mf/amx"</code><br> <code>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; xmlns:dvtm="http://xmlns.oracle.com/adf/mf/amx/dvt" &nbsp; &nbsp;&nbsp;</code><br> <code><strong><span style="color: #ff0000;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; xmlns:notification="http://xmlns.ateam.com/notification"</span></strong>&gt;</code></p> 
+         <h3>Custom Components : Pros, Cons and Best practices</h3> 
+         <p>With custom components in MAF, it becomes possible for web developers to implement sophisticated and highly customized mobile user experiences with the familiar&nbsp;JavaScript and CSS toolset. &nbsp;On the flip side though, custom components do come with certain limitations, at the time of writing this article, custom components do not offer a way to be packaged and shared as a single unit. This means that custom components need to be added as feature additions on all features that require it. The JDeveloper design time does not support using the property inspector to set the custom components properties. This is because the properties offered by a custom component are designed by the custom component creator and can be totally arbitrary, while no such meta-data is known to the JDeveloper design time.</p> 
+         <p>When building your own custom components, it is useful to have a set of general development guideines. It is recommended to surround the JavaScript function in a<code> try... catch</code> block to easily troubleshoot and debug the code using JavaScript debugging methods described <a title="here (Android)" href="http://www.ateam-oracle.com/debugging-maf-applications-on-android/">here(Android) </a>and <a href="http://www.ateam-oracle.com/debugging-maf-applications-on-ios/">here (iOS)</a>. Do not&nbsp;assume the DOM structure or develop a custom component that assumes and depends on a certain DOM structure for the rest of the DOM tree. This makes the component fragile and changes to the DOM structure either in the rest of the application code or in the AMX&nbsp;component implementation (perhaps in a later framework release) might break the custom component. Always use the APIs to introspect the AmxNode structure than relying on an observed DOM structure. In most cases like our example above, the markup that is generated also needs to be styled. For styling, any CSS class available through the skin or through a CSS file added to the feature can be used. In our example, we add a separate CSS file that contains CSS classes specific to the custom component. This keeps the skin, which is applicable to any MAF application, devoid of custom component styling. When developing CSS classes, it is a good practice to follow a naming convention like <span style="color: #000000;">&lt;namespace&gt;-&lt;component&gt;-&lt;element&gt;</span>&nbsp;, which is the structure that AMX&nbsp;uses. For example,class names like&nbsp;<em>notification-badge</em> and <em>notification-badge-text</em> would make it clear what component the CSS class belongs to, and would also be better at avoiding collisions.</p> 
+         <h3>Dialing it up a notch : Nesting AMX components inside your custom component</h3> 
+         <p>Taking the custom components to the next level, the first question would be if you can nest standard AMX components inside your custom component tag, and the answer is yes. This is particularly useful when you are building a custom component that wraps one of more AMX components to add specialized UI behavior.&nbsp;The <a href="http://docs.oracle.com/middleware/mobile200/mobile/develop/maf-ui-custom-components.htm#BABHJAIB">TypeHandler</a>, <a href="http://docs.oracle.com/middleware/mobile200/mobile/develop/maf-ui-custom-components.htm#BABJHGGC">AmxNode</a> and <a href="http://docs.oracle.com/middleware/mobile200/mobile/develop/maf-ui-custom-components.htm#BABCFIJJ">AmxTag </a>APIs <a href="http://docs.oracle.com/middleware/mobile200/mobile/develop/maf-ui-custom-components.htm#BABGHAFA">among others</a>, make the process of mixing and interacting with AMX components simple and easy by letting you have programmatic access to these AMXNodes. Two of the most important functions on the AmxNode API to programmatically access and manipulate the custom component’s nested child components would be the would be the <code>getChildren()</code> API that returns an array of AMXNodes that are the children of the current node. This lets you use the API to manipulate the child nodes before they are rendreded. Just as with the custom component you created above, the standard AMX components also generate their HTML root elements that are HTMLElement subclasses when they are rendered by the runtime. The <code>renderDescendants()</code> API rendders the child nodes and returns an array of HTMLElements that are the root elements created by the child AmxNodes. Our simple example here to get the reader introduced to custom components does not leverage these APIs, and stands to prove that even with very simple implementations meaningful custom components can be built. The framework also ships with a set of samples that&nbsp;show how these APIs work. The samples can be found in the&nbsp;<code style="color: #000000;">PublicSamples.zip</code><span style="color: #222222;">&nbsp;file within the&nbsp;</span><code style="color: #000000;"><span class="codeinlineitalic" style="font-style: italic;">jdev_install</span></code><code style="color: #000000;">/jdeveloper/jdev/extensions/oracle.maf/Samples</code></p> 
+         <p>I hope that this has whet your appetite for more on custom components, and we shall dive deeper in to custom components and the APIs in a future post. You can download the sample application used in the article here&nbsp;:&nbsp;<a href="http://www.ateam-oracle.com/wp-content/uploads/2014/07/MAFCustomComponentExample.zip">MAFCustomComponentExample</a></p> 
+         <p>&nbsp;</p> 
+         <p class="copyright">All site content is the property of Oracle Corp. Redistribution not allowed without written permission</p>
+         <!-- AddThis Sharing Buttons below --> 
+         <div class="addthis_toolbox addthis_default_style " addthis:url="http://www.ateam-oracle.com/custom-components-with-maf/" addthis:title="Developing Custom Components with Oracle Mobile Application Framework"> 
+          <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a> 
+          <a class="addthis_button_tweet"></a> 
+          <a class="addthis_button_pinterest_pinit"></a> 
+          <a class="addthis_counter addthis_pill_style"></a> 
+         </div>
+        </div>
+        <div class="post-meta">
+         <span class="categories">Filed Under: <a href="http://www.ateam-oracle.com/category/mobile-platform/maf/" rel="category tag">MAF</a>, <a href="http://www.ateam-oracle.com/category/mobile-platform/" rel="category tag">Mobile Platform</a></span> 
+         <span class="tags">Tagged With: <a href="http://www.ateam-oracle.com/tag/adf-mobile/" rel="tag">ADF Mobile</a>, <a href="http://www.ateam-oracle.com/tag/app-development/" rel="tag">App development</a>, <a href="http://www.ateam-oracle.com/tag/css/" rel="tag">CSS</a>, <a href="http://www.ateam-oracle.com/tag/custom-component/" rel="tag">Custom Component</a>, <a href="http://www.ateam-oracle.com/tag/extending-maf-skins/" rel="tag">Extending MAF Skins</a>, <a href="http://www.ateam-oracle.com/tag/javascript/" rel="tag">Javascript</a>, <a href="http://www.ateam-oracle.com/tag/maf/" rel="tag">MAF</a>, <a href="http://www.ateam-oracle.com/tag/maf-skins/" rel="tag">MAF Skins</a>, <a href="http://www.ateam-oracle.com/tag/mobile-application-framework/" rel="tag">Mobile Application Framework</a>, <a href="http://www.ateam-oracle.com/tag/mobile-development/" rel="tag">Mobile development</a>, <a href="http://www.ateam-oracle.com/tag/mobile-platform/" rel="tag">Mobile Platform</a></span>
+        </div>
+       </div>
+       <div id="comments">
+        <h3>Comments</h3>
+        <ol class="comment-list"> 
+         <li class="comment byuser comment-author-horst-ritter even thread-even depth-1" id="comment-3404"> 
+          <div class="comment-header"> 
+           <div class="comment-author vcard"> 
+            <img alt="" src="http://2.gravatar.com/avatar/e172c36e1349c20e4405a7795cef393e?s=48&amp;d=mm&amp;r=g" srcset="http://2.gravatar.com/avatar/e172c36e1349c20e4405a7795cef393e?s=96&amp;d=mm&amp;r=g 2x" class="avatar avatar-48 photo" height="48" width="48"> 
+            <cite class="fn">Horst</cite> 
+            <span class="says">says:</span> 
+           </div> 
+           <div class="comment-meta commentmetadata"> 
+            <a href="http://www.ateam-oracle.com/custom-components-with-maf/#comment-3404">September 10, 2015 at 4:45 AM</a> 
+           </div> 
+          </div> 
+          <div class="comment-content"> 
+           <p>Hi Jeevan,<br> good article. Some remarks:<br> – There is a typing mistake in the tag: Instead of appIcon it must be notification-icon.<br> – In maf-config.xml the skin-family mobileAlta must be version 1.1, it does not work with version 1.3.<br> – Some more information about font-awesome would be could good, e.g. which files have to be copied to the ApplicationContoller.<br> Regards, Horst</p> 
+          </div> 
+          <div class="reply"> 
+           <a rel="nofollow" class="comment-reply-login" href="http://www.ateam-oracle.com/wp-login.php?redirect_to=http%3A%2F%2Fwww.ateam-oracle.com%2Fcustom-components-with-maf%2F">Log in to Reply</a> 
+          </div> </li>
+         <!-- #comment-## --> 
+        </ol>
+       </div> 
+       <div id="respond" class="comment-respond"> 
+        <h3 id="reply-title" class="comment-reply-title">Add Your Comment <small><a rel="nofollow" id="cancel-comment-reply-link" href="/custom-components-with-maf/#respond" style="display:none;">Cancel reply</a></small></h3>
+        <p class="must-log-in">You must be <a href="http://www.ateam-oracle.com/wp-login.php?redirect_to=http%3A%2F%2Fwww.ateam-oracle.com%2Fcustom-components-with-maf%2F">logged in</a> to post a comment.</p> 
+       </div>
+       <!-- #respond --> 
+      </div>
+      <div id="sidebar" class="sidebar widget-area">
+       <div id="widget_linkmasterpro_ri-3" class="widget List of Links">
+        <div class="widget-wrap"> 
+         <h2></h2> 
+         <a href> <img src="/wp-content/uploads/snipit/infograhics_3d.jpg" width="255" border="0"> </a> 
+         <br>
+         <br>
+         <br> 
+        </div>
+       </div> 
+       <div id="search-3" class="widget widget_search">
+        <div class="widget-wrap">
+         <form method="get" class="searchform search-form" action="http://www.ateam-oracle.com/" role="search">
+          <input type="text" value="Search this website…" name="s" class="s search-input" onfocus="if ('Search this website…' === this.value) {this.value = '';}" onblur="if ('' === this.value) {this.value = 'Search this website…';}">
+          <input type="submit" class="searchsubmit search-submit" value="Search">
+         </form>
+        </div>
+       </div> 
+       <div id="addthis-widget-2" class="widget atwidget">
+        <div class="widget-wrap">
+         <h4 class="widget-title widgettitle">Share</h4> 
+         <div class="addthis_toolbox addthis_default_style addthis_32x32_style"> 
+          <a class="addthis_button_preferred_1"></a> 
+          <a class="addthis_button_preferred_2"></a> 
+          <a class="addthis_button_preferred_3"></a> 
+          <a class="addthis_button_preferred_4"></a> 
+          <a class="addthis_button_compact"></a> 
+          <a class="addthis_counter addthis_bubble_style"></a> 
+         </div>
+        </div>
+       </div> 
+       <div id="categories-3" class="widget widget_categories">
+        <div class="widget-wrap">
+         <h4 class="widget-title widgettitle">Categories</h4> 
+         <label class="screen-reader-text" for="cat">Categories</label>
+         <select name="cat" id="cat" class="postform"> <option class="level-0" value="62">-Featured Articles&nbsp;&nbsp;(27)</option> <option class="level-0" value="1160">-Private&nbsp;&nbsp;(2)</option> <option class="level-1" value="1159">&nbsp;&nbsp;&nbsp;Chronicles OLM&nbsp;&nbsp;(1)</option> <option class="level-0" value="146">A-Team Chronicles&nbsp;&nbsp;(262)</option> <option class="level-0" value="61">Cloud&nbsp;&nbsp;(264)</option> <option class="level-1" value="1557">&nbsp;&nbsp;&nbsp;PaaS&nbsp;&nbsp;(213)</option> <option class="level-2" value="1729">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BI Cloud Service&nbsp;&nbsp;(50)</option> <option class="level-2" value="2117">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Content &amp; Experience Cloud&nbsp;&nbsp;(4)</option> <option class="level-2" value="1730">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database as a Service&nbsp;&nbsp;(41)</option> <option class="level-2" value="1731">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database Schema Service&nbsp;&nbsp;(29)</option> <option class="level-2" value="1732">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Developer Cloud Service&nbsp;&nbsp;(12)</option> <option class="level-2" value="1733">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Documents Cloud Service&nbsp;&nbsp;(21)</option> <option class="level-2" value="1734">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Integration Cloud Service&nbsp;&nbsp;(45)</option> <option class="level-2" value="1735">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Java Cloud Service&nbsp;&nbsp;(11)</option> <option class="level-2" value="1736">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Java Cloud Service – SaaS Extension&nbsp;&nbsp;(6)</option> <option class="level-2" value="1737">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Messaging Cloud Service&nbsp;&nbsp;(3)</option> <option class="level-2" value="1738">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mobile Cloud Service&nbsp;&nbsp;(19)</option> <option class="level-2" value="1739">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Node.js&nbsp;&nbsp;(14)</option> <option class="level-2" value="2093">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Oracle Analytics Cloud Service&nbsp;&nbsp;(4)</option> <option class="level-2" value="1910">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Process Cloud Service&nbsp;&nbsp;(13)</option> <option class="level-2" value="1820">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Security&nbsp;&nbsp;(23)</option> <option class="level-1" value="1556">&nbsp;&nbsp;&nbsp;SaaS&nbsp;&nbsp;(84)</option> <option class="level-2" value="1558">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Customer Experience&nbsp;&nbsp;(50)</option> <option class="level-3" value="1740">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Commerce&nbsp;&nbsp;(7)</option> <option class="level-3" value="1742">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Marketing&nbsp;&nbsp;(6)</option> <option class="level-3" value="1743">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sales&nbsp;&nbsp;(27)</option> <option class="level-3" value="1744">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Service&nbsp;&nbsp;(9)</option> <option class="level-2" value="1745">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Enterprise Resource Planning&nbsp;&nbsp;(14)</option> <option class="level-3" value="1746">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Accounting Hub Reporting&nbsp;&nbsp;(2)</option> <option class="level-3" value="1747">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Financials&nbsp;&nbsp;(6)</option> <option class="level-3" value="1748">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Procurement&nbsp;&nbsp;(4)</option> <option class="level-3" value="1749">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Project Financial Management&nbsp;&nbsp;(3)</option> <option class="level-3" value="1750">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Project Management&nbsp;&nbsp;(4)</option> <option class="level-3" value="1751">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Revenue Management&nbsp;&nbsp;(3)</option> <option class="level-2" value="1752">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Human Capital Management&nbsp;&nbsp;(20)</option> <option class="level-3" value="1753">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Global Human Resources&nbsp;&nbsp;(9)</option> <option class="level-3" value="1754">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Talent Management&nbsp;&nbsp;(5)</option> <option class="level-2" value="1755">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Supply Chain Management&nbsp;&nbsp;(11)</option> <option class="level-3" value="1756">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Inventory and Costing&nbsp;&nbsp;(1)</option> <option class="level-3" value="1757">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Product Value Chain&nbsp;&nbsp;(2)</option> <option class="level-3" value="1758">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Transportation and Global Trade Management&nbsp;&nbsp;(1)</option> <option class="level-0" value="52">Cloud Application Foundation&nbsp;&nbsp;(72)</option> <option class="level-1" value="53">&nbsp;&nbsp;&nbsp;Coherence&nbsp;&nbsp;(25)</option> <option class="level-1" value="164">&nbsp;&nbsp;&nbsp;Tuxedo&nbsp;&nbsp;(5)</option> <option class="level-1" value="163">&nbsp;&nbsp;&nbsp;WebLogic Server&nbsp;&nbsp;(39)</option> <option class="level-0" value="1283">Commerce Suite&nbsp;&nbsp;(34)</option> <option class="level-1" value="1284">&nbsp;&nbsp;&nbsp;Commerce&nbsp;&nbsp;(22)</option> <option class="level-1" value="1286">&nbsp;&nbsp;&nbsp;Commerce Experience Manager&nbsp;&nbsp;(2)</option> <option class="level-1" value="1287">&nbsp;&nbsp;&nbsp;Commerce Guided Search&nbsp;&nbsp;(9)</option> <option class="level-1" value="1285">&nbsp;&nbsp;&nbsp;Commerce Merchandising&nbsp;&nbsp;(1)</option> <option class="level-0" value="63">Data Integration&nbsp;&nbsp;(175)</option> <option class="level-1" value="65">&nbsp;&nbsp;&nbsp;GoldenGate&nbsp;&nbsp;(86)</option> <option class="level-2" value="1031">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GoldenGate Best Practices&nbsp;&nbsp;(31)</option> <option class="level-2" value="1033">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GoldenGate Misc. Articles&nbsp;&nbsp;(32)</option> <option class="level-2" value="1032">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GoldenGate Solutions&nbsp;&nbsp;(28)</option> <option class="level-1" value="64">&nbsp;&nbsp;&nbsp;ODI&nbsp;&nbsp;(48)</option> <option class="level-0" value="202">Enterprise Manager&nbsp;&nbsp;(10)</option> <option class="level-0" value="17">Exalogic&nbsp;&nbsp;(51)</option> <option class="level-1" value="18">&nbsp;&nbsp;&nbsp;Architecture&nbsp;&nbsp;(7)</option> <option class="level-1" value="1474">&nbsp;&nbsp;&nbsp;Exalogic A-Team Tools&nbsp;&nbsp;(6)</option> <option class="level-1" value="20">&nbsp;&nbsp;&nbsp;Hardware&nbsp;&nbsp;(12)</option> <option class="level-1" value="19">&nbsp;&nbsp;&nbsp;Operating Systems&nbsp;&nbsp;(18)</option> <option class="level-1" value="186">&nbsp;&nbsp;&nbsp;Software&nbsp;&nbsp;(20)</option> <option class="level-1" value="187">&nbsp;&nbsp;&nbsp;Tips and Tricks&nbsp;&nbsp;(31)</option> <option class="level-0" value="40">Fusion Applications&nbsp;&nbsp;(141)</option> <option class="level-1" value="41">&nbsp;&nbsp;&nbsp;Architecture&nbsp;&nbsp;(29)</option> <option class="level-1" value="42">&nbsp;&nbsp;&nbsp;BI/Reporting&nbsp;&nbsp;(33)</option> <option class="level-1" value="43">&nbsp;&nbsp;&nbsp;Diagnose and Troubleshoot&nbsp;&nbsp;(15)</option> <option class="level-1" value="781">&nbsp;&nbsp;&nbsp;E-Business Suite&nbsp;&nbsp;(9)</option> <option class="level-1" value="44">&nbsp;&nbsp;&nbsp;Extend and Customize&nbsp;&nbsp;(20)</option> <option class="level-1" value="46">&nbsp;&nbsp;&nbsp;Install and Provision&nbsp;&nbsp;(22)</option> <option class="level-1" value="47">&nbsp;&nbsp;&nbsp;Integrate and Co-exist&nbsp;&nbsp;(33)</option> <option class="level-1" value="48">&nbsp;&nbsp;&nbsp;Lifecycle Management&nbsp;&nbsp;(30)</option> <option class="level-1" value="797">&nbsp;&nbsp;&nbsp;PeopleSoft&nbsp;&nbsp;(2)</option> <option class="level-1" value="50">&nbsp;&nbsp;&nbsp;Performance&nbsp;&nbsp;(6)</option> <option class="level-1" value="51">&nbsp;&nbsp;&nbsp;Security&nbsp;&nbsp;(28)</option> <option class="level-0" value="31">Identity Management&nbsp;&nbsp;(346)</option> <option class="level-1" value="32">&nbsp;&nbsp;&nbsp;Access Management&nbsp;&nbsp;(167)</option> <option class="level-1" value="34">&nbsp;&nbsp;&nbsp;Directory Services&nbsp;&nbsp;(29)</option> <option class="level-1" value="1058">&nbsp;&nbsp;&nbsp;General Topics&nbsp;&nbsp;(32)</option> <option class="level-1" value="33">&nbsp;&nbsp;&nbsp;Identity Governance&nbsp;&nbsp;(64)</option> <option class="level-1" value="35">&nbsp;&nbsp;&nbsp;Platform Security&nbsp;&nbsp;(89)</option> <option class="level-0" value="25">Integration&nbsp;&nbsp;(302)</option> <option class="level-1" value="27">&nbsp;&nbsp;&nbsp;AIA&nbsp;&nbsp;(20)</option> <option class="level-1" value="624">&nbsp;&nbsp;&nbsp;BPM Suite&nbsp;&nbsp;(98)</option> <option class="level-1" value="1059">&nbsp;&nbsp;&nbsp;General Topics&nbsp;&nbsp;(9)</option> <option class="level-1" value="1071">&nbsp;&nbsp;&nbsp;JCAPS&nbsp;&nbsp;(1)</option> <option class="level-1" value="1176">&nbsp;&nbsp;&nbsp;Oracle Event Processing&nbsp;&nbsp;(8)</option> <option class="level-1" value="28">&nbsp;&nbsp;&nbsp;Oracle Service Bus&nbsp;&nbsp;(34)</option> <option class="level-1" value="30">&nbsp;&nbsp;&nbsp;SOA Governance&nbsp;&nbsp;(1)</option> <option class="level-1" value="26">&nbsp;&nbsp;&nbsp;SOA Suite&nbsp;&nbsp;(150)</option> <option class="level-2" value="113">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Adapters&nbsp;&nbsp;(20)</option> <option class="level-2" value="115">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;B2B&nbsp;&nbsp;(16)</option> <option class="level-2" value="116">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BAM&nbsp;&nbsp;(6)</option> <option class="level-2" value="112">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;BPEL&nbsp;&nbsp;(36)</option> <option class="level-2" value="114">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Business Rules&nbsp;&nbsp;(5)</option> <option class="level-2" value="810">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Human Workflow&nbsp;&nbsp;(3)</option> <option class="level-2" value="118">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SOA for Healthcare&nbsp;&nbsp;(9)</option> <option class="level-0" value="979">Java&nbsp;&nbsp;(39)</option> <option class="level-0" value="1446">Mobile Platform&nbsp;&nbsp;(34)</option> <option class="level-1" value="1447" selected>&nbsp;&nbsp;&nbsp;MAF&nbsp;&nbsp;(28)</option> <option class="level-1" value="1449">&nbsp;&nbsp;&nbsp;Mobile Security&nbsp;&nbsp;(2)</option> <option class="level-1" value="151">&nbsp;&nbsp;&nbsp;OSB&nbsp;&nbsp;(10)</option> <option class="level-0" value="975">Operating Systems&nbsp;&nbsp;(14)</option> <option class="level-0" value="54">Tools&nbsp;&nbsp;(127)</option> <option class="level-1" value="538">&nbsp;&nbsp;&nbsp;.Net&nbsp;&nbsp;(6)</option> <option class="level-1" value="142">&nbsp;&nbsp;&nbsp;ADF&nbsp;&nbsp;(43)</option> <option class="level-1" value="1023">&nbsp;&nbsp;&nbsp;ADF Mobile&nbsp;&nbsp;(10)</option> <option class="level-1" value="491">&nbsp;&nbsp;&nbsp;APEX&nbsp;&nbsp;(8)</option> <option class="level-1" value="800">&nbsp;&nbsp;&nbsp;Build Automation&nbsp;&nbsp;(22)</option> <option class="level-1" value="56">&nbsp;&nbsp;&nbsp;Diagnostics&nbsp;&nbsp;(16)</option> <option class="level-1" value="143">&nbsp;&nbsp;&nbsp;JDeveloper&nbsp;&nbsp;(15)</option> <option class="level-1" value="1809">&nbsp;&nbsp;&nbsp;Oracle JET&nbsp;&nbsp;(8)</option> <option class="level-1" value="537">&nbsp;&nbsp;&nbsp;Visual Studio&nbsp;&nbsp;(5)</option> <option class="level-0" value="1">Uncategorized&nbsp;&nbsp;(78)</option> <option class="level-0" value="36">WebCenter&nbsp;&nbsp;(218)</option> <option class="level-1" value="39">&nbsp;&nbsp;&nbsp;WebCenter Content&nbsp;&nbsp;(61)</option> <option class="level-1" value="37">&nbsp;&nbsp;&nbsp;WebCenter Portal&nbsp;&nbsp;(102)</option> <option class="level-1" value="38">&nbsp;&nbsp;&nbsp;WebCenter Sites&nbsp;&nbsp;(52)</option> </select> 
+         <script type="text/javascript">
+/* <![CDATA[ */
+(function() {
+	var dropdown = document.getElementById( "cat" );
+	function onCatChange() {
+		if ( dropdown.options[ dropdown.selectedIndex ].value > 0 ) {
+			location.href = "http://www.ateam-oracle.com/?cat=" + dropdown.options[ dropdown.selectedIndex ].value;
+		}
+	}
+	dropdown.onchange = onCatChange;
+})();
+/* ]]> */
+</script> 
+        </div>
+       </div> 
+       <div id="oracle-recent-posts-2" class="widget oracle_widget_recent_entries">
+        <div class="widget-wrap"> 
+         <h4 class="widget-title widgettitle">Recent Posts</h4> 
+         <ul> 
+          <li> 
+           <!--	<a href="http://www.ateam-oracle.com/migrating-ampa-apps-to-oracle-maf-2-3-1-client-data-model/" title="Migrating AMPA Apps to Oracle MAF 2.3.1 Client Data Model">Migrating AMPA Apps to Oracle MAF 2.3.1 Client Data Model</a> --> <a href="http://www.ateam-oracle.com/migrating-ampa-apps-to-oracle-maf-2-3-1-client-data-model/" title="Migrating AMPA Apps to Oracle MAF 2.3.1 Client Data Model">Migrating AMPA Apps to Oracle MAF 2.3.1 Client Data Model</a> </li> 
+          <li> 
+           <!--	<a href="http://www.ateam-oracle.com/some-great-news-for-oracle-maf-developers/" title="Some Great News for Oracle MAF Developers">Some Great News for Oracle MAF Developers</a> --> <a href="http://www.ateam-oracle.com/some-great-news-for-oracle-maf-developers/" title="Some Great News for Oracle MAF Developers">Some Great News for Oracle MAF Developers</a> </li> 
+          <li> 
+           <!--	<a href="http://www.ateam-oracle.com/oracle-mobile-cloud-service-by-example-part-2-create-a-hello-world-mobile-api-in-4-mins/" title="Oracle Mobile Cloud Service by Example Part 2: Create a Hello World Mobile API in 4 mins">Oracle Mobile Cloud Service by Example Part 2: Create a Hello World Mobile API in 4 mins</a> --> <a href="http://www.ateam-oracle.com/oracle-mobile-cloud-service-by-example-part-2-create-a-hello-world-mobile-api-in-4-mins/" title="Oracle Mobile Cloud Service by Example Part 2: Create a Hello World Mobile API in 4 mins">Oracle Mobile Cloud Service by Example Part 2: Create a Hello World Mobile API in 4 mins</a> </li> 
+          <li> 
+           <!--	<a href="http://www.ateam-oracle.com/creating-a-mobile-optimized-rest-api-using-oracle-mobile-cloud-service-part-1-api-design/" title="Creating a Mobile-Optimized REST API Using Oracle Mobile Cloud Service &#8211; Part 1 API Design">Creating a Mobile-Optimized REST API Using Oracle Mobile Cloud Service &#8211; Part 1 API Design</a> --> <a href="http://www.ateam-oracle.com/creating-a-mobile-optimized-rest-api-using-oracle-mobile-cloud-service-part-1-api-design/" title="Creating a Mobile-Optimized REST API Using Oracle Mobile Cloud Service – Part 1 API Design">Creating a Mobile-Optimized REST API Using Oracle Mobile Cloud Service – Part 1 API Design</a> </li> 
+          <li> 
+           <!--	<a href="http://www.ateam-oracle.com/mobile-cloud-service-by-example-part1-defining-and-implementing-a-mock-api/" title="Mobile Cloud Service by Example Part1: Defining and Implementing a Mock API">Mobile Cloud Service by Example Part1: Defining and Implementing a Mock API</a> --> <a href="http://www.ateam-oracle.com/mobile-cloud-service-by-example-part1-defining-and-implementing-a-mock-api/" title="Mobile Cloud Service by Example Part1: Defining and Implementing a Mock API">Mobile Cloud Service by Example Part1: Defining and Implementing a Mock API</a> </li> 
+          <li> 
+           <!--	<a href="http://www.ateam-oracle.com/a-team-mobile-persistence-accelerator-release-12-1-3-2-now-available/" title="A-Team Mobile Persistence Accelerator Release 12.1.3.2 Now Available!">A-Team Mobile Persistence Accelerator Release 12.1.3.2 Now Available!</a> --> <a href="http://www.ateam-oracle.com/a-team-mobile-persistence-accelerator-release-12-1-3-2-now-available/" title="A-Team Mobile Persistence Accelerator Release 12.1.3.2 Now Available!">A-Team Mobile Persistence Accelerator Release 12.1.3.2 Now Available!</a> </li> 
+          <li> 
+           <!--	<a href="http://www.ateam-oracle.com/ibeacon-apps-with-oracle-maf/" title="Building iBeacon based apps with Oracle MAF">Building iBeacon based apps with Oracle MAF</a> --> <a href="http://www.ateam-oracle.com/ibeacon-apps-with-oracle-maf/" title="Building iBeacon based apps with Oracle MAF">Building iBeacon based apps with Oracle MAF</a> </li> 
+         </ul> 
+        </div>
+       </div> 
+       <div id="archives-4" class="widget widget_archive">
+        <div class="widget-wrap">
+         <h4 class="widget-title widgettitle">Archives</h4> 
+         <label class="screen-reader-text" for="archives-dropdown-4">Archives</label> 
+         <select id="archives-dropdown-4" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;"> <option value="">Select Month</option> <option value="http://www.ateam-oracle.com/2017/10/"> October 2017 &nbsp;(2)</option> <option value="http://www.ateam-oracle.com/2017/09/"> September 2017 &nbsp;(11)</option> <option value="http://www.ateam-oracle.com/2017/08/"> August 2017 &nbsp;(14)</option> <option value="http://www.ateam-oracle.com/2017/07/"> July 2017 &nbsp;(10)</option> <option value="http://www.ateam-oracle.com/2017/06/"> June 2017 &nbsp;(8)</option> <option value="http://www.ateam-oracle.com/2017/05/"> May 2017 &nbsp;(21)</option> <option value="http://www.ateam-oracle.com/2017/04/"> April 2017 &nbsp;(11)</option> <option value="http://www.ateam-oracle.com/2017/03/"> March 2017 &nbsp;(10)</option> <option value="http://www.ateam-oracle.com/2017/02/"> February 2017 &nbsp;(7)</option> <option value="http://www.ateam-oracle.com/2017/01/"> January 2017 &nbsp;(17)</option> <option value="http://www.ateam-oracle.com/2016/12/"> December 2016 &nbsp;(12)</option> <option value="http://www.ateam-oracle.com/2016/11/"> November 2016 &nbsp;(18)</option> <option value="http://www.ateam-oracle.com/2016/10/"> October 2016 &nbsp;(16)</option> <option value="http://www.ateam-oracle.com/2016/09/"> September 2016 &nbsp;(8)</option> <option value="http://www.ateam-oracle.com/2016/08/"> August 2016 &nbsp;(9)</option> <option value="http://www.ateam-oracle.com/2016/07/"> July 2016 &nbsp;(9)</option> <option value="http://www.ateam-oracle.com/2016/06/"> June 2016 &nbsp;(11)</option> <option value="http://www.ateam-oracle.com/2016/05/"> May 2016 &nbsp;(16)</option> <option value="http://www.ateam-oracle.com/2016/04/"> April 2016 &nbsp;(13)</option> <option value="http://www.ateam-oracle.com/2016/03/"> March 2016 &nbsp;(14)</option> <option value="http://www.ateam-oracle.com/2016/02/"> February 2016 &nbsp;(15)</option> <option value="http://www.ateam-oracle.com/2016/01/"> January 2016 &nbsp;(10)</option> <option value="http://www.ateam-oracle.com/2015/12/"> December 2015 &nbsp;(9)</option> <option value="http://www.ateam-oracle.com/2015/11/"> November 2015 &nbsp;(13)</option> <option value="http://www.ateam-oracle.com/2015/10/"> October 2015 &nbsp;(5)</option> <option value="http://www.ateam-oracle.com/2015/09/"> September 2015 &nbsp;(12)</option> <option value="http://www.ateam-oracle.com/2015/08/"> August 2015 &nbsp;(17)</option> <option value="http://www.ateam-oracle.com/2015/07/"> July 2015 &nbsp;(8)</option> <option value="http://www.ateam-oracle.com/2015/06/"> June 2015 &nbsp;(13)</option> <option value="http://www.ateam-oracle.com/2015/05/"> May 2015 &nbsp;(7)</option> <option value="http://www.ateam-oracle.com/2015/04/"> April 2015 &nbsp;(17)</option> <option value="http://www.ateam-oracle.com/2015/03/"> March 2015 &nbsp;(10)</option> <option value="http://www.ateam-oracle.com/2015/02/"> February 2015 &nbsp;(10)</option> <option value="http://www.ateam-oracle.com/2015/01/"> January 2015 &nbsp;(14)</option> <option value="http://www.ateam-oracle.com/2014/12/"> December 2014 &nbsp;(14)</option> <option value="http://www.ateam-oracle.com/2014/11/"> November 2014 &nbsp;(17)</option> <option value="http://www.ateam-oracle.com/2014/10/"> October 2014 &nbsp;(21)</option> <option value="http://www.ateam-oracle.com/2014/09/"> September 2014 &nbsp;(13)</option> <option value="http://www.ateam-oracle.com/2014/08/"> August 2014 &nbsp;(16)</option> <option value="http://www.ateam-oracle.com/2014/07/"> July 2014 &nbsp;(18)</option> <option value="http://www.ateam-oracle.com/2014/06/"> June 2014 &nbsp;(19)</option> <option value="http://www.ateam-oracle.com/2014/05/"> May 2014 &nbsp;(24)</option> <option value="http://www.ateam-oracle.com/2014/04/"> April 2014 &nbsp;(14)</option> <option value="http://www.ateam-oracle.com/2014/03/"> March 2014 &nbsp;(12)</option> <option value="http://www.ateam-oracle.com/2014/02/"> February 2014 &nbsp;(13)</option> <option value="http://www.ateam-oracle.com/2014/01/"> January 2014 &nbsp;(15)</option> <option value="http://www.ateam-oracle.com/2013/12/"> December 2013 &nbsp;(14)</option> <option value="http://www.ateam-oracle.com/2013/11/"> November 2013 &nbsp;(8)</option> <option value="http://www.ateam-oracle.com/2013/10/"> October 2013 &nbsp;(12)</option> <option value="http://www.ateam-oracle.com/2013/09/"> September 2013 &nbsp;(24)</option> <option value="http://www.ateam-oracle.com/2013/08/"> August 2013 &nbsp;(29)</option> <option value="http://www.ateam-oracle.com/2013/07/"> July 2013 &nbsp;(29)</option> <option value="http://www.ateam-oracle.com/2013/06/"> June 2013 &nbsp;(13)</option> <option value="http://www.ateam-oracle.com/2013/05/"> May 2013 &nbsp;(20)</option> <option value="http://www.ateam-oracle.com/2013/04/"> April 2013 &nbsp;(35)</option> <option value="http://www.ateam-oracle.com/2013/03/"> March 2013 &nbsp;(15)</option> <option value="http://www.ateam-oracle.com/2013/02/"> February 2013 &nbsp;(16)</option> <option value="http://www.ateam-oracle.com/2013/01/"> January 2013 &nbsp;(21)</option> <option value="http://www.ateam-oracle.com/2012/12/"> December 2012 &nbsp;(21)</option> <option value="http://www.ateam-oracle.com/2012/11/"> November 2012 &nbsp;(8)</option> <option value="http://www.ateam-oracle.com/2012/10/"> October 2012 &nbsp;(12)</option> <option value="http://www.ateam-oracle.com/2012/09/"> September 2012 &nbsp;(22)</option> <option value="http://www.ateam-oracle.com/2012/08/"> August 2012 &nbsp;(19)</option> <option value="http://www.ateam-oracle.com/2012/07/"> July 2012 &nbsp;(21)</option> <option value="http://www.ateam-oracle.com/2012/06/"> June 2012 &nbsp;(32)</option> <option value="http://www.ateam-oracle.com/2012/05/"> May 2012 &nbsp;(20)</option> <option value="http://www.ateam-oracle.com/2012/04/"> April 2012 &nbsp;(18)</option> <option value="http://www.ateam-oracle.com/2012/03/"> March 2012 &nbsp;(30)</option> <option value="http://www.ateam-oracle.com/2012/02/"> February 2012 &nbsp;(42)</option> <option value="http://www.ateam-oracle.com/2012/01/"> January 2012 &nbsp;(17)</option> <option value="http://www.ateam-oracle.com/2011/12/"> December 2011 &nbsp;(11)</option> <option value="http://www.ateam-oracle.com/2011/11/"> November 2011 &nbsp;(22)</option> <option value="http://www.ateam-oracle.com/2011/10/"> October 2011 &nbsp;(13)</option> <option value="http://www.ateam-oracle.com/2011/09/"> September 2011 &nbsp;(18)</option> <option value="http://www.ateam-oracle.com/2011/08/"> August 2011 &nbsp;(24)</option> <option value="http://www.ateam-oracle.com/2011/07/"> July 2011 &nbsp;(11)</option> <option value="http://www.ateam-oracle.com/2011/06/"> June 2011 &nbsp;(15)</option> <option value="http://www.ateam-oracle.com/2011/05/"> May 2011 &nbsp;(6)</option> <option value="http://www.ateam-oracle.com/2011/04/"> April 2011 &nbsp;(17)</option> <option value="http://www.ateam-oracle.com/2011/03/"> March 2011 &nbsp;(27)</option> <option value="http://www.ateam-oracle.com/2011/02/"> February 2011 &nbsp;(10)</option> <option value="http://www.ateam-oracle.com/2011/01/"> January 2011 &nbsp;(20)</option> <option value="http://www.ateam-oracle.com/2010/12/"> December 2010 &nbsp;(10)</option> <option value="http://www.ateam-oracle.com/2010/11/"> November 2010 &nbsp;(2)</option> <option value="http://www.ateam-oracle.com/2010/10/"> October 2010 &nbsp;(8)</option> <option value="http://www.ateam-oracle.com/2010/09/"> September 2010 &nbsp;(6)</option> <option value="http://www.ateam-oracle.com/2010/08/"> August 2010 &nbsp;(8)</option> <option value="http://www.ateam-oracle.com/2010/07/"> July 2010 &nbsp;(7)</option> <option value="http://www.ateam-oracle.com/2010/06/"> June 2010 &nbsp;(8)</option> <option value="http://www.ateam-oracle.com/2010/05/"> May 2010 &nbsp;(10)</option> <option value="http://www.ateam-oracle.com/2010/04/"> April 2010 &nbsp;(5)</option> <option value="http://www.ateam-oracle.com/2010/03/"> March 2010 &nbsp;(6)</option> <option value="http://www.ateam-oracle.com/2010/02/"> February 2010 &nbsp;(7)</option> <option value="http://www.ateam-oracle.com/2010/01/"> January 2010 &nbsp;(6)</option> <option value="http://www.ateam-oracle.com/2009/12/"> December 2009 &nbsp;(4)</option> <option value="http://www.ateam-oracle.com/2009/11/"> November 2009 &nbsp;(2)</option> <option value="http://www.ateam-oracle.com/2009/10/"> October 2009 &nbsp;(8)</option> <option value="http://www.ateam-oracle.com/2009/09/"> September 2009 &nbsp;(7)</option> <option value="http://www.ateam-oracle.com/2009/08/"> August 2009 &nbsp;(2)</option> <option value="http://www.ateam-oracle.com/2009/07/"> July 2009 &nbsp;(8)</option> <option value="http://www.ateam-oracle.com/2009/06/"> June 2009 &nbsp;(5)</option> <option value="http://www.ateam-oracle.com/2009/05/"> May 2009 &nbsp;(3)</option> <option value="http://www.ateam-oracle.com/2009/04/"> April 2009 &nbsp;(5)</option> <option value="http://www.ateam-oracle.com/2008/12/"> December 2008 &nbsp;(1)</option> <option value="http://www.ateam-oracle.com/2008/10/"> October 2008 &nbsp;(1)</option> </select> 
+        </div>
+       </div> 
+      </div>
+     </div>
+    </div>
+    <!-- end .wrap -->
+   </div>
+   <!-- end #inner -->
+   <div id="footer-widgets-section">
+    <div id="footer-widgets" class="footer-widgets">
+     <div class="wrap">
+      <div class="wrap">
+       <div class="footer-widgets-1 widget-area">
+        <div id="text-7" class="widget widget_text">
+         <div class="widget-wrap"> 
+          <div class="textwidget">
+           <img src="http://www.ateam-oracle.com/wp-content/themes/eleven40/images/logo-footer.jpg" title="oracle">
+          </div> 
+         </div>
+        </div> 
+       </div>
+       <div class="footer-widgets-2 widget-area"></div>
+       <div class="footer-widgets-3 widget-area"></div>
+      </div>
+     </div>
+    </div>
+    <div id="footer" class="footer">
+     <div class="wrap">
+      <div id="gwfoot-footer-one-area" class="gwfoot-footer-one-one-third">
+       <div id="text-4" class="gwfoot-footer-one widget-area widget_text"> 
+        <div class="textwidget">
+         <ul class="social-hub"> 
+          <li><strong>Social</strong></li> 
+          <li><a class="Facebook" target="_blank" href="http://bit.ly/otnarchfb">Facebook</a></li> 
+          <li><a class="blog" target="_blank" href="http://bit.ly/otnarchblog">Arch Beat</a></li> 
+          <li><a class="twitter" target="_blank" href="http://bit.ly/otnarchtw">Twitter</a></li> 
+          <li><a class="Linkedin" target="_blank" href="http://www.linkedin.com/groups?gid=1874684">OTN Group</a></li> 
+          <li><a class="Linkedin" target="_blank" href="http://www.linkedin.com/groups?gid=142076">FMW Group</a></li> 
+         </ul>
+        </div> 
+       </div>
+      </div>
+      <!-- end #gwfoot-footer-one-area -->
+      <div id="gwfoot-footer-two-area" class="gwfoot-footer-two-two-thirds">
+       <div id="nav_menu-4" class="gwfoot-footer-two widget-area widget_nav_menu">
+        <div class="menu-footer-menu-container">
+         <ul id="menu-footer-menu" class="menu">
+          <li id="menu-item-13477" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-13477"><a href="http://www.oracle.com/us/legal/copyright/index.html">Copyright Information</a></li> 
+          <li id="menu-item-15699" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-15699"><a href="http://www.oracle.com/us/legal/privacy/index.html">Privacy at Oracle</a></li> 
+          <li id="menu-item-13476" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-13476"><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of use</a></li> 
+          <li id="menu-item-15756" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-15756"><a href="http://www.ateam-oracle.com/the-a-team/">About the A-Team</a></li> 
+         </ul>
+        </div>
+       </div>
+      </div>
+      <!-- end #gwfoot-footer-two-area -->
+     </div>
+    </div>
+    <div id="gwfoot-footer-disclaimer-area">
+     <div class="gwfoot-footer-disclaimer-content">
+      <div id="text-10" class="gwfoot-footer-disclaimer widget-area widget_text"> 
+       <div class="textwidget">
+        <div class="wrap">
+         All content and s/w code on this site are offered without any warranty, or promise of operational quality or functionality.
+        </div>
+       </div> 
+      </div>
+     </div>
+     <!-- end .gwfoot-footer-disclaimer-content -->
+    </div>
+    <!-- end #gwfoot-footer-disclaimer-area -->
+   </div>
+   <!-- end #wrap --> 
+   <!-- HITSTEPS TRACKING CODE v5.30 - DO NOT CHANGE --> 
+   <noscript>
+    <a href="https://www.hitsteps.com/"><img src="https://log.hitsteps.com/track.php?mode=img&amp;code=2295eb6bee4d4a15132b865dad767f54&amp;title=Developing+Custom+Components+with+Oracle+Mobile+Application+Framework" alt="Tracking for non-javascript browsers by Hitsteps real time web analytics" border="0" width="1" height="1"></a>
+   </noscript> 
+   <!-- HITSTEPS TRACKING CODE - Footer Code - DO NOT CHANGE --> 
+   <!-- WP SyntaxHighlighter Ver.1.7.3 Begin --> 
+   <script type="text/javascript" src="http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shCore.js?ver=3.0"></script> 
+   <script type="text/javascript" src="http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shAutoloader.js?ver=3.0"></script> 
+   <script type="text/javascript" src="http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushXml.js?ver=3.0"></script> 
+   <script type="text/javascript">//<![CDATA[
+	SyntaxHighlighter.autoloader(
+	"applescript	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushAppleScript.js?ver=3.0"
+	,"as3 actionscript3	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushAS3.js?ver=3.0"
+	,"bash shell	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushBash.js?ver=3.0"
+	,"cf coldfusion	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushColdFusion.js?ver=3.0"
+	,"cpp c	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushCpp.js?ver=3.0"
+	,"c# c-sharp csharp	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushCSharp.js?ver=3.0"
+	,"css	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushCss.js?ver=3.0"
+	,"delphi pas pascal	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushDelphi.js?ver=3.0"
+	,"diff patch	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushDiff.js?ver=3.0"
+	,"erl erlang	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushErlang.js?ver=3.0"
+	,"groovy	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushGroovy.js?ver=3.0"
+	,"java	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJava.js?ver=3.0"
+	,"jfx javafx	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJavaFX.js?ver=3.0"
+	,"js jscript javascript	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushJScript.js?ver=3.0"
+	,"perl pl	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPerl.js?ver=3.0"
+	,"php	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPhp.js?ver=3.0"
+	,"plain text	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPlain.js?ver=3.0"
+	,"ps powershell	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPowerShell.js?ver=3.0"
+	,"py python	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushPython.js?ver=3.0"
+	,"rails ror ruby rb	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushRuby.js?ver=3.0"
+	,"sass scss	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushSass.js?ver=3.0"
+	,"scala	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushScala.js?ver=3.0"
+	,"sql	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushSql.js?ver=3.0"
+	,"vb vbnet	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushVb.js?ver=3.0"
+	,"xml xhtml xslt html	http://www.ateam-oracle.com/wp-content/plugins/wp-syntaxhighlighter/syntaxhighlighter3/scripts/shBrushXml.js?ver=3.0"
+	);
+	SyntaxHighlighter.defaults['auto-links'] = true;
+	SyntaxHighlighter.defaults['quick-code'] = true;
+	SyntaxHighlighter.defaults['title'] = '';
+	SyntaxHighlighter.defaults['class-name'] = 'notranslate';
+	SyntaxHighlighter.defaults['collapse'] = false;
+	SyntaxHighlighter.defaults['first-line'] = 1;
+	SyntaxHighlighter.defaults['gutter'] = true;
+	SyntaxHighlighter.defaults['pad-line-numbers'] = false;
+	SyntaxHighlighter.defaults['smart-tabs'] = true;
+	SyntaxHighlighter.defaults['tab-size'] = 4;
+	SyntaxHighlighter.defaults['toolbar'] = true;
+	SyntaxHighlighter.config.strings.expandSource = '+ expand source';
+	SyntaxHighlighter.config.strings.help = '?';
+	SyntaxHighlighter.config.strings.alert = 'SyntaxHighlighter\n\n';
+	SyntaxHighlighter.config.strings.noBrush = "Can't find brush for: ";
+	SyntaxHighlighter.config.strings.brushNotHtmlScript = "Brush wasn't configured for html-script option: ";
+	SyntaxHighlighter.all();
+	
+//]]></script> 
+   <!-- WP SyntaxHighlighter Ver.1.7.3 End --> 
+   <script data-cfasync="false" type="text/javascript">
+var addthis_config = {"data_track_clickback":false,"ui_atversion":300,"ignore_server_config":true};
+var addthis_share = {};
+</script> 
+   <!-- AddThis Settings Begin --> 
+   <script data-cfasync="false" type="text/javascript">
+                    var addthis_product = "wpp-5.3.2";
+                    var wp_product_version = "wpp-5.3.2";
+                    var wp_blog_version = "4.5.1";
+                    var addthis_plugin_info = {"info_status":"enabled","cms_name":"WordPress","cms_version":"4.5.1","plugin_name":"Share Buttons by AddThis","plugin_version":"5.3.2","anonymous_profile_id":"wp-d9090fa5d9e7d6dd8cc6856e26c44152","plugin_mode":"WordPress","select_prefs":{"addthis_per_post_enabled":true,"addthis_above_enabled":false,"addthis_below_enabled":true,"addthis_sidebar_enabled":false,"addthis_mobile_toolbar_enabled":false,"addthis_above_showon_home":false,"addthis_below_showon_home":false,"addthis_above_showon_pages":false,"addthis_below_showon_pages":false,"addthis_above_showon_categories":false,"addthis_below_showon_categories":false,"addthis_above_showon_archives":false,"addthis_below_showon_archives":false,"addthis_above_showon_posts":true,"addthis_above_showon_excerpts":true,"addthis_below_showon_posts":true,"addthis_below_showon_excerpts":true,"addthis_sidebar_showon_home":true,"addthis_sidebar_showon_posts":true,"addthis_sidebar_showon_pages":true,"addthis_sidebar_showon_archives":true,"addthis_sidebar_showon_categories":true,"addthis_mobile_toolbar_showon_home":true,"addthis_mobile_toolbar_showon_posts":true,"addthis_mobile_toolbar_showon_pages":true,"addthis_mobile_toolbar_showon_archives":true,"addthis_mobile_toolbar_showon_categories":true,"sharing_enabled_on_post_via_metabox":true},"page_info":{"template":"posts","post_type":""}};
+                    if (typeof(addthis_config) == "undefined") {
+                        var addthis_config = {"data_track_clickback":false,"ui_atversion":300,"ignore_server_config":true};
+                    }
+                    if (typeof(addthis_share) == "undefined") {
+                        var addthis_share = {};
+                    }
+                    if (typeof(addthis_layers) == "undefined") {
+                        var addthis_layers = {};
+                    }
+                </script> 
+   <script data-cfasync="false" type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-536a4fa602eb1e12 ">
+                </script> 
+   <script data-cfasync="false" type="text/javascript">
+                    (function() {
+                        var at_interval = setInterval(function () {
+                            if(window.addthis) {
+                                clearInterval(at_interval);
+                                addthis.layers(addthis_layers);
+                            }
+                        },1000)
+                    }());
+                </script> 
+   <link rel="stylesheet" id="addthis_output-css" href="http://www.ateam-oracle.com/wp-content/plugins/addthis/css/output.css?ver=4.5.1" type="text/css" media="all"> 
+   <script type="text/javascript" src="http://www.ateam-oracle.com/wp-content/plugins/wp-spamshield/js/jscripts-ftr-min.js"></script> 
+   <script type="text/javascript" src="http://www.ateam-oracle.com/wp-includes/js/comment-reply.min.js?ver=4.5.1"></script> 
+   <script type="text/javascript" src="http://www.ateam-oracle.com/wp-content/themes/genesis/lib/js/menu/superfish.min.js?ver=1.7.4"></script> 
+   <script type="text/javascript" src="http://www.ateam-oracle.com/wp-content/themes/genesis/lib/js/menu/superfish.args.min.js?ver=2.1.2"></script> 
+   <script type="text/javascript" src="http://www.ateam-oracle.com/wp-content/themes/genesis/lib/js/menu/superfish.compat.min.js?ver=2.1.2"></script> 
+   <script type="text/javascript" src="http://www.ateam-oracle.com/wp-includes/js/wp-embed.min.js?ver=4.5.1"></script> 
+   <!--wp_footer-->   
+  </div>
+ </body>
+</html>
