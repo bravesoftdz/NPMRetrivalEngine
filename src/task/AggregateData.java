@@ -169,7 +169,7 @@ public class AggregateData {
 		//searchers.add(lucene);
 		//searchers.add(google);
 		searchers.add(npm);
-		//searchers.add(npmsearch);
+		searchers.add(npmsearch);
 		searchers.add(new MetaSearcherImp(externalRank, filterGoogleRankAgregator, max_results));
 		
 		List<Aggregator> aggregators = new ArrayList<Aggregator>();
@@ -188,7 +188,7 @@ public class AggregateData {
 		Aggregator m4 = new M4();
 		aggregators.add(m4);
 		
-		Double[] weights_borda = {0.50, 0.00, 0.50};
+		Double[] weights_borda = {0.33, 0.33, 0.33};
 		Aggregator w_borda = new WeightedBordaFuse(Arrays.asList(weights_borda));
 		aggregators.add(w_borda);
 		

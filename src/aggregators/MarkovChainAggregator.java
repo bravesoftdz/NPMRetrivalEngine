@@ -15,13 +15,17 @@ public abstract class MarkovChainAggregator implements Aggregator{
 	public Ranking aggregate(List<Ranking> rankings) {
 		List<RankedItem> uniqueItems = getUniqueItems(rankings);
 	    int N = uniqueItems.size();
-	    double[][] transition = getTransitionMatrix(uniqueItems,rankings);
-	    //checkTransitionMatrix(transition, N);
-		Matrix stationaryMatrix = computeUsingXIterations(N, transition, 50);	
-        for(int i = 0; i<stationaryMatrix.getRowDimension(); i++){
-        	System.out.println(stationaryMatrix.get(i, 0));	
-        }
-		return getRankingFromMatrix(uniqueItems, stationaryMatrix);
+	    if(N>0){
+		    double[][] transition = getTransitionMatrix(uniqueItems,rankings);
+		    //checkTransitionMatrix(transition, N);
+			Matrix stationaryMatrix = computeUsingXIterations(N, transition, 50);	
+	        for(int i = 0; i<stationaryMatrix.getRowDimension(); i++){
+	        	System.out.println(stationaryMatrix.get(i, 0));	
+	        }
+			return getRankingFromMatrix(uniqueItems, stationaryMatrix);
+	    }else{
+	    	return new Ranking(uniqueItems);
+	    }
 	}
 	
 	private Matrix computeMatrix(int N, double[][] transition) {
