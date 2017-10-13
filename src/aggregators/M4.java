@@ -28,7 +28,7 @@ public class M4 extends MarkovChainAggregator {
 				int mayor = 0;
 				int minor = 0;
 				for(Ranking r:rankings){
-					if(!uniqueItems.get(P).equals(uniqueItems.get(Q))&&r.contains(uniqueItems.get(P)) && r.contains(uniqueItems.get(Q))){
+					if(!uniqueItems.get(P).equals(uniqueItems.get(Q)) && r.contains(uniqueItems.get(P)) && r.contains(uniqueItems.get(Q))){
 						if(uniqueItems.get(P).getScore()<uniqueItems.get(Q).getScore()){
 							mayor++;
 						}else{
@@ -36,7 +36,7 @@ public class M4 extends MarkovChainAggregator {
 						}
 					}
 				}
-				if(mayor<minor){
+				if(mayor>minor){
 					if(higherRanked.get(uniqueItems.get(Q).getName())==null){
 						higherRanked.put(uniqueItems.get(Q).getName(),1.0);
 					}else{

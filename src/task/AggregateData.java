@@ -188,7 +188,7 @@ public class AggregateData {
 		Aggregator m4 = new M4();
 		aggregators.add(m4);
 		
-		Double[] weights_borda = {0.33, 0.33, 0.33};
+		Double[] weights_borda = {0.50, 0.00, 0.50};
 		Aggregator w_borda = new WeightedBordaFuse(Arrays.asList(weights_borda));
 		aggregators.add(w_borda);
 		
