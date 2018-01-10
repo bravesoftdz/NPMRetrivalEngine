@@ -116,17 +116,21 @@ public class AggregateData {
 
 		}*/
 		
-		
+		/**
+		 * External Searchers
+		 */
 		List<Searcher> filters = new ArrayList<Searcher>();
-		filters.add(lucene);
-		filters.add(npm);	
+		filters.add(lucene);	
+		filters.add(npm);
+		
+		
 		List<Searcher> externalRank = new ArrayList<Searcher>();
 		externalRank.add(google);
 		externalRank.add(google2);
 		externalRank.add(google3);
-		externalRank.add(bing);
-		externalRank.add(bing2);
-		externalRank.add(bing3);
+//		externalRank.add(bing);
+//		externalRank.add(bing2);
+//		externalRank.add(bing3);
 		
 		FilterExternalRankAgregator filterGoogleRankAgregator = new FilterExternalRankAgregator();
 		filterGoogleRankAgregator.setName(filterGoogleRankAgregator.getPrefix()+externalRank.get(0).getId());
@@ -160,6 +164,45 @@ public class AggregateData {
 
 		}		
 		
+		List<Searcher> externalRank2 = new ArrayList<Searcher>();
+//		externalRank.add(google);
+//		externalRank.add(google2);
+//		externalRank.add(google3);
+		externalRank2.add(bing);
+		externalRank2.add(bing2);
+		externalRank2.add(bing3);
+		
+		FilterExternalRankAgregator filterBingRankAgregator = new FilterExternalRankAgregator();
+		filterBingRankAgregator.setName(filterBingRankAgregator.getPrefix()+externalRank2.get(0).getId());
+
+		for (int i = 0 ; i < max_queries ; i++) {
+
+			String query = QueryManager.getInstance().getQueries().get(i);
+
+			System.out.println("Query "+ query);
+			
+			List<Ranking> rank_filters = new ArrayList<Ranking>();
+			for(Searcher filter:filters){
+				Ranking r = CacheRankingManager.getInstance().loadRankingFromCache(filter, query)!=null?
+						CacheRankingManager.getInstance().loadRankingFromCache(filter, query):
+							new Ranking(new ArrayList<RankedItem>());;
+				rank_filters.add(r);
+			}
+			
+			filterBingRankAgregator.setFilters(rank_filters);
+			
+			MetaSearcher meta = new MetaSearcherImp(externalRank2, filterBingRankAgregator, max_results);
+			
+			Ranking ranking = null; //CacheRankingManager.getInstance().loadRankingFromCache(meta, query);
+			if (ranking == null) {
+				meta.acquireData(query, proxy);
+				ranking = meta.processData(null);//TODO data null
+				CacheRankingManager.getInstance().saveRankingInCache(ranking, meta, query);
+			}
+			
+			System.out.println();
+
+		}	
 		
 		/**
 		 * Aggregators
@@ -171,6 +214,7 @@ public class AggregateData {
 		searchers.add(npm);
 		searchers.add(npmsearch);
 		searchers.add(new MetaSearcherImp(externalRank, filterGoogleRankAgregator, max_results));
+		searchers.add(new MetaSearcherImp(externalRank2, filterBingRankAgregator, max_results));
 		
 		List<Aggregator> aggregators = new ArrayList<Aggregator>();
 
@@ -188,7 +232,7 @@ public class AggregateData {
 		Aggregator m4 = new M4();
 		aggregators.add(m4);
 		
-		Double[] weights_borda = {0.50, 0.00, 0.50};
+		Double[] weights_borda = {0.50, 0.00, 0.25, 0.25};
 		Aggregator w_borda = new WeightedBordaFuse(Arrays.asList(weights_borda));
 		aggregators.add(w_borda);
 		

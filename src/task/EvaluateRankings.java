@@ -18,7 +18,8 @@ public class EvaluateRankings {
 	public static final String EXT = ".txt";
 	
 	public static String[] folders = { "npmjs.com_optimal", "npmsearch.com", 
-			"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedBordaFuse","Filter_google.com_hyp_match"};
+			"M1","M2","M3","M4","BordaFuse","Cordorcet","BoostedBordaFuse","WeightedBordaFuse",
+			"Filter_google.com_hyp_match", "Filter_bing.com_hyp_match"};
 
 	public static int max_queries = Integer.valueOf(ConfigManager.getInstance().getProperty("max_queries"));
 	public static int max_position = Integer.valueOf(ConfigManager.getInstance().getProperty("top_results"));
